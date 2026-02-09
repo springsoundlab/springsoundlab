@@ -3,206 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spring Sound Lab — Audio Engineering</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <title>SPRING SOUND LAB | EXPERIMENTAL AUDIO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #f5f5f5; /* Светло-серый, "бумажный" фон */
-            --text: #000000;
-            --accent: #ff3b30; /* Единственный яркий акцент — швейцарский красный */
-            --border: #d1d1d1;
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #050508;
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; scroll-behavior: smooth; }
         body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            line-height: 1.4;
+            margin: 0; padding: 0; 
+            background: var(--bg-dark); 
+            color: #fff; 
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
         }
 
-        /* Шапка в стиле технического чертежа */
+        /* Анимированный фон Лаборатории */
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+        .grid-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
         header {
-            padding: 100px 40px;
-            border-bottom: 1px solid var(--border);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: end;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle, rgba(188, 19, 254, 0.1) 0%, transparent 70%);
+        }
+
+        .lab-tag {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            opacity: 0.8;
         }
 
         h1 {
-            font-size: clamp(3rem, 10vw, 8rem);
-            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 5rem);
             margin: 0;
-            line-height: 0.9;
-            text-transform: uppercase;
-            letter-spacing: -0.05em;
+            background: linear-gradient(90deg, #fff, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.3));
         }
 
-        .header-info {
-            text-align: right;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
+        .container { padding: 100px 20px; max-width: 1200px; margin: auto; }
 
-        .container { padding: 0 40px; }
-
-        /* Сетка услуг — идеальные пропорции */
-        .pricing-section {
+        /* Секция пакетов как модулей консоли */
+        .module-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            border-left: 1px solid var(--border);
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
         }
 
-        .package {
-            padding: 60px 40px;
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            transition: background 0.3s;
+        .module {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2px; /* Острые углы как у приборов */
+            padding: 50px 30px;
+            position: relative;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
-        .package:hover { background: #fff; }
-
-        .package-num { font-weight: 700; font-size: 0.8rem; margin-bottom: 40px; }
-
-        h3 { 
-            font-size: 1.5rem; 
-            font-weight: 700; 
-            margin: 0 0 20px 0; 
-            text-transform: uppercase; 
+        .module::before {
+            content: "";
+            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: var(--neon-blue);
+            transform: scaleX(0); transition: 0.4s;
         }
 
-        .price { 
-            font-size: 3rem; 
-            font-weight: 400; 
-            margin-bottom: 40px; 
-            letter-spacing: -0.02em;
+        .module:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--neon-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
         }
 
-        .features { 
-            list-style: none; 
-            padding: 0; 
-            margin: 0 0 60px 0; 
-            flex-grow: 1; 
+        .module:hover::before { transform: scaleX(1); }
+
+        .module h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            color: var(--neon-blue);
         }
 
-        .features li { 
-            padding: 10px 0; 
-            border-top: 1px solid var(--border);
-            font-size: 0.9rem;
-            text-transform: uppercase;
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            font-family: 'Orbitron';
+            margin-bottom: 10px;
+        }
+        .price span { font-size: 1rem; opacity: 0.5; }
+
+        .specs {
+            list-style: none; padding: 0; margin: 40px 0;
+            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;
+            color: #aaa;
         }
 
-        .btn {
-            display: inline-block;
-            padding: 20px;
-            background: var(--text);
+        .specs li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between;
+        }
+
+        .specs li span { color: var(--neon-purple); }
+
+        .btn-lab {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--neon-blue);
+            background: transparent;
             color: #fff;
+            text-transform: uppercase;
+            font-family: 'Orbitron';
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.3s;
             text-decoration: none;
             text-align: center;
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            transition: 0.2s;
         }
 
-        .btn:hover { background: var(--accent); }
+        .btn-lab:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
 
-        /* Футер */
         footer {
-            padding: 100px 40px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #666;
-        }
-
-        .footer-brand { color: var(--text); font-weight: 700; }
-
-        @media (max-width: 768px) {
-            header { grid-template-columns: 1fr; gap: 40px; padding: 60px 20px; }
-            h1 { font-size: 4rem; }
-            .header-info { text-align: left; }
-            .container { padding: 0 20px; }
+            padding: 50px;
+            text-align: center;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: #444;
+            border-top: 1px solid #111;
         }
     </style>
 </head>
 <body>
 
+<div class="grid-overlay"></div>
+
 <header>
-    <h1>SPRING<br>SOUND LAB</h1>
-    <div class="header-info">
-        Professional Audio Services<br>
-        Est. 2026<br>
-        Location: Digital / Hybrid
-    </div>
+    <div class="lab-tag">Audio Research & Development</div>
+    <h1>SPRING SOUND LAB</h1>
+    <div style="margin-top: 20px; font-size: 0.8rem; color: #666; letter-spacing: 4px;">SYSTEM STATUS: ONLINE</div>
 </header>
 
 <div class="container">
-    <section class="pricing-section">
+    <div class="module-grid">
         
-        <div class="package">
-            <div class="package-num">01 / AUDIO</div>
+        <div class="module">
             <h3>START EDITION</h3>
-            <div class="price">3 500 ₽</div>
-            <ul class="features">
-                <li>1.5 часа записи вокала</li>
-                <li>Частотная коррекция</li>
-                <li>Pitch Correction (Auto)</li>
-                <li>Базовое сведение</li>
+            <div class="price">3 500<span>₽</span></div>
+            <ul class="specs">
+                <li>Recording <span>1.5H</span></li>
+                <li>Pitch Correction <span>Auto</span></li>
+                <li>Processing <span>Standard</span></li>
+                <li>Delivery <span>48H</span></li>
             </ul>
-            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Выбрать пакет</a>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn-lab">Initialize Session</a>
         </div>
 
-        <div class="package">
-            <div class="package-num">02 / PRODUCTION</div>
+        <div class="module" style="border-color: var(--neon-purple); background: rgba(188, 19, 254, 0.05);">
+            <div style="position: absolute; top: 10px; right: 10px; font-size: 0.5rem; color: var(--neon-purple);">RECOMMENDED</div>
             <h3>ARTIST EDITION</h3>
-            <div class="price">6 000 ₽</div>
-            <ul class="features">
-                <li>3 часа записи</li>
-                <li>Ручной тюнинг (Melodyne)</li>
-                <li>Проф. сведение вокала</li>
-                <li>Мастеринг (Streaming Ready)</li>
+            <div class="price">6 000<span>₽</span></div>
+            <ul class="specs">
+                <li>Recording <span>3H</span></li>
+                <li>Manual Tuning <span>Melodyne</span></li>
+                <li>Full Mix <span>Pro</span></li>
+                <li>Mastering <span>Included</span></li>
             </ul>
-            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Выбрать пакет</a>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn-lab" style="border-color: var(--neon-purple); background: var(--neon-purple);">Initialize Session</a>
         </div>
 
-        <div class="package">
-            <div class="package-num">03 / PREMIUM</div>
+        <div class="module">
             <h3>PLATINUM EDITION</h3>
-            <div class="price">Custom</div>
-            <ul class="features">
-                <li>Сведение по дорожкам</li>
-                <li>Creative Sound Design</li>
-                <li>Безлимит правок</li>
-                <li>Приоритетный график</li>
+            <div class="price">CUSTOM</div>
+            <ul class="specs">
+                <li>Multitrack <span>Unlimited</span></li>
+                <li>Sound Design <span>Experimental</span></li>
+                <li>Revisions <span>Infinite</span></li>
+                <li>Producer Support <span>Full</span></li>
             </ul>
-            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Связаться</a>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn-lab">Contact Lab</a>
         </div>
 
-    </section>
+    </div>
 </div>
 
 <footer>
-    <div>
-        <span class="footer-brand">SPRING SOUND LAB</span><br>
-        Engineering and Production
-    </div>
-    <div>
-        Social Support:<br>
-        <a href="https://t.me/ТВОЙ_ЛОГИН" style="color: inherit;">Telegram</a> / 
-        <a href="#" style="color: inherit;">VK</a>
-    </div>
-    <div style="text-align: right;">
-        &copy; 2026<br>
-        No "UP" Logo Policy
-    </div>
+    SPRING SOUND LAB &copy; 2026 // NO "UP" LOGO // HIGH PRECISION AUDIO
 </footer>
 
 </body>
