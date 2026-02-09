@@ -10,7 +10,7 @@
             --neon-blue: #00f2ff;
             --neon-purple: #bc13fe;
             --bg-dark: #050508;
-            --glass: rgba(0, 0, 0, 0.75);
+            --glass: rgba(0, 0, 0, 0.85); /* Чуть плотнее для лучшего контраста при параллаксе */
         }
 
         * { box-sizing: border-box; scroll-behavior: smooth; border-radius: 0 !important; }
@@ -29,6 +29,7 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* Настройка Параллакса */
         header {
             height: 100vh;
             display: flex;
@@ -37,9 +38,12 @@
             align-items: center;
             text-align: center;
             position: relative;
-            background: linear-gradient(rgba(5, 5, 8, 0.75), rgba(5, 5, 8, 0.85)), 
-                        url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+            background: linear-gradient(rgba(5, 5, 8, 0.65), rgba(5, 5, 8, 0.75)), 
+                        url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* ГЛАВНЫЙ ЭФФЕКТ ПАРАЛЛАКСА */
             border-bottom: 2px solid var(--neon-blue);
         }
 
@@ -56,15 +60,22 @@
             filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.3));
         }
 
-        .container { padding: 60px 20px; max-width: 1400px; margin: auto; }
+        .container { 
+            padding: 60px 20px; 
+            max-width: 1400px; 
+            margin: auto; 
+            position: relative;
+            z-index: 5;
+            background: var(--bg-dark); /* Фон контента, который накрывает параллакс */
+        }
 
         .module-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
-            margin-top: -80px;
+            margin-top: -120px; /* Увеличил наложение для глубины */
             position: relative;
-            z-index: 3;
+            z-index: 10;
         }
 
         .module {
@@ -144,7 +155,6 @@
         
         audio { width: 100%; height: 35px; filter: invert(100%); opacity: 0.8; }
 
-        /* Разделение Адреса и Телефона на два окошка */
         .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -158,9 +168,7 @@
             transition: 0.3s;
         }
 
-        .info-box:hover {
-            border-color: var(--neon-purple);
-        }
+        .info-box:hover { border-color: var(--neon-purple); }
 
         .info-box h3 {
             font-family: 'Orbitron', sans-serif;
@@ -171,12 +179,7 @@
             text-transform: uppercase;
         }
 
-        .info-text {
-            font-size: 1.1rem;
-            color: #fff;
-            letter-spacing: 1px;
-            line-height: 1.5;
-        }
+        .info-text { font-size: 1.1rem; color: #fff; letter-spacing: 1px; line-height: 1.5; }
 
         .phone-link {
             display: inline-block;
