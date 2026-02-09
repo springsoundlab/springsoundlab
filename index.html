@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPRING SOUND LAB | WEYTON</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;500;700;800&family=Montserrat:wght@100;200;300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --neon-blue: #00f2ff;
@@ -37,6 +38,30 @@
 
         @keyframes backgroundSubtleScale { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 
+        /* Социальные сети в шапке */
+        .social-nav {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            display: flex;
+            gap: 25px;
+            z-index: 100;
+        }
+
+        .social-link {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.5rem;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .social-link:hover { transform: translateY(-3px); }
+        .social-link.vk:hover { color: #0077ff; text-shadow: 0 0 15px #0077ff; }
+        .social-link.tg:hover { color: #24A1DE; text-shadow: 0 0 15px #24A1DE; }
+        .social-link.ig:hover { color: #f09433; text-shadow: 0 0 15px #e6683c; }
+        .social-link.yt:hover { color: #ff0000; text-shadow: 0 0 15px #ff0000; }
+        .social-link.sc:hover { color: #ff5500; text-shadow: 0 0 15px #ff5500; }
+
         .flicker-header {
             font-family: 'Syne', sans-serif;
             font-weight: 700;
@@ -54,7 +79,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        header { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        header { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; position: relative; }
 
         h1 {
             font-family: 'Orbitron', sans-serif; 
@@ -157,6 +182,18 @@
         .specs li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem; display: flex; justify-content: space-between; text-transform: uppercase; letter-spacing: 1px; }
         .specs li span { color: var(--neon-blue); font-weight: 700; text-align: right; margin-left: 10px; }
 
+        /* Студия / Оборудование */
+        .gear-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            transition: var(--transition);
+        }
+        .gear-card:hover { border-color: var(--neon-blue); background: rgba(0, 242, 255, 0.03); }
+        .gear-card i { font-size: 2rem; color: var(--neon-blue); margin-bottom: 20px; }
+        .gear-card h4 { font-family: 'Orbitron'; letter-spacing: 3px; margin-bottom: 15px; font-size: 0.8rem; color: #fff; }
+        .gear-list { list-style: none; padding: 0; font-size: 0.75rem; color: rgba(255,255,255,0.5); line-height: 1.8; text-transform: uppercase; letter-spacing: 1px; }
+
         .booking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .contact-card {
             background: rgba(0, 0, 0, 0.1);
@@ -182,19 +219,29 @@
         }
 
         .contact-label { font-family: 'Orbitron'; font-weight: 700; color: #555; letter-spacing: 8px; font-size: 0.8rem; margin-bottom: 30px; text-transform: uppercase; }
-        .contact-main-text { color: var(--neon-blue); font-size: clamp(1.2rem, 2.5vw, 2.2rem); font-family: 'Orbitron'; font-weight: 900; margin-bottom: 20px; }
+        .contact-main-text { color: var(--neon-blue); font-size: clamp(1.2rem, 2.5vw, 2.2rem); font-family: 'Orbitron'; font-weight: 900; margin-bottom: 20px; transition: 0.3s; }
+        .contact-card:hover .contact-main-text { color: #fff; text-shadow: 0 0 20px var(--neon-blue); }
         .contact-sub-info { font-family: 'Orbitron'; font-weight: 500; letter-spacing: 4px; font-size: 0.85rem; margin-bottom: 30px; text-transform: uppercase; }
         .action-hint { font-family: 'Montserrat'; font-size: 0.7rem; letter-spacing: 3px; color: #444; text-transform: uppercase; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; width: 100%; }
 
-        footer { padding: 120px 20px; text-align: center; font-family: 'Orbitron'; font-weight: 400; font-size: 0.8rem; color: #222; letter-spacing: 12px; border-top: 1px solid #111; }
+        footer { padding: 60px 20px; text-align: center; font-family: 'Orbitron'; font-weight: 400; font-size: 0.7rem; color: #333; letter-spacing: 5px; border-top: 1px solid #111; }
+        .legal { font-size: 0.5rem; letter-spacing: 1px; color: #222; margin-top: 20px; }
 
         @media (max-width: 1100px) { .module-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 768px) { .booking-grid, .module-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .booking-grid, .module-grid { grid-template-columns: 1fr; .social-nav { top: 20px; right: 20px; gap: 15px; } }
     </style>
 </head>
 <body>
 
 <div class="studio-background"></div>
+
+<nav class="social-nav">
+    <a href="ССЫЛКА_НА_ВК" class="social-link vk" target="_blank"><i class="fab fa-vk"></i></a>
+    <a href="ССЫЛКА_НА_ТГ" class="social-link tg" target="_blank"><i class="fab fa-telegram"></i></a>
+    <a href="ССЫЛКА_НА_ИНСТ" class="social-link ig" target="_blank"><i class="fab fa-instagram"></i></a>
+    <a href="ССЫЛКА_НА_ЮТУБ" class="social-link yt" target="_blank"><i class="fab fa-youtube"></i></a>
+    <a href="ССЫЛКА_НА_SOUNDCLOUD" class="social-link sc" target="_blank"><i class="fab fa-soundcloud"></i></a>
+</nav>
 
 <header>
     <div class="flicker-header">СТУДИЯ ЗВУКОЗАПИСИ</div>
@@ -286,27 +333,48 @@
                 </ul>
             </div>
             
-            <div class="module tuning">
-                <h3>РУЧНАЯ КОРРЕКЦИЯ (ТЮНИНГ)</h3>
-                <div class="price">ОТ 1 000 <span>₽</span></div>
-                <div class="module-description">
-                    Секрет топового звучания — в кропотливой ручной правке каждой ноты.
-                    <div class="sub-package">
-                        <span class="sub-package-title">ПАКЕТ SOLO — 1 000 ₽</span>
-                        • Коррекция Melodyne одной основной дорожки вокала.
-                    </div>
-                    <div class="sub-package">
-                        <span class="sub-package-title">ПАКЕТ FULL — 2 500 ₽ (ДО 6 ДОРОЖЕК)</span>
-                        • Полная проработка вокальной пачки (основной голос, даблы, бэки).
-                    </div>
-                </div>
-                <ul class="specs">
-                    <li>ТЕХНОЛОГИЯ <span>MELODYNE</span></li>
-                    <li>ПОДХОД <span>ADVANCED</span></li>
-                    <li>СРОК <span>1-2 ДНЯ</span></li>
+        </div>
+    </section>
+
+    <section id="studio">
+        <h2>STUDIO GEAR</h2>
+        <div class="module-grid">
+            <div class="gear-card">
+                <i class="fas fa-microphone-lines"></i>
+                <h4>MICROPHONES</h4>
+                <ul class="gear-list">
+                    <li>Warm Audio WA-8000</li>
+                    <li>Neumann TLM 103 (Custom)</li>
+                    <li>Shure SM7B</li>
                 </ul>
             </div>
-
+            <div class="gear-card">
+                <i class="fas fa-wave-square"></i>
+                <h4>INTERFACE & PRE</h4>
+                <ul class="gear-list">
+                    <li>Universal Audio Apollo x4</li>
+                    <li>Neve 1073 Preamp</li>
+                    <li>UAD-2 DSP Processing</li>
+                </ul>
+            </div>
+            <div class="gear-card">
+                <i class="fas fa-sliders"></i>
+                <h4>MONITORING</h4>
+                <ul class="gear-list">
+                    <li>Yamaha HS8 (Linear Mod)</li>
+                    <li>Beyerdynamic DT 1990 Pro</li>
+                    <li>Sonarworks SoundID Reference</li>
+                </ul>
+            </div>
+            <div class="gear-card">
+                <i class="fas fa-compact-disc"></i>
+                <h4>SOFTWARE</h4>
+                <ul class="gear-list">
+                    <li>Melodyne 5 Studio</li>
+                    <li>FabFilter Total Bundle</li>
+                    <li>UAD / Waves / Soundtoys</li>
+                </ul>
+            </div>
         </div>
     </section>
 
@@ -330,6 +398,7 @@
 
 <footer>
     WEYTON // SPRING SOUND LAB &copy; 2026 // NO UP IN LOGO
+    <div class="legal">* Instagram принадлежит Meta, признанной экстремистской организацией в РФ.</div>
 </footer>
 
 </body>
