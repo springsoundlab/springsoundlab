@@ -13,29 +13,56 @@
             --neon-red: #ff003c;
             --neon-gold: #ffcc00;
             --bg-dark: #020205;
-            --transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-speed: 0.5s;
+            --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { box-sizing: border-box; scroll-behavior: smooth; border-radius: 0 !important; }
+        * { 
+            box-sizing: border-box; 
+            scroll-behavior: smooth; 
+            border-radius: 0 !important; 
+            margin: 0;
+            padding: 0;
+        }
         
         body { 
-            margin: 0; padding: 0; 
+            margin-top: 0;
+            margin-bottom: 0;
+            margin-left: 0;
+            margin-right: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            padding-left: 0;
+            padding-right: 0;
             background-color: var(--bg-dark);
-            color: #fff; 
+            color: #ffffff; 
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
+            line-height: 1.5;
         }
 
         .studio-background {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
             z-index: -2;
             background-image: linear-gradient(rgba(2, 2, 5, 0.75), rgba(2, 2, 5, 0.98)), url('bg.jpg'); 
-            background-size: cover; background-position: center; background-repeat: no-repeat;
-            animation: backgroundSubtleScale 80s infinite alternate ease-in-out;
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            animation-name: backgroundSubtleScale;
+            animation-duration: 80s;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+            animation-timing-function: ease-in-out;
         }
 
-        @keyframes backgroundSubtleScale { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+        @keyframes backgroundSubtleScale { 
+            0% { transform: scale(1); } 
+            100% { transform: scale(1.15); } 
+        }
 
         header { 
             height: 100vh; 
@@ -44,7 +71,11 @@
             justify-content: center; 
             align-items: center; 
             text-align: center; 
-            padding: 20px; 
+            padding-left: 20px; 
+            padding-right: 20px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            position: relative;
         }
 
         .flicker-header {
@@ -52,29 +83,44 @@
             font-weight: 700;
             font-size: 1.4rem; 
             letter-spacing: 22px;
-            color: #fff;
+            color: #ffffff;
             text-transform: uppercase;
             margin-bottom: 25px;
             opacity: 0;
             transform: translateY(15px);
-            animation: ultraSmoothFade 1.5s forwards 0.8s;
+            animation-name: ultraSmoothFade;
+            animation-duration: 1.5s;
+            animation-delay: 0.8s;
+            animation-fill-mode: forwards;
         }
 
-        @keyframes ultraSmoothFade { to { opacity: 1; transform: translateY(0); } }
+        @keyframes ultraSmoothFade { 
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); } 
+        }
 
         h1 {
             font-family: 'Orbitron', sans-serif; 
             font-size: clamp(2.5rem, 8vw, 7.5rem); 
-            margin: 0;
-            background: linear-gradient(90deg, #fff, var(--neon-blue), var(--neon-purple), #fff);
-            background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: flow 15s infinite linear; 
+            margin-top: 0;
+            margin-bottom: 0;
+            background-image: linear-gradient(90deg, #ffffff, var(--neon-blue), var(--neon-purple), #ffffff);
+            background-size: 300% auto; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            animation-name: flow;
+            animation-duration: 15s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear; 
             text-transform: uppercase; 
             letter-spacing: 15px; 
             font-weight: 900;
         }
 
-        @keyframes flow { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+        @keyframes flow { 
+            0% { background-position: 0% 50%; } 
+            100% { background-position: 300% 50%; } 
+        }
 
         .header-subtitle {
             font-family: 'Syne', sans-serif;
@@ -88,7 +134,10 @@
             text-transform: uppercase;
             opacity: 0;
             transform: translateY(15px);
-            animation: ultraSmoothFade 1.5s forwards 1.8s;
+            animation-name: ultraSmoothFade;
+            animation-duration: 1.5s;
+            animation-delay: 1.8s;
+            animation-fill-mode: forwards;
         }
 
         .header-socials {
@@ -97,104 +146,229 @@
             margin-top: 70px;
             opacity: 0;
             transform: translateY(20px);
-            animation: ultraSmoothFade 1.5s forwards 2.5s;
+            animation-name: ultraSmoothFade;
+            animation-duration: 1.5s;
+            animation-delay: 2.5s;
+            animation-fill-mode: forwards;
         }
 
         .social-btn {
             color: rgba(255, 255, 255, 0.25);
             font-size: 3.5rem;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-property: all;
+            transition-duration: 0.4s;
+            transition-timing-function: var(--transition-timing);
             text-decoration: none;
+            display: inline-block;
         }
 
-        .social-btn:hover { transform: scale(1.15); }
-        .social-btn.vk:hover { color: #0077ff; filter: drop-shadow(0 0 15px rgba(0, 119, 255, 0.6)); }
-        .social-btn.tg:hover { color: #24A1DE; filter: drop-shadow(0 0 15px rgba(36, 161, 222, 0.6)); }
-        .social-btn.ig:hover { color: #f09433; filter: drop-shadow(0 0 15px rgba(230, 104, 60, 0.6)); }
+        .social-btn:hover { 
+            transform: scale(1.15); 
+        }
 
-        .container { padding: 50px 20px; max-width: 1600px; margin: auto; position: relative; z-index: 5; }
-        section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
-        h2 { font-family: 'Orbitron'; font-weight: 700; text-align: center; letter-spacing: 15px; margin-bottom: 80px; font-size: 2.8rem; text-transform: uppercase; }
+        .social-btn.vk:hover { 
+            color: #0077ff; 
+            filter: drop-shadow(0 0 15px rgba(0, 119, 255, 0.6)); 
+        }
+
+        .social-btn.tg:hover { 
+            color: #24A1DE; 
+            filter: drop-shadow(0 0 15px rgba(36, 161, 222, 0.6)); 
+        }
+
+        .social-btn.ig:hover { 
+            color: #f09433; 
+            filter: drop-shadow(0 0 15px rgba(230, 104, 60, 0.6)); 
+        }
+
+        .container { 
+            padding-top: 50px;
+            padding-bottom: 50px;
+            padding-left: 20px;
+            padding-right: 20px;
+            max-width: 1600px; 
+            margin-left: auto;
+            margin-right: auto;
+            position: relative; 
+            z-index: 5; 
+        }
+
+        section { 
+            padding-top: 120px; 
+            padding-bottom: 120px;
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: rgba(255, 255, 255, 0.05);
+        }
+
+        h2 { 
+            font-family: 'Orbitron', sans-serif; 
+            font-weight: 700; 
+            text-align: center; 
+            letter-spacing: 15px; 
+            margin-bottom: 80px; 
+            font-size: 2.8rem; 
+            text-transform: uppercase; 
+        }
 
         .module-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
             gap: 20px; 
+            align-items: stretch; /* Растягиваем карточки по высоте самого высокого соседа */
         }
 
         .module { 
-            background: rgba(0, 0, 0, 0.1); 
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            padding: 50px 25px; 
-            transition: var(--transition); 
+            background-color: rgba(0, 0, 0, 0.1); 
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgba(255, 255, 255, 0.03);
+            padding-top: 50px;
+            padding-bottom: 50px;
+            padding-left: 25px;
+            padding-right: 25px;
+            transition-property: all;
+            transition-duration: var(--transition-speed);
+            transition-timing-function: var(--transition-timing);
             display: flex;
             flex-direction: column;
-            align-items: flex-start; /* ВОЗВРАТ ВЫРАВНИВАНИЯ ПО ЛЕВОМУ КРАЮ */
-            text-align: left; /* ТЕКСТ СЛЕВА */
+            align-items: flex-start; 
+            text-align: left; 
             backdrop-filter: blur(8px);
+            position: relative;
+            height: 100%; /* Карточка занимает всю высоту сетки */
         }
 
         .module:hover {
-            background: rgba(0, 0, 0, 0.05); 
+            background-color: rgba(0, 0, 0, 0.05); 
             transform: translateY(-8px);
         }
 
-        .module.rec:hover { border-color: #fff; box-shadow: 0 0 50px rgba(255, 255, 255, 0.1); }
-        .module.start:hover { border-color: var(--neon-purple); box-shadow: 0 0 50px rgba(188, 19, 254, 0.2); }
-        .module.artist:hover { border-color: var(--neon-red); box-shadow: 0 0 50px rgba(255, 0, 60, 0.2); }
-        .module.platinum:hover { border-color: var(--neon-gold); box-shadow: 0 0 50px rgba(255, 204, 0, 0.2); }
+        .module.rec:hover { 
+            border-color: #ffffff; 
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.1); 
+        }
 
-        .module h3 { font-family: 'Orbitron'; font-weight: 700; letter-spacing: 3px; margin-bottom: 20px; font-size: 0.9rem; }
-        .price { font-size: 2.2rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 10px; }
-        .price span { font-size: 0.8rem; color: #777; font-family: 'Montserrat'; }
+        .module.start:hover { 
+            border-color: var(--neon-purple); 
+            box-shadow: 0 0 50px rgba(188, 19, 254, 0.2); 
+        }
+
+        .module.artist:hover { 
+            border-color: var(--neon-red); 
+            box-shadow: 0 0 50px rgba(255, 0, 60, 0.2); 
+        }
+
+        .module.platinum:hover { 
+            border-color: var(--neon-gold); 
+            box-shadow: 0 0 50px rgba(255, 204, 0, 0.2); 
+        }
+
+        .module h3 { 
+            font-family: 'Orbitron', sans-serif; 
+            font-weight: 700; 
+            letter-spacing: 3px; 
+            margin-bottom: 20px; 
+            font-size: 0.9rem; 
+            text-transform: uppercase;
+        }
+
+        .price { 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+            font-family: 'Orbitron', sans-serif; 
+            margin-bottom: 10px; 
+        }
+
+        .price span { 
+            font-size: 0.8rem; 
+            color: #777777; 
+            font-family: 'Montserrat', sans-serif; 
+        }
 
         .module-description {
-            font-family: 'Montserrat';
+            font-family: 'Montserrat', sans-serif;
             font-size: 0.7rem;
             line-height: 1.6;
             color: rgba(255, 255, 255, 0.6);
             margin-bottom: 25px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            flex-grow: 1; /* Описание занимает свободное место */
         }
 
         .sub-package {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: rgba(255, 255, 255, 0.1);
             margin-top: 15px;
             padding-top: 15px;
             width: 100%;
         }
 
         .sub-package-title {
-            font-family: 'Orbitron';
+            font-family: 'Orbitron', sans-serif;
             font-weight: 700;
             font-size: 0.8rem;
             margin-bottom: 8px;
             display: block;
+            text-transform: uppercase;
         }
 
-        .specs { list-style: none; padding: 0; margin-top: auto; width: 100%; }
+        .specs { 
+            list-style-type: none; 
+            padding-left: 0;
+            padding-right: 0;
+            margin-top: 30px; /* Отступ сверху для отделения от описания */
+            width: 100%; 
+        }
+
         .specs li { 
-            padding: 12px 0; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            padding-top: 12px;
+            padding-bottom: 12px;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: rgba(255, 255, 255, 0.05);
             font-size: 0.75rem; 
             display: flex; 
-            justify-content: space-between; /* ВОЗВРАТ РАЗНОСА ТЕКСТА ПО КРАЯМ */
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: space-between; /* Разнос названия влево, а значения вправо */
+            align-items: center;
             text-transform: uppercase; 
             letter-spacing: 1px; 
         }
-        .specs li span { color: var(--neon-blue); font-weight: 700; }
 
-        .booking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .specs li span { 
+            color: var(--neon-blue); 
+            font-weight: 700; 
+            text-align: right; /* Текст внутри синего блока к правому краю */
+            margin-left: 10px; /* Минимальный отступ от левого текста */
+        }
+
+        .booking-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px; 
+        }
+
         .contact-card {
-            background: rgba(0, 0, 0, 0.1);
-            padding: 80px 40px;
+            background-color: rgba(0, 0, 0, 0.1);
+            padding-top: 80px;
+            padding-bottom: 80px;
+            padding-left: 40px;
+            padding-right: 40px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.05);
+            border-width: 1px;
+            border-style: solid;
+            border-color: rgba(255, 255, 255, 0.05);
             text-decoration: none;
-            color: #fff;
-            transition: var(--transition);
+            color: #ffffff;
+            transition-property: all;
+            transition-duration: var(--transition-speed);
+            transition-timing-function: var(--transition-timing);
             backdrop-filter: blur(8px);
+            display: block;
         }
 
         .contact-card:hover {
@@ -203,23 +377,63 @@
             transform: translateY(-5px);
         }
 
+        .contact-label {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: #777777;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
         .contact-main-text { 
             color: var(--neon-blue); 
             font-size: clamp(1.2rem, 2.5vw, 2.2rem); 
-            font-family: 'Orbitron'; 
+            font-family: 'Orbitron', sans-serif; 
             font-weight: 900; 
             margin-bottom: 20px;
-            transition: 0.3s;
+            transition-property: all;
+            transition-duration: 0.3s;
+            text-transform: uppercase;
         }
 
         .contact-card:hover .contact-main-text {
-            color: #fff;
+            color: #ffffff;
             text-shadow: 0 0 20px var(--neon-blue);
         }
 
-        footer { padding: 60px 20px; text-align: center; font-family: 'Orbitron'; font-size: 0.7rem; color: #333; letter-spacing: 5px; border-top: 1px solid #111; }
+        .action-hint {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+        }
 
-        @media (max-width: 768px) { .booking-grid { grid-template-columns: 1fr; } }
+        footer { 
+            padding-top: 60px;
+            padding-bottom: 60px;
+            padding-left: 20px;
+            padding-right: 20px;
+            text-align: center; 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 0.7rem; 
+            color: #333333; 
+            letter-spacing: 5px; 
+            border-top-width: 1px;
+            border-top-style: solid;
+            border-top-color: #111111;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) { 
+            .booking-grid { 
+                grid-template-columns: 1fr; 
+            } 
+            .header-socials {
+                gap: 30px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -250,7 +464,7 @@
                 <div class="module-description">
                     80% успеха трека — это правильное исполнение. Моя задача — выжать максимум из твоего таланта.
                     <div class="sub-package">
-                        <span class="sub-package-title" style="color: #fff;">ВОКАЛЬНЫЙ КОУЧИНГ</span>
+                        <span class="sub-package-title" style="color: #ffffff;">ВОКАЛЬНЫЙ КОУЧИНГ</span>
                         • Помогу с подачей и интонацией, подберу крутые фишки для твоего голоса. <br>
                         • Исправляю ошибки на лету: если не попал в такт или ноту, перепишем и добьёмся идеала. <br>
                         • Работаем над эмоциями и динамикой, чтобы слушатель верил каждому твоему слову.
