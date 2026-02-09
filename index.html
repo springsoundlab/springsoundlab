@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPRING SOUND LAB | WEYTON</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@100;200;300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-blue: #00f2ff;
@@ -38,20 +38,23 @@
 
         @keyframes backgroundSubtleScale { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 
-        /* МЕРЦАЮЩИЙ НАДЗАГОЛОВОК (ЭФФЕКТ ЛАМПЫ) */
+        /* ОБНОВЛЕННЫЙ НАДЗАГОЛОВОК (БЕЗ МЕРЦАНИЯ, ВСПЛЫВАЮЩИЙ) */
         .flicker-header {
-            font-family: 'Orbitron';
-            font-size: 0.9rem;
-            letter-spacing: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 200;
+            font-size: 1.2rem;
+            letter-spacing: 15px;
             color: var(--neon-blue);
             text-transform: uppercase;
-            margin-bottom: 20px;
-            animation: lampFlicker 3.5s infinite;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slowFadeUp 1.8s forwards ease-out;
+            text-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
         }
 
-        @keyframes lampFlicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% { text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); opacity: 1; }
-            20%, 24%, 55% { text-shadow: none; opacity: 0.2; }
+        @keyframes slowFadeUp {
+            to { opacity: 1; transform: translateY(0); }
         }
 
         header { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
@@ -65,36 +68,47 @@
 
         @keyframes flow { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
 
-        .container { padding: 50px 20px; max-width: 1400px; margin: auto; position: relative; z-index: 5; }
+        .container { padding: 50px 20px; max-width: 1600px; margin: auto; position: relative; z-index: 5; }
 
         section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
 
         h2 { font-family: 'Orbitron'; text-align: center; letter-spacing: 15px; margin-bottom: 80px; font-size: 2.8rem; text-transform: uppercase; }
 
-        /* УСЛУГИ С ПОЛНОЙ ПОДСВЕТКОЙ (GLOW) */
-        .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 35px; }
-        .module { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.1); padding: 70px 45px; transition: var(--transition); position: relative; }
+        /* УСЛУГИ В ОДНУ ЛИНИЮ (4 КОЛОНКИ) */
+        .module-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 20px; 
+        }
 
-        /* ОБНОВЛЕННЫЕ ЦВЕТА ПОДСВЕТКИ */
+        .module { 
+            background: var(--glass); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 50px 25px; 
+            transition: var(--transition); 
+            position: relative; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
         .module.rec:hover { border-color: #fff; box-shadow: 0 0 60px rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05); }
         .module.start:hover { border-color: var(--neon-purple); box-shadow: 0 0 60px rgba(188, 19, 254, 0.3); background: rgba(188, 19, 254, 0.05); }
         .module.artist:hover { border-color: var(--neon-red); box-shadow: 0 0 60px rgba(255, 0, 60, 0.3); background: rgba(255, 0, 60, 0.05); }
         .module.platinum:hover { border-color: var(--neon-gold); box-shadow: 0 0 60px rgba(255, 204, 0, 0.3); background: rgba(255, 204, 0, 0.05); }
 
-        .module h3 { font-family: 'Orbitron'; letter-spacing: 5px; margin-bottom: 25px; }
-        .price { font-size: 3.2rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 30px; }
-        .price span { font-size: 1rem; color: #555; }
+        .module h3 { font-family: 'Orbitron'; letter-spacing: 3px; margin-bottom: 20px; font-size: 0.9rem; }
+        .price { font-size: 2.2rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 25px; }
+        .price span { font-size: 0.8rem; color: #555; }
 
-        .specs { list-style: none; padding: 0; margin-bottom: 40px; }
-        .specs li { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; display: flex; justify-content: space-between; text-transform: uppercase; }
+        .specs { list-style: none; padding: 0; margin-bottom: 0; }
+        .specs li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem; display: flex; justify-content: space-between; text-transform: uppercase; letter-spacing: 1px; }
         .specs li span { color: var(--neon-blue); font-weight: 700; }
 
-        /* ДОПОЛНИТЕЛЬНЫЕ ИНФО-БЛОКИ */
         .workflow-grid, .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
         .info-card { padding: 50px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); }
         .info-card h4 { font-family: 'Orbitron'; color: var(--neon-blue); margin-bottom: 20px; letter-spacing: 3px; }
 
-        /* КОНТАКТНЫЙ БЛОК (НОМЕР, АДРЕС, КАРТА) */
         .contact-box {
             background: var(--glass); padding: 100px 50px; text-align: center; border: 1px solid rgba(255,255,255,0.1);
             display: block; text-decoration: none; color: #fff; transition: var(--transition);
@@ -116,6 +130,14 @@
         .yandex-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 30px var(--neon-blue); }
 
         footer { padding: 120px 20px; text-align: center; font-family: 'Orbitron'; font-size: 0.8rem; color: #222; letter-spacing: 12px; border-top: 1px solid #111; }
+
+        /* Адаптация сетки для планшетов и телефонов */
+        @media (max-width: 1100px) {
+            .module-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 650px) {
+            .module-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -124,7 +146,6 @@
 
 <header>
     <div class="flicker-header">СТУДИЯ ЗВУКОЗАПИСИ</div>
-    <div style="font-family: 'Orbitron'; letter-spacing: 15px; opacity: 0.5; font-size: 0.7rem; margin-bottom: 10px;">WEYTON PRESENTS</div>
     <h1>SPRING SOUND LAB</h1>
 </header>
 
@@ -156,8 +177,8 @@
                 <div class="price">6 000 <span>₽</span></div>
                 <ul class="specs">
                     <li>СВЕДЕНИЕ <span>PREMIUM MIX</span></li>
-                    <li>ТЮНИНГ <span>MANUAL (MELODYNE)</span></li>
-                    <li>ЭФФЕКТЫ <span>3D FX / CREATIVE</span></li>
+                    <li>ТЮНИНГ <span>MANUAL</span></li>
+                    <li>ЭФФЕКТЫ <span>3D FX</span></li>
                 </ul>
             </div>
             <div class="module platinum">
@@ -165,8 +186,8 @@
                 <div class="price">ОТ 9 000 <span>₽</span></div>
                 <ul class="specs">
                     <li>МУЛЬТИТРЕК <span>FULL EXPORT</span></li>
-                    <li>МАСТЕРИНГ <span>ANALOG GEAR</span></li>
-                    <li>ПРАВКИ <span>БЕЗЛИМИТНО</span></li>
+                    <li>МАСТЕРИНГ <span>ANALOG</span></li>
+                    <li>ПРАВКИ <span>UNLIMITED</span></li>
                 </ul>
             </div>
         </div>
