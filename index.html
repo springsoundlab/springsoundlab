@@ -9,6 +9,8 @@
         :root {
             --neon-blue: #00f2ff;
             --neon-purple: #bc13fe;
+            --neon-red: #ff003c;
+            --neon-gold: #ffcc00;
             --bg-dark: #050508;
             --glass: rgba(0, 0, 0, 0.85);
             --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -48,15 +50,14 @@
             padding: 40px;
         }
 
-        /* УВЕЛИЧЕННАЯ НАДПИСЬ НАД ЗАГОЛОВКОМ */
         .sub-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1rem, 2vw, 1.4rem); /* Увеличен размер */
-            letter-spacing: 12px; /* Больше воздуха между буквами */
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            letter-spacing: 12px;
             color: var(--neon-blue);
             text-transform: uppercase;
             margin-bottom: 20px;
-            font-weight: 700; /* Жирнее */
+            font-weight: 700;
             text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
         }
 
@@ -108,7 +109,7 @@
             background: var(--glass);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 50px 35px;
             transition: var(--transition);
             display: flex;
@@ -116,169 +117,87 @@
             position: relative;
         }
 
-        .module:hover { 
-            border-color: var(--neon-blue); 
-            transform: translateY(-10px);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
-            background: rgba(0, 242, 255, 0.05);
-        }
-
-        .module.artist:hover {
-            border-color: var(--neon-purple);
-            box-shadow: 0 0 30px rgba(188, 19, 254, 0.3);
-            background: rgba(188, 19, 254, 0.05);
-        }
-
-        .module h3 { 
-            font-family: 'Orbitron'; font-size: 0.9rem; letter-spacing: 3px; 
-            margin-bottom: 30px; color: var(--neon-blue); 
-        }
-
-        .price { 
-            font-size: 2.5rem; font-weight: 900; font-family: 'Orbitron'; 
-            margin-bottom: 15px; display: flex; align-items: baseline; gap: 8px;
-        }
+        .module h3 { font-family: 'Orbitron'; font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 30px; }
+        .price { font-size: 2.5rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 15px; display: flex; align-items: baseline; gap: 8px; }
         .price span { font-size: 0.85rem; color: #666; }
-
-        .specs {
-            list-style: none; padding: 0; margin: 30px 0;
-            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.2px;
-            color: #bbb; flex-grow: 1;
-        }
-
-        .specs li { 
-            padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); 
-            display: flex; justify-content: space-between; 
-        }
-
-        .specs li span { color: var(--neon-purple); font-weight: 700; }
-
+        .specs { list-style: none; padding: 0; margin: 30px 0; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.2px; color: #bbb; flex-grow: 1; }
+        .specs li { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .specs li span { font-weight: 700; text-align: right; margin-left: 10px; }
+        
         .btn-lab {
-            display: block; padding: 20px; border: 1px solid var(--neon-blue);
+            display: block; padding: 20px; border: 1px solid;
             color: #fff; text-transform: uppercase; font-family: 'Orbitron'; 
             font-size: 0.75rem; text-decoration: none; text-align: center; 
             transition: var(--transition); letter-spacing: 2px;
         }
 
-        .btn-lab:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px rgba(0, 242, 255, 0.4); }
+        /* 1. ЗАПИСЬ (BLUE) */
+        .module.rec { border-color: var(--neon-blue); }
+        .module.rec h3, .module.rec .specs li span { color: var(--neon-blue); }
+        .module.rec .btn-lab { border-color: var(--neon-blue); }
+        .module.rec:hover { 
+            border-color: var(--neon-blue); 
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+            background: rgba(0, 242, 255, 0.05);
+            transform: translateY(-10px);
+        }
+        .module.rec .btn-lab:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px rgba(0, 242, 255, 0.4); }
+
+        /* 2. START EDITION (RED) */
+        .module.start { border-color: var(--neon-red); }
+        .module.start h3, .module.start .specs li span { color: var(--neon-red); }
+        .module.start .btn-lab { border-color: var(--neon-red); }
+        .module.start:hover { 
+            border-color: var(--neon-red); 
+            box-shadow: 0 0 30px rgba(255, 0, 60, 0.3);
+            background: rgba(255, 0, 60, 0.05);
+            transform: translateY(-10px);
+        }
+        .module.start .btn-lab:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px rgba(255, 0, 60, 0.4); }
+
+        /* 3. ARTIST EDITION (PURPLE) */
+        .module.artist { border-color: var(--neon-purple); }
+        .module.artist h3, .module.artist .specs li span { color: var(--neon-purple); }
+        .module.artist .btn-lab { border-color: var(--neon-purple); }
+        .module.artist:hover { 
+            border-color: var(--neon-purple); 
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.3);
+            background: rgba(188, 19, 254, 0.05);
+            transform: translateY(-10px);
+        }
+        .module.artist .btn-lab:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); }
+
+        /* 4. PLATINUM EDITION (GOLD) */
+        .module.platinum { border-color: var(--neon-gold); }
+        .module.platinum h3, .module.platinum .specs li span { color: var(--neon-gold); }
+        .module.platinum .btn-lab { border-color: var(--neon-gold); }
+        .module.platinum:hover { 
+            border-color: var(--neon-gold); 
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+            background: rgba(255, 204, 0, 0.05);
+            transform: translateY(-10px);
+        }
+        .module.platinum .btn-lab:hover { background: var(--neon-gold); color: #000; box-shadow: 0 0 20px rgba(255, 204, 0, 0.4); }
 
         .portfolio-section, .contact-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
-        
-        h2 { 
-            font-family: 'Orbitron'; 
-            color: var(--neon-blue); 
-            letter-spacing: 12px; 
-            margin-bottom: 60px; 
-            text-align: center; 
-            font-size: 1.8rem;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
-        }
-        
+        h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 12px; margin-bottom: 60px; text-align: center; font-size: 1.8rem; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 242, 255, 0.5); }
         .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        
-        .track-card { 
-            background: rgba(255, 255, 255, 0.02); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            padding: 40px; 
-        }
-        
-        .track-card h4 { 
-            font-family: 'Orbitron'; 
-            font-size: 0.8rem; 
-            font-weight: 400;
-            color: #999; 
-            margin-bottom: 25px; 
-            letter-spacing: 5px; 
-            text-transform: uppercase;
-        }
-        
+        .track-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 40px; }
+        .track-card h4 { font-family: 'Orbitron'; font-size: 0.8rem; font-weight: 400; color: #999; margin-bottom: 25px; letter-spacing: 5px; text-transform: uppercase; }
         audio { width: 100%; height: 35px; filter: invert(100%); opacity: 0.6; }
 
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        
-        .info-box { 
-            background: var(--glass); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            padding: 45px; 
-            text-align: center; 
-            transition: var(--transition);
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-        }
+        .info-box { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.05); padding: 45px; text-align: center; transition: var(--transition); cursor: pointer; text-decoration: none; display: block; }
+        .info-box:hover { background: rgba(188, 19, 254, 0.05); border-color: var(--neon-purple); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(188, 19, 254, 0.2); }
+        .info-box h3 { font-family: 'Orbitron'; font-size: 0.8rem; font-weight: 700; color: var(--neon-purple); margin-bottom: 25px; letter-spacing: 6px; text-transform: uppercase; transition: var(--transition); }
+        .info-box:hover h3 { color: #fff; text-shadow: 0 0 15px var(--neon-purple); }
+        .info-text { font-family: 'Orbitron'; font-size: 1rem; color: #fff; line-height: 1.8; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; transition: var(--transition); }
+        .info-box:hover .info-text { color: #fff; text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue); }
+        .hint-text { display: block; margin-top: 15px; font-size: 0.65rem; color: #555; letter-spacing: 1px; transition: var(--transition); }
+        .info-box:hover .hint-text { color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue); }
+        .phone-display { color: var(--neon-blue); font-weight: 700; font-size: 1.3rem; display: inline-block; margin-top: 10px; }
 
-        .info-box:hover {
-            background: rgba(188, 19, 254, 0.05);
-            border-color: var(--neon-purple);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(188, 19, 254, 0.2);
-        }
-        
-        .info-box h3 { 
-            font-family: 'Orbitron'; 
-            font-size: 0.8rem; 
-            font-weight: 700;
-            color: var(--neon-purple); 
-            margin-bottom: 25px; 
-            letter-spacing: 6px; 
-            text-transform: uppercase;
-            transition: var(--transition);
-        }
-
-        .info-box:hover h3 {
-            color: #fff;
-            text-shadow: 0 0 15px var(--neon-purple);
-        }
-        
-        .info-text { 
-            font-family: 'Orbitron';
-            font-size: 1rem; 
-            color: #fff; 
-            line-height: 1.8; 
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-weight: 400;
-            transition: var(--transition);
-        }
-
-        .info-box:hover .info-text {
-            color: #fff;
-            text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue);
-        }
-
-        .hint-text {
-            display: block;
-            margin-top: 15px;
-            font-size: 0.65rem;
-            color: #555;
-            letter-spacing: 1px;
-            transition: var(--transition);
-        }
-
-        .info-box:hover .hint-text {
-            color: var(--neon-blue);
-            text-shadow: 0 0 5px var(--neon-blue);
-        }
-
-        .phone-display { 
-            color: var(--neon-blue); 
-            font-weight: 700;
-            font-size: 1.3rem;
-            display: inline-block;
-            margin-top: 10px;
-        }
-
-        footer { 
-            padding: 80px; 
-            text-align: center; 
-            font-family: 'Orbitron';
-            font-size: 0.65rem; 
-            color: #444; 
-            border-top: 1px solid #111; 
-            letter-spacing: 4px; 
-            text-transform: uppercase;
-        }
+        footer { padding: 80px; text-align: center; font-family: 'Orbitron'; font-size: 0.65rem; color: #444; border-top: 1px solid #111; letter-spacing: 4px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -295,7 +214,7 @@
 
 <div class="container">
     <div class="module-grid">
-        <div class="module" style="border-color: var(--neon-blue);">
+        <div class="module rec">
             <h3>ЗАПИСЬ</h3>
             <div class="price">900 <span>₽/час</span></div>
             <ul class="specs">
@@ -307,7 +226,7 @@
             <a href="https://t.me/WEYTON" class="btn-lab">Забронировать</a>
         </div>
 
-        <div class="module">
+        <div class="module start">
             <h3>START EDITION</h3>
             <div class="price">3 500 <span>₽</span></div>
             <ul class="specs">
@@ -319,23 +238,23 @@
             <a href="https://t.me/WEYTON" class="btn-lab">Выбрать</a>
         </div>
 
-        <div class="module artist" style="border-color: var(--neon-purple); border-width: 2px;">
+        <div class="module artist">
             <h3>ARTIST EDITION</h3>
             <div class="price">6 000 <span>₽</span></div>
             <ul class="specs">
-                <li>Тюнинг вокала <span>РУЧНОЙ (MELODYNE)</span></li>
-                <li>Сведение <span>PRO (MULTI-BUS)</span></li>
+                <li>Тюнинг вокала <span>MELODYNE</span></li>
+                <li>Сведение <span>PRO MIX</span></li>
                 <li>Динамика <span>COMPRESSION</span></li>
-                <li>Сатурация <span>ANALOG WARMTH</span></li>
+                <li>Сатурация <span>ANALOG</span></li>
                 <li>Пространство <span>3D EFFECTS</span></li>
                 <li>Стерео-поле <span>IMAGING</span></li>
                 <li>Даблы / Бэки <span>FULL FIT</span></li>
-                <li>Мастеринг <span>STREAMING READY</span></li>
+                <li>Мастеринг <span>READY</span></li>
             </ul>
-            <a href="https://t.me/WEYTON" class="btn-lab" style="border-color: var(--neon-purple);">Выбрать</a>
+            <a href="https://t.me/WEYTON" class="btn-lab">Выбрать</a>
         </div>
 
-        <div class="module">
+        <div class="module platinum">
             <h3>PLATINUM EDITION</h3>
             <div class="price">ОТ 9 000 <span>₽</span></div>
             <ul class="specs">
