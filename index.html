@@ -27,16 +27,42 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ДОБАВЛЕННЫЙ БЭКГРАУНД */
-        .bg-layer {
+        /* АНИМИРОВАННЫЙ БЭКГРАУНД */
+        .bg-wrapper {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(5, 5, 8, 0.85), rgba(5, 5, 8, 0.85)), 
+            z-index: -1;
+            background: linear-gradient(rgba(5, 5, 8, 0.8), rgba(5, 5, 8, 0.9)), 
                         url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1920&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
-            z-index: -1;
+        }
+
+        /* Эффект анимированных звуковых волн на фоне */
+        .audio-waves {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 0 10px;
+            overflow: hidden;
+        }
+
+        .wave-bar {
+            width: 2px;
+            background: var(--neon-blue);
+            height: 10%;
+            animation: wave-animation 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes wave-animation {
+            from { height: 5%; opacity: 0.3; }
+            to { height: 60%; opacity: 1; }
         }
 
         header {
@@ -132,70 +158,40 @@
             transition: var(--transition); letter-spacing: 2px;
         }
 
-        /* 1. ЗАПИСЬ (BLUE) */
+        /* КАТЕГОРИИ С ЦВЕТНОЙ ПОДСВЕТКОЙ */
         .module.rec { border-color: var(--neon-blue); }
         .module.rec h3, .module.rec .specs li span { color: var(--neon-blue); }
         .module.rec .btn-lab { border-color: var(--neon-blue); }
-        .module.rec:hover { 
-            border-color: var(--neon-blue); 
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
-            background: rgba(0, 242, 255, 0.05);
-            transform: translateY(-10px);
-        }
+        .module.rec:hover { border-color: var(--neon-blue); box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); background: rgba(0, 242, 255, 0.05); transform: translateY(-10px); }
         .module.rec .btn-lab:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px rgba(0, 242, 255, 0.4); }
 
-        /* 2. START EDITION (RED) */
         .module.start { border-color: var(--neon-red); }
         .module.start h3, .module.start .specs li span { color: var(--neon-red); }
         .module.start .btn-lab { border-color: var(--neon-red); }
-        .module.start:hover { 
-            border-color: var(--neon-red); 
-            box-shadow: 0 0 30px rgba(255, 0, 60, 0.3);
-            background: rgba(255, 0, 60, 0.05);
-            transform: translateY(-10px);
-        }
+        .module.start:hover { border-color: var(--neon-red); box-shadow: 0 0 30px rgba(255, 0, 60, 0.3); background: rgba(255, 0, 60, 0.05); transform: translateY(-10px); }
         .module.start .btn-lab:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px rgba(255, 0, 60, 0.4); }
 
-        /* 3. ARTIST EDITION (PURPLE) */
         .module.artist { border-color: var(--neon-purple); }
         .module.artist h3, .module.artist .specs li span { color: var(--neon-purple); }
         .module.artist .btn-lab { border-color: var(--neon-purple); }
-        .module.artist:hover { 
-            border-color: var(--neon-purple); 
-            box-shadow: 0 0 30px rgba(188, 19, 254, 0.3);
-            background: rgba(188, 19, 254, 0.05);
-            transform: translateY(-10px);
-        }
+        .module.artist:hover { border-color: var(--neon-purple); box-shadow: 0 0 30px rgba(188, 19, 254, 0.3); background: rgba(188, 19, 254, 0.05); transform: translateY(-10px); }
         .module.artist .btn-lab:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); }
 
-        /* 4. PLATINUM EDITION (GOLD) */
         .module.platinum { border-color: var(--neon-gold); }
         .module.platinum h3, .module.platinum .specs li span { color: var(--neon-gold); }
         .module.platinum .btn-lab { border-color: var(--neon-gold); }
-        .module.platinum:hover { 
-            border-color: var(--neon-gold); 
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
-            background: rgba(255, 204, 0, 0.05);
-            transform: translateY(-10px);
-        }
+        .module.platinum:hover { border-color: var(--neon-gold); box-shadow: 0 0 30px rgba(255, 204, 0, 0.3); background: rgba(255, 204, 0, 0.05); transform: translateY(-10px); }
         .module.platinum .btn-lab:hover { background: var(--neon-gold); color: #000; box-shadow: 0 0 20px rgba(255, 204, 0, 0.4); }
 
         .portfolio-section, .contact-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
         h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 12px; margin-bottom: 60px; text-align: center; font-size: 1.8rem; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 242, 255, 0.5); }
-        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .track-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 40px; }
-        .track-card h4 { font-family: 'Orbitron'; font-size: 0.8rem; font-weight: 400; color: #999; margin-bottom: 25px; letter-spacing: 5px; text-transform: uppercase; }
-        audio { width: 100%; height: 35px; filter: invert(100%); opacity: 0.6; }
-
+        
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .info-box { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.05); padding: 45px; text-align: center; transition: var(--transition); cursor: pointer; text-decoration: none; display: block; }
         .info-box:hover { background: rgba(188, 19, 254, 0.05); border-color: var(--neon-purple); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(188, 19, 254, 0.2); }
         .info-box h3 { font-family: 'Orbitron'; font-size: 0.8rem; font-weight: 700; color: var(--neon-purple); margin-bottom: 25px; letter-spacing: 6px; text-transform: uppercase; transition: var(--transition); }
-        .info-box:hover h3 { color: #fff; text-shadow: 0 0 15px var(--neon-purple); }
         .info-text { font-family: 'Orbitron'; font-size: 1rem; color: #fff; line-height: 1.8; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; transition: var(--transition); }
         .info-box:hover .info-text { color: #fff; text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue); }
-        .hint-text { display: block; margin-top: 15px; font-size: 0.65rem; color: #555; letter-spacing: 1px; transition: var(--transition); }
-        .info-box:hover .hint-text { color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue); }
         .phone-display { color: var(--neon-blue); font-weight: 700; font-size: 1.3rem; display: inline-block; margin-top: 10px; }
 
         footer { padding: 80px; text-align: center; font-family: 'Orbitron'; font-size: 0.65rem; color: #444; border-top: 1px solid #111; letter-spacing: 4px; text-transform: uppercase; }
@@ -203,7 +199,9 @@
 </head>
 <body>
 
-<div class="bg-layer"></div>
+<div class="bg-wrapper">
+    <div class="audio-waves" id="waves"></div>
+</div>
 
 <header>
     <div class="sub-title">студия звукозаписи</div>
@@ -268,21 +266,11 @@
         </div>
     </div>
 
-    <section class="portfolio-section">
-        <h2>ПОРТФОЛИО</h2>
-        <div class="portfolio-grid">
-            <div class="track-card"><h4>PROD BY WEYTON 01</h4><audio controls></audio></div>
-            <div class="track-card"><h4>PROD BY WEYTON 02</h4><audio controls></audio></div>
-            <div class="track-card"><h4>PROD BY WEYTON 03</h4><audio controls></audio></div>
-        </div>
-    </section>
-
     <section class="contact-section">
         <div class="info-grid">
             <a href="https://yandex.ru/maps/?mode=routes&rtext=~48.674308,44.470021&rtt=auto" target="_blank" class="info-box">
                 <h3>Адрес</h3>
                 <div class="info-text">Волгоград, ул. Тулака, 9<br>Ежедневно 10:00 – 22:00</div>
-                <span class="hint-text">Нажми, чтобы построить маршрут</span>
             </a>
             
             <a href="tel:+79178382017" class="info-box">
@@ -290,7 +278,6 @@
                 <div class="info-text">
                     <span class="phone-display">+7 917 838 20 17</span>
                 </div>
-                <span class="hint-text">Нажми, чтобы позвонить</span>
             </a>
         </div>
     </section>
@@ -299,6 +286,25 @@
 <footer>
     WEYTON // SPRING SOUND LAB &copy; 2026 // NO "UP" IN LOGO
 </footer>
+
+<script>
+    // Генерируем столбики эквалайзера для фона
+    const wavesContainer = document.getElementById('waves');
+    const barCount = 100;
+
+    for (let i = 0; i < barCount; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'wave-bar';
+        // Случайная задержка и длительность для естественности
+        const duration = 0.5 + Math.random() * 2;
+        const delay = Math.random() * 2;
+        bar.style.animationDuration = `${duration}s`;
+        bar.style.animationDelay = `-${delay}s`;
+        // Разные оттенки синего и фиолетового
+        bar.style.background = i % 2 === 0 ? 'var(--neon-blue)' : 'var(--neon-purple)';
+        wavesContainer.appendChild(bar);
+    }
+</script>
 
 </body>
 </html>
