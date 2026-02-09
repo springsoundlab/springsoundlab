@@ -17,23 +17,13 @@
         
         body { 
             margin: 0; padding: 0; 
+            /* ГАРАНТИРОВАННЫЙ ФОН ДЛЯ ПК: Сначала прозрачный слой, потом картинка */
+            background: linear-gradient(rgba(5, 5, 8, 0.88), rgba(5, 5, 8, 0.88)), 
+                        url('https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=2070&auto=format&fit=crop') center center / cover no-repeat fixed;
             background-color: var(--bg-dark);
             color: #fff; 
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
-        }
-
-        /* ХАК ДЛЯ IPHONE: Фиксированный фон отдельным слоем */
-        .bg-fixed {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(5, 5, 8, 0.92), rgba(5, 5, 8, 0.92)), 
-                              url('https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            z-index: -1; /* Уходит на самый задний план */
-            will-change: transform; /* Оптимизация для мобильных */
         }
 
         @keyframes flow {
@@ -49,12 +39,8 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            position: relative;
-            /* Для iPhone в шапке тоже используем упрощенный фон без fixed, 
-               чтобы не ломать верстку, фиксированный слой сзади все равно создаст эффект */
-            background: linear-gradient(rgba(5, 5, 8, 0.4), rgba(5, 5, 8, 0.6)), 
-                        url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
-            background-size: cover;
+            background: linear-gradient(rgba(5, 5, 8, 0.3), rgba(5, 5, 8, 0.5)), 
+                        url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop') center center / cover no-repeat fixed;
             border-bottom: 2px solid var(--neon-blue);
             padding: 40px;
         }
@@ -67,7 +53,6 @@
             background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            z-index: 2;
             animation: flow 8s infinite linear;
             filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.3));
         }
@@ -78,13 +63,11 @@
             font-size: clamp(1rem, 2vw, 1.25rem);
             line-height: 1.8;
             color: #fff;
-            z-index: 2;
             padding: 25px 0;
             border-top: 1px solid rgba(188, 19, 254, 0.3);
             border-bottom: 1px solid rgba(188, 19, 254, 0.3);
             text-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
             font-weight: 300;
-            letter-spacing: 0.5px;
         }
 
         .container { 
@@ -92,7 +75,6 @@
             max-width: 1400px; 
             margin: auto; 
             position: relative;
-            z-index: 5;
         }
 
         .module-grid {
@@ -100,8 +82,6 @@
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-top: -80px;
-            position: relative;
-            z-index: 10;
         }
 
         .module {
@@ -158,13 +138,12 @@
             letter-spacing: 2px;
             text-decoration: none;
             text-align: center;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: 0.3s;
         }
 
         .btn-lab:hover {
             background: var(--neon-blue);
             color: #000;
-            box-shadow: 0 0 12px rgba(0, 242, 255, 0.4);
         }
 
         .portfolio-section, .contact-section { padding: 100px 0; border-top: 1px solid #222; }
@@ -176,19 +155,15 @@
         audio { width: 100%; height: 35px; filter: invert(100%); opacity: 0.8; }
 
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .info-box { background: var(--glass); border: 1px solid rgba(0, 242, 255, 0.1); padding: 35px; transition: 0.3s; }
-        .info-box:hover { border-color: var(--neon-purple); }
+        .info-box { background: var(--glass); border: 1px solid rgba(0, 242, 255, 0.1); padding: 35px; }
         .info-box h3 { font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon-purple); margin-bottom: 15px; letter-spacing: 3px; text-transform: uppercase; }
         .info-text { font-size: 1.1rem; color: #fff; letter-spacing: 1px; line-height: 1.5; }
-        .phone-link { display: inline-block; color: var(--neon-blue); text-decoration: none; font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 2px; transition: 0.3s; }
-        .phone-link:hover { color: #fff; text-shadow: 0 0 10px var(--neon-blue); }
+        .phone-link { display: inline-block; color: var(--neon-blue); text-decoration: none; font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 2px; }
 
         footer { padding: 60px; text-align: center; font-size: 0.65rem; color: #444; border-top: 1px solid #222; letter-spacing: 3px; text-transform: uppercase;}
     </style>
 </head>
 <body>
-
-<div class="bg-fixed"></div>
 
 <header>
     <h1>SPRING SOUND LAB</h1>
@@ -210,7 +185,6 @@
             </ul>
             <a href="https://t.me/WEYTON" class="btn-lab">Забронировать</a>
         </div>
-
         <div class="module">
             <h3>START EDITION</h3>
             <div class="price">3 500 <span>₽</span></div>
@@ -222,7 +196,6 @@
             </ul>
             <a href="https://t.me/WEYTON" class="btn-lab">Выбрать</a>
         </div>
-
         <div class="module" style="border-color: var(--neon-purple);">
             <h3>ARTIST EDITION</h3>
             <div class="price">6 000 <span>₽</span></div>
@@ -234,7 +207,6 @@
             </ul>
             <a href="https://t.me/WEYTON" class="btn-lab" style="background: var(--neon-purple); border-color: var(--neon-purple);">Выбрать</a>
         </div>
-
         <div class="module">
             <h3>PLATINUM EDITION</h3>
             <div class="price">CUSTOM</div>
@@ -247,7 +219,6 @@
             <a href="https://t.me/WEYTON" class="btn-lab">Связаться</a>
         </div>
     </div>
-
     <section class="portfolio-section">
         <h2>ПОРТФОЛИО</h2>
         <div class="portfolio-grid">
@@ -257,7 +228,6 @@
             <div class="track-card"><h4>ПРИМЕР 4</h4><audio controls src="audio4.mp3"></audio></div>
         </div>
     </section>
-
     <section class="contact-section">
         <div class="info-grid">
             <div class="info-box">
@@ -267,7 +237,6 @@
             <div class="info-box">
                 <h3>Телефон</h3>
                 <a href="tel:+79178382017" class="phone-link">+7 917 838 20 17</a>
-                <div style="margin-top: 10px; font-size: 0.7rem; color: #555;">Кликните для звонка</div>
             </div>
         </div>
     </section>
