@@ -3,150 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spring Sound Lab | Цены и услуги</title>
+    <title>Spring Sound Lab | WEYTON Production</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { 
             --neon-blue: #00f2ff;
             --neon-purple: #bc13fe;
-            --platinum: #e5e4e2;
-            --bg: #050505; 
+            --platinum: #ffffff;
+            --bg: #030303; 
         }
         * { box-sizing: border-box; scroll-behavior: smooth; }
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: #fff; margin: 0; line-height: 1.6; }
         
-        header { 
-            height: 60vh; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center;
-            background: radial-gradient(circle, rgba(188,19,254,0.15) 0%, rgba(5,5,5,1) 80%);
-            border-bottom: 1px solid #111;
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background: var(--bg); 
+            color: #fff; 
+            margin: 0; 
+            overflow-x: hidden;
         }
 
-        h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 8vw, 3.5rem); text-shadow: 0 0 15px var(--neon-purple); margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        header p { color: var(--neon-blue); letter-spacing: 4px; text-transform: uppercase; margin-top: 10px; font-weight: 600; font-size: 0.9rem; }
+        /* Анимированный фон */
+        .bg-animate {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(188,19,254,0.1) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(0,242,255,0.05) 0%, transparent 40%);
+            z-index: -1;
+            animation: moveBg 15s infinite alternate;
+        }
+        @keyframes moveBg {
+            from { transform: scale(1); }
+            to { transform: scale(1.2); }
+        }
 
-        .container { padding: 80px 20px; max-width: 1200px; margin: auto; }
-        
-        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-top: 50px; }
+        header { 
+            height: 100vh; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center;
+        }
+
+        h1 { 
+            font-family: 'Orbitron', sans-serif; font-size: clamp(2.5rem, 10vw, 5rem); 
+            text-shadow: 0 0 20px var(--neon-purple); margin: 0; 
+            letter-spacing: 5px; animation: glow 2s infinite alternate;
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 10px var(--neon-purple); }
+            to { text-shadow: 0 0 30px var(--neon-purple), 0 0 10px var(--neon-blue); }
+        }
+
+        header p { color: var(--neon-blue); letter-spacing: 6px; text-transform: uppercase; font-weight: 600; font-size: 0.8rem; margin-top: 20px; }
+
+        .container { padding: 100px 20px; max-width: 1200px; margin: auto; }
+
+        /* Сетка услуг (Glassmorphism) */
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         
         .package { 
-            background: #0d0d0d; 
-            padding: 40px; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            flex-direction: column;
-            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            padding: 40px; border-radius: 30px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.5s; position: relative;
         }
-
         .package:hover { 
-            border-color: var(--neon-blue);
-            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.1);
-            transform: translateY(-10px);
+            border-color: var(--neon-blue); 
+            transform: translateY(-15px) scale(1.02);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        /* Стиль для Platinum Edition */
-        .package.platinum {
-            border: 1px solid var(--platinum);
-            background: linear-gradient(145deg, #0d0d0d 0%, #1a1a1a 100%);
+        .package h3 { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); font-size: 1.4rem; margin-bottom: 10px; }
+        .price { font-size: 2.5rem; font-weight: 900; margin: 20px 0; font-family: 'Orbitron'; }
+        
+        .features { list-style: none; padding: 0; margin-bottom: 30px; color: #bbb; font-size: 0.9rem; }
+        .features li { margin-bottom: 12px; }
+        .features li::before { content: "●"; color: var(--neon-purple); margin-right: 10px; font-size: 0.7rem; }
+
+        /* Блок Портфолио */
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 40px; }
+        .track-card { 
+            background: #111; padding: 20px; border-radius: 15px; 
+            border: 1px solid #222; text-align: left;
         }
-        .package.platinum:hover {
-            box-shadow: 0 0 25px rgba(229, 228, 226, 0.2);
-            border-color: #fff;
-        }
-
-        .package h3 { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px; letter-spacing: 1px; }
-        .package.platinum h3 { color: var(--platinum); text-shadow: 0 0 10px rgba(255,255,255,0.3); }
-
-        .price { font-size: 2.8rem; font-weight: 700; margin: 20px 0; font-family: 'Orbitron', sans-serif; }
-        .price span { font-size: 1.2rem; color: #444; margin-left: 5px; }
-
-        .features { list-style: none; padding: 0; margin: 0 0 40px 0; flex-grow: 1; }
-        .features li { margin-bottom: 15px; font-size: 0.95rem; color: #ccc; display: flex; align-items: flex-start; }
-        .features li::before { content: "⚡"; color: var(--neon-blue); margin-right: 12px; font-size: 0.8rem; margin-top: 4px; }
-        .package.platinum .features li::before { color: var(--platinum); }
+        .track-card span { color: var(--neon-blue); font-size: 0.8rem; font-family: 'Orbitron'; }
+        .track-card h4 { margin: 5px 0 15px 0; font-size: 1rem; }
 
         .btn { 
-            display: block;
-            padding: 18px; 
-            background: transparent; 
-            color: #fff; 
-            text-decoration: none; 
-            border: 1px solid var(--neon-blue);
-            border-radius: 10px; 
-            transition: 0.3s;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 1px;
-            font-size: 0.85rem;
-            text-align: center;
+            display: block; padding: 15px; border: 1px solid var(--neon-purple);
+            color: #fff; text-decoration: none; border-radius: 50px;
+            text-align: center; font-weight: 700; text-transform: uppercase;
+            font-size: 0.8rem; transition: 0.4s; letter-spacing: 1px;
         }
-        .btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
+        .btn:hover { background: var(--neon-purple); box-shadow: 0 0 30px var(--neon-purple); }
 
-        .platinum-btn { border-color: var(--platinum); }
-        .platinum-btn:hover { background: var(--platinum); color: #000; box-shadow: 0 0 20px var(--platinum); }
+        .social-links { margin-top: 40px; display: flex; gap: 20px; justify-content: center; }
+        .social-links a { color: #555; text-decoration: none; font-size: 0.8rem; transition: 0.3s; text-transform: uppercase; border-bottom: 1px solid transparent; }
+        .social-links a:hover { color: var(--neon-blue); border-color: var(--neon-blue); }
 
-        footer { text-align: center; padding: 60px; color: #333; font-size: 0.75rem; letter-spacing: 1px; border-top: 1px solid #111; }
+        footer { text-align: center; padding: 100px 20px; color: #333; font-size: 0.7rem; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
+<div class="bg-animate"></div>
+
 <header>
+    <div style="font-size: 0.7rem; letter-spacing: 4px; color: #555; margin-bottom: 20px;">WEYTON PRESENTS</div>
     <h1>SPRING SOUND LAB</h1>
-    <p>Premium Audio Production by WEYTON</p>
+    <p>Analog Heat • Digital Precision</p>
 </header>
 
-<section class="container">
+<section class="container" id="services">
     <div class="pricing-grid">
-        
         <div class="package">
             <h3>START</h3>
-            <div class="price">3 500<span>₽</span></div>
+            <div class="price">3 500 ₽</div>
             <ul class="features">
-                <li>Запись вокала (до 1.5 часов)</li>
-                <li>Базовая частотная обработка</li>
-                <li>Автоматический тюнинг (Autotune)</li>
-                <li>Сведение с минусом (одним файлом)</li>
+                <li>Запись вокала (до 1.5ч)</li>
+                <li>Автоматический тюнинг</li>
+                <li>Базовое сведение</li>
+                <li>Мастеринг</li>
             </ul>
             <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Забронировать</a>
         </div>
 
-        <div class="package">
+        <div class="package" style="border-color: var(--neon-purple);">
             <h3>ARTIST</h3>
-            <div class="price">6 000<span>₽</span></div>
+            <div class="price">6 000 ₽</div>
             <ul class="features">
-                <li>Сессия записи (до 3 часов)</li>
-                <li>Ручная коррекция вокала (Melodyne)</li>
-                <li>Профессиональное сведение вокала</li>
-                <li>Мастеринг под стриминги</li>
+                <li>Сессия записи (до 3ч)</li>
+                <li>Ручной тюнинг (Melodyne)</li>
+                <li>Проф. сведение вокала</li>
+                <li>Готовность: приоритет</li>
             </ul>
-            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Выбрать стиль</a>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn" style="background: var(--neon-purple);">Выбрать</a>
         </div>
 
-        <div class="package platinum">
-            <div style="position: absolute; top: 15px; right: 20px; color: var(--platinum); font-size: 0.6rem; letter-spacing: 2px; font-weight: 900;">ULTIMATE</div>
+        <div class="package">
             <h3>PLATINUM</h3>
-            <div class="price">По запросу<span>₽</span></div>
+            <div class="price">CUSTOM</div>
             <ul class="features">
-                <li><b>Full Multitrack Mixing</b> (сведение по дорожкам)</li>
-                <li>Детальная работа над аранжировкой</li>
-                <li>Эксклюзивные эффекты и саунд-дизайн</li>
-                <li>Безлимитные правки до идеала</li>
-                <li>Приоритет в графике Spring Sound Lab</li>
+                <li>Full Multitrack Mixing</li>
+                <li>Саунд-дизайн и FX</li>
+                <li>Участие в аранжировке</li>
+                <li>Безлимит правок</li>
             </ul>
-            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn platinum-btn">Обсудить проект</a>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Обсудить</a>
         </div>
+    </div>
+</section>
 
+<section class="container" style="border-top: 1px solid #111;">
+    <h2 style="font-family: 'Orbitron'; text-align: center; letter-spacing: 3px;">PORTFOLIO</h2>
+    <div class="portfolio-grid">
+        <div class="track-card">
+            <span>HIP-HOP / TRAP</span>
+            <h4>WEYTON — Demo Track 1</h4>
+            <div style="height: 4px; background: #222; border-radius: 2px; overflow: hidden;">
+                <div style="width: 65%; height: 100%; background: var(--neon-blue);"></div>
+            </div>
+        </div>
+        <div class="track-card">
+            <span>POP / VOCAL</span>
+            <h4>WEYTON — Demo Track 2</h4>
+            <div style="height: 4px; background: #222; border-radius: 2px; overflow: hidden;">
+                <div style="width: 80%; height: 100%; background: var(--neon-purple);"></div>
+            </div>
+        </div>
     </div>
 </section>
 
 <footer>
-    SPRING SOUND LAB &copy; 2026 | DESIGN BY WEYTON | NO "UP" IN LOGO
+    <div class="social-links">
+        <a href="https://t.me/ТВОЙ_ЛОГИН">Telegram</a>
+        <a href="#">VKontakte</a>
+        <a href="#">Soundcloud</a>
+    </div>
+    <p style="margin-top: 40px;">SPRING SOUND LAB &copy; 2026 / CONCEPT BY WEYTON / NO "UP" LOGO</p>
 </footer>
 
 </body>
