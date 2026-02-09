@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRING SOUND LAB | EXPERIMENTAL AUDIO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>SPRING SOUND LAB | Лаборатория Звука</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-blue: #00f2ff;
             --neon-purple: #bc13fe;
-            --bg-dark: #050508;
-            --glass: rgba(255, 255, 255, 0.03);
+            --bg-dark: #08080a;
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
         * { box-sizing: border-box; scroll-behavior: smooth; }
@@ -22,200 +22,190 @@
             overflow-x: hidden;
         }
 
-        /* Анимированный фон Лаборатории */
-        canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-        .grid-overlay {
+        /* Фон с сеткой */
+        .grid-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background-image: linear-gradient(rgba(0, 242, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 242, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
             z-index: -1;
         }
 
+        .container { max-width: 1200px; margin: auto; padding: 0 20px; }
+
+        /* Шапка */
         header {
-            height: 100vh;
+            height: 80vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            background: radial-gradient(circle, rgba(188, 19, 254, 0.1) 0%, transparent 70%);
         }
 
-        .lab-tag {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
-            letter-spacing: 5px;
-            color: var(--neon-blue);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            opacity: 0.8;
+        .lab-status { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--neon-blue); letter-spacing: 5px; margin-bottom: 20px; }
+        h1 { 
+            font-family: 'Orbitron'; font-size: clamp(2.5rem, 8vw, 4.5rem); margin: 0;
+            background: linear-gradient(to right, #fff, var(--neon-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2.5rem, 10vw, 5rem);
-            margin: 0;
-            background: linear-gradient(90deg, #fff, var(--neon-blue), var(--neon-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.3));
-        }
-
-        .container { padding: 100px 20px; max-width: 1200px; margin: auto; }
-
-        /* Секция пакетов как модулей консоли */
-        .module-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
-        }
-
-        .module {
+        /* Блок О НАС */
+        .about-section {
             background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 2px; /* Острые углы как у приборов */
-            padding: 50px 30px;
-            position: relative;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
+            padding: 60px;
+            border-radius: 40px; /* Закругленные углы */
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 100px;
+        }
+        .about-section h2 { font-family: 'Orbitron'; color: var(--neon-blue); margin-top: 0; }
+        .about-section p { line-height: 1.8; color: #ccc; font-size: 1.1rem; }
+
+        /* Сетка пакетов */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 100px;
         }
 
-        .module::before {
-            content: "";
-            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-            background: var(--neon-blue);
-            transform: scaleX(0); transition: 0.4s;
+        .package {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px; /* Сильное закругление */
+            padding: 50px 40px;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
         }
 
-        .module:hover {
-            background: rgba(255, 255, 255, 0.07);
+        .package:hover {
+            transform: scale(1.03);
             border-color: var(--neon-blue);
-            transform: translateY(-5px);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 242, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .module:hover::before { transform: scaleX(1); }
-
-        .module h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
-            color: var(--neon-blue);
-        }
-
-        .price {
-            font-size: 3rem;
-            font-weight: 700;
-            font-family: 'Orbitron';
-            margin-bottom: 10px;
-        }
+        .package h3 { font-family: 'Orbitron'; font-size: 1.2rem; color: var(--neon-blue); margin-bottom: 30px; }
+        .price { font-size: 2.5rem; font-weight: 700; margin-bottom: 30px; }
         .price span { font-size: 1rem; opacity: 0.5; }
 
-        .specs {
-            list-style: none; padding: 0; margin: 40px 0;
-            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;
-            color: #aaa;
-        }
+        .features { list-style: none; padding: 0; margin-bottom: auto; text-align: left; }
+        .features li { margin-bottom: 15px; color: #999; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
 
-        .specs li {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex; justify-content: space-between;
+        .btn {
+            display: block; padding: 18px; border-radius: 50px;
+            text-decoration: none; font-weight: 700; font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 2px;
+            border: 1px solid #fff; color: #fff; transition: 0.3s;
         }
+        .btn:hover { background: #fff; color: #000; box-shadow: 0 0 20px #fff; }
 
-        .specs li span { color: var(--neon-purple); }
-
-        .btn-lab {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            border: 1px solid var(--neon-blue);
-            background: transparent;
-            color: #fff;
-            text-transform: uppercase;
-            font-family: 'Orbitron';
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: 0.3s;
-            text-decoration: none;
-            text-align: center;
+        /* Плееры */
+        .portfolio-section { margin-bottom: 100px; }
+        .portfolio-section h2 { font-family: 'Orbitron'; text-align: center; margin-bottom: 50px; }
+        
+        .audio-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
+        .audio-card span { font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon-purple); min-width: 150px; }
+        audio { flex-grow: 1; filter: invert(100%) hue-rotate(180deg) brightness(1.5); }
 
-        .btn-lab:hover {
-            background: var(--neon-blue);
-            color: #000;
-            box-shadow: 0 0 20px var(--neon-blue);
-        }
-
-        footer {
-            padding: 50px;
-            text-align: center;
-            font-size: 0.6rem;
-            letter-spacing: 3px;
-            color: #444;
-            border-top: 1px solid #111;
-        }
+        footer { padding: 80px; text-align: center; color: #444; font-size: 0.7rem; letter-spacing: 3px; border-top: 1px solid #111; }
     </style>
 </head>
 <body>
 
-<div class="grid-overlay"></div>
-
-<header>
-    <div class="lab-tag">Audio Research & Development</div>
-    <h1>SPRING SOUND LAB</h1>
-    <div style="margin-top: 20px; font-size: 0.8rem; color: #666; letter-spacing: 4px;">SYSTEM STATUS: ONLINE</div>
-</header>
+<div class="grid-bg"></div>
 
 <div class="container">
-    <div class="module-grid">
-        
-        <div class="module">
+    <header>
+        <div class="lab-status">SOUND RESEARCH UNIT // ONLINE</div>
+        <h1>SPRING SOUND LAB</h1>
+        <p style="letter-spacing: 5px; color: #666; margin-top: 20px;">ПРОФЕССИОНАЛЬНАЯ СРЕДА ДЛЯ ВАШЕГО ТВОРЧЕСТВА</p>
+    </header>
+
+    <section class="about-section">
+        <h2>О ЛАБОРАТОРИИ</h2>
+        <p>
+            Spring Sound Lab — это не просто студия, а высокотехнологичное пространство для работы со звуком. 
+            Мы фокусируемся на деталях, используя передовые алгоритмы обработки и аналоговую теплоту. 
+            Каждый проект проходит через строгий контроль качества, чтобы на выходе вы получили 
+            современное, конкурентоспособное звучание. Здесь ваши идеи обретают форму.
+        </p>
+    </section>
+
+    <div class="pricing-grid">
+        <div class="package">
             <h3>START EDITION</h3>
-            <div class="price">3 500<span>₽</span></div>
-            <ul class="specs">
-                <li>Recording <span>1.5H</span></li>
-                <li>Pitch Correction <span>Auto</span></li>
-                <li>Processing <span>Standard</span></li>
-                <li>Delivery <span>48H</span></li>
+            <div class="price">3 500 <span>₽</span></div>
+            <ul class="features">
+                <li>Запись вокала (1.5 часа)</li>
+                <li>Автоматическая коррекция тона</li>
+                <li>Базовое сведение</li>
+                <li>Мастеринг</li>
             </ul>
-            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn-lab">Initialize Session</a>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Забронировать</a>
         </div>
 
-        <div class="module" style="border-color: var(--neon-purple); background: rgba(188, 19, 254, 0.05);">
-            <div style="position: absolute; top: 10px; right: 10px; font-size: 0.5rem; color: var(--neon-purple);">RECOMMENDED</div>
+        <div class="package" style="border-color: var(--neon-purple);">
             <h3>ARTIST EDITION</h3>
-            <div class="price">6 000<span>₽</span></div>
-            <ul class="specs">
-                <li>Recording <span>3H</span></li>
-                <li>Manual Tuning <span>Melodyne</span></li>
-                <li>Full Mix <span>Pro</span></li>
-                <li>Mastering <span>Included</span></li>
+            <div class="price">6 000 <span>₽</span></div>
+            <ul class="features">
+                <li>Сессия записи (3 часа)</li>
+                <li>Ручной тюнинг Melodyne</li>
+                <li>Профессиональное сведение</li>
+                <li>Мастеринг под стриминги</li>
             </ul>
-            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn-lab" style="border-color: var(--neon-purple); background: var(--neon-purple);">Initialize Session</a>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn" style="background: var(--neon-purple); border-color: var(--neon-purple);">Выбрать</a>
         </div>
 
-        <div class="module">
+        <div class="package">
             <h3>PLATINUM EDITION</h3>
             <div class="price">CUSTOM</div>
-            <ul class="specs">
-                <li>Multitrack <span>Unlimited</span></li>
-                <li>Sound Design <span>Experimental</span></li>
-                <li>Revisions <span>Infinite</span></li>
-                <li>Producer Support <span>Full</span></li>
+            <ul class="features">
+                <li>Сведение мультитрека</li>
+                <li>Саунд-дизайн и эффекты</li>
+                <li>Участие в аранжировке</li>
+                <li>Безлимитные правки</li>
             </ul>
-            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn-lab">Contact Lab</a>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Обсудить</a>
+        </div>
+    </div>
+
+    <section class="portfolio-section">
+        <h2>ПРИМЕРЫ РАБОТ</h2>
+        
+        <div class="audio-card">
+            <span>HIP-HOP / TRAP</span>
+            <audio controls>
+                <source src="track1.mp3" type="audio/mpeg">
+                Ваш браузер не поддерживает плеер.
+            </audio>
         </div>
 
-    </div>
+        <div class="audio-card">
+            <span>POP / VOCAL</span>
+            <audio controls>
+                <source src="track2.mp3" type="audio/mpeg">
+                Ваш браузер не поддерживает плеер.
+            </audio>
+        </div>
+    </section>
 </div>
 
 <footer>
-    SPRING SOUND LAB &copy; 2026 // NO "UP" LOGO // HIGH PRECISION AUDIO
+    SPRING SOUND LAB &copy; 2026 // БЕЗ СЛОВА "UP" В ЛОГОТИПЕ // ВЫСОКАЯ ТОЧНОСТЬ ЗВУКА
 </footer>
 
 </body>
