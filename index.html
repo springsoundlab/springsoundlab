@@ -27,6 +27,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* УНИКАЛЬНЫЙ НЕОНОВЫЙ БЭКГРАУНД */
         .studio-background {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -56,13 +57,28 @@
             pointer-events: none;
         }
 
+        .studio-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.05), transparent);
+            animation: gearBlink 4s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes gearBlink {
+            0% { opacity: 0.2; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.3; }
+        }
+
         @keyframes flicker {
             0%, 18%, 20%, 25%, 26%, 53%, 55%, 100% { opacity: 1; }
             19%, 24%, 54% { opacity: 0.6; }
         }
 
         header {
-            height: 80vh;
+            height: 90vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -78,22 +94,25 @@
             letter-spacing: 10px;
             color: var(--neon-blue);
             text-transform: uppercase;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-weight: 700;
             text-shadow: 0 0 15px var(--neon-blue);
             animation: flicker 6s infinite;
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2rem, 7vw, 5rem);
+            font-size: clamp(2.5rem, 8vw, 5.5rem);
             margin: 0;
             background: linear-gradient(90deg, #fff, var(--neon-blue), var(--neon-purple), #fff);
             background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: flow 12s infinite linear;
+            filter: drop-shadow(0 0 25px rgba(0, 242, 255, 0.5));
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 6px;
+            line-height: 1.1;
         }
 
         @keyframes flow {
@@ -102,112 +121,123 @@
         }
 
         .header-about {
-            max-width: 800px;
-            margin-top: 40px;
-            font-size: clamp(0.85rem, 1.8vw, 1.1rem);
-            line-height: 1.8;
+            max-width: 850px;
+            margin-top: 50px;
+            font-size: clamp(0.95rem, 2vw, 1.2rem);
+            line-height: 1.9;
             color: #efefef;
-            padding: 30px;
+            padding: 40px;
             border-top: 1px solid rgba(188, 19, 254, 0.3);
             border-bottom: 1px solid rgba(188, 19, 254, 0.3);
-            background: rgba(0, 0, 0, 0.6);
+            font-weight: 300;
+            background: rgba(0, 0, 0, 0.65);
             backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 30px rgba(188, 19, 254, 0.05);
         }
 
-        .container { padding: 60px 15px; max-width: 1440px; margin: auto; position: relative; z-index: 5; }
+        .container { padding: 100px 15px; max-width: 1440px; margin: auto; position: relative; z-index: 5; }
 
         .module-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-top: -80px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: -120px;
         }
 
         .module {
             background: var(--glass);
             backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px 25px;
+            padding: 50px 30px;
             transition: var(--transition);
             display: flex;
             flex-direction: column;
             position: relative;
-            cursor: pointer;
+            overflow: hidden;
         }
 
-        .module h3 { font-family: 'Orbitron'; font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; }
-        .price { font-size: 2rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 15px; display: flex; align-items: baseline; gap: 8px; }
-        .price span { font-size: 0.8rem; color: #777; }
-        .specs { list-style: none; padding: 0; margin: 25px 0; font-size: 0.75rem; text-transform: uppercase; color: #ccc; flex-grow: 1; }
-        .specs li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; }
+        .module h3 { font-family: 'Orbitron'; font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 30px; text-transform: uppercase; }
+        .price { font-size: 2.2rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 20px; display: flex; align-items: baseline; gap: 10px; }
+        .price span { font-size: 0.85rem; color: #777; }
+        .specs { list-style: none; padding: 0; margin: 30px 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.2px; color: #ccc; flex-grow: 1; }
+        .specs li { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; }
+        .specs li span { font-weight: 700; text-align: right; }
 
         /* ЭФФЕКТЫ ПОДСВЕТКИ ПРИ НАВЕДЕНИИ */
         .module.rec:hover { 
             border-color: var(--neon-blue); 
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3), inset 0 0 15px rgba(0, 242, 255, 0.1);
-            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.3), inset 0 0 20px rgba(0, 242, 255, 0.1);
+            transform: translateY(-8px);
         }
-        .module.rec h3, .module.rec .specs li span { color: var(--neon-blue); }
+        .module.rec h3, .module.rec .specs li span { color: var(--neon-blue); text-shadow: 0 0 10px rgba(0, 242, 255, 0.4); }
 
         .module.start:hover { 
             border-color: var(--neon-red); 
-            box-shadow: 0 0 30px rgba(255, 0, 60, 0.3), inset 0 0 15px rgba(255, 0, 60, 0.1);
-            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(255, 0, 60, 0.3), inset 0 0 20px rgba(255, 0, 60, 0.1);
+            transform: translateY(-8px);
         }
-        .module.start h3, .module.start .specs li span { color: var(--neon-red); }
+        .module.start h3, .module.start .specs li span { color: var(--neon-red); text-shadow: 0 0 10px rgba(255, 0, 60, 0.4); }
 
         .module.artist:hover { 
             border-color: var(--neon-purple); 
-            box-shadow: 0 0 30px rgba(188, 19, 254, 0.3), inset 0 0 15px rgba(188, 19, 254, 0.1);
-            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(188, 19, 254, 0.3), inset 0 0 20px rgba(188, 19, 254, 0.1);
+            transform: translateY(-8px);
         }
-        .module.artist h3, .module.artist .specs li span { color: var(--neon-purple); }
+        .module.artist h3, .module.artist .specs li span { color: var(--neon-purple); text-shadow: 0 0 10px rgba(188, 19, 254, 0.4); }
 
         .module.platinum:hover { 
             border-color: var(--neon-gold); 
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3), inset 0 0 15px rgba(255, 204, 0, 0.1);
-            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(255, 204, 0, 0.3), inset 0 0 20px rgba(255, 204, 0, 0.1);
+            transform: translateY(-8px);
         }
-        .module.platinum h3, .module.platinum .specs li span { color: var(--neon-gold); }
+        .module.platinum h3, .module.platinum .specs li span { color: var(--neon-gold); text-shadow: 0 0 10px rgba(255, 204, 0, 0.4); }
 
         .btn-lab {
-            display: block; padding: 15px; border: 1px solid;
+            display: block; padding: 20px; border: 1px solid;
             color: #fff; text-transform: uppercase; font-family: 'Orbitron'; 
-            font-size: 0.7rem; text-decoration: none; text-align: center; 
-            transition: var(--transition); letter-spacing: 2px;
+            font-size: 0.75rem; text-decoration: none; text-align: center; 
+            transition: var(--transition); letter-spacing: 2px; margin-top: 10px;
         }
 
         .rec .btn-lab { border-color: var(--neon-blue); }
-        .rec .btn-lab:hover { background: var(--neon-blue); color: #000; }
+        .rec .btn-lab:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
         .start .btn-lab { border-color: var(--neon-red); }
-        .start .btn-lab:hover { background: var(--neon-red); color: #fff; }
+        .start .btn-lab:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px var(--neon-red); }
         .artist .btn-lab { border-color: var(--neon-purple); }
-        .artist .btn-lab:hover { background: var(--neon-purple); color: #fff; }
+        .artist .btn-lab:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px var(--neon-purple); }
         .platinum .btn-lab { border-color: var(--neon-gold); }
-        .platinum .btn-lab:hover { background: var(--neon-gold); color: #000; }
+        .platinum .btn-lab:hover { background: var(--neon-gold); color: #000; box-shadow: 0 0 20px var(--neon-gold); }
 
-        .portfolio-section { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.05); }
-        h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 12px; margin-bottom: 60px; text-align: center; font-size: 1.8rem; text-transform: uppercase; }
-        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .track-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); padding: 35px; transition: var(--transition); }
-        .track-card:hover { border-color: var(--neon-purple); }
-        audio { width: 100%; height: 35px; filter: invert(100%); opacity: 0.5; }
+        /* ПОРТФОЛИО */
+        .portfolio-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
+        h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 15px; margin-bottom: 80px; text-align: center; font-size: 2.2rem; text-transform: uppercase; text-shadow: 0 0 15px var(--neon-blue); }
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .track-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); padding: 45px; transition: var(--transition); }
+        .track-card:hover { border-color: var(--neon-purple); background: rgba(188, 19, 254, 0.04); transform: scale(1.02); }
+        .track-card h4 { font-family: 'Orbitron'; font-size: 0.85rem; color: #aaa; margin-bottom: 30px; letter-spacing: 5px; text-transform: uppercase; }
+        audio { width: 100%; height: 35px; filter: invert(100%); opacity: 0.5; transition: 0.4s; }
+        audio:hover { opacity: 0.9; }
 
-        .contact-section { padding: 80px 0; }
-        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 35px; }
-        .info-box { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.05); padding: 50px; text-align: center; transition: var(--transition); text-decoration: none; display: block; }
-        .info-box:hover { border-color: var(--neon-purple); transform: translateY(-5px); }
-        .info-box h3 { font-family: 'Orbitron'; font-size: 0.85rem; color: var(--neon-purple); margin-bottom: 25px; letter-spacing: 7px; text-transform: uppercase; }
-        .info-text { font-family: 'Orbitron'; font-size: 1.1rem; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
-        .info-box:hover .info-text { text-shadow: 0 0 15px var(--neon-blue); }
-        .phone-display { color: var(--neon-blue); font-weight: 700; font-size: 1.4rem; display: inline-block; margin-top: 15px; }
+        /* КОНТАКТЫ */
+        .contact-section { padding: 100px 0; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 35px; }
+        .info-box { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.05); padding: 55px; text-align: center; transition: var(--transition); text-decoration: none; display: block; position: relative; }
+        .info-box:hover { border-color: var(--neon-purple); box-shadow: 0 15px 40px rgba(188, 19, 254, 0.2); transform: translateY(-8px); }
+        .info-box h3 { font-family: 'Orbitron'; font-size: 0.85rem; color: var(--neon-purple); margin-bottom: 30px; letter-spacing: 7px; text-transform: uppercase; }
+        .info-text { font-family: 'Orbitron'; font-size: 1.1rem; color: #fff; letter-spacing: 2.5px; text-transform: uppercase; transition: var(--transition); line-height: 1.6; }
+        .info-box:hover .info-text { color: #fff; text-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue); }
+        .phone-display { color: var(--neon-blue); font-weight: 700; font-size: 1.4rem; display: inline-block; margin-top: 15px; transition: var(--transition); }
         .hint-text { display: block; margin-top: 20px; font-size: 0.7rem; color: #444; letter-spacing: 2px; text-transform: uppercase; }
 
-        footer { padding: 80px; text-align: center; font-family: 'Orbitron'; font-size: 0.7rem; color: #333; border-top: 1px solid #111; letter-spacing: 4px; }
+        footer { padding: 100px; text-align: center; font-family: 'Orbitron'; font-size: 0.75rem; color: #333; border-top: 1px solid #111; letter-spacing: 5px; text-transform: uppercase; }
 
+        /* МОБИЛЬНАЯ ВЕРСИЯ */
         @media (max-width: 768px) {
-            header { height: auto; padding: 100px 20px; }
+            header { height: auto; padding: 120px 20px; }
             .module-grid { margin-top: 0; }
+            .container { padding-top: 40px; }
+            .module { padding: 40px 20px; }
+            h2 { font-size: 1.6rem; letter-spacing: 8px; }
         }
     </style>
 </head>
@@ -215,12 +245,13 @@
 
 <div class="studio-background"></div>
 <div class="studio-overlay"></div>
+<div class="studio-glow"></div>
 
 <header>
     <div class="sub-title">студия звукозаписи</div>
     <h1>SPRING SOUND LAB</h1>
     <div class="header-about">
-        SPRING SOUND LAB — высокотехнологичное пространство для работы со звуком под руководством <b>WEYTON</b>.
+        SPRING SOUND LAB — это высокотехнологичное пространство для работы со звуком под руководством <b>WEYTON</b>. Мы объединяем техническую точность и эстетику современного аудио-производства. В нашей лаборатории каждый проект проходит через детальную обработку и финальный тюнинг качества.
     </div>
 </header>
 
@@ -257,6 +288,7 @@
                 <li>СВЕДЕНИЕ <span>PRO MIX</span></li>
                 <li>ЭФФЕКТЫ <span>3D SPACE</span></li>
                 <li>ДАБЛЫ / БЭКИ <span>FULL</span></li>
+                <li>МАСТЕРИНГ <span>READY</span></li>
             </ul>
             <a href="https://t.me/WEYTON" class="btn-lab">Выбрать</a>
         </div>
