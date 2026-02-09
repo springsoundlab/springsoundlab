@@ -12,7 +12,7 @@
             --neon-red: #ff003c;
             --neon-gold: #ffcc00;
             --bg-dark: #020205;
-            --glass: rgba(0, 0, 0, 0.88);
+            --glass: rgba(0, 0, 0, 0.9);
             --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -26,175 +26,88 @@
             overflow-x: hidden;
         }
 
-        /* 4K ФОН С ГИТХАБА */
+        /* 4K ФОН */
         .studio-background {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -2;
-            background-color: #05050a;
-            background-image: linear-gradient(rgba(2, 2, 5, 0.8), rgba(2, 2, 5, 0.96)), 
-                              url('bg.jpg'); 
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background-image: linear-gradient(rgba(2, 2, 5, 0.8), rgba(2, 2, 5, 0.97)), url('bg.jpg'); 
+            background-size: cover; background-position: center; background-repeat: no-repeat;
             animation: backgroundSubtleScale 80s infinite alternate ease-in-out;
         }
 
-        @keyframes backgroundSubtleScale {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
-        }
+        @keyframes backgroundSubtleScale { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 
-        header {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .sub-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
-            letter-spacing: 15px;
+        /* ЭФФЕКТ МЕРЦАЮЩЕЙ ЛАМПЫ */
+        .flicker-title {
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            letter-spacing: 10px;
             color: var(--neon-blue);
             text-transform: uppercase;
-            margin-bottom: 30px;
-            text-shadow: 0 0 20px var(--neon-blue);
+            margin-bottom: 20px;
+            animation: flicker 3s infinite;
         }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% { text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); opacity: 1; }
+            20%, 24%, 55% { text-shadow: none; opacity: 0.3; }
+        }
+
+        header { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
 
         h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2.5rem, 8vw, 7rem);
-            margin: 0;
+            font-family: 'Orbitron'; font-size: clamp(2.5rem, 8vw, 7rem); margin: 0;
             background: linear-gradient(90deg, #fff, var(--neon-blue), var(--neon-purple), #fff);
-            background-size: 300% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: flow 15s infinite linear;
-            text-transform: uppercase;
-            letter-spacing: 12px;
-            font-weight: 900;
+            background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: flow 15s infinite linear; text-transform: uppercase; letter-spacing: 12px; font-weight: 900;
         }
 
-        @keyframes flow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 300% 50%; }
-        }
+        @keyframes flow { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
 
         .container { padding: 100px 20px; max-width: 1400px; margin: auto; position: relative; z-index: 5; }
 
-        section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
+        /* УСЛУГИ С ЦВЕТНОЙ ПОДСВЕТКОЙ СЗАДИ */
+        .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .module { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.1); padding: 70px 45px; transition: var(--transition); }
 
-        h2 { 
-            font-family: 'Orbitron'; 
-            text-align: center; 
-            letter-spacing: 15px; 
-            margin-bottom: 80px; 
-            font-size: 2.5rem; 
-            text-transform: uppercase;
-        }
+        /* Пакеты с их цветами свечения */
+        .module.rec:hover { border-color: var(--neon-blue); box-shadow: 0 0 60px rgba(0, 242, 255, 0.3); background: rgba(0, 242, 255, 0.05); }
+        .module.start:hover { border-color: var(--neon-blue); box-shadow: 0 0 60px rgba(0, 242, 255, 0.3); background: rgba(0, 242, 255, 0.05); }
+        .module.artist:hover { border-color: var(--neon-red); box-shadow: 0 0 60px rgba(255, 0, 60, 0.3); background: rgba(255, 0, 60, 0.05); }
+        .module.platinum:hover { border-color: var(--neon-gold); box-shadow: 0 0 60px rgba(255, 204, 0, 0.3); background: rgba(255, 204, 0, 0.05); }
 
-        /* УСЛУГИ С ТВОЕЙ ПОДСВЕТКОЙ */
-        .module-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .module {
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 70px 45px;
-            transition: var(--transition);
-        }
-
-        .module h3 { font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 4px; margin-bottom: 30px; }
-
-        .module.rec:hover { border-color: var(--neon-blue); box-shadow: 0 0 40px rgba(0, 242, 255, 0.2); }
-        .module.start:hover { border-color: var(--neon-red); box-shadow: 0 0 40px rgba(255, 0, 60, 0.2); }
-        .module.artist:hover { border-color: var(--neon-purple); box-shadow: 0 0 40px rgba(188, 19, 254, 0.2); }
-        .module.platinum:hover { border-color: var(--neon-gold); box-shadow: 0 0 40px rgba(255, 204, 0, 0.2); }
-
-        .price { font-size: 2.8rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 30px; }
-        .price span { font-size: 1rem; color: #555; }
-
-        .specs { list-style: none; padding: 0; margin-bottom: 40px; }
-        .specs li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; display: flex; justify-content: space-between; text-transform: uppercase; }
+        .module h3 { font-family: 'Orbitron'; letter-spacing: 4px; margin-bottom: 25px; }
+        .price { font-size: 3rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 30px; }
+        .specs { list-style: none; padding: 0; margin-bottom: 30px; }
+        .specs li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; display: flex; justify-content: space-between; }
         .specs li span { color: var(--neon-blue); }
 
-        /* ПРЕИМУЩЕСТВА */
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .feature-item { padding: 40px; background: rgba(255,255,255,0.02); border-left: 3px solid var(--neon-purple); transition: 0.3s; }
-        .feature-item:hover { background: rgba(188, 19, 254, 0.05); transform: translateX(10px); }
-        .feature-item h4 { font-family: 'Orbitron'; color: #fff; margin-bottom: 15px; letter-spacing: 3px; }
-        .feature-item p { font-size: 0.85rem; color: #888; line-height: 1.6; }
-
-        /* WORKFLOW */
-        .workflow-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .step-card { padding: 40px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); position: relative; }
-        .step-num { font-family: 'Orbitron'; font-size: 4rem; color: rgba(0, 242, 255, 0.05); position: absolute; top: 10px; right: 20px; font-weight: 900; }
-        .step-card h4 { font-family: 'Orbitron'; color: var(--neon-blue); margin-bottom: 15px; }
-
-        /* ОТЗЫВЫ */
-        .reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .review-card { background: rgba(255,255,255,0.03); padding: 40px; border-top: 2px solid var(--neon-blue); }
-        .review-author { font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.8rem; letter-spacing: 2px; display: block; margin-bottom: 15px; }
-
-        /* СОЦСЕТИ */
-        .social-flex { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
-        .social-link { width: 280px; padding: 40px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.05); text-align: center; text-decoration: none; color: #fff; transition: 0.4s; }
-        .social-link:hover { border-color: var(--neon-purple); background: rgba(188, 19, 254, 0.05); transform: translateY(-10px); }
-        .social-link h4 { font-family: 'Orbitron'; letter-spacing: 4px; margin-bottom: 10px; }
-
-        /* ТЕЛЕФОН И АДРЕС (ПОДСВЕТКА СОХРАНЕНА) */
-        .contact-box {
-            background: var(--glass);
-            padding: 100px 50px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: 0.4s;
-            display: block;
-            text-decoration: none;
-            color: #fff;
-            margin-top: 50px;
+        /* КОНТАКТНЫЙ БЛОК: ТЕЛЕФОН + КАРТА + ВРЕМЯ */
+        .contact-section { margin-top: 100px; }
+        .contact-card {
+            background: var(--glass); padding: 80px 40px; text-align: center; border: 1px solid rgba(255,255,255,0.1);
+            display: block; text-decoration: none; color: #fff; transition: var(--transition);
         }
+        .contact-card:hover { border-color: var(--neon-purple); transform: scale(1.02); box-shadow: 0 0 50px rgba(188, 19, 254, 0.2); }
 
-        .phone-link {
-            color: var(--neon-blue);
-            font-size: 3rem;
-            font-family: 'Orbitron';
-            font-weight: 700;
-            transition: 0.3s;
-        }
+        .phone-link { color: var(--neon-blue); font-size: 3rem; font-family: 'Orbitron'; font-weight: 700; transition: 0.3s; display: block; }
+        .contact-card:hover .phone-link { color: var(--neon-purple); text-shadow: 0 0 25px var(--neon-purple); }
 
-        .contact-box:hover .phone-link {
-            color: var(--neon-purple);
-            text-shadow: 0 0 30px var(--neon-purple);
-            transform: scale(1.05);
-        }
+        .info-row { display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap; }
+        .info-item { text-align: center; }
+        .info-item label { font-family: 'Orbitron'; color: var(--neon-purple); font-size: 0.7rem; letter-spacing: 3px; display: block; margin-bottom: 10px; }
+        .info-item span { font-size: 0.9rem; color: #aaa; }
 
-        .address-text {
-            display: block;
-            margin-top: 20px;
-            font-family: 'Orbitron';
-            color: #555;
-            letter-spacing: 5px;
-            font-size: 0.9rem;
+        /* КНОПКА КАРТЫ */
+        .map-btn {
+            display: inline-block; margin-top: 40px; padding: 15px 40px; border: 1px solid var(--neon-blue);
+            font-family: 'Orbitron'; color: var(--neon-blue); text-decoration: none; font-size: 0.8rem;
+            letter-spacing: 3px; transition: 0.3s;
         }
+        .map-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
 
-        footer {
-            padding: 80px 20px;
-            text-align: center;
-            font-family: 'Orbitron';
-            font-size: 0.7rem;
-            color: #222;
-            letter-spacing: 10px;
-            border-top: 1px solid #111;
-        }
+        footer { padding: 100px 20px; text-align: center; font-family: 'Orbitron'; font-size: 0.7rem; color: #222; letter-spacing: 8px; border-top: 1px solid #111; }
     </style>
 </head>
 <body>
@@ -202,7 +115,8 @@
 <div class="studio-background"></div>
 
 <header>
-    <div class="sub-title">WEYTON PRESENTS</div>
+    <div class="flicker-title">СТУДИЯ ЗВУКОЗАПИСИ</div>
+    <div style="font-family: 'Orbitron'; letter-spacing: 15px; color: #fff; opacity: 0.5; font-size: 0.7rem; margin-bottom: 10px;">WEYTON PRESENTS</div>
     <h1>SPRING SOUND LAB</h1>
 </header>
 
@@ -228,7 +142,7 @@
                 </ul>
             </div>
             <div class="module artist">
-                <h3>ARTIST</h3>
+                <h3>ARTIST EDITION</h3>
                 <div class="price">6 000 <span>₽</span></div>
                 <ul class="specs">
                     <li>СВЕДЕНИЕ <span>PRO</span></li>
@@ -246,73 +160,25 @@
         </div>
     </section>
 
-    <section id="features">
-        <h2>WHY WEYTON?</h2>
-        <div class="features-grid">
-            <div class="feature-item">
-                <h4>ACOUSTIC DESIGN</h4>
-                <p>Идеальная реверберация для кристально чистого вокала.</p>
+    <section class="contact-section">
+        <div class="contact-card">
+            <h3 style="font-family:'Orbitron'; letter-spacing:10px; margin-bottom:40px;">CONTACT US</h3>
+            
+            <a href="tel:+79178382017" class="phone-link">+7 917 838 20 17</a>
+            
+            <div class="info-row">
+                <div class="info-item">
+                    <label>АДРЕС</label>
+                    <span>Волгоград, Тулака 9</span>
+                </div>
+                <div class="info-item">
+                    <label>ВРЕМЯ РАБОТЫ</label>
+                    <span>Круглосуточно (по записи)</span>
+                </div>
             </div>
-            <div class="feature-item">
-                <h4>TOP GEAR</h4>
-                <p>Легендарные микрофоны и преампы для "дорогого" звука.</p>
-            </div>
-            <div class="feature-item">
-                <h4>EXPERT MIXING</h4>
-                <p>Глубокая проработка каждой частоты вашего микса.</p>
-            </div>
-        </div>
-    </section>
 
-    <section id="workflow">
-        <h2>WORKFLOW</h2>
-        <div class="workflow-grid">
-            <div class="step-card">
-                <div class="step-num">01</div>
-                <h4>ЗАПИСЬ</h4>
-                <p>Профессиональная сессия с инженером в студии.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-num">02</div>
-                <h4>СВЕДЕНИЕ</h4>
-                <p>Баланс инструментов и частотная коррекция.</p>
-            </div>
-            <div class="step-card">
-                <div class="step-num">03</div>
-                <h4>МАСТЕРИНГ</h4>
-                <p>Подготовка трека к стриминговым площадкам.</p>
-            </div>
+            <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="map-btn">ОТКРЫТЬ КАРТЫ</a>
         </div>
-    </section>
-
-    <section id="reviews">
-        <h2>REVIEWS</h2>
-        <div class="reviews-grid">
-            <div class="review-card">
-                <span class="review-author">ARTIST X</span>
-                <p>"Лучшее сведение в городе. WEYTON знает своё дело."</p>
-            </div>
-            <div class="review-card">
-                <span class="review-author">PRODUCER Y</span>
-                <p>"Результат превзошел ожидания. Очень плотный звук."</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="connect">
-        <h2>CONNECT</h2>
-        <div class="social-flex">
-            <a href="https://t.me/WEYTON" class="social-link" target="_blank"><h4>TELEGRAM</h4><span>Direct</span></a>
-            <a href="https://vk.com/" class="social-link" target="_blank"><h4>VKONTAKTE</h4><span>Community</span></a>
-        </div>
-    </section>
-
-    <section id="booking" style="border:none;">
-        <a href="tel:+79178382017" class="contact-box">
-            <h3 style="font-family:'Orbitron'; margin-bottom:30px; letter-spacing:10px;">BOOK NOW</h3>
-            <span class="phone-link">+7 917 838 20 17</span>
-            <span class="address-text">ВОЛГОГРАД, ТУЛАКА 9</span>
-        </a>
     </section>
 
 </div>
