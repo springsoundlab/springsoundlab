@@ -27,15 +27,16 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* КОНТЕЙНЕР ДЛЯ АНИМАЦИИ ФОНА */
-        #bg-canvas {
+        /* ФОНОВОЕ ИЗОБРАЖЕНИЕ */
+        .bg-layer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(5, 5, 8, 0.85), rgba(5, 5, 8, 0.85)), 
+                        url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             z-index: -1;
-            background: radial-gradient(circle at center, #10101a 0%, #050508 100%);
         }
 
         header {
@@ -46,6 +47,7 @@
             align-items: center;
             text-align: center;
             position: relative;
+            border-bottom: 2px solid var(--neon-blue);
             padding: 40px;
         }
 
@@ -132,38 +134,43 @@
         .module.rec h3, .module.rec .specs li span { color: var(--neon-blue); }
         .module.rec .btn-lab { border-color: var(--neon-blue); }
         .module.rec:hover { border-color: var(--neon-blue); box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); background: rgba(0, 242, 255, 0.05); transform: translateY(-10px); }
+        .module.rec .btn-lab:hover { background: var(--neon-blue); color: #000; }
 
         .module.start { border-color: var(--neon-red); }
         .module.start h3, .module.start .specs li span { color: var(--neon-red); }
         .module.start .btn-lab { border-color: var(--neon-red); }
         .module.start:hover { border-color: var(--neon-red); box-shadow: 0 0 30px rgba(255, 0, 60, 0.3); background: rgba(255, 0, 60, 0.05); transform: translateY(-10px); }
+        .module.start .btn-lab:hover { background: var(--neon-red); color: #fff; }
 
         .module.artist { border-color: var(--neon-purple); }
         .module.artist h3, .module.artist .specs li span { color: var(--neon-purple); }
         .module.artist .btn-lab { border-color: var(--neon-purple); }
         .module.artist:hover { border-color: var(--neon-purple); box-shadow: 0 0 30px rgba(188, 19, 254, 0.3); background: rgba(188, 19, 254, 0.05); transform: translateY(-10px); }
+        .module.artist .btn-lab:hover { background: var(--neon-purple); color: #fff; }
 
         .module.platinum { border-color: var(--neon-gold); }
         .module.platinum h3, .module.platinum .specs li span { color: var(--neon-gold); }
         .module.platinum .btn-lab { border-color: var(--neon-gold); }
         .module.platinum:hover { border-color: var(--neon-gold); box-shadow: 0 0 30px rgba(255, 204, 0, 0.3); background: rgba(255, 204, 0, 0.05); transform: translateY(-10px); }
+        .module.platinum .btn-lab:hover { background: var(--neon-gold); color: #000; }
 
-        .portfolio-section, .contact-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
-        h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 12px; margin-bottom: 60px; text-align: center; font-size: 1.8rem; text-transform: uppercase; }
-
+        /* КОНТАКТЫ */
+        .contact-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .info-box { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.05); padding: 45px; text-align: center; transition: var(--transition); text-decoration: none; display: block; }
         .info-box:hover { border-color: var(--neon-purple); box-shadow: 0 10px 30px rgba(188, 19, 254, 0.2); }
         .info-box h3 { font-family: 'Orbitron'; color: var(--neon-purple); margin-bottom: 25px; letter-spacing: 6px; text-transform: uppercase; }
-        .info-text { font-family: 'Orbitron'; color: #fff; text-transform: uppercase; transition: var(--transition); }
-        .info-box:hover .info-text { text-shadow: 0 0 15px var(--neon-blue); }
+        .info-text { font-family: 'Orbitron'; color: #fff; text-transform: uppercase; transition: var(--transition); font-size: 1rem; letter-spacing: 2px; }
         
-        footer { padding: 80px; text-align: center; font-family: 'Orbitron'; font-size: 0.65rem; color: #444; letter-spacing: 4px; }
+        /* Подсветка текста при наведении как на телефон, так и на адрес */
+        .info-box:hover .info-text { color: #fff; text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue); }
+        
+        footer { padding: 80px; text-align: center; font-family: 'Orbitron'; font-size: 0.65rem; color: #444; letter-spacing: 4px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
+<div class="bg-layer"></div>
 
 <header>
     <div class="sub-title">студия звукозаписи</div>
@@ -243,67 +250,6 @@
 <footer>
     WEYTON // SPRING SOUND LAB &copy; 2026 // NO "UP" IN LOGO
 </footer>
-
-<script>
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-
-    let particles = [];
-    const particleCount = 60;
-
-    function init() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        particles = [];
-        for (let i = 0; i < particleCount; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 2 + 1,
-                speedX: (Math.random() - 0.5) * 0.5,
-                speedY: (Math.random() - 0.5) * 0.5,
-                color: Math.random() > 0.5 ? '#00f2ff' : '#bc13fe'
-            });
-        }
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        particles.forEach(p => {
-            p.x += p.speedX;
-            p.y += p.speedY;
-
-            if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
-            if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
-
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = 0.3;
-            ctx.fill();
-            
-            // Линии между частицами
-            particles.forEach(p2 => {
-                const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-                if (dist < 150) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = p.color;
-                    ctx.globalAlpha = 1 - (dist / 150);
-                    ctx.lineWidth = 0.5;
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.stroke();
-                }
-            });
-        });
-        requestAnimationFrame(animate);
-    }
-
-    window.addEventListener('resize', init);
-    init();
-    animate();
-</script>
 
 </body>
 </html>
