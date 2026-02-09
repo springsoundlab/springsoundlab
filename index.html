@@ -27,34 +27,54 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ПОЛНОЦЕННЫЙ ФОН С ЭФФЕКТОМ МЕРЦАНИЯ ОБОРУДОВАНИЯ */
-        .bg-layer {
+        /* ФОН ПО МОТИВАМ ИЗОБРАЖЕНИЯ */
+        .bg-wrapper {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* Изображение консоли/студии */
-            background: linear-gradient(rgba(5, 5, 8, 0.6), rgba(5, 5, 8, 0.9)), 
+            z-index: -2;
+            background: linear-gradient(rgba(5, 5, 8, 0.7), rgba(5, 5, 8, 0.9)), 
                         url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1920&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
-            z-index: -2;
-            animation: studioPulse 6s infinite ease-in-out;
+            animation: hardwareGlow 8s infinite alternate ease-in-out;
         }
 
-        /* Анимация мерцания "железа" на фоне */
-        @keyframes studioPulse {
-            0% { filter: brightness(0.8) contrast(1); }
-            30% { filter: brightness(1.1) contrast(1.1) saturate(1.2); }
-            50% { filter: brightness(0.9) contrast(1); }
-            70% { filter: brightness(1.1) contrast(1.1) saturate(1.3); }
-            100% { filter: brightness(0.8) contrast(1); }
+        @keyframes hardwareGlow {
+            0% { filter: brightness(0.8) contrast(1.1); }
+            50% { filter: brightness(1.1) contrast(1.2); }
+            100% { filter: brightness(0.8) contrast(1.1); }
         }
 
-        #particles-js {
+        /* НЕОНОВАЯ ВОЛНА (СИНУСОИДА) НА ФОНЕ */
+        .neon-wave-container {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 45%;
+            left: 0;
+            width: 100%;
+            height: 300px;
             z-index: -1;
             pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .wave-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .wave-path {
+            fill: none;
+            stroke: url(#waveGradient);
+            stroke-width: 3;
+            filter: drop-shadow(0 0 15px var(--neon-blue)) drop-shadow(0 0 5px var(--neon-purple));
+            stroke-dasharray: 1000;
+            animation: waveMove 10s linear infinite;
+        }
+
+        @keyframes waveMove {
+            0% { stroke-dashoffset: 1000; opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0.4; }
         }
 
         header {
@@ -65,7 +85,6 @@
             align-items: center;
             text-align: center;
             position: relative;
-            /* Полоска удалена по твоему требованию */
             padding: 40px;
         }
 
@@ -97,8 +116,7 @@
 
         @keyframes flow {
             0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
         }
 
         .header-about {
@@ -133,7 +151,6 @@
             transition: var(--transition);
             display: flex;
             flex-direction: column;
-            position: relative;
         }
 
         .module h3 { font-family: 'Orbitron'; font-size: 0.9rem; letter-spacing: 3px; margin-bottom: 30px; }
@@ -150,57 +167,66 @@
             transition: var(--transition); letter-spacing: 2px;
         }
 
-        /* ЦВЕТА ПАКЕТОВ ПРИ НАВЕДЕНИИ */
+        /* ПОДСВЕТКА ПАКЕТОВ */
         .module.rec { border-color: var(--neon-blue); }
         .module.rec h3, .module.rec .specs li span { color: var(--neon-blue); }
-        .module.rec .btn-lab { border-color: var(--neon-blue); }
         .module.rec:hover { border-color: var(--neon-blue); box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); background: rgba(0, 242, 255, 0.05); transform: translateY(-10px); }
-        .module.rec .btn-lab:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px rgba(0, 242, 255, 0.4); }
+        .module.rec .btn-lab { border-color: var(--neon-blue); }
+        .module.rec .btn-lab:hover { background: var(--neon-blue); color: #000; }
 
         .module.start { border-color: var(--neon-red); }
         .module.start h3, .module.start .specs li span { color: var(--neon-red); }
-        .module.start .btn-lab { border-color: var(--neon-red); }
         .module.start:hover { border-color: var(--neon-red); box-shadow: 0 0 30px rgba(255, 0, 60, 0.3); background: rgba(255, 0, 60, 0.05); transform: translateY(-10px); }
-        .module.start .btn-lab:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px rgba(255, 0, 60, 0.4); }
+        .module.start .btn-lab { border-color: var(--neon-red); }
+        .module.start .btn-lab:hover { background: var(--neon-red); color: #fff; }
 
         .module.artist { border-color: var(--neon-purple); }
         .module.artist h3, .module.artist .specs li span { color: var(--neon-purple); }
-        .module.artist .btn-lab { border-color: var(--neon-purple); }
         .module.artist:hover { border-color: var(--neon-purple); box-shadow: 0 0 30px rgba(188, 19, 254, 0.3); background: rgba(188, 19, 254, 0.05); transform: translateY(-10px); }
-        .module.artist .btn-lab:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); }
+        .module.artist .btn-lab { border-color: var(--neon-purple); }
+        .module.artist .btn-lab:hover { background: var(--neon-purple); color: #fff; }
 
         .module.platinum { border-color: var(--neon-gold); }
         .module.platinum h3, .module.platinum .specs li span { color: var(--neon-gold); }
-        .module.platinum .btn-lab { border-color: var(--neon-gold); }
         .module.platinum:hover { border-color: var(--neon-gold); box-shadow: 0 0 30px rgba(255, 204, 0, 0.3); background: rgba(255, 204, 0, 0.05); transform: translateY(-10px); }
-        .module.platinum .btn-lab:hover { background: var(--neon-gold); color: #000; box-shadow: 0 0 20px rgba(255, 204, 0, 0.4); }
+        .module.platinum .btn-lab { border-color: var(--neon-gold); }
+        .module.platinum .btn-lab:hover { background: var(--neon-gold); color: #000; }
 
         .portfolio-section, .contact-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
-        h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 12px; margin-bottom: 60px; text-align: center; font-size: 1.8rem; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 242, 255, 0.5); }
+        h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 12px; margin-bottom: 60px; text-align: center; font-size: 1.8rem; text-transform: uppercase; }
+        
         .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
         .track-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 40px; }
-        .track-card h4 { font-family: 'Orbitron'; font-size: 0.8rem; font-weight: 400; color: #999; margin-bottom: 25px; letter-spacing: 5px; text-transform: uppercase; }
-        audio { width: 100%; height: 35px; filter: invert(100%); opacity: 0.6; }
+        .track-card h4 { font-family: 'Orbitron'; font-size: 0.8rem; color: #999; margin-bottom: 25px; letter-spacing: 5px; text-transform: uppercase; }
+        audio { width: 100%; filter: invert(100%); opacity: 0.5; }
 
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .info-box { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.05); padding: 45px; text-align: center; transition: var(--transition); cursor: pointer; text-decoration: none; display: block; }
-        .info-box:hover { background: rgba(188, 19, 254, 0.05); border-color: var(--neon-purple); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(188, 19, 254, 0.2); }
-        .info-box h3 { font-family: 'Orbitron'; font-size: 0.8rem; font-weight: 700; color: var(--neon-purple); margin-bottom: 25px; letter-spacing: 6px; text-transform: uppercase; }
-        .info-text { font-family: 'Orbitron'; font-size: 1rem; color: #fff; line-height: 1.8; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; transition: var(--transition); }
-        
-        /* Подсветка при наведении на контакты */
+        .info-box { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.05); padding: 45px; text-align: center; transition: var(--transition); text-decoration: none; display: block; }
+        .info-box:hover { border-color: var(--neon-purple); box-shadow: 0 10px 30px rgba(188, 19, 254, 0.2); transform: translateY(-5px); }
+        .info-box h3 { font-family: 'Orbitron'; color: var(--neon-purple); margin-bottom: 25px; letter-spacing: 6px; text-transform: uppercase; }
+        .info-text { font-family: 'Orbitron'; font-size: 1rem; color: #fff; letter-spacing: 2px; text-transform: uppercase; transition: var(--transition); }
         .info-box:hover .info-text { color: #fff; text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue); }
-        .phone-display { color: var(--neon-blue); font-weight: 700; font-size: 1.3rem; display: inline-block; margin-top: 10px; }
-        .hint-text { display: block; margin-top: 15px; font-size: 0.65rem; color: #555; letter-spacing: 1px; transition: var(--transition); }
-        .info-box:hover .hint-text { color: var(--neon-blue); }
+        .phone-display { color: var(--neon-blue); font-weight: 700; font-size: 1.3rem; }
 
         footer { padding: 80px; text-align: center; font-family: 'Orbitron'; font-size: 0.65rem; color: #444; border-top: 1px solid #111; letter-spacing: 4px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-<div class="bg-layer"></div>
-<div id="particles-js"></div>
+<div class="bg-wrapper"></div>
+
+<div class="neon-wave-container">
+    <svg class="wave-svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <defs>
+            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:var(--neon-blue);stop-opacity:1" />
+                <stop offset="50%" style="stop-color:var(--neon-purple);stop-opacity:1" />
+                <stop offset="100%" style="stop-color:var(--neon-red);stop-opacity:1" />
+            </linearGradient>
+        </defs>
+        <path class="wave-path" d="M0,160 C150,60 350,260 500,160 C650,60 850,260 1000,160 C1150,60 1350,260 1440,160 L1440,320 L0,320 Z"></path>
+    </svg>
+</div>
 
 <header>
     <div class="sub-title">студия звукозаписи</div>
@@ -279,7 +305,6 @@
             <a href="https://yandex.ru/maps/?mode=routes&rtext=~48.674308,44.470021&rtt=auto" target="_blank" class="info-box">
                 <h3>Адрес</h3>
                 <div class="info-text">Волгоград, ул. Тулака, 9<br>Ежедневно 10:00 – 22:00</div>
-                <span class="hint-text">Нажми, чтобы построить маршрут</span>
             </a>
             
             <a href="tel:+79178382017" class="info-box">
@@ -287,7 +312,6 @@
                 <div class="info-text">
                     <span class="phone-display">+7 917 838 20 17</span>
                 </div>
-                <span class="hint-text">Нажми, чтобы позвонить</span>
             </a>
         </div>
     </section>
@@ -296,25 +320,6 @@
 <footer>
     WEYTON // SPRING SOUND LAB &copy; 2026 // NO "UP" IN LOGO
 </footer>
-
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script>
-    particlesJS("particles-js", {
-        "particles": {
-            "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
-            "color": { "value": "#00f2ff" },
-            "shape": { "type": "circle" },
-            "opacity": { "value": 0.4, "random": true },
-            "size": { "value": 2, "random": true },
-            "line_linked": { "enable": true, "distance": 150, "color": "#00f2ff", "opacity": 0.1, "width": 1 },
-            "move": { "enable": true, "speed": 0.8, "direction": "none", "random": true, "out_mode": "out" }
-        },
-        "interactivity": {
-            "events": { "onhover": { "enable": true, "mode": "bubble" } },
-            "modes": { "bubble": { "distance": 200, "size": 4, "duration": 2, "opacity": 0.8 } }
-        }
-    });
-</script>
 
 </body>
 </html>
