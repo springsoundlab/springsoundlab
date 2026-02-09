@@ -11,7 +11,7 @@
             --neon-purple: #bc13fe;
             --neon-red: #ff003c;
             --neon-gold: #ffcc00;
-            --bg-dark: #050508;
+            --bg-dark: #020205;
             --glass: rgba(0, 0, 0, 0.85);
             --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -27,54 +27,40 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ФОН ПО МОТИВАМ ИЗОБРАЖЕНИЯ */
-        .bg-wrapper {
+        /* ПОЛНОЦЕННЫЙ АНИМИРОВАННЫЙ ФОН СТУДИИ */
+        .studio-background {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -2;
-            background: linear-gradient(rgba(5, 5, 8, 0.7), rgba(5, 5, 8, 0.9)), 
-                        url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1920&auto=format&fit=crop');
+            background-image: url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2500&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
-            animation: hardwareGlow 8s infinite alternate ease-in-out;
+            filter: contrast(1.2) brightness(0.6) saturate(1.1);
         }
 
-        @keyframes hardwareGlow {
-            0% { filter: brightness(0.8) contrast(1.1); }
-            50% { filter: brightness(1.1) contrast(1.2); }
-            100% { filter: brightness(0.8) contrast(1.1); }
-        }
-
-        /* НЕОНОВАЯ ВОЛНА (СИНУСОИДА) НА ФОНЕ */
-        .neon-wave-container {
+        .studio-overlay {
             position: fixed;
-            top: 45%;
-            left: 0;
-            width: 100%;
-            height: 300px;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(0, 242, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 50%, rgba(188, 19, 254, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at center, transparent 10%, rgba(2, 2, 5, 0.9) 100%);
+        }
+
+        .studio-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.05), transparent);
+            animation: gearBlink 5s infinite alternate ease-in-out;
             pointer-events: none;
-            opacity: 0.6;
         }
 
-        .wave-svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .wave-path {
-            fill: none;
-            stroke: url(#waveGradient);
-            stroke-width: 3;
-            filter: drop-shadow(0 0 15px var(--neon-blue)) drop-shadow(0 0 5px var(--neon-purple));
-            stroke-dasharray: 1000;
-            animation: waveMove 10s linear infinite;
-        }
-
-        @keyframes waveMove {
-            0% { stroke-dashoffset: 1000; opacity: 0.4; }
-            50% { opacity: 1; }
-            100% { stroke-dashoffset: 0; opacity: 0.4; }
+        @keyframes gearBlink {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.8; filter: brightness(1.2); }
+            100% { opacity: 0.4; }
         }
 
         header {
@@ -116,7 +102,8 @@
 
         @keyframes flow {
             0% { background-position: 0% 50%; }
-            100% { background-position: 300% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .header-about {
@@ -145,7 +132,6 @@
         .module {
             background: var(--glass);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 50px 35px;
             transition: var(--transition);
@@ -159,7 +145,7 @@
         .specs { list-style: none; padding: 0; margin: 30px 0; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.2px; color: #bbb; flex-grow: 1; }
         .specs li { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .specs li span { font-weight: 700; text-align: right; margin-left: 10px; }
-        
+
         .btn-lab {
             display: block; padding: 20px; border: 1px solid;
             color: #fff; text-transform: uppercase; font-family: 'Orbitron'; 
@@ -167,7 +153,7 @@
             transition: var(--transition); letter-spacing: 2px;
         }
 
-        /* ПОДСВЕТКА ПАКЕТОВ */
+        /* ЦВЕТА ПАКЕТОВ */
         .module.rec { border-color: var(--neon-blue); }
         .module.rec h3, .module.rec .specs li span { color: var(--neon-blue); }
         .module.rec:hover { border-color: var(--neon-blue); box-shadow: 0 0 30px rgba(0, 242, 255, 0.3); background: rgba(0, 242, 255, 0.05); transform: translateY(-10px); }
@@ -192,47 +178,39 @@
         .module.platinum .btn-lab { border-color: var(--neon-gold); }
         .module.platinum .btn-lab:hover { background: var(--neon-gold); color: #000; }
 
-        .portfolio-section, .contact-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
-        h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 12px; margin-bottom: 60px; text-align: center; font-size: 1.8rem; text-transform: uppercase; }
-        
+        /* ПОРТФОЛИО */
+        .portfolio-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
+        h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 12px; margin-bottom: 60px; text-align: center; font-size: 1.8rem; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 242, 255, 0.5); }
         .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
         .track-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 40px; }
         .track-card h4 { font-family: 'Orbitron'; font-size: 0.8rem; color: #999; margin-bottom: 25px; letter-spacing: 5px; text-transform: uppercase; }
-        audio { width: 100%; filter: invert(100%); opacity: 0.5; }
+        audio { width: 100%; height: 35px; filter: invert(100%); opacity: 0.6; }
 
+        /* КОНТАКТЫ */
+        .contact-section { padding: 100px 0; }
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         .info-box { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.05); padding: 45px; text-align: center; transition: var(--transition); text-decoration: none; display: block; }
         .info-box:hover { border-color: var(--neon-purple); box-shadow: 0 10px 30px rgba(188, 19, 254, 0.2); transform: translateY(-5px); }
-        .info-box h3 { font-family: 'Orbitron'; color: var(--neon-purple); margin-bottom: 25px; letter-spacing: 6px; text-transform: uppercase; }
+        .info-box h3 { font-family: 'Orbitron'; font-size: 0.8rem; color: var(--neon-purple); margin-bottom: 25px; letter-spacing: 6px; text-transform: uppercase; }
         .info-text { font-family: 'Orbitron'; font-size: 1rem; color: #fff; letter-spacing: 2px; text-transform: uppercase; transition: var(--transition); }
         .info-box:hover .info-text { color: #fff; text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue); }
-        .phone-display { color: var(--neon-blue); font-weight: 700; font-size: 1.3rem; }
+        .phone-display { color: var(--neon-blue); font-weight: 700; font-size: 1.3rem; display: inline-block; margin-top: 10px; }
+        .hint-text { display: block; margin-top: 15px; font-size: 0.65rem; color: #555; letter-spacing: 1px; }
 
         footer { padding: 80px; text-align: center; font-family: 'Orbitron'; font-size: 0.65rem; color: #444; border-top: 1px solid #111; letter-spacing: 4px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-<div class="bg-wrapper"></div>
-
-<div class="neon-wave-container">
-    <svg class="wave-svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
-        <defs>
-            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:var(--neon-blue);stop-opacity:1" />
-                <stop offset="50%" style="stop-color:var(--neon-purple);stop-opacity:1" />
-                <stop offset="100%" style="stop-color:var(--neon-red);stop-opacity:1" />
-            </linearGradient>
-        </defs>
-        <path class="wave-path" d="M0,160 C150,60 350,260 500,160 C650,60 850,260 1000,160 C1150,60 1350,260 1440,160 L1440,320 L0,320 Z"></path>
-    </svg>
-</div>
+<div class="studio-background"></div>
+<div class="studio-overlay"></div>
+<div class="studio-glow"></div>
 
 <header>
     <div class="sub-title">студия звукозаписи</div>
     <h1>SPRING SOUND LAB</h1>
     <div class="header-about">
-        SPRING SOUND LAB — высокотехнологичное пространство для работы со звуком. Техническая точность и эстетика аудио-производства. В нашей лаборатории каждый проект проходит через детальную обработку.
+        SPRING SOUND LAB — высокотехнологичное пространство для работы со звуком под руководством <b>WEYTON</b>. Техническая точность и эстетика аудио-производства. В нашей лаборатории каждый проект проходит через детальную обработку.
     </div>
 </header>
 
@@ -305,6 +283,7 @@
             <a href="https://yandex.ru/maps/?mode=routes&rtext=~48.674308,44.470021&rtt=auto" target="_blank" class="info-box">
                 <h3>Адрес</h3>
                 <div class="info-text">Волгоград, ул. Тулака, 9<br>Ежедневно 10:00 – 22:00</div>
+                <span class="hint-text">Нажми, чтобы построить маршрут</span>
             </a>
             
             <a href="tel:+79178382017" class="info-box">
@@ -312,6 +291,7 @@
                 <div class="info-text">
                     <span class="phone-display">+7 917 838 20 17</span>
                 </div>
+                <span class="hint-text">Нажми, чтобы позвонить</span>
             </a>
         </div>
     </section>
