@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPRING SOUND LAB | WEYTON</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-blue: #00f2ff;
@@ -12,8 +12,8 @@
             --neon-red: #ff003c;
             --neon-gold: #ffcc00;
             --bg-dark: #020205;
-            --glass: rgba(0, 0, 0, 0.92);
-            --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --glass: rgba(0, 0, 0, 0.85);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { box-sizing: border-box; scroll-behavior: smooth; border-radius: 0 !important; }
@@ -24,71 +24,96 @@
             color: #fff; 
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* КИНЕМАТОГРАФИЧНЫЙ ФОН */
+        /* УНИКАЛЬНЫЙ НЕОНОВЫЙ БЭКГРАУНД (ИЗ ИСХОДНИКА) */
         .studio-background {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: -2;
             background-color: #05050a;
-            background-image: linear-gradient(rgba(2, 2, 5, 0.75), rgba(2, 2, 5, 0.98)), 
-                              url('bg.jpg'); 
+            background-image: linear-gradient(rgba(2, 2, 5, 0.65), rgba(2, 2, 5, 0.85)), 
+                              url('https://files.catbox.moe/o3t305.jpg'); 
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            animation: backgroundSubtleScale 80s infinite alternate ease-in-out;
+            filter: contrast(1.1) brightness(0.6);
+            animation: backgroundSubtleScale 25s infinite alternate ease-in-out;
         }
 
         @keyframes backgroundSubtleScale {
             0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
+            100% { transform: scale(1.08); }
         }
 
-        /* ЭФФЕКТ МЕРЦАЮЩЕЙ ЛАМПЫ (НАДЗАГОЛОВОК) */
-        .flicker-title {
-            font-family: 'Orbitron';
-            font-size: 0.8rem;
-            letter-spacing: 12px;
+        .studio-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(188, 19, 254, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        .studio-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.05), transparent);
+            animation: gearBlink 4s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes gearBlink {
+            0% { opacity: 0.2; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.3; }
+        }
+
+        /* ЭФФЕКТ МЕРЦАЮЩЕЙ ЛАМПЫ ДЛЯ НАДЗАГОЛОВКА */
+        .sub-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+            letter-spacing: 10px;
             color: var(--neon-blue);
             text-transform: uppercase;
-            margin-bottom: 20px;
-            animation: lampFlicker 4s infinite;
+            margin-bottom: 25px;
+            font-weight: 700;
+            text-shadow: 0 0 15px var(--neon-blue);
+            animation: flickerLamp 4s infinite;
         }
 
-        @keyframes lampFlicker {
-            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { 
-                text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); 
-                opacity: 1; 
-            }
-            20%, 22%, 24%, 55% { 
-                text-shadow: none; 
-                opacity: 0.2; 
-            }
+        @keyframes flickerLamp {
+            0%, 18%, 20%, 25%, 26%, 53%, 55%, 100% { opacity: 1; text-shadow: 0 0 15px var(--neon-blue); }
+            19%, 24%, 54% { opacity: 0.3; text-shadow: none; }
         }
 
         header {
-            height: 100vh;
+            height: 90vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
+            position: relative;
             padding: 20px;
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2.5rem, 8vw, 7rem);
+            font-size: clamp(2.5rem, 8vw, 5.5rem);
             margin: 0;
             background: linear-gradient(90deg, #fff, var(--neon-blue), var(--neon-purple), #fff);
             background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: flow 15s infinite linear;
+            animation: flow 12s infinite linear;
+            filter: drop-shadow(0 0 25px rgba(0, 242, 255, 0.5));
             text-transform: uppercase;
-            letter-spacing: 15px;
-            font-weight: 900;
+            letter-spacing: 6px;
+            line-height: 1.1;
         }
 
         @keyframes flow {
@@ -96,229 +121,257 @@
             100% { background-position: 300% 50%; }
         }
 
-        .container { padding: 50px 20px; max-width: 1400px; margin: auto; position: relative; z-index: 5; }
-
-        section { padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.05); }
-
-        h2 { 
-            font-family: 'Orbitron'; 
-            text-align: center; 
-            letter-spacing: 15px; 
-            margin-bottom: 80px; 
-            font-size: 2.5rem; 
-            text-transform: uppercase;
+        .header-about {
+            max-width: 850px;
+            margin-top: 50px;
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            line-height: 1.9;
+            color: #efefef;
+            padding: 40px;
+            border-top: 1px solid rgba(188, 19, 254, 0.3);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            font-weight: 300;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 30px rgba(188, 19, 254, 0.05);
         }
 
-        /* УСЛУГИ С ЦВЕТНЫМ ГЛОУ-ЭФФЕКТОМ */
+        .container { padding: 100px 15px; max-width: 1440px; margin: auto; position: relative; z-index: 5; }
+
         .module-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 35px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: -120px;
         }
 
         .module {
             background: var(--glass);
+            backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 70px 45px;
+            padding: 60px 35px;
             transition: var(--transition);
+            display: flex;
+            flex-direction: column;
             position: relative;
+            overflow: hidden;
         }
 
-        .module h3 { font-family: 'Orbitron'; letter-spacing: 4px; margin-bottom: 25px; }
+        .module h3 { font-family: 'Orbitron'; font-size: 0.95rem; letter-spacing: 3px; margin-bottom: 30px; text-transform: uppercase; z-index: 2; }
+        .price { font-size: 2.5rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 20px; display: flex; align-items: baseline; gap: 10px; z-index: 2; }
+        .price span { font-size: 0.85rem; color: #777; }
+        .specs { list-style: none; padding: 0; margin: 30px 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.2px; color: #ccc; flex-grow: 1; z-index: 2; }
+        .specs li { padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; }
+        .specs li span { font-weight: 700; text-align: right; }
 
-        /* ИНДИВИДУАЛЬНАЯ ПОДСВЕТКА (НИКОГДА НЕ МЕНЯЕТСЯ) */
-        .module.rec:hover { border-color: var(--neon-blue); box-shadow: 0 0 50px rgba(0, 242, 255, 0.25); background: rgba(0, 242, 255, 0.03); }
-        .module.start:hover { border-color: var(--neon-blue); box-shadow: 0 0 50px rgba(0, 242, 255, 0.25); background: rgba(0, 242, 255, 0.03); }
-        .module.artist:hover { border-color: var(--neon-red); box-shadow: 0 0 50px rgba(255, 0, 60, 0.25); background: rgba(255, 0, 60, 0.03); }
-        .module.platinum:hover { border-color: var(--neon-gold); box-shadow: 0 0 50px rgba(255, 204, 0, 0.25); background: rgba(255, 204, 0, 0.03); }
-
-        .price { font-size: 3rem; font-weight: 900; font-family: 'Orbitron'; margin-bottom: 30px; }
-        .price span { font-size: 1rem; color: #555; }
-
-        .specs { list-style: none; padding: 0; margin-bottom: 40px; }
-        .specs li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; display: flex; justify-content: space-between; text-transform: uppercase; }
-        .specs li span { color: var(--neon-blue); }
-
-        /* ПРАВИЛА СТУДИИ */
-        .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .rule-card { padding: 40px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); position: relative; }
-        .rule-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 0; background: var(--neon-blue); transition: 0.5s; }
-        .rule-card:hover::before { height: 100%; }
-        .rule-card h4 { font-family: 'Orbitron'; color: var(--neon-blue); margin-bottom: 15px; font-size: 0.8rem; letter-spacing: 2px; }
-        .rule-card p { color: #666; font-size: 0.85rem; line-height: 1.6; }
-
-        /* СТАТИСТИКА */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; text-align: center; }
-        .stat-item { padding: 20px; }
-        .stat-number { display: block; font-family: 'Orbitron'; font-size: 3.5rem; color: var(--neon-blue); text-shadow: 0 0 20px var(--neon-blue); margin-bottom: 10px; font-weight: 900; }
-        .stat-desc { font-family: 'Orbitron'; font-size: 0.7rem; color: #666; letter-spacing: 3px; text-transform: uppercase; }
-
-        /* ТЕХНОЛОГИИ */
-        .tech-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .tech-item { border: 1px solid rgba(255,255,255,0.05); padding: 40px; text-align: center; transition: 0.3s; }
-        .tech-item:hover { border-color: var(--neon-purple); background: rgba(188, 19, 254, 0.05); }
-        .tech-item h5 { font-family: 'Orbitron'; color: var(--neon-blue); margin-bottom: 10px; font-size: 1rem; }
-
-        /* СОЦСЕТИ */
-        .social-flex { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
-        .social-link { width: 280px; padding: 45px; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.05); text-align: center; text-decoration: none; color: #fff; transition: 0.4s; }
-        .social-link:hover { border-color: var(--neon-purple); background: rgba(188, 19, 254, 0.05); transform: translateY(-10px); }
-        .social-link h4 { font-family: 'Orbitron'; letter-spacing: 5px; margin-bottom: 10px; }
-
-        /* КОНТАКТНЫЙ БЛОК (С ПОДСВЕТКОЙ НОМЕРА И КАРТОЙ) */
-        .contact-card {
-            background: var(--glass); padding: 100px 40px; text-align: center; border: 1px solid rgba(255,255,255,0.1);
-            display: block; text-decoration: none; color: #fff; transition: var(--transition); margin-top: 50px;
+        /* ЭФФЕКТЫ ПОДСВЕТКИ (ЦВЕТОВАЯ ЗАЛИВКА СЗАДИ) */
+        .module.rec:hover { 
+            border-color: var(--neon-blue); 
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.3);
+            background: rgba(0, 242, 255, 0.08);
+            transform: translateY(-10px);
         }
-        .contact-card:hover { border-color: var(--neon-purple); box-shadow: 0 0 60px rgba(188, 19, 254, 0.2); }
+        .module.rec h3, .module.rec .specs li span { color: var(--neon-blue); }
 
-        .phone-link { color: var(--neon-blue); font-size: clamp(1.8rem, 5vw, 3.5rem); font-family: 'Orbitron'; font-weight: 900; transition: 0.3s; display: block; }
+        .module.start:hover { 
+            border-color: var(--neon-red); 
+            box-shadow: 0 0 50px rgba(255, 0, 60, 0.3);
+            background: rgba(255, 0, 60, 0.08);
+            transform: translateY(-10px);
+        }
+        .module.start h3, .module.start .specs li span { color: var(--neon-red); }
+
+        .module.artist:hover { 
+            border-color: var(--neon-purple); 
+            box-shadow: 0 0 50px rgba(188, 19, 254, 0.3);
+            background: rgba(188, 19, 254, 0.08);
+            transform: translateY(-10px);
+        }
+        .module.artist h3, .module.artist .specs li span { color: var(--neon-purple); }
+
+        .module.platinum:hover { 
+            border-color: var(--neon-gold); 
+            box-shadow: 0 0 50px rgba(255, 204, 0, 0.3);
+            background: rgba(255, 204, 0, 0.08);
+            transform: translateY(-10px);
+        }
+        .module.platinum h3, .module.platinum .specs li span { color: var(--neon-gold); }
+
+        .btn-lab {
+            display: block; padding: 22px; border: 1px solid;
+            color: #fff; text-transform: uppercase; font-family: 'Orbitron'; 
+            font-size: 0.8rem; text-decoration: none; text-align: center; 
+            transition: var(--transition); letter-spacing: 3px; margin-top: 15px; z-index: 2;
+        }
+
+        .rec .btn-lab { border-color: var(--neon-blue); }
+        .rec .btn-lab:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 25px var(--neon-blue); }
+        .start .btn-lab { border-color: var(--neon-red); }
+        .start .btn-lab:hover { background: var(--neon-red); color: #fff; box-shadow: 0 0 25px var(--neon-red); }
+        .artist .btn-lab { border-color: var(--neon-purple); }
+        .artist .btn-lab:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 25px var(--neon-purple); }
+        .platinum .btn-lab { border-color: var(--neon-gold); }
+        .platinum .btn-lab:hover { background: var(--neon-gold); color: #000; box-shadow: 0 0 25px var(--neon-gold); }
+
+        /* ДОПОЛНИТЕЛЬНЫЕ СЕКЦИИ (ДЛЯ ОБЪЕМА) */
+        .features-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
+        h2 { font-family: 'Orbitron'; color: var(--neon-blue); letter-spacing: 15px; margin-bottom: 80px; text-align: center; font-size: 2.5rem; text-transform: uppercase; text-shadow: 0 0 15px var(--neon-blue); }
         
-        /* ПОДСВЕТКА НОМЕРА ПРИ НАВЕДЕНИИ */
-        .contact-card:hover .phone-link { color: var(--neon-purple); text-shadow: 0 0 30px var(--neon-purple); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .feat-card { background: rgba(255, 255, 255, 0.02); padding: 50px; border-left: 2px solid var(--neon-purple); transition: 0.3s; }
+        .feat-card:hover { background: rgba(188, 19, 254, 0.05); transform: translateX(10px); }
+        .feat-card h4 { font-family: 'Orbitron'; color: #fff; margin-bottom: 20px; letter-spacing: 3px; }
+        .feat-card p { color: #888; line-height: 1.7; font-size: 0.9rem; }
 
-        .info-row { display: flex; justify-content: center; gap: 50px; margin-top: 50px; flex-wrap: wrap; }
-        .info-item label { font-family: 'Orbitron'; color: var(--neon-purple); font-size: 0.75rem; letter-spacing: 4px; display: block; margin-bottom: 15px; }
-        .info-item span { font-size: 1rem; color: #888; letter-spacing: 1px; }
+        /* ПОРТФОЛИО */
+        .portfolio-section { padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); }
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .track-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); padding: 45px; transition: var(--transition); }
+        .track-card:hover { border-color: var(--neon-purple); background: rgba(188, 19, 254, 0.04); transform: scale(1.02); }
+        .track-card h4 { font-family: 'Orbitron'; font-size: 0.85rem; color: #aaa; margin-bottom: 30px; letter-spacing: 5px; text-transform: uppercase; }
+        audio { width: 100%; height: 35px; filter: invert(100%); opacity: 0.5; transition: 0.4s; }
+        audio:hover { opacity: 0.9; }
 
-        .map-btn {
-            display: inline-block; margin-top: 50px; padding: 20px 50px; border: 1px solid var(--neon-blue);
-            font-family: 'Orbitron'; color: var(--neon-blue); text-decoration: none; font-size: 0.85rem;
-            letter-spacing: 4px; transition: 0.3s;
+        /* КОНТАКТЫ (ИЗ ИСХОДНИКА С УЛУЧШЕННОЙ ПОДСВЕТКОЙ) */
+        .contact-section { padding: 100px 0; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 35px; }
+        .info-box { background: var(--glass); border: 1px solid rgba(255, 255, 255, 0.05); padding: 60px; text-align: center; transition: var(--transition); text-decoration: none; display: block; position: relative; }
+        .info-box:hover { border-color: var(--neon-purple); box-shadow: 0 15px 50px rgba(188, 19, 254, 0.25); transform: translateY(-8px); }
+        
+        .info-box h3 { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--neon-purple); margin-bottom: 35px; letter-spacing: 7px; text-transform: uppercase; }
+        .info-text { font-family: 'Orbitron'; font-size: 1.2rem; color: #fff; letter-spacing: 2px; text-transform: uppercase; transition: var(--transition); line-height: 1.7; }
+        
+        /* ПУРПУРНАЯ ПОДСВЕТКА НОМЕРА */
+        .phone-display { color: var(--neon-blue); font-weight: 700; font-size: 1.6rem; display: inline-block; margin-top: 15px; transition: var(--transition); }
+        .info-box:hover .phone-display { color: var(--neon-purple); text-shadow: 0 0 25px var(--neon-purple); }
+        .info-box:hover .info-text { text-shadow: 0 0 20px var(--neon-blue); }
+        
+        .hint-text { display: block; margin-top: 25px; font-size: 0.75rem; color: #555; letter-spacing: 3px; text-transform: uppercase; }
+
+        footer { padding: 120px; text-align: center; font-family: 'Orbitron'; font-size: 0.8rem; color: #222; border-top: 1px solid #111; letter-spacing: 8px; text-transform: uppercase; }
+
+        @media (max-width: 768px) {
+            header { height: auto; padding: 150px 20px; }
+            .module-grid { margin-top: 0; }
+            h2 { font-size: 1.8rem; letter-spacing: 8px; }
         }
-        .map-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 30px var(--neon-blue); }
-
-        footer { padding: 120px 20px; text-align: center; font-family: 'Orbitron'; font-size: 0.75rem; color: #222; letter-spacing: 10px; border-top: 1px solid #111; }
     </style>
 </head>
 <body>
 
 <div class="studio-background"></div>
+<div class="studio-overlay"></div>
+<div class="studio-glow"></div>
 
 <header>
-    <div class="flicker-title">СТУДИЯ ЗВУКОЗАПИСИ</div>
-    <div style="font-family: 'Orbitron'; letter-spacing: 15px; color: #fff; opacity: 0.4; font-size: 0.7rem; margin-bottom: 10px;">WEYTON PRESENTS</div>
+    <div class="sub-title">студия звукозаписи</div>
     <h1>SPRING SOUND LAB</h1>
+    <div class="header-about">
+        SPRING SOUND LAB — это высокотехнологичное пространство для работы со звуком под руководством <b>WEYTON</b>. Мы объединяем техническую точность и эстетику современного аудио-производства. В нашей лаборатории каждый проект проходит через детальную обработку и финальный тюнинг качества.
+    </div>
 </header>
 
 <div class="container">
-    
-    <section>
-        <div class="stats-grid">
-            <div class="stat-item">
-                <span class="stat-number">500+</span>
-                <span class="stat-desc">Сведенных треков</span>
+    <div class="module-grid">
+        <div class="module rec">
+            <h3>ЗАПИСЬ</h3>
+            <div class="price">900 <span>₽/час</span></div>
+            <ul class="specs">
+                <li>ЗАПИСЬ ВОКАЛА <span>ДА</span></li>
+                <li>ИНЖЕНЕР <span>ВКЛЮЧЕН</span></li>
+                <li>PRO ОБОРУДОВАНИЕ <span>ДА</span></li>
+                <li>МОНИТОРИНГ <span>ADAM AUDIO</span></li>
+            </ul>
+            <a href="https://t.me/WEYTON" class="btn-lab">Забронировать</a>
+        </div>
+
+        <div class="module start">
+            <h3>START EDITION</h3>
+            <div class="price">3 500 <span>₽</span></div>
+            <ul class="specs">
+                <li>ТЮНИНГ ВОКАЛА <span>AUTO</span></li>
+                <li>СВЕДЕНИЕ <span>BASE MIX</span></li>
+                <li>МАСТЕРИНГ <span>STANDART</span></li>
+                <li>СРОК <span>48 ЧАСОВ</span></li>
+            </ul>
+            <a href="https://t.me/WEYTON" class="btn-lab">Выбрать</a>
+        </div>
+
+        <div class="module artist">
+            <h3>ARTIST EDITION</h3>
+            <div class="price">6 000 <span>₽</span></div>
+            <ul class="specs">
+                <li>ТЮНИНГ <span>MELODYNE</span></li>
+                <li>СВЕДЕНИЕ <span>PRO MIX</span></li>
+                <li>ЭФФЕКТЫ <span>3D SPACE</span></li>
+                <li>ДАБЛЫ / БЭКИ <span>FULL</span></li>
+                <li>МАСТЕРИНГ <span>READY</span></li>
+            </ul>
+            <a href="https://t.me/WEYTON" class="btn-lab">Выбрать</a>
+        </div>
+
+        <div class="module platinum">
+            <h3>PLATINUM EDITION</h3>
+            <div class="price">ОТ 9 000 <span>₽</span></div>
+            <ul class="specs">
+                <li>МУЛЬТИТРЕК <span>FULL WORK</span></li>
+                <li>SOUND DESIGN <span>CUSTOM</span></li>
+                <li>ПРАВКИ <span>БЕЗЛИМИТ</span></li>
+                <li>РЕЗУЛЬТАТ <span>TOP-TIER</span></li>
+                <li>АНАЛОГОВАЯ ЦЕПЬ <span>ДА</span></li>
+            </ul>
+            <a href="https://t.me/WEYTON" class="btn-lab">Связаться</a>
+        </div>
+    </div>
+
+    <section class="features-section">
+        <h2>WHY WE?</h2>
+        <div class="features-grid">
+            <div class="feat-card">
+                <h4>ACOUSTIC DESIGN</h4>
+                <p>Помещение спроектировано для достижения идеального времени реверберации, что гарантирует чистоту каждой записанной ноты.</p>
             </div>
-            <div class="stat-item">
-                <span class="stat-number">100+</span>
-                <span class="stat-desc">Постоянных артистов</span>
+            <div class="feat-card">
+                <h4>ANALOG HEART</h4>
+                <p>Мы используем легендарные преампы и компрессоры для придания вашему звуку того самого «дорогого» характера.</p>
             </div>
-            <div class="stat-item">
-                <span class="stat-number">24/7</span>
-                <span class="stat-desc">Поддержка проектов</span>
+            <div class="feat-card">
+                <h4>WEYTON VISION</h4>
+                <p>Опыт работы с сотнями артистов позволяет нам найти уникальное звучание для любого жанра — от хип-хопа до метала.</p>
             </div>
         </div>
     </section>
 
-    <section id="services">
-        <h2>SERVICES</h2>
-        <div class="module-grid">
-            <div class="module rec">
-                <h3>ЗАПИСЬ</h3>
-                <div class="price">900 <span>₽/ч</span></div>
-                <ul class="specs">
-                    <li>ИНЖЕНЕР <span>ВКЛЮЧЕН</span></li>
-                    <li>ОБОРУДОВАНИЕ <span>PRO</span></li>
-                </ul>
-            </div>
-            <div class="module start">
-                <h3>START</h3>
-                <div class="price">3 500 <span>₽</span></div>
-                <ul class="specs">
-                    <li>СВЕДЕНИЕ <span>BASE</span></li>
-                    <li>ТЮНИНГ <span>AUTO</span></li>
-                </ul>
-            </div>
-            <div class="module artist">
-                <h3>ARTIST EDITION</h3>
-                <div class="price">6 000 <span>₽</span></div>
-                <ul class="specs">
-                    <li>СВЕДЕНИЕ <span>PRO</span></li>
-                    <li>ТЮНИНГ <span>MANUAL</span></li>
-                </ul>
-            </div>
-            <div class="module platinum">
-                <h3>PLATINUM</h3>
-                <div class="price">ОТ 9 000 <span>₽</span></div>
-                <ul class="specs">
-                    <li>МУЛЬТИТРЕК <span>FULL</span></li>
-                    <li>ПРАВКИ <span>UNLIMITED</span></li>
-                </ul>
-            </div>
+    <section class="portfolio-section">
+        <h2>ПОРТФОЛИО</h2>
+        <div class="portfolio-grid">
+            <div class="track-card"><h4>PROD BY WEYTON 01</h4><audio controls></audio></div>
+            <div class="track-card"><h4>PROD BY WEYTON 02</h4><audio controls></audio></div>
+            <div class="track-card"><h4>PROD BY WEYTON 03</h4><audio controls></audio></div>
         </div>
     </section>
 
-    <section id="rules">
-        <h2>STUDIO RULES</h2>
-        <div class="rules-grid">
-            <div class="rule-card">
-                <h4>ПУНКТУАЛЬНОСТЬ</h4>
-                <p>Время сессии начинается строго в забронированный час. Пожалуйста, не опаздывайте.</p>
-            </div>
-            <div class="rule-card">
-                <h4>ГОСТИ</h4>
-                <p>Вы можете привести с собой не более двух сопровождающих. Лишние люди отвлекают.</p>
-            </div>
-            <div class="rule-card">
-                <h4>МАТЕРИАЛЫ</h4>
-                <p>Минусовки лучше присылать заранее или приносить в формате WAV.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="tech">
-        <h2>TECHNOLOGY</h2>
-        <div class="tech-list">
-            <div class="tech-item"><h5>ANALOG HEART</h5><p>Ламповое усиление</p></div>
-            <div class="tech-item"><h5>DIGITAL MIND</h5><p>DSP обработка</p></div>
-            <div class="tech-item"><h5>PURE SOUND</h5><p>24-bit / 96kHz</p></div>
-            <div class="tech-item"><h5>NEVE 1073</h5><p>Classic Preamp</p></div>
-        </div>
-    </section>
-
-    <section id="social">
-        <h2>CONNECT</h2>
-        <div class="social-flex">
-            <a href="https://t.me/WEYTON" class="social-link" target="_blank"><h4>TELEGRAM</h4><span>Direct Chat</span></a>
-            <a href="https://vk.com/" class="social-link" target="_blank"><h4>VKONTAKTE</h4><span>Community</span></a>
-        </div>
-    </section>
-
-    <section id="booking" style="border:none;">
-        <div class="contact-card">
-            <h3 style="font-family:'Orbitron'; letter-spacing:10px; margin-bottom:40px;">ЗАБРОНИРОВАТЬ СЕССИЮ</h3>
+    <section class="contact-section">
+        <div class="info-grid">
+            <a href="https://yandex.ru/maps/?mode=routes&rtext=~48.674308,44.470021&rtt=auto" target="_blank" class="info-box">
+                <h3>Адрес</h3>
+                <div class="info-text">Волгоград, ул. Тулака, 9<br>Круглосуточно (по записи)</div>
+                <span class="hint-text">Нажми, чтобы построить маршрут</span>
+            </a>
             
-            <a href="tel:+79178382017" class="phone-link">+7 917 838 20 17</a>
-            
-            <div class="info-row">
-                <div class="info-item">
-                    <label>АДРЕС</label>
-                    <span>Волгоград, Тулака 9</span>
+            <a href="tel:+79178382017" class="info-box">
+                <h3>Телефон</h3>
+                <div class="info-text">
+                    <span class="phone-display">+7 917 838 20 17</span>
                 </div>
-                <div class="info-item">
-                    <label>ГРАФИК</label>
-                    <span>Круглосуточно (по записи)</span>
-                </div>
-            </div>
-
-            <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="map-btn">ОТКРЫТЬ ЯНДЕКС.КАРТЫ</a>
+                <span class="hint-text">Нажми, чтобы позвонить</span>
+            </a>
         </div>
     </section>
-
 </div>
 
 <footer>
-    WEYTON // SPRING SOUND LAB &copy; 2026 // NO UP IN LOGO
+    WEYTON // SPRING SOUND LAB &copy; 2026 // NO "UP" IN LOGO
 </footer>
 
 </body>
