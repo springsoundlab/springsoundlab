@@ -3,100 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spring Sound Lab | Analog & Digital Audio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <title>Spring Sound Lab | Цены и услуги</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --primary: #ff8c00; /* Янтарный свет ламп */
-            --bg: #0d0d0d; 
-            --accent: #2a2a2a;
-            --text: #e0e0e0;
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --platinum: #e5e4e2;
+            --bg: #050505; 
         }
         * { box-sizing: border-box; scroll-behavior: smooth; }
-        body { font-family: 'Space Mono', monospace; background: var(--bg); color: var(--text); margin: 0; line-height: 1.6; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: #fff; margin: 0; line-height: 1.6; }
         
         header { 
-            height: 100vh; 
+            height: 60vh; 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            background: linear-gradient(rgba(13,13,13,0.8), rgba(13,13,13,0.9)), 
-                        url('https://images.unsplash.com/photo-1520529157200-254e4887372b?auto=format&fit=crop&w=1600&q=80');
-            background-size: cover;
-            background-position: center;
             text-align: center;
-            border-bottom: 1px solid var(--accent);
+            background: radial-gradient(circle, rgba(188,19,254,0.15) 0%, rgba(5,5,5,1) 80%);
+            border-bottom: 1px solid #111;
         }
 
-        h1 { font-family: 'Syncopate', sans-serif; font-size: clamp(2rem, 6vw, 4.5rem); font-weight: 700; margin: 0; letter-spacing: -2px; color: #fff; }
-        header p { font-size: 1rem; color: var(--primary); margin-top: 10px; letter-spacing: 5px; text-transform: uppercase; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 8vw, 3.5rem); text-shadow: 0 0 15px var(--neon-purple); margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        header p { color: var(--neon-blue); letter-spacing: 4px; text-transform: uppercase; margin-top: 10px; font-weight: 600; font-size: 0.9rem; }
+
+        .container { padding: 80px 20px; max-width: 1200px; margin: auto; }
+        
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-top: 50px; }
+        
+        .package { 
+            background: #0d0d0d; 
+            padding: 40px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .package:hover { 
+            border-color: var(--neon-blue);
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.1);
+            transform: translateY(-10px);
+        }
+
+        /* Стиль для Platinum Edition */
+        .package.platinum {
+            border: 1px solid var(--platinum);
+            background: linear-gradient(145deg, #0d0d0d 0%, #1a1a1a 100%);
+        }
+        .package.platinum:hover {
+            box-shadow: 0 0 25px rgba(229, 228, 226, 0.2);
+            border-color: #fff;
+        }
+
+        .package h3 { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); font-size: 1.5rem; margin-bottom: 5px; letter-spacing: 1px; }
+        .package.platinum h3 { color: var(--platinum); text-shadow: 0 0 10px rgba(255,255,255,0.3); }
+
+        .price { font-size: 2.8rem; font-weight: 700; margin: 20px 0; font-family: 'Orbitron', sans-serif; }
+        .price span { font-size: 1.2rem; color: #444; margin-left: 5px; }
+
+        .features { list-style: none; padding: 0; margin: 0 0 40px 0; flex-grow: 1; }
+        .features li { margin-bottom: 15px; font-size: 0.95rem; color: #ccc; display: flex; align-items: flex-start; }
+        .features li::before { content: "⚡"; color: var(--neon-blue); margin-right: 12px; font-size: 0.8rem; margin-top: 4px; }
+        .package.platinum .features li::before { color: var(--platinum); }
 
         .btn { 
-            margin-top: 40px;
-            padding: 15px 35px; 
+            display: block;
+            padding: 18px; 
             background: transparent; 
-            color: var(--primary); 
+            color: #fff; 
             text-decoration: none; 
-            font-weight: bold; 
-            border: 1px solid var(--primary);
+            border: 1px solid var(--neon-blue);
+            border-radius: 10px; 
             transition: 0.3s;
             text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            text-align: center;
         }
-        .btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
+        .btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
 
-        .container { padding: 100px 20px; max-width: 1100px; margin: auto; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .card { 
-            background: #151515; 
-            padding: 40px; 
-            border-left: 2px solid var(--accent);
-            transition: 0.3s;
-        }
-        .card:hover { border-left-color: var(--primary); background: #1a1a1a; }
-        .card h3 { margin-top: 0; color: #fff; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
-        .card p { color: #888; font-size: 0.9rem; }
+        .platinum-btn { border-color: var(--platinum); }
+        .platinum-btn:hover { background: var(--platinum); color: #000; box-shadow: 0 0 20px var(--platinum); }
 
-        .lab-footer { text-align: center; padding: 40px; color: #444; font-size: 0.7rem; letter-spacing: 2px; }
+        footer { text-align: center; padding: 60px; color: #333; font-size: 0.75rem; letter-spacing: 1px; border-top: 1px solid #111; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>SPRING SOUND LAB</h1>
-    <p>Precision Audio Engineering</p>
-    <a href="#contact" class="btn">Зайти в лабораторию</a>
+    <p>Premium Audio Production by WEYTON</p>
 </header>
 
 <section class="container">
-    <div class="grid">
-        <div class="card">
-            <h3>Input</h3>
-            <p>Запись через высококлассные преампы. Ловим каждую деталь вашего исполнения.</p>
+    <div class="pricing-grid">
+        
+        <div class="package">
+            <h3>START</h3>
+            <div class="price">3 500<span>₽</span></div>
+            <ul class="features">
+                <li>Запись вокала (до 1.5 часов)</li>
+                <li>Базовая частотная обработка</li>
+                <li>Автоматический тюнинг (Autotune)</li>
+                <li>Сведение с минусом (одним файлом)</li>
+            </ul>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Забронировать</a>
         </div>
-        <div class="card">
-            <h3>Process</h3>
-            <p>Гибридное сведение. Мощность цифры и характер аналоговых цепей.</p>
+
+        <div class="package">
+            <h3>ARTIST</h3>
+            <div class="price">6 000<span>₽</span></div>
+            <ul class="features">
+                <li>Сессия записи (до 3 часов)</li>
+                <li>Ручная коррекция вокала (Melodyne)</li>
+                <li>Профессиональное сведение вокала</li>
+                <li>Мастеринг под стриминги</li>
+            </ul>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Выбрать стиль</a>
         </div>
-        <div class="card">
-            <h3>Output</h3>
-            <p>Финальный мастеринг. Подготовка звука к любым акустическим системам.</p>
+
+        <div class="package platinum">
+            <div style="position: absolute; top: 15px; right: 20px; color: var(--platinum); font-size: 0.6rem; letter-spacing: 2px; font-weight: 900;">ULTIMATE</div>
+            <h3>PLATINUM</h3>
+            <div class="price">По запросу<span>₽</span></div>
+            <ul class="features">
+                <li><b>Full Multitrack Mixing</b> (сведение по дорожкам)</li>
+                <li>Детальная работа над аранжировкой</li>
+                <li>Эксклюзивные эффекты и саунд-дизайн</li>
+                <li>Безлимитные правки до идеала</li>
+                <li>Приоритет в графике Spring Sound Lab</li>
+            </ul>
+            <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn platinum-btn">Обсудить проект</a>
         </div>
+
     </div>
 </section>
 
-<section class="container" id="contact" style="text-align: center; border-top: 1px solid var(--accent);">
-    <h2>Связь с инженером</h2>
-    <p style="color: #666; margin-bottom: 30px;">WEYTON: Готов к работе над вашим звуком.</p>
-    <a href="https://t.me/ТВОЙ_ЛОГИН" class="btn">Telegram</a>
-</section>
-
-<div class="lab-footer">
-    SPRING SOUND LAB &copy; 2026 / NO "UP" LOGO CONCEPT / BY WEYTON
-</div>
+<footer>
+    SPRING SOUND LAB &copy; 2026 | DESIGN BY WEYTON | NO "UP" IN LOGO
+</footer>
 
 </body>
 </html>
