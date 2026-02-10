@@ -897,24 +897,73 @@
         .social-btn.activated.yt { color: #ff0000 !important; filter: drop-shadow(0 0 8px #ff0000) !important; }
         .social-btn.activated.ig { color: #f09433 !important; filter: drop-shadow(0 0 8px #f09433) !important; }
     }
+<style>
+    /* 1. ПРИГЛУШАЕМ ЯРКОСТЬ СОЦСЕТЕЙ (ПК и Мобильные) */
+    .social-btn.activated, .social-btn:hover {
+        /* Уменьшаем интенсивность свечения и насыщенность */
+        filter: drop-shadow(0 0 5px currentColor) opacity(0.8) !important;
+    }
+
+    /* 2. УСЛУГИ НА ПК (Покой и Наведение) */
+    @media (min-width: 1025px) {
+        /* Сбрасываем автоматическую подсветку от скролла */
+        .module.active-scroll {
+            background-color: rgba(255, 255, 255, 0.02) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: none !important;
+            transform: none !important;
+            backdrop-filter: blur(2px) !important;
+        }
+
+        /* Настраиваем цвета строго ПРИ НАВЕДЕНИИ МЫШКОЙ */
+        .module:hover {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            transform: translateY(-8px) !important;
+            backdrop-filter: blur(15px) !important;
+        }
+
+        /* Индивидуальные цвета пакетов при наведении */
+        .module.rec:hover { border-color: #ffffff !important; box-shadow: 0 0 15px rgba(255, 255, 255, 0.1) !important; }
+        .module.start:hover { border-color: var(--neon-purple) !important; box-shadow: 0 0 15px rgba(188, 19, 254, 0.15) !important; }
+        .module.artist:hover { border-color: var(--neon-red) !important; box-shadow: 0 0 15px rgba(255, 0, 60, 0.15) !important; }
+        .module.platinum:hover { border-color: var(--neon-gold) !important; box-shadow: 0 0 15px rgba(255, 204, 0, 0.15) !important; }
+
+        /* Шапка (номер телефона) - только наведение */
+        .phone-box-container.active-scroll {
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            box-shadow: none !important;
+        }
+        .phone-box-container:hover {
+            border-color: #00f2ff !important;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3) !important;
+        }
+    }
+
+    /* 3. ОБЩИЙ СБРОС ЦВЕТОВ В ПОКОЕ (Для ПК) */
+    @media (min-width: 1025px) {
+        .social-btn, .header-phone {
+            color: #ffffff !important;
+            filter: none !important;
+            text-shadow: none !important;
+        }
+    }
 </style>
 
 <script>
     (function() {
-        // Очищаем старые события, чтобы не было двойной работы
-        const newScrollHandler = () => {
+        const updateAll = () => {
             const winWidth = window.innerWidth;
             const winHeight = window.innerHeight;
             const scrollY = window.scrollY;
             const midPoint = scrollY + (winHeight / 2);
 
-            // Скрытие шапки
-            if (artistTrigger) {
+            // 1. Скрытие шапки
+            if (typeof artistTrigger !== 'undefined' && artistTrigger) {
                 header.classList.toggle('header-hidden', artistTrigger.getBoundingClientRect().top <= 50);
             }
 
-            // Волна соцсетей (Только мобилки)
-            if (winWidth < 1025 && socialContainer) {
+            // 2. Соцсети (Волна только для мобилок)
+            if (winWidth < 1025 && typeof socialContainer !== 'undefined') {
                 const socialTop = socialContainer.getBoundingClientRect().top + scrollY;
                 if (midPoint >= socialTop) {
                     socialIcons.forEach((icon, i) => setTimeout(() => icon.classList.add('activated'), i * 200));
@@ -925,20 +974,26 @@
                 socialIcons.forEach(icon => icon.classList.remove('activated'));
             }
 
-            // Подсветка блоков услуг (Работает везде)
+            // 3. Блоки услуг и контакты (Авто-подсветка только для МОБИЛОК)
             allGlowElements.forEach(el => {
                 const rect = el.getBoundingClientRect();
-                // На мобилках подсвечиваем центр, на ПК оставляем как было
-                if (rect.top < winHeight * 0.7 && rect.bottom > winHeight * 0.3) {
-                    el.classList.add('active-scroll');
+                if (winWidth < 1025) {
+                    // Мобильная логика: подсвечиваем то, что в центре
+                    if (rect.top < winHeight * 0.6 && rect.bottom > winHeight * 0.4) {
+                        el.classList.add('active-scroll');
+                    } else {
+                        el.classList.remove('active-scroll');
+                    }
                 } else {
+                    // ПК логика: убираем активный класс, чтобы работал только :hover из CSS
                     el.classList.remove('active-scroll');
                 }
             });
         };
 
-        window.addEventListener('scroll', newScrollHandler);
-        window.dispatchEvent(new Event('scroll'));
+        window.addEventListener('scroll', updateAll);
+        window.addEventListener('resize', updateAll);
+        updateAll();
     })();
 </script>
 </body>
