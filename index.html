@@ -913,56 +913,90 @@
         .module.artist:hover { border-color: #ff003c !important; }
         .module.platinum:hover { border-color: #ffcc00 !important; }
     }
+<style>
+    /* 1. БАЗОВЫЙ СТИЛЬ: БЕЛЫЙ ЦВЕТ, БЕЗ СВЕЧЕНИЯ */
+    .social-btn {
+        color: #ffffff !important;
+        filter: none !important;
+        text-shadow: none !important;
+        transition: color 0.3s ease, transform 0.3s ease !important;
+        display: inline-block;
+    }
+
+    /* 2. ЭФФЕКТ ПРИ НАВЕДЕНИИ: УВЕЛИЧЕНИЕ И ЦВЕТ */
+    .social-btn:hover {
+        transform: scale(1.2) !important; /* Увеличили один раз и всё */
+    }
+
+    /* Цвета кнопок */
+    .social-btn.vk:hover, .social-btn.vk.activated { color: #0077ff !important; }
+    .social-btn.tg:hover, .social-btn.tg.activated { color: #24A1DE !important; }
+    .social-btn.yt:hover, .social-btn.yt.activated { color: #ff0000 !important; }
+    .social-btn.ig:hover, .social-btn.ig.activated { color: #f09433 !important; }
+
+    /* 3. БЛОКИРОВКА ЭФФЕКТОВ НА ПК */
+    @media (min-width: 1025px) {
+        /* Отключаем любые анимации, кроме наведения */
+        .social-btn.activated {
+            color: #ffffff !important;
+            transform: scale(1) !important;
+        }
+        
+        /* Услуги: только наведение */
+        .module.active-scroll {
+            background-color: rgba(255, 255, 255, 0.02) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        .module:hover {
+            transform: translateY(-5px) !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+    }
 </style>
 
 <script>
     (function() {
-        const updateAll = () => {
+        const cleanUpdate = () => {
             const winWidth = window.innerWidth;
             const winHeight = window.innerHeight;
             const scrollY = window.scrollY;
-            const midPoint = scrollY + (winHeight / 2);
 
-            // ЛОГИКА СОЦСЕТЕЙ
+            // Работа с соцсетями
             if (winWidth < 1025) {
-                // На мобильных: "волна" при достижении середины
-                if (typeof socialContainer !== 'undefined') {
-                    const socialTop = socialContainer.getBoundingClientRect().top + scrollY;
-                    if (midPoint >= socialTop) {
-                        socialIcons.forEach((icon, i) => {
-                            setTimeout(() => icon.classList.add('activated'), i * 150);
-                        });
-                    } else {
-                        socialIcons.forEach(icon => icon.classList.remove('activated'));
-                    }
-                }
-            } else {
-                // На ПК: принудительно гасим все активации от скролла
-                if (typeof socialIcons !== 'undefined') {
+                // На телефоне оставляем логику появления
+                const socialTop = socialContainer.getBoundingClientRect().top + scrollY;
+                if (scrollY + (winHeight / 2) >= socialTop) {
+                    socialIcons.forEach((icon, i) => {
+                        setTimeout(() => icon.classList.add('activated'), i * 150);
+                    });
+                } else {
                     socialIcons.forEach(icon => icon.classList.remove('activated'));
                 }
+            } else {
+                // НА ПК ВООБЩЕ УБИРАЕМ АКТИВАЦИЮ (ЧТОБЫ НЕ БЫЛО ЦВЕТА СЛЕВА НАПРАВО)
+                socialIcons.forEach(icon => {
+                    icon.classList.remove('activated');
+                });
             }
 
-            // ПОДСВЕТКА МОДУЛЕЙ (Только мобилки)
-            if (typeof allGlowElements !== 'undefined') {
-                allGlowElements.forEach(el => {
-                    const rect = el.getBoundingClientRect();
-                    if (winWidth < 1025) {
-                        if (rect.top < winHeight * 0.6 && rect.bottom > winHeight * 0.4) {
-                            el.classList.add('active-scroll');
-                        } else {
-                            el.classList.remove('active-scroll');
-                        }
+            // Услуги (только мобилки)
+            allGlowElements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (winWidth < 1025) {
+                    if (rect.top < winHeight * 0.6 && rect.bottom > winHeight * 0.4) {
+                        el.classList.add('active-scroll');
                     } else {
                         el.classList.remove('active-scroll');
                     }
-                });
-            }
+                } else {
+                    el.classList.remove('active-scroll');
+                }
+            });
         };
 
-        window.addEventListener('scroll', updateAll);
-        window.addEventListener('resize', updateAll);
-        updateAll();
+        window.addEventListener('scroll', cleanUpdate);
+        window.addEventListener('resize', cleanUpdate);
+        cleanUpdate();
     })();
 </script>
 </body>
