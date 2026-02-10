@@ -1041,6 +1041,52 @@
     @media (min-width: 1025px) {
         .social-btn, .header-phone { color: #ffffff !important; filter: none !important; }
     }
+<style>
+    /* 1. ПОЛНЫЙ ЗАПРЕТ СВЕЧЕНИЯ ДЛЯ СОЦСЕТЕЙ (ПК и МОБ) */
+    .social-btn.activated, 
+    .social-btn:hover {
+        filter: none !important;            /* Убираем размытое свечение */
+        text-shadow: none !important;      /* Убираем свечение текста/иконки */
+        -webkit-filter: none !important;
+        opacity: 1 !important;
+    }
+
+    /* Чистые цвета при активации/наведении */
+    .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; }
+    .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; }
+    .social-btn.activated.yt, .social-btn.yt:hover { color: #ff0000 !important; }
+    .social-btn.activated.ig, .social-btn.ig:hover { color: #f09433 !important; }
+
+    /* 2. УСЛУГИ НА ПК (Покой и Наведение) */
+    @media (min-width: 1025px) {
+        .module.active-scroll {
+            background-color: rgba(255, 255, 255, 0.02) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        .module:hover {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            transform: translateY(-8px) !important;
+            backdrop-filter: blur(15px) !important;
+        }
+
+        /* Цвета рамок услуг при наведении (тоже без фанатизма) */
+        .module.rec:hover { border-color: #ffffff !important; box-shadow: 0 0 10px rgba(255, 255, 255, 0.1) !important; }
+        .module.start:hover { border-color: var(--neon-purple) !important; box-shadow: 0 0 10px rgba(188, 19, 254, 0.1) !important; }
+        .module.artist:hover { border-color: var(--neon-red) !important; box-shadow: 0 0 10px rgba(255, 0, 60, 0.1) !important; }
+        .module.platinum:hover { border-color: var(--neon-gold) !important; box-shadow: 0 0 10px rgba(255, 204, 0, 0.1) !important; }
+
+        .phone-box-container.active-scroll { border-color: rgba(255, 255, 255, 0.2) !important; }
+        .phone-box-container:hover { border-color: #00f2ff !important; box-shadow: 0 0 10px rgba(0, 242, 255, 0.2) !important; }
+        .phone-box-container:hover .header-phone { color: #00f2ff !important; text-shadow: none !important; }
+    }
+
+    /* Общий сброс для ПК в покое */
+    @media (min-width: 1025px) {
+        .social-btn, .header-phone { color: #ffffff !important; filter: none !important; }
+    }
 </style>
 
 <script>
@@ -1055,6 +1101,7 @@
                 header.classList.toggle('header-hidden', artistTrigger.getBoundingClientRect().top <= 50);
             }
 
+            // Волна соцсетей для мобилок (без свечения, только цвет)
             if (winWidth < 1025 && typeof socialContainer !== 'undefined') {
                 const socialTop = socialContainer.getBoundingClientRect().top + scrollY;
                 if (midPoint >= socialTop) {
@@ -1066,6 +1113,7 @@
                 socialIcons.forEach(icon => icon.classList.remove('activated'));
             }
 
+            // Подсветка блоков (только мобилки)
             allGlowElements.forEach(el => {
                 const rect = el.getBoundingClientRect();
                 if (winWidth < 1025) {
