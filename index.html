@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPRING SOUND LAB | WEYTON</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;500;700;800&family=Montserrat:wght@100;200;300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Syne:wght@300;400;500;600;700;800&family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         /* ==========================================
-           1. ПЕРЕМЕННЫЕ И ОСНОВНЫЕ СТИЛИ (CSS VARIABLES)
+           1. CORE VARIABLES & RESET
            ========================================== */
         :root {
             --neon-blue: #00f2ff;
@@ -17,695 +19,623 @@
             --neon-gold: #ffcc00;
             --youtube-red: #ff0000;
             --bg-dark: #020205;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --border-light: rgba(255, 255, 255, 0.1);
             --transition-speed: 0.4s;
-            --transition-speed-mobile: 0.6s;
             --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
             --soft-glow: rgba(0, 242, 255, 0.25);
+            --purple-glow: rgba(188, 19, 254, 0.2);
+            --red-glow: rgba(255, 0, 60, 0.2);
+            --gold-glow: rgba(255, 204, 0, 0.2);
         }
 
         * { 
             box-sizing: border-box; 
             scroll-behavior: smooth; 
-            border-radius: 0 !important; 
-            margin-top: 0;
-            margin-bottom: 0;
-            margin-left: 0;
-            margin-right: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            padding-left: 0;
-            padding-right: 0;
+            border-radius: 0 !important;
+            margin: 0;
+            padding: 0;
+            outline: none;
         }
         
         body { 
-            margin-top: 0;
-            margin-bottom: 0;
-            margin-left: 0;
-            margin-right: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            padding-left: 0;
-            padding-right: 0;
             background-color: var(--bg-dark);
             color: #ffffff; 
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
-            line-height: 1.5;
+            line-height: 1.6;
             width: 100%;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* ==========================================
-           2. ФОН И АНИМАЦИЯ (BACKGROUND)
+           2. CINEMATIC BACKGROUND
            ========================================== */
         .studio-background {
             position: fixed;
-            top: 0; 
-            left: 0; 
-            width: 100%; 
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
             z-index: -2;
-            background-image: linear-gradient(rgba(2, 2, 5, 0.75), rgba(2, 2, 5, 0.98)), url('bg.jpg'); 
-            background-size: cover; 
-            background-position: center; 
+            background-image: linear-gradient(rgba(2, 2, 5, 0.8), rgba(2, 2, 5, 0.95)), url('bg.jpg'); 
+            background-size: cover;
+            background-position: center;
             background-repeat: no-repeat;
-            animation-name: backgroundSubtleScale;
-            animation-duration: 80s;
-            animation-iteration-count: infinite;
-            animation-direction: alternate;
-            animation-timing-function: ease-in-out;
+            animation: backgroundSubtleScale 100s infinite alternate ease-in-out;
         }
 
-        @keyframes backgroundSubtleScale { 
-            0% { 
-                transform: scale(1); 
-            } 
-            100% { 
-                transform: scale(1.15); 
-            } 
+        @keyframes backgroundSubtleScale {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+
+        .bg-overlay-fx {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 70%);
+            pointer-events: none;
         }
 
         /* ==========================================
-           3. ШАПКА САЙТА (HEADER)
+           3. HEADER & NAVIGATION SECTION
            ========================================== */
         header { 
-            height: 100vh; 
-            min-height: 600px;
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            padding-left: 20px; 
-            padding-right: 20px;
-            padding-top: 20px;
-            padding-bottom: 20px;
+            height: 100vh;
+            min-height: 700px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
             position: relative;
             width: 100%;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.8s var(--transition-timing), visibility 0.8s;
+            z-index: 100;
         }
 
         .flicker-header {
             font-family: 'Syne', sans-serif;
             font-weight: 700;
-            font-size: 1.4rem; 
-            letter-spacing: 22px;
+            font-size: 1.4rem;
+            letter-spacing: 24px;
             color: #ffffff;
             text-transform: uppercase;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             opacity: 0;
-            transform: translateY(15px);
-            animation-name: ultraSmoothFade;
-            animation-duration: 1.5s;
-            animation-delay: 0.8s;
-            animation-fill-mode: forwards;
+            transform: translateY(20px);
+            animation: ultraSmoothFade 1.5s 0.8s forwards, flickerText 4s infinite 3s;
         }
 
-        @keyframes ultraSmoothFade { 
-            from { 
-                opacity: 0; 
-                transform: translateY(15px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            } 
+        @keyframes flickerText {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+            52% { opacity: 0.9; }
+            54% { opacity: 0.7; }
+        }
+
+        @keyframes ultraSmoothFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
-            font-family: 'Orbitron', sans-serif; 
-            font-size: clamp(2.5rem, 8vw, 7.5rem); 
-            margin-top: 0;
-            margin-bottom: 0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.8rem, 9vw, 8.5rem);
+            line-height: 1;
             background-image: linear-gradient(90deg, #ffffff, var(--neon-blue), var(--neon-purple), #ffffff);
-            background-size: 300% auto; 
-            -webkit-background-clip: text; 
+            background-size: 300% auto;
+            -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation-name: flow;
-            animation-duration: 15s;
-            animation-iteration-count: infinite;
-            animation-timing-function: linear; 
-            text-transform: uppercase; 
-            letter-spacing: 15px; 
+            animation: flow 18s infinite linear;
+            text-transform: uppercase;
+            letter-spacing: 18px;
             font-weight: 900;
             width: 100%;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));
         }
 
-        @keyframes flow { 
-            0% { 
-                background-position: 0% 50%; 
-            } 
-            100% { 
-                background-position: 300% 50%; 
-            } 
+        @keyframes flow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
         }
 
         .header-subtitle {
             font-family: 'Syne', sans-serif;
             font-weight: 300;
-            font-size: clamp(1.2rem, 2.5vw, 1.7rem); 
-            max-width: 1100px;
-            margin-top: 50px; 
-            line-height: 1.6;
-            letter-spacing: 2px;
-            color: rgba(255, 255, 255, 0.9);
+            font-size: clamp(1.1rem, 2.8vw, 1.8rem);
+            max-width: 1200px;
+            margin-top: 60px;
+            line-height: 1.8;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.85);
             text-transform: uppercase;
             opacity: 0;
-            transform: translateY(15px);
-            animation-name: ultraSmoothFade;
-            animation-duration: 1.5s;
-            animation-delay: 1.8s;
-            animation-fill-mode: forwards;
+            transform: translateY(20px);
+            animation: ultraSmoothFade 1.5s 1.8s forwards;
         }
 
-        /* ==========================================
-           4. СОЦИАЛЬНЫЕ СЕТИ В ШАПКЕ
-           ========================================== */
+        /* SOCIAL BUTTONS */
         .header-socials {
             display: flex;
-            gap: 50px;
-            margin-top: 70px;
+            gap: 60px;
+            margin-top: 80px;
             opacity: 0;
-            transform: translateY(20px);
-            animation-name: ultraSmoothFade;
-            animation-duration: 1.5s;
-            animation-delay: 2.5s;
-            animation-fill-mode: forwards;
+            transform: translateY(30px);
+            animation: ultraSmoothFade 1.5s 2.6s forwards;
         }
 
         .social-btn {
-            color: #ffffff; 
-            font-size: 3.5rem;
-            transition: color 0.6s var(--transition-timing), transform 0.4s var(--transition-timing), filter 0.6s ease;
+            color: #ffffff;
+            font-size: 3.8rem;
+            transition: all 0.6s var(--transition-timing);
             text-decoration: none;
             display: inline-block;
+            position: relative;
         }
 
-        .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; filter: drop-shadow(0 0 8px rgba(0, 119, 255, 0.4)); }
-        .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; filter: drop-shadow(0 0 8px rgba(36, 161, 222, 0.4)); }
-        .social-btn.activated.yt, .social-btn.yt:hover { color: var(--youtube-red) !important; filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.4)); }
-        .social-btn.activated.ig, .social-btn.ig:hover { color: #f09433 !important; filter: drop-shadow(0 0 8px rgba(230, 104, 60, 0.4)); }
+        .social-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: currentColor;
+            transition: all 0.4s var(--transition-timing);
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .social-btn:hover::after { width: 100%; }
+
+        .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; filter: drop-shadow(0 0 12px rgba(0, 119, 255, 0.6)); }
+        .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; filter: drop-shadow(0 0 12px rgba(36, 161, 222, 0.6)); }
+        .social-btn.activated.yt, .social-btn.yt:hover { color: var(--youtube-red) !important; filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.6)); }
+        .social-btn.activated.ig, .social-btn.ig:hover { color: #f09433 !important; filter: drop-shadow(0 0 12px rgba(230, 104, 60, 0.6)); }
 
         @media (min-width: 1025px) {
-            .social-btn:hover { 
-                transform: scale(1.1); 
-            }
+            .social-btn:hover { transform: translateY(-10px) scale(1.1); }
         }
 
-        /* ==========================================
-           5. ТЕЛЕФОН В ШАПКЕ
-           ========================================== */
+        /* PHONE BOX */
         .phone-box-container {
-            margin-top: 40px;
-            padding-top: 20px;
-            padding-bottom: 20px;
-            padding-left: 40px;
-            padding-right: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background-color: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            margin-top: 60px;
+            padding: 25px 50px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background-color: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             display: inline-flex;
             flex-direction: column;
             align-items: center;
             text-decoration: none;
-            transition: all var(--transition-speed) var(--transition-timing);
+            transition: all 0.5s var(--transition-timing);
             opacity: 0;
-            transform: translateY(20px);
-            animation-name: ultraSmoothFade;
-            animation-duration: 1.5s;
-            animation-delay: 3s;
-            animation-fill-mode: forwards;
+            transform: translateY(30px);
+            animation: ultraSmoothFade 1.5s 3.2s forwards;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
+
+        .phone-box-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: 0.5s;
+        }
+
+        .phone-box-container:hover::before { left: 100%; }
 
         .header-phone {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             color: #ffffff;
-            letter-spacing: 5px;
-            transition: all var(--transition-speed) var(--transition-timing);
-            margin-bottom: 5px;
+            letter-spacing: 6px;
+            transition: all 0.5s;
+            margin-bottom: 8px;
+            font-weight: 700;
         }
 
         .phone-hint {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.6rem;
-            letter-spacing: 3px;
-            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
-            transition: all var(--transition-speed) var(--transition-timing);
+            font-weight: 500;
+            transition: all 0.5s;
         }
 
         .phone-box-container:hover {
             border-color: var(--neon-blue);
-            box-shadow: 0 0 10px var(--soft-glow);
-            background-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 25px var(--soft-glow);
+            background-color: rgba(255, 255, 255, 0.07);
         }
 
         .phone-box-container:hover .header-phone {
             color: var(--neon-blue);
-            text-shadow: 0 0 5px var(--soft-glow);
+            text-shadow: 0 0 10px var(--soft-glow);
         }
 
-        .phone-box-container:hover .phone-hint {
-            color: #ffffff;
-        }
+        .phone-box-container:hover .phone-hint { color: #ffffff; }
 
         /* ==========================================
-           6. ОСНОВНОЙ КОНТЕНТ (GRID & CONTAINERS)
+           4. MAIN CONTENT AREA (CONTAINER)
            ========================================== */
         .container { 
-            padding: 50px 20px;
-            max-width: 1600px; 
+            padding: 80px 40px;
+            max-width: 1700px;
             margin: 0 auto;
-            position: relative; 
-            z-index: 5; 
+            position: relative;
+            z-index: 5;
             width: 100%;
         }
 
-        section { 
-            padding: 120px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        section {
+            padding: 150px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
         }
 
         h2 { 
-            font-family: 'Orbitron', sans-serif; 
-            font-weight: 700; 
-            text-align: center; 
-            letter-spacing: 15px; 
-            margin-bottom: 80px; 
-            font-size: 2.8rem; 
-            text-transform: uppercase; 
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            text-align: center;
+            letter-spacing: 20px;
+            margin-bottom: 100px;
+            font-size: 3.2rem;
+            text-transform: uppercase;
+            position: relative;
         }
 
-        .module-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
-            gap: 20px; 
-            align-items: stretch; 
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--soft-glow);
+        }
+
+        /* ==========================================
+           5. SERVICES SECTION (PRICING MODULES)
+           ========================================== */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            align-items: stretch;
         }
 
         .module { 
-            background-color: rgba(255, 255, 255, 0.02); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 50px 25px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-light);
+            padding: 60px 35px;
             transition: all var(--transition-speed) var(--transition-timing);
             display: flex;
             flex-direction: column;
-            align-items: flex-start; 
-            text-align: left; 
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            align-items: flex-start;
+            text-align: left;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             position: relative;
-            height: 100%; 
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .module::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 40px; height: 40px;
+            background: linear-gradient(225deg, transparent 50%, rgba(255,255,255,0.05) 50%);
         }
 
         .module:hover {
-            background-color: rgba(255, 255, 255, 0.05); 
-            transform: translateY(-8px);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background-color: rgba(255, 255, 255, 0.06);
+            transform: translateY(-12px);
+            backdrop-filter: blur(20px);
+            z-index: 10;
         }
 
-        /* Пакетная подсветка */
-        .module.rec:hover, .module.rec.active-scroll { 
-            border-color: #ffffff; 
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); 
-        }
-        
-        .module.start:hover, .module.start.active-scroll { 
-            border-color: var(--neon-purple); 
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.1); 
-        }
-        
-        .module.artist:hover, .module.artist.active-scroll { 
-            border-color: var(--neon-red); 
-            box-shadow: 0 0 15px rgba(255, 0, 60, 0.1); 
-        }
-        
-        .module.platinum {
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-        .module.platinum:hover, .module.platinum.active-scroll { 
-            border-color: var(--neon-gold) !important; 
-            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2) !important; 
-        }
+        /* SPECIFIC MODULE GLOWS */
+        .module.rec:hover, .module.rec.active-scroll { border-color: #ffffff; box-shadow: 0 0 30px rgba(255, 255, 255, 0.08); }
+        .module.start:hover, .module.start.active-scroll { border-color: var(--neon-purple); box-shadow: 0 0 30px var(--purple-glow); }
+        .module.artist:hover, .module.artist.active-scroll { border-color: var(--neon-red); box-shadow: 0 0 30px var(--red-glow); }
+        .module.platinum:hover, .module.platinum.active-scroll { border-color: var(--neon-gold) !important; box-shadow: 0 0 40px var(--gold-glow) !important; }
 
-        .module h3 { 
-            font-family: 'Orbitron', sans-serif; 
-            font-weight: 700; 
-            letter-spacing: 3px; 
-            margin-bottom: 20px; 
-            font-size: 0.9rem; 
+        .module h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+            font-size: 1rem;
             text-transform: uppercase;
-            color: #ffffff;
+            color: rgba(255, 255, 255, 0.6);
         }
 
-        .price { 
-            font-size: 2.2rem; 
-            font-weight: 900; 
-            font-family: 'Orbitron', sans-serif; 
-            margin-bottom: 10px; 
+        .price {
+            font-size: 2.8rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 15px;
             color: #ffffff;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
         }
 
-        .price span { 
-            font-size: 0.8rem; 
-            color: #aaaaaa; 
-            font-family: 'Montserrat', sans-serif; 
-        }
+        .price span { font-size: 0.9rem; color: #888888; text-transform: uppercase; letter-spacing: 2px; }
 
         .module-description {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.7rem;
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 25px;
+            font-size: 0.8rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 35px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            flex-grow: 1; 
+            letter-spacing: 1.5px;
+            flex-grow: 1;
         }
 
         .sub-package {
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            margin-top: 15px;
-            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 20px;
+            padding-top: 20px;
             width: 100%;
         }
 
         .sub-package-title {
             font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 0.8rem;
-            margin-bottom: 8px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
             display: block;
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .specs { 
-            list-style-type: none; 
+        .specs {
+            list-style-type: none;
             padding: 0;
-            margin-top: 30px; 
-            width: 100%; 
+            margin-top: 40px;
+            width: 100%;
         }
 
-        .specs li { 
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.75rem; 
-            display: flex; 
-            justify-content: space-between; 
+        .specs li {
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
             color: #ffffff;
         }
 
-        .specs li span { 
-            color: var(--neon-blue); 
-            font-weight: 700; 
-            text-align: right; 
-            margin-left: 10px; 
+        .specs li span {
+            color: var(--neon-blue);
+            font-weight: 800;
+            margin-left: 15px;
+            font-family: 'Orbitron', sans-serif;
         }
 
         /* ==========================================
-           7. PORTFOLIO SECTION (ДОБАВЛЕНО)
+           6. PORTFOLIO SHOWCASE SECTION
            ========================================== */
-        .portfolio-grid {
+        .showcase-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 50px;
             width: 100%;
         }
 
-        .audio-card {
+        .showcase-item {
             background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            transition: all var(--transition-speed) var(--transition-timing);
+            border: 1px solid var(--border-light);
+            padding: 40px;
+            transition: all 0.6s var(--transition-timing);
+            backdrop-filter: blur(10px);
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            backdrop-filter: blur(5px);
+            gap: 30px;
+            position: relative;
         }
 
-        .audio-card:hover, .audio-card.active-scroll {
+        .showcase-item:hover, .showcase-item.active-scroll {
             border-color: var(--neon-blue);
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
-            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
         }
 
-        .audio-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+        .showcase-info {
+            border-left: 4px solid var(--neon-blue);
+            padding-left: 25px;
         }
 
-        .audio-title {
+        .showcase-tag {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
+            font-size: 0.75rem;
+            color: var(--neon-blue);
+            letter-spacing: 5px;
             text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .showcase-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             color: #ffffff;
         }
 
-        .audio-subtitle {
-            font-size: 0.65rem;
-            color: #aaaaaa;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .yandex-wrapper {
+            width: 100%;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        audio {
-            width: 100%;
-            height: 40px;
-            filter: invert(100%) hue-rotate(180deg) brightness(1.2);
-            outline: none;
-            opacity: 0.8;
+        .yandex-wrapper a {
+            color: var(--neon-blue) !important;
+            text-decoration: none;
+            font-size: 0.75rem;
             transition: opacity 0.3s;
         }
 
-        audio:hover { opacity: 1; }
+        .yandex-wrapper a:hover { opacity: 0.7; }
 
         /* ==========================================
-           8. СЕКЦИЯ КОНТАКТОВ (BOOKING)
+           7. BOOKING & CONTACTS
            ========================================== */
-        .booking-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 30px; 
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
         }
 
         .contact-card {
             background-color: rgba(255, 255, 255, 0.02);
-            padding: 80px 40px;
+            padding: 100px 50px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-light);
             text-decoration: none;
             color: #ffffff;
-            transition: all var(--transition-speed) var(--transition-timing);
-            backdrop-filter: blur(8px);
+            transition: all 0.5s var(--transition-timing);
+            backdrop-filter: blur(10px);
             display: block;
+            position: relative;
+            overflow: hidden;
         }
 
         .contact-label {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-            color: #aaaaaa;
-            margin-bottom: 10px;
+            font-size: 0.8rem;
+            letter-spacing: 5px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 20px;
             text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif;
         }
 
-        .contact-main-text { 
-            color: #ffffff; 
-            font-size: clamp(1.2rem, 2.5vw, 2.2rem); 
-            font-family: 'Orbitron', sans-serif; 
-            font-weight: 900; 
-            margin-bottom: 10px;
-            transition: all var(--transition-speed);
+        .contact-main-text {
+            font-size: clamp(1.4rem, 3vw, 2.5rem);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            margin-bottom: 20px;
             text-transform: uppercase;
+            letter-spacing: 4px;
         }
 
-        .contact-card:hover {
+        .contact-card:hover, .contact-card.active-scroll {
             border-color: var(--neon-blue);
-            box-shadow: 0 0 15px var(--soft-glow);
-            transform: translateY(-5px);
+            box-shadow: 0 0 35px var(--soft-glow);
+            transform: translateY(-8px);
             background-color: rgba(255, 255, 255, 0.05);
         }
 
-        .contact-card:hover .contact-main-text {
+        .contact-card:hover .contact-main-text, .contact-card.active-scroll .contact-main-text {
             color: var(--neon-blue);
-            text-shadow: 0 0 6px var(--soft-glow);
-        }
-
-        /* Мобильная подсветка контактов */
-        .contact-card.active-scroll {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px var(--soft-glow);
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-        .contact-card.active-scroll .contact-main-text {
-            color: var(--neon-blue);
-            text-shadow: 0 0 6px var(--soft-glow);
+            text-shadow: 0 0 10px var(--soft-glow);
         }
 
         .work-time {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
+            font-size: 1rem;
+            letter-spacing: 3px;
             color: #ffffff;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             text-transform: uppercase;
+            font-weight: 500;
         }
 
         .action-hint {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.6rem;
-            letter-spacing: 2px;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.6);
             text-transform: uppercase;
+            font-weight: 600;
         }
 
         /* ==========================================
-           9. ПОДВАЛ (FOOTER)
+           8. FOOTER
            ========================================== */
-        footer { 
-            padding: 60px 20px;
-            text-align: center; 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 0.7rem; 
-            color: #555555; 
-            letter-spacing: 5px; 
-            border-top: 1px solid #111111;
+        footer {
+            padding: 80px 20px;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: #444444;
+            letter-spacing: 8px;
+            border-top: 1px solid rgba(255,255,255,0.03);
             text-transform: uppercase;
+            font-weight: 600;
         }
 
         .header-hidden {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
+            transform: translateY(-20px);
         }
 
         /* ==========================================
-           10. МЕДИА-ЗАПРОСЫ (АДАПТИВНОСТЬ)
+           9. MOBILE OPTIMIZATION (RESPONSIVE)
            ========================================== */
         @media (max-width: 1024px) { 
-            header { 
-                height: auto; 
-                min-height: 100vh; 
-                padding: 60px 20px; 
-            }
+            header { height: auto; min-height: 100vh; padding: 100px 20px; }
+            h1 { font-size: 3rem; letter-spacing: 10px; line-height: 1.2; }
+            .header-subtitle { font-size: 1rem; margin-top: 40px; padding: 0 10px; }
+            .header-socials { gap: 40px; margin-top: 60px; }
+            .social-btn { font-size: 3rem; }
+            .phone-box-container { width: 90%; max-width: 360px; padding: 20px; }
             
-            .flicker-header { 
-                font-size: 0.8rem; 
-                letter-spacing: 10px; 
-                margin-bottom: 15px; 
-                opacity: 1; 
-                transform: none; 
-                animation: none;
-            }
-
-            h1 { 
-                font-size: 2.8rem; 
-                letter-spacing: 8px; 
-                line-height: 1.1;
-                width: 100%;
-            }
-
-            .header-subtitle { 
-                font-size: 0.9rem; 
-                margin-top: 30px; 
-                letter-spacing: 1px;
-                padding: 0 10px;
-                opacity: 1; 
-                transform: none; 
-                animation: none;
-            }
-
-            .header-socials { 
-                gap: 20px; 
-                margin-top: 40px; 
-                opacity: 1; 
-                transform: none; 
-                animation: none; 
-            }
+            .container { padding: 60px 25px; }
+            section { padding: 80px 0; }
+            h2 { font-size: 2.2rem; letter-spacing: 10px; margin-bottom: 60px; }
             
-            .social-btn { 
-                font-size: 2.5rem; 
-            }
-
-            .header-phone { 
-                font-size: 1.1rem; 
-                letter-spacing: 3px; 
-            }
+            .module-grid { grid-template-columns: 1fr; gap: 25px; }
+            .showcase-grid { grid-template-columns: 1fr; gap: 35px; }
+            .booking-grid { grid-template-columns: 1fr; gap: 25px; }
             
-            .phone-box-container { 
-                padding: 15px 25px; 
-                margin-top: 30px; 
-                width: 90%; 
-                max-width: 320px; 
-                opacity: 1; 
-                transform: none; 
-                animation: none; 
-            }
-
-            section { 
-                padding: 60px 0; 
-            }
+            .showcase-item { padding: 25px; }
+            .contact-card { padding: 60px 30px; }
             
-            h2 { 
-                font-size: 2rem; 
-                letter-spacing: 8px; 
-                margin-bottom: 40px; 
-            }
-            
-            .module-grid { 
-                grid-template-columns: 1fr; 
-            }
-            
-            .booking-grid { 
-                grid-template-columns: 1fr; 
-            } 
-            
-            .contact-card { 
-                padding: 50px 20px; 
-            }
-            
-            .contact-main-text { 
-                font-size: 1.4rem; 
-            }
-
-            /* Запрет трансформации при ховере на мобильных */
-            .module:hover, 
-            .social-btn:hover, 
-            .phone-box-container:hover,
-            .contact-card:hover,
-            .audio-card:hover { 
-                transform: none; 
-            }
-
-            .module.active-scroll, .audio-card.active-scroll {
-                background-color: rgba(255, 255, 255, 0.05); 
+            .module:hover, .contact-card:hover, .showcase-item:hover { transform: none; }
+            .module.active-scroll, .showcase-item.active-scroll, .contact-card.active-scroll {
+                background-color: rgba(255, 255, 255, 0.06);
                 backdrop-filter: blur(15px);
-                -webkit-backdrop-filter: blur(15px);
             }
         }
 
-        @media (max-width: 350px) {
-            h1 { 
-                font-size: 2.2rem; 
-            }
-            .flicker-header { 
-                letter-spacing: 5px; 
-            }
+        @media (max-width: 480px) {
+            h1 { font-size: 2.2rem; letter-spacing: 6px; }
+            .header-phone { font-size: 1.4rem; letter-spacing: 3px; }
+            .price { font-size: 2.2rem; }
+            .contact-main-text { font-size: 1.3rem; letter-spacing: 2px; }
         }
     </style>
 </head>
 <body>
 
 <div class="studio-background"></div>
+<div class="bg-overlay-fx"></div>
 
 <header id="main-header">
     <div class="flicker-header">СТУДИЯ ЗВУКОЗАПИСИ</div>
@@ -715,37 +645,39 @@
     </div>
     
     <div class="header-socials" id="social-container">
-        <a href="ССЫЛКА_ВК" class="social-btn vk" target="_blank" title="ВКонтакте"><i class="fab fa-vk"></i></a>
-        <a href="ССЫЛКА_ТГ" class="social-btn tg" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
-        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-        <a href="ССЫЛКА_ИГ" class="social-btn ig" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="ССЫЛКА_ВК" class="social-btn vk" target="_blank" aria-label="VK"><i class="fab fa-vk"></i></a>
+        <a href="ССЫЛКА_ТГ" class="social-btn tg" target="_blank" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="ССЫЛКА_ИГ" class="social-btn ig" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
     </div>
 
-    <a href="tel:+79178382017" class="phone-box-container js-header-phone">
+    <a href="tel:+79178382017" class="phone-box-container">
         <span class="header-phone">+7 917 838 20 17</span>
         <span class="phone-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</span>
     </a>
 </header>
 
 <div class="container">
+    
     <section id="services">
         <h2>SERVICES</h2>
         <div class="module-grid">
+            
             <div class="module rec js-scroll-glow">
                 <h3>ЗАПИСЬ</h3>
                 <div class="price">900 <span>₽/ч</span></div>
                 <div class="module-description">
                     80% успеха трека — это правильное исполнение. Моя задача — выжать максимум из твоего таланта.
                     <div class="sub-package">
-                        <span class="sub-package-title" style="color: #ffffff;">ВОКАЛЬНЫЙ КОУЧИНГ</span>
-                        • Помогу с подачей и интонацией, подберу крутые фишки для твоего голоса. <br>
-                        • Исправляю ошибки на лету: если не попал в такт или ноту, перепишем и добьёмся идеала. <br>
-                        • Работаем над эмоциями и динамикой, чтобы слушатель верил каждому твоему слову.
+                        <span class="sub-package-title">ВОКАЛЬНЫЙ КОУЧИНГ</span>
+                        • Помогу с подачей и интонацией. <br>
+                        • Исправляю ошибки на лету. <br>
+                        • Работаем над эмоциями.
                     </div>
                 </div>
                 <ul class="specs">
-                    <li>РАБОТАЕМ <span>ПО ПРЕДВАРИТЕЛЬНОЙ ЗАПИСИ</span></li>
-                    <li>БРОНИРОВАНИЕ ВРЕМЕНИ <span>500 ₽ (ВХОДИТ В СТОИМОСТЬ СЕССИИ)</span></li>
+                    <li>СТАТУС <span>ПО ПРЕДВАРИТЕЛЬНОЙ ЗАПИСИ</span></li>
+                    <li>ОБОРУДОВАНИЕ <span>PRO CLASS</span></li>
                 </ul>
             </div>
 
@@ -753,17 +685,17 @@
                 <h3>START EDITION</h3>
                 <div class="price">3 500 <span>₽</span></div>
                 <div class="module-description">
-                    Идеальное решение для песен в подарок или корпоративных гимнов. Подойдет тем, кому нужен качественный, но быстрый результат без лишних сложностей.
+                    Идеальное решение для песен в подарок или корпоративных гимнов. Качественно, быстро, доступно.
                     <div class="sub-package">
                         <span class="sub-package-title" style="color: var(--neon-purple);">БАЗОВЫЙ ПРОДАКШН</span>
-                        • Чистый голос: уберу лишний шум и сделаю вокал разборчивым. <br>
-                        • Стандартная обработка: громкость, плотность и приятное эхо. <br>
-                        • Сведение с минусом: аккуратно вклеим твой голос в музыку.
+                        • Чистый голос. <br>
+                        • Стандартная обработка частот. <br>
+                        • Легкая пространственная обработка.
                     </div>
                 </div>
                 <ul class="specs">
-                    <li>ВКЛЮЧЕНО <span>СВЕДЕНИЕ МИНУСА + 1 ДОРОЖКА</span></li>
-                    <li>ТЮНИНГ ВОКАЛА <span>+ 1 000 ₽ / ДОРОЖКА</span></li>
+                    <li>ВКЛЮЧЕНО <span>СВЕДЕНИЕ + 1 ДОРОЖКА</span></li>
+                    <li>СРОКИ <span>ОТ 2 ДНЕЙ</span></li>
                 </ul>
             </div>
 
@@ -771,18 +703,17 @@
                 <h3>ARTIST EDITION</h3>
                 <div class="price">6 000 <span>₽</span></div>
                 <div class="module-description">
-                    Продукт для топ-чартов и стриминговых площадок. Полная проработка коммерческого звучания, которое будет конкурировать с лучшими релизами индустрии.
+                    Продукт для тех, кто целится в топ-чарты. Плотный, современный звук с глубокой проработкой.
                     <div class="sub-package">
                         <span class="sub-package-title" style="color: var(--neon-red);">ПРОФЕССИОНАЛЬНЫЙ ПОДХОД</span>
-                        • Ручная коррекция основного вокала: каждый слог встанет на свое место по нотам. <br>
-                        • Современный объем и эффекты: используем передовые плагины для создания пространства. <br>
-                        • Работа со вторыми голосами: создадим мощную панораму и плотность.
+                        • Детальная ручная коррекция. <br>
+                        • Текстурное наслоение звука. <br>
+                        • Уникальные FX-эффекты.
                     </div>
                 </div>
                 <ul class="specs">
-                    <li>ВКЛЮЧЕНО <span>ОБРАБОТКА 2-Х ДОП. ДОРОЖЕК</span></li>
-                    <li>ТЮНИНГ ДОП. ДОРОЖКИ <span>+ 500 ₽</span></li>
-                    <li>ОБРАБОТКА ДОП. ДОРОЖКИ <span>+ 300 ₽</span></li>
+                    <li>ВКЛЮЧЕНО <span>2 ДОП. ДОРОЖКИ</span></li>
+                    <li>ТЮНИНГ <span>MANUAL CELEMONY</span></li>
                 </ul>
             </div>
 
@@ -790,78 +721,68 @@
                 <h3>PLATINUM EDITION</h3>
                 <div class="price">ОТ 10 000 <span>₽</span></div>
                 <div class="module-description">
-                    Масштабный продакшн для монолитного звука. Когда в треке много партий, инструментов и нюансов, требующих ювелирной точности.
+                    Бескомпромиссное качество. Работа над каждым вдохом для достижения монолитного звучания.
                     <div class="sub-package">
-                        <span class="sub-package-title" style="color: var(--neon-gold);">МУЛЬТИТРЕК</span>
-                        • Сведение до 20 дорожек включительно: детальная работа с каждой частотой. <br>
-                        • Ручной тюнинг основного вокала включен: идеальный питч без механического звука. <br>
-                        • Творческая работа: создание уникального саунд-дизайна под твой запрос.
+                        <span class="sub-package-title" style="color: var(--neon-gold);">МУЛЬТИТРЕК ПРОДАКШН</span>
+                        • Сведение до 20 дорожек. <br>
+                        • Глубокий аналоговый саунд. <br>
+                        • Персональный мастеринг.
                     </div>
                 </div>
                 <ul class="specs">
                     <li>ДОП. ДОРОЖКА <span>+ 300 ₽</span></li>
-                    <li>ТЮНИНГ БЭКОВ <span>ОТДЕЛЬНО</span></li>
+                    <li>МАСТЕРИНГ <span>ВКЛЮЧЕН</span></li>
                 </ul>
             </div>
+            
         </div>
     </section>
 
     <section id="portfolio">
         <h2>PORTFOLIO</h2>
-        <div class="portfolio-grid">
-            <div class="audio-card js-scroll-glow">
-                <div class="audio-info">
-                    <div class="audio-title">TRACK 01 // PRODUCTION</div>
-                    <div class="audio-subtitle">Mixed by WEYTON</div>
+        <div class="showcase-grid">
+            
+            <div class="showcase-item js-scroll-glow">
+                <div class="showcase-info">
+                    <span class="showcase-tag">ARTIST SHOWCASE</span>
+                    <h3 class="showcase-title">LUANHO — ЛЕТИ СО МНОЙ</h3>
                 </div>
-                <audio controls>
-                    <source src="track1.mp3" type="audio/mpeg">
-                    Ваш браузер не поддерживает аудио-плеер.
-                </audio>
-            </div>
-            <div class="audio-card js-scroll-glow">
-                <div class="audio-info">
-                    <div class="audio-title">TRACK 02 // ARTIST EDITION</div>
-                    <div class="audio-subtitle">Sound Design & Engineering</div>
+                <div class="yandex-wrapper">
+                    <iframe frameborder="0" allow="clipboard-write" style="border:none;width:614px;height:556px;" width="614" height="556" src="https://music.yandex.ru/iframe/album/38668535">Слушайте <a href="https://music.yandex.ru/album/38668535?utm_source=web&utm_medium=copy_link">Лети со мной</a> — <a href="https://music.yandex.ru/artist/21249006">LUANHO</a> на Яндекс Музыке</iframe>
                 </div>
-                <audio controls>
-                    <source src="track2.mp3" type="audio/mpeg">
-                </audio>
             </div>
-            <div class="audio-card js-scroll-glow">
-                <div class="audio-info">
-                    <div class="audio-title">TRACK 03 // VOCAL MIX</div>
-                    <div class="audio-subtitle">Spring Sound Lab Quality</div>
+
+            <div class="showcase-item js-scroll-glow">
+                <div class="showcase-info">
+                    <span class="showcase-tag">COMING SOON</span>
+                    <h3 class="showcase-title">NEW PRODUCTION</h3>
                 </div>
-                <audio controls>
-                    <source src="track3.mp3" type="audio/mpeg">
-                </audio>
-            </div>
-            <div class="audio-card js-scroll-glow">
-                <div class="audio-info">
-                    <div class="audio-title">TRACK 04 // PLATINUM TRACK</div>
-                    <div class="audio-subtitle">Full Production Cycle</div>
+                <div class="yandex-wrapper" style="height: 556px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.03);">
+                    <i class="fas fa-compact-disc fa-spin" style="font-size: 4rem; color: rgba(255,255,255,0.1); margin-bottom: 20px;"></i>
+                    <p style="font-family: 'Orbitron'; font-size: 0.9rem; color: #333; letter-spacing: 8px;">RECORDING IN PROGRESS</p>
                 </div>
-                <audio controls>
-                    <source src="track4.mp3" type="audio/mpeg">
-                </audio>
             </div>
+
         </div>
     </section>
 
     <section id="booking">
         <div class="booking-grid">
+            
             <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="contact-card js-scroll-glow">
-                <div class="contact-label">АДРЕС</div>
+                <div class="contact-label">LOCATION</div>
                 <div class="contact-main-text">ВОЛГОГРАД, ТУЛАКА 9</div>
-                <div class="work-time">ЕЖЕДНЕВНО С 10:00 ДО 22:00</div>
-                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</div>
+                <div class="work-time">ЕЖЕДНЕВНО: 10:00 — 22:00</div>
+                <div class="action-hint"><i class="fas fa-location-arrow" style="margin-right: 10px;"></i> ПОСТРОИТЬ МАРШРУТ</div>
             </a>
+            
             <a href="tel:+79178382017" class="contact-card js-scroll-glow">
-                <div class="contact-label">ПОЗВОНИТЬ</div>
+                <div class="contact-label">BOOKING</div>
                 <div class="contact-main-text">+7 917 838 20 17</div>
-                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</div>
+                <div class="work-time">WEYTON PRODUCTION</div>
+                <div class="action-hint"><i class="fas fa-phone-alt" style="margin-right: 10px;"></i> СВЯЗАТЬСЯ НАПРЯМУЮ</div>
             </a>
+            
         </div>
     </section>
 </div>
@@ -871,9 +792,6 @@
 </footer>
 
 <script>
-    /* ==========================================
-       JS LOGIC: SCROLL EFFECTS & VISIBILITY
-       ========================================== */
     const header = document.getElementById('main-header');
     const artistTrigger = document.querySelector('.js-artist-trigger');
     const socialIcons = document.querySelectorAll('.social-btn');
@@ -881,62 +799,63 @@
     const allGlowElements = document.querySelectorAll('.js-scroll-glow');
     const isMobile = window.innerWidth < 1025;
 
-    // Настройки для Intersection Observer (для мобильной подсветки)
-    const observerOptions = {
-        root: null,
-        rootMargin: '-45% 0px -45% 0px',
-        threshold: 0
-    };
-
-    // 1. ЛОГИКА АКТИВНОЙ КАРТОЧКИ (ТОЛЬКО МОБИЛЬНЫЕ)
+    // SCROLL ANIMATIONS FOR MOBILE (ACTIVE STATES)
     if (isMobile) {
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active-scroll');
-                } else {
-                    entry.target.classList.remove('active-scroll');
+                if (entry.isIntersecting) { 
+                    entry.target.classList.add('active-scroll'); 
+                } else { 
+                    entry.target.classList.remove('active-scroll'); 
                 }
             });
-        }, observerOptions);
-
+        }, { 
+            root: null, 
+            rootMargin: '-40% 0px -40% 0px', 
+            threshold: 0 
+        });
+        
         allGlowElements.forEach(el => scrollObserver.observe(el));
     }
 
-    // 2. ОБЩАЯ ЛОГИКА СКРОЛЛА
+    // SCROLL HANDLING
     window.addEventListener('scroll', () => {
-        const winWidth = window.innerWidth;
         const scrollY = window.scrollY;
-        const midPoint = scrollY + (window.innerHeight / 2);
 
-        // Исчезновение шапки при скролле до услуг
+        // Header Visibility Logic
         if (artistTrigger) {
             const artistRect = artistTrigger.getBoundingClientRect();
-            if (artistRect.top <= 50) {
-                header.classList.add('header-hidden');
-            } else {
-                header.classList.remove('header-hidden');
+            if (artistRect.top <= 80) { 
+                header.classList.add('header-hidden'); 
+            } else { 
+                header.classList.remove('header-hidden'); 
             }
         }
 
-        // Волна активации соцсетей (для мобильных)
-        if (socialContainer && winWidth < 1025) {
+        // Social Icons Activation (Mobile)
+        if (socialContainer && isMobile) {
             const socialRect = socialContainer.getBoundingClientRect();
-            const socialAbsoluteTop = socialRect.top + scrollY;
-
-            if (midPoint >= socialAbsoluteTop) {
-                socialIcons.forEach((icon, index) => {
-                    setTimeout(() => {
-                        icon.classList.add('activated');
-                    }, index * 150); 
+            if (window.scrollY + (window.innerHeight/1.5) >= socialRect.top + window.scrollY) {
+                socialIcons.forEach((icon, index) => { 
+                    setTimeout(() => icon.classList.add('activated'), index * 120); 
                 });
-            } else {
-                socialIcons.forEach(icon => icon.classList.remove('activated'));
+            } else { 
+                socialIcons.forEach(icon => icon.classList.remove('activated')); 
             }
         }
     });
 
-    // Первичный вызов для проверки состояния при загрузке
+    // PARALLAX EFFECT FOR BACKGROUND
+    window.addEventListener('mousemove', (e) => {
+        if (!isMobile) {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            const bg = document.querySelector('.studio-background');
+            bg.style.transform = `scale(1.1) translate(${(x - 0.5) * 20}px, ${(y - 0.5) * 20}px)`;
+        }
+    });
+
+    // INITIAL TRIGGER
     window.dispatchEvent(new Event('scroll'));
 </script>
 
