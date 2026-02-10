@@ -781,39 +781,17 @@
 
     // 2. ЛОГИКА ШАПКИ И ВОЛНЫ СОЦСЕТЕЙ
     window.addEventListener('scroll', () => {
-    const winWidth = window.innerWidth;
-    const scrollY = window.scrollY;
-    const winHeight = window.innerHeight;
-    const midPoint = scrollY + (winHeight / 2); // Центр экрана
+        const winHeight = window.innerHeight;
+        const scrollY = window.scrollY;
+        const midPoint = scrollY + (winHeight / 2);
 
-    // Скрытие шапки при прокрутке к услугам
-    if (artistTrigger && artistTrigger.getBoundingClientRect().top <= 50) {
-        header.classList.add('header-hidden');
-    } else {
-        header.classList.remove('header-hidden');
-    }
-
-    // ЛОГИКА ДЛЯ МОБИЛКИ (Волна)
-    if (winWidth < 1025 && socialContainer) {
-        const socialRect = socialContainer.getBoundingClientRect();
-        const socialTop = socialRect.top + scrollY;
-
-        // Если центр экрана дошел до блока соцсетей
-        if (midPoint >= socialTop) {
-            socialIcons.forEach((icon, i) => {
-                setTimeout(() => {
-                    icon.classList.add('activated');
-                }, i * 200); // Плавное загорание слева направо
-            });
-        } else {
-            // Если ушли выше центра — снова белые
-            socialIcons.forEach(icon => icon.classList.remove('activated'));
-        }
-    } else {
-        // На ПК принудительно снимаем классы, чтобы работал только :hover
-        socialIcons.forEach(icon => icon.classList.remove('activated'));
-    }
-});
+        // Исчезновение шапки при достижении блока Artist Edition
+        if (artistTrigger) {
+            const artistRect = artistTrigger.getBoundingClientRect();
+            if (artistRect.top <= 50) {
+                header.classList.add('header-hidden');
+            } else {
+                header.classList.remove('header-hidden');
             }
         }
 
