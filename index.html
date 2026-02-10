@@ -817,6 +817,75 @@
     // Дополнительная проверка при загрузке страницы
     window.dispatchEvent(new Event('scroll'));
 </script>
+<style>
+    /* 1. Возвращаем рамку и настраиваем белый цвет в покое */
+    .phone-box-container {
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    .header-phone, .social-btn {
+        color: #ffffff !important;
+        filter: none !important;
+    }
 
+    /* 2. Эффекты только для ПК (наведение) */
+    @media (min-width: 1025px) {
+        /* Убираем мобильную активацию на ПК */
+        .social-btn.activated { color: #ffffff !important; filter: none !important; }
+        
+        /* Цвета при наведении */
+        .social-btn.vk:hover { color: #0077ff !important; filter: drop-shadow(0 0 10px #0077ff) !important; }
+        .social-btn.tg:hover { color: #24A1DE !important; filter: drop-shadow(0 0 10px #24A1DE) !important; }
+        .social-btn.yt:hover { color: #ff0000 !important; filter: drop-shadow(0 0 10px #ff0000) !important; }
+        .social-btn.ig:hover { color: #f09433 !important; filter: drop-shadow(0 0 10px #f09433) !important; }
+
+        .phone-box-container:hover {
+            border-color: #00f2ff !important;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.4) !important;
+            background-color: rgba(255, 255, 255, 0.08) !important;
+        }
+        .phone-box-container:hover .header-phone {
+            color: #00f2ff !important;
+            text-shadow: 0 0 8px rgba(0, 242, 255, 0.5) !important;
+        }
+    }
+</style>
+
+<script>
+    // Перезаписываем логику скролла (исправляем "волну" и оставляем мобильную подсветку)
+    window.addEventListener('scroll', () => {
+        const winWidth = window.innerWidth;
+        const winHeight = window.innerHeight;
+        const scrollY = window.scrollY;
+        const midPoint = scrollY + (winHeight / 2);
+
+        // 1. Скрытие логотипа
+        if (artistTrigger) {
+            header.classList.toggle('header-hidden', artistTrigger.getBoundingClientRect().top <= 50);
+        }
+
+        // 2. Волна соцсетей (Только мобилки)
+        if (winWidth < 1025 && socialContainer) {
+            const socialTop = socialContainer.getBoundingClientRect().top + scrollY;
+            if (midPoint >= socialTop) {
+                socialIcons.forEach((icon, i) => setTimeout(() => icon.classList.add('activated'), i * 200));
+            } else {
+                socialIcons.forEach(icon => icon.classList.remove('activated'));
+            }
+        } else {
+            socialIcons.forEach(icon => icon.classList.remove('activated'));
+        }
+
+        // 3. Подсветка всех остальных блоков (Услуги/Контакты)
+        allGlowElements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < winHeight * 0.7 && rect.bottom > winHeight * 0.3) {
+                el.classList.add('active-scroll');
+            } else {
+                el.classList.remove('active-scroll');
+            }
+        });
+    });
+</script>
 </body>
 </html>
