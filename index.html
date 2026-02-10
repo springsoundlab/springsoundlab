@@ -194,7 +194,7 @@
 
         .social-btn:hover::after { width: 100%; }
 
-        /* Цвета соцсетей (индивидуальная подсветка) */
+        /* Цвета соцсетей */
         .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; filter: drop-shadow(0 0 12px rgba(0, 119, 255, 0.6)); }
         .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; filter: drop-shadow(0 0 12px rgba(36, 161, 222, 0.6)); }
         .social-btn.activated.yt, .social-btn.yt:hover { color: var(--youtube-red) !important; filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.6)); }
@@ -204,7 +204,7 @@
             .social-btn:hover { transform: translateY(-10px) scale(1.1); }
         }
 
-        /* PHONE BOX (Запрещено менять подсветку) */
+        /* PHONE BOX */
         .phone-box-container {
             margin-top: 60px;
             padding: 25px 50px;
@@ -335,7 +335,6 @@
             overflow: hidden;
         }
 
-        /* Специфическая подсветка пакетов (Запрещено менять) */
         .module.rec:hover, .module.rec.active-scroll { border-color: #ffffff; box-shadow: 0 0 30px rgba(255, 255, 255, 0.08); }
         .module.start:hover, .module.start.active-scroll { border-color: var(--neon-purple); box-shadow: 0 0 30px var(--purple-glow); }
         .module.artist:hover, .module.artist.active-scroll { border-color: var(--neon-red); box-shadow: 0 0 30px var(--red-glow); }
@@ -418,7 +417,7 @@
         }
 
         /* ==========================================
-           6. PORTFOLIO SHOWCASE (3 В РЯД)
+           6. PORTFOLIO SHOWCASE & VINYL PLAYER
            ========================================== */
         .showcase-grid {
             display: grid;
@@ -429,33 +428,150 @@
             margin: 0 auto;
         }
 
+        .vinyl-card {
+            position: relative;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-light);
+            padding: 20px;
+            transition: all 0.5s var(--transition-timing);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: visible;
+        }
+
+        .vinyl-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            background: #000;
+            z-index: 5;
+        }
+
+        .vinyl-cover {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .vinyl-disk {
+            position: absolute;
+            top: 5%;
+            right: 0;
+            width: 90%;
+            height: 90%;
+            background: radial-gradient(circle, #111 20%, #000 100%);
+            border-radius: 50% !important;
+            z-index: 1;
+            transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .vinyl-disk::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50% !important;
+            background: repeating-radial-gradient(rgba(255,255,255,0.05) 0%, transparent 2px, transparent 5px);
+        }
+
+        /* Анимация вращения пластинки */
+        @keyframes rotateDisk {
+            from { transform: translateX(45%) rotate(0deg); }
+            to { transform: translateX(45%) rotate(360deg); }
+        }
+
+        .vinyl-card:hover .vinyl-disk {
+            transform: translateX(45%);
+        }
+
+        .vinyl-card.playing .vinyl-disk {
+            animation: rotateDisk 4s linear infinite;
+        }
+
+        .vinyl-card:hover .vinyl-cover {
+            transform: translateX(-15%);
+        }
+
+        .player-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 15;
+            position: relative;
+        }
+
+        .track-info {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+        }
+
+        .main-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .play-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+        }
+
+        .play-btn:hover { color: var(--neon-blue); transform: scale(1.1); }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--neon-blue);
+            width: 0%;
+            box-shadow: 0 0 10px var(--soft-glow);
+            transition: width 0.1s linear;
+        }
+
+        .time-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 1px;
+        }
+
+        /* Обычные слоты */
         .showcase-item {
             background: #000;
             border: 1px solid var(--border-light);
             transition: all 0.5s var(--transition-timing);
-            position: relative;
-            overflow: hidden;
             aspect-ratio: 1 / 1;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .showcase-item:hover {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 30px var(--soft-glow);
-            transform: translateY(-5px);
-        }
-
-        .yandex-full-player {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            transform: scale(1.05); /* Убираем рамки Яндекса */
-            background: #000;
         }
 
         /* ==========================================
@@ -513,7 +629,6 @@
             color: #ffffff;
             margin-bottom: 30px;
             text-transform: uppercase;
-            font-weight: 500;
         }
 
         .action-hint {
@@ -547,39 +662,16 @@
         }
 
         /* ==========================================
-           9. MOBILE OPTIMIZATION (FULL)
+           9. MOBILE OPTIMIZATION
            ========================================== */
         @media (max-width: 1024px) { 
             header { height: auto; min-height: 100vh; padding: 100px 20px; }
-            h1 { font-size: 3rem; letter-spacing: 10px; line-height: 1.2; }
-            .header-subtitle { font-size: 1rem; margin-top: 40px; padding: 0 10px; }
-            .header-socials { gap: 40px; margin-top: 60px; }
-            .social-btn { font-size: 3rem; }
-            .phone-box-container { width: 90%; max-width: 360px; padding: 20px; }
-            
-            .container { padding: 60px 25px; }
-            section { padding: 80px 0; }
-            h2 { font-size: 2.2rem; letter-spacing: 10px; margin-bottom: 60px; }
-            
-            .module-grid { grid-template-columns: 1fr; gap: 25px; }
-            .showcase-grid { grid-template-columns: 1fr; gap: 20px; }
-            .showcase-item { aspect-ratio: 1/1; }
-            .booking-grid { grid-template-columns: 1fr; gap: 25px; }
-            
-            .contact-card { padding: 60px 30px; }
-            
-            .module:hover, .contact-card:hover, .showcase-item:hover { transform: none; }
-            .module.active-scroll, .showcase-item.active-scroll, .contact-card.active-scroll {
-                background-color: rgba(255, 255, 255, 0.06);
-                backdrop-filter: blur(15px);
-            }
-        }
-
-        @media (max-width: 480px) {
-            h1 { font-size: 2.2rem; letter-spacing: 6px; }
-            .header-phone { font-size: 1.4rem; letter-spacing: 3px; }
-            .price { font-size: 2.2rem; }
-            .contact-main-text { font-size: 1.3rem; letter-spacing: 2px; }
+            h1 { font-size: 3rem; letter-spacing: 10px; }
+            .showcase-grid { grid-template-columns: 1fr; gap: 40px; }
+            .module-grid { grid-template-columns: 1fr; }
+            .booking-grid { grid-template-columns: 1fr; }
+            .vinyl-card:hover .vinyl-cover { transform: none; }
+            .vinyl-card:hover .vinyl-disk { transform: translateX(25%); }
         }
     </style>
 </head>
@@ -596,10 +688,10 @@
     </div>
     
     <div class="header-socials" id="social-container">
-        <a href="ССЫЛКА_ВК" class="social-btn vk" target="_blank" aria-label="VK"><i class="fab fa-vk"></i></a>
-        <a href="ССЫЛКА_ТГ" class="social-btn tg" target="_blank" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
-        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-        <a href="ССЫЛКА_ИГ" class="social-btn ig" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="ССЫЛКА_ВК" class="social-btn vk" target="_blank"><i class="fab fa-vk"></i></a>
+        <a href="ССЫЛКА_ТГ" class="social-btn tg" target="_blank"><i class="fab fa-telegram"></i></a>
+        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="ССЫЛКА_ИГ" class="social-btn ig" target="_blank"><i class="fab fa-instagram"></i></a>
     </div>
 
     <a href="tel:+79178382017" class="phone-box-container">
@@ -697,16 +789,35 @@
         <h2>PORTFOLIO</h2>
         <div class="showcase-grid">
             
-            <div class="showcase-item js-scroll-glow">
-                <iframe class="yandex-full-player" src="https://music.yandex.ru/iframe/album/38668535"></iframe>
+            <div class="vinyl-card js-scroll-glow" id="card-audio-1">
+                <div class="vinyl-wrapper">
+                    <img src="image_041492.png" alt="WEYTON - В ОБЛАКА" class="vinyl-cover">
+                    <div class="vinyl-disk">
+                        <div style="width: 25%; height: 25%; background: #222; border-radius: 50% !important; border: 2px solid #333; position: relative; z-index: 20;"></div>
+                    </div>
+                </div>
+                
+                <div class="player-controls">
+                    <div class="track-info">WEYTON — В ОБЛАКА</div>
+                    <div class="main-controls">
+                        <button class="play-btn" onclick="togglePlay(this, 'audio-1')">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="progress-container" onclick="setProgress(event, 'audio-1')">
+                            <div class="progress-bar" id="bar-audio-1"></div>
+                        </div>
+                        <div class="time-display" id="time-audio-1">0:00</div>
+                    </div>
+                    <audio id="audio-1" src="В облака_008.wav"></audio>
+                </div>
             </div>
 
             <div class="showcase-item js-scroll-glow" style="background: rgba(255,255,255,0.01);">
-                <p style="font-family:'Orbitron'; font-size:0.6rem; color:#333; letter-spacing:8px; text-align:center;">TRACK SLOT 02</p>
+                <p style="font-family:'Orbitron'; font-size:0.6rem; color:#222; letter-spacing:8px; text-align:center;">UPCOMING SLOT 02</p>
             </div>
 
             <div class="showcase-item js-scroll-glow" style="background: rgba(255,255,255,0.01);">
-                <p style="font-family:'Orbitron'; font-size:0.6rem; color:#333; letter-spacing:8px; text-align:center;">TRACK SLOT 03</p>
+                <p style="font-family:'Orbitron'; font-size:0.6rem; color:#222; letter-spacing:8px; text-align:center;">UPCOMING SLOT 03</p>
             </div>
 
         </div>
@@ -714,21 +825,18 @@
 
     <section id="booking">
         <div class="booking-grid">
-            
             <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="contact-card js-scroll-glow">
                 <div class="contact-label">LOCATION</div>
                 <div class="contact-main-text">ВОЛГОГРАД, ТУЛАКА 9</div>
                 <div class="work-time">ЕЖЕДНЕВНО: 10:00 — 22:00</div>
                 <div class="action-hint"><i class="fas fa-location-arrow" style="margin-right: 10px;"></i> ПОСТРОИТЬ МАРШРУТ</div>
             </a>
-            
             <a href="tel:+79178382017" class="contact-card js-scroll-glow">
                 <div class="contact-label">BOOKING</div>
                 <div class="contact-main-text">+7 917 838 20 17</div>
                 <div class="work-time">WEYTON PRODUCTION</div>
                 <div class="action-hint"><i class="fas fa-phone-alt" style="margin-right: 10px;"></i> СВЯЗАТЬСЯ НАПРЯМУЮ</div>
             </a>
-            
         </div>
     </section>
 </div>
@@ -745,44 +853,66 @@
     const allGlowElements = document.querySelectorAll('.js-scroll-glow');
     const isMobile = window.innerWidth < 1025;
 
-    // 1. Анимация при скролле для мобилок
-    if (isMobile) {
-        const scrollObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) { 
-                    entry.target.classList.add('active-scroll'); 
-                } else { 
-                    entry.target.classList.remove('active-scroll'); 
-                }
-            });
-        }, { root: null, rootMargin: '-40% 0px -40% 0px', threshold: 0 });
-        allGlowElements.forEach(el => scrollObserver.observe(el));
+    // ПЛЕЕР: Логика управления
+    function togglePlay(btn, audioId) {
+        const audio = document.getElementById(audioId);
+        const card = document.getElementById('card-' + audioId);
+        const icon = btn.querySelector('i');
+        
+        if (audio.paused) {
+            audio.play();
+            icon.classList.replace('fa-play', 'fa-pause');
+            card.classList.add('playing');
+        } else {
+            audio.pause();
+            icon.classList.replace('fa-pause', 'fa-play');
+            card.classList.remove('playing');
+        }
+
+        audio.ontimeupdate = () => {
+            const bar = document.getElementById('bar-' + audioId);
+            const timeDisplay = document.getElementById('time-' + audioId);
+            const pct = (audio.currentTime / audio.duration) * 100;
+            bar.style.width = pct + '%';
+            
+            let mins = Math.floor(audio.currentTime / 60);
+            let secs = Math.floor(audio.currentTime % 60);
+            timeDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        };
+
+        audio.onended = () => {
+            icon.classList.replace('fa-pause', 'fa-play');
+            card.classList.remove('playing');
+        };
     }
 
-    // 2. Логика видимости хедера и активации иконок
+    function setProgress(e, audioId) {
+        const audio = document.getElementById(audioId);
+        const container = e.currentTarget;
+        const width = container.clientWidth;
+        const clickX = e.offsetX;
+        audio.currentTime = (clickX / width) * audio.duration;
+    }
+
+    // СКРОЛЛ: Анимации и хедер
     window.addEventListener('scroll', () => {
         if (artistTrigger) {
             const artistRect = artistTrigger.getBoundingClientRect();
-            if (artistRect.top <= 80) { 
-                header.classList.add('header-hidden'); 
-            } else { 
-                header.classList.remove('header-hidden'); 
-            }
+            if (artistRect.top <= 80) { header.classList.add('header-hidden'); } 
+            else { header.classList.remove('header-hidden'); }
         }
 
-        if (socialContainer && isMobile) {
-            const socialRect = socialContainer.getBoundingClientRect();
-            if (window.scrollY + (window.innerHeight/1.5) >= socialRect.top + window.scrollY) {
-                socialIcons.forEach((icon, index) => { 
-                    setTimeout(() => icon.classList.add('activated'), index * 120); 
-                });
-            } else { 
-                socialIcons.forEach(icon => icon.classList.remove('activated')); 
-            }
+        if (isMobile) {
+            allGlowElements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.8 && rect.bottom > 0) {
+                    el.classList.add('active-scroll');
+                }
+            });
         }
     });
 
-    // 3. Параллакс фона
+    // МЫШЬ: Параллакс
     window.addEventListener('mousemove', (e) => {
         if (!isMobile) {
             const x = e.clientX / window.innerWidth;
@@ -792,13 +922,6 @@
         }
     });
 
-    // 4. Инициализация
-    window.addEventListener('load', () => {
-        window.dispatchEvent(new Event('scroll'));
-    });
-    window.addEventListener('resize', () => {
-        window.dispatchEvent(new Event('scroll'));
-    });
     window.dispatchEvent(new Event('scroll'));
 </script>
 
