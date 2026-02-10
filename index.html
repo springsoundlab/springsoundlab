@@ -194,6 +194,7 @@
 
         .social-btn:hover::after { width: 100%; }
 
+        /* Цвета соцсетей */
         .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; filter: drop-shadow(0 0 12px rgba(0, 119, 255, 0.6)); }
         .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; filter: drop-shadow(0 0 12px rgba(36, 161, 222, 0.6)); }
         .social-btn.activated.yt, .social-btn.yt:hover { color: var(--youtube-red) !important; filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.6)); }
@@ -321,7 +322,6 @@
             overflow: hidden;
         }
 
-        /* ОРИГИНАЛЬНАЯ ПОДСВЕТКА */
         .module.rec:hover, .module.rec.active-scroll { border-color: #ffffff; box-shadow: 0 0 30px rgba(255, 255, 255, 0.08); }
         .module.start:hover, .module.start.active-scroll { border-color: var(--neon-purple); box-shadow: 0 0 30px var(--purple-glow); }
         .module.artist:hover, .module.artist.active-scroll { border-color: var(--neon-red); box-shadow: 0 0 30px var(--red-glow); }
@@ -404,7 +404,7 @@
         }
 
         /* ==========================================
-           6. PORTFOLIO & VINYL PLAYER
+           6. PORTFOLIO SHOWCASE & VINYL PLAYER
            ========================================== */
         .showcase-grid {
             display: grid;
@@ -509,10 +509,11 @@
             font-size: 1.4rem;
             cursor: pointer;
             transition: all 0.3s;
-            width: 30px;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 30px;
         }
 
         .progress-container {
@@ -666,13 +667,6 @@
                 <div class="price">900 <span>₽/ч</span></div>
                 <div class="module-description">
                     80% успеха трека — это правильное исполнение. Моя задача — выжать максимум из твоего таланта.
-                    <div class="sub-package">
-                        <span class="sub-package-title">ВОКАЛЬНЫЙ КОУЧИНГ</span>
-                        • Помогу с подачей и интонацией. <br>
-                        • Исправляю ошибки на лету. <br>
-                        • Работаем над эмоциями. <br>
-                        • Поиск уникального тембра.
-                    </div>
                 </div>
                 <ul class="specs">
                     <li>СТАТУС <span>ПО ПРЕДВАРИТЕЛЬНОЙ ЗАПИСИ</span></li>
@@ -685,17 +679,9 @@
                 <div class="price">3 500 <span>₽</span></div>
                 <div class="module-description">
                     Идеальное решение для песен в подарок или корпоративных гимнов. Качественно, быстро, доступно.
-                    <div class="sub-package">
-                        <span class="sub-package-title" style="color: var(--neon-purple);">БАЗОВЫЙ ПРОДАКШН</span>
-                        • Чистый голос. <br>
-                        • Стандартная обработка частот. <br>
-                        • Легкая пространственная обработка. <br>
-                        • Склеивание дорожек.
-                    </div>
                 </div>
                 <ul class="specs">
                     <li>ВКЛЮЧЕНО <span>СВЕДЕНИЕ + 1 ДОРОЖКА</span></li>
-                    <li>СРОКИ <span>ОТ 2 ДНЕЙ</span></li>
                 </ul>
             </div>
 
@@ -704,17 +690,10 @@
                 <div class="price">6 000 <span>₽</span></div>
                 <div class="module-description">
                     Продукт для тех, кто целится в топ-чарты. Плотный, современный звук с глубокой проработкой.
-                    <div class="sub-package">
-                        <span class="sub-package-title" style="color: var(--neon-red);">ПРОФЕССИОНАЛЬНЫЙ ПОДХОД</span>
-                        • Детальная ручная коррекция (тюн). <br>
-                        • Текстурное наслоение звука. <br>
-                        • Уникальные FX-эффекты. <br>
-                        • Плотная работа с инструменталом.
-                    </div>
                 </div>
                 <ul class="specs">
                     <li>ВКЛЮЧЕНО <span>2 ДОП. ДОРОЖКИ</span></li>
-                    <li>ТЮНИНГ <span>MANUAL CELEMONY</span></li>
+                    <li>ТЮН <span>CELEMONY</span></li>
                 </ul>
             </div>
 
@@ -723,17 +702,9 @@
                 <div class="price">ОТ 10 000 <span>₽</span></div>
                 <div class="module-description">
                     Бескомпромиссное качество. Работа над каждым вдохом для достижения монолитного звучания.
-                    <div class="sub-package">
-                        <span class="sub-package-title" style="color: var(--neon-gold);">МУЛЬТИТРЕК ПРОДАКШН</span>
-                        • Сведение до 20 дорожек. <br>
-                        • Глубокий аналоговый саунд. <br>
-                        • Персональный мастеринг. <br>
-                        • Безлимитные правки.
-                    </div>
                 </div>
                 <ul class="specs">
                     <li>ДОП. ДОРОЖКА <span>+ 300 ₽</span></li>
-                    <li>МАСТЕРИНГ <span>ВКЛЮЧЕН</span></li>
                 </ul>
             </div>
             
@@ -801,8 +772,6 @@
 <script>
     const header = document.getElementById('main-header');
     const artistTrigger = document.querySelector('.js-artist-trigger');
-    const socialIcons = document.querySelectorAll('.social-btn');
-    const socialContainer = document.getElementById('social-container');
     const allGlowElements = document.querySelectorAll('.js-scroll-glow');
     const isMobile = window.innerWidth < 1025;
 
@@ -810,6 +779,7 @@
         const audio = document.getElementById(audioId);
         const card = document.getElementById('card-' + audioId);
         const icon = btn.querySelector('i');
+        
         if (audio.paused) {
             audio.play();
             icon.classList.replace('fa-play', 'fa-pause');
@@ -819,11 +789,13 @@
             icon.classList.replace('fa-pause', 'fa-play');
             card.classList.remove('playing');
         }
+
         audio.ontimeupdate = () => {
             const bar = document.getElementById('bar-' + audioId);
             const timeDisplay = document.getElementById('time-' + audioId);
             const pct = (audio.currentTime / audio.duration) * 100;
             bar.style.width = pct + '%';
+            
             let mins = Math.floor(audio.currentTime / 60);
             let secs = Math.floor(audio.currentTime % 60);
             timeDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
@@ -838,14 +810,17 @@
 
     window.addEventListener('scroll', () => {
         if (artistTrigger) {
-            const rect = artistTrigger.getBoundingClientRect();
-            if (rect.top <= 80) header.classList.add('header-hidden');
-            else header.classList.remove('header-hidden');
+            const artistRect = artistTrigger.getBoundingClientRect();
+            if (artistRect.top <= 80) { header.classList.add('header-hidden'); } 
+            else { header.classList.remove('header-hidden'); }
         }
+
         if (isMobile) {
             allGlowElements.forEach(el => {
-                const r = el.getBoundingClientRect();
-                if (r.top < window.innerHeight * 0.8 && r.bottom > 0) el.classList.add('active-scroll');
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.8 && rect.bottom > 0) {
+                    el.classList.add('active-scroll');
+                }
             });
         }
     });
