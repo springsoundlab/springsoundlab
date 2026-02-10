@@ -14,12 +14,9 @@
             --neon-gold: #ffcc00;
             --youtube-red: #ff0000;
             --bg-dark: #020205;
-            /* Базовая скорость для ПК (курсор) */
             --transition-speed: 0.4s;
-            /* Ультра-быстрая скорость для мобильного скролла */
-            --transition-speed-mobile: 0.4s;
+            --transition-speed-mobile: 0.6s;
             --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
-            /* Переменная для мягкого свечения (уменьшена яркость) */
             --soft-glow: rgba(0, 242, 255, 0.25);
         }
 
@@ -163,18 +160,26 @@
         }
 
         .social-btn {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.4);
             font-size: 3.5rem;
-            transition: all var(--transition-speed) var(--transition-timing), filter var(--transition-speed);
+            transition: all var(--transition-speed-mobile) var(--transition-timing);
             text-decoration: none;
             display: inline-block;
         }
 
-        .social-btn:hover, .social-btn.active-scroll { transform: scale(1.05); }
-        .social-btn.vk:hover, .social-btn.vk.active-scroll { color: #0077ff; filter: drop-shadow(0 0 5px rgba(0, 119, 255, 0.3)); }
-        .social-btn.tg:hover, .social-btn.tg.active-scroll { color: #24A1DE; filter: drop-shadow(0 0 5px rgba(36, 161, 222, 0.3)); }
-        .social-btn.ig:hover, .social-btn.ig.active-scroll { color: #f09433; filter: drop-shadow(0 0 5px rgba(230, 104, 60, 0.3)); }
-        .social-btn.yt:hover, .social-btn.yt.active-scroll { color: var(--youtube-red); filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.3)); }
+        /* Анимация "ВЖУХ" слева направо для мобильных */
+        .header-socials.active-scroll .social-btn.vk { color: #0077ff; filter: drop-shadow(0 0 12px rgba(0, 119, 255, 0.6)); transition-delay: 0.1s; }
+        .header-socials.active-scroll .social-btn.tg { color: #24A1DE; filter: drop-shadow(0 0 12px rgba(36, 161, 222, 0.6)); transition-delay: 0.3s; }
+        .header-socials.active-scroll .social-btn.yt { color: var(--youtube-red); filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.6)); transition-delay: 0.5s; }
+        .header-socials.active-scroll .social-btn.ig { color: #f09433; filter: drop-shadow(0 0 12px rgba(230, 104, 60, 0.6)); transition-delay: 0.7s; }
+
+        @media (min-width: 1025px) {
+            .social-btn:hover { transform: scale(1.1); transition-delay: 0s !important; }
+            .social-btn.vk:hover { color: #0077ff; filter: drop-shadow(0 0 15px #0077ff); }
+            .social-btn.tg:hover { color: #24A1DE; filter: drop-shadow(0 0 15px #24A1DE); }
+            .social-btn.yt:hover { color: var(--youtube-red); filter: drop-shadow(0 0 15px var(--youtube-red)); }
+            .social-btn.ig:hover { color: #f09433; filter: drop-shadow(0 0 15px #f09433); }
+        }
 
         .phone-box-container {
             margin-top: 40px;
@@ -549,11 +554,11 @@
         Профессиональная архитектура звука. Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
     </div>
     
-    <div class="header-socials">
-        <a href="ССЫЛКА_ВК" class="social-btn vk js-scroll-glow" target="_blank" title="ВКонтакте"><i class="fab fa-vk"></i></a>
-        <a href="ССЫЛКА_ТГ" class="social-btn tg js-scroll-glow" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
-        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt js-scroll-glow" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-        <a href="ССЫЛКА_ИГ" class="social-btn ig js-scroll-glow" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+    <div class="header-socials js-wave-trigger">
+        <a href="ССЫЛКА_ВК" class="social-btn vk" target="_blank" title="ВКонтакте"><i class="fab fa-vk"></i></a>
+        <a href="ССЫЛКА_ТГ" class="social-btn tg" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
+        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="ССЫЛКА_ИГ" class="social-btn ig" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
     </div>
 
     <a href="tel:+79178382017" class="phone-box-container js-scroll-glow">
@@ -664,32 +669,38 @@
 
 <script>
     if (window.innerWidth <= 1024) {
-        // Выбираем абсолютно все интерактивные элементы для контроля свечения при скролле
-        const scrollElements = document.querySelectorAll('.js-scroll-glow');
-        
+        const soloElements = document.querySelectorAll('.js-scroll-glow, .module, .contact-card');
+        const waveTrigger = document.querySelector('.js-wave-trigger');
+
         const observerOptions = {
             root: null,
-            rootMargin: '-45% 0px -45% 0px', // Зона активации ровно в центре экрана
+            rootMargin: '-40% 0px -40% 0px', 
             threshold: 0
         };
 
-        const observer = new IntersectionObserver((entries) => {
+        const soloObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    // Убираем подсветку у всех элементов сразу (обеспечиваем эксклюзивность)
-                    scrollElements.forEach(el => el.classList.remove('active-scroll'));
-                    // Зажигаем только тот, что в центре
+                    soloElements.forEach(el => el.classList.remove('active-scroll'));
                     entry.target.classList.add('active-scroll');
                 } else {
-                    // Гасим, если ушел из зоны центра
                     entry.target.classList.remove('active-scroll');
                 }
             });
         }, observerOptions);
 
-        scrollElements.forEach(el => {
-            observer.observe(el);
-        });
+        const waveObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active-scroll');
+                } else {
+                    entry.target.classList.remove('active-scroll');
+                }
+            });
+        }, { rootMargin: '-30% 0px -30% 0px', threshold: 0 });
+
+        soloElements.forEach(el => soloObserver.observe(el));
+        if (waveTrigger) waveObserver.observe(waveTrigger);
     }
 </script>
 
