@@ -811,14 +811,15 @@
         <div class="portfolio-grid">
             <div class="audio-card js-scroll-glow">
                 <div class="audio-info">
-                    <div class="audio-title">TRACK 01 // PRODUCTION</div>
-                    <div class="audio-subtitle">Mixed by WEYTON</div>
+                    <div class="audio-title">LUANHO — ЛЕТИ СО МНОЙ</div>
+                    <div class="audio-subtitle">Mixed by WEYTON // SPRING SOUND LAB</div>
                 </div>
                 <audio controls>
-                    <source src="track1.mp3" type="audio/mpeg">
+                    <source src="лети_со_мной.mp3" type="audio/mpeg">
                     Ваш браузер не поддерживает аудио-плеер.
                 </audio>
             </div>
+
             <div class="audio-card js-scroll-glow">
                 <div class="audio-info">
                     <div class="audio-title">TRACK 02 // ARTIST EDITION</div>
@@ -855,7 +856,7 @@
                 <div class="contact-label">АДРЕС</div>
                 <div class="contact-main-text">ВОЛГОГРАД, ТУЛАКА 9</div>
                 <div class="work-time">ЕЖЕДНЕВНО С 10:00 ДО 22:00</div>
-                <div class="action-hint">ОТКРЫТЬ КАРТУ</div>
+                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОСМОТРЕТЬ КАРТУ</div>
             </a>
             <a href="tel:+79178382017" class="contact-card js-scroll-glow">
                 <div class="contact-label">ПОЗВОНИТЬ</div>
@@ -874,12 +875,12 @@
     /* ==========================================
        JS LOGIC: SCROLL EFFECTS & VISIBILITY
        ========================================== */
-    const headerElement = document.getElementById('main-header');
+    const header = document.getElementById('main-header');
     const artistTrigger = document.querySelector('.js-artist-trigger');
     const socialIcons = document.querySelectorAll('.social-btn');
     const socialContainer = document.getElementById('social-container');
     const allGlowElements = document.querySelectorAll('.js-scroll-glow');
-    const isMobileDevice = window.innerWidth < 1025;
+    const isMobile = window.innerWidth < 1025;
 
     // Настройки для Intersection Observer (для мобильной подсветки)
     const observerOptions = {
@@ -889,7 +890,7 @@
     };
 
     // 1. ЛОГИКА АКТИВНОЙ КАРТОЧКИ (ТОЛЬКО МОБИЛЬНЫЕ)
-    if (isMobileDevice) {
+    if (isMobile) {
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -903,29 +904,18 @@
         allGlowElements.forEach(el => scrollObserver.observe(el));
     }
 
-    // 2. СКРЫТИЕ ХЕДЕРА ПРИ СКРОЛЛЕ К ARTIST EDITION
+    // Дополнительная логика для хедера (исчезновение при скролле)
     window.addEventListener('scroll', () => {
-        if (artistTrigger) {
-            const triggerRect = artistTrigger.getBoundingClientRect();
-            if (triggerRect.top < window.innerHeight * 0.3) {
-                headerElement.classList.add('header-hidden');
-            } else {
-                headerElement.classList.remove('header-hidden');
-            }
+        const scrollY = window.scrollY;
+        if (scrollY > 100) {
+            header.style.opacity = '0';
+            header.style.visibility = 'hidden';
+        } else {
+            header.style.opacity = '1';
+            header.style.visibility = 'visible';
         }
     });
-
-    // 3. АНИМАЦИЯ СОЦИАЛЬНЫХ СЕТЕЙ ПРИ ЗАГРУЗКЕ
-    window.addEventListener('load', () => {
-        socialIcons.forEach((btn, index) => {
-            setTimeout(() => {
-                btn.classList.add('activated');
-                setTimeout(() => {
-                    btn.classList.remove('activated');
-                }, 800);
-            }, 3000 + (index * 200));
-        });
-    });
 </script>
+
 </body>
 </html>
