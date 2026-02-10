@@ -161,7 +161,7 @@
         }
 
         /* ==========================================
-           5. ТЕЛЕФОН В ШАПКЕ
+           5. ТЕЛЕФОН В ШАПКЕ (С БЛИКОМ)
            ========================================== */
         .phone-box-container {
             margin-top: 40px;
@@ -179,6 +179,8 @@
             transform: translateY(20px);
             animation: ultraSmoothFade 1.5s 3s forwards;
             cursor: pointer;
+            position: relative; /* Для блика */
+            overflow: hidden; /* Для блика */
         }
 
         .header-phone {
@@ -188,6 +190,7 @@
             letter-spacing: 5px;
             transition: all var(--transition-speed) var(--transition-timing);
             margin-bottom: 5px;
+            z-index: 2;
         }
 
         .phone-hint {
@@ -197,6 +200,7 @@
             color: rgba(255, 255, 255, 0.6);
             text-transform: uppercase;
             transition: all var(--transition-speed) var(--transition-timing);
+            z-index: 2;
         }
 
         .phone-box-container:hover {
@@ -212,6 +216,30 @@
 
         .phone-box-container:hover .phone-hint {
             color: #ffffff;
+        }
+
+        /* ЭФФЕКТ БЛИКА (SHIMMER) */
+        .phone-box-container::before, .contact-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%
+            );
+            transform: skewX(-25deg);
+            z-index: 1;
+            transition: 0s;
+        }
+
+        .phone-box-container:hover::before, .contact-card:hover::before {
+            left: 150%;
+            transition: 0.7s ease-in-out;
         }
 
         /* ==========================================
@@ -439,7 +467,7 @@
         audio:hover { opacity: 1; }
 
         /* ==========================================
-           8. СЕКЦИЯ КОНТАКТОВ (BOOKING)
+           8. СЕКЦИЯ КОНТАКТОВ (BOOKING С БЛИКОМ)
            ========================================== */
         .booking-grid { 
             display: grid; 
@@ -457,6 +485,8 @@
             transition: all var(--transition-speed) var(--transition-timing);
             backdrop-filter: blur(8px);
             display: block;
+            position: relative; /* Для блика */
+            overflow: hidden; /* Для блика */
         }
 
         .contact-label {
@@ -466,6 +496,8 @@
             color: #aaaaaa;
             margin-bottom: 10px;
             text-transform: uppercase;
+            position: relative;
+            z-index: 2;
         }
 
         .contact-main-text { 
@@ -476,6 +508,8 @@
             margin-bottom: 10px;
             transition: all var(--transition-speed);
             text-transform: uppercase;
+            position: relative;
+            z-index: 2;
         }
 
         .contact-card:hover {
@@ -507,6 +541,8 @@
             color: #ffffff;
             margin-bottom: 20px;
             text-transform: uppercase;
+            position: relative;
+            z-index: 2;
         }
 
         .action-hint {
@@ -515,6 +551,8 @@
             letter-spacing: 2px;
             color: rgba(255, 255, 255, 0.7);
             text-transform: uppercase;
+            position: relative;
+            z-index: 2;
         }
 
         /* ==========================================
