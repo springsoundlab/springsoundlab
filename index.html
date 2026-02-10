@@ -187,7 +187,6 @@
             filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.4));
         }
 
-        /* КОНТЕЙНЕР ДЛЯ НОМЕРА В ШАПКЕ С РАМКОЙ И БЛЮРОМ */
         .phone-box-container {
             margin-top: 40px;
             padding: 20px 40px;
@@ -291,27 +290,27 @@
             height: 100%; 
         }
 
-        .module:hover {
+        .module:hover, .module.active-scroll {
             background-color: rgba(0, 0, 0, 0.05); 
             transform: translateY(-8px);
         }
 
-        .module.rec:hover { 
+        .module.rec:hover, .module.rec.active-scroll { 
             border-color: #ffffff; 
             box-shadow: 0 0 50px rgba(255, 255, 255, 0.1); 
         }
 
-        .module.start:hover { 
+        .module.start:hover, .module.start.active-scroll { 
             border-color: var(--neon-purple); 
             box-shadow: 0 0 50px rgba(188, 19, 254, 0.2); 
         }
 
-        .module.artist:hover { 
+        .module.artist:hover, .module.artist.active-scroll { 
             border-color: var(--neon-red); 
             box-shadow: 0 0 50px rgba(255, 0, 60, 0.2); 
         }
 
-        .module.platinum:hover { 
+        .module.platinum:hover, .module.platinum.active-scroll { 
             border-color: var(--neon-gold); 
             box-shadow: 0 0 50px rgba(255, 204, 0, 0.2); 
         }
@@ -628,6 +627,23 @@
 <footer>
     WEYTON // SPRING SOUND LAB &copy; 2026 // NO UP IN LOGO
 </footer>
+
+<script>
+    const observerOptions = { threshold: 0.5 };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active-scroll');
+            } else {
+                entry.target.classList.remove('active-scroll');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.module').forEach(module => {
+        observer.observe(module);
+    });
+</script>
 
 </body>
 </html>
