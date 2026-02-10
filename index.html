@@ -49,7 +49,7 @@
         }
 
         /* ==========================================
-           2. CINEMATIC BACKGROUND
+           2. CINEMATIC BACKGROUND & FX
            ========================================== */
         .studio-background {
             position: fixed;
@@ -79,6 +79,11 @@
             z-index: -1;
             background: radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 70%);
             pointer-events: none;
+        }
+
+        /* Глитч-эффект для текста (зарезервировано) */
+        .glitch-wrapper {
+            position: relative;
         }
 
         /* ==========================================
@@ -194,6 +199,7 @@
 
         .social-btn:hover::after { width: 100%; }
 
+        /* Цвета соцсетей при наведении */
         .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; filter: drop-shadow(0 0 12px rgba(0, 119, 255, 0.6)); }
         .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; filter: drop-shadow(0 0 12px rgba(36, 161, 222, 0.6)); }
         .social-btn.activated.yt, .social-btn.yt:hover { color: var(--youtube-red) !important; filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.6)); }
@@ -349,7 +355,7 @@
             z-index: 10;
         }
 
-        /* SPECIFIC MODULE GLOWS */
+        /* Специфическая подсветка пакетов (Запрещено менять) */
         .module.rec:hover, .module.rec.active-scroll { border-color: #ffffff; box-shadow: 0 0 30px rgba(255, 255, 255, 0.08); }
         .module.start:hover, .module.start.active-scroll { border-color: var(--neon-purple); box-shadow: 0 0 30px var(--purple-glow); }
         .module.artist:hover, .module.artist.active-scroll { border-color: var(--neon-red); box-shadow: 0 0 30px var(--red-glow); }
@@ -436,21 +442,22 @@
            ========================================== */
         .showcase-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 в строчку по умолчанию */
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
             gap: 40px;
             width: 100%;
+            justify-content: center;
         }
 
         .showcase-item {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-light);
-            padding: 0;
             transition: all 0.5s var(--transition-timing);
             backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
             position: relative;
             overflow: hidden;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .showcase-item:hover {
@@ -459,64 +466,11 @@
             transform: translateY(-10px);
         }
 
-        /* Квадратная обложка */
-        .showcase-cover {
+        .yandex-full-player {
             width: 100%;
-            aspect-ratio: 1 / 1;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .showcase-cover::after {
-            content: '';
-            position: absolute;
-            top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(transparent 60%, rgba(0,0,0,0.8));
-        }
-
-        .showcase-track-info {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            z-index: 2;
-        }
-
-        .showcase-tag {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.65rem;
-            color: var(--neon-blue);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .showcase-title {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #ffffff;
-        }
-
-        /* Кастомный мини-плеер внизу */
-        .custom-player-bar {
-            padding: 20px;
-            background: rgba(255,255,255,0.03);
-            width: 100%;
-            height: auto;
-        }
-
-        .yandex-square-iframe {
-            width: 100%;
-            height: 180px; /* Фиксированная высота для элементов управления Яндекса */
+            height: 100%;
             border: none;
-            overflow: hidden;
-            display: block;
+            background: #000;
         }
 
         /* ==========================================
@@ -615,10 +569,6 @@
         /* ==========================================
            9. MOBILE OPTIMIZATION (RESPONSIVE)
            ========================================== */
-        @media (max-width: 1200px) {
-            .showcase-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
         @media (max-width: 1024px) { 
             header { height: auto; min-height: 100vh; padding: 100px 20px; }
             h1 { font-size: 3rem; letter-spacing: 10px; line-height: 1.2; }
@@ -632,7 +582,8 @@
             h2 { font-size: 2.2rem; letter-spacing: 10px; margin-bottom: 60px; }
             
             .module-grid { grid-template-columns: 1fr; gap: 25px; }
-            .showcase-grid { grid-template-columns: 1fr; gap: 30px; }
+            .showcase-grid { grid-template-columns: 1fr; gap: 25px; }
+            .showcase-item { aspect-ratio: auto; min-height: 500px; }
             .booking-grid { grid-template-columns: 1fr; gap: 25px; }
             
             .contact-card { padding: 60px 30px; }
@@ -649,6 +600,7 @@
             .header-phone { font-size: 1.4rem; letter-spacing: 3px; }
             .price { font-size: 2.2rem; }
             .contact-main-text { font-size: 1.3rem; letter-spacing: 2px; }
+            .showcase-item { min-height: 550px; }
         }
     </style>
 </head>
@@ -763,39 +715,11 @@
         <div class="showcase-grid">
             
             <div class="showcase-item js-scroll-glow">
-                <div class="showcase-cover" style="background-image: url('https://avatars.yandex.net/get-music-content/13812204/8597148a.a.38668535-1/400x400');">
-                    <div class="showcase-track-info">
-                        <span class="showcase-tag">ARTIST CASE</span>
-                        <h3 class="showcase-title">LUANHO — ЛЕТИ СО МНОЙ</h3>
-                    </div>
-                </div>
-                <div class="custom-player-bar">
-                    <iframe class="yandex-square-iframe" src="https://music.yandex.ru/iframe/track/132174620/38668535"></iframe>
-                </div>
+                <iframe class="yandex-full-player" src="https://music.yandex.ru/iframe/album/38668535"></iframe>
             </div>
 
-            <div class="showcase-item js-scroll-glow">
-                <div class="showcase-cover" style="background-image: linear-gradient(45deg, #111, #222);">
-                    <div class="showcase-track-info" style="text-align:center; left:0; right:0;">
-                        <span class="showcase-tag">UPCOMING</span>
-                        <h3 class="showcase-title">NEW TRACK</h3>
-                    </div>
-                </div>
-                <div class="custom-player-bar" style="height:180px; display:flex; align-items:center; justify-content:center;">
-                    <p style="font-family:'Orbitron'; font-size:0.7rem; color:#444; letter-spacing:5px;">AWAITING UPLOAD</p>
-                </div>
-            </div>
-
-            <div class="showcase-item js-scroll-glow">
-                <div class="showcase-cover" style="background-image: linear-gradient(-45deg, #111, #222);">
-                    <div class="showcase-track-info" style="text-align:center; left:0; right:0;">
-                        <span class="showcase-tag">UPCOMING</span>
-                        <h3 class="showcase-title">NEW TRACK</h3>
-                    </div>
-                </div>
-                <div class="custom-player-bar" style="height:180px; display:flex; align-items:center; justify-content:center;">
-                    <p style="font-family:'Orbitron'; font-size:0.7rem; color:#444; letter-spacing:5px;">AWAITING UPLOAD</p>
-                </div>
+            <div class="showcase-item js-scroll-glow" style="display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.01);">
+                <p style="font-family:'Orbitron'; font-size:0.7rem; color:#222; letter-spacing:10px;">AWAITING NEXT HIT</p>
             </div>
 
         </div>
@@ -834,7 +758,7 @@
     const allGlowElements = document.querySelectorAll('.js-scroll-glow');
     const isMobile = window.innerWidth < 1025;
 
-    // SCROLL ANIMATIONS FOR MOBILE (ACTIVE STATES)
+    // 1. SCROLL ANIMATIONS FOR MOBILE (ACTIVE STATES)
     if (isMobile) {
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -853,7 +777,7 @@
         allGlowElements.forEach(el => scrollObserver.observe(el));
     }
 
-    // SCROLL HANDLING
+    // 2. SCROLL HANDLING (HEADER & SOCIALS)
     window.addEventListener('scroll', () => {
         // Header Visibility Logic
         if (artistTrigger) {
@@ -878,7 +802,7 @@
         }
     });
 
-    // PARALLAX EFFECT FOR BACKGROUND
+    // 3. PARALLAX EFFECT FOR BACKGROUND
     window.addEventListener('mousemove', (e) => {
         if (!isMobile) {
             const x = e.clientX / window.innerWidth;
@@ -888,7 +812,16 @@
         }
     });
 
-    // INITIAL TRIGGER
+    // 4. PRELOADER & INITIAL TRIGGER (Z-INDEX FIX)
+    window.addEventListener('load', () => {
+        window.dispatchEvent(new Event('scroll'));
+    });
+
+    // RE-DISPATCH ON RESIZE
+    window.addEventListener('resize', () => {
+        window.dispatchEvent(new Event('scroll'));
+    });
+
     window.dispatchEvent(new Event('scroll'));
 </script>
 
