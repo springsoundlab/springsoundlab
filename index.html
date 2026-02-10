@@ -817,6 +817,103 @@
     // Дополнительная проверка при загрузке страницы
     window.dispatchEvent(new Event('scroll'));
 </script>
+<style>
+    /* 1. ПОЛНОЕ УНИЧТОЖЕНИЕ СВЕЧЕНИЯ (ПК и МОБ) */
+    .social-btn, 
+    .social-btn.activated, 
+    .social-btn:hover {
+        filter: none !important;
+        -webkit-filter: none !important;
+        text-shadow: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
 
+    /* 2. ЧИСТЫЕ ЦВЕТА (Без градиентов и эффектов) */
+    .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; }
+    .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; }
+    .social-btn.activated.yt, .social-btn.yt:hover { color: #ff0000 !important; }
+    .social-btn.activated.ig, .social-btn.ig:hover { color: #f09433 !important; }
+
+    /* 3. УСЛУГИ НА ПК (Покой и Наведение) */
+    @media (min-width: 1025px) {
+        /* Убираем авто-загорание блоков от скролла */
+        .module.active-scroll {
+            background-color: rgba(255, 255, 255, 0.02) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: none !important;
+        }
+
+        .module:hover {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            transform: translateY(-5px) !important;
+        }
+
+        /* Цвета рамок при наведении БЕЗ свечения */
+        .module.rec:hover { border-color: #ffffff !important; box-shadow: none !important; }
+        .module.start:hover { border-color: #bc13fe !important; box-shadow: none !important; }
+        .module.artist:hover { border-color: #ff003c !important; box-shadow: none !important; }
+        .module.platinum:hover { border-color: #ffcc00 !important; box-shadow: none !important; }
+
+        /* Номер телефона на ПК (Только цвет при наведении) */
+        .phone-box-container.active-scroll { border-color: rgba(255, 255, 255, 0.2) !important; }
+        .phone-box-container:hover { border-color: #00f2ff !important; }
+        .phone-box-container:hover .header-phone { color: #00f2ff !important; text-shadow: none !important; }
+        
+        /* ГАРАНТИРУЕМ: На ПК иконки всегда белые, пока нет наведения */
+        .social-btn.activated { color: #ffffff !important; }
+        .social-btn:hover { transition: none !important; } /* Убираем плавность, чтобы не бесило */
+    }
+</style>
+
+<script>
+    (function() {
+        const updateAll = () => {
+            const winWidth = window.innerWidth;
+            const winHeight = window.innerHeight;
+            const scrollY = window.scrollY;
+            const midPoint = scrollY + (winHeight / 2);
+
+            // Скрытие логотипа
+            if (typeof artistTrigger !== 'undefined' && artistTrigger) {
+                header.classList.toggle('header-hidden', artistTrigger.getBoundingClientRect().top <= 50);
+            }
+
+            // ЛОГИКА СОЦСЕТЕЙ
+            if (winWidth < 1025) {
+                // На телефоне оставляем поочередное загорание (волну)
+                if (typeof socialContainer !== 'undefined') {
+                    const socialTop = socialContainer.getBoundingClientRect().top + scrollY;
+                    if (midPoint >= socialTop) {
+                        socialIcons.forEach((icon, i) => setTimeout(() => icon.classList.add('activated'), i * 150));
+                    } else {
+                        socialIcons.forEach(icon => icon.classList.remove('activated'));
+                    }
+                }
+            } else {
+                // На ПК ПОЛНОСТЬЮ выключаем все классы активации
+                socialIcons.forEach(icon => icon.classList.remove('activated'));
+            }
+
+            // ПОДСВЕТКА БЛОКОВ (Только для мобилок)
+            allGlowElements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (winWidth < 1025) {
+                    if (rect.top < winHeight * 0.6 && rect.bottom > winHeight * 0.4) {
+                        el.classList.add('active-scroll');
+                    } else {
+                        el.classList.remove('active-scroll');
+                    }
+                } else {
+                    el.classList.remove('active-scroll');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', updateAll);
+        window.addEventListener('resize', updateAll);
+        updateAll();
+    })();
+</script>
 </body>
 </html>
