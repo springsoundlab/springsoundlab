@@ -163,29 +163,12 @@
             display: inline-block;
         }
 
-        .social-btn:hover { 
-            transform: scale(1.1); 
-        }
-
-        .social-btn.vk:hover { 
-            color: #0077ff; 
-            filter: drop-shadow(0 0 8px rgba(0, 119, 255, 0.4)); 
-        }
-
-        .social-btn.tg:hover { 
-            color: #24A1DE; 
-            filter: drop-shadow(0 0 8px rgba(36, 161, 222, 0.4)); 
-        }
-
-        .social-btn.ig:hover { 
-            color: #f09433; 
-            filter: drop-shadow(0 0 8px rgba(230, 104, 60, 0.4)); 
-        }
-
-        .social-btn.yt:hover {
-            color: var(--youtube-red);
-            filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.4));
-        }
+        /* ПОДСВЕТКА СОЦСЕТЕЙ */
+        .social-btn:hover, .social-btn.active-scroll { transform: scale(1.1); }
+        .social-btn.vk:hover, .social-btn.vk.active-scroll { color: #0077ff; filter: drop-shadow(0 0 12px rgba(0, 119, 255, 0.6)); }
+        .social-btn.tg:hover, .social-btn.tg.active-scroll { color: #24A1DE; filter: drop-shadow(0 0 12px rgba(36, 161, 222, 0.6)); }
+        .social-btn.ig:hover, .social-btn.ig.active-scroll { color: #f09433; filter: drop-shadow(0 0 12px rgba(230, 104, 60, 0.6)); }
+        .social-btn.yt:hover, .social-btn.yt.active-scroll { color: var(--youtube-red); filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.6)); }
 
         .phone-box-container {
             margin-top: 40px;
@@ -204,7 +187,7 @@
             animation: ultraSmoothFade 1.5s 3s forwards;
         }
 
-        .phone-box-container:hover {
+        .phone-box-container:hover, .phone-box-container.active-scroll {
             border-color: var(--neon-blue);
             box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
             background: rgba(255, 255, 255, 0.05);
@@ -219,7 +202,7 @@
             margin-bottom: 5px;
         }
 
-        .phone-box-container:hover .header-phone {
+        .phone-box-container:hover .header-phone, .phone-box-container.active-scroll .header-phone {
             color: var(--neon-blue);
             text-shadow: 0 0 15px var(--neon-blue);
         }
@@ -516,13 +499,13 @@
     </div>
     
     <div class="header-socials">
-        <a href="ССЫЛКА_ВК" class="social-btn vk" target="_blank" title="ВКонтакте"><i class="fab fa-vk"></i></a>
-        <a href="ССЫЛКА_ТГ" class="social-btn tg" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
-        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-        <a href="ССЫЛКА_ИГ" class="social-btn ig" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="ССЫЛКА_ВК" class="social-btn vk js-observe" target="_blank" title="ВКонтакте"><i class="fab fa-vk"></i></a>
+        <a href="ССЫЛКА_ТГ" class="social-btn tg js-observe" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
+        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt js-observe" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="ССЫЛКА_ИГ" class="social-btn ig js-observe" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
     </div>
 
-    <a href="tel:+79178382017" class="phone-box-container">
+    <a href="tel:+79178382017" class="phone-box-container js-observe">
         <span class="header-phone">+7 917 838 20 17</span>
         <span class="phone-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</span>
     </a>
@@ -629,7 +612,7 @@
 </footer>
 
 <script>
-    const observerOptions = { threshold: 0.5 };
+    const observerOptions = { threshold: 0.3 };
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -640,8 +623,9 @@
         });
     }, observerOptions);
 
-    document.querySelectorAll('.module').forEach(module => {
-        observer.observe(module);
+    // Следим и за карточками услуг, и за элементами шапки (соцсети/телефон)
+    document.querySelectorAll('.module, .js-observe').forEach(el => {
+        observer.observe(el);
     });
 </script>
 
