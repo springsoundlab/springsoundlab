@@ -855,7 +855,7 @@
                 <div class="contact-label">АДРЕС</div>
                 <div class="contact-main-text">ВОЛГОГРАД, ТУЛАКА 9</div>
                 <div class="work-time">ЕЖЕДНЕВНО С 10:00 ДО 22:00</div>
-                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</div>
+                <div class="action-hint">ОТКРЫТЬ КАРТУ</div>
             </a>
             <a href="tel:+79178382017" class="contact-card js-scroll-glow">
                 <div class="contact-label">ПОЗВОНИТЬ</div>
@@ -874,12 +874,12 @@
     /* ==========================================
        JS LOGIC: SCROLL EFFECTS & VISIBILITY
        ========================================== */
-    const header = document.getElementById('main-header');
+    const headerElement = document.getElementById('main-header');
     const artistTrigger = document.querySelector('.js-artist-trigger');
     const socialIcons = document.querySelectorAll('.social-btn');
     const socialContainer = document.getElementById('social-container');
     const allGlowElements = document.querySelectorAll('.js-scroll-glow');
-    const isMobile = window.innerWidth < 1025;
+    const isMobileDevice = window.innerWidth < 1025;
 
     // Настройки для Intersection Observer (для мобильной подсветки)
     const observerOptions = {
@@ -889,7 +889,7 @@
     };
 
     // 1. ЛОГИКА АКТИВНОЙ КАРТОЧКИ (ТОЛЬКО МОБИЛЬНЫЕ)
-    if (isMobile) {
+    if (isMobileDevice) {
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -903,42 +903,29 @@
         allGlowElements.forEach(el => scrollObserver.observe(el));
     }
 
-    // 2. ОБЩАЯ ЛОГИКА СКРОЛЛА
+    // 2. СКРЫТИЕ ХЕДЕРА ПРИ СКРОЛЛЕ К ARTIST EDITION
     window.addEventListener('scroll', () => {
-        const winWidth = window.innerWidth;
-        const scrollY = window.scrollY;
-        const midPoint = scrollY + (window.innerHeight / 2);
-
-        // Исчезновение шапки при скролле до услуг
         if (artistTrigger) {
-            const artistRect = artistTrigger.getBoundingClientRect();
-            if (artistRect.top <= 50) {
-                header.classList.add('header-hidden');
+            const triggerRect = artistTrigger.getBoundingClientRect();
+            if (triggerRect.top < window.innerHeight * 0.3) {
+                headerElement.classList.add('header-hidden');
             } else {
-                header.classList.remove('header-hidden');
-            }
-        }
-
-        // Волна активации соцсетей (для мобильных)
-        if (socialContainer && winWidth < 1025) {
-            const socialRect = socialContainer.getBoundingClientRect();
-            const socialAbsoluteTop = socialRect.top + scrollY;
-
-            if (midPoint >= socialAbsoluteTop) {
-                socialIcons.forEach((icon, index) => {
-                    setTimeout(() => {
-                        icon.classList.add('activated');
-                    }, index * 150); 
-                });
-            } else {
-                socialIcons.forEach(icon => icon.classList.remove('activated'));
+                headerElement.classList.remove('header-hidden');
             }
         }
     });
 
-    // Первичный вызов для проверки состояния при загрузке
-    window.dispatchEvent(new Event('scroll'));
+    // 3. АНИМАЦИЯ СОЦИАЛЬНЫХ СЕТЕЙ ПРИ ЗАГРУЗКЕ
+    window.addEventListener('load', () => {
+        socialIcons.forEach((btn, index) => {
+            setTimeout(() => {
+                btn.classList.add('activated');
+                setTimeout(() => {
+                    btn.classList.remove('activated');
+                }, 800);
+            }, 3000 + (index * 200));
+        });
+    });
 </script>
-
 </body>
 </html>
