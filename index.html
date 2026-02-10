@@ -81,11 +81,6 @@
             pointer-events: none;
         }
 
-        /* Глитч-эффект для текста (зарезервировано) */
-        .glitch-wrapper {
-            position: relative;
-        }
-
         /* ==========================================
            3. HEADER & NAVIGATION SECTION
            ========================================== */
@@ -199,7 +194,7 @@
 
         .social-btn:hover::after { width: 100%; }
 
-        /* Цвета соцсетей при наведении */
+        /* Цвета соцсетей (индивидуальная подсветка) */
         .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; filter: drop-shadow(0 0 12px rgba(0, 119, 255, 0.6)); }
         .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; filter: drop-shadow(0 0 12px rgba(36, 161, 222, 0.6)); }
         .social-btn.activated.yt, .social-btn.yt:hover { color: var(--youtube-red) !important; filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.6)); }
@@ -209,7 +204,7 @@
             .social-btn:hover { transform: translateY(-10px) scale(1.1); }
         }
 
-        /* PHONE BOX */
+        /* PHONE BOX (Запрещено менять подсветку) */
         .phone-box-container {
             margin-top: 60px;
             padding: 25px 50px;
@@ -340,21 +335,6 @@
             overflow: hidden;
         }
 
-        .module::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 40px; height: 40px;
-            background: linear-gradient(225deg, transparent 50%, rgba(255,255,255,0.05) 50%);
-        }
-
-        .module:hover {
-            background-color: rgba(255, 255, 255, 0.06);
-            transform: translateY(-12px);
-            backdrop-filter: blur(20px);
-            z-index: 10;
-        }
-
         /* Специфическая подсветка пакетов (Запрещено менять) */
         .module.rec:hover, .module.rec.active-scroll { border-color: #ffffff; box-shadow: 0 0 30px rgba(255, 255, 255, 0.08); }
         .module.start:hover, .module.start.active-scroll { border-color: var(--neon-purple); box-shadow: 0 0 30px var(--purple-glow); }
@@ -438,38 +418,43 @@
         }
 
         /* ==========================================
-           6. PORTFOLIO SHOWCASE (SQUARE VITRINE)
+           6. PORTFOLIO SHOWCASE (3 В РЯД)
            ========================================== */
         .showcase-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
             width: 100%;
-            justify-content: center;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .showcase-item {
-            background: rgba(255, 255, 255, 0.02);
+            background: #000;
             border: 1px solid var(--border-light);
             transition: all 0.5s var(--transition-timing);
-            backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
             aspect-ratio: 1 / 1;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .showcase-item:hover {
             border-color: var(--neon-blue);
-            box-shadow: 0 0 40px var(--soft-glow);
-            transform: translateY(-10px);
+            box-shadow: 0 0 30px var(--soft-glow);
+            transform: translateY(-5px);
         }
 
         .yandex-full-player {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             border: none;
+            transform: scale(1.05); /* Убираем рамки Яндекса */
             background: #000;
         }
 
@@ -521,11 +506,6 @@
             background-color: rgba(255, 255, 255, 0.05);
         }
 
-        .contact-card:hover .contact-main-text, .contact-card.active-scroll .contact-main-text {
-            color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--soft-glow);
-        }
-
         .work-time {
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
@@ -567,7 +547,7 @@
         }
 
         /* ==========================================
-           9. MOBILE OPTIMIZATION (RESPONSIVE)
+           9. MOBILE OPTIMIZATION (FULL)
            ========================================== */
         @media (max-width: 1024px) { 
             header { height: auto; min-height: 100vh; padding: 100px 20px; }
@@ -582,8 +562,8 @@
             h2 { font-size: 2.2rem; letter-spacing: 10px; margin-bottom: 60px; }
             
             .module-grid { grid-template-columns: 1fr; gap: 25px; }
-            .showcase-grid { grid-template-columns: 1fr; gap: 25px; }
-            .showcase-item { aspect-ratio: auto; min-height: 500px; }
+            .showcase-grid { grid-template-columns: 1fr; gap: 20px; }
+            .showcase-item { aspect-ratio: 1/1; }
             .booking-grid { grid-template-columns: 1fr; gap: 25px; }
             
             .contact-card { padding: 60px 30px; }
@@ -600,7 +580,6 @@
             .header-phone { font-size: 1.4rem; letter-spacing: 3px; }
             .price { font-size: 2.2rem; }
             .contact-main-text { font-size: 1.3rem; letter-spacing: 2px; }
-            .showcase-item { min-height: 550px; }
         }
     </style>
 </head>
@@ -644,7 +623,8 @@
                         <span class="sub-package-title">ВОКАЛЬНЫЙ КОУЧИНГ</span>
                         • Помогу с подачей и интонацией. <br>
                         • Исправляю ошибки на лету. <br>
-                        • Работаем над эмоциями.
+                        • Работаем над эмоциями. <br>
+                        • Поиск уникального тембра.
                     </div>
                 </div>
                 <ul class="specs">
@@ -662,7 +642,8 @@
                         <span class="sub-package-title" style="color: var(--neon-purple);">БАЗОВЫЙ ПРОДАКШН</span>
                         • Чистый голос. <br>
                         • Стандартная обработка частот. <br>
-                        • Легкая пространственная обработка.
+                        • Легкая пространственная обработка. <br>
+                        • Склеивание дорожек.
                     </div>
                 </div>
                 <ul class="specs">
@@ -678,9 +659,10 @@
                     Продукт для тех, кто целится в топ-чарты. Плотный, современный звук с глубокой проработкой.
                     <div class="sub-package">
                         <span class="sub-package-title" style="color: var(--neon-red);">ПРОФЕССИОНАЛЬНЫЙ ПОДХОД</span>
-                        • Детальная ручная коррекция. <br>
+                        • Детальная ручная коррекция (тюн). <br>
                         • Текстурное наслоение звука. <br>
-                        • Уникальные FX-эффекты.
+                        • Уникальные FX-эффекты. <br>
+                        • Плотная работа с инструменталом.
                     </div>
                 </div>
                 <ul class="specs">
@@ -698,7 +680,8 @@
                         <span class="sub-package-title" style="color: var(--neon-gold);">МУЛЬТИТРЕК ПРОДАКШН</span>
                         • Сведение до 20 дорожек. <br>
                         • Глубокий аналоговый саунд. <br>
-                        • Персональный мастеринг.
+                        • Персональный мастеринг. <br>
+                        • Безлимитные правки.
                     </div>
                 </div>
                 <ul class="specs">
@@ -718,8 +701,12 @@
                 <iframe class="yandex-full-player" src="https://music.yandex.ru/iframe/album/38668535"></iframe>
             </div>
 
-            <div class="showcase-item js-scroll-glow" style="display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.01);">
-                <p style="font-family:'Orbitron'; font-size:0.7rem; color:#222; letter-spacing:10px;">AWAITING NEXT HIT</p>
+            <div class="showcase-item js-scroll-glow" style="background: rgba(255,255,255,0.01);">
+                <p style="font-family:'Orbitron'; font-size:0.6rem; color:#333; letter-spacing:8px; text-align:center;">TRACK SLOT 02</p>
+            </div>
+
+            <div class="showcase-item js-scroll-glow" style="background: rgba(255,255,255,0.01);">
+                <p style="font-family:'Orbitron'; font-size:0.6rem; color:#333; letter-spacing:8px; text-align:center;">TRACK SLOT 03</p>
             </div>
 
         </div>
@@ -758,7 +745,7 @@
     const allGlowElements = document.querySelectorAll('.js-scroll-glow');
     const isMobile = window.innerWidth < 1025;
 
-    // 1. SCROLL ANIMATIONS FOR MOBILE (ACTIVE STATES)
+    // 1. Анимация при скролле для мобилок
     if (isMobile) {
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -768,18 +755,12 @@
                     entry.target.classList.remove('active-scroll'); 
                 }
             });
-        }, { 
-            root: null, 
-            rootMargin: '-40% 0px -40% 0px', 
-            threshold: 0 
-        });
-        
+        }, { root: null, rootMargin: '-40% 0px -40% 0px', threshold: 0 });
         allGlowElements.forEach(el => scrollObserver.observe(el));
     }
 
-    // 2. SCROLL HANDLING (HEADER & SOCIALS)
+    // 2. Логика видимости хедера и активации иконок
     window.addEventListener('scroll', () => {
-        // Header Visibility Logic
         if (artistTrigger) {
             const artistRect = artistTrigger.getBoundingClientRect();
             if (artistRect.top <= 80) { 
@@ -789,7 +770,6 @@
             }
         }
 
-        // Social Icons Activation (Mobile)
         if (socialContainer && isMobile) {
             const socialRect = socialContainer.getBoundingClientRect();
             if (window.scrollY + (window.innerHeight/1.5) >= socialRect.top + window.scrollY) {
@@ -802,7 +782,7 @@
         }
     });
 
-    // 3. PARALLAX EFFECT FOR BACKGROUND
+    // 3. Параллакс фона
     window.addEventListener('mousemove', (e) => {
         if (!isMobile) {
             const x = e.clientX / window.innerWidth;
@@ -812,16 +792,13 @@
         }
     });
 
-    // 4. PRELOADER & INITIAL TRIGGER (Z-INDEX FIX)
+    // 4. Инициализация
     window.addEventListener('load', () => {
         window.dispatchEvent(new Event('scroll'));
     });
-
-    // RE-DISPATCH ON RESIZE
     window.addEventListener('resize', () => {
         window.dispatchEvent(new Event('scroll'));
     });
-
     window.dispatchEvent(new Event('scroll'));
 </script>
 
