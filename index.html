@@ -395,14 +395,28 @@
         }
 
         .audio-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            transition: all var(--transition-speed) var(--transition-timing);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Базовый слой блика */
+        .flare-layer {
+            position: absolute;
+            top: -150%;
+            left: -150%;
+            width: 60%;
+            height: 400%;
+            background: linear-gradient(
+                to right, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(255, 255, 255, 0.2) 30%, 
+                rgba(255, 255, 255, 0.6) 50%, 
+                rgba(255, 255, 255, 0.2) 70%, 
+                rgba(255, 255, 255, 0) 100%
+            );
+            pointer-events: none;
+            z-index: 10;
+            /* Плавность оставляем в JS для контроля */
         }
 
         .audio-card:hover, .audio-card.active-scroll {
@@ -904,7 +918,41 @@ function seek(e, id) {
     const pct = (e.clientX - rect.left) / rect.width;
     audio.currentTime = pct * audio.duration;
 }
-    
+    document.querySelectorAll('.audio-card').forEach(card => {
+    // Создаем элемент блика внутри каждой карточки
+    const flare = document.createElement('div');
+    flare.className = 'flare-layer';
+    card.appendChild(flare);
+
+    card.addEventListener('mouseenter', () => {
+        // 1. Рандомный угол (от 15 до 45 градусов)
+        const angle = Math.floor(Math.random() * 30) + 15;
+        // 2. Рандомная скорость (от 0.4с до 1.2с)
+        const duration = (Math.random() * 0.8 + 0.4).toFixed(2);
+        // 3. Рандомная яркость (насыщенность блика)
+        const opacity = (Math.random() * 0.5 + 0.3).toFixed(1);
+        // 4. Рандомный оттенок (чуть синеватый или чисто белый)
+        const hue = Math.random() > 0.5 ? '200, 230, 255' : '255, 255, 255';
+
+        // Применяем настройки
+        flare.style.transition = 'none';
+        flare.style.left = '-150%';
+        flare.style.transform = `rotate(${angle}deg)`;
+        flare.style.background = `linear-gradient(to right, rgba(${hue}, 0) 0%, rgba(${hue}, ${opacity}) 50%, rgba(${hue}, 0) 100%)`;
+
+        // Запускаем анимацию в следующем кадре
+        requestAnimationFrame(() => {
+            flare.style.transition = `left ${duration}s ease-in-out`;
+            flare.style.left = '150%';
+        });
+    });
+
+    // Сбрасываем позицию, когда мышь уходит, чтобы быть готовым к новому "выстрелу"
+    card.addEventListener('mouseleave', () => {
+        flare.style.transition = 'none';
+        flare.style.left = '-150%';
+    });
+});
 </script>
 </body>
 </html>
