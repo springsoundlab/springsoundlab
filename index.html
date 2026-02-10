@@ -429,7 +429,7 @@
         }
 
         /* ==========================================
-           7. PORTFOLIO SECTION (ОБНОВЛЕННЫЙ ПЛЕЕР)
+           7. PORTFOLIO SECTION (ОБНОВЛЕНО)
            ========================================== */
         .portfolio-grid {
             display: grid;
@@ -454,21 +454,6 @@
             background: rgba(255, 255, 255, 0.05);
             box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
             transform: translateY(-5px);
-        }
-
-        /* Обложка трека */
-        .track-cover {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            background-size: cover;
-            background-position: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .track-cover:hover {
-            transform: scale(1.02);
         }
 
         .audio-info {
@@ -555,6 +540,7 @@
             text-shadow: 0 0 6px var(--soft-glow);
         }
 
+        /* Мобильная подсветка контактов */
         .contact-card.active-scroll {
             border-color: var(--neon-blue);
             box-shadow: 0 0 15px var(--soft-glow);
@@ -594,6 +580,12 @@
             letter-spacing: 5px; 
             border-top: 1px solid #111111;
             text-transform: uppercase;
+        }
+
+        .header-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         /* ==========================================
@@ -685,6 +677,7 @@
                 font-size: 1.4rem; 
             }
 
+            /* Запрет трансформации при ховере на мобильных */
             .module:hover, 
             .social-btn:hover, 
             .phone-box-container:hover,
@@ -817,17 +810,16 @@
         <h2>PORTFOLIO</h2>
         <div class="portfolio-grid">
             <div class="audio-card js-scroll-glow">
-                <div class="track-cover" style="background-image: url('https://lh3.googleusercontent.com/d/10TfB0_Y9R0fV6rN9kG_D3k0FvF-m9D1y');" onclick="this.nextElementSibling.nextElementSibling.play()"></div>
                 <div class="audio-info">
-                    <div class="audio-title">LUANHO - Лети со мной</div>
-                    <div class="audio-subtitle">Produced & Mixed by WEYTON</div>
+                    <div class="audio-title">Лети со мной // LUANHO</div>
+                    <div class="audio-subtitle">Mixed by WEYTON</div>
                 </div>
                 <audio controls>
-                    <source src="LUANHO - Лети со мной.wav" type="audio/wav">
+                    <source src="https://raw.githubusercontent.com/springsoundlab/portfolio/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg">
                     Ваш браузер не поддерживает аудио-плеер.
                 </audio>
             </div>
-
+            
             <div class="audio-card js-scroll-glow">
                 <div class="audio-info">
                     <div class="audio-title">TRACK 02 // ARTIST EDITION</div>
@@ -864,7 +856,7 @@
                 <div class="contact-label">АДРЕС</div>
                 <div class="contact-main-text">ВОЛГОГРАД, ТУЛАКА 9</div>
                 <div class="work-time">ЕЖЕДНЕВНО С 10:00 ДО 22:00</div>
-                <div class="action-hint">НАЖМИ, ЧТОБЫ УЗНАТЬ ПУТЬ</div>
+                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОСМОТРЕТЬ НА КАРТЕ</div>
             </a>
             <a href="tel:+79178382017" class="contact-card js-scroll-glow">
                 <div class="contact-label">ПОЗВОНИТЬ</div>
@@ -880,6 +872,9 @@
 </footer>
 
 <script>
+    /* ==========================================
+       JS LOGIC: SCROLL EFFECTS & VISIBILITY
+       ========================================== */
     const header = document.getElementById('main-header');
     const artistTrigger = document.querySelector('.js-artist-trigger');
     const socialIcons = document.querySelectorAll('.social-btn');
@@ -887,12 +882,14 @@
     const allGlowElements = document.querySelectorAll('.js-scroll-glow');
     const isMobile = window.innerWidth < 1025;
 
+    // Настройки для Intersection Observer (для мобильной подсветки)
     const observerOptions = {
         root: null,
         rootMargin: '-45% 0px -45% 0px',
         threshold: 0
     };
 
+    // 1. ЛОГИКА АКТИВНОЙ КАРТОЧКИ (ТОЛЬКО МОБИЛЬНЫЕ)
     if (isMobile) {
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -907,16 +904,10 @@
         allGlowElements.forEach(el => scrollObserver.observe(el));
     }
 
+    // 2. ОБЩАЯ ЛОГИКА СКРОЛЛА
     window.addEventListener('scroll', () => {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        if (scrollTop > 100) {
-            header.style.opacity = '0';
-            header.style.visibility = 'hidden';
-        } else {
-            header.style.opacity = '1';
-            header.style.visibility = 'visible';
-        }
+        const winWidth = window.innerWidth;
+        // Здесь можно добавить логику исчезновения хедера при скролле, если нужно
     });
 </script>
 
