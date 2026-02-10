@@ -589,11 +589,38 @@
             h1 { font-size: 2.2rem; }
             .flicker-header { letter-spacing: 5px; }
         }
+        /* --- ЭФФЕКТ СТУДИЙНОГО СВЕТА (LIGHT LEAKS) --- */
+        .light-leak {
+            position: fixed;
+            width: 60vw;
+            height: 60vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(0, 243, 255, 0.05) 0%, 
+                rgba(0, 102, 255, 0.02) 40%, 
+                transparent 70%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            mix-blend-mode: screen;
+        }
 
+        .light-1 { top: -10%; left: -10%; }
+        .light-2 { bottom: -10%; right: -10%; background: radial-gradient(circle, rgba(255, 0, 255, 0.03) 0%, transparent 70%); }
+
+        /* Анимация "дыхания" света */
+        @keyframes light-float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(5%, 5%) scale(1.1); }
+            66% { transform: translate(-5%, 2%) scale(0.9); }
+        }
     </style>
 </head>
 <body>
-
+<div class="light-leak light-1" id="light1"></div>
+<div class="light-leak light-2" id="light2"></div>
 <div class="studio-background"></div>
 
 <header id="main-header">
@@ -874,7 +901,29 @@ function seek(e, id) {
     const pct = (e.clientX - rect.left) / rect.width;
     audio.currentTime = pct * audio.duration;
 }
+    // Логика студийного света
+const light1 = document.getElementById('light1');
+const light2 = document.getElementById('light2');
+
+// Проявляем свет при загрузке
+setTimeout(() => {
+    light1.style.opacity = "1";
+    light2.style.opacity = "1";
+    light1.style.animation = "light-float 15s infinite alternate ease-in-out";
+    light2.style.animation = "light-float 20s infinite alternate-reverse ease-in-out";
+}, 500);
+
+// Свет слегка следует за мышью, как блик в объективе
+document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth) * 30; // амплитуда движения
+    const y = (e.clientY / window.innerHeight) * 30;
     
+    light1.style.left = `calc(-10% + ${x}px)`;
+    light1.style.top = `calc(-10% + ${y}px)`;
+    
+    light2.style.right = `calc(-10% - ${x}px)`;
+    light2.style.bottom = `calc(-10% - ${y}px)`;
+});
 </script>
 </body>
 </html>
