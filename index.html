@@ -781,17 +781,27 @@
 
     // 2. ЛОГИКА ШАПКИ И ВОЛНЫ СОЦСЕТЕЙ
     window.addEventListener('scroll', () => {
-        const winHeight = window.innerHeight;
-        const scrollY = window.scrollY;
-        const midPoint = scrollY + (winHeight / 2);
+    const winWidth = window.innerWidth;
+    const scrollY = window.scrollY;
+    const midPoint = scrollY + (window.innerHeight / 2);
 
-        // Исчезновение шапки при достижении блока Artist Edition
-        if (artistTrigger) {
-            const artistRect = artistTrigger.getBoundingClientRect();
-            if (artistRect.top <= 50) {
-                header.classList.add('header-hidden');
-            } else {
-                header.classList.remove('header-hidden');
+    if (artistTrigger && artistTrigger.getBoundingClientRect().top <= 50) {
+        header.classList.add('header-hidden');
+    } else {
+        header.classList.remove('header-hidden');
+    }
+
+    if (winWidth < 1025 && socialContainer) {
+        const socialTop = socialContainer.getBoundingClientRect().top + scrollY;
+        if (midPoint >= socialTop) {
+            socialIcons.forEach((icon, i) => setTimeout(() => icon.classList.add('activated'), i * 200));
+        } else {
+            socialIcons.forEach(icon => icon.classList.remove('activated'));
+        }
+    } else {
+        socialIcons.forEach(icon => icon.classList.remove('activated'));
+    }
+});
             }
         }
 
