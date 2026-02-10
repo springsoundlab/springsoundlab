@@ -419,11 +419,36 @@
             /* Плавность оставляем в JS для контроля */
         }
 
-        .audio-card:hover, .audio-card.active-scroll {
-            border-color: var(--neon-blue);
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
-            transform: translateY(-5px);
+        .audio-card {
+            background: rgba(255, 255, 255, 0.03); /* Почти прозрачный фон */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            
+            /* Эффект стекла (блюр фона под карточкой) */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+
+            /* Плавность: 0.6 секунды с мягким замедлением в конце */
+            transition: 
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), 
+                box-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                background 0.6s ease,
+                border-color 0.6s ease;
+            
+            will-change: transform; /* Подсказка браузеру для плавной анимации */
+        }
+
+        /* Состояние при наведении */
+        .audio-card:hover {
+            transform: translateY(-12px); /* Плавное всплытие вверх */
+            background: rgba(255, 255, 255, 0.07); /* Чуть больше "стекла" */
+            border-color: rgba(0, 243, 255, 0.3); /* Тонкий намек на цвет сайта */
+            
+            /* Мягкое неоновое свечение СЗАДИ (Shadow) */
+            box-shadow: 0 15px 40px rgba(0, 243, 255, 0.15); 
         }
 
         /* Обложка трека */
