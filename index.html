@@ -92,6 +92,7 @@
             padding-bottom: 20px;
             position: relative;
             width: 100%;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
         .flicker-header {
@@ -180,58 +181,22 @@
         }
 
         .social-btn {
-            color: rgba(255, 255, 255, 0.4);
+            color: #ffffff; /* Изначально белые */
             font-size: 3.5rem;
-            transition-property: all;
-            transition-duration: var(--transition-speed-mobile);
-            transition-timing-function: var(--transition-timing);
+            transition: color 0.8s var(--transition-timing), transform 0.4s var(--transition-timing), filter 0.8s ease;
             text-decoration: none;
             display: inline-block;
         }
 
-        /* МЯГКОЕ СВЕЧЕНИЕ ДЛЯ МОБИЛЬНОЙ ВЕРСИИ (ОСТАЮТСЯ ГОРЕТЬ ДО РАЗДЕЛА ARTIST) */
-        .header-socials.active-scroll .social-btn.vk { 
-            color: #0077ff; 
-            filter: drop-shadow(0 0 5px rgba(0, 119, 255, 0.3)); 
-            transition-delay: 0.1s; 
-        }
-        .header-socials.active-scroll .social-btn.tg { 
-            color: #24A1DE; 
-            filter: drop-shadow(0 0 5px rgba(36, 161, 222, 0.3)); 
-            transition-delay: 0.3s; 
-        }
-        .header-socials.active-scroll .social-btn.yt { 
-            color: var(--youtube-red); 
-            filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.3)); 
-            transition-delay: 0.5s; 
-        }
-        .header-socials.active-scroll .social-btn.ig { 
-            color: #f09433; 
-            filter: drop-shadow(0 0 5px rgba(230, 104, 60, 0.3)); 
-            transition-delay: 0.7s; 
-        }
+        /* ЦВЕТОВАЯ ВОЛНА ДЛЯ МОБИЛЬНЫХ И ПК (АКТИВИРУЕТСЯ СКРИПТОМ) */
+        .social-btn.activated.vk { color: #0077ff; filter: drop-shadow(0 0 8px rgba(0, 119, 255, 0.4)); }
+        .social-btn.activated.tg { color: #24A1DE; filter: drop-shadow(0 0 8px rgba(36, 161, 222, 0.4)); }
+        .social-btn.activated.yt { color: var(--youtube-red); filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.4)); }
+        .social-btn.activated.ig { color: #f09433; filter: drop-shadow(0 0 8px rgba(230, 104, 60, 0.4)); }
 
-        /* НАСТРОЙКИ ПК: УБРАНА ЯРКОСТЬ И ТЕНИ ПРИ НАВЕДЕНИИ */
         @media (min-width: 1025px) {
             .social-btn:hover { 
                 transform: scale(1.1); 
-                transition-delay: 0s !important; 
-            }
-            .social-btn.vk:hover { 
-                color: #0077ff; 
-                filter: none; /* Убрано свечение */
-            }
-            .social-btn.tg:hover { 
-                color: #24A1DE; 
-                filter: none; 
-            }
-            .social-btn.yt:hover { 
-                color: var(--youtube-red); 
-                filter: none; 
-            }
-            .social-btn.ig:hover { 
-                color: #f09433; 
-                filter: none; 
             }
         }
 
@@ -241,18 +206,7 @@
             padding-bottom: 20px;
             padding-left: 40px;
             padding-right: 40px;
-            border-top-width: 1px;
-            border-bottom-width: 1px;
-            border-left-width: 1px;
-            border-right-width: 1px;
-            border-top-style: solid;
-            border-bottom-style: solid;
-            border-left-style: solid;
-            border-right-style: solid;
-            border-top-color: rgba(255, 255, 255, 0.2);
-            border-bottom-color: rgba(255, 255, 255, 0.2);
-            border-left-color: rgba(255, 255, 255, 0.2);
-            border-right-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             background-color: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -260,9 +214,7 @@
             flex-direction: column;
             align-items: center;
             text-decoration: none;
-            transition-property: all;
-            transition-duration: var(--transition-speed);
-            transition-timing-function: var(--transition-timing);
+            transition: all var(--transition-speed) var(--transition-timing);
             opacity: 0;
             transform: translateY(20px);
             animation-name: ultraSmoothFade;
@@ -277,9 +229,7 @@
             font-size: 1.6rem;
             color: #ffffff;
             letter-spacing: 5px;
-            transition-property: all;
-            transition-duration: var(--transition-speed);
-            transition-timing-function: var(--transition-timing);
+            transition: all var(--transition-speed) var(--transition-timing);
             margin-bottom: 5px;
         }
 
@@ -289,17 +239,12 @@
             letter-spacing: 3px;
             color: rgba(255, 255, 255, 0.6);
             text-transform: uppercase;
-            transition-property: all;
-            transition-duration: var(--transition-speed);
-            transition-timing-function: var(--transition-timing);
+            transition: all var(--transition-speed) var(--transition-timing);
         }
 
         .phone-box-container:hover, 
         .phone-box-container.active-scroll {
-            border-top-color: var(--neon-blue);
-            border-bottom-color: var(--neon-blue);
-            border-left-color: var(--neon-blue);
-            border-right-color: var(--neon-blue);
+            border-color: var(--neon-blue);
             box-shadow: 0 0 10px var(--soft-glow);
             background-color: rgba(255, 255, 255, 0.08);
         }
@@ -316,24 +261,17 @@
         }
 
         .container { 
-            padding-top: 50px;
-            padding-bottom: 50px;
-            padding-left: 20px;
-            padding-right: 20px;
+            padding: 50px 20px;
             max-width: 1600px; 
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto;
             position: relative; 
             z-index: 5; 
             width: 100%;
         }
 
         section { 
-            padding-top: 120px; 
-            padding-bottom: 120px;
-            border-top-width: 1px;
-            border-top-style: solid;
-            border-top-color: rgba(255, 255, 255, 0.05);
+            padding: 120px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         h2 { 
@@ -355,25 +293,9 @@
 
         .module { 
             background-color: rgba(255, 255, 255, 0.02); 
-            border-top-width: 1px;
-            border-bottom-width: 1px;
-            border-left-width: 1px;
-            border-right-width: 1px;
-            border-top-style: solid;
-            border-bottom-style: solid;
-            border-left-style: solid;
-            border-right-style: solid;
-            border-top-color: rgba(255, 255, 255, 0.1);
-            border-bottom-color: rgba(255, 255, 255, 0.1);
-            border-left-color: rgba(255, 255, 255, 0.1);
-            border-right-color: rgba(255, 255, 255, 0.1);
-            padding-top: 50px;
-            padding-bottom: 50px;
-            padding-left: 25px;
-            padding-right: 25px;
-            transition-property: transform, background-color, border-color, box-shadow, backdrop-filter;
-            transition-duration: var(--transition-speed), var(--transition-speed), var(--transition-speed), var(--transition-speed), 0.6s;
-            transition-timing-function: var(--transition-timing);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 50px 25px;
+            transition: all var(--transition-speed) var(--transition-timing);
             display: flex;
             flex-direction: column;
             align-items: flex-start; 
@@ -388,6 +310,7 @@
             background-color: rgba(255, 255, 255, 0.05); 
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
+            transform: translateY(-8px);
         }
 
         .module:hover {
@@ -399,37 +322,25 @@
 
         .module.rec:hover, 
         .module.rec.active-scroll { 
-            border-top-color: #ffffff; 
-            border-bottom-color: #ffffff; 
-            border-left-color: #ffffff; 
-            border-right-color: #ffffff; 
+            border-color: #ffffff; 
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); 
         }
         
         .module.start:hover, 
         .module.start.active-scroll { 
-            border-top-color: var(--neon-purple); 
-            border-bottom-color: var(--neon-purple); 
-            border-left-color: var(--neon-purple); 
-            border-right-color: var(--neon-purple); 
+            border-color: var(--neon-purple); 
             box-shadow: 0 0 15px rgba(188, 19, 254, 0.1); 
         }
         
         .module.artist:hover, 
         .module.artist.active-scroll { 
-            border-top-color: var(--neon-red); 
-            border-bottom-color: var(--neon-red); 
-            border-left-color: var(--neon-red); 
-            border-right-color: var(--neon-red); 
+            border-color: var(--neon-red); 
             box-shadow: 0 0 15px rgba(255, 0, 60, 0.1); 
         }
         
         .module.platinum:hover, 
         .module.platinum.active-scroll { 
-            border-top-color: var(--neon-gold); 
-            border-bottom-color: var(--neon-gold); 
-            border-left-color: var(--neon-gold); 
-            border-right-color: var(--neon-gold); 
+            border-color: var(--neon-gold); 
             box-shadow: 0 0 15px rgba(255, 204, 0, 0.1); 
         }
 
@@ -469,9 +380,7 @@
         }
 
         .sub-package {
-            border-top-width: 1px;
-            border-top-style: solid;
-            border-top-color: rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
             margin-top: 15px;
             padding-top: 15px;
             width: 100%;
@@ -488,22 +397,16 @@
 
         .specs { 
             list-style-type: none; 
-            padding-left: 0;
-            padding-right: 0;
+            padding: 0;
             margin-top: 30px; 
             width: 100%; 
         }
 
         .specs li { 
-            padding-top: 12px;
-            padding-bottom: 12px;
-            border-bottom-width: 1px;
-            border-bottom-style: solid;
-            border-bottom-color: rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 0.75rem; 
             display: flex; 
-            flex-direction: row;
-            flex-wrap: nowrap;
             justify-content: space-between; 
             align-items: center;
             text-transform: uppercase; 
@@ -526,38 +429,19 @@
 
         .contact-card {
             background-color: rgba(255, 255, 255, 0.02);
-            padding-top: 80px;
-            padding-bottom: 80px;
-            padding-left: 40px;
-            padding-right: 40px;
+            padding: 80px 40px;
             text-align: center;
-            border-top-width: 1px;
-            border-bottom-width: 1px;
-            border-left-width: 1px;
-            border-right-width: 1px;
-            border-top-style: solid;
-            border-bottom-style: solid;
-            border-left-style: solid;
-            border-right-style: solid;
-            border-top-color: rgba(255, 255, 255, 0.1);
-            border-bottom-color: rgba(255, 255, 255, 0.1);
-            border-left-color: rgba(255, 255, 255, 0.1);
-            border-right-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             text-decoration: none;
             color: #ffffff;
-            transition-property: all;
-            transition-duration: var(--transition-speed);
-            transition-timing-function: var(--transition-timing);
+            transition: all var(--transition-speed) var(--transition-timing);
             backdrop-filter: blur(8px);
             display: block;
         }
 
         .contact-card:hover, 
         .contact-card.active-scroll {
-            border-top-color: var(--neon-blue);
-            border-bottom-color: var(--neon-blue);
-            border-left-color: var(--neon-blue);
-            border-right-color: var(--neon-blue);
+            border-color: var(--neon-blue);
             box-shadow: 0 0 15px var(--soft-glow);
             transform: translateY(-5px);
             background-color: rgba(255, 255, 255, 0.05);
@@ -578,8 +462,7 @@
             font-family: 'Orbitron', sans-serif; 
             font-weight: 900; 
             margin-bottom: 10px;
-            transition-property: all;
-            transition-duration: var(--transition-speed);
+            transition: all var(--transition-speed);
             text-transform: uppercase;
         }
 
@@ -607,27 +490,27 @@
         }
 
         footer { 
-            padding-top: 60px;
-            padding-bottom: 60px;
-            padding-left: 20px;
-            padding-right: 20px;
+            padding: 60px 20px;
             text-align: center; 
             font-family: 'Orbitron', sans-serif; 
             font-size: 0.7rem; 
             color: #555555; 
             letter-spacing: 5px; 
-            border-top-width: 1px;
-            border-top-style: solid;
-            border-top-color: #111111;
+            border-top: 1px solid #111111;
             text-transform: uppercase;
+        }
+
+        .header-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         @media (max-width: 1024px) { 
             header { 
                 height: auto; 
                 min-height: 100vh; 
-                padding-top: 60px; 
-                padding-bottom: 60px; 
+                padding: 60px 20px; 
             }
             
             .flicker-header { 
@@ -650,8 +533,7 @@
                 font-size: 0.9rem; 
                 margin-top: 30px; 
                 letter-spacing: 1px;
-                padding-left: 10px;
-                padding-right: 10px;
+                padding: 0 10px;
                 opacity: 1; 
                 transform: none; 
                 animation: none;
@@ -675,10 +557,7 @@
             }
             
             .phone-box-container { 
-                padding-top: 15px; 
-                padding-bottom: 15px; 
-                padding-left: 25px; 
-                padding-right: 25px; 
+                padding: 15px 25px; 
                 margin-top: 30px; 
                 width: 90%; 
                 max-width: 320px; 
@@ -688,8 +567,7 @@
             }
 
             section { 
-                padding-top: 60px; 
-                padding-bottom: 60px; 
+                padding: 60px 0; 
             }
             
             h2 { 
@@ -707,10 +585,7 @@
             } 
             
             .contact-card { 
-                padding-top: 50px; 
-                padding-bottom: 50px; 
-                padding-left: 20px; 
-                padding-right: 20px; 
+                padding: 50px 20px; 
             }
             
             .contact-main-text { 
@@ -746,14 +621,14 @@
 
 <div class="studio-background"></div>
 
-<header>
+<header id="main-header">
     <div class="flicker-header">СТУДИЯ ЗВУКОЗАПИСИ</div>
     <h1>SPRING SOUND LAB</h1>
     <div class="header-subtitle">
         Профессиональная архитектура звука. Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
     </div>
     
-    <div class="header-socials js-wave-trigger">
+    <div class="header-socials js-wave-trigger" id="social-container">
         <a href="ССЫЛКА_ВК" class="social-btn vk" target="_blank" title="ВКонтакте"><i class="fab fa-vk"></i></a>
         <a href="ССЫЛКА_ТГ" class="social-btn tg" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
         <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
@@ -867,59 +742,73 @@
 </footer>
 
 <script>
-    if (window.innerWidth <= 1024) {
-        const contentElements = document.querySelectorAll('.module:not(.js-artist-trigger), .contact-card');
-        const headerWave = document.querySelector('.js-wave-trigger');
-        const headerPhone = document.querySelector('.js-header-phone');
-        const artistSection = document.querySelector('.js-artist-trigger');
+    const header = document.getElementById('main-header');
+    const artistTrigger = document.querySelector('.js-artist-trigger');
+    const socialIcons = document.querySelectorAll('.social-btn');
+    const socialContainer = document.getElementById('social-container');
+    const allGlowElements = document.querySelectorAll('.js-scroll-glow');
 
-        const observerOptions = {
-            root: null,
-            rootMargin: '-40% 0px -40% 0px', 
-            threshold: 0
-        };
+    // Настройки для Intersection Observer
+    const observerOptions = {
+        root: null,
+        rootMargin: '-45% 0px -45% 0px', // Реагируем на центр экрана
+        threshold: 0
+    };
 
-        const contentObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    contentElements.forEach(el => el.classList.remove('active-scroll'));
-                    entry.target.classList.add('active-scroll');
-                } else {
-                    entry.target.classList.remove('active-scroll');
-                }
-            });
-        }, observerOptions);
-
-        contentElements.forEach(el => contentObserver.observe(el));
-
-        const artistObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    headerWave.classList.remove('active-scroll');
-                    headerPhone.classList.remove('active-scroll');
-                    entry.target.classList.add('active-scroll');
-                } else {
-                    entry.target.classList.remove('active-scroll');
-                    if (window.scrollY < entry.boundingClientRect.top + window.scrollY) {
-                        headerWave.classList.add('active-scroll');
-                        headerPhone.classList.add('active-scroll');
-                    }
-                }
-            });
-        }, observerOptions);
-
-        if (artistSection) artistObserver.observe(artistSection);
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY < 100) {
-                headerWave.classList.add('active-scroll');
-                headerPhone.classList.add('active-scroll');
+    // 1. ЛОГИКА ОДНОЙ АКТИВНОЙ КАРТОЧКИ (Пакеты и контакты)
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Сначала тушим ВСЕ карточки
+                allGlowElements.forEach(el => el.classList.remove('active-scroll'));
+                // Зажигаем только ту, что в центре
+                entry.target.classList.add('active-scroll');
+            } else {
+                entry.target.classList.remove('active-scroll');
             }
         });
-        
-        headerWave.classList.add('active-scroll');
-        headerPhone.classList.add('active-scroll');
-    }
+    }, observerOptions);
+
+    allGlowElements.forEach(el => scrollObserver.observe(el));
+
+    // 2. ЛОГИКА ШАПКИ И ВОЛНЫ СОЦСЕТЕЙ
+    window.addEventListener('scroll', () => {
+        const winHeight = window.innerHeight;
+        const scrollY = window.scrollY;
+        const midPoint = scrollY + (winHeight / 2);
+
+        // Исчезновение шапки при достижении блока Artist Edition
+        if (artistTrigger) {
+            const artistRect = artistTrigger.getBoundingClientRect();
+            if (artistRect.top <= 50) {
+                header.classList.add('header-hidden');
+            } else {
+                header.classList.remove('header-hidden');
+            }
+        }
+
+        // Волна соцсетей при прохождении через центр (изначально белые -> цвета)
+        if (socialContainer) {
+            const socialRect = socialContainer.getBoundingClientRect();
+            const socialAbsoluteTop = socialRect.top + scrollY;
+
+            // Если контейнер соцсетей пересекает середину экрана
+            if (midPoint >= socialAbsoluteTop) {
+                socialIcons.forEach((icon, index) => {
+                    setTimeout(() => {
+                        icon.classList.add('activated');
+                    }, index * 200); // Задержка для эффекта волны
+                });
+            } else {
+                // Возвращаем в белый цвет при скролле вверх
+                socialIcons.forEach(icon => icon.classList.remove('activated'));
+            }
+        }
+    });
+
+    // Дополнительная проверка при загрузке страницы
+    window.dispatchEvent(new Event('scroll'));
 </script>
+
 </body>
 </html>
