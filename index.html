@@ -589,7 +589,37 @@
             h1 { font-size: 2.2rem; }
             .flicker-header { letter-spacing: 5px; }
         }
+/* --- ЭФФЕКТ ДОРОГОГО БЛИКА (LENS FLARE SWEEP) --- */
+        .audio-card {
+            position: relative; /* Чтобы блик не вылетал за границы */
+            overflow: hidden;    /* Обрезаем блик по краям карточки */
+        }
 
+        .audio-card::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -150%; /* Прячем блик далеко слева */
+            width: 50%;
+            height: 200%;
+            background: linear-gradient(
+                to right, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(255, 255, 255, 0.1) 30%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                rgba(255, 255, 255, 0.1) 70%, 
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(25deg); /* Тот самый наклон "от угла к углу" */
+            transition: none;
+            pointer-events: none; /* Чтобы блик не мешал кликать по кнопкам */
+        }
+
+        /* Анимация при наведении */
+        .audio-card:hover::after {
+            left: 150%; /* Блик пролетает насквозь на правую сторону */
+            transition: left 0.7s ease-in-out; /* Скорость пролета блика */
+        }
     </style>
 </head>
 <body>
