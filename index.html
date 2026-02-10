@@ -689,25 +689,15 @@
         <div class="portfolio-grid">
             <div class="audio-card js-scroll-glow">
                 <div class="audio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif');"></div>
-                <div class="audio-card js-scroll-glow">
-    <div class="audio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif');"></div>
-    
-    <div class="audio-info">
-        <div class="audio-title">LUANHO - ЛЕТИ СО МНОЙ</div>
-        <div class="audio-subtitle">Mixed by WEYTON</div>
-    </div>
-
-    <div class="custom-audio-player">
-        <button class="play-btn" onclick="togglePlay(this, 't1')">
-            <i class="fas fa-play"></i>
-        </button>
-        <div class="time-display" id="time-t1">0:00</div>
-        <div class="progress-container" onclick="seek(event, 't1')">
-            <div class="progress-bar" id="bar-t1"></div>
-        </div>
-        <audio id="t1" src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" ontimeupdate="upd('t1')"></audio>
-    </div>
-</div>
+                <div class="audio-info">
+                    <div class="audio-title">LUANHO - ЛЕТИ СО МНОЙ</div>
+                    <div class="audio-subtitle">Mixed by WEYTON</div>
+                </div>
+                <audio controls>
+                    <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg">
+                    Ваш браузер не поддерживает аудио-плеер.
+                </audio>
+            </div>
             
             <div class="audio-card js-scroll-glow">
                 <div class="audio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/blob/main/etot_gorod/oblojka.jpg?raw=true');"></div>
@@ -823,47 +813,6 @@
     activateSocials();
     setInterval(activateSocials, 8000);
 </script>
-<script>
-function togglePlay(btn, id) {
-    const audio = document.getElementById(id);
-    const icon = btn.querySelector('i');
-    
-    // Останавливаем другие треки при включении нового
-    document.querySelectorAll('audio').forEach(a => {
-        if(a.id !== id) {
-            a.pause();
-            const otherBtnIcon = a.parentElement.querySelector('i');
-            if(otherBtnIcon) otherBtnIcon.classList.replace('fa-pause', 'fa-play');
-        }
-    });
 
-    if (audio.paused) {
-        audio.play();
-        icon.classList.replace('fa-play', 'fa-pause');
-    } else {
-        audio.pause();
-        icon.classList.replace('fa-pause', 'fa-play');
-    }
-}
-
-function upd(id) {
-    const audio = document.getElementById(id);
-    const bar = document.getElementById('bar-' + id);
-    const time = document.getElementById('time-' + id);
-    if(audio.duration) {
-        bar.style.width = (audio.currentTime / audio.duration * 100) + '%';
-        let m = Math.floor(audio.currentTime / 60);
-        let s = Math.floor(audio.currentTime % 60);
-        time.innerText = m + ':' + (s < 10 ? '0' : '') + s;
-    }
-}
-
-function seek(e, id) {
-    const audio = document.getElementById(id);
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-}
-</script>
 </body>
 </html>
