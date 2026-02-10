@@ -283,18 +283,17 @@
                         background-color var(--transition-speed), 
                         border-color var(--transition-speed),
                         box-shadow var(--transition-speed),
-                        backdrop-filter 0.6s ease; /* Плавный блюр */
+                        backdrop-filter 0.6s ease; 
             display: flex;
             flex-direction: column;
             align-items: flex-start; 
             text-align: left; 
-            backdrop-filter: blur(2px); /* Начальный блюр */
+            backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
             position: relative;
             height: 100%; 
         }
 
-        /* Эффект при активации (Блюр усиливается) */
         .module.active-scroll {
             background-color: rgba(255, 255, 255, 0.05); 
             backdrop-filter: blur(15px);
@@ -648,7 +647,7 @@
                 <div class="contact-label">АДРЕС</div>
                 <div class="contact-main-text">ВОЛГОГРАД, ТУЛАКА 9</div>
                 <div class="work-time">ЕЖЕДНЕВНО С 10:00 ДО 22:00</div>
-                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</div>
+                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОСТРОИТЬ МАРШРУТ</div>
             </a>
             <a href="tel:+79178382017" class="contact-card js-scroll-glow">
                 <div class="contact-label">ПОЗВОНИТЬ</div>
@@ -664,33 +663,35 @@
 </footer>
 
 <script>
-    // Инициализация только для мобильных/планшетов
     if (window.innerWidth <= 1024) {
-        const glowElements = document.querySelectorAll('.js-scroll-glow');
+        // Элементы, которые должны работать эксклюзивно (только один в центре)
+        const exclusiveElements = document.querySelectorAll('.module, .contact-card');
+        // Соцсети и телефон в шапке (пусть светятся всегда, когда видны)
+        const headerElements = document.querySelectorAll('.social-btn, .phone-box-container');
         
-        const observerOptions = {
-            root: null,
-            rootMargin: '-40% 0px -40% 0px', // Элемент считается активным только в центре экрана
-            threshold: 0
-        };
-
-        const observer = new IntersectionObserver((entries) => {
+        const exclusiveObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    // Сначала убираем подсветку и блюр у ВСЕХ элементов
-                    glowElements.forEach(el => el.classList.remove('active-scroll'));
-                    // Добавляем только текущему (эксклюзивность)
+                    exclusiveElements.forEach(el => el.classList.remove('active-scroll'));
                     entry.target.classList.add('active-scroll');
                 } else {
-                    // Если элемент ушел из центра, гасим его
                     entry.target.classList.remove('active-scroll');
                 }
             });
-        }, observerOptions);
+        }, { rootMargin: '-40% 0px -40% 0px', threshold: 0 });
 
-        glowElements.forEach(el => {
-            observer.observe(el);
-        });
+        const headerObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active-scroll');
+                } else {
+                    entry.target.classList.remove('active-scroll');
+                }
+            });
+        }, { rootMargin: '0px', threshold: 0.1 });
+
+        exclusiveElements.forEach(el => exclusiveObserver.observe(el));
+        headerElements.forEach(el => headerObserver.observe(el));
     }
 </script>
 
