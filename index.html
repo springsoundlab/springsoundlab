@@ -14,7 +14,10 @@
             --neon-gold: #ffcc00;
             --youtube-red: #ff0000;
             --bg-dark: #020205;
-            --transition-speed: 0.6s;
+            /* Базовая скорость для ПК */
+            --transition-speed: 0.4s;
+            /* Сверхплавная скорость для мобильного скролла */
+            --transition-speed-mobile: 1.2s;
             --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -161,6 +164,7 @@
             display: inline-block;
         }
 
+        /* Эффекты свечения */
         .social-btn:hover, .social-btn.active-scroll { transform: scale(1.1); }
         .social-btn.vk:hover, .social-btn.vk.active-scroll { color: #0077ff; filter: drop-shadow(0 0 15px rgba(0, 119, 255, 0.6)); }
         .social-btn.tg:hover, .social-btn.tg.active-scroll { color: #24A1DE; filter: drop-shadow(0 0 15px rgba(36, 161, 222, 0.6)); }
@@ -284,25 +288,10 @@
             transform: translateY(-8px);
         }
 
-        .module.rec:hover, .module.rec.active-scroll { 
-            border-color: #ffffff; 
-            box-shadow: 0 0 50px rgba(255, 255, 255, 0.1); 
-        }
-
-        .module.start:hover, .module.start.active-scroll { 
-            border-color: var(--neon-purple); 
-            box-shadow: 0 0 50px rgba(188, 19, 254, 0.2); 
-        }
-
-        .module.artist:hover, .module.artist.active-scroll { 
-            border-color: var(--neon-red); 
-            box-shadow: 0 0 50px rgba(255, 0, 60, 0.2); 
-        }
-
-        .module.platinum:hover, .module.platinum.active-scroll { 
-            border-color: var(--neon-gold); 
-            box-shadow: 0 0 50px rgba(255, 204, 0, 0.2); 
-        }
+        .module.rec:hover, .module.rec.active-scroll { border-color: #ffffff; box-shadow: 0 0 50px rgba(255, 255, 255, 0.1); }
+        .module.start:hover, .module.start.active-scroll { border-color: var(--neon-purple); box-shadow: 0 0 50px rgba(188, 19, 254, 0.2); }
+        .module.artist:hover, .module.artist.active-scroll { border-color: var(--neon-red); box-shadow: 0 0 50px rgba(255, 0, 60, 0.2); }
+        .module.platinum:hover, .module.platinum.active-scroll { border-color: var(--neon-gold); box-shadow: 0 0 50px rgba(255, 204, 0, 0.2); }
 
         .module h3 { 
             font-family: 'Orbitron', sans-serif; 
@@ -472,24 +461,19 @@
             text-transform: uppercase;
         }
 
+        /* --- МОБИЛЬНЫЕ НАСТРОЙКИ ПЛАВНОСТИ --- */
         @media (max-width: 1024px) { 
-            .booking-grid { 
-                grid-template-columns: 1fr; 
-            } 
-            .header-socials {
-                gap: 30px;
-                flex-wrap: wrap;
-                justify-content: center;
+            /* Замедляем анимацию для скролла на мобильных */
+            .js-scroll-glow, 
+            .js-scroll-glow i, 
+            .js-scroll-glow span {
+                transition: all var(--transition-speed-mobile) var(--transition-timing) !important;
             }
-            .header-phone {
-                font-size: 1.1rem;
-            }
-            .phone-box-container {
-                padding-top: 15px;
-                padding-bottom: 15px;
-                padding-left: 25px;
-                padding-right: 25px;
-            }
+
+            .booking-grid { grid-template-columns: 1fr; } 
+            .header-socials { gap: 30px; flex-wrap: wrap; justify-content: center; }
+            .header-phone { font-size: 1.1rem; }
+            .phone-box-container { padding: 15px 25px; }
             .module:hover, .social-btn:hover, .phone-box-container:hover { transform: none; }
         }
     </style>
@@ -619,11 +603,11 @@
 </footer>
 
 <script>
-    // ПРОВЕРКА УСТРОЙСТВА: ЛОГИКА ДЛЯ МОБИЛЬНЫХ (ЦЕНТРАЛЬНЫЙ СКРОЛЛ)
     if (window.innerWidth <= 1024) {
         const observerOptions = {
             root: null,
-            rootMargin: '-35% 0px -35% 0px', 
+            // Увеличил зону захвата до 40% сверху/снизу, чтобы переход начинался раньше
+            rootMargin: '-30% 0px -30% 0px', 
             threshold: 0
         };
 
@@ -641,7 +625,6 @@
             observer.observe(el);
         });
     }
-    // НА ПК (БОЛЬШЕ 1024PX) РАБОТАЕТ ТОЛЬКО CSS HOVER (ПРОПИСАН В СТИЛЯХ)
 </script>
 
 </body>
