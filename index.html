@@ -212,7 +212,7 @@
         }
 
         /* ==========================================
-           5. ТЕЛЕФОН В ШАПКЕ (С ЭФФЕКТОМ БЛИКА)
+           5. ТЕЛЕФОН В ШАПКЕ
            ========================================== */
         .phone-box-container {
             margin-top: 40px;
@@ -236,36 +236,6 @@
             animation-delay: 3s;
             animation-fill-mode: forwards;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* ВОЗВРАЩЕННЫЙ БЛИК */
-        .phone-box-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(
-                to right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.2) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: skewX(-25deg);
-            transition: none;
-        }
-
-        .phone-box-container:hover::before {
-            animation: shine 0.75s forwards;
-        }
-
-        @keyframes shine {
-            100% {
-                left: 150%;
-            }
         }
 
         .header-phone {
@@ -350,29 +320,27 @@
             height: 100%; 
         }
 
-        /* ВОЗВРАЩЕННАЯ АНИМАЦИЯ УСЛУГ ПРИ НАВЕДЕНИИ */
         .module:hover {
             background-color: rgba(255, 255, 255, 0.05); 
-            transform: translateY(-15px) scale(1.02); /* Немного приподнимаются и увеличиваются */
+            transform: translateY(-8px);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            z-index: 10;
         }
 
         /* Пакетная подсветка */
         .module.rec:hover, .module.rec.active-scroll { 
             border-color: #ffffff; 
-            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); 
         }
         
         .module.start:hover, .module.start.active-scroll { 
             border-color: var(--neon-purple); 
-            box-shadow: 0 10px 30px rgba(188, 19, 254, 0.15); 
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.1); 
         }
         
         .module.artist:hover, .module.artist.active-scroll { 
             border-color: var(--neon-red); 
-            box-shadow: 0 10px 30px rgba(255, 0, 60, 0.15); 
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.1); 
         }
         
         .module.platinum {
@@ -380,7 +348,7 @@
         }
         .module.platinum:hover, .module.platinum.active-scroll { 
             border-color: var(--neon-gold) !important; 
-            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.25) !important; 
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2) !important; 
         }
 
         .module h3 { 
@@ -473,7 +441,7 @@
         .audio-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px;
+            padding: 30px;
             transition: all var(--transition-speed) var(--transition-timing);
             display: flex;
             flex-direction: column;
@@ -481,31 +449,26 @@
             backdrop-filter: blur(5px);
         }
 
-        /* МЕСТО ДЛЯ ОБЛОЖКИ (ВМЕСТО ПЛАСТИНКИ) */
-        .track-cover {
-            width: 100%;
-            aspect-ratio: 1/1;
-            background-color: #111;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .track-cover img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .audio-card:hover img {
-            transform: scale(1.05);
-        }
-
         .audio-card:hover, .audio-card.active-scroll {
             border-color: var(--neon-blue);
             background: rgba(255, 255, 255, 0.05);
             box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
             transform: translateY(-5px);
+        }
+
+        /* Обложка трека */
+        .track-cover {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .track-cover:hover {
+            transform: scale(1.02);
         }
 
         .audio-info {
@@ -592,7 +555,6 @@
             text-shadow: 0 0 6px var(--soft-glow);
         }
 
-        /* Мобильная подсветка контактов */
         .contact-card.active-scroll {
             border-color: var(--neon-blue);
             box-shadow: 0 0 15px var(--soft-glow);
@@ -632,12 +594,6 @@
             letter-spacing: 5px; 
             border-top: 1px solid #111111;
             text-transform: uppercase;
-        }
-
-        .header-hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
         }
 
         /* ==========================================
@@ -729,7 +685,6 @@
                 font-size: 1.4rem; 
             }
 
-            /* Запрет трансформации при ховере на мобильных (кроме активных элементов) */
             .module:hover, 
             .social-btn:hover, 
             .phone-box-container:hover,
@@ -742,7 +697,6 @@
                 background-color: rgba(255, 255, 255, 0.05); 
                 backdrop-filter: blur(15px);
                 -webkit-backdrop-filter: blur(15px);
-                transform: scale(1.02);
             }
         }
 
@@ -863,23 +817,18 @@
         <h2>PORTFOLIO</h2>
         <div class="portfolio-grid">
             <div class="audio-card js-scroll-glow">
-                <div class="track-cover">
-                    <img src="image_041492.png" alt="WEYTON - В ОБЛАКА">
-                </div>
+                <div class="track-cover" style="background-image: url('https://lh3.googleusercontent.com/d/10TfB0_Y9R0fV6rN9kG_D3k0FvF-m9D1y');" onclick="this.nextElementSibling.nextElementSibling.play()"></div>
                 <div class="audio-info">
-                    <div class="audio-title">WEYTON — В ОБЛАКА</div>
-                    <div class="audio-subtitle">Mixed by WEYTON</div>
+                    <div class="audio-title">LUANHO - Лети со мной</div>
+                    <div class="audio-subtitle">Produced & Mixed by WEYTON</div>
                 </div>
                 <audio controls>
-                    <source src="В облака_008.wav" type="audio/wav">
+                    <source src="LUANHO - Лети со мной.wav" type="audio/wav">
                     Ваш браузер не поддерживает аудио-плеер.
                 </audio>
             </div>
-            
+
             <div class="audio-card js-scroll-glow">
-                <div class="track-cover">
-                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#222; font-family:'Orbitron'; font-size:0.6rem; letter-spacing:3px;">NO COVER</div>
-                </div>
                 <div class="audio-info">
                     <div class="audio-title">TRACK 02 // ARTIST EDITION</div>
                     <div class="audio-subtitle">Sound Design & Engineering</div>
@@ -888,11 +837,7 @@
                     <source src="track2.mp3" type="audio/mpeg">
                 </audio>
             </div>
-
             <div class="audio-card js-scroll-glow">
-                <div class="track-cover">
-                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#222; font-family:'Orbitron'; font-size:0.6rem; letter-spacing:3px;">NO COVER</div>
-                </div>
                 <div class="audio-info">
                     <div class="audio-title">TRACK 03 // VOCAL MIX</div>
                     <div class="audio-subtitle">Spring Sound Lab Quality</div>
@@ -901,11 +846,7 @@
                     <source src="track3.mp3" type="audio/mpeg">
                 </audio>
             </div>
-
             <div class="audio-card js-scroll-glow">
-                <div class="track-cover">
-                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#222; font-family:'Orbitron'; font-size:0.6rem; letter-spacing:3px;">NO COVER</div>
-                </div>
                 <div class="audio-info">
                     <div class="audio-title">TRACK 04 // PLATINUM TRACK</div>
                     <div class="audio-subtitle">Full Production Cycle</div>
@@ -923,7 +864,7 @@
                 <div class="contact-label">АДРЕС</div>
                 <div class="contact-main-text">ВОЛГОГРАД, ТУЛАКА 9</div>
                 <div class="work-time">ЕЖЕДНЕВНО С 10:00 ДО 22:00</div>
-                <div class="action-hint">НАЖМИ, ЧТОБЫ УЗНАТЬ МЕСТО</div>
+                <div class="action-hint">НАЖМИ, ЧТОБЫ УЗНАТЬ ПУТЬ</div>
             </a>
             <a href="tel:+79178382017" class="contact-card js-scroll-glow">
                 <div class="contact-label">ПОЗВОНИТЬ</div>
@@ -939,9 +880,6 @@
 </footer>
 
 <script>
-    /* ==========================================
-        JS LOGIC: SCROLL EFFECTS & VISIBILITY
-        ========================================== */
     const header = document.getElementById('main-header');
     const artistTrigger = document.querySelector('.js-artist-trigger');
     const socialIcons = document.querySelectorAll('.social-btn');
@@ -949,14 +887,12 @@
     const allGlowElements = document.querySelectorAll('.js-scroll-glow');
     const isMobile = window.innerWidth < 1025;
 
-    // Настройки для Intersection Observer (для мобильной подсветки)
     const observerOptions = {
         root: null,
         rootMargin: '-45% 0px -45% 0px',
         threshold: 0
     };
 
-    // 1. ЛОГИКА АКТИВНОЙ КАРТОЧКИ (ТОЛЬКО МОБИЛЬНЫЕ)
     if (isMobile) {
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -971,14 +907,15 @@
         allGlowElements.forEach(el => scrollObserver.observe(el));
     }
 
-    // 2. СКРЫТИЕ ШАПКИ ПРИ СКРОЛЛЕ ДО УСЛУГ
     window.addEventListener('scroll', () => {
-        if (!artistTrigger) return;
-        const rect = artistTrigger.getBoundingClientRect();
-        if (rect.top <= 100) {
-            header.classList.add('header-hidden');
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > 100) {
+            header.style.opacity = '0';
+            header.style.visibility = 'hidden';
         } else {
-            header.classList.remove('header-hidden');
+            header.style.opacity = '1';
+            header.style.visibility = 'visible';
         }
     });
 </script>
