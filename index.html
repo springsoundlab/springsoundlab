@@ -156,14 +156,12 @@
         .social-btn {
             color: rgba(255, 255, 255, 0.25);
             font-size: 3.5rem;
-            transition-property: all;
-            transition-duration: 0.4s;
-            transition-timing-function: var(--transition-timing);
+            transition: all 0.4s var(--transition-timing);
             text-decoration: none;
             display: inline-block;
         }
 
-        /* ПОДСВЕТКА СОЦСЕТЕЙ */
+        /* ЭФФЕКТЫ СОЦСЕТЕЙ (ПК наведение + Мобильный скролл) */
         .social-btn:hover, .social-btn.active-scroll { transform: scale(1.1); }
         .social-btn.vk:hover, .social-btn.vk.active-scroll { color: #0077ff; filter: drop-shadow(0 0 12px rgba(0, 119, 255, 0.6)); }
         .social-btn.tg:hover, .social-btn.tg.active-scroll { color: #24A1DE; filter: drop-shadow(0 0 12px rgba(36, 161, 222, 0.6)); }
@@ -187,6 +185,7 @@
             animation: ultraSmoothFade 1.5s 3s forwards;
         }
 
+        /* ЭФФЕКТ ТЕЛЕФОНА В ШАПКЕ */
         .phone-box-container:hover, .phone-box-container.active-scroll {
             border-color: var(--neon-blue);
             box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
@@ -196,7 +195,7 @@
         .header-phone {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.6rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.3); /* Изначально тусклый */
             letter-spacing: 5px;
             transition: all 0.4s ease;
             margin-bottom: 5px;
@@ -261,9 +260,7 @@
             padding-bottom: 50px;
             padding-left: 25px;
             padding-right: 25px;
-            transition-property: all;
-            transition-duration: var(--transition-speed);
-            transition-timing-function: var(--transition-timing);
+            transition: all var(--transition-speed) var(--transition-timing);
             display: flex;
             flex-direction: column;
             align-items: flex-start; 
@@ -273,6 +270,7 @@
             height: 100%; 
         }
 
+        /* ПОДСВЕТКА ПАКЕТОВ (ПК + Мобильный) */
         .module:hover, .module.active-scroll {
             background-color: rgba(0, 0, 0, 0.05); 
             transform: translateY(-8px);
@@ -398,9 +396,7 @@
             border-color: rgba(255, 255, 255, 0.05);
             text-decoration: none;
             color: #ffffff;
-            transition-property: all;
-            transition-duration: var(--transition-speed);
-            transition-timing-function: var(--transition-timing);
+            transition: all var(--transition-speed) var(--transition-timing);
             backdrop-filter: blur(8px);
             display: block;
         }
@@ -426,8 +422,7 @@
             font-family: 'Orbitron', sans-serif; 
             font-weight: 900; 
             margin-bottom: 10px;
-            transition-property: all;
-            transition-duration: 0.3s;
+            transition: all 0.3s;
             text-transform: uppercase;
         }
 
@@ -484,6 +479,8 @@
             .phone-box-container {
                 padding: 15px 25px;
             }
+            /* Отключаем ховер на мобилках, чтобы работал только JS-скролл */
+            .module:hover, .social-btn:hover, .phone-box-container:hover { transform: none !important; }
         }
     </style>
 </head>
@@ -499,13 +496,13 @@
     </div>
     
     <div class="header-socials">
-        <a href="ССЫЛКА_ВК" class="social-btn vk js-observe" target="_blank" title="ВКонтакте"><i class="fab fa-vk"></i></a>
-        <a href="ССЫЛКА_ТГ" class="social-btn tg js-observe" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
-        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt js-observe" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-        <a href="ССЫЛКА_ИГ" class="social-btn ig js-observe" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="ССЫЛКА_ВК" class="social-btn vk js-scroll-glow" target="_blank" title="ВКонтакте"><i class="fab fa-vk"></i></a>
+        <a href="ССЫЛКА_ТГ" class="social-btn tg js-scroll-glow" target="_blank" title="Telegram"><i class="fab fa-telegram"></i></a>
+        <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt js-scroll-glow" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="ССЫЛКА_ИГ" class="social-btn ig js-scroll-glow" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
     </div>
 
-    <a href="tel:+79178382017" class="phone-box-container js-observe">
+    <a href="tel:+79178382017" class="phone-box-container js-scroll-glow">
         <span class="header-phone">+7 917 838 20 17</span>
         <span class="phone-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</span>
     </a>
@@ -515,7 +512,7 @@
     <section id="services">
         <h2>SERVICES</h2>
         <div class="module-grid">
-            <div class="module rec">
+            <div class="module rec js-scroll-glow">
                 <h3>ЗАПИСЬ</h3>
                 <div class="price">900 <span>₽/ч</span></div>
                 <div class="module-description">
@@ -533,7 +530,7 @@
                 </ul>
             </div>
 
-            <div class="module start">
+            <div class="module start js-scroll-glow">
                 <h3>START EDITION</h3>
                 <div class="price">3 500 <span>₽</span></div>
                 <div class="module-description">
@@ -551,7 +548,7 @@
                 </ul>
             </div>
 
-            <div class="module artist">
+            <div class="module artist js-scroll-glow">
                 <h3>ARTIST EDITION</h3>
                 <div class="price">6 000 <span>₽</span></div>
                 <div class="module-description">
@@ -570,7 +567,7 @@
                 </ul>
             </div>
 
-            <div class="module platinum">
+            <div class="module platinum js-scroll-glow">
                 <h3>PLATINUM EDITION</h3>
                 <div class="price">ОТ 10 000 <span>₽</span></div>
                 <div class="module-description">
@@ -612,21 +609,28 @@
 </footer>
 
 <script>
-    const observerOptions = { threshold: 0.3 };
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active-scroll');
-            } else {
-                entry.target.classList.remove('active-scroll');
-            }
-        });
-    }, observerOptions);
+    // Логика только для мобильных устройств (ширина экрана менее 1024px)
+    if (window.innerWidth <= 1024) {
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -20% 0px', // Элемент активируется, когда он ближе к центру экрана
+            threshold: 0.5
+        };
 
-    // Следим и за карточками услуг, и за элементами шапки (соцсети/телефон)
-    document.querySelectorAll('.module, .js-observe').forEach(el => {
-        observer.observe(el);
-    });
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active-scroll');
+                } else {
+                    entry.target.classList.remove('active-scroll');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.js-scroll-glow').forEach(el => {
+            observer.observe(el);
+        });
+    }
 </script>
 
 </body>
