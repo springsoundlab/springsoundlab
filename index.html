@@ -186,15 +186,16 @@
         .social-btn {
             color: #ffffff; 
             font-size: 3.5rem;
-            transition: color 0.8s var(--transition-timing), transform 0.4s var(--transition-timing), filter 0.8s ease;
+            transition: color 0.6s var(--transition-timing), transform 0.4s var(--transition-timing), filter 0.6s ease;
             text-decoration: none;
             display: inline-block;
         }
 
-        .social-btn.activated.vk { color: #0077ff; filter: drop-shadow(0 0 8px rgba(0, 119, 255, 0.4)); }
-        .social-btn.activated.tg { color: #24A1DE; filter: drop-shadow(0 0 8px rgba(36, 161, 222, 0.4)); }
-        .social-btn.activated.yt { color: var(--youtube-red); filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.4)); }
-        .social-btn.activated.ig { color: #f09433; filter: drop-shadow(0 0 8px rgba(230, 104, 60, 0.4)); }
+        /* ЦВЕТА ПРИ НАВЕДЕНИИ И ПРИ АКТИВАЦИИ (КЛАСС .activated ДОБАВЛЯЕТСЯ СКРИПТОМ) */
+        .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; filter: drop-shadow(0 0 8px rgba(0, 119, 255, 0.4)); }
+        .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; filter: drop-shadow(0 0 8px rgba(36, 161, 222, 0.4)); }
+        .social-btn.activated.yt, .social-btn.yt:hover { color: var(--youtube-red) !important; filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.4)); }
+        .social-btn.activated.ig, .social-btn.ig:hover { color: #f09433 !important; filter: drop-shadow(0 0 8px rgba(230, 104, 60, 0.4)); }
 
         @media (min-width: 1025px) {
             .social-btn:hover { 
@@ -781,6 +782,7 @@
 
     // 2. ЛОГИКА ШАПКИ И ВОЛНЫ СОЦСЕТЕЙ
     window.addEventListener('scroll', () => {
+        const winWidth = window.innerWidth;
         const winHeight = window.innerHeight;
         const scrollY = window.scrollY;
         const midPoint = scrollY + (winHeight / 2);
@@ -795,20 +797,24 @@
             }
         }
 
-        // Волна соцсетей при прохождении через центр (изначально белые -> цвета)
+        // --- ЛОГИКА СОЦСЕТЕЙ ---
         if (socialContainer) {
             const socialRect = socialContainer.getBoundingClientRect();
             const socialAbsoluteTop = socialRect.top + scrollY;
 
-            // Если контейнер соцсетей пересекает середину экрана
-            if (midPoint >= socialAbsoluteTop) {
-                socialIcons.forEach((icon, index) => {
-                    setTimeout(() => {
-                        icon.classList.add('activated');
-                    }, index * 200); // Задержка для эффекта волны
-                });
+            // Только для мобильных (ширина < 1025px)
+            if (winWidth < 1025) {
+                if (midPoint >= socialAbsoluteTop) {
+                    socialIcons.forEach((icon, index) => {
+                        setTimeout(() => {
+                            icon.classList.add('activated');
+                        }, index * 200); 
+                    });
+                } else {
+                    socialIcons.forEach(icon => icon.classList.remove('activated'));
+                }
             } else {
-                // Возвращаем в белый цвет при скролле вверх
+                // На ПК убираем класс активации, чтобы иконки были белыми в покое
                 socialIcons.forEach(icon => icon.classList.remove('activated'));
             }
         }
@@ -817,187 +823,6 @@
     // Дополнительная проверка при загрузке страницы
     window.dispatchEvent(new Event('scroll'));
 </script>
-<style>
-    /* 1. ПОЛНОЕ УНИЧТОЖЕНИЕ СВЕЧЕНИЯ (ПК и МОБ) */
-    .social-btn, 
-    .social-btn.activated, 
-    .social-btn:hover {
-        filter: none !important;
-        -webkit-filter: none !important;
-        text-shadow: none !important;
-        box-shadow: none !important;
-        outline: none !important;
-    }
 
-    /* 2. ЧИСТЫЕ ЦВЕТА (Без градиентов и эффектов) */
-    .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; }
-    .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; }
-    .social-btn.activated.yt, .social-btn.yt:hover { color: #ff0000 !important; }
-    .social-btn.activated.ig, .social-btn.ig:hover { color: #f09433 !important; }
-
-    /* 3. УСЛУГИ НА ПК (Покой и Наведение) */
-    @media (min-width: 1025px) {
-        /* Убираем авто-загорание блоков от скролла */
-        .module.active-scroll {
-            background-color: rgba(255, 255, 255, 0.02) !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
-            box-shadow: none !important;
-        }
-
-        .module:hover {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            transform: translateY(-5px) !important;
-        }
-
-        /* Цвета рамок при наведении БЕЗ свечения */
-        .module.rec:hover { border-color: #ffffff !important; box-shadow: none !important; }
-        .module.start:hover { border-color: #bc13fe !important; box-shadow: none !important; }
-        .module.artist:hover { border-color: #ff003c !important; box-shadow: none !important; }
-        .module.platinum:hover { border-color: #ffcc00 !important; box-shadow: none !important; }
-
-        /* Номер телефона на ПК (Только цвет при наведении) */
-        .phone-box-container.active-scroll { border-color: rgba(255, 255, 255, 0.2) !important; }
-        .phone-box-container:hover { border-color: #00f2ff !important; }
-        .phone-box-container:hover .header-phone { color: #00f2ff !important; text-shadow: none !important; }
-        
-        /* ГАРАНТИРУЕМ: На ПК иконки всегда белые, пока нет наведения */
-        .social-btn.activated { color: #ffffff !important; }
-        .social-btn:hover { transition: none !important; } /* Убираем плавность, чтобы не бесило */
-    }
-<style>
-    /* 1. УБИРАЕМ СВЕЧЕНИЕ НАМЕРТВО */
-    .social-btn, 
-    .social-btn.activated, 
-    .social-btn:hover {
-        filter: none !important;
-        text-shadow: none !important;
-        box-shadow: none !important;
-        /* Плавное наливание цветом и масштаб */
-        transition: color 0.4s ease, transform 0.4s ease !important;
-    }
-
-    /* 2. АНИМАЦИЯ МЯГКОЙ ПУЛЬСАЦИИ */
-    @keyframes pulse-soft {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.15); }
-        100% { transform: scale(1); }
-    }
-
-    /* 3. ЦВЕТА ПРИ НАВЕДЕНИИ/АКТИВАЦИИ */
-    .social-btn.activated.vk, .social-btn.vk:hover { color: #0077ff !important; }
-    .social-btn.activated.tg, .social-btn.tg:hover { color: #24A1DE !important; }
-    .social-btn.activated.yt, .social-btn.yt:hover { color: #ff0000 !important; }
-    .social-btn.activated.ig, .social-btn.ig:hover { color: #f09433 !important; }
-
-    /* 4. СПЕЦИФИКА ДЛЯ ПК (min-width: 1025px) */
-    @media (min-width: 1025px) {
-        /* Включаем пульсацию только при наведении мыши */
-        .social-btn:hover {
-            animation: pulse-soft 1.5s infinite ease-in-out !important;
-        }
-
-        /* Услуги: убираем авто-подсветку, оставляем только наведение */
-        .module.active-scroll {
-            background-color: rgba(255, 255, 255, 0.02) !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        .module:hover {
-            transform: translateY(-5px) !important;
-            background: rgba(255, 255, 255, 0.05) !important;
-        }
-        
-        /* Цвета рамок услуг при наведении на ПК */
-        .module.rec:hover { border-color: #ffffff !important; }
-        .module.start:hover { border-color: #bc13fe !important; }
-        .module.artist:hover { border-color: #ff003c !important; }
-        .module.platinum:hover { border-color: #ffcc00 !important; }
-    }
-<style>
-    /* 1. БАЗОВЫЙ СТИЛЬ: БЕЛЫЙ ЦВЕТ, БЕЗ СВЕЧЕНИЯ */
-    .social-btn {
-        color: #ffffff !important;
-        filter: none !important;
-        text-shadow: none !important;
-        transition: color 0.3s ease, transform 0.3s ease !important;
-        display: inline-block;
-    }
-
-    /* 2. ЭФФЕКТ ПРИ НАВЕДЕНИИ: УВЕЛИЧЕНИЕ И ЦВЕТ */
-    .social-btn:hover {
-        transform: scale(1.2) !important; /* Увеличили один раз и всё */
-    }
-
-    /* Цвета кнопок */
-    .social-btn.vk:hover, .social-btn.vk.activated { color: #0077ff !important; }
-    .social-btn.tg:hover, .social-btn.tg.activated { color: #24A1DE !important; }
-    .social-btn.yt:hover, .social-btn.yt.activated { color: #ff0000 !important; }
-    .social-btn.ig:hover, .social-btn.ig.activated { color: #f09433 !important; }
-
-    /* 3. БЛОКИРОВКА ЭФФЕКТОВ НА ПК */
-    @media (min-width: 1025px) {
-        /* Отключаем любые анимации, кроме наведения */
-        .social-btn.activated {
-            color: #ffffff !important;
-            transform: scale(1) !important;
-        }
-        
-        /* Услуги: только наведение */
-        .module.active-scroll {
-            background-color: rgba(255, 255, 255, 0.02) !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        .module:hover {
-            transform: translateY(-5px) !important;
-            background: rgba(255, 255, 255, 0.05) !important;
-        }
-    }
-</style>
-
-<script>
-    (function() {
-        const cleanUpdate = () => {
-            const winWidth = window.innerWidth;
-            const winHeight = window.innerHeight;
-            const scrollY = window.scrollY;
-
-            // Работа с соцсетями
-            if (winWidth < 1025) {
-                // На телефоне оставляем логику появления
-                const socialTop = socialContainer.getBoundingClientRect().top + scrollY;
-                if (scrollY + (winHeight / 2) >= socialTop) {
-                    socialIcons.forEach((icon, i) => {
-                        setTimeout(() => icon.classList.add('activated'), i * 150);
-                    });
-                } else {
-                    socialIcons.forEach(icon => icon.classList.remove('activated'));
-                }
-            } else {
-                // НА ПК ВООБЩЕ УБИРАЕМ АКТИВАЦИЮ (ЧТОБЫ НЕ БЫЛО ЦВЕТА СЛЕВА НАПРАВО)
-                socialIcons.forEach(icon => {
-                    icon.classList.remove('activated');
-                });
-            }
-
-            // Услуги (только мобилки)
-            allGlowElements.forEach(el => {
-                const rect = el.getBoundingClientRect();
-                if (winWidth < 1025) {
-                    if (rect.top < winHeight * 0.6 && rect.bottom > winHeight * 0.4) {
-                        el.classList.add('active-scroll');
-                    } else {
-                        el.classList.remove('active-scroll');
-                    }
-                } else {
-                    el.classList.remove('active-scroll');
-                }
-            });
-        };
-
-        window.addEventListener('scroll', cleanUpdate);
-        window.addEventListener('resize', cleanUpdate);
-        cleanUpdate();
-    })();
-</script>
 </body>
 </html>
