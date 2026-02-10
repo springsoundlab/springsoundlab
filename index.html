@@ -868,12 +868,9 @@
 
 <script>
     if (window.innerWidth <= 1024) {
-        // Элементы контента
         const contentElements = document.querySelectorAll('.module:not(.js-artist-trigger), .contact-card');
-        // Элементы шапки (соцсети и телефон)
         const headerWave = document.querySelector('.js-wave-trigger');
         const headerPhone = document.querySelector('.js-header-phone');
-        // Триггер - блок Artist Edition
         const artistSection = document.querySelector('.js-artist-trigger');
 
         const observerOptions = {
@@ -882,7 +879,6 @@
             threshold: 0
         };
 
-        // 1. Обычный обсервер для подсветки карточек услуг
         const contentObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -896,37 +892,34 @@
 
         contentElements.forEach(el => contentObserver.observe(el));
 
-        // 2. Логика для шапки: соцсети и телефон горят, пока мы не дошли до Artist Edition
-        const headerLogicObserver = new IntersectionObserver((entries) => {
+        const artistObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                // Если мы НА или НИЖЕ Artist Edition
-                if (entry.isIntersecting || entry.boundingClientRect.top < 0) {
+                if (entry.isIntersecting) {
                     headerWave.classList.remove('active-scroll');
                     headerPhone.classList.remove('active-scroll');
-                    artistSection.classList.add('active-scroll'); // Подсвечиваем сам Artist Edition
+                    entry.target.classList.add('active-scroll');
                 } else {
-                    // Если мы ВЫШЕ Artist Edition
-                    headerWave.classList.add('active-scroll');
-                    headerPhone.classList.add('active-scroll');
-                    artistSection.classList.remove('active-scroll');
+                    entry.target.classList.remove('active-scroll');
+                    if (window.scrollY < entry.boundingClientRect.top + window.scrollY) {
+                        headerWave.classList.add('active-scroll');
+                        headerPhone.classList.add('active-scroll');
+                    }
                 }
             });
-        }, {
-            rootMargin: '-10% 0px -40% 0px', 
-            threshold: 0
-        });
+        }, observerOptions);
 
-        if (artistSection) headerLogicObserver.observe(artistSection);
+        if (artistSection) artistObserver.observe(artistSection);
 
-        // Инициализация при загрузке: если мы в самом верху, зажечь шапку
-        window.addEventListener('load', () => {
+        window.addEventListener('scroll', () => {
             if (window.scrollY < 100) {
                 headerWave.classList.add('active-scroll');
                 headerPhone.classList.add('active-scroll');
             }
         });
+        
+        headerWave.classList.add('active-scroll');
+        headerPhone.classList.add('active-scroll');
     }
 </script>
-
 </body>
 </html>
