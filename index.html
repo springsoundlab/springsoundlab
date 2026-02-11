@@ -798,68 +798,68 @@
 </div>
 
 <script>
-    // 1. Собираем все плееры и кнопки на странице
-    const allAudio = document.querySelectorAll('audio');
-    const allPlayButtons = document.querySelectorAll('.play-btn');
-
-    allPlayButtons.forEach((btn) => {
-        btn.addEventListener('click', function() {
-            // Ищем аудио именно в этой карточке
-            const card = this.closest('.audio-card');
-            const currentAudio = card.querySelector('audio');
-            const currentIcon = this.querySelector('i');
-            const currentBar = card.querySelector('.progress-bar');
-
-            // Если этот трек уже играет — ставим на паузу
-            if (!currentAudio.paused) {
-                currentAudio.pause();
-                currentIcon.classList.replace('fa-pause', 'fa-play');
-            } 
-            // Если включаем новый трек
-            else {
-                // ВАЖНО: Останавливаем и СБРАСЫВАЕМ все остальные треки
-                allAudio.forEach(audio => {
-                    if (audio !== currentAudio) {
-                        audio.pause();
-                        audio.currentTime = 0; // Мотаем на начало
-                        
-                        // Ищем иконку и полоску именно того трека, который выключаем
-                        const otherCard = audio.closest('.audio-card');
-                        if (otherCard) {
-                            const otherIcon = otherCard.querySelector('.play-btn i');
-                            const otherBar = otherCard.querySelector('.progress-bar');
-                            if (otherIcon) otherIcon.classList.replace('fa-pause', 'fa-play');
-                            if (otherBar) otherBar.style.width = '0%';
-                        }
+   // 1. Слушаем событие начала воспроизведения на всей странице
+    document.addEventListener('play', function(e) {
+        // Получаем все аудио элементы
+        const allAudios = document.querySelectorAll('audio');
+        
+        allAudios.forEach(audio => {
+            // Если это НЕ тот трек, который только что включили - останавливаем его
+            if (audio !== e.target) {
+                audio.pause();
+                audio.currentTime = 0; // Сброс на начало
+                
+                // Ищем кнопку этого аудио, чтобы сменить иконку
+                // Мы идем вверх до ближайшего общего контейнера и ищем там иконку
+                const parent = audio.parentElement;
+                if (parent) {
+                    const icon = parent.querySelector('.play-btn i') || parent.parentElement.querySelector('.play-btn i');
+                    if (icon) {
+                        icon.className = 'fas fa-play';
                     }
-                });
+                    const bar = parent.querySelector('.progress-bar') || parent.parentElement.querySelector('.progress-bar');
+                    if (bar) {
+                        bar.style.width = '0%';
+                    }
+                }
+            }
+        });
+    }, true);
 
-                // Теперь запускаем тот, на который нажали
-                currentAudio.play();
-                currentIcon.classList.replace('fa-play', 'fa-pause');
+    // 2. Логика для кнопок Play/Pause (базовая работа)
+    document.querySelectorAll('.play-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Ищем аудио элемент внутри того же контейнера, где кнопка
+            const container = this.closest('div'); 
+            const audio = container.querySelector('audio') || this.parentElement.querySelector('audio');
+            const icon = this.querySelector('i');
+
+            if (audio.paused) {
+                audio.play();
+                icon.className = 'fas fa-pause';
+            } else {
+                audio.pause();
+                icon.className = 'fas fa-play';
             }
         });
     });
 
-    // Логика движения полоски прогресса
-    allAudio.forEach(audio => {
-        audio.addEventListener('timeupdate', () => {
-            const card = audio.closest('.audio-card');
-            const bar = card.querySelector('.progress-bar');
-            if (bar && audio.duration) {
-                const percent = (audio.currentTime / audio.duration) * 100;
+    // 3. Обновление полоски прогресса
+    document.querySelectorAll('audio').forEach(audio => {
+        audio.addEventListener('timeupdate', function() {
+            const container = this.closest('div');
+            const bar = container.querySelector('.progress-bar') || this.parentElement.querySelector('.progress-bar');
+            if (bar && this.duration) {
+                const percent = (this.currentTime / this.duration) * 100;
                 bar.style.width = percent + '%';
             }
         });
 
-        // Если трек доиграл до конца — возвращаем кнопку Play
-        audio.addEventListener('ended', () => {
-            const card = audio.closest('.audio-card');
-            const icon = card.querySelector('.play-btn i');
-            const bar = card.querySelector('.progress-bar');
-            icon.classList.replace('fa-pause', 'fa-play');
-            audio.currentTime = 0;
-            if (bar) bar.style.width = '0%';
+        audio.addEventListener('ended', function() {
+            const container = this.closest('div');
+            const icon = container.querySelector('.play-btn i') || this.parentElement.querySelector('.play-btn i');
+            if (icon) icon.className = 'fas fa-play';
+            this.currentTime = 0;
         });
     });
 </script>
