@@ -1179,6 +1179,32 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(aboutSection);
     }
 });
+
+// Функция для подсветки пакетов услуг при скролле на мобилках
+const highlightServicesOnScroll = () => {
+    // Работает только на мобильных (ширина меньше 768px)
+    if (window.innerWidth > 768) return;
+
+    const packages = document.querySelectorAll('.service-package');
+    const centerY = window.innerHeight / 2;
+
+    packages.forEach(pkg => {
+        const rect = pkg.getBoundingClientRect();
+        // Если центр блока находится в районе центра экрана (+/- 100px)
+        if (rect.top < centerY + 100 && rect.bottom > centerY - 100) {
+            // Сначала тушим все
+            packages.forEach(p => p.classList.remove('active-package'));
+            // Зажигаем текущий
+            pkg.classList.add('active-package');
+        }
+    });
+};
+
+// Запускаем при скролле
+window.addEventListener('scroll', highlightServicesOnScroll);
+// И при загрузке, чтобы первый блок сразу мог загореться
+window.addEventListener('load', highlightServicesOnScroll);
+    
 </script>
 </body>
 </html>
