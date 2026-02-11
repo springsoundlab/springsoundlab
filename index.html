@@ -1646,6 +1646,25 @@ const faderWrap = document.querySelector('.about-fader-wrap');
 if (faderWrap) {
     faderObserver.observe(faderWrap);
 }
+    // Улучшенный запуск фейдера
+const runFader = () => {
+    const fader = document.querySelector('.about-fader-wrap');
+    if (!fader) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                console.log('Fader activated!'); // Проверка в консоли
+            }
+        });
+    }, { threshold: 0.1 }); // Сработает даже если чуть-чуть показался край
+
+    observer.observe(fader);
+};
+
+// Запускаем после загрузки всей страницы
+window.addEventListener('DOMContentLoaded', runFader);
 </script>
 </body>
 </html>
