@@ -661,6 +661,94 @@
             left: 150%; /* Блик пролетает насквозь на правую сторону */
             transition: left 0.7s ease-in-out; /* Скорость пролета блика */
         }
+        .about-section {
+    padding: 120px 0;
+    overflow: hidden;
+    background: transparent;
+}
+
+.about-wrapper {
+    position: relative;
+    padding-left: 40px; /* Отступ для текста от полоски */
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Вертикальная неоновая полоска */
+.glow-line {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--neon-blue); /* Твой основной цвет */
+    box-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue);
+    border-radius: 10px;
+    
+    /* Начальное состояние: высота 0, точка роста сверху */
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Контент, скрытый слева */
+.about-content-reveal {
+    opacity: 0;
+    transform: translateX(-20px);
+    /* Эффект проявления слева направо */
+    clip-path: inset(0 100% 0 0); 
+    transition: 
+        opacity 1s ease, 
+        transform 1s ease, 
+        clip-path 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Задержка, чтобы текст пошел ПОСЛЕ того, как полоска начнет наливаться */
+    transition-delay: 0.4s;
+}
+
+/* Активные классы при появлении */
+.about-wrapper.is-visible .glow-line {
+    transform: scaleY(1);
+}
+
+.about-wrapper.is-visible .about-content-reveal {
+    opacity: 1;
+    transform: translateX(0);
+    clip-path: inset(0 0 0 0);
+}
+
+/* Стили текста */
+.about-header {
+    font-size: 3rem;
+    letter-spacing: 5px;
+    margin-bottom: 30px;
+    color: #fff;
+}
+
+.weyton-name {
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 20px;
+}
+
+.about-tags {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.tag {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    padding: 6px 12px;
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    color: var(--neon-blue);
+}
     </style>
 </head>
 <body>
@@ -686,7 +774,27 @@
         <span class="phone-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</span>
     </a>
 </header>
-
+<section id="about-me" class="about-section">
+    <div class="container">
+        <div class="about-wrapper">
+            <div class="glow-line"></div>
+            
+            <div class="about-content-reveal">
+                <h2 class="about-header">ABOUT <span class="weyton-name">ME</span></h2>
+                <div class="about-text">
+                    <p>Меня зовут <strong>WEYTON</strong>. Я создаю звуковую идентичность, которая выделяется на фоне шума.</p>
+                    <p>Мой путь в музыке — это поиск идеального баланса между техническим совершенством и чистой эмоцией. Каждый проект для меня — это отдельная вселенная.</p>
+                    
+                    <div class="about-tags">
+                        <span class="tag">SOUND PRODUCER</span>
+                        <span class="tag">ENGINEER</span>
+                        <span class="tag">ARTIST</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 <div class="container">
     <section id="services">
         <h2>SERVICES</h2>
@@ -1048,6 +1156,18 @@ document.addEventListener('play', function(e) {
         }
     });
 }, true);
+    const aboutObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+        }
+    });
+}, { threshold: 0.3 }); // Сработает, когда 30% блока в кадре
+
+const wrapper = document.querySelector('.about-wrapper');
+if (wrapper) {
+    aboutObserver.observe(wrapper);
+}
 </script>
 </body>
 </html>
