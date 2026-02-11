@@ -749,6 +749,108 @@
     border: 1px solid rgba(0, 243, 255, 0.2);
     color: var(--neon-blue);
 }
+        /* РАЗДЕЛ ABOUT ME: ЭФФЕКТ РАЗДВИЖНЫХ ШТОРОК С БЛЮРОМ */
+.about-section {
+    padding: 120px 0;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.about-container {
+    width: 90%;
+    max-width: 1100px; 
+    margin: 0 auto;
+}
+
+.shutter-wrapper {
+    position: relative;
+    width: 100%;
+    padding: 40px 0;
+}
+
+/* Линии-шторки */
+.shutter-line {
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: var(--neon-blue);
+    box-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+    z-index: 10;
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.8s ease, left 1.2s cubic-bezier(0.77, 0, 0.175, 1), right 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.line-left { left: 50%; }
+.line-right { right: 50%; }
+
+/* Контент на стеклянной подложке */
+.about-full-content {
+    width: 100%;
+    opacity: 0;
+    text-align: center;
+    transform: scale(0.95);
+    transition: opacity 1.2s ease, transform 1.2s ease;
+    transition-delay: 1s; /* Появляется, когда линии разъехались */
+    
+    /* Эффект матового стекла */
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 40px;
+    padding: 80px 40px;
+}
+
+/* Состояния при скролле (активация) */
+.shutter-wrapper.active .shutter-line {
+    transform: scaleY(1);
+}
+
+.shutter-wrapper.active .line-left { left: 0; }
+.shutter-wrapper.active .line-right { right: 0; }
+
+.shutter-wrapper.active .about-full-content {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Текст */
+.about-huge-title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    letter-spacing: 10px;
+    margin-bottom: 30px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.about-main-text {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-main-text p {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+}
+
+.about-skills {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 40px;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    color: var(--neon-blue);
+    opacity: 0.6;
+}
     </style>
 </head>
 <body>
@@ -774,6 +876,27 @@
         <span class="phone-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</span>
     </a>
 </header>
+    <section id="about-me" class="about-section">
+    <div class="about-container">
+        <div class="shutter-wrapper">
+            <div class="shutter-line line-left"></div>
+            <div class="shutter-line line-right"></div>
+            
+            <div class="about-full-content">
+                <h2 class="about-huge-title">ABOUT <span style="color: var(--neon-blue);">ME</span></h2>
+                <div class="about-main-text">
+                    <p>Меня зовут <strong>WEYTON</strong>. Я создаю звуковую идентичность, которая выделяется на фоне шума.</p>
+                    <p>Мой путь в музыке — это поиск идеального баланса между техническим совершенством и чистой эмоцией. Каждый проект для меня — это отдельная вселенная.</p>
+                </div>
+                <div class="about-skills">
+                    <span>SOUND DESIGNER</span>
+                    <span>PRODUCER</span>
+                    <span>ENGINEER</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 <section id="about-me" class="about-section">
     <div class="container">
         <div class="about-wrapper">
@@ -1164,6 +1287,20 @@ document.addEventListener('play', function(e) {
 const wrapper = document.querySelector('.about-wrapper');
 if (wrapper) {
     aboutObserver.observe(wrapper);
+}
+    // Запуск анимации About Me при появлении на экране
+const shutterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+        }
+    });
+}, { threshold: 0.3 });
+
+// Находим блок и включаем слежку
+const shutterTarget = document.querySelector('.shutter-wrapper');
+if (shutterTarget) {
+    shutterObserver.observe(shutterTarget);
 }
 </script>
 </body>
