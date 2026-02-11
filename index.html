@@ -1011,6 +1011,31 @@
             this.currentTime = 0;
         });
     });
+    // --- СКРИПТ ДЛЯ ПОЯВЛЕНИЯ БЛОКА ABOUT ME ПРИ СКРОЛЛЕ ---
+document.addEventListener('DOMContentLoaded', () => {
+    const aboutSection = document.getElementById('about-me');
+
+    if (aboutSection) {
+        const observerOptions = {
+            root: null, // Отслеживаем относительно viewport
+            rootMargin: '0px',
+            threshold: 0.4 // Когда 40% блока появятся на экране
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Добавляем класс, который запускает CSS-анимацию
+                    entry.target.classList.add('is-revealed');
+                    observer.unobserve(entry.target); // Останавливаем наблюдение после срабатывания
+                }
+            });
+        }, observerOptions);
+
+        observer.observe(aboutSection);
+    }
+});
+// --- КОНЕЦ СКРИПТА ДЛЯ ABOUT ME ---
 </script>
 </body>
 </html>
