@@ -1200,10 +1200,30 @@ const highlightServicesOnScroll = () => {
     });
 };
 
-// Запускаем при скролле
-window.addEventListener('scroll', highlightServicesOnScroll);
-// И при загрузке, чтобы первый блок сразу мог загореться
-window.addEventListener('load', highlightServicesOnScroll);
+// Создаем "датчик" для слежки за пакетами услуг
+const packageObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        // Если блок находится в центральной части экрана (минимум 50% видно)
+        if (entry.isIntersecting && window.innerWidth <= 768) {
+            // Убираем подсветку у всех
+            document.querySelectorAll('.service-package').forEach(pkg => {
+                pkg.classList.remove('active-package');
+            });
+            // Добавляем тому, который сейчас в центре
+            entry.target.classList.add('active-package');
+        }
+    });
+
+}, {
+    // Настройки: реагировать, когда блок пересекает середину экрана
+    rootMargin: "-20% 0px -20% 0px", 
+    threshold: 0.5 
+});
+
+// Запускаем слежку за каждым пакетом
+document.querySelectorAll('.service-package').forEach(pkg => {
+    packageObserver.observe(pkg);
+});
     
 </script>
 </body>
