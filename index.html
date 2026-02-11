@@ -851,6 +851,104 @@
     color: var(--neon-blue);
     opacity: 0.6;
 }
+        /* РАЗДЕЛ ABOUT С ФЕЙДЕРОМ И ЛЕГКИМ БЛЮРОМ */
+.about-section {
+    padding: 100px 0;
+    overflow: hidden;
+    background: transparent;
+}
+
+.about-flex {
+    display: flex;
+    align-items: flex-start;
+    gap: 50px; 
+    padding-left: 5%; /* Смещение всего блока влево */
+}
+
+/* Дорожка фейдера */
+.mixer-fader-track {
+    position: relative;
+    width: 10px;
+    height: 350px; 
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.8s ease;
+}
+
+/* Светодиодная полоска за ползунком */
+.fader-led-scale {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 0; 
+    background: linear-gradient(to top, var(--neon-blue), #005f63);
+    box-shadow: 0 0 15px var(--neon-blue);
+    border-radius: 20px;
+    transition: height 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: 0.4s;
+}
+
+/* Сам ползунок фейдера */
+.fader-handle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 26px;
+    height: 45px;
+    background: #111;
+    border: 2px solid var(--neon-blue);
+    border-radius: 3px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.7);
+    z-index: 5;
+    opacity: 0;
+    transition: top 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    transition-delay: 0.4s;
+}
+
+/* Подложка для текста с легким блюром */
+.about-content-revealer {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 1s ease;
+    transition-delay: 0.7s;
+    background: rgba(255, 255, 255, 0.02); /* Почти прозрачный фон */
+    backdrop-filter: blur(8px);           /* Легкий блюр, как ты просил */
+    -webkit-backdrop-filter: blur(8px);
+    padding: 40px 50px;
+    border-radius: 25px;
+    max-width: 850px;
+    border-left: 1px solid rgba(0, 243, 255, 0.1); /* Тонкий акцент слева */
+}
+
+/* Увеличенный текст */
+.about-header {
+    font-size: 3.8rem; 
+    letter-spacing: 8px;
+    margin-bottom: 25px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+.about-text-body p {
+    font-size: 1.3rem; 
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+}
+
+.accent-blue {
+    color: var(--neon-blue);
+}
+
+/* Состояния при скролле */
+.about-section.is-active .mixer-fader-track { opacity: 1; transform: translateY(0); }
+.about-section.is-active .fader-led-scale { height: 75%; } /* Уровень громкости */
+.about-section.is-active .fader-handle { top: 25%; opacity: 1; }
+.about-section.is-active .about-content-revealer { opacity: 1; transform: translateX(0); }
     </style>
 </head>
 <body>
@@ -876,27 +974,7 @@
         <span class="phone-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</span>
     </a>
 </header>
-    <section id="about-me" class="about-section">
-    <div class="about-container">
-        <div class="shutter-wrapper">
-            <div class="shutter-line line-left"></div>
-            <div class="shutter-line line-right"></div>
-            
-            <div class="about-full-content">
-                <h2 class="about-huge-title">ABOUT <span style="color: var(--neon-blue);">ME</span></h2>
-                <div class="about-main-text">
-                    <p>Меня зовут <strong>WEYTON</strong>. Я создаю звуковую идентичность, которая выделяется на фоне шума.</p>
-                    <p>Мой путь в музыке — это поиск идеального баланса между техническим совершенством и чистой эмоцией. Каждый проект для меня — это отдельная вселенная.</p>
-                </div>
-                <div class="about-skills">
-                    <span>SOUND DESIGNER</span>
-                    <span>PRODUCER</span>
-                    <span>ENGINEER</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+   
 <section id="about-me" class="about-section">
     <div class="container">
         <div class="about-wrapper">
@@ -1288,19 +1366,18 @@ const wrapper = document.querySelector('.about-wrapper');
 if (wrapper) {
     aboutObserver.observe(wrapper);
 }
-    // Запуск анимации About Me при появлении на экране
-const shutterObserver = new IntersectionObserver((entries) => {
+// Скрипт для фейдера WEYTON
+const faderObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            entry.target.classList.add('active');
+            entry.target.classList.add('is-active');
         }
     });
-}, { threshold: 0.3 });
+}, { threshold: 0.2 });
 
-// Находим блок и включаем слежку
-const shutterTarget = document.querySelector('.shutter-wrapper');
-if (shutterTarget) {
-    shutterObserver.observe(shutterTarget);
+const aboutSection = document.querySelector('.about-section');
+if (aboutSection) {
+    faderObserver.observe(aboutSection);
 }
 </script>
 </body>
