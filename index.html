@@ -1026,6 +1026,28 @@ function seek(e, id) {
         flare.style.opacity = '0';
     });
 });
+    // ГЛОБАЛЬНЫЙ КОНТРОЛЛЕР ЗВУКА
+document.addEventListener('play', function(e) {
+    // Находим все аудио-элементы на странице
+    const allAudios = document.getElementsByTagName('audio');
+    
+    for (let i = 0; i < allAudios.length; i++) {
+        // Если это не тот файл, который только что включили — выключаем его
+        if (allAudios[i] !== e.target) {
+            allAudios[i].pause();
+            // Опционально: allAudios[i].currentTime = 0; // Сброс в начало
+        }
+    }
+    
+    // Синхронизируем кнопки (чтобы на других плеерах сменился значок на Play)
+    document.querySelectorAll('.play-btn').forEach(btn => {
+        // Если кнопка не относится к текущему играющему треку, ставим ей значок Play
+        // Здесь важно, чтобы у твоих кнопок был класс .play-btn или похожий
+        if (btn.getAttribute('onclick') && !btn.getAttribute('onclick').includes(e.target.id.replace('audio', ''))) {
+            btn.innerHTML = '▶'; 
+        }
+    });
+}, true);
 </script>
 </body>
 </html>
