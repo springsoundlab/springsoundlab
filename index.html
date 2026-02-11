@@ -922,7 +922,7 @@
         border-color: #00ff41 !important; 
         box-shadow: 0 0 25px rgba(0, 255, 65, 0.6) !important; 
     }
-        
+        }
     </style>
 </head>
 <body>
@@ -1178,48 +1178,37 @@
         });
 
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // --- 1. АНИМАЦИЯ ABOUT ME (ВЫЕЗД) ---
+    // Чиним выезд About Me
     const aboutSection = document.querySelector('#about-me');
     if (aboutSection) {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    aboutSection.classList.add('is-revealed');
-                }
+                if (entry.isIntersecting) aboutSection.classList.add('is-revealed');
             });
         }, { threshold: 0.3 });
         observer.observe(aboutSection);
     }
 
-    // --- 2. ПОДСВЕТКА МОДУЛЕЙ (МОБИЛКА) ---
-    const highlightModulesOnScroll = () => {
+    // Подсветка как на ПК
+    const mobileGlow = () => {
         if (window.innerWidth > 768) return;
-
         const modules = document.querySelectorAll('.module');
-        const triggerLine = window.innerHeight / 2;
+        const center = window.innerHeight / 2;
 
-        // Используем requestAnimationFrame для супер-плавности на iPhone/Android
-        window.requestAnimationFrame(() => {
-            modules.forEach(mod => {
-                const box = mod.getBoundingClientRect();
-                const boxCenter = box.top + (box.height / 2);
+        modules.forEach(m => {
+            const rect = m.getBoundingClientRect();
+            const mCenter = rect.top + rect.height / 2;
 
-                // Зона срабатывания увеличена до 180px для отзывчивости
-                if (Math.abs(boxCenter - triggerLine) < 180) {
-                    if (!mod.classList.contains('active-package')) {
-                        modules.forEach(m => m.classList.remove('active-package'));
-                        mod.classList.add('active-package');
-                    }
-                }
-            });
+            if (Math.abs(mCenter - center) < 150) {
+                modules.forEach(el => el.classList.remove('active-package'));
+                m.classList.add('active-package');
+            }
         });
     };
 
-    // Слушатели событий
-    window.addEventListener('scroll', highlightModulesOnScroll, { passive: true });
-    window.addEventListener('touchmove', highlightModulesOnScroll, { passive: true });
-    window.addEventListener('load', highlightModulesOnScroll);
+    window.addEventListener('scroll', mobileGlow);
+    window.addEventListener('load', mobileGlow);
+    
 });
 
 </script>
