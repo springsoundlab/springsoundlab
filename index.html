@@ -401,22 +401,25 @@
 
         /* Базовый слой блика */
        /* Обновленный приглушенный блик */
+        /* Экстремально мягкий и реалистичный блик */
         .flare-layer {
             position: absolute;
             top: -150%;
             left: -150%;
-            width: 45%; /* Сделали полоску чуть уже */
+            width: 30%; /* Сделали его еще тоньше */
             height: 400%;
+            /* Градиент теперь едва заметен, основной акцент на центре */
             background: linear-gradient(
                 to right, 
                 rgba(255, 255, 255, 0) 0%, 
-                rgba(255, 255, 255, 0.05) 30%, /* Было 0.2, стало 0.05 */
-                rgba(255, 255, 255, 0.15) 50%, /* Было 0.6, стало 0.15 */
-                rgba(255, 255, 255, 0.05) 70%, /* Было 0.2, стало 0.05 */
+                rgba(255, 255, 255, 0.02) 40%, 
+                rgba(255, 255, 255, 0.08) 50%, 
+                rgba(255, 255, 255, 0.02) 60%, 
                 rgba(255, 255, 255, 0) 100%
             );
             pointer-events: none;
             z-index: 10;
+            filter: blur(15px); /* Добавляем сильное размытие для мягкости */
         }
 
         .audio-card {
@@ -950,26 +953,30 @@ function seek(e, id) {
     card.appendChild(flare);
 
     card.addEventListener('mouseenter', () => {
-        const angle = Math.floor(Math.random() * 30) + 15;
-        const duration = (Math.random() * 0.6 + 0.6).toFixed(2); // Чуть замедлили пролет
+        // Угол теперь почти одинаковый (25-30 град), чтобы не было хаоса
+        const angle = Math.floor(Math.random() * 10) + 25; 
         
-        // Уменьшили диапазон яркости: теперь от 0.05 до 0.2 (очень деликатно)
-        const opacity = (Math.random() * 0.15 + 0.05).toFixed(2); 
+        // Медленная, благородная скорость (от 1.2 до 1.8 секунды)
+        const duration = (Math.random() * 0.6 + 1.2).toFixed(2);
         
-        const hue = Math.random() > 0.5 ? '200, 230, 255' : '255, 255, 255';
+        // Яркость теперь на грани видимости (от 0.03 до 0.07)
+        const opacity = (Math.random() * 0.04 + 0.03).toFixed(3); 
+        
+        // Используем только мягкие оттенки
+        const hue = '230, 240, 255'; 
 
         flare.style.transition = 'none';
         flare.style.left = '-150%';
         flare.style.transform = `rotate(${angle}deg)`;
         
-        // Применяем обновленный мягкий градиент
         flare.style.background = `linear-gradient(to right, 
             rgba(${hue}, 0) 0%, 
             rgba(${hue}, ${opacity}) 50%, 
             rgba(${hue}, 0) 100%)`;
 
         requestAnimationFrame(() => {
-            flare.style.transition = `left ${duration}s ease-in-out`;
+            // Используем плавный выезд и затухание (ease-in-out)
+            flare.style.transition = `left ${duration}s cubic-bezier(0.4, 0, 0.2, 1)`;
             flare.style.left = '150%';
         });
     });
