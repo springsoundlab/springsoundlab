@@ -626,8 +626,60 @@
     transition: left 0.7s ease-in-out, top 0.7s ease-in-out;
 }
 /* Конец вставки */
+/* ОБЩИЙ СТИЛЬ БЛИКА ДЛЯ ИКОНОК И ТЕЛЕФОНА */
+.social-btn, .phone-box-container {
+    position: relative;
+    overflow: hidden;
+}
 
-</style>
+.social-btn::after, .phone-box-container::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -150%;
+    width: 60%;
+    height: 200%;
+    background: linear-gradient(
+        to right, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.4) 50%, 
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* АНИМАЦИЯ ПРОЛЕТА */
+@keyframes startGlare {
+    0% { left: -150%; opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { left: 150%; opacity: 0; }
+}
+
+/* ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ (ПО ОЧЕРЕДИ) */
+/* Первая иконка */
+.header-socials .social-btn:nth-child(1)::after {
+    animation: startGlare 0.8s ease-in-out 3.2s forwards;
+}
+/* Вторая иконка */
+.header-socials .social-btn:nth-child(2)::after {
+    animation: startGlare 0.8s ease-in-out 3.4s forwards;
+}
+/* Третья иконка */
+.header-socials .social-btn:nth-child(3)::after {
+    animation: startGlare 0.8s ease-in-out 3.6s forwards;
+}
+/* Четвертая иконка */
+.header-socials .social-btn:nth-child(4)::after {
+    animation: startGlare 0.8s ease-in-out 3.8s forwards;
+}
+
+/* ТЕЛЕФОН (Блик появляется последним) */
+.phone-box-container::after {
+    animation: startGlare 1s ease-in-out 4.2s forwards;
+}
     </style>
 </head>
 <body>
