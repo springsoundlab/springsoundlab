@@ -626,7 +626,131 @@
     transition: left 0.7s ease-in-out, top 0.7s ease-in-out;
 }
 /* Конец вставки */
+/* ==========================================
+   НОВЫЙ БЛОК: ABOUT ME (FADER REVEAL)
+   ========================================== */
+#about-me {
+    padding: 120px 0;
+    position: relative;
+    overflow: hidden; /* Важно для анимации выезда текста */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* Чтобы было пространство для скролла */
+}
 
+.about-container {
+    display: flex;
+    align-items: flex-end; /* Фейдер будет прижат к низу */
+    gap: 40px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    perspective: 1000px; /* Для 3D-эффекта */
+}
+
+/* Фейдер: основная дорожка */
+.fader-track {
+    width: 40px;
+    height: 300px; /* Изначальная высота фейдера */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Чтобы ручка была внизу изначально */
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Ручка фейдера */
+.fader-handle {
+    width: 60px;
+    height: 40px;
+    background: #0d0d0d;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: absolute;
+    bottom: 5px; /* Изначально внизу */
+    cursor: grab;
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    transform: translateY(0); /* Изначальное положение */
+}
+
+/* Неоновый след (LED-шкала) */
+.fader-led-scale {
+    position: absolute;
+    bottom: 5px; /* Совпадает с нижней частью ручки */
+    width: 4px;
+    height: 0%; /* Изначально нулевая высота */
+    background: var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue), 0 0 5px var(--neon-blue);
+    transition: height 0.8s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease;
+    opacity: 0;
+}
+
+/* ОБЛАСТЬ С КОНТЕНТОМ */
+.about-content-wrapper {
+    flex-grow: 1;
+    position: relative;
+    min-height: 300px; /* Чтобы содержимое не было слишком маленьким */
+    overflow: hidden; /* Скрываем текст до появления */
+}
+
+.about-content-blur {
+    background: rgba(0, 0, 0, 0.4); /* Полупрозрачный фон для блюра */
+    backdrop-filter: blur(0px); /* Изначально без блюра */
+    -webkit-backdrop-filter: blur(0px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 30px;
+    opacity: 0; /* Скрыт изначально */
+    transform: translateX(-100%); /* Скрыт за левой границей */
+    transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1), backdrop-filter 0.8s ease;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.about-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: 8px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px var(--soft-glow);
+}
+
+.about-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 15px;
+}
+.about-text:last-child { margin-bottom: 0; }
+
+/* ==========================================
+   АНИМАЦИЯ ПОЯВЛЕНИЯ ПРИ СКРОЛЛЕ (JS будет добавлять класс .is-revealed)
+   ========================================== */
+#about-me.is-revealed .fader-handle {
+    transform: translateY(-80%); /* Ручка поднимается */
+}
+
+#about-me.is-revealed .fader-led-scale {
+    height: 80%; /* Неоновый след поднимается вместе с ручкой */
+    opacity: 1;
+}
+
+#about-me.is-revealed .about-content-blur {
+    opacity: 1;
+    transform: translateX(0); /* Текст выезжает */
+    backdrop-filter: blur(5px); /* Блюр появляется */
+    -webkit-backdrop-filter: blur(5px);
+}
     </style>
 </head>
 <body>
