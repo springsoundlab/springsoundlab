@@ -1514,311 +1514,96 @@
 </footer>
 
 <script>
-    /* ==========================================
-        JS LOGIC: SCROLL EFFECTS & VISIBILITY
-        ========================================== */
-    const header = document.getElementById('main-header');
-    const artistTrigger = document.querySelector('.js-artist-trigger');
-    const socialIcons = document.querySelectorAll('.social-btn');
-    const socialContainer = document.getElementById('social-container');
-    const allGlowElements = document.querySelectorAll('.js-scroll-glow');
-    const isMobile = window.innerWidth < 1025;
-
-    // Настройки для Intersection Observer (для мобильной подсветки)
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. УНИВЕРСАЛЬНЫЙ НАБЛЮДАТЕЛЬ (Intersection Observer)
+    // Этот блок отвечает за все появления при скролле (и About, и пакеты услуг)
     const observerOptions = {
-        root: null,
-        rootMargin: '-45% 0px -45% 0px',
-        threshold: 0
+        threshold: 0.15 // Элемент появится, когда 15% его площади будет в кадре
     };
 
-    // 1. ЛОГИКА АКТИВНОЙ КАРТОЧКИ (ТОЛЬКО МОБИЛЬНЫЕ)
-    if (isMobile) {
-        const scrollObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Добавляем класс активности самому блоку
+                entry.target.classList.add('is-active');
+                
+                // Если это модуль услуги или карточка портфолио, подсвечиваем их
+                if (entry.target.classList.contains('module') || 
+                    entry.target.classList.contains('audio-card') || 
+                    entry.target.classList.contains('contact-card')) {
                     entry.target.classList.add('active-scroll');
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Указываем, за какими элементами следить (Убрали всё лишнее, оставили только нужное)
+    const elementsToWatch = document.querySelectorAll('section, .module, .audio-card, .contact-card, .mixer-fader-track');
+    elementsToWatch.forEach(el => scrollObserver.observe(el));
+
+
+    // 2. ЛОГИКА КАСТОМНЫХ ПЛЕЕРОВ
+    // Оставляем только если ты используешь черные плееры с прогресс-баром
+    const players = document.querySelectorAll('.custom-audio-player');
+    
+    players.forEach(player => {
+        const audio = player.querySelector('audio');
+        const playBtn = player.querySelector('.play-btn');
+        const progressBar = player.querySelector('.progress-bar');
+        const progressContainer = player.querySelector('.progress-container');
+
+        if (playBtn && audio) {
+            // Кнопка Play/Pause
+            playBtn.addEventListener('click', () => {
+                // Останавливаем другие плееры перед запуском этого
+                document.querySelectorAll('audio').forEach(otherAudio => {
+                    if (otherAudio !== audio) {
+                        otherAudio.pause();
+                        const otherBtn = otherAudio.closest('.custom-audio-player')?.querySelector('.play-btn');
+                        if (otherBtn) otherBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                });
+
+                if (audio.paused) {
+                    audio.play();
+                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
                 } else {
-                    entry.target.classList.remove('active-scroll');
+                    audio.pause();
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
                 }
             });
-        }, observerOptions);
 
-        allGlowElements.forEach(el => scrollObserver.observe(el));
-    }
+            // Обновление полоски прогресса
+            audio.addEventListener('timeupdate', () => {
+                const progress = (audio.currentTime / audio.duration) * 100;
+                if (progressBar) progressBar.style.width = `${progress}%`;
+            });
 
-    // 2. СКРЫТИЕ ШАПКИ ПРИ СКРОЛЛЕ ДО ARTIST EDITION
-    window.addEventListener('scroll', () => {
-        if (artistTrigger) {
-            const rect = artistTrigger.getBoundingClientRect();
-            if (rect.top <= 100) {
-                header.classList.add('header-hidden');
-            } else {
-                header.classList.remove('header-hidden');
+            // Перемотка при клике на полоску
+            if (progressContainer) {
+                progressContainer.addEventListener('click', (e) => {
+                    const width = progressContainer.clientWidth;
+                    const clickX = e.offsetX;
+                    const duration = audio.duration;
+                    audio.currentTime = (clickX / width) * duration;
+                });
             }
         }
     });
 
-    // 3. ПОСЛЕДОВАТЕЛЬНАЯ ПОДСВЕТКА СОЦСЕТЕЙ
-    function activateSocials() {
-        socialIcons.forEach((icon, index) => {
-            setTimeout(() => {
-                icon.classList.add('activated');
-                setTimeout(() => {
-                    icon.classList.remove('activated');
-                }, 800);
-            }, 3000 + (index * 250));
-        });
-    }
-
-    // Запуск цикла анимации соцсетей
-    activateSocials();
-    setInterval(activateSocials, 8000);
-</script>
-<script>
-// Основная логика переключения треков
-function togglePlay(id) {
-    const audio = document.getElementById('audio' + id);
-    const playBtn = document.getElementById('play' + id);
-
-    // --- МАГИЯ: ОСТАНОВКА ОСТАЛЬНЫХ ТРЕКОВ ---
-    if (audio.paused) {
-        // Находим все аудио-элементы на странице
-        document.querySelectorAll('audio').forEach(otherAudio => {
-            if (otherAudio !== audio) {
-                otherAudio.pause(); // Останавливаем
-                otherAudio.currentTime = 0; // Сбрасываем в начало (по желанию)
-                
-                // Сбрасываем иконки у других кнопок на "Play"
-                const otherId = otherAudio.id.replace('audio', '');
-                const otherBtn = document.getElementById('play' + otherId);
-                if (otherBtn) {
-                    otherBtn.innerHTML = '▶'; // Или твоя иконка Play
-                }
+    // 3. ПЛАВНЫЙ СКРОЛЛ ДЛЯ ССЫЛОК (Optional)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
             }
         });
-
-        // Теперь запускаем текущий
-        audio.play();
-        playBtn.innerHTML = '⏸'; // Иконка паузы
-    } else {
-        audio.pause();
-        playBtn.innerHTML = '▶';
-    }
-}
-
-// Функции обновления прогресса и перемотки остаются без изменений
-function upd(id) {
-    const audio = document.getElementById(id);
-    const bar = document.getElementById('bar-' + id);
-    const time = document.getElementById('time-' + id);
-    if(audio.duration) {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        bar.style.width = pct + '%';
-        let m = Math.floor(audio.currentTime / 60);
-        let s = Math.floor(audio.currentTime % 60);
-        time.innerText = m + ':' + (s < 10 ? '0' : '') + s;
-    }
-}
-
-function seek(e, id) {
-    const audio = document.getElementById(id);
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-}
-    document.querySelectorAll('.audio-card').forEach(card => {
-    // Создаем элемент блика внутри каждой карточки
-    const flare = document.createElement('div');
-    flare.className = 'flare-layer';
-    card.appendChild(flare);
-
-    card.addEventListener('mouseenter', () => {
-        // Угол теперь почти одинаковый (25-30 град), чтобы не было хаоса
-        const angle = Math.floor(Math.random() * 10) + 25; 
-        
-        // Медленная, благородная скорость (от 1.2 до 1.8 секунды)
-        const duration = (Math.random() * 0.6 + 1.2).toFixed(2);
-        
-        // Яркость теперь на грани видимости (от 0.03 до 0.07)
-        const opacity = (Math.random() * 0.04 + 0.03).toFixed(3); 
-        
-        // Используем только мягкие оттенки
-        const hue = '230, 240, 255'; 
-
-        flare.style.transition = 'none';
-        flare.style.left = '-150%';
-        flare.style.transform = `rotate(${angle}deg)`;
-        
-        flare.style.background = `linear-gradient(to right, 
-            rgba(${hue}, 0) 0%, 
-            rgba(${hue}, ${opacity}) 50%, 
-            rgba(${hue}, 0) 100%)`;
-
-        requestAnimationFrame(() => {
-            // Используем плавный выезд и затухание (ease-in-out)
-            flare.style.transition = `left ${duration}s cubic-bezier(0.4, 0, 0.2, 1)`;
-            flare.style.left = '150%';
-        });
-    });
-
-    // Сбрасываем позицию, когда мышь уходит, чтобы быть готовым к новому "выстрелу"
-    card.addEventListener('mouseleave', () => {
-        flare.style.transition = 'none';
-        flare.style.left = '-150%';
     });
 });
- document.querySelectorAll('.audio-card').forEach(card => {
-    // Создаем строго один слой блика
-    let flare = card.querySelector('.flare-layer');
-    if (!flare) {
-        flare = document.createElement('div');
-        flare.className = 'flare-layer';
-        card.appendChild(flare);
-    }
-
-    card.addEventListener('mouseenter', () => {
-        // Сброс в начальную точку (левый верхний угол)
-        flare.style.transition = 'none';
-        flare.style.opacity = '1';
-        flare.style.left = '-150%';
-        flare.style.top = '-150%';
-
-        // Запуск анимации
-        requestAnimationFrame(() => {
-            // Время пролета 1.5 секунды для солидности
-            // cubic-bezier(0.23, 1, 0.32, 1) — это быстрый вход и медленный финиш
-            flare.style.transition = 'left 1.5s cubic-bezier(0.23, 1, 0.32, 1), top 1.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 1.5s ease-out';
-            
-            // Уходит в правый нижний угол
-            flare.style.left = '150%';
-            flare.style.top = '150%';
-            
-            // В конце пути он должен полностью исчезнуть
-            setTimeout(() => {
-                flare.style.opacity = '0';
-            }, 1000); // Начинает исчезать чуть раньше, чем долетит
-        });
-    });
-
-    card.addEventListener('mouseleave', () => {
-        // Мягко гасим, если мышь ушла раньше времени
-        flare.style.opacity = '0';
-    });
-});
-    // ГЛОБАЛЬНЫЙ КОНТРОЛЛЕР ЗВУКА
-document.addEventListener('play', function(e) {
-    // Находим все аудио-элементы на странице
-    const allAudios = document.getElementsByTagName('audio');
-    
-    for (let i = 0; i < allAudios.length; i++) {
-        // Если это не тот файл, который только что включили — выключаем его
-        if (allAudios[i] !== e.target) {
-            allAudios[i].pause();
-            // Опционально: allAudios[i].currentTime = 0; // Сброс в начало
-        }
-    }
-    
-    // Синхронизируем кнопки (чтобы на других плеерах сменился значок на Play)
-    document.querySelectorAll('.play-btn').forEach(btn => {
-        // Если кнопка не относится к текущему играющему треку, ставим ей значок Play
-        // Здесь важно, чтобы у твоих кнопок был класс .play-btn или похожий
-        if (btn.getAttribute('onclick') && !btn.getAttribute('onclick').includes(e.target.id.replace('audio', ''))) {
-            btn.innerHTML = '▶'; 
-        }
-    });
-}, true);
-    const aboutObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-        }
-    });
-}, { threshold: 0.3 }); // Сработает, когда 30% блока в кадре
-
-const wrapper = document.querySelector('.about-wrapper');
-if (wrapper) {
-    aboutObserver.observe(wrapper);
-}
-// Скрипт для фейдера WEYTON
-const faderObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('is-active');
-        }
-    });
-}, { threshold: 0.2 });
-
-const aboutSection = document.querySelector('.about-section');
-if (aboutSection) {
-    faderObserver.observe(aboutSection);
-}
-    // Скрипт для микшера WEYTON
-const faderObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('is-active');
-        }
-    });
-}, { threshold: 0.4 });
-
-const aboutSection = document.querySelector('.about-section');
-if (aboutSection) {
-    faderObserver.observe(aboutSection);
-}
-    const faderObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            // Добавляем класс active, который запускает всю анимацию в CSS
-            entry.target.classList.add('active');
-        }
-    });
-}, { threshold: 0.5 }); // Сработает, когда блок покажется наполовину
-
-const faderWrap = document.querySelector('.about-fader-wrap');
-if (faderWrap) {
-    faderObserver.observe(faderWrap);
-}
-    // Улучшенный запуск фейдера
-const runFader = () => {
-    const fader = document.querySelector('.about-fader-wrap');
-    if (!fader) return;
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                console.log('Fader activated!'); // Проверка в консоли
-            }
-        });
-    }, { threshold: 0.1 }); // Сработает даже если чуть-чуть показался край
-
-    observer.observe(fader);
-};
-
-// Запускаем после загрузки всей страницы
-window.addEventListener('DOMContentLoaded', runFader);
-// СКРИПТ ЗАПУСКА МИКШЕРА
-const launchMixer = () => {
-    const section = document.getElementById('mixerSection');
-    if (!section) return;
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-            }
-        });
-    }, { threshold: 0.2 });
-
-    observer.observe(section);
-};
-
-// Запуск после загрузки страницы
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', launchMixer);
-} else {
-    launchMixer();
-}
 </script>
 </body>
 </html>
