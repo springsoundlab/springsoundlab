@@ -914,5 +914,55 @@ function seek(e, id) {
 }
     
 </script>
+// Находим все карточки аудио
+const audioCards = document.querySelectorAll('.audio-card');
+
+audioCards.forEach(currentCard => {
+    const audio = currentCard.querySelector('audio');
+    const playBtn = currentCard.querySelector('.play-btn');
+    const icon = playBtn.querySelector('i');
+    const progressBar = currentCard.querySelector('.progress-bar');
+
+    playBtn.addEventListener('click', () => {
+        // ПРОВЕРКА: Если этот трек уже играет — просто ставим на паузу
+        if (!audio.paused) {
+            audio.pause();
+            icon.classList.replace('fa-pause', 'fa-play');
+        } else {
+            // ЛОГИКА СБРОСА ВСЕХ ОСТАЛЬНЫХ ТРЕКОВ
+            document.querySelectorAll('audio').forEach(otherAudio => {
+                if (otherAudio !== audio) {
+                    otherAudio.pause(); // Останавливаем
+                    otherAudio.currentTime = 0; // Сбрасываем на 0:00
+                    
+                    // Обновляем иконки у других кнопок на "Play"
+                    const otherBtnIcon = otherAudio.closest('.audio-card').querySelector('.play-btn i');
+                    otherBtnIcon.classList.replace('fa-pause', 'fa-play');
+                    
+                    // Сбрасываем визуальный прогресс-бар у других треков
+                    const otherBar = otherAudio.closest('.audio-card').querySelector('.progress-bar');
+                    if (otherBar) otherBar.style.width = '0%';
+                }
+            });
+
+            // Запускаем текущий трек
+            audio.play();
+            icon.classList.replace('fa-play', 'fa-pause');
+        }
+    });
+
+    // Обновление прогресс-бара при проигрывании
+    audio.addEventListener('timeupdate', () => {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        if (progressBar) progressBar.style.width = percent + '%';
+    });
+
+    // Когда трек доиграл до конца — сбрасываем иконку
+    audio.addEventListener('ended', () => {
+        icon.classList.replace('fa-pause', 'fa-play');
+        audio.currentTime = 0;
+        if (progressBar) progressBar.style.width = '0%';
+    });
+});
 </body>
 </html>
