@@ -394,33 +394,30 @@
             width: 100%;
         }
 
-        .audio-card {
-            position: relative;
-            overflow: hidden;
+        /* 1. Убедись, что сам плеер готов принимать блики */
+.audio-card {
+    position: relative; /* Обязательно */
+    overflow: hidden;    /* Чтобы блик не вылетал за края */
+    /* ... остальные твои стили (background, padding и т.д.) ... */
         }
 
         /* Базовый слой блика */
        /* Обновленный приглушенный блик */
         /* Экстремально мягкий и реалистичный блик */
-        .flare-layer {
-            position: absolute;
-            top: -150%;
-            left: -150%;
-            width: 30%; /* Сделали его еще тоньше */
-            height: 400%;
-            /* Градиент теперь едва заметен, основной акцент на центре */
-            background: linear-gradient(
-                to right, 
-                rgba(255, 255, 255, 0) 0%, 
-                rgba(255, 255, 255, 0.02) 40%, 
-                rgba(255, 255, 255, 0.08) 50%, 
-                rgba(255, 255, 255, 0.02) 60%, 
-                rgba(255, 255, 255, 0) 100%
-            );
-            pointer-events: none;
-            z-index: 10;
-            filter: blur(15px); /* Добавляем сильное размытие для мягкости */
-        }
+        /* 2. Добавь этот блок сразу после .audio-card */
+.flare-layer {
+    position: absolute;
+    top: -150%;
+    left: -150%;
+    width: 30%;
+    height: 400%;
+    pointer-events: none;
+    z-index: 10;
+    /* Тот самый реалистичный блюр */
+    filter: blur(15px); 
+    /* Начальный фон (прозрачный) */
+    background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,0.05), rgba(255,255,255,0));
+         }
 
         .audio-card {
             background: rgba(255, 255, 255, 0.03); /* Почти прозрачный фон */
@@ -985,6 +982,58 @@ function seek(e, id) {
     card.addEventListener('mouseleave', () => {
         flare.style.transition = 'none';
         flare.style.left = '-150%';
+    });
+});
+    // Логика 20+ рандомных реалистичных бликов
+document.querySelectorAll('.audio-card').forEach(card => {
+    // Создаем слой блика, если его еще нет
+    let flare = card.querySelector('.flare-layer');
+    if (!flare) {
+        flare = document.createElement('div');
+        flare.className = 'flare-layer';
+        card.appendChild(flare);
+    }
+
+    card.addEventListener('mouseenter', () => {
+        // --- ПАРАМЕТРЫ РАНДОМА ---
+        const angle = Math.floor(Math.random() * 45) + 15; // Угол
+        const width = Math.floor(Math.random() * 35) + 15; // Ширина
+        const duration = (Math.random() * 1.2 + 0.8).toFixed(2); // Скорость (медленно/средне)
+        const opacity = (Math.random() * 0.05 + 0.02).toFixed(3); // Прозрачность (ультра-бледно)
+        
+        // Рандомный характер движения (плавность)
+        const easings = [
+            'cubic-bezier(0.4, 0, 0.2, 1)', 
+            'cubic-bezier(0.25, 0.1, 0.25, 1)', 
+            'cubic-bezier(0.15, 0.85, 0.85, 0.15)'
+        ];
+        const easing = easings[Math.floor(Math.random() * easings.length)];
+
+        // Сброс и применение новых случайных настроек
+        flare.style.transition = 'none';
+        flare.style.left = '-150%';
+        flare.style.width = `${width}%`;
+        flare.style.transform = `rotate(${angle}deg)`;
+        
+        const hue = '255, 255, 255'; // Чистый белый свет
+        flare.style.background = `linear-gradient(to right, 
+            rgba(${hue}, 0) 0%, 
+            rgba(${hue}, ${opacity}) 50%, 
+            rgba(${hue}, 0) 100%)`;
+
+        // Запуск анимации
+        setTimeout(() => {
+            flare.style.transition = `left ${duration}s ${easing}`;
+            flare.style.left = '180%';
+        }, 20);
+    });
+
+    card.addEventListener('mouseleave', () => {
+        // Подготовка к следующему разу без рывков
+        setTimeout(() => {
+            flare.style.transition = 'none';
+            flare.style.left = '-150%';
+        }, 500);
     });
 });
 </script>
