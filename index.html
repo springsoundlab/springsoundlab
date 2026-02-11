@@ -633,7 +633,7 @@
    ОБНОВЛЕННЫЙ ABOUT ME: РЕАЛИСТИЧНЫЙ ФЕЙДЕР
    ========================================== */
 /* ==========================================
-   ФИНАЛЬНЫЙ ABOUT ME: ВЫЕЗД ИЗ ФЕЙДЕРА ВПРАВО
+   FINAL ABOUT ME: РАЗВОРАЧИВАЮЩАЯСЯ ЛИНИЯ
    ========================================== */
 #about-me {
     padding: 150px 0;
@@ -647,13 +647,12 @@
 .about-container {
     display: flex;
     align-items: center; 
-    gap: 0; /* Убираем отступ, чтобы текст выезжал вплотную от линии */
+    gap: 0;
     max-width: 1200px;
     width: 100%;
     padding: 0 40px;
 }
 
-/* Дорожка фейдера */
 .fader-track {
     width: 12px;
     height: 400px;
@@ -664,11 +663,10 @@
     box-shadow: inset 2px 2px 5px rgba(0,0,0,0.8);
     display: flex;
     justify-content: center;
-    flex-shrink: 0; /* Чтобы фейдер не сжимался */
+    flex-shrink: 0;
     z-index: 20;
 }
 
-/* Неоновый след */
 .fader-led-scale {
     position: absolute;
     bottom: 0;
@@ -681,7 +679,6 @@
     z-index: 1;
 }
 
-/* Ручка фейдера */
 .fader-handle {
     width: 50px;
     height: 80px;
@@ -707,29 +704,43 @@
     box-shadow: 0 0 10px var(--neon-blue);
 }
 
-/* КОНТЕЙНЕР ДЛЯ ВЫЕЗДА ТЕКСТА */
 .about-content-wrapper {
-    overflow: hidden; /* Обрезаем текст, пока он "внутри" фейдера */
+    overflow: hidden;
     display: flex;
     align-items: center;
+    position: relative;
 }
 
 .about-content-blur {
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(0px); /* Изначально 0 */
+    backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
-    border-left: 2px solid var(--neon-blue);
+    /* Убрали левую границу, теперь будет только ПРАВАЯ выезжающая */
+    border-left: none; 
     padding: 40px;
     opacity: 0;
-    /* Текст полностью спрятан за фейдером слева */
     transform: translateX(-100%); 
-    /* Плавное появление: чуть быстрее фейдера, чтобы была динамика */
     transition: transform 2.2s cubic-bezier(0.4, 0, 0.2, 1), 
                 opacity 2s ease, 
                 backdrop-filter 2.5s ease;
+    position: relative;
 }
 
-/* АКТИВАЦИЯ ПО СКРОЛЛУ */
+/* ТА САМАЯ ВЫЕЗЖАЮЩАЯ СИНЯЯ ПОЛОСКА (Правая грань) */
+.about-content-blur::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue), 0 0 5px #fff;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* АКТИВАЦИЯ */
 #about-me.is-revealed .fader-handle {
     bottom: 320px; 
 }
@@ -741,9 +752,13 @@
 
 #about-me.is-revealed .about-content-blur {
     opacity: 1;
-    transform: translateX(0); /* Выезжает вправо в нормальное положение */
-    backdrop-filter: blur(4px); /* Уменьшенный блюр, как ты просил */
+    transform: translateX(0);
+    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+}
+
+#about-me.is-revealed .about-content-blur::after {
+    opacity: 1; /* Полоска проявляется при выезде */
 }
     </style>
 </head>
@@ -1004,25 +1019,19 @@
             if (icon) icon.className = 'fas fa-play';
             this.currentTime = 0;
         });
-    });
- document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const aboutSection = document.getElementById('about-me');
-
     if (aboutSection) {
-        const observerOptions = {
-            root: null,
-            threshold: 0.8 // 80% блока должно быть на экране для активации
-        };
-
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-revealed');
-                    // observer.unobserve(entry.target); // Удали эту строку, если хочешь, чтобы анимация повторялась
                 }
             });
-        }, observerOptions);
-
+        }, { 
+            // 0.4 — анимация начнется раньше (когда 40% блока в зоне видимости)
+            threshold: 0.4 
+        });
         observer.observe(aboutSection);
     }
 });
