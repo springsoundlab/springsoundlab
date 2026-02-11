@@ -797,171 +797,71 @@
     </section>
 </div>
 
-<footer>
-    WEYTON // SPRING SOUND LAB &copy; 2026 // NO UP IN LOGO
-</footer>
-
 <script>
-    /* ==========================================
-        JS LOGIC: SCROLL EFFECTS & VISIBILITY
-        ========================================== */
-    const header = document.getElementById('main-header');
-    const artistTrigger = document.querySelector('.js-artist-trigger');
-    const socialIcons = document.querySelectorAll('.social-btn');
-    const socialContainer = document.getElementById('social-container');
-    const allGlowElements = document.querySelectorAll('.js-scroll-glow');
-    const isMobile = window.innerWidth < 1025;
-
-    // Настройки для Intersection Observer (для мобильной подсветки)
-    const observerOptions = {
-        root: null,
-        rootMargin: '-45% 0px -45% 0px',
-        threshold: 0
-    };
-
-    // 1. ЛОГИКА АКТИВНОЙ КАРТОЧКИ (ТОЛЬКО МОБИЛЬНЫЕ)
-    if (isMobile) {
-        const scrollObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active-scroll');
-                } else {
-                    entry.target.classList.remove('active-scroll');
-                }
-            });
-        }, observerOptions);
-
-        allGlowElements.forEach(el => scrollObserver.observe(el));
-    }
-
-    // 2. СКРЫТИЕ ШАПКИ ПРИ СКРОЛЛЕ ДО ARTIST EDITION
-    window.addEventListener('scroll', () => {
-        if (artistTrigger) {
-            const rect = artistTrigger.getBoundingClientRect();
-            if (rect.top <= 100) {
-                header.classList.add('header-hidden');
-            } else {
-                header.classList.remove('header-hidden');
-            }
-        }
-    });
-
-    // 3. ПОСЛЕДОВАТЕЛЬНАЯ ПОДСВЕТКА СОЦСЕТЕЙ
-    function activateSocials() {
-        socialIcons.forEach((icon, index) => {
-            setTimeout(() => {
-                icon.classList.add('activated');
-                setTimeout(() => {
-                    icon.classList.remove('activated');
-                }, 800);
-            }, 3000 + (index * 250));
-        });
-    }
-
-    // Запуск цикла анимации соцсетей
-    activateSocials();
-    setInterval(activateSocials, 8000);
-</script>
-<script>
-function togglePlay(btn, id) {
-    const audio = document.getElementById(id);
-    const icon = btn.querySelector('i');
+    // 1. Находим все аудио-элементы на странице
+    const allAudio = document.querySelectorAll('audio');
     
-    // МАГИЯ: Останавливаем все остальные плееры перед запуском текущего
-    document.querySelectorAll('audio').forEach(otherAudio => {
-        if (otherAudio.id !== id) {
-            otherAudio.pause();
-            // Находим иконку в соседней кнопке и возвращаем ей вид "Play"
-            const otherBtnIcon = otherAudio.parentElement.querySelector('.play-btn i');
-            if (otherBtnIcon) {
-                otherBtnIcon.classList.remove('fa-pause');
-                otherBtnIcon.classList.add('fa-play');
+    // 2. Находим все кнопки воспроизведения
+    const allPlayButtons = document.querySelectorAll('.play-btn');
+
+    allPlayButtons.forEach((btn, index) => {
+        btn.addEventListener('click', function() {
+            const currentAudio = this.closest('.audio-card').querySelector('audio');
+            const currentIcon = this.querySelector('i');
+            const currentBar = this.closest('.audio-card').querySelector('.progress-bar');
+
+            // Если нажат трек, который уже ИГРАЕТ — ставим на паузу
+            if (!currentAudio.paused) {
+                currentAudio.pause();
+                currentIcon.classList.replace('fa-pause', 'fa-play');
+            } 
+            // Если нажат трек, который МОЛЧИТ
+            else {
+                // ОСТАНАВЛИВАЕМ И СБРАСЫВАЕМ ВСЕ ОСТАЛЬНЫЕ ТРЕКИ
+                allAudio.forEach(audio => {
+                    if (audio !== currentAudio) {
+                        audio.pause();
+                        audio.currentTime = 0; // Сброс на начало
+                        
+                        // Меняем иконки у других кнопок на "Play"
+                        const otherCard = audio.closest('.audio-card');
+                        if (otherCard) {
+                            const otherIcon = otherCard.querySelector('.play-btn i');
+                            const otherBar = otherCard.querySelector('.progress-bar');
+                            if (otherIcon) otherIcon.classList.replace('fa-pause', 'fa-play');
+                            if (otherBar) otherBar.style.width = '0%';
+                        }
+                    }
+                });
+
+                // ЗАПУСКАЕМ ТЕКУЩИЙ
+                currentAudio.play();
+                currentIcon.classList.replace('fa-play', 'fa-pause');
             }
-        }
+        });
     });
 
-    // Обычная логика Play/Pause для текущего трека
-    if (audio.paused) {
-        audio.play();
-        icon.classList.remove('fa-play');
-        icon.classList.add('fa-pause');
-    } else {
-        audio.pause();
-        icon.classList.remove('fa-pause');
-        icon.classList.add('fa-play');
-    }
-}
+    // Обновление прогресс-бара для каждого аудио
+    allAudio.forEach(audio => {
+        audio.addEventListener('timeupdate', () => {
+            const bar = audio.closest('.audio-card').querySelector('.progress-bar');
+            if (bar && audio.duration) {
+                const percent = (audio.currentTime / audio.duration) * 100;
+                bar.style.width = percent + '%';
+            }
+        });
 
-// Функции обновления прогресса и перемотки остаются без изменений
-function upd(id) {
-    const audio = document.getElementById(id);
-    const bar = document.getElementById('bar-' + id);
-    const time = document.getElementById('time-' + id);
-    if(audio.duration) {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        bar.style.width = pct + '%';
-        let m = Math.floor(audio.currentTime / 60);
-        let s = Math.floor(audio.currentTime % 60);
-        time.innerText = m + ':' + (s < 10 ? '0' : '') + s;
-    }
-}
-
-function seek(e, id) {
-    const audio = document.getElementById(id);
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-}
-    // Находим все карточки аудио
-const audioCards = document.querySelectorAll('.audio-card');
-
-audioCards.forEach(currentCard => {
-    const audio = currentCard.querySelector('audio');
-    const playBtn = currentCard.querySelector('.play-btn');
-    const icon = playBtn.querySelector('i');
-    const progressBar = currentCard.querySelector('.progress-bar');
-
-    playBtn.addEventListener('click', () => {
-        // ПРОВЕРКА: Если этот трек уже играет — просто ставим на паузу
-        if (!audio.paused) {
-            audio.pause();
+        // Сброс при окончании трека
+        audio.addEventListener('ended', () => {
+            const card = audio.closest('.audio-card');
+            const icon = card.querySelector('.play-btn i');
+            const bar = card.querySelector('.progress-bar');
             icon.classList.replace('fa-pause', 'fa-play');
-        } else {
-            // ЛОГИКА СБРОСА ВСЕХ ОСТАЛЬНЫХ ТРЕКОВ
-            document.querySelectorAll('audio').forEach(otherAudio => {
-                if (otherAudio !== audio) {
-                    otherAudio.pause(); // Останавливаем
-                    otherAudio.currentTime = 0; // Сбрасываем на 0:00
-                    
-                    // Обновляем иконки у других кнопок на "Play"
-                    const otherBtnIcon = otherAudio.closest('.audio-card').querySelector('.play-btn i');
-                    otherBtnIcon.classList.replace('fa-pause', 'fa-play');
-                    
-                    // Сбрасываем визуальный прогресс-бар у других треков
-                    const otherBar = otherAudio.closest('.audio-card').querySelector('.progress-bar');
-                    if (otherBar) otherBar.style.width = '0%';
-                }
-            });
-
-            // Запускаем текущий трек
-            audio.play();
-            icon.classList.replace('fa-play', 'fa-pause');
-        }
+            audio.currentTime = 0;
+            if (bar) bar.style.width = '0%';
+        });
     });
-
-    // Обновление прогресс-бара при проигрывании
-    audio.addEventListener('timeupdate', () => {
-        const percent = (audio.currentTime / audio.duration) * 100;
-        if (progressBar) progressBar.style.width = percent + '%';
-    });
-
-    // Когда трек доиграл до конца — сбрасываем иконку
-    audio.addEventListener('ended', () => {
-        icon.classList.replace('fa-pause', 'fa-play');
-        audio.currentTime = 0;
-        if (progressBar) progressBar.style.width = '0%';
-    });
-});
+</script>
 </script>
 </body>
 </html>
