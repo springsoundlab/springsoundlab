@@ -1351,17 +1351,18 @@
     </a>
 </header>
    
-<section class="about-mixer-area" id="mixerSection">
-    <div class="mixer-track">
-        <div class="mixer-glow-fill"></div>
-        <div class="mixer-handle"></div>
-    </div>
-
-    <div class="container">
-        <div class="mixer-text-reveal">
-            <h2 class="about-header">ABOUT <span style="color: #00f3ff;">ME</span></h2>
-            <div class="about-text-body">
-                <p>Привет! Меня зовут Александр. Я создаю уникальный звук под псевдонимом WEYTON. Моя работа — это баланс между технологиями и творчеством.</p>
+<section id="about" class="weyton-about-section">
+    <div class="weyton-about-container">
+        <div class="weyton-neon-line" id="aboutNeonLine"></div>
+        
+        <div class="weyton-about-reveal" id="aboutTextContent">
+            <h2 class="about-huge-title">PROJECT BY <span class="weyton-name">WEYTON</span></h2>
+            <div class="about-main-text">
+                <p>Добро пожаловать в <span class="accent-blue">SPRING SOUND LAB</span> — пространство, где звук превращается в искусство. Я — <span class="weyton-name">WEYTON</span>, и моя миссия — создавать звук, который заставляет сердца биться в такт.</p>
+                <p>Здесь высокие технологии встречаются с творческой интуицией. Каждая деталь, каждый герц и каждый децибел настраиваются вручную для достижения безупречного результата.</p>
+            </div>
+            <div class="about-skills">
+                <span>PRODUCTION</span> • <span>MIXING</span> • <span>MASTERING</span>
             </div>
         </div>
     </div>
@@ -1575,250 +1576,92 @@
     setInterval(activateSocials, 8000);
 </script>
 <script>
-// Основная логика переключения треков
-function togglePlay(id) {
-    const audio = document.getElementById('audio' + id);
-    const playBtn = document.getElementById('play' + id);
+document.addEventListener('DOMContentLoaded', () => {
 
-    // --- МАГИЯ: ОСТАНОВКА ОСТАЛЬНЫХ ТРЕКОВ ---
-    if (audio.paused) {
-        // Находим все аудио-элементы на странице
-        document.querySelectorAll('audio').forEach(otherAudio => {
-            if (otherAudio !== audio) {
-                otherAudio.pause(); // Останавливаем
-                otherAudio.currentTime = 0; // Сбрасываем в начало (по желанию)
-                
-                // Сбрасываем иконки у других кнопок на "Play"
-                const otherId = otherAudio.id.replace('audio', '');
-                const otherBtn = document.getElementById('play' + otherId);
-                if (otherBtn) {
-                    otherBtn.innerHTML = '▶'; // Или твоя иконка Play
+    // 1. АНИМАЦИЯ ДЛЯ ABOUT ME (Линия + Появление)
+    const initAboutAnimation = () => {
+        const aboutSection = document.querySelector('.weyton-about-section');
+        if (!aboutSection) return;
+
+        const handleScroll = () => {
+            const rect = aboutSection.getBoundingClientRect();
+            const screenCenter = window.innerHeight / 2;
+            const sectionCenter = rect.top + rect.height / 2;
+
+            // Активируем, когда центр блока доходит до центра экрана
+            if (sectionCenter <= screenCenter + 100) { 
+                aboutSection.classList.add('activated');
+                window.removeEventListener('scroll', handleScroll);
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+    };
+
+    // 2. ПОЯВЛЕНИЕ ПАКЕТОВ УСЛУГ И КАРТОЧЕК ПРИ СКРОЛЛЕ
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-active');
+                // Подсветка для твоих пакетов (модулей)
+                if (entry.target.classList.contains('module') || 
+                    entry.target.classList.contains('audio-card')) {
+                    entry.target.classList.add('active-scroll');
                 }
             }
         });
+    }, { threshold: 0.15 });
 
-        // Теперь запускаем текущий
-        audio.play();
-        playBtn.innerHTML = '⏸'; // Иконка паузы
-    } else {
-        audio.pause();
-        playBtn.innerHTML = '▶';
-    }
-}
+    // Следим за всеми важными блоками, кроме About (у него своя логика выше)
+    const elementsToWatch = document.querySelectorAll('section:not(.weyton-about-section), .module, .audio-card, .contact-card, .mixer-fader-track');
+    elementsToWatch.forEach(el => scrollObserver.observe(el));
 
-// Функции обновления прогресса и перемотки остаются без изменений
-function upd(id) {
-    const audio = document.getElementById(id);
-    const bar = document.getElementById('bar-' + id);
-    const time = document.getElementById('time-' + id);
-    if(audio.duration) {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        bar.style.width = pct + '%';
-        let m = Math.floor(audio.currentTime / 60);
-        let s = Math.floor(audio.currentTime % 60);
-        time.innerText = m + ':' + (s < 10 ? '0' : '') + s;
-    }
-}
+    // 3. РАБОТА АУДИОПЛЕЕРОВ (Запуск, Пауза, Прогресс)
+    const players = document.querySelectorAll('.custom-audio-player');
+    players.forEach(player => {
+        const audio = player.querySelector('audio');
+        const playBtn = player.querySelector('.play-btn');
+        const progressBar = player.querySelector('.progress-bar');
+        const progressContainer = player.querySelector('.progress-container');
 
-function seek(e, id) {
-    const audio = document.getElementById(id);
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = pct * audio.duration;
-}
-    document.querySelectorAll('.audio-card').forEach(card => {
-    // Создаем элемент блика внутри каждой карточки
-    const flare = document.createElement('div');
-    flare.className = 'flare-layer';
-    card.appendChild(flare);
+        if (playBtn && audio) {
+            playBtn.addEventListener('click', () => {
+                // Остановить другие треки при включении нового
+                document.querySelectorAll('audio').forEach(other => {
+                    if (other !== audio) {
+                        other.pause();
+                        const otherBtn = other.closest('.custom-audio-player')?.querySelector('.play-btn');
+                        if (otherBtn) otherBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                });
 
-    card.addEventListener('mouseenter', () => {
-        // Угол теперь почти одинаковый (25-30 град), чтобы не было хаоса
-        const angle = Math.floor(Math.random() * 10) + 25; 
-        
-        // Медленная, благородная скорость (от 1.2 до 1.8 секунды)
-        const duration = (Math.random() * 0.6 + 1.2).toFixed(2);
-        
-        // Яркость теперь на грани видимости (от 0.03 до 0.07)
-        const opacity = (Math.random() * 0.04 + 0.03).toFixed(3); 
-        
-        // Используем только мягкие оттенки
-        const hue = '230, 240, 255'; 
+                if (audio.paused) {
+                    audio.play();
+                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    audio.pause();
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
 
-        flare.style.transition = 'none';
-        flare.style.left = '-150%';
-        flare.style.transform = `rotate(${angle}deg)`;
-        
-        flare.style.background = `linear-gradient(to right, 
-            rgba(${hue}, 0) 0%, 
-            rgba(${hue}, ${opacity}) 50%, 
-            rgba(${hue}, 0) 100%)`;
+            audio.addEventListener('timeupdate', () => {
+                const progress = (audio.currentTime / audio.duration) * 100;
+                if (progressBar) progressBar.style.width = `${progress}%`;
+            });
 
-        requestAnimationFrame(() => {
-            // Используем плавный выезд и затухание (ease-in-out)
-            flare.style.transition = `left ${duration}s cubic-bezier(0.4, 0, 0.2, 1)`;
-            flare.style.left = '150%';
-        });
-    });
-
-    // Сбрасываем позицию, когда мышь уходит, чтобы быть готовым к новому "выстрелу"
-    card.addEventListener('mouseleave', () => {
-        flare.style.transition = 'none';
-        flare.style.left = '-150%';
-    });
-});
- document.querySelectorAll('.audio-card').forEach(card => {
-    // Создаем строго один слой блика
-    let flare = card.querySelector('.flare-layer');
-    if (!flare) {
-        flare = document.createElement('div');
-        flare.className = 'flare-layer';
-        card.appendChild(flare);
-    }
-
-    card.addEventListener('mouseenter', () => {
-        // Сброс в начальную точку (левый верхний угол)
-        flare.style.transition = 'none';
-        flare.style.opacity = '1';
-        flare.style.left = '-150%';
-        flare.style.top = '-150%';
-
-        // Запуск анимации
-        requestAnimationFrame(() => {
-            // Время пролета 1.5 секунды для солидности
-            // cubic-bezier(0.23, 1, 0.32, 1) — это быстрый вход и медленный финиш
-            flare.style.transition = 'left 1.5s cubic-bezier(0.23, 1, 0.32, 1), top 1.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 1.5s ease-out';
-            
-            // Уходит в правый нижний угол
-            flare.style.left = '150%';
-            flare.style.top = '150%';
-            
-            // В конце пути он должен полностью исчезнуть
-            setTimeout(() => {
-                flare.style.opacity = '0';
-            }, 1000); // Начинает исчезать чуть раньше, чем долетит
-        });
-    });
-
-    card.addEventListener('mouseleave', () => {
-        // Мягко гасим, если мышь ушла раньше времени
-        flare.style.opacity = '0';
-    });
-});
-    // ГЛОБАЛЬНЫЙ КОНТРОЛЛЕР ЗВУКА
-document.addEventListener('play', function(e) {
-    // Находим все аудио-элементы на странице
-    const allAudios = document.getElementsByTagName('audio');
-    
-    for (let i = 0; i < allAudios.length; i++) {
-        // Если это не тот файл, который только что включили — выключаем его
-        if (allAudios[i] !== e.target) {
-            allAudios[i].pause();
-            // Опционально: allAudios[i].currentTime = 0; // Сброс в начало
-        }
-    }
-    
-    // Синхронизируем кнопки (чтобы на других плеерах сменился значок на Play)
-    document.querySelectorAll('.play-btn').forEach(btn => {
-        // Если кнопка не относится к текущему играющему треку, ставим ей значок Play
-        // Здесь важно, чтобы у твоих кнопок был класс .play-btn или похожий
-        if (btn.getAttribute('onclick') && !btn.getAttribute('onclick').includes(e.target.id.replace('audio', ''))) {
-            btn.innerHTML = '▶'; 
-        }
-    });
-}, true);
-    const aboutObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-        }
-    });
-}, { threshold: 0.3 }); // Сработает, когда 30% блока в кадре
-
-const wrapper = document.querySelector('.about-wrapper');
-if (wrapper) {
-    aboutObserver.observe(wrapper);
-}
-// Скрипт для фейдера WEYTON
-const faderObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('is-active');
-        }
-    });
-}, { threshold: 0.2 });
-
-const aboutSection = document.querySelector('.about-section');
-if (aboutSection) {
-    faderObserver.observe(aboutSection);
-}
-    // Скрипт для микшера WEYTON
-const faderObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('is-active');
-        }
-    });
-}, { threshold: 0.4 });
-
-const aboutSection = document.querySelector('.about-section');
-if (aboutSection) {
-    faderObserver.observe(aboutSection);
-}
-    const faderObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            // Добавляем класс active, который запускает всю анимацию в CSS
-            entry.target.classList.add('active');
-        }
-    });
-}, { threshold: 0.5 }); // Сработает, когда блок покажется наполовину
-
-const faderWrap = document.querySelector('.about-fader-wrap');
-if (faderWrap) {
-    faderObserver.observe(faderWrap);
-}
-    // Улучшенный запуск фейдера
-const runFader = () => {
-    const fader = document.querySelector('.about-fader-wrap');
-    if (!fader) return;
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                console.log('Fader activated!'); // Проверка в консоли
+            if (progressContainer) {
+                progressContainer.addEventListener('click', (e) => {
+                    const width = progressContainer.clientWidth;
+                    const clickX = e.offsetX;
+                    audio.currentTime = (clickX / width) * audio.duration;
+                });
             }
-        });
-    }, { threshold: 0.1 }); // Сработает даже если чуть-чуть показался край
+        }
+    });
 
-    observer.observe(fader);
-};
-
-// Запускаем после загрузки всей страницы
-window.addEventListener('DOMContentLoaded', runFader);
-// СКРИПТ ЗАПУСКА МИКШЕРА
-const launchMixer = () => {
-    const section = document.getElementById('mixerSection');
-    if (!section) return;
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-            }
-        });
-    }, { threshold: 0.2 });
-
-    observer.observe(section);
-};
-
-// Запуск после загрузки страницы
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', launchMixer);
-} else {
-    launchMixer();
-}
+    // Запускаем всё
+    initAboutAnimation();
+});
 </script>
 </body>
 </html>
