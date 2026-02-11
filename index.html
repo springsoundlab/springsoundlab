@@ -1175,41 +1175,50 @@
           });
         });
 
-    document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- 1. АНИМАЦИЯ ABOUT ME (ЧИНИМ ВЫЕЗД) ---
+    const aboutSection = document.querySelector('#about-me');
+    if (aboutSection) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    aboutSection.classList.add('is-revealed');
+                }
+            });
+        }, { threshold: 0.3 });
+        observer.observe(aboutSection);
+    }
+
+    // --- 2. ПОДСВЕТКА ПАКЕТОВ (МОБИЛКА) ---
     const highlightModulesOnScroll = () => {
-        // Работаем только на мобилках
         if (window.innerWidth > 768) return;
 
         const modules = document.querySelectorAll('.module');
-        const triggerLine = window.innerHeight / 2; // Середина экрана
+        const triggerLine = window.innerHeight / 2;
 
         modules.forEach(mod => {
             const box = mod.getBoundingClientRect();
             const boxCenter = box.top + (box.height / 2);
 
-            // Если центр модуля в районе середины экрана (погрешность 160px)
             if (Math.abs(boxCenter - triggerLine) < 160) {
                 modules.forEach(m => m.classList.remove('active-package'));
                 mod.classList.add('active-package');
-                
-                // Для плавности на iPhone
-                mod.style.webkitTransform = "translateY(-10px) scale(1.02)";
             }
         });
     };
 
-    // Вешаем слушатели событий внутри DOMContentLoaded
     window.addEventListener('scroll', highlightModulesOnScroll, { passive: true });
     window.addEventListener('touchmove', highlightModulesOnScroll, { passive: true });
     window.addEventListener('load', highlightModulesOnScroll);
-
 });
 
 // Запускаем слежку за каждым пакетом
 document.querySelectorAll('.service-package').forEach(pkg => {
     packageObserver.observe(pkg);
+
 });
-    
+
 </script>
 </body>
 </html>
