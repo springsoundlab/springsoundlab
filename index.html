@@ -400,23 +400,26 @@
     overflow: hidden;    /* Чтобы блик не вылетал за края */
     /* ... остальные твои стили (background, padding и т.д.) ... */
         }
-
-        /* Базовый слой блика */
-       /* Обновленный приглушенный блик */
-        /* Экстремально мягкий и реалистичный блик */
-        /* 2. Добавь этот блок сразу после .audio-card */
-.flare-layer {
+/* Единый стиль для чистого реалистичного блика */
+        .flare-layer {
             position: absolute;
             top: -150%;
             left: -150%;
-            width: 30%;
+            width: 40%; /* Оптимальная ширина луча */
             height: 400%;
             pointer-events: none;
             z-index: 10;
-            filter: blur(20px);
-            transition: none;
+            filter: blur(25px); /* Максимально мягкие края */
             opacity: 0;
+            transform: rotate(35deg); /* Фиксированный угол диагонали */
             will-change: transform, left, top;
+            /* Базовый очень бледный свет */
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.08) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
         }
         .audio-card {
             background: rgba(255, 255, 255, 0.03); /* Почти прозрачный фон */
@@ -983,74 +986,42 @@ function seek(e, id) {
         flare.style.left = '-150%';
     });
 });
-    // Логика 20+ рандомных реалистичных бликов
-document.querySelectorAll('.audio-card').forEach(card => {
-    // Создаем два слоя бликов (основной и дополнительный)
-    for (let i = 0; i < 2; i++) {
-        let flare = card.querySelector(`.flare-${i}`);
-        if (!flare) {
-            flare = document.createElement('div');
-            flare.className = `flare-layer flare-${i}`;
-            card.appendChild(flare);
-        }
+ document.querySelectorAll('.audio-card').forEach(card => {
+    // Создаем строго один слой блика
+    let flare = card.querySelector('.flare-layer');
+    if (!flare) {
+        flare = document.createElement('div');
+        flare.className = 'flare-layer';
+        card.appendChild(flare);
     }
 
     card.addEventListener('mouseenter', () => {
-        const flares = card.querySelectorAll('.flare-layer');
-        
-        // --- 1. ВЫБИРАЕМ ОБЩИЙ ВЕКТОР ДЛЯ ЭТОГО НАВЕДЕНИЯ ---
-        // 0: слева-направо, 1: справа-налево, 2: сверху-вниз, 3: снизу-вверх
-        const vector = Math.floor(Math.random() * 4);
-        const globalAngle = Math.floor(Math.random() * 40) - 20; // небольшой разброс угла
+        // Сброс в начальную точку (левый верхний угол)
+        flare.style.transition = 'none';
+        flare.style.opacity = '1';
+        flare.style.left = '-150%';
+        flare.style.top = '-150%';
 
-        flares.forEach((flare, index) => {
-            // Вторая полоска появляется в 70% случаев для объема
-            if (index === 1 && Math.random() > 0.7) {
-                flare.style.opacity = '0';
-                return;
-            }
-
-            // --- 2. ИНДИВИДУАЛЬНЫЕ ПАРАМЕТРЫ (РАНДОМ ВНУТРИ ВЕКТОРА) ---
-            const width = Math.floor(Math.random() * 30) + 15;
-            const duration = (Math.random() * 0.8 + 1.0).toFixed(2); // Медленно и дорого
-            const opacity = index === 0 ? 0.08 : 0.04; // Основной чуть ярче, второй тусклее
-            const delay = index * (Math.random() * 200 + 100); // Второй блик чуть отстает
-
-            flare.style.transition = 'none';
-            flare.style.opacity = '1';
-            flare.style.width = `${width}%`;
-            flare.style.transform = `rotate(${globalAngle}deg)`;
+        // Запуск анимации
+        requestAnimationFrame(() => {
+            // Время пролета 1.5 секунды для солидности
+            // cubic-bezier(0.23, 1, 0.32, 1) — это быстрый вход и медленный финиш
+            flare.style.transition = 'left 1.5s cubic-bezier(0.23, 1, 0.32, 1), top 1.5s cubic-bezier(0.23, 1, 0.32, 1), opacity 1.5s ease-out';
             
-            const hue = '255, 255, 255';
-            flare.style.background = `linear-gradient(to right, 
-                rgba(${hue}, 0) 0%, 
-                rgba(${hue}, ${opacity}) 50%, 
-                rgba(${hue}, 0) 100%)`;
-
-            // Установка стартовой позиции в зависимости от вектора
-            if (vector === 0) { flare.style.left = '-150%'; flare.style.top = '-50%'; }
-            else if (vector === 1) { flare.style.left = '150%'; flare.style.top = '-50%'; }
-            else if (vector === 2) { flare.style.top = '-150%'; flare.style.left = '-50%'; flare.style.transform = `rotate(${globalAngle + 90}deg)`; }
-            else { flare.style.top = '150%'; flare.style.left = '-50%'; flare.style.transform = `rotate(${globalAngle + 90}deg)`; }
-
-            // --- 3. ЗАПУСК СИНХРОННОГО ДВИЖЕНИЯ ---
+            // Уходит в правый нижний угол
+            flare.style.left = '150%';
+            flare.style.top = '150%';
+            
+            // В конце пути он должен полностью исчезнуть
             setTimeout(() => {
-                flare.style.transition = `all ${duration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
-                
-                if (vector === 0) flare.style.left = '180%';
-                else if (vector === 1) flare.style.left = '-180%';
-                else if (vector === 2) flare.style.top = '180%';
-                else flare.style.top = '-180%';
-            }, 20 + delay);
+                flare.style.opacity = '0';
+            }, 1000); // Начинает исчезать чуть раньше, чем долетит
         });
     });
 
     card.addEventListener('mouseleave', () => {
-        const flares = card.querySelectorAll('.flare-layer');
-        flares.forEach(f => {
-            f.style.opacity = '0';
-            setTimeout(() => { f.style.transition = 'none'; }, 500);
-        });
+        // Мягко гасим, если мышь ушла раньше времени
+        flare.style.opacity = '0';
     });
 });
 </script>
