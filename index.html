@@ -888,29 +888,37 @@
         line-height: 1.4 !important;
 }
     
-      /* Общие правила для активного пакета (усиленные) */
-    .service-package.active-package {
-        transform: translateY(-10px) scale(1.05) !important;
-        background: rgba(255, 255, 255, 0.08) !important;
-        z-index: 10;
-        transition: all 0.4s ease !important;
+    /* 6. Подсветка модулей при скролле */
+    .module.active-package {
+        transform: translateY(-10px) scale(1.02) !important;
+        background: rgba(20, 20, 20, 0.95) !important;
+        z-index: 10 !important;
+        border: 2px solid #fff !important;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    /* Подсветка конкретных пакетов по их именам */
-    .service-package.active-package[data-package="start"] {
+    /* Белый неон — Час записи */
+    .module.active-package[data-package="hour"] {
+        border-color: #ffffff !important;
+        box-shadow: 0 0 35px rgba(255, 255, 255, 0.6) !important;
+    }
+
+    /* Голубой неон — Start Edition */
+    .module.active-package[data-package="start"] {
         border-color: #00f3ff !important;
-        box-shadow: 0 0 30px rgba(0, 243, 255, 0.5) !important;
+        box-shadow: 0 0 35px rgba(0, 243, 255, 0.6) !important;
     }
 
-    .service-package.active-package[data-package="artist"] {
+    /* Малиновый неон — Artist Edition */
+    .module.active-package[data-package="artist"] {
         border-color: #ff00ff !important;
-        box-shadow: 0 0 30px rgba(255, 0, 255, 0.5) !important;
+        box-shadow: 0 0 35px rgba(255, 0, 255, 0.6) !important;
     }
 
-    .service-package.active-package[data-package="pro"] {
+    /* Зеленый неон — Pro Edition */
+    .module.active-package[data-package="pro"] {
         border-color: #00ff41 !important;
-        box-shadow: 0 0 30px rgba(0, 255, 65, 0.5) !important;
-
+        box-shadow: 0 0 35px rgba(0, 255, 65, 0.6) !important;
     }
         
     </style>
@@ -1166,58 +1174,35 @@
             this.currentTime = 0;
           });
         });
-document.addEventListener('DOMContentLoaded', () => {
-    const aboutSection = document.getElementById('about-me');
-    if (aboutSection) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-revealed');
-                }
-            });
-        }, { threshold: 0.8 }); // Сработка в самом низу
-        observer.observe(aboutSection);
-    }
-});
 
-// Функция для подсветки пакетов услуг при скролле на мобилках
-const highlightServicesOnScroll = () => {
-    // Работает только на мобильных (ширина меньше 768px)
-    if (window.innerWidth > 768) return;
+    document.addEventListener('DOMContentLoaded', () => {
+    const highlightModulesOnScroll = () => {
+        // Работаем только на мобилках
+        if (window.innerWidth > 768) return;
 
-    const packages = document.querySelectorAll('.service-package');
-    const centerY = window.innerHeight / 2;
+        const modules = document.querySelectorAll('.module');
+        const triggerLine = window.innerHeight / 2; // Середина экрана
 
-    packages.forEach(pkg => {
-        const rect = pkg.getBoundingClientRect();
-        // Если центр блока находится в районе центра экрана (+/- 100px)
-        if (rect.top < centerY + 100 && rect.bottom > centerY - 100) {
-            // Сначала тушим все
-            packages.forEach(p => p.classList.remove('active-package'));
-            // Зажигаем текущий
-            pkg.classList.add('active-package');
-        }
-    });
-};
+        modules.forEach(mod => {
+            const box = mod.getBoundingClientRect();
+            const boxCenter = box.top + (box.height / 2);
 
-// Создаем "датчик" для слежки за пакетами услуг
-const packageObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        // Если блок находится в центральной части экрана (минимум 50% видно)
-        if (entry.isIntersecting && window.innerWidth <= 768) {
-            // Убираем подсветку у всех
-            document.querySelectorAll('.service-package').forEach(pkg => {
-                pkg.classList.remove('active-package');
-            });
-            // Добавляем тому, который сейчас в центре
-            entry.target.classList.add('active-package');
-        }
-    });
+            // Если центр модуля в районе середины экрана (погрешность 160px)
+            if (Math.abs(boxCenter - triggerLine) < 160) {
+                modules.forEach(m => m.classList.remove('active-package'));
+                mod.classList.add('active-package');
+                
+                // Для плавности на iPhone
+                mod.style.webkitTransform = "translateY(-10px) scale(1.02)";
+            }
+        });
+    };
 
-}, {
-    // Настройки: реагировать, когда блок пересекает середину экрана
-    rootMargin: "-20% 0px -20% 0px", 
-    threshold: 0.5 
+    // Вешаем слушатели событий внутри DOMContentLoaded
+    window.addEventListener('scroll', highlightModulesOnScroll, { passive: true });
+    window.addEventListener('touchmove', highlightModulesOnScroll, { passive: true });
+    window.addEventListener('load', highlightModulesOnScroll);
+
 });
 
 // Запускаем слежку за каждым пакетом
