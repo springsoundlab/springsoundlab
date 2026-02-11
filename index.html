@@ -626,7 +626,7 @@
     transition: left 0.7s ease-in-out, top 0.7s ease-in-out;
 }
 /* ==========================================
-   ФИНАЛЬНЫЙ ABOUT ME: ВЫЕЗД ИЗ ФЕЙДЕРА ВПРАВО
+   ФИНАЛЬНЫЙ ABOUT ME: ВЫЕЗД С НЕОНОВОЙ ЛИНИЕЙ
    ========================================== */
 #about-me {
     padding: 150px 0;
@@ -640,7 +640,7 @@
 .about-container {
     display: flex;
     align-items: center; 
-    gap: 0; /* Убираем отступ, чтобы текст выезжал вплотную от линии */
+    gap: 0;
     max-width: 1200px;
     width: 100%;
     padding: 0 40px;
@@ -657,7 +657,7 @@
     box-shadow: inset 2px 2px 5px rgba(0,0,0,0.8);
     display: flex;
     justify-content: center;
-    flex-shrink: 0; /* Чтобы фейдер не сжимался */
+    flex-shrink: 0;
     z-index: 20;
 }
 
@@ -702,24 +702,38 @@
 
 /* КОНТЕЙНЕР ДЛЯ ВЫЕЗДА ТЕКСТА */
 .about-content-wrapper {
-    overflow: hidden; /* Обрезаем текст, пока он "внутри" фейдера */
+    overflow: hidden;
     display: flex;
     align-items: center;
+    position: relative;
 }
 
 .about-content-blur {
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(0px); /* Изначально 0 */
+    backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
-    border-left: 2px solid var(--neon-blue);
+    border-left: 2px solid var(--neon-blue); /* Левая линия у фейдера */
     padding: 40px;
     opacity: 0;
-    /* Текст полностью спрятан за фейдером слева */
     transform: translateX(-100%); 
-    /* Плавное появление: чуть быстрее фейдера, чтобы была динамика */
     transition: transform 2.2s cubic-bezier(0.4, 0, 0.2, 1), 
                 opacity 2s ease, 
                 backdrop-filter 2.5s ease;
+    position: relative;
+}
+
+/* ТА САМАЯ ПРАВАЯ НЕОНОВАЯ ПОЛОСКА */
+.about-content-blur::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background: var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue);
+    opacity: 0;
+    transition: opacity 0.5s ease 1s; /* Проявляется чуть позже начала выезда */
 }
 
 /* АКТИВАЦИЯ ПО СКРОЛЛУ */
@@ -734,9 +748,13 @@
 
 #about-me.is-revealed .about-content-blur {
     opacity: 1;
-    transform: translateX(0); /* Выезжает вправо в нормальное положение */
-    backdrop-filter: blur(4px); /* Уменьшенный блюр, как ты просил */
+    transform: translateX(0);
+    backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+}
+
+#about-me.is-revealed .about-content-blur::after {
+    opacity: 1; /* Полоска светится, когда блок выехал */
 }
     </style>
 </head>
