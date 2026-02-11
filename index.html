@@ -632,7 +632,7 @@
     transition: left 0.7s ease-in-out, top 0.7s ease-in-out;
 }
 /* ==========================================
-   ULTRA-SPEED ABOUT ME: ЛИНИЯ-ЛИДЕР
+   БЕСШОВНЫЙ ABOUT ME: БЕЗ ПАУЗЫ
    ========================================== */
 #about-me {
     padding: 80px 0;
@@ -665,7 +665,7 @@
     display: flex;
     justify-content: center;
     flex-shrink: 0;
-    z-index: 30; /* Фейдер всегда выше всех */
+    z-index: 30;
 }
 
 .fader-led-scale {
@@ -675,7 +675,8 @@
     height: 0%; 
     background: var(--neon-blue);
     box-shadow: 0 0 20px var(--neon-blue);
-    transition: height 1s cubic-bezier(0.25, 1, 0.5, 1);
+    /* Четкий подъем за 1 секунду */
+    transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0;
 }
 
@@ -690,7 +691,8 @@
     transform: translateX(-50%);
     z-index: 35;
     box-shadow: 10px 10px 20px rgba(0,0,0,0.6);
-    transition: bottom 1s cubic-bezier(0.25, 1, 0.5, 1);
+    /* Ручка долетает за 1 секунду */
+    transition: bottom 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fader-handle::before {
@@ -711,13 +713,13 @@
     display: flex;
     align-items: center;
     height: 380px; 
-    position: relative;
 }
 
 .about-content-blur {
     background: rgba(255, 255, 255, 0.02);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    border-left: none; 
     padding: 20px 60px; 
     opacity: 0;
     width: 100%;
@@ -727,17 +729,18 @@
     justify-content: center; 
     transform: translateX(-100%); 
     
-    /* СУПЕР СКОРОСТЬ: выезд за 0.6с сразу после фейдера (задержка 1с) */
-    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 1s, 
-                opacity 0.4s ease 1s, 
-                backdrop-filter 0.6s ease 1s;
+    /* ТАЙМИНГ: Начинает выезд ровно через 1 секунду (когда фейдер закончил) 
+       Время выезда — 2.2 секунды для той самой плавности */
+    transition: transform 2.2s cubic-bezier(0.4, 0, 0.2, 1) 1s, 
+                opacity 1.5s ease 1s, 
+                backdrop-filter 2s ease 1s;
                 
     text-align: center;
     position: relative;
     box-sizing: border-box;
 }
 
-/* ГОЛУБАЯ ПОЛОСКА-ЛИДЕР (Правый край блока) */
+/* Синяя полоска на правом крае */
 .about-content-blur::after {
     content: "";
     position: absolute;
@@ -746,9 +749,8 @@
     width: 3px;
     height: 100%;
     background: var(--neon-blue);
-    box-shadow: 0 0 15px var(--neon-blue), 0 0 5px #fff;
-    opacity: 1; /* Всегда видна внутри контейнера, пока он выезжает */
-    z-index: 5;
+    box-shadow: 0 0 15px var(--neon-blue);
+    opacity: 1; /* Линия всегда на "переднем крае" при выезде */
 }
 
 .about-title {
@@ -774,7 +776,7 @@
     max-width: 950px;
 }
 
-/* АКТИВАЦИЯ */
+/* АНИМАЦИЯ АКТИВАЦИИ */
 #about-me.is-revealed .fader-handle { bottom: 280px; }
 #about-me.is-revealed .fader-led-scale { height: 320px; opacity: 1; }
 #about-me.is-revealed .about-content-blur { opacity: 1; transform: translateX(0); }
