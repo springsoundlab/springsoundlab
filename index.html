@@ -785,28 +785,69 @@
    ========================================== */
 
 @media (max-width: 768px) {
-    /* 1. Сжимаем сам раздел по вертикали */
+    /* 1. Убираем пустоту сверху и снизу самого раздела */
     #about-me {
-        padding: 20px 0 !important; /* Уменьшили отступы сверху и снизу с 80px до 20px */
+        padding: 20px 0 !important; /* Минимум отступов снаружи */
+        min-height: auto !important;
     }
 
-    /* 2. Убираем лишние отступы внутри текстового блока */
+    /* 2. Контейнер: строго в ряд, как на компьютере */
+    .about-container {
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 0 10px !important;
+    }
+
+    /* 3. Фейдер: делаем его компактнее, чтобы не тянул высоту блока */
+    .fader-track {
+        height: 180px !important; /* Уменьшили высоту трека */
+        width: 8px !important;
+        flex-shrink: 0; /* Чтобы фейдер не сплющило */
+    }
+
+    .fader-handle {
+        width: 30px !important;
+        height: 45px !important;
+    }
+
+    /* Настройка движения фейдера под новую высоту */
+    #about-me.is-revealed .fader-handle { 
+        bottom: 110px !important; 
+    }
+    #about-me.is-revealed .fader-led-scale { 
+        height: 130px !important; 
+    }
+
+    /* 4. Текст: убираем фиксированную высоту, чтобы он умещался */
     .about-content-blur {
-        padding: 10px 15px !important; /* Минимум отступов, чтобы текст не прилипал к краям */
-        height: auto !important; /* Высота подстроится под объем текста */
-        min-height: 200px; /* Но не меньше высоты фейдера */
+        height: auto !important; /* Высота подстраивается под текст */
+        min-height: 180px; /* Чтобы соответствовать фейдеру */
+        padding: 15px !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transform: translateX(-100%) !important; /* Выезд слева направо */
+        opacity: 0;
     }
 
-    /* 3. Уменьшаем отступы заголовка и текста, чтобы они сидели плотнее */
+    #about-me.is-revealed .about-content-blur {
+        transform: translateX(0) !important;
+        opacity: 1 !important;
+    }
+
+    /* 5. Сами шрифты оставляем как в "компьютерной" версии, но чуть плотнее */
     .about-title {
-        margin-top: 0 !important;
+        font-size: 1.2rem !important; 
         margin-bottom: 5px !important;
-        font-size: 1.2rem !important; /* Чуть-чуть подкорректировал, чтобы влезло в сжатый блок */
+        text-align: left !important; /* Выравнивание по левому краю, как на ПК */
     }
 
     .about-text {
-        margin-bottom: 0 !important;
-        line-height: 1.2 !important; /* Немного плотнее строки */
+        font-size: 0.85rem !important; /* Оставил комфортным для чтения */
+        line-height: 1.3 !important;
+        text-align: left !important;
     }
         
     </style>
