@@ -780,88 +780,60 @@
 #about-me.is-revealed .fader-led-scale { height: 320px; opacity: 1; }
 #about-me.is-revealed .about-content-blur { opacity: 1; transform: translateX(0); }
 
-        /* ==========================================
-   MOBILE ADAPTATION (iOS & Android)
+/* ==========================================
+   MOBILE ADAPTATION: SAME AS PC (Spring Sound Lab)
    ========================================== */
 
 @media (max-width: 768px) {
-    /* 1. Общие настройки контейнеров */
-    .container {
-        padding: 0 15px;
-    }
-
-    /* 2. Адаптация блока ABOUT ME */
+    /* Оставляем элементы в один ряд */
     .about-container {
-        flex-direction: column; /* Ставим фейдер над текстом */
+        flex-direction: row !important; /* Принудительно в ряд, как на ПК */
         align-items: center;
-        gap: 30px;
+        gap: 15px; /* Уменьшаем зазор, чтобы влезло */
+        padding: 0 10px;
     }
 
+    /* Уменьшаем высоту трека фейдера, чтобы он не занимал весь экран */
     .fader-track {
-        height: 250px; /* Чуть короче для мобильных */
-        width: 10px;
+        height: 220px !important; 
+        width: 8px !important;
     }
 
+    /* Уменьшаем саму ручку фейдера */
     .fader-handle {
-        width: 40px;
-        height: 60px;
+        width: 30px !important;
+        height: 50px !important;
     }
 
-    .about-content-wrapper {
-        width: 100%;
-        height: auto; /* Текст подстраивается под контент */
-        overflow: visible;
+    /* Корректируем точку остановки фейдера (под новую высоту) */
+    #about-me.is-revealed .fader-handle { 
+        bottom: 150px !important; 
+    }
+    #about-me.is-revealed .fader-led-scale { 
+        height: 170px !important; 
     }
 
+    /* Текст выезжает СЛЕВА НАПРАВО, как на компе */
     .about-content-blur {
-        transform: translateY(50px); /* Выезд снизу вверх вместо бокового */
-        opacity: 0;
-        padding: 30px 20px;
-        transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s, 
-                    opacity 0.8s ease 0.6s;
+        transform: translateX(-100%) !important; /* Исходная точка слева */
+        padding: 15px 20px !important;
+        height: 220px !important; /* Высота подстать фейдеру */
     }
 
-    /* Когда скроллим на телефоне, текст выплывает вверх */
     #about-me.is-revealed .about-content-blur {
-        transform: translateY(0);
-        opacity: 1;
+        transform: translateX(0) !important; /* Выезд в центр */
     }
 
+    /* Уменьшаем шрифт, чтобы текст не был слишком огромным */
     .about-title {
-        font-size: 1.8rem;
-        letter-spacing: 4px;
+        font-size: 1.1rem !important; /* Заголовок меньше */
+        letter-spacing: 2px !important;
+        margin-bottom: 10px !important;
     }
 
     .about-text {
-        font-size: 1.1rem;
-        line-height: 1.5;
-    }
-
-    /* 3. Адаптация STUDIO TOUR (Витрина) */
-    .showcase-grid {
-        grid-template-columns: 1fr; /* Один квадрат на всю ширину */
-        gap: 20px;
-    }
-
-    .showcase-item {
-        max-width: 400px;
-        margin: 0 auto; /* Центрируем карточку на экране */
-    }
-
-    /* 4. Навигация и заголовки */
-    .section-title {
-        font-size: 1.8rem !important;
-        letter-spacing: 3px !important;
-    }
-}
-
-/* Фикс для очень маленьких экранов (iPhone SE и т.д.) */
-@media (max-width: 380px) {
-    .about-title {
-        font-size: 1.5rem;
-    }
-    .about-text {
-        font-size: 1rem;
+        font-size: 0.75rem !important; /* Текст компактнее */
+        line-height: 1.3 !important;
     }
         
     </style>
