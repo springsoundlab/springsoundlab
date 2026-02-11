@@ -785,58 +785,63 @@
    ========================================== */
 
 @media (max-width: 768px) {
-    /* 1. Сжимаем раздел и центрируем содержимое */
+    /* 1. Центрируем блок по вертикали и убираем лишний воздух */
     #about-me {
-        padding: 30px 0 !important; 
+        padding: 40px 0 !important;
         display: flex;
-        justify-content: center; /* Центровка по горизонтали */
+        align-items: center;
+        justify-content: center;
     }
 
-    /* 2. Контейнер: элементы в ряд и по центру */
+    /* 2. Контейнер: фиксируем высоту для обоих элементов */
     .about-container {
         flex-direction: row !important;
-        align-items: stretch; /* Растягивает фейдер и текст под одну высоту! */
+        align-items: center; /* Центрируем фейдер и текст относительно друг друга */
         justify-content: center;
-        gap: 15px;
+        gap: 10px;
         width: 100% !important;
-        max-width: 100%;
-        padding: 0 15px !important;
+        padding: 0 10px !important;
     }
 
-    /* 3. Фейдер: теперь его высота подстраивается под текст */
+    /* 3. Фейдер: выравниваем высоту под текстовый блок */
     .fader-track {
-        height: auto !important; /* Авто-высота, чтобы тянуться за текстом */
-        min-height: 150px; 
+        height: 200px !important; /* Фиксированная высота для симметрии */
         width: 8px !important;
         flex-shrink: 0;
-        align-self: stretch; /* Важно: растягивает трек */
+        margin: 0 !important;
     }
 
     .fader-handle {
-        width: 30px !important;
+        width: 32px !important;
         height: 45px !important;
     }
 
-    /* Корректируем движение ручки (она будет в верхней части при активации) */
+    /* Анимация: теперь ручка доезжает до самого верха (90%) */
     #about-me.is-revealed .fader-handle { 
-        bottom: 70% !important; 
+        bottom: calc(100% - 45px) !important; 
     }
     #about-me.is-revealed .fader-led-scale { 
-        height: 75% !important; 
+        height: 100% !important; /* Шкала заполняется полностью */
+        opacity: 1 !important;
     }
 
-    /* 4. Текстовый блок: теперь он главный и диктует высоту */
+    /* 4. Текстовый блок: подгоняем под высоту фейдера */
     .about-content-blur {
-        height: auto !important;
-        padding: 20px 15px !important;
+        height: 200px !important; /* ТАКАЯ ЖЕ ВЫСОТА, КАК У ТРЕКА */
+        padding: 10px 15px !important;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-items: center; /* Центровка текста внутри */
-        text-align: center !important; /* Текст по центру */
+        text-align: center !important;
         transform: translateX(-100%) !important;
         opacity: 0;
-        flex-grow: 1; /* Занимает оставшееся место */
+        border-right: 2px solid var(--neon-blue); /* Неоновая линия справа */
+        box-shadow: 2px 0 10px rgba(0, 243, 255, 0.2);
+    }
+
+    /* Убираем псевдоэлементы, если они мешают выравниванию */
+    .about-content-blur::after {
+        display: none !important; 
     }
 
     #about-me.is-revealed .about-content-blur {
@@ -844,17 +849,17 @@
         opacity: 1 !important;
     }
 
-    /* 5. Шрифты */
+    /* 5. Шрифты (подгоняем под высоту 200px) */
     .about-title {
-        font-size: 1.3rem !important; 
-        margin-bottom: 8px !important;
-        text-align: center !important;
+        font-size: 1.1rem !important;
+        margin-bottom: 5px !important;
+        letter-spacing: 2px !important;
     }
 
     .about-text {
-        font-size: 0.85rem !important;
-        line-height: 1.4 !important;
-        text-align: center !important;
+        font-size: 0.8rem !important;
+        line-height: 1.3 !important;
+        margin: 0 !important;
     }
         
     </style>
