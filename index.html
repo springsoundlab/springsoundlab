@@ -400,23 +400,23 @@
         }
 
         /* Базовый слой блика */
+       /* Обновленный приглушенный блик */
         .flare-layer {
             position: absolute;
             top: -150%;
             left: -150%;
-            width: 60%;
+            width: 45%; /* Сделали полоску чуть уже */
             height: 400%;
             background: linear-gradient(
                 to right, 
                 rgba(255, 255, 255, 0) 0%, 
-                rgba(255, 255, 255, 0.2) 30%, 
-                rgba(255, 255, 255, 0.6) 50%, 
-                rgba(255, 255, 255, 0.2) 70%, 
+                rgba(255, 255, 255, 0.05) 30%, /* Было 0.2, стало 0.05 */
+                rgba(255, 255, 255, 0.15) 50%, /* Было 0.6, стало 0.15 */
+                rgba(255, 255, 255, 0.05) 70%, /* Было 0.2, стало 0.05 */
                 rgba(255, 255, 255, 0) 100%
             );
             pointer-events: none;
             z-index: 10;
-            /* Плавность оставляем в JS для контроля */
         }
 
         .audio-card {
@@ -950,22 +950,24 @@ function seek(e, id) {
     card.appendChild(flare);
 
     card.addEventListener('mouseenter', () => {
-        // 1. Рандомный угол (от 15 до 45 градусов)
         const angle = Math.floor(Math.random() * 30) + 15;
-        // 2. Рандомная скорость (от 0.4с до 1.2с)
-        const duration = (Math.random() * 0.8 + 0.4).toFixed(2);
-        // 3. Рандомная яркость (насыщенность блика)
-        const opacity = (Math.random() * 0.5 + 0.3).toFixed(1);
-        // 4. Рандомный оттенок (чуть синеватый или чисто белый)
+        const duration = (Math.random() * 0.6 + 0.6).toFixed(2); // Чуть замедлили пролет
+        
+        // Уменьшили диапазон яркости: теперь от 0.05 до 0.2 (очень деликатно)
+        const opacity = (Math.random() * 0.15 + 0.05).toFixed(2); 
+        
         const hue = Math.random() > 0.5 ? '200, 230, 255' : '255, 255, 255';
 
-        // Применяем настройки
         flare.style.transition = 'none';
         flare.style.left = '-150%';
         flare.style.transform = `rotate(${angle}deg)`;
-        flare.style.background = `linear-gradient(to right, rgba(${hue}, 0) 0%, rgba(${hue}, ${opacity}) 50%, rgba(${hue}, 0) 100%)`;
+        
+        // Применяем обновленный мягкий градиент
+        flare.style.background = `linear-gradient(to right, 
+            rgba(${hue}, 0) 0%, 
+            rgba(${hue}, ${opacity}) 50%, 
+            rgba(${hue}, 0) 100%)`;
 
-        // Запускаем анимацию в следующем кадре
         requestAnimationFrame(() => {
             flare.style.transition = `left ${duration}s ease-in-out`;
             flare.style.left = '150%';
