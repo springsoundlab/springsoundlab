@@ -896,32 +896,34 @@
     setInterval(activateSocials, 8000);
 </script>
 <script>
-function togglePlay(btn, id) {
-    const audio = document.getElementById(id);
-    const icon = btn.querySelector('i');
-    
-    // МАГИЯ: Останавливаем все остальные плееры перед запуском текущего
-    document.querySelectorAll('audio').forEach(otherAudio => {
-        if (otherAudio.id !== id) {
-            otherAudio.pause();
-            // Находим иконку в соседней кнопке и возвращаем ей вид "Play"
-            const otherBtnIcon = otherAudio.parentElement.querySelector('.play-btn i');
-            if (otherBtnIcon) {
-                otherBtnIcon.classList.remove('fa-pause');
-                otherBtnIcon.classList.add('fa-play');
-            }
-        }
-    });
+// Основная логика переключения треков
+function togglePlay(id) {
+    const audio = document.getElementById('audio' + id);
+    const playBtn = document.getElementById('play' + id);
 
-    // Обычная логика Play/Pause для текущего трека
+    // --- МАГИЯ: ОСТАНОВКА ОСТАЛЬНЫХ ТРЕКОВ ---
     if (audio.paused) {
+        // Находим все аудио-элементы на странице
+        document.querySelectorAll('audio').forEach(otherAudio => {
+            if (otherAudio !== audio) {
+                otherAudio.pause(); // Останавливаем
+                otherAudio.currentTime = 0; // Сбрасываем в начало (по желанию)
+                
+                // Сбрасываем иконки у других кнопок на "Play"
+                const otherId = otherAudio.id.replace('audio', '');
+                const otherBtn = document.getElementById('play' + otherId);
+                if (otherBtn) {
+                    otherBtn.innerHTML = '▶'; // Или твоя иконка Play
+                }
+            }
+        });
+
+        // Теперь запускаем текущий
         audio.play();
-        icon.classList.remove('fa-play');
-        icon.classList.add('fa-pause');
+        playBtn.innerHTML = '⏸'; // Иконка паузы
     } else {
         audio.pause();
-        icon.classList.remove('fa-pause');
-        icon.classList.add('fa-play');
+        playBtn.innerHTML = '▶';
     }
 }
 
