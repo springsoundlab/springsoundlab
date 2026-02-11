@@ -632,11 +632,11 @@
     transition: left 0.7s ease-in-out, top 0.7s ease-in-out;
 }
 /* ==========================================
-   ФИНАЛЬНЫЙ ABOUT ME: ВЫЕЗД С НЕОНОВОЙ ЛИНИЕЙ
+   АДАПТИРОВАННЫЙ ABOUT ME
    ========================================== */
 #about-me {
-    padding: 150px 0;
-    min-height: 100vh;
+    padding: 60px 0; /* Уменьшили высоту блока до стандартных расстояний */
+    min-height: auto; /* Убрали растягивание на весь экран */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -652,10 +652,10 @@
     padding: 0 40px;
 }
 
-/* Дорожка фейдера */
+/* Фейдер остается без изменений по механике */
 .fader-track {
     width: 12px;
-    height: 400px;
+    height: 350px; /* Немного уменьшили высоту под текст */
     background: #000;
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -667,68 +667,49 @@
     z-index: 20;
 }
 
-/* Неоновый след */
-.fader-led-scale {
-    position: absolute;
-    bottom: 0;
-    width: 4px;
-    height: 0%; 
-    background: var(--neon-blue);
-    box-shadow: 0 0 20px var(--neon-blue);
-    transition: height 2.5s cubic-bezier(0.4, 0, 0.2, 1);
-    opacity: 0;
-    z-index: 1;
-}
-
-/* Ручка фейдера */
-.fader-handle {
-    width: 50px;
-    height: 80px;
-    background: linear-gradient(145deg, #222, #444, #111);
-    border: 1px solid #555;
-    position: absolute;
-    bottom: 0px; 
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 25;
-    box-shadow: 10px 10px 20px rgba(0,0,0,0.6);
-    transition: bottom 2.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fader-handle::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--neon-blue);
-    box-shadow: 0 0 10px var(--neon-blue);
-}
-
-/* КОНТЕЙНЕР ДЛЯ ВЫЕЗДА ТЕКСТА */
-.about-content-wrapper {
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
+/* Текст и его оформление */
 .about-content-blur {
     background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
-    border-left: 2px solid var(--neon-blue); /* Левая линия у фейдера */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border-left: 2px solid var(--neon-blue);
     padding: 40px;
     opacity: 0;
     transform: translateX(-100%); 
     transition: transform 2.2s cubic-bezier(0.4, 0, 0.2, 1), 
                 opacity 2s ease, 
                 backdrop-filter 2.5s ease;
-    position: relative;
+    text-align: center; /* Центрируем текст внутри блока */
+    width: 100%;
 }
 
-/* ТА САМАЯ ПРАВАЯ НЕОНОВАЯ ПОЛОСКА */
+.about-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 5px;
+    color: #ffffff;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* Буква ME без свечения */
+.neon-accent {
+    color: var(--neon-blue);
+    text-shadow: none; /* Убрали свечение */
+}
+
+.about-text {
+    font-family: 'Montserrat', sans-serif; /* Тот же шрифт, что в пакетах услуг */
+    font-size: 1.1rem; /* Сделали шрифт побольше */
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 15px;
+    max-width: 800px; /* Чтобы текст не растягивался слишком широко при центровке */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Правая линия остается для красоты развертывания */
 .about-content-blur::after {
     content: "";
     position: absolute;
@@ -737,31 +718,17 @@
     width: 2px;
     height: 100%;
     background: var(--neon-blue);
-    box-shadow: 0 0 15px var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue);
     opacity: 0;
-    transition: opacity 0.5s ease 1s; /* Проявляется чуть позже начала выезда */
+    transition: opacity 0.5s ease 1s;
 }
 
-/* АКТИВАЦИЯ ПО СКРОЛЛУ */
-#about-me.is-revealed .fader-handle {
-    bottom: 320px; 
-}
-
-#about-me.is-revealed .fader-led-scale {
-    height: 360px;
-    opacity: 1;
-}
-
-#about-me.is-revealed .about-content-blur {
-    opacity: 1;
-    transform: translateX(0);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-}
-
-#about-me.is-revealed .about-content-blur::after {
-    opacity: 1; /* Полоска светится, когда блок выехал */
-}
+/* Анимация активации */
+#about-me.is-revealed .fader-handle { bottom: 280px; }
+#about-me.is-revealed .fader-led-scale { height: 320px; opacity: 1; }
+#about-me.is-revealed .about-content-blur { opacity: 1; transform: translateX(0); }
+#about-me.is-revealed .about-content-blur::after { opacity: 1; }
+   
     </style>
 </head>
 <body>
