@@ -413,11 +413,11 @@
             height: 400%;
             pointer-events: none;
             z-index: 10;
-            filter: blur(20px); /* Увеличили блюр для мягкости */
+            filter: blur(20px);
             transition: none;
             opacity: 0;
+            will-change: transform, left, top;
         }
-
         .audio-card {
             background: rgba(255, 255, 255, 0.03); /* Почти прозрачный фон */
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -985,44 +985,41 @@ function seek(e, id) {
 });
     // Логика 20+ рандомных реалистичных бликов
 document.querySelectorAll('.audio-card').forEach(card => {
-    // Создаем два слоя для потенциально двух полосок
+    // Создаем два слоя бликов (основной и дополнительный)
     for (let i = 0; i < 2; i++) {
-        const flare = document.createElement('div');
-        flare.className = `flare-layer flare-${i}`;
-        card.appendChild(flare);
+        let flare = card.querySelector(`.flare-${i}`);
+        if (!flare) {
+            flare = document.createElement('div');
+            flare.className = `flare-layer flare-${i}`;
+            card.appendChild(flare);
+        }
     }
 
     card.addEventListener('mouseenter', () => {
         const flares = card.querySelectorAll('.flare-layer');
         
+        // --- 1. ВЫБИРАЕМ ОБЩИЙ ВЕКТОР ДЛЯ ЭТОГО НАВЕДЕНИЯ ---
+        // 0: слева-направо, 1: справа-налево, 2: сверху-вниз, 3: снизу-вверх
+        const vector = Math.floor(Math.random() * 4);
+        const globalAngle = Math.floor(Math.random() * 40) - 20; // небольшой разброс угла
+
         flares.forEach((flare, index) => {
-            // Шанс появления второй полоски — 50%
-            if (index === 1 && Math.random() > 0.5) return;
-
-            // 1. ВЫБОР СТОРОНЫ (0 - слева направо, 1 - справа налево)
-            const side = Math.random() > 0.5 ? 1 : 0;
-            
-            // 2. РАНДОМНЫЕ ПАРАМЕТРЫ
-            const angle = Math.floor(Math.random() * 60) - 30; // Угол от -30 до 30
-            const width = Math.floor(Math.random() * 40) + 10;
-            const duration = (Math.random() * 1.5 + 0.7).toFixed(2);
-            const opacity = (Math.random() * 0.06 + 0.02).toFixed(3);
-            const delay = index * Math.random() * 300; // Вторая полоска чуть позже первой
-
-            // Сброс позиции перед выстрелом
-            flare.style.transition = 'none';
-            flare.style.opacity = '1';
-            
-            if (side === 0) {
-                flare.style.left = '-150%';
-                flare.style.top = '-150%';
-            } else {
-                flare.style.left = '150%';
-                flare.style.top = '-150%';
+            // Вторая полоска появляется в 70% случаев для объема
+            if (index === 1 && Math.random() > 0.7) {
+                flare.style.opacity = '0';
+                return;
             }
 
+            // --- 2. ИНДИВИДУАЛЬНЫЕ ПАРАМЕТРЫ (РАНДОМ ВНУТРИ ВЕКТОРА) ---
+            const width = Math.floor(Math.random() * 30) + 15;
+            const duration = (Math.random() * 0.8 + 1.0).toFixed(2); // Медленно и дорого
+            const opacity = index === 0 ? 0.08 : 0.04; // Основной чуть ярче, второй тусклее
+            const delay = index * (Math.random() * 200 + 100); // Второй блик чуть отстает
+
+            flare.style.transition = 'none';
+            flare.style.opacity = '1';
             flare.style.width = `${width}%`;
-            flare.style.transform = `rotate(${angle}deg)`;
+            flare.style.transform = `rotate(${globalAngle}deg)`;
             
             const hue = '255, 255, 255';
             flare.style.background = `linear-gradient(to right, 
@@ -1030,14 +1027,20 @@ document.querySelectorAll('.audio-card').forEach(card => {
                 rgba(${hue}, ${opacity}) 50%, 
                 rgba(${hue}, 0) 100%)`;
 
-            // Запуск анимации с учетом задержки
+            // Установка стартовой позиции в зависимости от вектора
+            if (vector === 0) { flare.style.left = '-150%'; flare.style.top = '-50%'; }
+            else if (vector === 1) { flare.style.left = '150%'; flare.style.top = '-50%'; }
+            else if (vector === 2) { flare.style.top = '-150%'; flare.style.left = '-50%'; flare.style.transform = `rotate(${globalAngle + 90}deg)`; }
+            else { flare.style.top = '150%'; flare.style.left = '-50%'; flare.style.transform = `rotate(${globalAngle + 90}deg)`; }
+
+            // --- 3. ЗАПУСК СИНХРОННОГО ДВИЖЕНИЯ ---
             setTimeout(() => {
-                flare.style.transition = `all ${duration}s cubic-bezier(0.2, 0.6, 0.3, 1)`;
-                if (side === 0) {
-                    flare.style.left = '180%';
-                } else {
-                    flare.style.left = '-180%';
-                }
+                flare.style.transition = `all ${duration}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+                
+                if (vector === 0) flare.style.left = '180%';
+                else if (vector === 1) flare.style.left = '-180%';
+                else if (vector === 2) flare.style.top = '180%';
+                else flare.style.top = '-180%';
             }, 20 + delay);
         });
     });
@@ -1046,6 +1049,7 @@ document.querySelectorAll('.audio-card').forEach(card => {
         const flares = card.querySelectorAll('.flare-layer');
         flares.forEach(f => {
             f.style.opacity = '0';
+            setTimeout(() => { f.style.transition = 'none'; }, 500);
         });
     });
 });
