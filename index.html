@@ -888,37 +888,39 @@
         line-height: 1.4 !important;
 }
     
-    /* 6. Подсветка модулей при скролле */
+   /* --- 6. ФИНАЛЬНАЯ ПОДСВЕТКА (МГНОВЕННАЯ) --- */
+    
+    /* Это заставляет телефон заранее подготовить графику и не тупить */
+    .module {
+        will-change: transform, border-color, box-shadow; 
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    /* Базовый вид активного блока */
     .module.active-package {
-        transform: translateY(-10px) scale(1.02) !important;
+        transform: translateY(-8px) scale(1.02) !important;
         background: rgba(20, 20, 20, 0.95) !important;
         z-index: 10 !important;
-        border: 2px solid #fff !important;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        /* Убираем общую белую рамку, чтобы она не вылезала раньше цвета */
+        border: 2px solid transparent !important; 
     }
 
-    /* Белый неон — Час записи */
-    .module.active-package[data-package="hour"] {
-        border-color: #ffffff !important;
-        box-shadow: 0 0 35px rgba(255, 255, 255, 0.6) !important;
+    /* Цвета: включаются МГНОВЕННО благодаря will-change выше */
+    .module.active-package[data-package="hour"] { 
+        border-color: #ffffff !important; 
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.6) !important; 
     }
-
-    /* Голубой неон — Start Edition */
-    .module.active-package[data-package="start"] {
-        border-color: #00f3ff !important;
-        box-shadow: 0 0 35px rgba(0, 243, 255, 0.6) !important;
+    .module.active-package[data-package="start"] { 
+        border-color: #00f3ff !important; 
+        box-shadow: 0 0 25px rgba(0, 243, 255, 0.6) !important; 
     }
-
-    /* Малиновый неон — Artist Edition */
-    .module.active-package[data-package="artist"] {
-        border-color: #ff00ff !important;
-        box-shadow: 0 0 35px rgba(255, 0, 255, 0.6) !important;
+    .module.active-package[data-package="artist"] { 
+        border-color: #ff00ff !important; 
+        box-shadow: 0 0 25px rgba(255, 0, 255, 0.6) !important; 
     }
-
-    /* Зеленый неон — Pro Edition */
-    .module.active-package[data-package="pro"] {
-        border-color: #00ff41 !important;
-        box-shadow: 0 0 35px rgba(0, 255, 65, 0.6) !important;
+    .module.active-package[data-package="pro"] { 
+        border-color: #00ff41 !important; 
+        box-shadow: 0 0 25px rgba(0, 255, 65, 0.6) !important; 
     }
         
     </style>
@@ -1177,7 +1179,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. АНИМАЦИЯ ABOUT ME (ЧИНИМ ВЫЕЗД) ---
+    // --- 1. АНИМАЦИЯ ABOUT ME (ВЫЕЗД) ---
     const aboutSection = document.querySelector('#about-me');
     if (aboutSection) {
         const observer = new IntersectionObserver((entries) => {
@@ -1190,33 +1192,34 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(aboutSection);
     }
 
-    // --- 2. ПОДСВЕТКА ПАКЕТОВ (МОБИЛКА) ---
+    // --- 2. ПОДСВЕТКА МОДУЛЕЙ (МОБИЛКА) ---
     const highlightModulesOnScroll = () => {
         if (window.innerWidth > 768) return;
 
         const modules = document.querySelectorAll('.module');
         const triggerLine = window.innerHeight / 2;
 
-        modules.forEach(mod => {
-            const box = mod.getBoundingClientRect();
-            const boxCenter = box.top + (box.height / 2);
+        // Используем requestAnimationFrame для супер-плавности на iPhone/Android
+        window.requestAnimationFrame(() => {
+            modules.forEach(mod => {
+                const box = mod.getBoundingClientRect();
+                const boxCenter = box.top + (box.height / 2);
 
-            if (Math.abs(boxCenter - triggerLine) < 160) {
-                modules.forEach(m => m.classList.remove('active-package'));
-                mod.classList.add('active-package');
-            }
+                // Зона срабатывания увеличена до 180px для отзывчивости
+                if (Math.abs(boxCenter - triggerLine) < 180) {
+                    if (!mod.classList.contains('active-package')) {
+                        modules.forEach(m => m.classList.remove('active-package'));
+                        mod.classList.add('active-package');
+                    }
+                }
+            });
         });
     };
 
+    // Слушатели событий
     window.addEventListener('scroll', highlightModulesOnScroll, { passive: true });
     window.addEventListener('touchmove', highlightModulesOnScroll, { passive: true });
     window.addEventListener('load', highlightModulesOnScroll);
-});
-
-// Запускаем слежку за каждым пакетом
-document.querySelectorAll('.service-package').forEach(pkg => {
-    packageObserver.observe(pkg);
-
 });
 
 </script>
