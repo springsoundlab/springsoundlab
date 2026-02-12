@@ -1101,8 +1101,9 @@
             </a>
         </div>
     </section>
-</div> <script>
-    // 1. Логика аудио-плееров (остановка других при запуске одного)
+</div>
+
+<script>
     document.addEventListener('play', function(e) {
         const allAudios = document.querySelectorAll('audio');
         allAudios.forEach(audio => {
@@ -1120,13 +1121,11 @@
         });
     }, true);
 
-    // 2. Логика кнопок Play/Pause
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const container = this.closest('div'); 
             const audio = container.querySelector('audio') || this.parentElement.querySelector('audio');
             const icon = this.querySelector('i');
-
             if (audio.paused) {
                 audio.play();
                 icon.className = 'fas fa-pause';
@@ -1137,7 +1136,6 @@
         });
     });
 
-    // 3. Прогресс-бары и окончание трека
     document.querySelectorAll('audio').forEach(audio => {
         audio.addEventListener('timeupdate', function() {
             const container = this.closest('div');
@@ -1147,7 +1145,6 @@
                 bar.style.width = percent + '%';
             }
         });
-
         audio.addEventListener('ended', function() {
             const container = this.closest('div');
             const icon = container.querySelector('.play-btn i') || this.parentElement.querySelector('.play-btn i');
@@ -1156,7 +1153,6 @@
         });
     });
 
-    // 4. Анимации появления (About Me) и мобильная подсветка
     document.addEventListener('DOMContentLoaded', () => {
         const aboutSection = document.querySelector('#about-me');
         if (aboutSection) {
@@ -1183,24 +1179,25 @@
                 }
             });
         };
-
         window.addEventListener('scroll', handleMobileGlow, { passive: true });
         handleMobileGlow();
     });
 </script>
 
-<footer style="background: #000; border-top: 1px solid #111; padding: 20px; text-align: center; margin-top: 50px;">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-        <div style="color: #444; font-size: 11px; letter-spacing: 2px; font-family: 'Orbitron', sans-serif;">
+<footer style="background: #000; border-top: 1px solid #111; padding: 10px 20px; text-align: center;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
+        
+        <div style="color: #444; font-size: 10px; letter-spacing: 2px; font-family: 'Orbitron', sans-serif;">
             © 2026 <span style="color: var(--neon-purple);">SPRING SOUND LAB</span>
         </div>
-        <div id="admin-trigger" style="color: #666; font-size: 10px; letter-spacing: 2px; cursor: pointer; border: 1px solid #222; padding: 5px 15px; font-family: 'Orbitron', sans-serif; transition: 0.3s;">
+        
+        <div id="admin-trigger" style="color: #666; font-size: 9px; letter-spacing: 2px; cursor: pointer; border: 1px solid #222; padding: 2px 10px; font-family: 'Orbitron', sans-serif; transition: 0.3s; line-height: 1;">
             LOG IN
         </div>
+
     </div>
 
     <script>
-    // Отдельный скрипт для админки, чтобы не путаться
     document.addEventListener('DOMContentLoaded', () => {
         const adminBtn = document.getElementById('admin-trigger');
         if (adminBtn) {
@@ -1208,7 +1205,8 @@
                 document.getElementById('admin-panel').style.display = 'block';
                 document.getElementById('admin-overlay').style.display = 'block';
                 setTimeout(() => {
-                    document.getElementById('admin-login').focus();
+                    const loginInput = document.getElementById('admin-login');
+                    if (loginInput) loginInput.focus();
                 }, 100);
             };
         }
@@ -1222,7 +1220,6 @@
     function checkAdminAuth() {
         const userLogin = document.getElementById('admin-login').value;
         const userPass = document.getElementById('admin-pass').value;
-
         if (userLogin === 'WEYTON' && userPass === '2026') {
             alert('Access Granted. Redirecting...');
             window.location.href = 'certificates.html'; 
@@ -1233,7 +1230,8 @@
     }
 
     document.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && document.getElementById('admin-panel').style.display === 'block') {
+        const panel = document.getElementById('admin-panel');
+        if (e.key === 'Enter' && panel && panel.style.display === 'block') {
             checkAdminAuth();
         }
     });
