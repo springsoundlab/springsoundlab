@@ -213,7 +213,7 @@
     let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
     let currentCart = { items: [], details: [], total: 0 };
     let currentCalDate = new Date();
-    let selectedDate = null; // Дата для сохранения задним числом
+    let selectedDate = null;
 
     const colorMap = {
         white: '#fff',
@@ -320,12 +320,13 @@
         const dateToSave = selectedDate || new Date().toLocaleDateString('ru-RU');
         const servicesText = currentCart.items.map(i => i.name).join(', ');
         
-        crmData.unshift({ 
+        crmData.push({ 
             date: dateToSave, 
             client: name, 
             services: servicesText, 
             details: [...currentCart.details], 
-            total: currentCart.total 
+            total: currentCart.total,
+            timestamp: Date.now() // Сохраняем время создания для порядка внутри дня
         });
         
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
@@ -341,14 +342,15 @@
         
         document.getElementById('currentViewText').innerText = `ОТЧЕТ ЗА ${document.getElementById('calMonthName').innerText}`;
 
-        // Сортировка: Сначала по дате (новые сверху), потом по времени добавления
+        // ЛОГИЧНАЯ СОРТИРОВКА: ОТ 1-го ЧИСЛА К ПОСЛЕДНЕМУ
         const sortedData = [...crmData].sort((a,b) => {
             const dateA = a.date.split('.').reverse().join('');
             const dateB = b.date.split('.').reverse().join('');
-            return dateB.localeCompare(dateA);
+            if (dateA !== dateB) return dateA.localeCompare(dateB);
+            return a.timestamp - b.timestamp; // Внутри одного дня — по времени добавления
         });
 
-        sortedData.forEach((row, index) => {
+        sortedData.forEach((row) => {
             if (!row.date.includes(monthKey)) return;
 
             const tr = document.createElement('tr');
