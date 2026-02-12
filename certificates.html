@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRING SOUND LAB | CRM & CERTS</title>
+    <title>SPRING SOUND LAB | CRM SYSTEM</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -14,88 +14,137 @@
         .back-btn { color: #444; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #222; padding: 5px 10px; border-radius: 4px; }
         .admin-grid { display: grid; grid-template-columns: 1fr 350px; gap: 20px; max-width: 1400px; margin: 0 auto; }
         .crm-panel, .certs-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #111; }
+        .controls-row { display: flex; align-items: center; gap: 8px; background: #000; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #111; flex-wrap: wrap; }
+        .action-btn { background: #111; border: 1px solid #222; color: #fff; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.3s; }
+        .action-btn:hover { border-color: var(--neon-purple); background: #161616; }
+        .platinum-group { display: flex; align-items: center; gap: 5px; border-left: 1px solid #222; padding-left: 10px; }
+        .plat-input { background: #000; border: 1px solid var(--neon-purple); color: #fff; width: 65px; padding: 7px; border-radius: 5px; font-family: 'Orbitron', sans-serif; font-size: 9px; outline: none; }
+        .current-session-box { background: rgba(191, 0, 255, 0.05); border: 1px dashed var(--neon-purple); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .total-box { background: rgba(191, 0, 255, 0.1); padding: 10px 20px; border: 1px solid var(--neon-purple); border-radius: 8px; text-align: right; }
         .total-amount { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); font-size: 20px; display: block; }
-        .total-label { font-size: 9px; color: #666; letter-spacing: 1px; }
-        .quick-actions { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #000; padding: 15px; border-radius: 8px; }
-        .action-btn { background: #111; border: 1px solid #222; color: #fff; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 11px; font-family: 'Orbitron', sans-serif; transition: 0.3s; }
-        .action-btn:hover { border-color: var(--neon-purple); background: #161616; }
-        .platinum-input { background: #000; border: 1px solid var(--neon-purple); color: #fff; width: 80px; padding: 7px; border-radius: 5px; font-family: 'Orbitron', sans-serif; font-size: 11px; outline: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; color: #444; font-family: 'Orbitron', sans-serif; font-size: 10px; padding: 10px; border-bottom: 1px solid #222; }
         td { padding: 12px 10px; border-bottom: 1px solid #111; }
+        .input-mini { background: #111; border: 1px solid #222; color: #fff; padding: 6px; font-size: 11px; width: 140px; outline: none; border-radius: 4px; }
+        .save-btn { background: var(--status-green); color: #000; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 10px; font-family: 'Orbitron'; }
         .certs-panel { height: 85vh; overflow-y: auto; }
         .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
-        .cert-id { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); font-size: 12px; }
-        .cert-status { font-size: 9px; font-weight: bold; border: 1px solid; padding: 2px 5px; border-radius: 3px; }
-        .input-mini { background: #111; border: 1px solid #222; color: #fff; padding: 4px; font-size: 11px; width: 100px; outline: none; }
-        .btn-mini { background: var(--neon-purple); border: none; color: #fff; font-size: 9px; padding: 4px 8px; border-radius: 3px; cursor: pointer; }
+        .cert-id { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); font-size: 11px; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); }
     </style>
 </head>
 <body>
+
 <header>
     <div class="logo">SPRING SOUND LAB | CRM SYSTEM</div>
-    <a href="index.html" class="back-btn">Выйти на сайт</a>
+    <div style="display:flex; gap:15px; align-items:center;">
+        <div class="total-box" style="padding: 5px 15px;">
+            <span id="monthTotal" style="font-family:'Orbitron'; color:var(--neon-purple); font-size:16px;">0 ₽</span>
+            <span style="font-size:8px; color:#555; display:block;">ИТОГО МЕСЯЦ</span>
+        </div>
+        <a href="index.html" class="back-btn">Выйти на сайт</a>
+    </div>
 </header>
+
 <div class="admin-grid">
     <div class="crm-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="font-family:'Orbitron'; font-size:18px; margin:0;">УЧЁТ СЕССИЙ</h2>
-            <div class="total-box">
-                <span id="totalDisplay" class="total-amount">0 ₽</span>
-                <span class="total-label">ИТОГО ЗА МЕСЯЦ</span>
+        <div class="controls-row">
+            <button class="action-btn" onclick="addToCart('ЧАС ЗАПИСИ', 900)">+ 1 ЧАС</button>
+            <button class="action-btn" onclick="addToCart('START EDITION', 3500)">START</button>
+            <button class="action-btn" onclick="addToCart('ARTIST EDITION', 6000)">ARTIST</button>
+            <button class="action-btn" style="border-color:#555" onclick="addToCart('ТЮНИНГ (1 ДОРА)', 1000)">ТЮНИНГ 1.0</button>
+            <button class="action-btn" style="border-color:#555" onclick="addToCart('ТЮНИНГ БЭКИ/W', 2500)">ТЮНИНГ 6.0</button>
+            
+            <div class="platinum-group">
+                <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
+                <button class="action-btn" style="border-color:#00ff66;" onclick="addPlatToCart()">+ PLATINUM</button>
             </div>
         </div>
-        <div class="quick-actions">
-            <button class="action-btn" onclick="addEntry('ЧАС ЗАПИСИ', 900)">+ 1 ЧАС (900)</button>
-            <button class="action-btn" onclick="addEntry('START EDITION', 3500)">START (3500)</button>
-            <button class="action-btn" onclick="addEntry('ARTIST EDITION', 6000)">ARTIST (6000)</button>
-            <div style="display:flex; align-items:center; gap:5px; margin-left:auto;">
-                <input type="number" id="platPrice" class="platinum-input" placeholder="10000">
-                <button class="action-btn" style="border-color:#00ff66;" onclick="addPlatinum()">+ PLATINUM</button>
+
+        <div id="currentSession" class="current-session-box" style="display: none;">
+            <div>
+                <div style="font-size: 9px; color: var(--neon-purple); margin-bottom: 5px; font-family:'Orbitron'">ТЕКУЩИЙ ЧЕК:</div>
+                <div id="cartItems" style="font-size: 11px; color: #ccc; max-width: 400px;"></div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <input type="text" id="clientName" class="input-mini" placeholder="ИМЯ КЛИЕНТА">
+                <div style="text-align:right">
+                    <span id="cartTotal" style="font-family:'Orbitron'; font-size:18px; color:#fff; display:block;">0 ₽</span>
+                    <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
+                </div>
+                <i class="fas fa-times" style="cursor:pointer; color:#444" onclick="clearCart()"></i>
             </div>
         </div>
+
         <table>
-            <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГА</th><th>СУММА</th><th></th></tr></thead>
+            <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th>ИТОГО</th><th></th></tr></thead>
             <tbody id="crmTableBody"></tbody>
         </table>
-        <button onclick="clearCRM()" style="margin-top:20px; background:none; border:none; color:#333; font-size:9px; cursor:pointer; text-transform:uppercase;">Очистить все записи</button>
+        <button onclick="clearFullHistory()" style="margin-top:40px; background:none; border:none; color:#222; font-size:8px; cursor:pointer; text-transform:uppercase;">Удалить всю историю</button>
     </div>
+
     <div class="certs-panel">
         <h2 style="font-family:'Orbitron'; font-size:14px; margin-bottom:20px; color:#444;">СЕРТИФИКАТЫ (300)</h2>
         <div id="certsList"></div>
     </div>
 </div>
+
 <script>
-    let crmData = JSON.parse(localStorage.getItem('spring_crm')) || [];
-    function updateCRM() {
-        const body = document.getElementById('crmTableBody');
-        const totalDisp = document.getElementById('totalDisplay');
-        body.innerHTML = ''; let total = 0;
-        crmData.forEach((item, index) => {
-            total += item.price;
-            const row = document.createElement('tr');
-            row.innerHTML = `<td>${item.date}</td><td><input type="text" class="input-mini" value="${item.client}" onchange="updateClient(${index},this.value)"></td><td style="color:var(--neon-purple)">${item.service}</td><td>${item.price} ₽</td><td><i class="fas fa-times" onclick="deleteEntry(${index})"></i></td>`;
-            body.appendChild(row);
-        });
-        totalDisp.innerHTML = total.toLocaleString() + ' ₽';
-        localStorage.setItem('spring_crm', JSON.stringify(crmData));
+    let crmData = JSON.parse(localStorage.getItem('spring_crm_v2')) || [];
+    let currentCart = { items: [], total: 0 };
+
+    function addToCart(name, price) {
+        currentCart.items.push(name);
+        currentCart.total += price;
+        renderCart();
     }
-    function addEntry(service, price) {
-        const date = new Date().toLocaleDateString('ru-RU');
-        crmData.unshift({ date, client: '', service, price });
-        updateCRM();
-    }
-    function addPlatinum() {
-        const price = document.getElementById('platPrice').value || 10000;
-        addEntry('PLATINUM', parseInt(price));
+
+    function addPlatToCart() {
+        const p = parseInt(document.getElementById('platPrice').value) || 10000;
+        addToCart('PLATINUM EDITION', p);
         document.getElementById('platPrice').value = '';
     }
-    function updateClient(index, val) { crmData[index].client = val; localStorage.setItem('spring_crm', JSON.stringify(crmData)); }
-    function deleteEntry(index) { crmData.splice(index, 1); updateCRM(); }
-    function clearCRM() { if(confirm('Удалить данные?')) { crmData = []; updateCRM(); } }
+
+    function renderCart() {
+        const box = document.getElementById('currentSession');
+        if (currentCart.items.length > 0) {
+            box.style.display = 'flex';
+            document.getElementById('cartItems').innerText = currentCart.items.join(' + ');
+            document.getElementById('cartTotal').innerText = currentCart.total + ' ₽';
+        } else { box.style.display = 'none'; }
+    }
+
+    function clearCart() {
+        currentCart = { items: [], total: 0 };
+        document.getElementById('clientName').value = '';
+        renderCart();
+    }
+
+    function saveSession() {
+        const name = document.getElementById('clientName').value || 'Без имени';
+        const date = new Date().toLocaleDateString('ru-RU');
+        crmData.unshift({ date, client: name, services: currentCart.items.join(', '), total: currentCart.total });
+        localStorage.setItem('spring_crm_v2', JSON.stringify(crmData));
+        clearCart(); updateTable();
+    }
+
+    function updateTable() {
+        const body = document.getElementById('crmTableBody');
+        const monthTotal = document.getElementById('monthTotal');
+        body.innerHTML = ''; let totalSum = 0;
+        crmData.forEach((row, index) => {
+            totalSum += row.total;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td style="color:#444">${row.date}</td><td style="font-weight:600">${row.client}</td><td style="color:var(--neon-purple); font-size:10px;">${row.services}</td><td style="font-family:'Orbitron'">${row.total} ₽</td><td><i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${index})"></i></td>`;
+            body.appendChild(tr);
+        });
+        monthTotal.innerText = totalSum.toLocaleString() + ' ₽';
+    }
+
+    function deleteRow(index) { if(confirm('Удалить?')) { crmData.splice(index, 1); localStorage.setItem('spring_crm_v2', JSON.stringify(crmData)); updateTable(); } }
+    function clearFullHistory() { if(confirm('Удалить ВСЁ?')) { crmData = []; localStorage.setItem('spring_crm_v2', JSON.stringify(crmData)); updateTable(); } }
+
     function updateCerts() {
         const list = document.getElementById('certsList');
         const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
@@ -105,19 +154,20 @@
             const data = savedCerts[id] || { active: false, name: '' };
             const div = document.createElement('div');
             div.className = 'cert-row';
-            div.innerHTML = `<span class="cert-id">${id}</span>${data.active ? `<span style="font-size:10px; color:#555">${data.name}</span>` : `<input type="text" id="in-${id}" class="input-mini" placeholder="Имя">`}${data.active ? `<span class="cert-status" style="color:var(--status-green); border-color:var(--status-green)">OK</span>` : `<button class="btn-mini" onclick="activateCert('${id}')">АКТИВ</button>`}`;
+            div.innerHTML = `<span class="cert-id">${id}</span>${data.active ? `<span style="font-size:10px; color:#555">${data.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${data.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}`;
             list.appendChild(div);
         }
     }
+
     function activateCert(id) {
         const name = document.getElementById('in-' + id).value;
-        if (!name) return alert('Введите имя!');
+        if (!name) return alert('Имя!');
         const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
         savedCerts[id] = { active: true, name: name };
         localStorage.setItem('spring_certs', JSON.stringify(savedCerts));
         updateCerts();
     }
-    updateCRM(); updateCerts();
+    updateTable(); updateCerts();
 </script>
 </body>
 </html>
