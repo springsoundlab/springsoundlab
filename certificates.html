@@ -138,18 +138,18 @@
             align-self: flex-end;
         }
         
-      /* Сумма: строго над кнопкой, размер в размер, прижата вправо */
+     /* Сумма: строго над кнопкой, размер в размер, прижата вправо */
         .total-display-pc { 
             font-family: 'Rajdhani', sans-serif; 
             font-weight: 700; 
             font-size: 34px; 
             color: #fff; 
-            /* Flex-режим выравнивает символ ₽ и цифры идеально по одной линии */
+            /* Выравниваем символ ₽ и цифры идеально по одной линии */
             display: flex;
             justify-content: flex-end;
             align-items: center; 
             
-            height: 42px; /* Высота как у кнопки для симметрии */
+            height: 42px; /* Идентичная высота с кнопкой и инпутом */
             width: 155px; 
             margin-bottom: 8px;
             letter-spacing: 1px;
@@ -167,7 +167,7 @@
             width: 320px;
         }
 
-        /* Поле ввода: шрифт крупнее, высота 42px (как у кнопки) */
+        /* Поле ввода: высота 42px (как у кнопки), шрифт 13px */
         .input-mini { 
             background: #000; 
             border: 1px solid #333; 
@@ -186,6 +186,7 @@
             justify-content: center;
         }
         .input-mini::placeholder { color: #444; font-size: 9px; }
+
         /* Кнопка сохранить: высота 42px, ширина 155px */
         .save-btn { 
             background: var(--status-green); 
@@ -415,28 +416,30 @@
         document.getElementById('platPrice').value = '';
     }
 
-  function renderCart() {
+ function renderCart() {
         const itemsContainer = document.getElementById('cartItems');
         const totalDisplay = document.getElementById('cartTotal');
         
+        // Считаем общую сумму из массива currentCart
+        const currentTotal = currentCart.reduce((sum, item) => sum + item.price, 0);
+
         // 1. Обновляем итоговую сумму с красивым символом рубля
         if (totalDisplay) {
-            totalDisplay.innerText = cartTotal + ' ₽';
+            totalDisplay.innerText = currentTotal + ' ₽';
         }
         
-        // 2. Очищаем контейнер перед отрисовкой плашек
+        if (!itemsContainer) return;
         itemsContainer.innerHTML = '';
 
-        // 3. Если корзина пуста, выводим надпись
+        // 2. Если корзина пуста
         if (currentCart.length === 0) {
             itemsContainer.innerHTML = '<span style="color:#444; font-size:10px; font-family:\'Orbitron\'">Пусто...</span>';
             return;
         }
 
-        // 4. Отрисовываем плашки услуг (используем правильный массив currentCart)
+        // 3. Отрисовываем плашки услуг
         currentCart.forEach((item, index) => {
             const tag = document.createElement('div');
-            // Подставляем класс цвета (tag-purple, tag-red и т.д.)
             tag.className = `cart-tag ${getTagClass(item.type)}`;
             tag.innerHTML = `
                 ${item.name}
@@ -445,33 +448,37 @@
             itemsContainer.appendChild(tag);
         });
     }
-            totalDisplay.innerText = currentCart.total + ' ₽';
-        } else {
-            itemsContainer.innerText = 'Пусто...';
-            totalDisplay.innerText = '0 ₽';
-        }
-    }
 
     function clearCart() {
-        currentCart = { items: [], details: [], total: 0 };
-        document.getElementById('clientName').value = '';
+        currentCart = []; // Очищаем массив
+        const nameInput = document.getElementById('clientName');
+        if (nameInput) nameInput.value = '';
         renderCart();
     }
 
     function saveSession() {
-        if (currentCart.items.length === 0) return alert('Добавьте услуги!');
-        const name = document.getElementById('clientName').value || 'Без имени';
+        if (currentCart.length === 0) return alert('Добавьте услуги!');
+        
+        const nameInput = document.getElementById('clientName');
+        const name = (nameInput && nameInput.value) ? nameInput.value : 'Без имени';
         const dateToSave = selectedDate || new Date().toLocaleDateString('ru-RU');
-        const servicesText = currentCart.items.map(i => i.name).join(', ');
+        
+        const servicesText = currentCart.map(i => i.name).join(', ');
+        const totalToSave = currentCart.reduce((sum, item) => sum + item.price, 0);
         
         crmData.push({ 
             date: dateToSave, 
             client: name, 
             services: servicesText, 
-            details: [...currentCart.details], 
-            total: currentCart.total,
+            total: totalToSave,
             timestamp: Date.now()
         });
+
+        localStorage.setItem('crmData', JSON.stringify(crmData));
+        clearCart();
+        renderTable();
+        if (typeof updateStats === 'function') updateStats();
+    }
         
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         clearCart(); 
