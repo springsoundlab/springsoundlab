@@ -1218,63 +1218,65 @@ document.addEventListener('DOMContentLoaded', () => {
     handleMobileGlow();
 });
 
-// Открытие панели по кнопке Log In
-const adminBtn = document.getElementById('admin-trigger');
-if (adminBtn) {
-    adminBtn.addEventListener('click', () => {
-        document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('admin-overlay').style.display = 'block';
-        document.getElementById('admin-login').focus();
+<footer style="background: #000; border-top: 1px solid #111; padding: 20px; text-align: center; margin-top: 50px;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        
+        <div style="color: #444; font-size: 11px; letter-spacing: 2px; font-family: 'Orbitron', sans-serif;">
+            © 2026 <span style="color: var(--neon-purple);">SPRING SOUND LAB</span>
+        </div>
+        
+        <div id="admin-trigger" style="color: #666; font-size: 10px; letter-spacing: 2px; cursor: pointer; border: 1px solid #222; padding: 5px 15px; font-family: 'Orbitron', sans-serif; transition: 0.3s;">
+            LOG IN
+        </div>
+    </div>
+
+    <script>
+    // Объединяем всю логику в одном месте
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminBtn = document.getElementById('admin-trigger');
+        if (adminBtn) {
+            adminBtn.onclick = function() {
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('admin-overlay').style.display = 'block';
+                // Небольшая задержка, чтобы фокус сработал идеально
+                setTimeout(() => {
+                    const loginInput = document.getElementById('admin-login');
+                    if (loginInput) loginInput.focus();
+                }, 100);
+            };
+        }
     });
-}
 
-<script>
-
-    <footer>
-    
-// ЛОГИКА АДМИНКИ
-document.addEventListener('DOMContentLoaded', () => {
-    const adminBtn = document.getElementById('admin-trigger');
-    if (adminBtn) {
-        adminBtn.onclick = function() {
-            document.getElementById('admin-panel').style.display = 'block';
-            document.getElementById('admin-overlay').style.display = 'block';
-            setTimeout(() => document.getElementById('admin-login').focus(), 100);
-        };
+    function closeAdmin() {
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('admin-overlay').style.display = 'none';
     }
-});
 
-function closeAdmin() {
-    document.getElementById('admin-panel').style.display = 'none';
-    document.getElementById('admin-overlay').style.display = 'none';
-}
+    function checkAdminAuth() {
+        const userLogin = document.getElementById('admin-login').value;
+        const userPass = document.getElementById('admin-pass').value;
 
-function checkAdminAuth() {
-    const userLogin = document.getElementById('admin-login').value;
-    const userPass = document.getElementById('admin-pass').value;
-
-    if (userLogin === 'WEYTON' && userPass === '2026') {
-        alert('Access Granted. Redirecting...');
-        window.location.href = 'certificates.html'; 
-    } else {
-        alert('Access Denied.');
-        document.getElementById('admin-pass').value = '';
+        // Твои данные для входа: WEYTON / 2026
+        if (userLogin === 'WEYTON' && userPass === '2026') {
+            alert('Access Granted. Redirecting...');
+            window.location.href = 'certificates.html'; 
+        } else {
+            alert('Access Denied. Incorrect Login or Password.');
+            document.getElementById('admin-pass').value = '';
+        }
     }
-}
 
-// Слушаем нажатие Enter
-document.addEventListener('keypress', (e) => {
-    const panel = document.getElementById('admin-panel');
-    if (e.key === 'Enter' && panel && panel.style.display === 'block') {
-        checkAdminAuth();
-    }
-});
+    // Слушаем нажатие Enter для входа
+    document.addEventListener('keypress', (e) => {
+        const panel = document.getElementById('admin-panel');
+        if (e.key === 'Enter' && panel && panel.style.display === 'block') {
+            checkAdminAuth();
+        }
+    });
+    </script>
+</footer> 
 
-    
-</script>
-</footer>
-    
-    <div id="admin-overlay" onclick="closeAdmin()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; backdrop-filter: blur(5px);"></div>
+<div id="admin-overlay" onclick="closeAdmin()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; backdrop-filter: blur(5px);"></div>
 
 <div id="admin-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 320px; background: #0a0a0a; border: 1px solid var(--neon-purple); padding: 30px; z-index: 10000; border-radius: 15px; box-shadow: 0 0 30px rgba(191, 0, 255, 0.2); font-family: 'Orbitron', sans-serif; text-align: center;">
     <div style="color: var(--neon-purple); font-size: 18px; margin-bottom: 25px; letter-spacing: 2px;">WEYTON ACCESS</div>
@@ -1287,6 +1289,6 @@ document.addEventListener('keypress', (e) => {
     
     <div onclick="closeAdmin()" style="margin-top: 20px; color: #444; font-size: 10px; cursor: pointer; text-transform: uppercase;">Abort Mission</div>
 </div>
-    
+
 </body>
 </html>
