@@ -23,6 +23,7 @@
         .back-btn { color: #888; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #222; padding: 5px 10px; border-radius: 4px; transition: 0.3s; }
         .back-btn:hover { color: #fff; border-color: var(--neon-purple); }
 
+        /* СЕТКА ДЛЯ КОМПЬЮТЕРА (ВОЗВРАЩЕНО) */
         .admin-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; max-width: 1600px; margin: 0 auto; align-items: stretch; }
         .crm-panel, .side-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #111; display: flex; flex-direction: column; }
 
@@ -58,11 +59,12 @@
 
         .btn-tooltip { bottom: 120%; left: 50%; transform: translateX(-50%); width: auto; padding: 5px 10px; }
 
-        .btn-white { border: 1px solid #fff; }
-        .btn-purple { border: 1px solid var(--neon-purple); }
-        .btn-red { border: 1px solid var(--artist-red); }
-        .btn-green { border: 1px solid var(--status-green); }
-        .btn-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
+        /* ЦВЕТА КНОПОК (ВОЗВРАЩЕНО) */
+        .btn-white { border: 1px solid #fff !important; }
+        .btn-purple { border: 1px solid var(--neon-purple) !important; color: var(--neon-purple) !important; }
+        .btn-red { border: 1px solid var(--artist-red) !important; color: var(--artist-red) !important; }
+        .btn-green { border: 1px solid var(--status-green) !important; color: var(--status-green) !important; }
+        .btn-gold { border: 1px solid var(--platinum-gold) !important; color: var(--platinum-gold) !important; }
         .btn-dashed-green { border: 1px dashed var(--status-green) !important; }
         .btn-dashed-gold { border: 1px dashed var(--platinum-gold) !important; }
 
@@ -132,48 +134,37 @@
         .reset-link:hover { color: var(--neon-purple); }
 
         /* ————————————————————————————————————————————————————————————
-           МОБИЛЬНАЯ АДАПТАЦИЯ (ДЛЯ IPHONE SE И ДРУГИХ)
+           МОБИЛЬНАЯ АДАПТАЦИЯ (ВКЛЮЧАЕТСЯ ТОЛЬКО ПРИ ШИРИНЕ МЕНЬШЕ 900PX)
            ———————————————————————————————————————————————————————————— */
         @media (max-width: 900px) {
             body { padding: 10px; padding-top: env(safe-area-inset-top, 20px); }
-            
-            /* Шапка вертикально */
             header { flex-direction: column; gap: 15px; padding: 15px 10px; }
-            header .logo { font-size: 12px; text-align: center; }
             header div[style*="display:flex"] { flex-direction: column; width: 100%; gap: 10px; }
-            .total-box { width: 100%; text-align: center; box-sizing: border-box; }
-            .back-btn { width: 100%; text-align: center; padding: 12px; box-sizing: border-box; }
+            .total-box { width: 100%; text-align: center; }
+            .back-btn { width: 100%; text-align: center; }
 
-            /* Изменение порядка блоков через Flexbox */
+            /* Перестроение блоков только для мобилки */
             .admin-grid { display: flex; flex-direction: column; }
-            .side-panel { order: 1; } /* Календарь теперь выше панели CRM */
+            .side-panel { order: 1; } 
             .crm-panel { order: 2; }
-            .certs-section { order: 3; margin-top: 30px; } /* Сертификаты в самом низу */
+            .certs-section { order: 3; margin-top: 30px; }
 
-            /* Кнопки услуг - Крупнее и на всю ширину */
             .controls-row { justify-content: center; padding: 10px; gap: 8px; }
             .btn-wrapper { width: 100%; }
-            .action-btn { width: 100%; padding: 15px; font-size: 10px; text-align: center; }
-            .platinum-group { flex-direction: column; width: 100%; border-left: none; border-top: 1px solid #222; padding-left: 0; padding-top: 15px; }
-            .plat-input { width: 100%; box-sizing: border-box; margin-bottom: 10px; height: 45px; }
+            .action-btn { width: 100%; padding: 15px; font-size: 10px; }
+            .platinum-group { flex-direction: column; width: 100%; border-left: none; border-top: 1px solid #222; padding-top: 15px; }
+            .plat-input { width: 100%; margin-bottom: 10px; height: 45px; }
 
-            /* Текущий чек */
             .current-session-box { flex-direction: column; padding: 20px 10px; gap: 20px; }
             .current-session-box div[style*="display:flex"] { margin-left: 0; width: 100%; flex-direction: column; }
-            .input-mini { width: 100%; height: 45px; margin-bottom: 10px; }
-            #cartTotal { text-align: center; font-size: 40px; margin-bottom: 15px; }
+            .input-mini { width: 100%; height: 45px; }
+            #cartTotal { text-align: center; font-size: 40px; }
             .save-btn { width: 100%; height: 50px; }
 
-            /* Таблица - прокрутка */
-            .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .table-container { overflow-x: auto; }
             table { min-width: 500px; }
             
-            /* Скрываем тултипы на мобиле, они не работают на тачскрине */
             .btn-tooltip, .session-tooltip, .history-tooltip { display: none !important; }
-            
-            /* Теги в корзине */
-            .cart-tag { padding-right: 35px; margin-bottom: 8px; font-size: 11px; }
-            .tag-remove { right: 0; width: 30px; background: rgba(255,255,255,0.2); }
         }
     </style>
 </head>
@@ -182,7 +173,7 @@
 <header>
     <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
     <div style="display:flex; gap:15px; align-items:center;">
-        <div class="total-box">
+        <div class="total-box" style="padding: 5px 15px;">
             <span id="monthTotal" class="month-total-text">0 ₽</span>
             <span id="totalLabel" style="font-size:8px; color:#666; display:block; letter-spacing: 1px;">ДОХОД ЗА МЕСЯЦ</span>
         </div>
@@ -191,17 +182,6 @@
 </header>
 
 <div class="admin-grid">
-    <div class="side-panel">
-        <div class="calendar-widget">
-            <div class="cal-header">
-                <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(-1)"></i>
-                <div class="month-name" id="calMonthName">ФЕВРАЛЬ 2026</div>
-                <i class="fas fa-chevron-right" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(1)"></i>
-            </div>
-            <div class="cal-grid" id="calendarDays"></div>
-        </div>
-    </div>
-
     <div class="crm-panel">
         <div class="controls-row">
             <div class="btn-wrapper">
@@ -229,9 +209,11 @@
                 <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
                 <div class="btn-wrapper">
                     <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM EDITION</button>
+                    <div class="btn-tooltip">База (по умолч. 10к)</div>
                 </div>
                 <div class="btn-wrapper">
                     <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
+                    <div class="btn-tooltip">300 ₽</div>
                 </div>
             </div>
         </div>
@@ -248,7 +230,7 @@
                     <span id="cartTotal" style="font-family:'Rajdhani'; font-weight:700; font-size:32px; color:#fff; display:block; line-height:1; margin-bottom:5px;">0 ₽</span>
                     <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
                 </div>
-                <i class="fas fa-times" style="cursor:pointer; color:#333; font-size: 18px; padding: 10px;" onclick="clearCart()"></i>
+                <i class="fas fa-times" style="cursor:pointer; color:#333; font-size: 18px; padding: 10px; transition: 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#333'" onclick="clearCart()"></i>
             </div>
         </div>
 
@@ -266,9 +248,20 @@
         <button onclick="clearFullHistory()" style="margin-top:40px; background:none; border:none; color:#222; font-size:8px; cursor:pointer; text-transform:uppercase;">Удалить всю историю</button>
     </div>
 
-    <div class="certs-section">
-        <h2 style="font-family:'Orbitron'; font-size:14px; margin-bottom:15px; color:#fff;">СЕРТИФИКАТЫ</h2>
-        <div class="certs-container" id="certsList"></div>
+    <div class="side-panel">
+        <div class="calendar-widget">
+            <div class="cal-header">
+                <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(-1)"></i>
+                <div class="month-name" id="calMonthName" onclick="filterByMonth()">ФЕВРАЛЬ 2026</div>
+                <i class="fas fa-chevron-right" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(1)"></i>
+            </div>
+            <div class="cal-grid" id="calendarDays"></div>
+        </div>
+
+        <div class="certs-section" style="display:flex; flex-direction:column; flex-grow:1;">
+            <h2 style="font-family:'Orbitron'; font-size:14px; margin-bottom:15px; color:#fff;">СЕРТИФИКАТЫ</h2>
+            <div class="certs-container" id="certsList"></div>
+        </div>
     </div>
 </div>
 
@@ -380,7 +373,7 @@
                 <td style="font-weight:600">${row.client}</td>
                 <td style="font-size:11px; color:#ccc;">${row.services}</td>
                 <td class="num-cell price-cell">${row.total} ₽</td>
-                <td><i class="fas fa-trash" style="color:#222; cursor:pointer;" onclick="deleteRow(${crmData.indexOf(row)})"></i></td>
+                <td><i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${crmData.indexOf(row)})"></i></td>
             `;
             body.appendChild(tr);
         });
@@ -394,7 +387,7 @@
         document.getElementById('monthTotal').innerText = total.toLocaleString() + ' ₽';
     }
 
-    function deleteRow(index) { if(confirm('Удалить?')) { crmData.splice(index, 1); localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
+    function deleteRow(index) { if(confirm('Удалить запись?')) { crmData.splice(index, 1); localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
     function clearFullHistory() { if(confirm('Удалить ВСЕ данные?')) { crmData = []; localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
 
     function updateCerts() {
@@ -413,7 +406,7 @@
 
     function activateCert(id) {
         const name = document.getElementById('in-' + id).value;
-        if (!name) return alert('Имя!');
+        if (!name) return alert('Введите имя!');
         const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
         savedCerts[id] = { active: true, name: name };
         localStorage.setItem('spring_certs', JSON.stringify(savedCerts));
