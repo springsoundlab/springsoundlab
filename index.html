@@ -890,43 +890,24 @@
     
 /* --- 6. ИСПРАВЛЕННАЯ ПОДСВЕТКА (КАК НА ПК) --- */
     
-    .module {
-        transition: all 0.4s ease !important;
-        /* Делаем изначальную рамку почти невидимой, как на ПК */
-        border: 2px solid rgba(255, 255, 255, 0.1) !important;
-        background: rgba(255, 255, 255, 0.03) !important; /* Легкий фон, не черный! */
-        will-change: transform, border-color, box-shadow;
-    }
+.module {
+    transition: all 0.4s ease !important;
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+}
 
-    /* Когда блок в центре экрана */
-    .module.active-package {
-        transform: translateY(-10px) scale(1.02) !important;
-        /* Фон становится чуть заметнее, но остается прозрачным */
-        background: rgba(255, 255, 255, 0.08) !important; 
-        z-index: 10 !important;
-        opacity: 1 !important;
-    }
+/* Эффект увеличения для активного блока на мобилке */
+.module.active-package {
+    transform: translateY(-10px) scale(1.02) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    z-index: 10;
+}
 
-    /* Цвета неона — теперь точно как на ПК */
-    /* Пакет: Час записи */
-    .module.active-package.hour, .module.active-package[data-package="hour"] { 
-        border-color: #ffffff !important; 
-        box-shadow: 0 0 25px rgba(255, 255, 255, 0.6) !important; 
-    }
-    /* Пакет: Start */
-    .module.active-package.start, .module.active-package[data-package="start"] { 
-        border-color: #00f3ff !important; 
-        box-shadow: 0 0 25px rgba(0, 243, 255, 0.6) !important; 
-    }
-    /* Пакет: Artist */
-    .module.active-package.artist, .module.active-package[data-package="artist"] { 
-        border-color: #ff00ff !important; 
-        box-shadow: 0 0 25px rgba(255, 0, 255, 0.6) !important; 
-    }
-    /* Пакет: Pro */
-    .module.active-package.pro, .module.active-package[data-package="pro"] { 
-        border-color: #00ff41 !important; 
-        box-shadow: 0 0 25px rgba(0, 255, 65, 0.6) !important; 
+/* Цвета границ и свечения строго по твоим классам */
+.module.active-package.rec { border-color: #ffffff !important; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4) !important; }
+.module.active-package.start { border-color: #00f3ff !important; box-shadow: 0 0 20px rgba(0, 243, 255, 0.4) !important; }
+.module.active-package.artist { border-color: #ff00ff !important; box-shadow: 0 0 20px rgba(255, 0, 255, 0.4) !important; }
+.module.active-package.platinum { border-color: #ffd700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4) !important; }
     }
 }
         
@@ -979,7 +960,7 @@
     <section id="services">
         <h2>SERVICES</h2>
         <div class="module-grid">
-            <div class="module rec js-scroll-glow">
+            <div class="module rec js-scroll-glow" data-package="rec">
                 <h3>ЗАПИСЬ</h3>
                 <div class="price">900 <span>₽/ч</span></div>
                 <div class="module-description">
@@ -997,7 +978,7 @@
                 </ul>
             </div>
 
-            <div class="module start js-scroll-glow">
+            <div class="module start js-scroll-glow" data-package="start">
                 <h3>START EDITION</h3>
                 <div class="price">3 500 <span>₽</span></div>
                 <div class="module-description">
@@ -1015,7 +996,7 @@
                 </ul>
             </div>
 
-            <div class="module artist js-scroll-glow js-artist-trigger">
+            <div class="module artist js-scroll-glow js-artist-trigger" data-package="artist">
                 <h3>ARTIST EDITION</h3>
                 <div class="price">6 000 <span>₽</span></div>
                 <div class="module-description">
@@ -1034,7 +1015,7 @@
                 </ul>
             </div>
 
-            <div class="module platinum js-scroll-glow">
+            <div class="module platinum js-scroll-glow" data-package="platinum">
                 <h3>PLATINUM EDITION</h3>
                 <div class="price">ОТ 10 000 <span>₽</span></div>
                 <div class="module-description">
@@ -1185,43 +1166,29 @@
         });
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Анимация About Me
-    const aboutSection = document.querySelector('#about-me');
-    if (aboutSection) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) aboutSection.classList.add('is-revealed');
-            });
-        }, { threshold: 0.3 });
-        observer.observe(aboutSection);
-    }
-
-    // 2. Функция подсветки модулей
-    const highlightModulesOnScroll = () => {
+    const handleScrollGlow = () => {
+        // Включаем логику только на мобилках
         if (window.innerWidth > 768) return;
 
         const modules = document.querySelectorAll('.module');
-        const triggerLine = window.innerHeight / 2;
+        const triggerPoint = window.innerHeight / 2; // Центр экрана
 
-        window.requestAnimationFrame(() => {
-            modules.forEach(mod => {
-                const box = mod.getBoundingClientRect();
-                const boxCenter = box.top + (box.height / 2);
+        modules.forEach(mod => {
+            const rect = mod.getBoundingClientRect();
+            const center = rect.top + rect.height / 2;
 
-                if (Math.abs(boxCenter - triggerLine) < 200) {
-                    if (!mod.classList.contains('active-package')) {
-                        modules.forEach(m => m.classList.remove('active-package'));
-                        mod.classList.add('active-package');
-                    }
+            // Если центр блока совпадает с центром экрана (с погрешностью)
+            if (Math.abs(center - triggerPoint) < 150) {
+                if (!mod.classList.contains('active-package')) {
+                    modules.forEach(m => m.classList.remove('active-package'));
+                    mod.classList.add('active-package');
                 }
-            });
+            }
         });
     };
 
-    // 3. СЛУШАТЕЛИ (Исправил названия функций здесь)
-    window.addEventListener('scroll', highlightModulesOnScroll, { passive: true });
-    window.addEventListener('touchmove', highlightModulesOnScroll, { passive: true });
-    window.addEventListener('load', highlightModulesOnScroll);
+    window.addEventListener('scroll', handleScrollGlow, { passive: true });
+    window.addEventListener('load', handleScrollGlow);
 });
 
 </script>
