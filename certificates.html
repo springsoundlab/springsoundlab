@@ -138,35 +138,36 @@
             align-self: flex-end;
         }
         
-       /* Сумма: строго над кнопкой, размер в размер, прижата вправо */
+      /* Сумма: строго над кнопкой, размер в размер, прижата вправо */
         .total-display-pc { 
             font-family: 'Rajdhani', sans-serif; 
             font-weight: 700; 
             font-size: 34px; 
             color: #fff; 
-            /* Flex-режим принудительно ровняет символ и цифры в одну высоту */
+            /* Flex-режим выравнивает символ ₽ и цифры идеально по одной линии */
             display: flex;
             justify-content: flex-end;
             align-items: center; 
             
-            line-height: 1;
+            height: 42px; /* Высота как у кнопки для симметрии */
             width: 155px; 
             margin-bottom: 8px;
             letter-spacing: 1px;
             margin-left: auto; 
             padding-right: 2px;
             box-sizing: border-box;
+            line-height: 1;
         }
 
         /* Ряд управления: Имя + Сохранить */
         .session-controls-row {
             display: flex;
-            align-items: stretch;
+            align-items: center;
             gap: 10px;
             width: 320px;
         }
 
-        /* Поле ввода: шрифт крупнее, высота совпадает с кнопкой */
+        /* Поле ввода: шрифт крупнее, высота 42px (как у кнопки) */
         .input-mini { 
             background: #000; 
             border: 1px solid #333; 
@@ -180,9 +181,11 @@
             outline: none; 
             box-sizing: border-box;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .input-mini::placeholder { color: #444; font-size: 9px; }
-        
         /* Кнопка сохранить: высота 42px, ширина 155px */
         .save-btn { 
             background: var(--status-green); 
@@ -412,23 +415,28 @@
         document.getElementById('platPrice').value = '';
     }
 
-   function renderCart() {
+  function renderCart() {
         const itemsContainer = document.getElementById('cartItems');
-        // Исправлено: Сначала обновляем текст суммы, потом работаем с контейнером
-        document.getElementById('cartTotal').innerText = cartTotal + ' ₽';
+        const totalDisplay = document.getElementById('cartTotal');
         
-        const tooltip = document.getElementById('sessionTooltip');
+        // 1. Обновляем итоговую сумму с красивым символом рубля
+        if (totalDisplay) {
+            totalDisplay.innerText = cartTotal + ' ₽';
+        }
         
-        // Очищаем контейнер перед рендером
+        // 2. Очищаем контейнер перед отрисовкой плашек
         itemsContainer.innerHTML = '';
 
+        // 3. Если корзина пуста, выводим надпись
         if (currentCart.length === 0) {
-            itemsContainer.innerHTML = 'Пусто...';
+            itemsContainer.innerHTML = '<span style="color:#444; font-size:10px; font-family:\'Orbitron\'">Пусто...</span>';
             return;
         }
 
+        // 4. Отрисовываем плашки услуг (используем правильный массив currentCart)
         currentCart.forEach((item, index) => {
             const tag = document.createElement('div');
+            // Подставляем класс цвета (tag-purple, tag-red и т.д.)
             tag.className = `cart-tag ${getTagClass(item.type)}`;
             tag.innerHTML = `
                 ${item.name}
@@ -437,24 +445,6 @@
             itemsContainer.appendChild(tag);
         });
     }
-        
-        // Полностью очищаем тултип, чтобы он больше не всплывал
-        if (tooltip) tooltip.innerHTML = '';
-        
-        itemsContainer.innerHTML = '';
-
-        if (currentCart.items.length > 0) {
-            currentCart.items.forEach((item, idx) => {
-                // Плашки теперь окрашиваются в цвет кнопки (tag-purple, tag-red и т.д.)
-                // Располагаются слева направо сверху вниз благодаря CSS
-                itemsContainer.innerHTML += `
-                    <span class="cart-tag tag-${item.colorClass}">
-                        ${item.name}
-                        <div class="tag-remove" onclick="removeFromCart(${idx})">
-                            <i class="fas fa-times"></i>
-                        </div>
-                    </span>`;
-            });
             totalDisplay.innerText = currentCart.total + ' ₽';
         } else {
             itemsContainer.innerText = 'Пусто...';
