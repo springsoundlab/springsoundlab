@@ -16,11 +16,26 @@
         
         header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid #111; margin-bottom: 20px; }
         .logo { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); letter-spacing: 2px; font-size: 14px; }
-        .back-btn { color: #888; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #222; padding: 5px 10px; border-radius: 4px; transition: 0.3s; }
+        
+        /* Кнопка "Выйти" — вернул как было, без рамок в покое */
+        .back-btn { color: #888; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #222; padding: 5px 10px; border-radius: 4px; transition: 0.3s; margin-left: 20px; }
         .back-btn:hover { color: #fff; border-color: var(--neon-purple); }
 
-        /* ———— ВЕРХНЯЯ ПАНЕЛЬ ———— */
-        .income-amount { font-family: 'Rajdhani'; font-weight: 700; font-size: 24px; color: #fff; }
+        /* Фиолетовый прямоугольник для дохода ТОЛЬКО на ПК */
+        .total-box { 
+            background: var(--neon-purple); 
+            padding: 5px 15px; 
+            border-radius: 6px; 
+            text-align: center;
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 120px;
+        }
+        /* Шрифт суммы (уменьшил) */
+        .income-amount { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: #fff; line-height: 1.1; }
+        /* Мелкая подпись под суммой */
+        #totalLabel { font-size: 7px; display: block; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.9); margin-top: 1px; font-weight: 600; }
 
         .admin-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; max-width: 1600px; margin: 0 auto; align-items: stretch; }
         .crm-panel, .side-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #111; display: flex; flex-direction: column; }
@@ -86,8 +101,7 @@
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
-        .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; 
-        }
+        .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; }
 
         /* Сертификаты */
         .certs-container { flex-grow: 1; height: 300px; overflow-y: auto; padding-right: 15px; }
@@ -105,33 +119,23 @@
         }
         .history-row:hover .history-tooltip { visibility: visible; opacity: 1; }
 
-        /* ———— МОБИЛЬНАЯ АДАПТАЦИЯ ———— */
+        /* ———— МОБИЛЬНАЯ АДАПТАЦИЯ (ВОЗВРАТ К ОРИГИНАЛУ) ———— */
         @media (max-width: 992px) {
             body { padding: 10px; }
             header { flex-direction: column; gap: 20px; align-items: center; border-bottom: none; }
             .logo { text-align: center; font-size: 16px; width: 100%; }
             
-            /* Фиолетовая рамка для дохода на ПК */
-        .total-box { 
-            background: var(--neon-purple); 
-            padding: 8px 20px; 
-            border-radius: 8px; 
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(191, 0, 255, 0.2);
-            min-width: 140px;
-        }
-            
-        .income-amount { font-family: 'Rajdhani'; font-weight: 700; font-size: 22px; color: #fff; line-height: 1; }
-        #totalLabel { font-size: 8px; display: block; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.8); margin-top: 2px; }
+            /* Убираем фиолетовую рамку на мобиле, возвращаем обычный вид */
+            .total-box { background: transparent; padding: 0; border-radius: 0; box-shadow: none; min-width: auto; }
+            .income-amount { font-size: 24px; }
+            #totalLabel { font-size: 10px; color: #888; margin-top: 5px; }
+            .back-btn { margin-left: 0; }
 
             .admin-grid { display: flex !important; flex-direction: column !important; }
-            
             .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
             .calendar-widget { margin-bottom: 15px; }
-
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
             
-            /* Кнопки услуг - идеальная сетка */
             .controls-row { 
                 display: grid !important; 
                 grid-template-columns: repeat(2, 1fr) !important; 
@@ -178,7 +182,7 @@
 
 <header>
     <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
-    <div class="header-right">
+    <div style="display: flex; align-items: center;">
         <div class="total-box">
             <span id="monthTotal" class="income-amount">0 ₽</span>
             <span id="totalLabel">ДОХОД ЗА МЕСЯЦ</span>
