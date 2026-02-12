@@ -19,7 +19,7 @@
         .back-btn { color: #888; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #222; padding: 5px 10px; border-radius: 4px; transition: 0.3s; }
         .back-btn:hover { color: #fff; border-color: var(--neon-purple); }
 
-        /* ———— ВЕРХНЯЯ ПАНЕЛЬ (ДОХОД) — ВОЗВРАТ РАМКИ И ШРИФТА ———— */
+        /* ———— ВЕРХНЯЯ ПАНЕЛЬ (ДОХОД) ———— */
         .income-block {
             background: rgba(191, 0, 255, 0.05);
             border: 1px solid var(--neon-purple); 
@@ -138,18 +138,17 @@
             align-self: flex-end;
         }
         
-     /* Сумма: строго над кнопкой, размер в размер, прижата вправо */
+        /* Сумма: строго над кнопкой, размер в размер, прижата вправо */
         .total-display-pc { 
             font-family: 'Rajdhani', sans-serif; 
             font-weight: 700; 
             font-size: 34px; 
             color: #fff; 
-            /* Выравниваем символ ₽ и цифры идеально по одной линии */
             display: flex;
             justify-content: flex-end;
             align-items: center; 
             
-            height: 42px; /* Идентичная высота с кнопкой и инпутом */
+            height: 42px; 
             width: 155px; 
             margin-bottom: 8px;
             letter-spacing: 1px;
@@ -159,7 +158,6 @@
             line-height: 1;
         }
 
-        /* Ряд управления: Имя + Сохранить */
         .session-controls-row {
             display: flex;
             align-items: center;
@@ -167,7 +165,6 @@
             width: 320px;
         }
 
-        /* Поле ввода: высота 42px (как у кнопки), шрифт 13px */
         .input-mini { 
             background: #000; 
             border: 1px solid #333; 
@@ -181,13 +178,9 @@
             outline: none; 
             box-sizing: border-box;
             text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .input-mini::placeholder { color: #444; font-size: 9px; }
 
-        /* Кнопка сохранить: высота 42px, ширина 155px */
         .save-btn { 
             background: var(--status-green); 
             color: #fff; 
@@ -207,7 +200,6 @@
         }
         .save-btn:hover { filter: brightness(1.2); box-shadow: 0 0 15px rgba(0, 143, 57, 0.2); }
 
-        /* Таблица */
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
@@ -229,7 +221,6 @@
         .reset-link { cursor: pointer; color: #fff; transition: 0.3s; }
         .reset-link:hover { color: var(--neon-purple); }
 
-        /* Тултип (исправлен разрыв буквы Р) */
         .btn-tooltip { 
             visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 8px 12px; border-radius: 8px; z-index: 1000; width: auto; white-space: nowrap;
@@ -237,14 +228,15 @@
             font-family: 'Rajdhani'; font-weight: 700; font-size: 14px;
         }
     </style>
+</head>
 <body>
 
 <header>
     <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
     <div style="display:flex; gap:15px; align-items:center;">
-        <div class="total-box" style="padding: 5px 15px;">
-            <span id="monthTotal" class="month-total-text">0 ₽</span>
-            <span id="totalLabel" style="font-size:8px; color:#666; display:block; letter-spacing: 1px;">ДОХОД ЗА МЕСЯЦ</span>
+        <div class="total-box" style="padding: 5px 15px; text-align: right;">
+            <span id="monthTotal" class="income-amount" style="font-size: 20px; display: block;">0 ₽</span>
+            <span id="totalLabel" style="font-size:8px; color:#666; display:block; letter-spacing: 1px; text-transform: uppercase;">ДОХОД ЗА МЕСЯЦ</span>
         </div>
         <a href="index.html" class="back-btn">Выйти на сайт</a>
     </div>
@@ -287,7 +279,7 @@
             </div>
         </div>
 
-     <div id="currentSession" class="current-session-box">
+        <div id="currentSession" class="current-session-box">
             <div class="cart-info">
                 <div id="sessionDateLabel" style="font-size: 10px; color: #444; margin-bottom: 12px; font-family:'Orbitron'; letter-spacing: 1px;">ТЕКУЩИЙ ЧЕК:</div>
                 <div id="cartItems">Пусто...</div>
@@ -331,6 +323,7 @@
         </div>
     </div>
 </div>
+
 <script>
     let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
     let currentCart = { items: [], details: [], total: 0 };
@@ -348,6 +341,7 @@
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
         const monthName = document.getElementById('calMonthName');
+        if(!grid || !monthName) return;
         grid.innerHTML = '';
         const now = new Date();
         const year = currentCalDate.getFullYear();
@@ -376,7 +370,8 @@
 
     function selectCalendarDate(date) {
         selectedDate = date;
-        document.getElementById('sessionDateLabel').innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
         renderCalendar();
     }
 
@@ -390,7 +385,8 @@
     function resetFilter() { 
         selectedDate = null; 
         currentCalDate = new Date();
-        document.getElementById('sessionDateLabel').innerText = `ТЕКУЩИЙ ЧЕК (СЕГОДНЯ):`;
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (СЕГОДНЯ):`;
         updateTable(); 
         renderCalendar(); 
     }
@@ -416,31 +412,22 @@
         document.getElementById('platPrice').value = '';
     }
 
- function renderCart() {
+    function renderCart() {
         const itemsContainer = document.getElementById('cartItems');
         const totalDisplay = document.getElementById('cartTotal');
-        
-        // Считаем общую сумму из массива currentCart
-        const currentTotal = currentCart.reduce((sum, item) => sum + item.price, 0);
+        if(!itemsContainer || !totalDisplay) return;
 
-        // 1. Обновляем итоговую сумму с красивым символом рубля
-        if (totalDisplay) {
-            totalDisplay.innerText = currentTotal + ' ₽';
-        }
-        
-        if (!itemsContainer) return;
+        totalDisplay.innerText = currentCart.total + ' ₽';
         itemsContainer.innerHTML = '';
 
-        // 2. Если корзина пуста
-        if (currentCart.length === 0) {
-            itemsContainer.innerHTML = '<span style="color:#444; font-size:10px; font-family:\'Orbitron\'">Пусто...</span>';
+        if (currentCart.items.length === 0) {
+            itemsContainer.innerHTML = 'Пусто...';
             return;
         }
 
-        // 3. Отрисовываем плашки услуг
-        currentCart.forEach((item, index) => {
+        currentCart.items.forEach((item, index) => {
             const tag = document.createElement('div');
-            tag.className = `cart-tag ${getTagClass(item.type)}`;
+            tag.className = `cart-tag tag-${item.colorClass}`;
             tag.innerHTML = `
                 ${item.name}
                 <div class="tag-remove" onclick="removeFromCart(${index})">×</div>
@@ -450,36 +437,27 @@
     }
 
     function clearCart() {
-        currentCart = []; // Очищаем массив
+        currentCart = { items: [], details: [], total: 0 };
         const nameInput = document.getElementById('clientName');
         if (nameInput) nameInput.value = '';
         renderCart();
     }
 
     function saveSession() {
-        if (currentCart.length === 0) return alert('Добавьте услуги!');
-        
+        if (currentCart.items.length === 0) return alert('Добавьте услуги!');
         const nameInput = document.getElementById('clientName');
         const name = (nameInput && nameInput.value) ? nameInput.value : 'Без имени';
         const dateToSave = selectedDate || new Date().toLocaleDateString('ru-RU');
         
-        const servicesText = currentCart.map(i => i.name).join(', ');
-        const totalToSave = currentCart.reduce((sum, item) => sum + item.price, 0);
-        
         crmData.push({ 
             date: dateToSave, 
             client: name, 
-            services: servicesText, 
-            total: totalToSave,
+            services: currentCart.items.map(i => i.name).join(', '), 
+            details: [...currentCart.details], 
+            total: currentCart.total,
             timestamp: Date.now()
         });
 
-        localStorage.setItem('crmData', JSON.stringify(crmData));
-        clearCart();
-        renderTable();
-        if (typeof updateStats === 'function') updateStats();
-    }
-        
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         clearCart(); 
         updateTable(); 
@@ -488,12 +466,15 @@
 
     function updateTable() {
         const body = document.getElementById('crmTableBody');
+        if(!body) return;
         body.innerHTML = ''; 
         const m = String(currentCalDate.getMonth() + 1).padStart(2, '0');
         const y = currentCalDate.getFullYear();
         const monthKey = `.${m}.${y}`;
         
-        document.getElementById('currentViewText').innerText = `ОТЧЕТ ЗА ${document.getElementById('calMonthName').innerText}`;
+        const viewText = document.getElementById('currentViewText');
+        const calMonthName = document.getElementById('calMonthName');
+        if(viewText && calMonthName) viewText.innerText = `ОТЧЕТ ЗА ${calMonthName.innerText}`;
 
         const sortedData = [...crmData].sort((a,b) => {
             const dateA = a.date.split('.').reverse().join('');
@@ -508,13 +489,11 @@
             const tr = document.createElement('tr');
             tr.className = 'history-row';
             
-            // Формируем тултип, где каждая услуга своего цвета
             let historyTooltipHtml = '<div class="history-tooltip">';
             historyTooltipHtml += '<div style="color:#888; font-family:Orbitron; font-size:9px; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ ЗАКАЗА:</div>';
             
             if (row.details) {
                 row.details.forEach(item => {
-                    // Берем цвет услуги из карты цветов
                     const sColor = colorMap[item.colorClass] || '#fff';
                     historyTooltipHtml += `
                         <div class="tooltip-item" style="border-left: 2px solid ${sColor}; margin-bottom:5px; padding-left:8px; display:flex; justify-content:space-between;">
@@ -525,7 +504,6 @@
             }
             historyTooltipHtml += `<div style="text-align:right; margin-top:10px; font-family:Rajdhani; font-weight:700; font-size:16px; color:var(--neon-purple);">ИТОГО: ${row.total} ₽</div></div>`;
 
-            // Рендер строки: все тексты белые, кроме итоговой суммы
             tr.innerHTML = `
                 <td class="num-cell">${row.date}</td>
                 <td class="client-name-cell">${row.client}</td>
@@ -540,6 +518,7 @@
 
     function updateMonthTotal() {
         const monthTotal = document.getElementById('monthTotal');
+        if(!monthTotal) return;
         const m = String(currentCalDate.getMonth() + 1).padStart(2, '0');
         const y = currentCalDate.getFullYear();
         const monthKey = `.${m}.${y}`;
@@ -553,6 +532,7 @@
 
     function updateCerts() {
         const list = document.getElementById('certsList');
+        if(!list) return;
         const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
         list.innerHTML = '';
         for (let i = 1; i <= 300; i++) {
@@ -566,7 +546,8 @@
     }
 
     function activateCert(id) {
-        const name = document.getElementById('in-' + id).value;
+        const input = document.getElementById('in-' + id);
+        const name = input ? input.value : '';
         if (!name) return alert('Введите имя!');
         const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
         savedCerts[id] = { active: true, name: name };
