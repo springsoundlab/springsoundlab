@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPRING SOUND LAB | CRM & ANALYTICS</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -138,6 +138,7 @@
             align-self: flex-end;
         }
         
+        /* Сумма: строго над кнопкой, размер в размер, прижата вправо */
         .total-display-pc { 
             font-family: 'Rajdhani', sans-serif; 
             font-weight: 700; 
@@ -146,6 +147,7 @@
             display: flex;
             justify-content: flex-end;
             align-items: center; 
+            
             height: 42px; 
             width: 155px; 
             margin-bottom: 8px;
@@ -198,7 +200,6 @@
         }
         .save-btn:hover { filter: brightness(1.2); box-shadow: 0 0 15px rgba(0, 143, 57, 0.2); }
 
-        /* Таблица отчёта */
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
@@ -212,68 +213,19 @@
         .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
         .cert-id { font-family: 'Rajdhani', sans-serif; font-weight: 700; color: var(--neon-purple); font-size: 14px; letter-spacing: 1px; }
 
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
+        
         .filter-info { font-size: 10px; color: #888; margin: 15px 0 10px 0; display: flex; justify-content: space-between; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         .reset-link { cursor: pointer; color: #fff; transition: 0.3s; }
         .reset-link:hover { color: var(--neon-purple); }
 
-        /* Аккордеон для мобилы */
-        .mobile-details { display: none; padding: 10px; background: #000; border-top: 1px solid #222; }
-        .history-row.active .mobile-details { display: block; }
-
-        /* ———— АДАПТИВ ПОД IPHONE SE / МОБИЛКИ ———— */
-        @media (max-width: 992px) {
-            body { padding: 10px; }
-            header { flex-direction: column; gap: 15px; }
-            .admin-grid { display: flex; flex-direction: column; }
-            
-            /* ПОРЯДОК: Календарь -> Услуги -> Чек -> Таблица -> Сертификаты */
-            .side-panel { order: 1; width: 100%; }
-            .side-panel .calendar-widget { order: 1; }
-            .side-panel .certs-section { order: 5; margin-top: 30px; }
-            
-            .crm-panel { order: 2; width: 100%; background: none; border: none; padding: 0; }
-            
-            /* Сетка услуг: 2 в ряд */
-            .controls-row { 
-                display: grid; 
-                grid-template-columns: 1fr 1fr; 
-                gap: 8px; 
-                padding: 10px; 
-                order: 2;
-            }
-            .action-btn { height: 60px; font-size: 10px; width: 100%; box-sizing: border-box; }
-            .platinum-group { grid-column: 1/-1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border: none; padding: 0; }
-            .plat-input { width: 100%; height: 60px; font-size: 16px; }
-
-            /* Чек */
-            .current-session-box { order: 3; flex-direction: column; min-height: auto; padding: 15px; }
-            .cart-actions { width: 100%; margin-top: 15px; }
-            .total-display-pc { width: 100%; font-size: 40px; height: auto; text-align: center; justify-content: center; }
-            .session-controls-row { width: 100%; flex-direction: column; }
-            .input-mini, .save-btn { width: 100%; height: 55px; font-size: 14px; }
-
-            /* Таблица как карточки */
-            .table-container { order: 4; margin-top: 20px; }
-            thead { display: none; }
-            .history-row { 
-                display: flex; flex-direction: column; 
-                background: #0a0a0a; border: 1px solid #222; 
-                margin-bottom: 10px; border-radius: 8px; overflow: hidden;
-            }
-            .history-row td { border: none; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
-            .history-row td:nth-child(1) { order: 1; background: #111; font-size: 11px; } /* Дата */
-            .history-row td:nth-child(2) { order: 2; font-size: 16px; font-weight: 700; } /* Имя */
-            .history-row td:nth-child(4) { order: 3; font-size: 20px; color: var(--neon-purple); border-top: 1px solid #111; } /* Итого */
-            .history-row td:nth-child(3) { display: none; } /* Услуги прячем в мобиле (будут в раскрывашке) */
-            .history-row td:nth-child(5) { order: 5; justify-content: flex-end; padding-top: 0; } /* Корзина */
-            
-            /* Кнопка "Развернуть" для мобилы */
-            .history-row::after {
-                content: 'ПОСМОТРЕТЬ УСЛУГИ ▼';
-                display: block; text-align: center; font-size: 9px; color: #444; 
-                padding: 10px; background: #050505; cursor: pointer; font-family: 'Orbitron';
-            }
-            .history-row.active::after { content: 'СВЕРНУТЬ ▲'; }
+        .btn-tooltip { 
+            visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
+            padding: 8px 12px; border-radius: 8px; z-index: 1000; width: auto; white-space: nowrap;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9); transition: opacity 0.3s ease; pointer-events: none;
+            font-family: 'Rajdhani'; font-weight: 700; font-size: 14px;
         }
     </style>
 </head>
@@ -318,6 +270,7 @@
                 <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
                 <div class="btn-wrapper">
                     <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM EDITION</button>
+                    <div class="btn-tooltip">База (по умолч. 10к)</div>
                 </div>
                 <div class="btn-wrapper">
                     <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
@@ -364,7 +317,7 @@
             <div class="cal-grid" id="calendarDays"></div>
         </div>
 
-        <div class="certs-section">
+        <div class="certs-section" style="display:flex; flex-direction:column; flex-grow:1;">
             <h2 style="font-family:'Orbitron'; font-size:14px; margin-bottom:15px; color:#fff;">СЕРТИФИКАТЫ</h2>
             <div class="certs-container" id="certsList"></div>
         </div>
@@ -377,13 +330,20 @@
     let currentCalDate = new Date();
     let selectedDate = null;
 
-    const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
+    const colorMap = {
+        white: '#fff',
+        purple: '#bf00ff',
+        red: '#cc0000',
+        green: '#008f39',
+        gold: '#b89600'
+    };
 
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
         const monthName = document.getElementById('calMonthName');
         if(!grid || !monthName) return;
         grid.innerHTML = '';
+        const now = new Date();
         const year = currentCalDate.getFullYear();
         const month = currentCalDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
@@ -398,8 +358,9 @@
         for(let d=1; d<=daysInMonth; d++) {
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
             const hasData = crmData.some(row => row.date === dateStr);
+            const isToday = now.toLocaleDateString('ru-RU') === dateStr;
             let classes = ['day'];
-            if (new Date().toLocaleDateString('ru-RU') === dateStr) classes.push('today');
+            if (isToday) classes.push('today');
             if (hasData) classes.push('has-data');
             if (selectedDate === dateStr) classes.push('selected-day');
             grid.innerHTML += `<div class="${classes.join(' ')}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
@@ -409,9 +370,9 @@
 
     function selectCalendarDate(date) {
         selectedDate = date;
-        document.getElementById('sessionDateLabel').innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
         renderCalendar();
-        updateTable();
     }
 
     function changeMonth(dir) { 
@@ -424,6 +385,8 @@
     function resetFilter() { 
         selectedDate = null; 
         currentCalDate = new Date();
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (СЕГОДНЯ):`;
         updateTable(); 
         renderCalendar(); 
     }
@@ -444,69 +407,109 @@
 
     function addPlatToCart() {
         const val = document.getElementById('platPrice').value;
-        addToCart('PLATINUM EDITION', parseInt(val) || 10000, 'gold');
+        const p = parseInt(val) || 10000;
+        addToCart('PLATINUM EDITION', p, 'gold');
         document.getElementById('platPrice').value = '';
     }
 
     function renderCart() {
         const itemsContainer = document.getElementById('cartItems');
         const totalDisplay = document.getElementById('cartTotal');
+        if(!itemsContainer || !totalDisplay) return;
+
         totalDisplay.innerText = currentCart.total + ' ₽';
-        itemsContainer.innerHTML = currentCart.items.length === 0 ? 'Пусто...' : '';
+        itemsContainer.innerHTML = '';
+
+        if (currentCart.items.length === 0) {
+            itemsContainer.innerHTML = 'Пусто...';
+            return;
+        }
+
         currentCart.items.forEach((item, index) => {
             const tag = document.createElement('div');
             tag.className = `cart-tag tag-${item.colorClass}`;
-            tag.innerHTML = `${item.name} <div class="tag-remove" onclick="removeFromCart(${index})">×</div>`;
+            tag.innerHTML = `
+                ${item.name}
+                <div class="tag-remove" onclick="removeFromCart(${index})">×</div>
+            `;
             itemsContainer.appendChild(tag);
         });
     }
 
+    function clearCart() {
+        currentCart = { items: [], details: [], total: 0 };
+        const nameInput = document.getElementById('clientName');
+        if (nameInput) nameInput.value = '';
+        renderCart();
+    }
+
     function saveSession() {
         if (currentCart.items.length === 0) return alert('Добавьте услуги!');
-        const name = document.getElementById('clientName').value || 'Без имени';
+        const nameInput = document.getElementById('clientName');
+        const name = (nameInput && nameInput.value) ? nameInput.value : 'Без имени';
+        const dateToSave = selectedDate || new Date().toLocaleDateString('ru-RU');
+        
         crmData.push({ 
-            date: selectedDate || new Date().toLocaleDateString('ru-RU'), 
+            date: dateToSave, 
             client: name, 
             services: currentCart.items.map(i => i.name).join(', '), 
             details: [...currentCart.details], 
             total: currentCart.total,
             timestamp: Date.now()
         });
+
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-        currentCart = { items: [], details: [], total: 0 };
-        document.getElementById('clientName').value = '';
-        renderCart(); updateTable(); renderCalendar();
+        clearCart(); 
+        updateTable(); 
+        renderCalendar();
     }
 
     function updateTable() {
         const body = document.getElementById('crmTableBody');
+        if(!body) return;
         body.innerHTML = ''; 
         const m = String(currentCalDate.getMonth() + 1).padStart(2, '0');
-        const monthKey = `.${m}.${currentCalDate.getFullYear()}`;
+        const y = currentCalDate.getFullYear();
+        const monthKey = `.${m}.${y}`;
         
-        crmData.sort((a,b) => b.timestamp - a.timestamp).forEach((row) => {
-            if (selectedDate && row.date !== selectedDate) return;
-            if (!selectedDate && !row.date.includes(monthKey)) return;
+        const viewText = document.getElementById('currentViewText');
+        const calMonthName = document.getElementById('calMonthName');
+        if(viewText && calMonthName) viewText.innerText = `ОТЧЕТ ЗА ${calMonthName.innerText}`;
+
+        const sortedData = [...crmData].sort((a,b) => {
+            const dateA = a.date.split('.').reverse().join('');
+            const dateB = b.date.split('.').reverse().join('');
+            if (dateA !== dateB) return dateA.localeCompare(dateB);
+            return a.timestamp - b.timestamp;
+        });
+
+        sortedData.forEach((row) => {
+            if (!row.date.includes(monthKey)) return;
 
             const tr = document.createElement('tr');
             tr.className = 'history-row';
-            tr.onclick = function() { this.classList.toggle('active'); };
-
-            let detailsHtml = '<div class="mobile-details">';
-            row.details.forEach(d => {
-                detailsHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:12px;">
-                    <span style="color:${colorMap[d.colorClass]}">${d.name}</span>
-                    <span>${d.price} ₽</span>
-                </div>`;
-            });
-            detailsHtml += '</div>';
+            
+            let historyTooltipHtml = '<div class="history-tooltip">';
+            historyTooltipHtml += '<div style="color:#888; font-family:Orbitron; font-size:9px; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ ЗАКАЗА:</div>';
+            
+            if (row.details) {
+                row.details.forEach(item => {
+                    const sColor = colorMap[item.colorClass] || '#fff';
+                    historyTooltipHtml += `
+                        <div class="tooltip-item" style="border-left: 2px solid ${sColor}; margin-bottom:5px; padding-left:8px; display:flex; justify-content:space-between;">
+                            <span style="color: ${sColor}; font-size:11px; font-weight:600;">${item.name}</span>
+                            <span style="color:#fff; font-family:Rajdhani; font-weight:700; font-size:13px;">${item.price} ₽</span>
+                        </div>`;
+                });
+            }
+            historyTooltipHtml += `<div style="text-align:right; margin-top:10px; font-family:Rajdhani; font-weight:700; font-size:16px; color:var(--neon-purple);">ИТОГО: ${row.total} ₽</div></div>`;
 
             tr.innerHTML = `
-                <td class="num-cell"><span>ДАТА:</span> ${row.date}</td>
-                <td class="client-name-cell"><span>КЛИЕНТ:</span> ${row.client}</td>
-                <td class="services-cell">${row.services}${detailsHtml}</td>
-                <td class="num-cell price-cell"><span>ИТОГО:</span> ${row.total} ₽</td>
-                <td><i class="fas fa-trash" style="color:#333;" onclick="event.stopPropagation(); deleteRow(${crmData.indexOf(row)})"></i></td>
+                <td class="num-cell">${row.date}</td>
+                <td class="client-name-cell">${row.client}</td>
+                <td class="services-cell" style="position:relative;">${row.services}${historyTooltipHtml}</td>
+                <td class="num-cell price-cell">${row.total} ₽</td>
+                <td><i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${crmData.indexOf(row)})"></i></td>
             `;
             body.appendChild(tr);
         });
@@ -514,38 +517,41 @@
     }
 
     function updateMonthTotal() {
+        const monthTotal = document.getElementById('monthTotal');
+        if(!monthTotal) return;
         const m = String(currentCalDate.getMonth() + 1).padStart(2, '0');
-        const monthKey = `.${m}.${currentCalDate.getFullYear()}`;
+        const y = currentCalDate.getFullYear();
+        const monthKey = `.${m}.${y}`;
         let total = 0;
         crmData.forEach(row => { if (row.date.includes(monthKey)) total += row.total; });
-        document.getElementById('monthTotal').innerText = total.toLocaleString() + ' ₽';
+        monthTotal.innerText = total.toLocaleString() + ' ₽';
     }
 
-    function deleteRow(index) { if(confirm('Удалить?')) { crmData.splice(index, 1); localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
-    function clearFullHistory() { if(confirm('Удалить всё?')) { crmData = []; localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
+    function deleteRow(index) { if(confirm('Удалить запись?')) { crmData.splice(index, 1); localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
+    function clearFullHistory() { if(confirm('Удалить ВСЕ данные?')) { crmData = []; localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
 
     function updateCerts() {
         const list = document.getElementById('certsList');
-        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        if(!list) return;
+        const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
         list.innerHTML = '';
         for (let i = 1; i <= 300; i++) {
             const id = 'SSL-' + String(i).padStart(3, '0');
-            const data = saved[id] || { active: false, name: '' };
+            const data = savedCerts[id] || { active: false, name: '' };
             const div = document.createElement('div');
             div.className = 'cert-row';
-            div.innerHTML = `<span class="cert-id">${id}</span>
-                ${data.active ? `<span style="font-size:10px; color:#555">${data.name}</span>` : `<input type="text" id="in-${id}" placeholder="Имя" style="width:80px; background:#111; border:1px solid #333; color:#fff; font-size:10px;">`}
-                ${data.active ? `<span style="color:#00ff66; border:1px solid #00ff66; padding:2px 5px; font-size:8px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:5px 10px; border-radius:3px;">АКТИВ</button>`}`;
+            div.innerHTML = `<span class="cert-id">${id}</span>${data.active ? `<span style="font-size:10px; color:#555">${data.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${data.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}`;
             list.appendChild(div);
         }
     }
 
     function activateCert(id) {
-        const name = document.getElementById('in-' + id).value;
-        if (!name) return alert('Имя!');
-        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
-        saved[id] = { active: true, name };
-        localStorage.setItem('spring_certs', JSON.stringify(saved));
+        const input = document.getElementById('in-' + id);
+        const name = input ? input.value : '';
+        if (!name) return alert('Введите имя!');
+        const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        savedCerts[id] = { active: true, name: name };
+        localStorage.setItem('spring_certs', JSON.stringify(savedCerts));
         updateCerts();
     }
 
