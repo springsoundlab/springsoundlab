@@ -922,7 +922,7 @@
 <div class="studio-background"></div>
 
 <header id="main-header">
-    <div class="flicker-header">СТУДИЯ ЗВУКОЗАПИСИ</div>
+    <div class="flicker-header">СТУДИЯ З<span id="admin-trigger" style="cursor: default; user-select: none; -webkit-tap-highlight-color: transparent;">В</span>УКОЗАПИСИ
     <h1>SPRING SOUND LAB</h1>
     <div class="header-subtitle">
         Профессиональная архитектура звука. Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
@@ -1218,6 +1218,57 @@ document.addEventListener('DOMContentLoaded', () => {
     handleMobileGlow();
 });
 
+    // Функция открытия панели при клике на букву
+const adminTrigger = document.getElementById('admin-trigger');
+if (adminTrigger) {
+    adminTrigger.addEventListener('click', () => {
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('admin-overlay').style.display = 'block';
+        document.getElementById('admin-login').focus();
+    });
+}
+
+// Закрытие панели
+function closeAdmin() {
+    document.getElementById('admin-panel').style.display = 'none';
+    document.getElementById('admin-overlay').style.display = 'none';
+    // Очищаем поля при закрытии
+    document.getElementById('admin-login').value = '';
+    document.getElementById('admin-pass').value = '';
+}
+
+// Проверка данных
+function checkAdminAuth() {
+    const userLogin = document.getElementById('admin-login').value;
+    const userPass = document.getElementById('admin-pass').value;
+
+    // ЗДЕСЬ ТВОИ ДАННЫЕ ДЛЯ ВХОДА
+    if (userLogin === 'WEYTON' && userPass === '2026') {
+        alert('Access Granted. Welcome, WEYTON.');
+        // Сюда вставь ссылку на свою админку, если она на другом файле, например:
+        // window.location.href = 'admin_dashboard.html';
+        closeAdmin();
+    } else {
+        alert('Access Denied. Incorrect Login or Password.');
+        document.getElementById('admin-pass').value = '';
+    }
+}
+    
 </script>
+
+<div id="admin-overlay" onclick="closeAdmin()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; backdrop-filter: blur(5px);"></div>
+
+<div id="admin-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 320px; background: #0a0a0a; border: 1px solid var(--neon-purple); padding: 30px; z-index: 10000; border-radius: 15px; box-shadow: 0 0 30px rgba(191, 0, 255, 0.2); font-family: 'Orbitron', sans-serif; text-align: center;">
+    <div style="color: var(--neon-purple); font-size: 18px; margin-bottom: 25px; letter-spacing: 2px;">WEYTON ACCESS</div>
+    
+    <input type="text" id="admin-login" placeholder="LOGIN" autocomplete="off" style="width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 15px; border-radius: 5px; outline: none; font-size: 12px;">
+    
+    <input type="password" id="admin-pass" placeholder="PASSWORD" style="width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; margin-bottom: 20px; border-radius: 5px; outline: none; font-size: 12px;">
+    
+    <button onclick="checkAdminAuth()" style="width: 100%; padding: 12px; background: var(--neon-purple); border: none; color: #fff; cursor: pointer; font-weight: bold; border-radius: 5px; transition: 0.3s; letter-spacing: 1px;">AUTHENTICATE</button>
+    
+    <div onclick="closeAdmin()" style="margin-top: 20px; color: #444; font-size: 10px; cursor: pointer; text-transform: uppercase;">Abort Mission</div>
+</div>
+    
 </body>
 </html>
