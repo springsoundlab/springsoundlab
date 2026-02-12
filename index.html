@@ -888,27 +888,31 @@
         line-height: 1.4 !important;
 }
     
-/* --- 6. ИСПРАВЛЕННАЯ ПОДСВЕТКА (КАК НА ПК) --- */
-    
-.module {
-    transition: all 0.4s ease !important;
-    border: 2px solid rgba(255, 255, 255, 0.1) !important;
-    background: rgba(255, 255, 255, 0.03) !important;
+/* Цвета для мобильной активации — теперь строго по твоим цветам */
+
+/* ЗАПИСЬ — Белый */
+.module.active-package.rec { 
+    border-color: #ffffff !important; 
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important; 
 }
 
-/* Эффект увеличения для активного блока на мобилке */
-.module.active-package {
-    transform: translateY(-10px) scale(1.02) !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    z-index: 10;
+/* START EDITION — Фиолетовый (как у тебя в коде) */
+.module.active-package.start { 
+    border-color: var(--neon-purple) !important; 
+    box-shadow: 0 0 25px rgba(191, 0, 255, 0.5) !important; 
 }
 
-/* Цвета границ и свечения строго по твоим классам */
-.module.active-package.rec { border-color: #ffffff !important; box-shadow: 0 0 20px rgba(255, 255, 255, 0.4) !important; }
-.module.active-package.start { border-color: #00f3ff !important; box-shadow: 0 0 20px rgba(0, 243, 255, 0.4) !important; }
-.module.active-package.artist { border-color: #ff00ff !important; box-shadow: 0 0 20px rgba(255, 0, 255, 0.4) !important; }
-.module.active-package.platinum { border-color: #ffd700 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4) !important; }
-    }
+/* ARTIST EDITION — Красный/Розовый */
+.module.active-package.artist { 
+    border-color: var(--neon-red) !important; 
+    box-shadow: 0 0 25px rgba(255, 0, 60, 0.5) !important; 
+}
+
+/* PLATINUM EDITION — Золотой */
+.module.active-package.platinum { 
+    border-color: var(--neon-gold) !important; 
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5) !important; 
+}
 }
         
     </style>
@@ -1166,19 +1170,32 @@
         });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const handleScrollGlow = () => {
-        // Включаем логику только на мобилках
+    
+    // --- 1. ВОЗВРАЩАЕМ АНИМАЦИЮ ABOUT ME ---
+    const aboutSection = document.querySelector('#about-me');
+    if (aboutSection) {
+        const aboutObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    aboutSection.classList.add('is-revealed'); // Добавляем класс активации
+                }
+            });
+        }, { threshold: 0.2 }); // Активируется, когда 20% блока видно
+        aboutObserver.observe(aboutSection);
+    }
+
+    // --- 2. ЛОГИКА ПОДСВЕТКИ ПАКЕТОВ (МОБИЛКА) ---
+    const handleMobileGlow = () => {
         if (window.innerWidth > 768) return;
 
         const modules = document.querySelectorAll('.module');
-        const triggerPoint = window.innerHeight / 2; // Центр экрана
+        const triggerLine = window.innerHeight / 2;
 
         modules.forEach(mod => {
             const rect = mod.getBoundingClientRect();
-            const center = rect.top + rect.height / 2;
+            const moduleCenter = rect.top + (rect.height / 2);
 
-            // Если центр блока совпадает с центром экрана (с погрешностью)
-            if (Math.abs(center - triggerPoint) < 150) {
+            if (Math.abs(moduleCenter - triggerLine) < 150) {
                 if (!mod.classList.contains('active-package')) {
                     modules.forEach(m => m.classList.remove('active-package'));
                     mod.classList.add('active-package');
@@ -1187,8 +1204,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    window.addEventListener('scroll', handleScrollGlow, { passive: true });
-    window.addEventListener('load', handleScrollGlow);
+    // Слушатели для мобильного скролла
+    window.addEventListener('scroll', handleMobileGlow, { passive: true });
+    window.addEventListener('touchmove', handleMobileGlow, { passive: true });
+    
+    // Запускаем проверку один раз при загрузке
+    handleMobileGlow();
 });
 
 </script>
