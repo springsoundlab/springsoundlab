@@ -37,56 +37,49 @@
 
         /* Кнопки услуг */
         .controls-row { display: flex; align-items: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #111; flex-wrap: wrap; }
-        .action-btn { background: transparent; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.3s; }
         
+        .btn-wrapper { position: relative; display: inline-block; }
+        .action-btn { background: transparent; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.3s; position: relative; }
+        
+        .btn-tooltip { 
+            visibility: hidden; opacity: 0; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+            background: #000; border: 1px solid var(--neon-purple); color: #fff; padding: 5px 10px; border-radius: 4px;
+            font-size: 10px; font-family: 'Rajdhani'; white-space: nowrap; z-index: 100; transition: opacity 0.2s ease;
+        }
+        .btn-wrapper:hover .btn-tooltip { visibility: visible; opacity: 1; transition-delay: 0.5s; }
+
         .btn-white { border: 1px solid #fff; }
-        .btn-white:hover { background: rgba(255, 255, 255, 0.1); }
         .btn-purple { border: 1px solid var(--neon-purple); }
-        .btn-purple:hover { background: rgba(191, 0, 255, 0.15); }
         .btn-red { border: 1px solid var(--artist-red); }
-        .btn-red:hover { background: rgba(204, 0, 0, 0.15); }
         .btn-green { border: 1px solid var(--status-green); }
-        .btn-green:hover { background: rgba(0, 143, 57, 0.15); }
         .btn-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
-        .btn-gold:hover { background: rgba(184, 150, 0, 0.15); }
+        .btn-dashed-green { border: 1px dashed var(--status-green) !important; }
+        .btn-dashed-gold { border: 1px dashed var(--platinum-gold) !important; }
 
         .platinum-group { display: flex; align-items: center; gap: 10px; border-left: 1px solid #222; padding-left: 10px; }
         .plat-input { background: #000; border: 1px solid #222; color: var(--platinum-gold); width: 75px; padding: 8px; border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 13px; outline: none; text-align: center; }
 
         /* ЧЕК */
         .current-session-box { 
-            background: rgba(191, 0, 255, 0.05); 
-            border: 1px dashed var(--neon-purple); 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            position: relative; 
-            z-index: 10;
+            background: rgba(191, 0, 255, 0.05); border: 1px dashed var(--neon-purple); padding: 15px; border-radius: 8px; 
+            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 10;
         }
-
         .session-tooltip { 
-            visibility: hidden; 
-            position: absolute; 
-            top: 110%; 
-            left: 20px; 
-            background: #0a0a0a; 
-            border: 1px solid var(--neon-purple); 
-            padding: 15px; 
-            border-radius: 8px; 
-            z-index: 1000; 
-            width: 280px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
-            opacity: 0; 
-            transition: opacity 0.4s ease, visibility 0.4s, top 0.4s;
-            transition-delay: 2s; 
-            pointer-events: none; 
+            visibility: hidden; position: absolute; top: 100%; left: 20px; background: #0a0a0a; border: 1px solid var(--neon-purple); 
+            padding: 15px; border-radius: 8px; z-index: 1000; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
+            opacity: 0; transition: opacity 0.2s ease; pointer-events: none; 
         }
-
         .current-session-box:hover .session-tooltip { visibility: visible; opacity: 1; top: 105%; }
-        .tooltip-item { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; border-bottom: 1px solid #1a1a1a; padding-bottom: 4px; }
+
+        /* Стили для услуг в строке чека */
+        .cart-tag { font-size: 8px; font-family: 'Orbitron'; padding: 2px 6px; border-radius: 3px; margin-right: 5px; display: inline-block; }
+        .tag-white { border: 1px solid #fff; color: #fff; }
+        .tag-purple { border: 1px solid var(--neon-purple); color: var(--neon-purple); }
+        .tag-red { border: 1px solid var(--artist-red); color: var(--artist-red); }
+        .tag-green { border: 1px solid var(--status-green); color: var(--status-green); }
+        .tag-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
+
+        .tooltip-item { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; border-bottom: 1px solid #1a1a1a; padding: 4px 0 4px 8px; }
 
         .total-box { background: rgba(191, 0, 255, 0.1); padding: 10px 20px; border: 1px solid var(--neon-purple); border-radius: 8px; text-align: right; }
         .month-total-text { font-family: 'Rajdhani', sans-serif; font-weight: 700; color: var(--neon-purple); font-size: 26px; display: block; line-height: 1; }
@@ -97,7 +90,7 @@
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #ffffff !important; font-family: 'Inter', sans-serif; }
         
         .num-cell { font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 0.5px; }
-        .price-cell { color: var(--neon-purple) !important; font-weight: 700; font-size: 15px; }
+        .price-cell { color: #ffffff !important; font-weight: 700; font-size: 15px; }
 
         .input-mini { background: #111; border: 1px solid #222; color: #fff; padding: 8px; font-size: 11px; width: 150px; outline: none; border-radius: 4px; }
         .save-btn { background: var(--status-green); color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 10px; font-family: 'Orbitron'; transition: 0.3s; }
@@ -111,6 +104,8 @@
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
         
         .filter-info { font-size: 10px; color: #888; margin-bottom: 10px; display: flex; justify-content: space-between; font-weight: 600; }
+        .reset-link { cursor: pointer; color: #fff; transition: 0.3s; }
+        .reset-link:hover { color: var(--neon-purple); }
     </style>
 </head>
 <body>
@@ -129,24 +124,45 @@
 <div class="admin-grid">
     <div class="crm-panel">
         <div class="controls-row">
-            <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900)">+ 1 ЧАС</button>
-            <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500)">START EDITION</button>
-            <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000)">ARTIST EDITION</button>
-            <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ 1.0', 1000)">ТЮНИНГ 1.0</button>
-            <button class="action-btn btn-green" onclick="addToCart('ДОП. ДОРОЖКА', 500)">+ ДОП. ДОРОЖКА</button>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white')">+ 1 ЧАС</button>
+                <div class="btn-tooltip">900 ₽</div>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
+                <div class="btn-tooltip">3500 ₽</div>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
+                <div class="btn-tooltip">6000 ₽</div>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
+                <div class="btn-tooltip">1000 ₽</div>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
+                <div class="btn-tooltip">500 ₽</div>
+            </div>
             
             <div class="platinum-group">
                 <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
-                <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM EDITION</button>
-                <button class="action-btn btn-gold" style="border-style: dashed;" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300)">+ ПЛАТ. ДОРОЖКА (300)</button>
+                <div class="btn-wrapper">
+                    <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM EDITION</button>
+                    <div class="btn-tooltip">База (по умолч. 10к)</div>
+                </div>
+                <div class="btn-wrapper">
+                    <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
+                    <div class="btn-tooltip">300 ₽</div>
+                </div>
             </div>
         </div>
 
         <div id="currentSession" class="current-session-box">
             <div id="sessionTooltip" class="session-tooltip"></div>
             <div>
-                <div style="font-size: 9px; color: var(--neon-purple); margin-bottom: 5px; font-family:'Orbitron'">ТЕКУЩИЙ ЧЕК:</div>
-                <div id="cartItems" style="font-size: 11px; color: #ccc; max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Пусто...</div>
+                <div style="font-size: 9px; color: #fff; margin-bottom: 7px; font-family:'Orbitron'">ТЕКУЩИЙ ЧЕК:</div>
+                <div id="cartItems" style="display:flex; align-items:center; flex-wrap:nowrap; gap:2px; overflow:hidden;">Пусто...</div>
             </div>
             <div style="display:flex; align-items:center; gap:12px;">
                 <input type="text" id="clientName" class="input-mini" placeholder="ИМЯ КЛИЕНТА">
@@ -160,7 +176,7 @@
 
         <div class="filter-info">
             <span id="currentViewText">ПОКАЗАНЫ ВСЕ ЗАПИСИ</span>
-            <span style="cursor:pointer; color:var(--neon-purple)" onclick="resetFilter()">СБРОСИТЬ</span>
+            <span class="reset-link" onclick="resetFilter()">СБРОСИТЬ</span>
         </div>
 
         <div class="table-container">
@@ -194,6 +210,14 @@
     let currentCart = { items: [], details: [], total: 0 };
     let currentCalDate = new Date();
     let filterDate = null;
+
+    const colorMap = {
+        white: '#fff',
+        purple: '#bf00ff',
+        red: '#cc0000',
+        green: '#008f39',
+        gold: '#b89600'
+    };
 
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
@@ -233,9 +257,9 @@
     }
     function resetFilter() { filterDate = null; document.getElementById('currentViewText').innerText = `ПОКАЗАНЫ ВСЕ ЗАПИСИ`; updateTable(); renderCalendar(); }
 
-    function addToCart(name, price) {
-        currentCart.items.push(name);
-        currentCart.details.push({ name, price });
+    function addToCart(name, price, colorClass) {
+        currentCart.items.push({ name, colorClass });
+        currentCart.details.push({ name, price, colorClass });
         currentCart.total += price;
         renderCart();
     }
@@ -243,22 +267,33 @@
     function addPlatToCart() {
         const val = document.getElementById('platPrice').value;
         const p = parseInt(val) || 10000;
-        addToCart('PLATINUM EDITION', p);
+        addToCart('PLATINUM EDITION', p, 'gold');
         document.getElementById('platPrice').value = '';
     }
 
     function renderCart() {
         const tooltip = document.getElementById('sessionTooltip');
+        const itemsContainer = document.getElementById('cartItems');
+        
         if (currentCart.items.length > 0) {
-            document.getElementById('cartItems').innerText = currentCart.items.join(' + ');
+            itemsContainer.innerHTML = '';
+            currentCart.items.forEach(item => {
+                itemsContainer.innerHTML += `<span class="cart-tag tag-${item.colorClass}">${item.name}</span>`;
+            });
+
             document.getElementById('cartTotal').innerText = currentCart.total + ' ₽';
-            tooltip.innerHTML = '<div style="color:var(--neon-purple); font-family:Orbitron; font-size:10px; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ:</div>';
+            
+            tooltip.innerHTML = '<div style="color:#fff; font-family:Orbitron; font-size:10px; margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ:</div>';
             currentCart.details.forEach(item => {
-                tooltip.innerHTML += `<div class="tooltip-item"><span>${item.name}</span><span style="color:var(--neon-purple); font-family:Rajdhani; font-weight:700; font-size:14px;">${item.price} ₽</span></div>`;
+                tooltip.innerHTML += `
+                <div class="tooltip-item" style="border-left: 2px solid ${colorMap[item.colorClass]}">
+                    <span style="color: ${colorMap[item.colorClass]}">${item.name}</span>
+                    <span style="color:#fff; font-family:Rajdhani; font-weight:700; font-size:14px;">${item.price} ₽</span>
+                </div>`;
             });
             tooltip.innerHTML += `<div style="text-align:right; margin-top:10px; font-family:Rajdhani; font-weight:700; font-size:16px; color:#fff;">СУММА: ${currentCart.total} ₽</div>`;
         } else {
-            document.getElementById('cartItems').innerText = 'Пусто...';
+            itemsContainer.innerText = 'Пусто...';
             document.getElementById('cartTotal').innerText = '0 ₽';
             tooltip.innerHTML = '';
         }
@@ -274,7 +309,8 @@
         if (currentCart.items.length === 0) return alert('Добавьте услуги!');
         const name = document.getElementById('clientName').value || 'Без имени';
         const date = new Date().toLocaleDateString('ru-RU');
-        crmData.unshift({ date, client: name, services: currentCart.items.join(', '), total: currentCart.total });
+        const servicesList = currentCart.items.map(i => i.name).join(', ');
+        crmData.unshift({ date, client: name, services: servicesList, total: currentCart.total });
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         clearCart(); updateTable(); renderCalendar();
     }
