@@ -20,6 +20,35 @@
         .back-btn { color: #888; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #222; padding: 5px 10px; border-radius: 4px; transition: 0.3s; margin-left: 20px; }
         .back-btn:hover { color: #fff; border-color: var(--neon-purple); }
 
+        /* Эффект блюра для финансовых данных */
+        .privacy-blur {
+            filter: blur(5px);
+            transition: filter 0.3s ease;
+        }
+        /* Снятие блюра при активации пароля */
+        .privacy-active .privacy-blur {
+            filter: blur(0);
+        }
+
+        /* Кнопка разблокировки */
+        .unlock-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #444;
+            font-size: 8px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Orbitron';
+            margin-bottom: 5px;
+            transition: 0.3s;
+            letter-spacing: 1px;
+        }
+        .unlock-btn:hover {
+            color: var(--neon-purple);
+            border-color: var(--neon-purple);
+        }
+
         /* ЕДИНЫЙ СТИЛЬ ДОХОДА (ПК И МОБИЛКА) */
         .total-box { 
             background: var(--neon-purple); 
@@ -117,7 +146,7 @@
         }
         .history-row:hover .history-tooltip { visibility: visible; opacity: 1; }
 
-/* ———— МОБИЛЬНАЯ АДАПТАЦИЯ ———— */
+        /* ———— МОБИЛЬНАЯ АДАПТАЦИЯ ———— */
         @media (max-width: 992px) {
             body { padding: 10px; }
             header { flex-direction: column; gap: 15px; align-items: center; border-bottom: none; }
@@ -197,9 +226,12 @@
 <header>
     <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
     <div style="display: flex; align-items: center;">
-        <div class="total-box">
-            <span id="monthTotal" class="income-amount">0 ₽</span>
-            <span id="totalLabel">ДОХОД ЗА МЕСЯЦ</span>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <button class="unlock-btn" onclick="checkPrivacyPassword()">UNLOCK</button>
+            <div class="total-box">
+                <span id="monthTotal" class="income-amount privacy-blur">0 ₽</span>
+                <span id="totalLabel">ДОХОД ЗА МЕСЯЦ</span>
+            </div>
         </div>
         <a href="index.html" class="back-btn">Выйти на сайт</a>
     </div>
@@ -294,6 +326,17 @@
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
+    // Функция проверки пароля для блюра
+    function checkPrivacyPassword() {
+        const pass = prompt("Введите пароль для просмотра финансовых данных:");
+        const correctPassword = '123'; // ТВОЙ ПАРОЛЬ ТУТ
+        if (pass === correctPassword) {
+            document.body.classList.add('privacy-active');
+        } else {
+            alert("Неверный пароль");
+        }
+    }
+
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
         const monthName = document.getElementById('calMonthName');
@@ -334,15 +377,6 @@
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
         selectedDate = null;
-        updateTable(); 
-        renderCalendar(); 
-    }
-
-    function resetFilter() { 
-        selectedDate = null; 
-        currentCalDate = new Date();
-        const label = document.getElementById('sessionDateLabel');
-        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (СЕГОДНЯ):`;
         updateTable(); 
         renderCalendar(); 
     }
@@ -434,7 +468,7 @@
                 <td class="num-cell" data-label="ДАТА">${row.date}</td>
                 <td class="client-name-cell" data-label="КЛИЕНТ">${row.client}</td>
                 <td class="services-cell" style="position:relative;">${row.services}${historyTooltipHtml}</td>
-                <td class="num-cell price-cell" data-label="ИТОГО">${row.total} ₽</td>
+                <td class="num-cell price-cell privacy-blur" data-label="ИТОГО">${row.total} ₽</td>
                 <td data-label="ДЕЙСТВИЕ"><i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${crmData.indexOf(row)})"></i></td>
             `;
             body.appendChild(tr);
