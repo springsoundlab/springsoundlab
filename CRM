@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPRING SOUND LAB | CRM & CERTS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; --status-green: #00ff66; }
+        body { background: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid #111; margin-bottom: 20px; }
+        .logo { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); letter-spacing: 2px; font-size: 14px; }
+        .back-btn { color: #444; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #222; padding: 5px 10px; border-radius: 4px; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 350px; gap: 20px; max-width: 1400px; margin: 0 auto; }
+        .crm-panel, .certs-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #111; }
+        .total-box { background: rgba(191, 0, 255, 0.1); padding: 10px 20px; border: 1px solid var(--neon-purple); border-radius: 8px; text-align: right; }
+        .total-amount { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); font-size: 20px; display: block; }
+        .total-label { font-size: 9px; color: #666; letter-spacing: 1px; }
+        .quick-actions { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #000; padding: 15px; border-radius: 8px; }
+        .action-btn { background: #111; border: 1px solid #222; color: #fff; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 11px; font-family: 'Orbitron', sans-serif; transition: 0.3s; }
+        .action-btn:hover { border-color: var(--neon-purple); background: #161616; }
+        .platinum-input { background: #000; border: 1px solid var(--neon-purple); color: #fff; width: 80px; padding: 7px; border-radius: 5px; font-family: 'Orbitron', sans-serif; font-size: 11px; outline: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th { text-align: left; color: #444; font-family: 'Orbitron', sans-serif; font-size: 10px; padding: 10px; border-bottom: 1px solid #222; }
+        td { padding: 12px 10px; border-bottom: 1px solid #111; }
+        .certs-panel { height: 85vh; overflow-y: auto; }
+        .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
+        .cert-id { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); font-size: 12px; }
+        .cert-status { font-size: 9px; font-weight: bold; border: 1px solid; padding: 2px 5px; border-radius: 3px; }
+        .input-mini { background: #111; border: 1px solid #222; color: #fff; padding: 4px; font-size: 11px; width: 100px; outline: none; }
+        .btn-mini { background: var(--neon-purple); border: none; color: #fff; font-size: 9px; padding: 4px 8px; border-radius: 3px; cursor: pointer; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-purple); }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">SPRING SOUND LAB | CRM SYSTEM</div>
+    <a href="index.html" class="back-btn">Выйти на сайт</a>
+</header>
+<div class="admin-grid">
+    <div class="crm-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="font-family:'Orbitron'; font-size:18px; margin:0;">УЧЁТ СЕССИЙ</h2>
+            <div class="total-box">
+                <span id="totalDisplay" class="total-amount">0 ₽</span>
+                <span class="total-label">ИТОГО ЗА МЕСЯЦ</span>
+            </div>
+        </div>
+        <div class="quick-actions">
+            <button class="action-btn" onclick="addEntry('ЧАС ЗАПИСИ', 900)">+ 1 ЧАС (900)</button>
+            <button class="action-btn" onclick="addEntry('START EDITION', 3500)">START (3500)</button>
+            <button class="action-btn" onclick="addEntry('ARTIST EDITION', 6000)">ARTIST (6000)</button>
+            <div style="display:flex; align-items:center; gap:5px; margin-left:auto;">
+                <input type="number" id="platPrice" class="platinum-input" placeholder="10000">
+                <button class="action-btn" style="border-color:#00ff66;" onclick="addPlatinum()">+ PLATINUM</button>
+            </div>
+        </div>
+        <table>
+            <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГА</th><th>СУММА</th><th></th></tr></thead>
+            <tbody id="crmTableBody"></tbody>
+        </table>
+        <button onclick="clearCRM()" style="margin-top:20px; background:none; border:none; color:#333; font-size:9px; cursor:pointer; text-transform:uppercase;">Очистить все записи</button>
+    </div>
+    <div class="certs-panel">
+        <h2 style="font-family:'Orbitron'; font-size:14px; margin-bottom:20px; color:#444;">СЕРТИФИКАТЫ (300)</h2>
+        <div id="certsList"></div>
+    </div>
+</div>
+<script>
+    let crmData = JSON.parse(localStorage.getItem('spring_crm')) || [];
+    function updateCRM() {
+        const body = document.getElementById('crmTableBody');
+        const totalDisp = document.getElementById('totalDisplay');
+        body.innerHTML = ''; let total = 0;
+        crmData.forEach((item, index) => {
+            total += item.price;
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${item.date}</td><td><input type="text" class="input-mini" value="${item.client}" onchange="updateClient(${index},this.value)"></td><td style="color:var(--neon-purple)">${item.service}</td><td>${item.price} ₽</td><td><i class="fas fa-times" onclick="deleteEntry(${index})"></i></td>`;
+            body.appendChild(row);
+        });
+        totalDisp.innerHTML = total.toLocaleString() + ' ₽';
+        localStorage.setItem('spring_crm', JSON.stringify(crmData));
+    }
+    function addEntry(service, price) {
+        const date = new Date().toLocaleDateString('ru-RU');
+        crmData.unshift({ date, client: '', service, price });
+        updateCRM();
+    }
+    function addPlatinum() {
+        const price = document.getElementById('platPrice').value || 10000;
+        addEntry('PLATINUM', parseInt(price));
+        document.getElementById('platPrice').value = '';
+    }
+    function updateClient(index, val) { crmData[index].client = val; localStorage.setItem('spring_crm', JSON.stringify(crmData)); }
+    function deleteEntry(index) { crmData.splice(index, 1); updateCRM(); }
+    function clearCRM() { if(confirm('Удалить данные?')) { crmData = []; updateCRM(); } }
+    function updateCerts() {
+        const list = document.getElementById('certsList');
+        const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        list.innerHTML = '';
+        for (let i = 1; i <= 300; i++) {
+            const id = 'SL-' + String(i).padStart(3, '0');
+            const data = savedCerts[id] || { active: false, name: '' };
+            const div = document.createElement('div');
+            div.className = 'cert-row';
+            div.innerHTML = `<span class="cert-id">${id}</span>${data.active ? `<span style="font-size:10px; color:#555">${data.name}</span>` : `<input type="text" id="in-${id}" class="input-mini" placeholder="Имя">`}${data.active ? `<span class="cert-status" style="color:var(--status-green); border-color:var(--status-green)">OK</span>` : `<button class="btn-mini" onclick="activateCert('${id}')">АКТИВ</button>`}`;
+            list.appendChild(div);
+        }
+    }
+    function activateCert(id) {
+        const name = document.getElementById('in-' + id).value;
+        if (!name) return alert('Введите имя!');
+        const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        savedCerts[id] = { active: true, name: name };
+        localStorage.setItem('spring_certs', JSON.stringify(savedCerts));
+        updateCerts();
+    }
+    updateCRM(); updateCerts();
+</script>
+</body>
+</html>
