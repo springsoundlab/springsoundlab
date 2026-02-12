@@ -65,7 +65,7 @@
         .platinum-group { display: flex; align-items: center; gap: 10px; border-left: 1px solid #222; padding-left: 10px; }
         .plat-input { background: #000; border: 1px solid #222; color: var(--platinum-gold); width: 75px; padding: 8px; border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 13px; outline: none; text-align: center; }
 
-        /* ———— БЛОК ТЕКУЩИЙ ЧЕК (ПК ЛОГИКА) ———— */
+/* ———— БЛОК ТЕКУЩИЙ ЧЕК (ПК ЛОГИКА) ———— */
         .current-session-box { 
             background: rgba(191, 0, 255, 0.05); 
             border: 1px dashed var(--neon-purple); 
@@ -75,7 +75,7 @@
             display: flex; 
             justify-content: space-between;
             min-height: 175px; 
-            align-items: flex-start; /* Изменено на верх, чтобы услуги росли сверху вниз */
+            align-items: flex-start; 
             box-sizing: border-box;
             position: relative;
         }
@@ -84,19 +84,18 @@
             flex-grow: 1; 
             display: flex; 
             flex-direction: column; 
-            align-items: flex-start; /* Услуги прижаты влево */
+            align-items: flex-start; 
         }
         
         #cartItems {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            justify-content: flex-start; /* Направление слева направо */
+            justify-content: flex-start;
             align-content: flex-start;
             max-width: 100%;
         }
 
-        /* Цвета плашек в чеке, соответствующие кнопкам */
         .cart-tag { 
             font-size: 10px; 
             font-family: 'Orbitron'; 
@@ -135,8 +134,8 @@
             align-items: flex-end; 
             justify-content: flex-end; 
             gap: 10px; 
-            min-width: 350px;
-            align-self: flex-end; /* Кнопка и сумма остаются внизу справа */
+            min-width: 155px; /* Ширина строго под кнопку */
+            align-self: flex-end;
         }
         
         .total-display-pc { 
@@ -149,6 +148,22 @@
             margin-bottom: 5px;
             line-height: 1;
         }
+
+        /* Поле ввода: размер как у кнопки, серый цвет, шрифт Orbitron */
+        .input-mini { 
+            background: #111; 
+            border: 1px solid #222; 
+            color: #666; 
+            padding: 12px; 
+            border-radius: 6px; 
+            width: 155px; 
+            font-size: 10px; 
+            font-family: 'Orbitron';
+            outline: none; 
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .input-mini::placeholder { color: #444; }
         
         .save-btn { 
             background: var(--status-green); 
@@ -162,11 +177,12 @@
             cursor: pointer; 
             transition: 0.3s; 
         }
+        .save-btn:hover { filter: brightness(1.2); }
 
-        /* Таблица (Яркие шрифты) */
+        /* Таблица */
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
-        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; } 
+        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
         
         /* Имя клиента и услуги — ярко белые */
         .client-name-cell { color: #fff !important; font-weight: 600; font-size: 13px; }
@@ -239,17 +255,14 @@
         </div>
 
       <div id="currentSession" class="current-session-box">
-            <div id="sessionTooltip" class="session-tooltip"></div>
             <div class="cart-info">
-                <div id="sessionDateLabel" style="font-size: 10px; color: #555; margin-bottom: 12px; font-family:'Orbitron'; letter-spacing: 1px;">ТЕКУЩИЙ ЧЕК:</div>
-                <div id="cartItems" style="display:flex; align-items:center; flex-wrap:wrap; gap:8px;">Пусто...</div>
+                <div id="sessionDateLabel" style="font-size: 10px; color: #444; margin-bottom: 12px; font-family:'Orbitron'; letter-spacing: 1px;">ТЕКУЩИЙ ЧЕК:</div>
+                <div id="cartItems">Пусто...</div>
             </div>
             <div class="cart-actions">
                 <div class="total-display-pc" id="cartTotal">0 ₽</div>
-                <div class="controls-row-pc">
-                    <input type="text" id="clientName" class="input-mini" placeholder="ИМЯ КЛИЕНТА">
-                    <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
-                    </div>
+                <input type="text" id="clientName" class="input-mini" placeholder="ИМЯ КЛИЕНТА">
+                <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
             </div>
         </div>
 
