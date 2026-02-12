@@ -9,7 +9,7 @@
     <style>
         :root { 
             --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
-            --status-green: #00ff66; --artist-red: #ff0000; --platinum-gold: #ffcc00;
+            --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
         }
         body { background: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; overflow-x: hidden; }
         
@@ -25,26 +25,31 @@
         .calendar-widget { margin-bottom: 20px; background: #000; border-radius: 10px; padding: 15px; border: 1px solid #222; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .month-name { font-family: 'Orbitron'; color: var(--neon-purple); cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
-        .month-name:hover { text-shadow: 0 0 10px var(--neon-purple); }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .day-name { font-size: 9px; color: #444; font-weight: bold; padding-bottom: 5px; }
-        .day { font-size: 11px; padding: 8px 0; cursor: pointer; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; }
-        .day:hover { border-color: var(--neon-purple); color: var(--neon-purple); }
-        .day.active { background: var(--neon-purple); color: #fff; font-weight: bold; }
-        .day.has-data { color: var(--status-green); position: relative; }
-        .day.has-data::after { content: ''; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 3px; height: 3px; background: var(--status-green); border-radius: 50%; }
+        .day { font-size: 11px; padding: 8px 0; cursor: pointer; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; color: #666; }
+        
+        /* Сегодняшний день (Фиолетовый) */
+        .day.today { background: var(--neon-purple) !important; color: #fff !important; font-weight: bold; }
+        /* День с данными (Темно-зеленый) */
+        .day.has-data { background: var(--status-green); color: #fff; }
+        /* Выбранный день в фильтре */
+        .day.active-filter { border: 1px solid var(--neon-purple); color: var(--neon-purple); }
+        .day:hover { background: #111; }
 
-        /* Кнопки услуг */
+        /* Кнопки услуг - Убрано яркое свечение */
         .controls-row { display: flex; align-items: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #111; flex-wrap: wrap; }
-        .action-btn { background: #000; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.3s; border: 1px solid transparent; }
-        .btn-white { border-color: #ffffff; } .btn-white:hover { background: #fff; color: #000; }
-        .btn-purple { border-color: var(--neon-purple); } .btn-purple:hover { background: var(--neon-purple); }
-        .btn-red { border-color: var(--artist-red); } .btn-red:hover { background: var(--artist-red); }
-        .btn-green { border-color: var(--status-green); } .btn-green:hover { background: var(--status-green); color: #000; }
-        .btn-gold { border-color: var(--platinum-gold); color: var(--platinum-gold); } .btn-gold:hover { background: var(--platinum-gold); color: #000; }
+        .action-btn { background: #000; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.2s; border: 1px solid #222; }
+        
+        .btn-white:hover { background: #fff; color: #000; border-color: #fff; }
+        .btn-purple:hover { background: var(--neon-purple); border-color: var(--neon-purple); }
+        .btn-red:hover { background: var(--artist-red); border-color: var(--artist-red); }
+        .btn-green:hover { background: var(--status-green); border-color: var(--status-green); }
+        .btn-gold { color: var(--platinum-gold); border-color: #333; }
+        .btn-gold:hover { background: var(--platinum-gold); color: #000; border-color: var(--platinum-gold); }
 
         .platinum-group { display: flex; align-items: center; gap: 5px; border-left: 1px solid #222; padding-left: 10px; }
-        .plat-input { background: #000; border: 1px solid var(--platinum-gold); color: var(--platinum-gold); width: 75px; padding: 8px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 10px; outline: none; }
+        .plat-input { background: #000; border: 1px solid #222; color: var(--platinum-gold); width: 75px; padding: 8px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 10px; outline: none; }
 
         /* ЧЕК С ВЫПАДЕНИЕМ ВНИЗ */
         .current-session-box { 
@@ -78,12 +83,7 @@
             pointer-events: none; 
         }
 
-        .current-session-box:hover .session-tooltip { 
-            visibility: visible; 
-            opacity: 1; 
-            top: 105%; 
-        }
-
+        .current-session-box:hover .session-tooltip { visibility: visible; opacity: 1; top: 105%; }
         .tooltip-item { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; border-bottom: 1px solid #1a1a1a; padding-bottom: 4px; }
 
         .total-box { background: rgba(191, 0, 255, 0.1); padding: 10px 20px; border: 1px solid var(--neon-purple); border-radius: 8px; text-align: right; }
@@ -95,7 +95,7 @@
         th { text-align: left; color: #444; font-family: 'Orbitron', sans-serif; font-size: 10px; padding: 10px; border-bottom: 1px solid #222; }
         td { padding: 12px 10px; border-bottom: 1px solid #111; }
         .input-mini { background: #111; border: 1px solid #222; color: #fff; padding: 8px; font-size: 11px; width: 150px; outline: none; border-radius: 4px; }
-        .save-btn { background: var(--status-green); color: #000; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 10px; font-family: 'Orbitron'; transition: 0.3s; }
+        .save-btn { background: var(--status-green); color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 10px; font-family: 'Orbitron'; transition: 0.3s; }
         
         .certs-container { height: 300px; overflow-y: auto; padding-top: 10px; }
         .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
@@ -190,21 +190,33 @@
         const grid = document.getElementById('calendarDays');
         const monthName = document.getElementById('calMonthName');
         grid.innerHTML = '';
+        
+        const now = new Date();
         const year = currentCalDate.getFullYear();
         const month = currentCalDate.getMonth();
+        
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         monthName.innerText = `${monthNames[month]} ${year}`;
+        
         ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'].forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
+        
         let startingSpace = firstDay === 0 ? 6 : firstDay - 1;
         for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
+        
         for(let d=1; d<=daysInMonth; d++) {
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
             const hasData = crmData.some(row => row.date === dateStr);
-            const activeClass = filterDate === dateStr ? 'active' : '';
-            const dataClass = hasData ? 'has-data' : '';
-            grid.innerHTML += `<div class="day ${activeClass} ${dataClass}" onclick="filterByDay('${dateStr}')">${d}</div>`;
+            const isToday = now.toLocaleDateString('ru-RU') === dateStr;
+            
+            let classes = ['day'];
+            if (isToday) classes.push('today');
+            if (hasData) classes.push('has-data');
+            if (filterDate === dateStr) classes.push('active-filter');
+            
+            grid.innerHTML += `<div class="${classes.join(' ')}" onclick="filterByDay('${dateStr}')">${d}</div>`;
         }
     }
 
@@ -257,9 +269,9 @@
     }
 
     function saveSession() {
-        if (currentCart.items.length === 0) return alert('Сначала добавьте услуги!');
+        if (currentCart.items.length === 0) return alert('Добавьте услуги!');
         const name = document.getElementById('clientName').value || 'Без имени';
-        const date = new Date().toLocaleDateString('ru-RU');
+        const date = new Date().toLocaleDateString('ru-RU'); // АВТО-ДАТА (СЕГОДНЯ)
         crmData.unshift({ date, client: name, services: currentCart.items.join(', '), total: currentCart.total });
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         clearCart(); updateTable(); renderCalendar();
@@ -288,7 +300,7 @@
         const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
         list.innerHTML = '';
         for (let i = 1; i <= 300; i++) {
-            const id = 'SSL-' + String(i).padStart(3, '0'); // ТЕПЕРЬ SSL
+            const id = 'SSL-' + String(i).padStart(3, '0');
             const data = savedCerts[id] || { active: false, name: '' };
             const div = document.createElement('div');
             div.className = 'cert-row';
