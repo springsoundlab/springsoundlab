@@ -1171,32 +1171,38 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. ВОЗВРАЩАЕМ АНИМАЦИЮ ABOUT ME ---
+    // --- 1. АНИМАЦИЯ ABOUT ME (АКТИВАЦИЯ ПОЗЖЕ) ---
     const aboutSection = document.querySelector('#about-me');
     if (aboutSection) {
         const aboutObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    aboutSection.classList.add('is-revealed'); // Добавляем класс активации
+                    aboutSection.classList.add('is-revealed');
                 }
             });
-        }, { threshold: 0.2 }); // Активируется, когда 20% блока видно
+        }, { 
+            // 0.7 означает, что блок активируется, когда он выйдет на экран на 70%
+            threshold: 0.7 
+        });
         aboutObserver.observe(aboutSection);
     }
 
-    // --- 2. ЛОГИКА ПОДСВЕТКИ ПАКЕТОВ (МОБИЛКА) ---
+    // --- 2. ПОДСВЕТКА ПАКЕТОВ НА МОБИЛКЕ ---
     const handleMobileGlow = () => {
+        // Если экран шире 768px (компьютер), мобильная логика не работает
         if (window.innerWidth > 768) return;
 
         const modules = document.querySelectorAll('.module');
-        const triggerLine = window.innerHeight / 2;
+        const triggerLine = window.innerHeight / 2; // Линия в центре экрана
 
         modules.forEach(mod => {
             const rect = mod.getBoundingClientRect();
             const moduleCenter = rect.top + (rect.height / 2);
 
+            // Если центр блока находится в радиусе 150px от центра экрана
             if (Math.abs(moduleCenter - triggerLine) < 150) {
                 if (!mod.classList.contains('active-package')) {
+                    // Снимаем подсветку со всех и даем текущему
                     modules.forEach(m => m.classList.remove('active-package'));
                     mod.classList.add('active-package');
                 }
@@ -1204,11 +1210,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // Слушатели для мобильного скролла
+    // Слушаем скролл и движение пальцем на мобилке
     window.addEventListener('scroll', handleMobileGlow, { passive: true });
     window.addEventListener('touchmove', handleMobileGlow, { passive: true });
     
-    // Запускаем проверку один раз при загрузке
+    // Проверяем положение блоков сразу при загрузке
     handleMobileGlow();
 });
 
