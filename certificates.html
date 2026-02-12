@@ -19,7 +19,43 @@
         .action-btn:hover { border-color: var(--neon-purple); background: #161616; }
         .platinum-group { display: flex; align-items: center; gap: 5px; border-left: 1px solid #222; padding-left: 10px; }
         .plat-input { background: #000; border: 1px solid var(--neon-purple); color: #fff; width: 65px; padding: 7px; border-radius: 5px; font-family: 'Orbitron', sans-serif; font-size: 9px; outline: none; }
-        .current-session-box { background: rgba(191, 0, 255, 0.05); border: 1px dashed var(--neon-purple); padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* СТИЛИ ТЕКУЩЕГО ЧЕКА И ПОДСКАЗКИ */
+        .current-session-box { 
+            background: rgba(191, 0, 255, 0.05); 
+            border: 1px dashed var(--neon-purple); 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            position: relative;
+            transition: 0.3s;
+        }
+        .current-session-box:hover { background: rgba(191, 0, 255, 0.1); border-style: solid; }
+
+        /* Всплывающее окно (Tooltip) */
+        .session-tooltip {
+            visibility: hidden;
+            position: absolute;
+            bottom: 110%;
+            left: 20px;
+            background: #0f0f0f;
+            border: 1px solid var(--neon-purple);
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 100;
+            width: 280px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+        .current-session-box:hover .session-tooltip { visibility: visible; opacity: 1; bottom: 105%; }
+        .tooltip-item { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; border-bottom: 1px solid #1a1a1a; padding-bottom: 3px; }
+        .tooltip-price { color: var(--neon-purple); font-family: 'Orbitron'; }
+
         .total-box { background: rgba(191, 0, 255, 0.1); padding: 10px 20px; border: 1px solid var(--neon-purple); border-radius: 8px; text-align: right; }
         .total-amount { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); font-size: 20px; display: block; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -63,9 +99,11 @@
         </div>
 
         <div id="currentSession" class="current-session-box" style="display: none;">
+            <div id="sessionTooltip" class="session-tooltip"></div>
+            
             <div>
-                <div style="font-size: 9px; color: var(--neon-purple); margin-bottom: 5px; font-family:'Orbitron'">ТЕКУЩИЙ ЧЕК:</div>
-                <div id="cartItems" style="font-size: 11px; color: #ccc; max-width: 400px;"></div>
+                <div style="font-size: 9px; color: var(--neon-purple); margin-bottom: 5px; font-family:'Orbitron'">ТЕКУЩИЙ ЧЕК (наведи для деталей):</div>
+                <div id="cartItems" style="font-size: 11px; color: #ccc; max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
             </div>
             <div style="display:flex; align-items:center; gap:12px;">
                 <input type="text" id="clientName" class="input-mini" placeholder="ИМЯ КЛИЕНТА">
@@ -92,10 +130,11 @@
 
 <script>
     let crmData = JSON.parse(localStorage.getItem('spring_crm_v2')) || [];
-    let currentCart = { items: [], total: 0 };
+    let currentCart = { items: [], details: [], total: 0 };
 
     function addToCart(name, price) {
         currentCart.items.push(name);
+        currentCart.details.push({ name, price });
         currentCart.total += price;
         renderCart();
     }
@@ -108,15 +147,29 @@
 
     function renderCart() {
         const box = document.getElementById('currentSession');
+        const tooltip = document.getElementById('sessionTooltip');
+        
         if (currentCart.items.length > 0) {
             box.style.display = 'flex';
             document.getElementById('cartItems').innerText = currentCart.items.join(' + ');
             document.getElementById('cartTotal').innerText = currentCart.total + ' ₽';
+            
+            // Генерируем содержимое всплывающего окна
+            tooltip.innerHTML = '<div style="color:var(--neon-purple); font-family:Orbitron; font-size:10px; margin-bottom:10px; border-bottom:1px solid #333;">ДЕТАЛИЗАЦИЯ:</div>';
+            currentCart.details.forEach(item => {
+                tooltip.innerHTML += `
+                    <div class="tooltip-item">
+                        <span>${item.name}</span>
+                        <span class="tooltip-price">${item.price} ₽</span>
+                    </div>`;
+            });
+            tooltip.innerHTML += `<div style="text-align:right; margin-top:10px; font-family:Orbitron; font-size:12px;">ИТОГО: ${currentCart.total} ₽</div>`;
+            
         } else { box.style.display = 'none'; }
     }
 
     function clearCart() {
-        currentCart = { items: [], total: 0 };
+        currentCart = { items: [], details: [], total: 0 };
         document.getElementById('clientName').value = '';
         renderCart();
     }
