@@ -187,7 +187,7 @@
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
         .day:hover { background: #111; }
 
-        /* НОВЫЕ СТИЛИ ДЛЯ ВВОДА ВРЕМЕНИ И ИМЕНИ ПОД КАЛЕНДАРЕМ */
+        /* ВИДЖЕТ БРОНИРОВАНИЯ: ЦЕНТРИРОВАНИЕ ТЕКСТА */
         .session-booking-widget {
             background: #000; border: 1px solid #222; border-radius: 10px; padding: 15px; margin-bottom: 20px;
         }
@@ -195,6 +195,7 @@
         .booking-field {
             background: #080808; border: 1px solid #1a1a1a; border-radius: 6px; padding: 8px; color: #fff; 
             font-family: 'Orbitron'; font-size: 11px; outline: none; width: 100%; transition: 0.3s;
+            text-align: center; /* Текст по центру как просил */
         }
         .booking-field:focus { border-color: var(--neon-purple); }
         .booking-label { font-family: 'Orbitron'; font-size: 8px; color: #444; margin-bottom: 5px; text-transform: uppercase; }
@@ -253,9 +254,12 @@
         .tag-green { border: 1px solid var(--status-green); color: var(--status-green); }
         .tag-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
         .tag-remove { position: absolute; right: 0; top: 0; bottom: 0; width: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.5; }
+        
+        /* КНОПКА СОХРАНИТЬ И ПОЛЕ ИМЕНИ РЯДОМ */
         .cart-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; align-self: flex-end; }
         .total-display-pc { font-family: 'Rajdhani'; font-weight: 700; font-size: 34px; color: #fff; height: 42px; width: 155px; margin-bottom: 8px; text-align: right; }
         .save-btn { background: var(--status-green); color: #fff; border: none; height: 42px; width: 155px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
+        .client-input-session { background: #000; border: 1px solid #222; color: #fff; padding: 10px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; outline: none; width: 155px; box-sizing: border-box; text-align: center; }
 
         .progress-container { width: 100%; height: 2px; background: #111; margin-top: 5px; border-radius: 1px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--neon-purple); transition: 0.5s; width: 0%; }
@@ -268,10 +272,13 @@
         .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; padding-right: 12px; }
 
         th:nth-child(1), td:nth-child(1) { width: 90px; }
-        th:nth-child(2), td:nth-child(2) { width: 150px; }
+        th:nth-child(2), td:nth-child(2) { width: 160px; } /* Чуть расширил для времени */
         th:nth-child(3), td:nth-child(3) { width: auto; }
         th:nth-child(4), td:nth-child(4) { width: 110px; }
         th:nth-child(5), td:nth-child(5) { width: 120px; }
+
+        /* КРУПНОЕ ВРЕМЯ В ТАБЛИЦЕ */
+        .table-time-large { font-family: 'Rajdhani'; font-weight: 700; font-size: 16px; color: var(--neon-purple); margin-right: 8px; }
 
         .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
         .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
@@ -302,8 +309,6 @@
         .icon-btn-box:hover span { color: var(--neon-purple); }
         .icon-delete:hover i { color: var(--artist-red); }
         .icon-delete:hover span { color: var(--artist-red); }
-
-        .client-input { background: #000; border: 1px solid #222; color: #fff; padding: 10px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; outline: none; width: 200px; margin-bottom: 12px; }
 
         @media (max-width: 992px) {
             body { overflow-y: auto; height: auto; }
@@ -388,11 +393,11 @@
         <div id="currentSession" class="current-session-box">
             <div class="cart-info">
                 <div id="sessionDateLabel" style="font-size: 10px; color: #444; margin-bottom: 12px; font-family:'Orbitron'; letter-spacing: 1px;">ТЕКУЩИЙ ЧЕК:</div>
-                <input type="text" id="clientName" class="client-input" placeholder="Имя клиента..." oninput="syncClientNames(this.value)">
                 <div id="cartItems">Пусто...</div>
             </div>
             <div class="cart-actions">
                 <div class="total-display-pc" id="cartTotal">0 ₽</div>
+                <input type="text" id="clientName" class="client-input-session" placeholder="Имя клиента..." oninput="syncClientNames(this.value)">
                 <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
             </div>
         </div>
@@ -454,7 +459,6 @@
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
-    // ФОРМАТИРОВАНИЕ ВВОДА ВРЕМЕНИ (ЧЧ:ММ)
     function formatTimeInput(input) {
         let val = input.value.replace(/\D/g, '');
         if (val.length >= 2) {
@@ -463,7 +467,6 @@
         input.value = val;
     }
 
-    // СИНХРОНИЗАЦИЯ ИМЕНИ КЛИЕНТА МЕЖДУ ДВУМЯ ПОЛЯМИ
     function syncClientNames(val) {
         document.getElementById('clientName').value = val;
         document.getElementById('bookingClient').value = val;
@@ -471,25 +474,19 @@
 
     function initTooltipLogic() {
         const tableBody = document.getElementById('crmTableBody');
-        
+        if(!tableBody) return;
         tableBody.addEventListener('mousemove', (e) => {
             const cell = e.target.closest('.services-cell');
             const allTooltips = document.querySelectorAll('.history-tooltip');
-            
             clearTimeout(hoverTimer);
             allTooltips.forEach(t => t.classList.remove('active'));
-
             if (cell) {
                 const tooltip = cell.querySelector('.history-tooltip');
                 tooltip.style.left = e.clientX + 'px';
                 tooltip.style.top = e.clientY + 'px';
-
-                hoverTimer = setTimeout(() => {
-                    tooltip.classList.add('active');
-                }, hoverDelay);
+                hoverTimer = setTimeout(() => { tooltip.classList.add('active'); }, hoverDelay);
             }
         });
-
         tableBody.addEventListener('mouseleave', () => {
             clearTimeout(hoverTimer);
             document.querySelectorAll('.history-tooltip').forEach(t => t.classList.remove('active'));
@@ -519,7 +516,6 @@
 
     function checkPrivacyPassword() {
         if(document.body.classList.contains('privacy-active')) return;
-        
         openModal("ВВЕДИТЕ ПАРОЛЬ АДМИНИСТРАТОРА", "password", function() {
             const pass = document.getElementById('modalInput').value;
             if (pass === '123') {
@@ -631,7 +627,10 @@
     function saveSession() {
         if (currentCart.items.length === 0) return alert('Добавьте услуги!');
         const name = document.getElementById('clientName').value || 'Без имени';
-        const bookingTime = document.getElementById('bookingTime').value || '--:--';
+        let bookingTime = document.getElementById('bookingTime').value;
+        // Очищаем время от пустых масок, если ничего не ввели
+        if (bookingTime === '00:00' || bookingTime === '') bookingTime = null;
+        
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
         
         crmData.push({ 
@@ -713,10 +712,16 @@
             });
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
+            // ЛОГИКА ОТОБРАЖЕНИЯ ВРЕМЕНИ: Крупно, только если оно есть
+            let timeDisplay = row.time ? `<span class="table-time-large">${row.time}</span>` : '';
+
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
                 <td data-label="КЛИЕНТ">
-                    <div style="font-weight:600;">${row.client} ${row.time ? `<span style="font-size:9px; color:var(--neon-purple); margin-left:5px;">[${row.time}]</span>` : ''}</div>
+                    <div style="display:flex; align-items:center;">
+                        ${timeDisplay}
+                        <div style="font-weight:600;">${row.client}</div>
+                    </div>
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
                 <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
@@ -750,6 +755,7 @@
     function updateCerts() {
         const list = document.getElementById('certsList');
         const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        if(!list) return;
         list.innerHTML = '';
         for (let i = 1; i <= 300; i++) {
             const id = 'SSL-' + String(i).padStart(3, '0');
@@ -781,13 +787,14 @@
         tomorrow.setDate(now.getDate() + 1);
         const tomorrowStr = tomorrow.toLocaleDateString('ru-RU');
 
-        const upcoming = crmData.filter(r => r.date === todayStr || r.date === tomorrowStr);
+        // Ищем записи с указанным временем на сегодня или завтра
+        const upcoming = crmData.filter(r => (r.date === todayStr || r.date === tomorrowStr) && r.time);
         
         if (upcoming.length > 0) {
             upcoming.sort((a, b) => (a.date === todayStr ? -1 : 1));
             const next = upcoming[0];
             dateEl.innerText = next.date === todayStr ? 'СЕГОДНЯ' : 'ЗАВТРА';
-            clientEl.innerText = `${next.client} (${next.time || 'Время не указано'})`;
+            clientEl.innerText = `${next.client} (${next.time})`;
         } else {
             dateEl.innerText = '--';
             clientEl.innerText = 'Нет записей';
