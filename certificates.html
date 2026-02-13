@@ -26,7 +26,6 @@
             flex-direction: column;
         }
         
-        /* ОБНОВЛЕННАЯ ШАПКА (ОСТАВИЛ КАК ПОНРАВИЛОСЬ) */
         header { 
             display: flex; 
             justify-content: space-between; 
@@ -36,6 +35,7 @@
             flex-shrink: 0; 
         }
 
+        /* ОБНОВЛЕННЫЙ ЛЕВИЙ БЛОК ШАПКИ */
         .header-left-info {
             display: flex;
             flex-direction: column;
@@ -49,6 +49,7 @@
             font-size: 24px; 
             text-transform: uppercase;
             line-height: 1.2;
+            padding-top: 0;
         }
 
         .header-datetime {
@@ -92,6 +93,10 @@
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
         }
+        .total-box:hover {
+            box-shadow: 0 4px 30px rgba(191, 0, 255, 0.4);
+            border-color: rgba(255,255,255,0.3);
+        }
 
         .income-amount { 
             font-family: 'Rajdhani'; 
@@ -99,8 +104,8 @@
             font-size: 32px; 
             color: #fff; 
             line-height: 1;
+            transition: 0.3s;
         }
-
         #totalLabel { 
             font-size: 9px; 
             display: block; 
@@ -128,20 +133,9 @@
             transition: 0.3s;
         }
 
-        .privacy-blur { 
-            filter: blur(15px); 
-            opacity: 0.6; 
-            transition: 0.3s;
-        }
-        
-        .privacy-active .privacy-blur { 
-            filter: blur(0) !important; 
-            opacity: 1 !important; 
-        }
-        .privacy-active .unlock-overlay { 
-            opacity: 0; 
-            visibility: hidden; 
-        }
+        .privacy-blur { filter: blur(15px); opacity: 0.3; }
+        .privacy-active .privacy-blur { filter: blur(0); opacity: 1; }
+        .privacy-active .unlock-overlay { opacity: 0; visibility: hidden; }
 
         .back-btn { 
             color: #555; 
@@ -156,6 +150,11 @@
             text-align: center;
             font-family: 'Orbitron';
             background: rgba(255,255,255,0.02);
+        }
+        .back-btn:hover { 
+            color: #fff; 
+            border-color: var(--neon-purple); 
+            background: rgba(191, 0, 255, 0.05);
         }
 
         .admin-grid { 
@@ -181,88 +180,184 @@
             flex-grow: 1;
             overflow-y: auto;
             margin-top: 10px;
+            padding-right: 5px;
         }
 
-        /* КАЛЕНДАРЬ И НОВОЕ ПОЛЕ ВРЕМЕНИ */
-        .calendar-widget { flex-shrink: 0; background: #000; border-radius: 10px; padding: 15px; border: 1px solid #222; margin-bottom: 10px; }
-        .time-picker-box { 
-            background: #000; border: 1px solid #222; border-radius: 10px; padding: 12px; 
-            margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 99999; backdrop-filter: blur(5px);
         }
-        .time-picker-label { font-family: 'Orbitron'; font-size: 9px; color: #666; text-transform: uppercase; }
-        .time-input-styled { 
-            background: #111; border: 1px solid var(--neon-purple); color: #fff; 
-            font-family: 'Rajdhani'; font-size: 16px; font-weight: 700; width: 80px; 
-            text-align: center; border-radius: 4px; padding: 5px; outline: none;
+        .custom-modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #0a0a0a; border: 1px solid var(--neon-purple); padding: 25px; border-radius: 15px;
+            z-index: 100000; box-shadow: 0 0 40px rgba(191, 0, 255, 0.3); width: 320px; text-align: center;
         }
+        .modal-title { font-family: 'Orbitron'; font-size: 11px; margin-bottom: 15px; color: #fff; letter-spacing: 1px; line-height: 1.4; }
+        .modal-input {
+            width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 12px;
+            margin-bottom: 20px; border-radius: 6px; font-family: 'Rajdhani'; font-size: 20px; text-align: center; outline: none; box-sizing: border-box;
+        }
+        .modal-btns { display: flex; gap: 10px; justify-content: center; }
+        .m-btn { padding: 10px 15px; border-radius: 6px; font-family: 'Orbitron'; font-size: 9px; cursor: pointer; text-transform: uppercase; border: none; flex: 1; transition: 0.2s; }
+        .m-confirm { background: var(--status-green); color: #fff; }
+        .m-cancel { background: #222; color: #888; }
+        .m-delete { background: var(--artist-red); color: #fff; }
+
+        .calendar-widget { flex-shrink: 0; margin-bottom: 10px; background: #000; border-radius: 10px; padding: 15px; border: 1px solid #222; }
+        
+        /* НОВОЕ ПОЛЕ ВРЕМЕНИ ПОД КАЛЕНДАРЕМ */
+        .time-picker-container {
+            background: #000; border: 1px solid #222; border-radius: 10px; padding: 12px;
+            margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+        }
+        .time-label { font-family: 'Orbitron'; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+        .time-input-styled {
+            background: #050505; border: 1px solid var(--neon-purple); color: #fff;
+            font-family: 'Rajdhani'; font-size: 18px; font-weight: 700; width: 85px;
+            text-align: center; border-radius: 6px; padding: 6px; outline: none; transition: 0.3s;
+        }
+        .time-input-styled:focus { box-shadow: 0 0 10px rgba(191, 0, 255, 0.3); }
 
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .month-name { font-family: 'Orbitron'; color: #fff; text-transform: uppercase; font-size: 13px; }
+        .month-name { font-family: 'Orbitron'; color: #fff; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .day { font-size: 12px; padding: 8px 0; cursor: pointer; border-radius: 4px; color: #fff; font-family: 'Rajdhani'; font-weight: 600; }
+        .day-name { font-size: 9px; color: #666; font-weight: bold; padding-bottom: 5px; }
+        .day { font-size: 12px; padding: 8px 0; cursor: pointer; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
         .day.today { border: 1px solid var(--neon-purple); }
-        .day.has-data { background: var(--status-green); }
+        .day.has-data { background: var(--status-green) !important; color: #fff !important; }
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
+        .day:hover { background: #111; }
 
-        /* БЛИЖАЙШАЯ ЗАПИСЬ */
         .next-session-widget {
-            background: rgba(191, 0, 255, 0.05); border: 1px solid rgba(191, 0, 255, 0.2); 
-            border-radius: 10px; padding: 15px; margin-bottom: 20px;
+            background: rgba(191, 0, 255, 0.05); border: 1px solid rgba(191, 0, 255, 0.2); border-radius: 10px; padding: 15px; margin-bottom: 20px; flex-shrink: 0;
         }
-        .next-session-title { font-family: 'Orbitron'; font-size: 9px; color: #666; margin-bottom: 10px; text-transform: uppercase; }
+        .next-session-title { font-family: 'Orbitron'; font-size: 9px; color: #666; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
         .next-session-info { display: flex; flex-direction: column; gap: 5px; }
         .next-session-row { display: flex; align-items: baseline; gap: 10px; }
-        .next-session-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: var(--neon-purple); }
+        .next-session-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: var(--neon-purple); line-height: 1; }
+        .next-session-time { font-family: 'Orbitron'; font-size: 12px; color: #fff; }
         .next-session-client { font-family: 'Inter'; font-weight: 600; font-size: 14px; color: #888; }
 
-        /* КНОПКИ УСЛУГ (ВЕРНУЛ ВИЗУАЛ) */
-        .controls-row { display: flex; align-items: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #111; flex-wrap: wrap; }
-        .action-btn { 
-            background: transparent; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; 
-            font-size: 9px; font-family: 'Orbitron', sans-serif; border: 1px solid #222; transition: 0.3s;
-        }
-        .action-btn:hover { border-color: var(--neon-purple); }
+        .prepaid-toggle { display: flex; align-items: center; gap: 10px; margin-right: 15px; padding: 5px 12px; border-right: 1px solid #222; }
+        .prepaid-toggle span { font-family: 'Orbitron'; font-size: 9px; color: var(--neon-purple); }
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 34px; border: 1px solid #333; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--neon-purple); }
+        input:checked + .slider:before { transform: translateX(16px); }
 
-        /* КОРЗИНА И ЧЕК */
+        .controls-row { display: flex; align-items: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #111; flex-wrap: wrap; flex-shrink: 0; }
+        .btn-wrapper { position: relative; display: inline-block; }
+        .action-btn { background: transparent; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.3s; position: relative; }
+        
+        .btn-tooltip { 
+            visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
+            padding: 8px 12px; border-radius: 8px; z-index: 1000; width: auto; white-space: nowrap;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9); transition: opacity 0.3s ease; pointer-events: none;
+            font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; bottom: 120%; left: 50%; transform: translateX(-50%);
+        }
+        .btn-wrapper:hover .btn-tooltip { visibility: visible; opacity: 1; }
+
+        .btn-white { border: 1px solid #fff; }
+        .btn-purple { border: 1px solid var(--neon-purple); }
+        .btn-red { border: 1px solid var(--artist-red); }
+        .btn-green { border: 1px solid var(--status-green); }
+        .btn-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
+        .btn-dashed-green { border: 1px dashed var(--status-green) !important; }
+        .btn-dashed-gold { border: 1px dashed var(--platinum-gold) !important; }
+
+        .platinum-group { display: flex; align-items: center; gap: 10px; border-left: 1px solid #222; padding-left: 10px; }
+        .plat-input { background: #000; border: 1px solid #222; color: var(--platinum-gold); width: 75px; padding: 8px; border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 13px; outline: none; text-align: center; }
+
         .current-session-box { 
             background: rgba(191, 0, 255, 0.05); border: 1px solid var(--neon-purple); 
             padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; 
-            justify-content: space-between; align-items: flex-start;
+            justify-content: space-between; min-height: 140px; align-items: flex-start; position: relative; flex-shrink: 0;
         }
-        .cart-tag { 
-            font-size: 10px; font-family: 'Orbitron'; padding: 6px 10px; border-radius: 4px; 
-            display: inline-flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #444; margin: 0 5px 5px 0;
-        }
-        .total-display-pc { font-family: 'Rajdhani'; font-weight: 700; font-size: 34px; color: #fff; text-align: right; }
-        .input-mini { 
-            background: #000; border: 1px solid #333; color: #fff; padding: 10px; 
-            border-radius: 6px; font-size: 13px; font-family: 'Orbitron'; outline: none; width: 150px;
-        }
-        .save-btn { 
-            background: var(--status-green); color: #fff; border: none; padding: 12px 20px; 
-            border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; cursor: pointer; text-transform: uppercase;
-        }
+        .cart-info { flex-grow: 1; display: flex; flex-direction: column; align-items: flex-start; }
+        #cartItems { display: flex; flex-wrap: wrap; gap: 8px; }
+        .cart-tag { font-size: 10px; font-family: 'Orbitron'; padding: 6px 30px 6px 10px; border-radius: 4px; display: inline-flex; align-items: center; position: relative; background: rgba(0,0,0,0.3); }
+        .tag-white { border: 1px solid #fff; color: #fff; }
+        .tag-purple { border: 1px solid var(--neon-purple); color: var(--neon-purple); }
+        .tag-red { border: 1px solid var(--artist-red); color: var(--artist-red); }
+        .tag-green { border: 1px solid var(--status-green); color: var(--status-green); }
+        .tag-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
+        .tag-remove { position: absolute; right: 0; top: 0; bottom: 0; width: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.5; }
+        .cart-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; align-self: flex-end; }
+        .total-display-pc { font-family: 'Rajdhani'; font-weight: 700; font-size: 34px; color: #fff; height: 42px; width: 155px; margin-bottom: 8px; text-align: right; }
+        .session-controls-row { display: flex; align-items: center; gap: 10px; width: 320px; }
+        .input-mini { background: #000; border: 1px solid #333; color: #fff; padding: 0 10px; height: 42px; border-radius: 6px; width: 155px; font-size: 13px; font-family: 'Orbitron'; text-align: center; outline: none; }
+        .save-btn { background: var(--status-green); color: #fff; border: none; height: 42px; width: 155px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
 
-        /* ТАБЛИЦА */
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
-        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff; }
-        .price-cell { font-weight: 700; font-size: 15px; text-align: right; }
+        .progress-container { width: 100%; height: 2px; background: #111; margin-top: 5px; border-radius: 1px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--neon-purple); transition: 0.5s; width: 0%; }
+        .progress-bar.complete { background: var(--status-green); }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; }
-        .custom-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0a0a0a; border: 1px solid var(--neon-purple); padding: 25px; border-radius: 15px; z-index: 100000; width: 320px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+        th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; position: sticky; top: 0; background: var(--card-bg); z-index: 10; }
+        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; word-wrap: break-word; }
+        
+        .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; padding-right: 12px; }
+
+        th:nth-child(1), td:nth-child(1) { width: 95px; }
+        th:nth-child(2), td:nth-child(2) { width: 150px; }
+        th:nth-child(3), td:nth-child(3) { width: auto; }
+        th:nth-child(4), td:nth-child(4) { width: 110px; }
+        th:nth-child(5), td:nth-child(5) { width: 120px; }
+
+        .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
+        .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
+        .cert-id { font-family: 'Rajdhani'; font-weight: 700; color: var(--neon-purple); font-size: 14px; }
+
+        .filter-info { font-size: 10px; color: #888; margin: 0 0 10px 0; display: flex; justify-content: space-between; font-weight: 600; text-transform: uppercase; flex-shrink: 0; }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
+
+        .history-tooltip { 
+            visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
+            padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
+            pointer-events: none; transition: opacity 0.4s ease;
+        }
+        
+        .history-tooltip.active { visibility: visible; opacity: 1; }
+        .history-tooltip.pos-down { transform: translate(15px, 15px); }
+        .history-tooltip.pos-up { transform: translate(15px, calc(-100% - 15px)); }
+
+        .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
+
+        .action-icons-wrap { display: flex; align-items: center; gap: 15px; justify-content: flex-end; }
+        .icon-btn-box { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.3s; }
+        .icon-btn-box i { font-size: 12px; color: #444; }
+        .icon-btn-box span { font-family: 'Orbitron'; font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
+        .icon-btn-box:hover i { color: var(--neon-purple); }
+        .icon-btn-box:hover span { color: var(--neon-purple); }
+        .icon-delete:hover i { color: var(--artist-red); }
+        .icon-delete:hover span { color: var(--artist-red); }
+
+        @media (max-width: 992px) {
+            body { overflow-y: auto; height: auto; }
+            .header-right-zone { width: 100%; }
+            .admin-grid { display: flex !important; flex-direction: column !important; height: auto !important; overflow: visible; }
+            .table-scroll-container { max-height: none; overflow-y: visible; }
+            header { flex-direction: column; gap: 15px; align-items: center; border-bottom: none; }
+            .logo { text-align: center; font-size: 20px; width: 100%; margin-bottom: 5px; }
+            .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
+            .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
+        }
     </style>
 </head>
 <body>
 
 <div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
 <div id="customModal" class="custom-modal">
-    <div id="modalTitle" class="modal-title" style="font-family:'Orbitron'; font-size:11px; color:#fff; margin-bottom:15px;">ПАРОЛЬ</div>
-    <input type="password" id="modalInput" style="width:100%; background:#000; border:1px solid #222; color:#fff; padding:12px; margin-bottom:20px; border-radius:6px; text-align:center;">
-    <button class="save-btn" id="modalConfirmBtn">ПОДТВЕРДИТЬ</button>
+    <div id="modalTitle" class="modal-title">ДОПЛАТА</div>
+    <input type="number" id="modalInput" class="modal-input" placeholder="0">
+    <div class="modal-btns">
+        <button class="m-btn m-cancel" onclick="closeModal()">ОТМЕНА</button>
+        <button id="modalConfirmBtn" class="m-btn m-confirm">ГОТОВО</button>
+    </div>
 </div>
 
 <header>
@@ -286,187 +381,430 @@
 <div class="admin-grid">
     <div class="crm-panel">
         <div class="controls-row">
-            <button class="action-btn" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
-            <button class="action-btn" onclick="addToCart('START EDITION', 3500, 'purple')">START</button>
-            <button class="action-btn" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST</button>
-            <button class="action-btn" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ</button>
-            <div style="border-left: 1px solid #222; padding-left: 10px;">
-                <input type="number" id="platPrice" style="background:#000; border:1px solid #222; color:var(--platinum-gold); width:60px; padding:8px; border-radius:4px;" placeholder="Цена">
-                <button class="action-btn" style="color:var(--platinum-gold)" onclick="addPlatToCart()">PLATINUM</button>
+            <div class="prepaid-toggle">
+                <span>50%</span>
+                <label class="switch">
+                    <input type="checkbox" id="prepaidMode" onchange="applyPrepaidToggle()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
+                <div class="btn-tooltip">900 ₽ (Всегда 100%)</div>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
+                <div class="btn-tooltip">3500 ₽</div>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
+                <div class="btn-tooltip">6000 ₽</div>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
+                <div class="btn-tooltip">1000 ₽</div>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
+                <div class="btn-tooltip">500 ₽</div>
+            </div>
+            
+            <div class="platinum-group">
+                <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
+                <div class="btn-wrapper">
+                    <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM EDITION</button>
+                    <div class="btn-tooltip">База (10000 ₽)</div>
+                </div>
+                <div class="btn-wrapper">
+                    <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
+                    <div class="btn-tooltip">300 ₽</div>
+                </div>
             </div>
         </div>
 
-        <div class="current-session-box">
+        <div id="currentSession" class="current-session-box">
             <div class="cart-info">
-                <div id="sessionDateLabel" style="font-size: 10px; color: #444; margin-bottom: 12px; font-family:'Orbitron';">ТЕКУЩИЙ ЧЕК:</div>
+                <div id="sessionDateLabel" style="font-size: 10px; color: #444; margin-bottom: 12px; font-family:'Orbitron'; letter-spacing: 1px;">ТЕКУЩИЙ ЧЕК:</div>
                 <div id="cartItems">Пусто...</div>
             </div>
-            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+            <div class="cart-actions">
                 <div class="total-display-pc" id="cartTotal">0 ₽</div>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="clientName" class="input-mini" placeholder="ИМЯ КЛИЕНТА">
+                <div class="session-controls-row">
+                    <input type="text" id="clientName" class="input-mini" placeholder="ИМЯ КЛИЕНТА" oninput="updateNextSessionPreview()">
                     <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
                 </div>
             </div>
         </div>
 
+        <div class="filter-info">
+            <span id="currentViewText">ОТЧЕТ ЗА ФЕВРАЛЬ 2026</span>
+        </div>
+
         <div class="table-scroll-container">
             <table>
-                <thead><tr><th>ДАТА / ВРЕМЯ</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right">ВНЕСЕНО</th></tr></thead>
+                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right; padding-right:12px;">ВНЕСЕНО</th><th style="text-align:right">ДЕЙСТВИЯ</th></tr></thead>
                 <tbody id="crmTableBody"></tbody>
             </table>
         </div>
+        <button onclick="clearFullHistory()" style="margin-top:20px; background:none; border:none; color:#222; font-size:8px; cursor:pointer; text-transform:uppercase; flex-shrink:0;">Удалить всю историю</button>
     </div>
 
     <div class="side-panel">
         <div class="calendar-widget">
             <div class="cal-header">
-                <i class="fas fa-chevron-left" style="cursor:pointer;" onclick="changeMonth(-1)"></i>
+                <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(-1)"></i>
                 <div class="month-name" id="calMonthName">ФЕВРАЛЬ 2026</div>
-                <i class="fas fa-chevron-right" style="cursor:pointer;" onclick="changeMonth(1)"></i>
+                <i class="fas fa-chevron-right" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(1)"></i>
             </div>
             <div class="cal-grid" id="calendarDays"></div>
         </div>
 
-        <div class="time-picker-box">
-            <span class="time-picker-label">Время записи:</span>
-            <input type="text" id="selectedTime" class="time-input-styled" placeholder="14:00" oninput="updateNextSession()">
+        <div class="time-picker-container">
+            <span class="time-label">Время:</span>
+            <input type="text" id="selectedTime" class="time-input-styled" placeholder="14:00" oninput="updateNextSessionPreview()">
         </div>
 
-        <div class="next-session-widget">
-            <div class="next-session-title">Ближайшая запись</div>
+        <div class="next-session-widget" id="nextSessionBox">
+            <div class="next-session-title">Предпросмотр записи</div>
             <div class="next-session-info">
                 <div class="next-session-row">
-                    <span class="next-session-date" id="nextSessionDate">--</span>
-                    <span id="nextSessionTime" style="font-family:'Orbitron'; font-size:12px; color:#fff;">--:--</span>
+                    <div class="next-session-date" id="nextSessionDate">--</div>
+                    <div class="next-session-time" id="nextSessionTime">--:--</div>
                 </div>
                 <div class="next-session-client" id="nextSessionClient">Нет записей</div>
             </div>
         </div>
 
-        <div style="flex-grow:1; overflow-y:auto; border-top:1px solid #111; padding-top:15px;">
-            <h3 style="font-family:'Orbitron'; font-size:10px; color:#444; margin-bottom:10px;">СЕРТИФИКАТЫ</h3>
-            <div id="certsList"></div>
+        <div class="certs-section" style="display:flex; flex-direction:column; flex-grow:1; overflow:hidden;">
+            <h2 style="font-family:'Orbitron'; font-size:14px; margin-bottom:15px; color:#fff; flex-shrink:0;">СЕРТИФИКАТЫ</h2>
+            <div class="certs-container" id="certsList"></div>
         </div>
     </div>
 </div>
 
 <script>
     let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
-    let currentCart = { items: [], details: [], total: 0 };
+    let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = new Date().toLocaleDateString('ru-RU');
 
-    function startHeaderClock() {
-        const clockEl = document.getElementById('headerClock');
+    let hoverTimer;
+    const hoverDelay = 700;
+    const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
+
+    function startClock() {
+        const clock = document.getElementById('headerClock');
         const dateEl = document.getElementById('headerDate');
         setInterval(() => {
             const now = new Date();
-            clockEl.innerText = now.toLocaleTimeString('ru-RU');
-            dateEl.innerText = now.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
+            if(clock) clock.innerText = now.toLocaleTimeString('ru-RU');
+            if(dateEl) dateEl.innerText = now.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase();
         }, 1000);
+    }
+
+    function initTooltipLogic() {
+        const tableBody = document.getElementById('crmTableBody');
+        tableBody.addEventListener('mousemove', (e) => {
+            const cell = e.target.closest('.services-cell');
+            const allTooltips = document.querySelectorAll('.history-tooltip');
+            clearTimeout(hoverTimer);
+            allTooltips.forEach(t => t.classList.remove('active'));
+            if (cell) {
+                const tooltip = cell.querySelector('.history-tooltip');
+                tooltip.style.left = e.clientX + 'px';
+                tooltip.style.top = e.clientY + 'px';
+                hoverTimer = setTimeout(() => { tooltip.classList.add('active'); }, hoverDelay);
+            }
+        });
+        tableBody.addEventListener('mouseleave', () => {
+            clearTimeout(hoverTimer);
+            document.querySelectorAll('.history-tooltip').forEach(t => t.classList.remove('active'));
+        });
+    }
+
+    function openModal(title, type, confirmCallback, defaultValue = '') {
+        const modal = document.getElementById('customModal');
+        const overlay = document.getElementById('modalOverlay');
+        const titleEl = document.getElementById('modalTitle');
+        const inputEl = document.getElementById('modalInput');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
+        titleEl.innerText = title;
+        inputEl.value = defaultValue;
+        inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
+        confirmBtn.className = 'm-btn ' + (type === 'delete' || type === 'confirm-delete' ? 'm-delete' : 'm-confirm');
+        confirmBtn.onclick = confirmCallback;
+        modal.style.display = 'block';
+        overlay.style.display = 'block';
+        if(type !== 'confirm-delete') inputEl.focus();
+    }
+
+    function closeModal() {
+        document.getElementById('customModal').style.display = 'none';
+        document.getElementById('modalOverlay').style.display = 'none';
     }
 
     function checkPrivacyPassword() {
         if(document.body.classList.contains('privacy-active')) return;
-        document.getElementById('modalOverlay').style.display = 'block';
-        document.getElementById('customModal').style.display = 'block';
-        document.getElementById('modalConfirmBtn').onclick = () => {
-            if(document.getElementById('modalInput').value === '123') {
+        openModal("ВВЕДИТЕ ПАРОЛЬ АДМИНИСТРАТОРА", "password", function() {
+            const pass = document.getElementById('modalInput').value;
+            if (pass === '123') {
                 document.body.classList.add('privacy-active');
                 closeModal();
-            }
-        };
-    }
-
-    function closeModal() {
-        document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('customModal').style.display = 'none';
+            } else { alert("Неверный пароль"); }
+        });
     }
 
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
+        const monthName = document.getElementById('calMonthName');
+        if(!grid || !monthName) return;
         grid.innerHTML = '';
+        const now = new Date();
         const year = currentCalDate.getFullYear();
         const month = currentCalDate.getMonth();
-        const firstDay = (new Date(year, month, 1).getDay() || 7) - 1;
+        const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        
-        document.getElementById('calMonthName').innerText = new Intl.DateTimeFormat('ru-RU', { month: 'long', year: 'numeric' }).format(currentCalDate);
-        
-        for(let i=0; i<firstDay; i++) grid.innerHTML += '<div></div>';
+        const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        monthName.innerText = `${monthNames[month]} ${year}`;
+        ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'].forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
+        let startingSpace = firstDay === 0 ? 6 : firstDay - 1;
+        for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
         for(let d=1; d<=daysInMonth; d++) {
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
-            const isSelected = selectedDate === dateStr;
-            grid.innerHTML += `<div class="day ${isSelected ? 'selected-day' : ''}" onclick="selectDate('${dateStr}')">${d}</div>`;
+            const hasData = crmData.some(row => row.date === dateStr);
+            const isToday = now.toLocaleDateString('ru-RU') === dateStr;
+            let classes = ['day'];
+            if (isToday) classes.push('today');
+            if (hasData) classes.push('has-data');
+            if (selectedDate === dateStr) classes.push('selected-day');
+            grid.innerHTML += `<div class="${classes.join(' ')}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
+        updateMonthTotal();
     }
 
-    function selectDate(date) {
+    function selectCalendarDate(date) {
         selectedDate = date;
-        document.getElementById('sessionDateLabel').innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
         renderCalendar();
-        updateNextSession();
+        updateNextSessionPreview();
     }
 
-    function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); renderCalendar(); }
+    function changeMonth(dir) { 
+        currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
+        selectedDate = null;
+        updateTable(); renderCalendar(); 
+    }
 
-    function addToCart(name, price, color) {
-        currentCart.items.push({ name, color });
-        currentCart.total += price;
+    function applyPrepaidToggle() {
+        const isPrepaid = document.getElementById('prepaidMode').checked;
+        currentCart.total = 0;
+        currentCart.details.forEach(item => {
+            const isForceFull = item.name.includes('ЧАС ЗАПИСИ');
+            if (isPrepaid && !isForceFull) {
+                item.price = item.basePrice / 2;
+                if (!item.name.includes('(50%)')) item.name += ' (50%)';
+            } else {
+                item.price = item.basePrice;
+                item.name = item.name.replace(' (50%)', '');
+            }
+            currentCart.total += item.price;
+        });
+        currentCart.items = currentCart.details.map(d => ({ name: d.name, colorClass: d.colorClass }));
         renderCart();
+    }
+
+    function addToCart(name, price, colorClass, forceFull = false) {
+        const isPrepaid = document.getElementById('prepaidMode').checked;
+        let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
+        let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
+        currentCart.details.push({ name: finalName, price: finalPrice, basePrice: price, colorClass });
+        currentCart.items.push({ name: finalName, colorClass });
+        currentCart.total += finalPrice;
+        currentCart.fullPriceTotal += price;
+        renderCart();
+    }
+
+    function removeFromCart(index) {
+        const item = currentCart.details[index];
+        currentCart.total -= item.price;
+        currentCart.fullPriceTotal -= item.basePrice;
+        currentCart.items.splice(index, 1);
+        currentCart.details.splice(index, 1);
+        renderCart();
+    }
+
+    function addPlatToCart() {
+        const p = parseInt(document.getElementById('platPrice').value) || 10000;
+        addToCart('PLATINUM EDITION', p, 'gold');
+        document.getElementById('platPrice').value = '';
     }
 
     function renderCart() {
         const container = document.getElementById('cartItems');
-        container.innerHTML = currentCart.items.length ? '' : 'Пусто...';
-        currentCart.items.forEach(it => {
-            container.innerHTML += `<div class="cart-tag">${it.name}</div>`;
+        const total = document.getElementById('cartTotal');
+        if(!container || !total) return;
+        total.innerText = currentCart.total + ' ₽';
+        container.innerHTML = currentCart.items.length === 0 ? 'Пусто...' : '';
+        currentCart.items.forEach((item, i) => {
+            const tag = document.createElement('div');
+            tag.className = `cart-tag tag-${item.colorClass}`;
+            tag.innerHTML = `${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div>`;
+            container.appendChild(tag);
         });
-        document.getElementById('cartTotal').innerText = currentCart.total + ' ₽';
     }
 
     function saveSession() {
-        const time = document.getElementById('selectedTime').value || '00:00';
-        crmData.push({
-            date: selectedDate,
-            time: time,
-            client: document.getElementById('clientName').value || 'Клиент',
-            services: currentCart.items.map(i => i.name).join(', '),
-            total: currentCart.total,
-            timestamp: Date.now()
+        if (currentCart.items.length === 0) return alert('Добавьте услуги!');
+        const name = document.getElementById('clientName').value || 'Без имени';
+        const date = selectedDate || new Date().toLocaleDateString('ru-RU');
+        const time = document.getElementById('selectedTime').value || '--:--';
+        
+        crmData.push({ 
+            date, 
+            time,
+            client: name, 
+            services: currentCart.items.map(i => i.name).join(', '), 
+            details: [...currentCart.details], 
+            total: currentCart.total, 
+            fullTotal: currentCart.fullPriceTotal,
+            timestamp: Date.now() 
         });
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-        currentCart = { items: [], details: [], total: 0 };
-        renderCart(); updateTable(); updateNextSession();
+        currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        document.getElementById('clientName').value = '';
+        document.getElementById('selectedTime').value = '';
+        renderCart(); updateTable(); renderCalendar(); updateNextSessionPreview();
+    }
+
+    function addPayment(index) {
+        const row = crmData[index];
+        const full = row.fullTotal || row.total;
+        const remaining = full - row.total;
+        if (remaining <= 0) return alert('Заказ уже полностью оплачен');
+        openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, "pay", function() {
+            const amount = parseInt(document.getElementById('modalInput').value);
+            if (!isNaN(amount) && amount > 0) {
+                row.total += amount;
+                localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+                updateTable(); closeModal();
+            }
+        }, remaining);
+    }
+
+    function deleteRow(i) {
+        openModal("УДАЛИТЬ ЗАПИСЬ?", "confirm-delete", function() {
+            crmData.splice(i, 1);
+            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+            updateTable(); renderCalendar(); updateNextSessionPreview(); closeModal();
+        });
+    }
+
+    function clearFullHistory() {
+        openModal("УДАЛИТЬ ВООБЩЕ ВСЮ ИСТОРИЮ?", "confirm-delete", function() {
+            crmData = [];
+            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+            updateTable(); renderCalendar(); updateNextSessionPreview(); closeModal();
+        });
     }
 
     function updateTable() {
         const body = document.getElementById('crmTableBody');
+        if(!body) return;
         body.innerHTML = '';
-        crmData.sort((a,b) => b.timestamp - a.timestamp).forEach(row => {
-            body.innerHTML += `<tr>
-                <td>${row.date}<br><small style="color:#444">${row.time}</small></td>
-                <td>${row.client}</td>
-                <td>${row.services}</td>
-                <td class="price-cell privacy-blur">${row.total} ₽</td>
-            </tr>`;
-        });
-        const mTotal = crmData.reduce((s, r) => s + r.total, 0);
-        document.getElementById('monthTotal').innerText = mTotal.toLocaleString() + ' ₽';
-    }
-
-    function updateNextSession() {
-        const timeInput = document.getElementById('selectedTime').value;
-        const clientInput = document.getElementById('clientName').value;
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         
-        // Показываем в виджете то, что сейчас выбрано в календаре/поле времени
-        document.getElementById('nextSessionDate').innerText = selectedDate;
-        document.getElementById('nextSessionTime').innerText = timeInput || '--:--';
-        document.getElementById('nextSessionClient').innerText = clientInput || 'Новая запись...';
+        const filteredData = crmData.filter(r => r.date.includes(mKey)).sort((a,b) => {
+            const da = a.date.split('.').reverse().join('');
+            const db = b.date.split('.').reverse().join('');
+            return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
+        });
+
+        filteredData.forEach((row, index) => {
+            const full = row.fullTotal || row.total;
+            const paid = row.total;
+            const perc = Math.min((paid / full) * 100, 100);
+            const isComplete = perc >= 100;
+            const realIndex = crmData.indexOf(row);
+            const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
+            const tr = document.createElement('tr');
+            tr.className = 'history-row';
+
+            let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+            row.details.forEach(d => {
+                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+            });
+            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
+
+            tr.innerHTML = `
+                <td>${row.date}<br><small style="color:#444">${row.time || ''}</small></td>
+                <td>
+                    <div style="font-weight:600;">${row.client}</div>
+                    <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
+                </td>
+                <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
+                <td class="price-cell privacy-blur">${paid} ₽</td>
+                <td>
+                    <div class="action-icons-wrap">
+                        <div class="icon-btn-box" onclick="addPayment(${realIndex})">
+                            <span>доплата</span><i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})">
+                            <span>удалить</span><i class="fas fa-trash"></i>
+                        </div>
+                    </div>
+                </td>
+            `;
+            body.appendChild(tr);
+        });
+        updateMonthTotal();
     }
 
-    startHeaderClock(); renderCalendar(); updateTable(); updateNextSession();
+    function updateMonthTotal() {
+        const el = document.getElementById('monthTotal');
+        if(!el) return;
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+        const sum = crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + b.total, 0);
+        el.innerText = sum.toLocaleString() + ' ₽';
+    }
+
+    function updateCerts() {
+        const list = document.getElementById('certsList');
+        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        list.innerHTML = '';
+        for (let i = 1; i <= 300; i++) {
+            const id = 'SSL-' + String(i).padStart(3, '0');
+            const d = saved[id] || { active: false, name: '' };
+            const div = document.createElement('div');
+            div.className = 'cert-row';
+            div.innerHTML = `<span class="cert-id">${id}</span>${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}`;
+            list.appendChild(div);
+        }
+    }
+
+    function activateCert(id) {
+        const n = document.getElementById('in-' + id).value;
+        if (!n) return alert('Имя!');
+        const s = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        s[id] = { active: true, name: n };
+        localStorage.setItem('spring_certs', JSON.stringify(s));
+        updateCerts();
+    }
+
+    function updateNextSessionPreview() {
+        const dateEl = document.getElementById('nextSessionDate');
+        const timeEl = document.getElementById('nextSessionTime');
+        const clientEl = document.getElementById('nextSessionClient');
+        
+        const selectedTime = document.getElementById('selectedTime').value || '--:--';
+        const clientName = document.getElementById('clientName').value || 'Новый клиент...';
+
+        dateEl.innerText = selectedDate || '--';
+        timeEl.innerText = selectedTime;
+        clientEl.innerText = clientName;
+    }
+
+    startClock(); renderCalendar(); updateTable(); updateCerts(); initTooltipLogic(); updateNextSessionPreview();
 </script>
 </body>
 </html>
