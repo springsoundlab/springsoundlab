@@ -13,7 +13,6 @@
             --text-gray: #b0b0b0;
         }
         
-        /* СТАТИЧНАЯ СТРАНИЦА БЕЗ ОБЩЕГО СКРОЛЛА */
         body { 
             background: var(--bg-dark); 
             color: #fff; 
@@ -51,7 +50,6 @@
         .income-amount { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: #fff; line-height: 1.1; }
         #totalLabel { font-size: 7px; display: block; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.9); margin-top: 1px; font-weight: 600; }
 
-        /* ОСНОВНАЯ СЕТКА */
         .admin-grid { 
             display: grid; 
             grid-template-columns: 1fr 380px; 
@@ -68,10 +66,9 @@
             border: 1px solid #111; 
             display: flex; 
             flex-direction: column; 
-            overflow: hidden; /* Чтобы внутренние скроллы работали корректно */
+            overflow: hidden;
         }
 
-        /* СКРОЛЛ ТАБЛИЦЫ */
         .table-scroll-container {
             flex-grow: 1;
             overflow-y: auto;
@@ -79,7 +76,6 @@
             padding-right: 5px;
         }
 
-        /* МОДАЛЬНОЕ ОКНО */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 99999; backdrop-filter: blur(5px);
@@ -100,7 +96,6 @@
         .m-cancel { background: #222; color: #888; }
         .m-delete { background: var(--artist-red); color: #fff; }
 
-        /* КАЛЕНДАРЬ */
         .calendar-widget { flex-shrink: 0; margin-bottom: 20px; background: #000; border-radius: 10px; padding: 15px; border: 1px solid #222; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .month-name { font-family: 'Orbitron'; color: #fff; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
@@ -189,19 +184,19 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
+        /* ОКНО ДЕТАЛИЗАЦИИ */
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
-            pointer-events: none; transition: opacity 0.3s ease;
+            pointer-events: none; transition: opacity 0.4s ease;
         }
         
+        /* КЛАСС ДЛЯ ПОКАЗА ОКНА */
+        .history-tooltip.active { visibility: visible; opacity: 1; }
+
         .history-tooltip.pos-down { transform: translate(15px, 15px); }
         .history-tooltip.pos-up { transform: translate(15px, calc(-100% - 15px)); }
 
-        .services-cell:hover .history-tooltip { 
-            transition-delay: 0.3s; 
-            visibility: visible; opacity: 1; 
-        }
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
 
         .action-icons-wrap { display: flex; align-items: center; gap: 15px; justify-content: flex-end; }
@@ -360,15 +355,42 @@
     let currentCalDate = new Date();
     let selectedDate = null;
 
+    // Логика умного показа детализации
+    let hoverTimer;
+    const hoverDelay = 700; // Задержка в мс (появление при остановке курсора)
+
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
-    document.addEventListener('mousemove', (e) => {
-        const tooltips = document.querySelectorAll('.history-tooltip');
-        tooltips.forEach(t => {
-            t.style.left = e.clientX + 'px';
-            t.style.top = e.clientY + 'px';
+    function initTooltipLogic() {
+        const tableBody = document.getElementById('crmTableBody');
+        
+        tableBody.addEventListener('mousemove', (e) => {
+            const cell = e.target.closest('.services-cell');
+            const allTooltips = document.querySelectorAll('.history-tooltip');
+            
+            // Если мы ведем мышкой, всё скрываем и сбрасываем таймер
+            clearTimeout(hoverTimer);
+            allTooltips.forEach(t => t.classList.remove('active'));
+
+            if (cell) {
+                const tooltip = cell.querySelector('.history-tooltip');
+                
+                // Обновляем позицию сразу
+                tooltip.style.left = e.clientX + 'px';
+                tooltip.style.top = e.clientY + 'px';
+
+                // Запускаем таймер: если курсор замрет, окно появится
+                hoverTimer = setTimeout(() => {
+                    tooltip.classList.add('active');
+                }, hoverDelay);
+            }
         });
-    });
+
+        tableBody.addEventListener('mouseleave', () => {
+            clearTimeout(hoverTimer);
+            document.querySelectorAll('.history-tooltip').forEach(t => t.classList.remove('active'));
+        });
+    }
 
     function openModal(title, type, confirmCallback, defaultValue = '') {
         const modal = document.getElementById('customModal');
@@ -636,7 +658,7 @@
         updateCerts();
     }
 
-    renderCalendar(); updateTable(); updateCerts();
+    renderCalendar(); updateTable(); updateCerts(); initTooltipLogic();
 </script>
 </body>
 </html>
