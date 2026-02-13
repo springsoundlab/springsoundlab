@@ -114,7 +114,7 @@
         .progress-bar { height: 100%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .progress-bar.complete { background: var(--status-green); box-shadow: 0 0 10px var(--status-green); }
 
-        .history-row { position: relative; }
+        .history-row { position: relative; user-select: none; -webkit-tap-highlight-color: transparent; }
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 1000; width: 280px; box-shadow: -10px 10px 40px rgba(0,0,0,0.9); 
@@ -156,12 +156,28 @@
             .total-display-pc { width: 100% !important; text-align: center !important; font-size: 40px !important; margin-bottom: 10px !important; color: #fff !important; }
             .session-controls-row { width: 100% !important; flex-direction: column !important; }
             .input-mini, .save-btn { width: 100% !important; height: 50px !important; }
+            
             thead { display: none !important; }
-            .history-row { display: block !important; border: 1px solid #222 !important; margin-bottom: 10px !important; background: #0a0a0a !important; padding: 5px 0; }
-            .history-row td { display: flex !important; justify-content: space-between !important; padding: 12px 15px !important; border-bottom: 1px solid #111 !important; align-items: center; }
-            .history-row td::before { content: attr(data-label); font-family: 'Orbitron'; font-size: 8px; color: #555; margin-right: 15px; flex-shrink: 0; }
-            .services-cell { display: none !important; }
-            .history-tooltip { display: none !important; }
+            .history-row { display: flex !important; flex-direction: column !important; border: 1px solid #222 !important; margin-bottom: 15px !important; background: #0a0a0a !important; padding: 15px !important; border-radius: 8px !important; }
+            .history-row td { display: block !important; width: 100% !important; padding: 8px 0 !important; border-bottom: none !important; text-align: left !important; }
+            
+            /* Новая мобильная структура ячеек */
+            .mobile-name-row { text-align: center !important; font-size: 18px !important; font-family: 'Orbitron', sans-serif; color: var(--neon-purple) !important; border-bottom: 1px solid #222 !important; margin-bottom: 10px; padding-bottom: 10px !important; }
+            .mobile-date-row { font-size: 11px !important; color: #555 !important; text-transform: uppercase; letter-spacing: 1px; }
+            .mobile-progress-row { padding: 10px 0 !important; }
+            .mobile-services-row { font-size: 12px !important; color: #888 !important; border-top: 1px solid #111 !important; padding-top: 10px !important; }
+            .mobile-total-row { display: flex !important; justify-content: space-between !important; align-items: center !important; font-weight: bold; border-top: 1px solid #111 !important; margin-top: 5px; }
+            .mobile-total-row::before { content: "ВНЕСЕНО:"; font-family: 'Orbitron'; font-size: 8px; color: #444; }
+            .mobile-actions-row { display: flex !important; justify-content: flex-end !important; gap: 20px !important; padding-top: 15px !important; border-top: 1px solid #222 !important; margin-top: 10px; }
+
+            /* Мобильная всплывайка по центру */
+            .history-tooltip { 
+                position: fixed !important; top: 50% !important; left: 50% !important; 
+                right: auto !important; transform: translate(-50%, -50%) !important; 
+                margin: 0 !important; width: 90% !important; max-width: 320px !important;
+                visibility: hidden; pointer-events: auto !important; opacity: 0;
+            }
+            .history-row.active-press .history-tooltip { visibility: visible !important; opacity: 1 !important; }
             .certs-section { order: 4 !important; height: 350px !important; margin-top: 20px !important; }
             .certs-container { height: 100% !important; }
         }
@@ -281,6 +297,7 @@
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
+    let touchTimer;
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
@@ -397,12 +414,10 @@
         renderCart(); updateTable(); renderCalendar();
     }
 
-    // НОВАЯ ФУНКЦИЯ: Доплата
     function addPayment(index) {
         const row = crmData[index];
         const remaining = row.fullTotal - row.total;
         const amount = prompt(`Доплата для ${row.client}.\nОстаток: ${remaining} ₽.\nВведите сумму доплаты:`, remaining);
-        
         if (amount !== null && !isNaN(amount) && amount !== "") {
             row.total += parseInt(amount);
             localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
@@ -432,6 +447,16 @@
             
             const tr = document.createElement('tr');
             tr.className = 'history-row';
+            
+            tr.ontouchstart = (e) => {
+                touchTimer = setTimeout(() => {
+                    tr.classList.add('active-press');
+                }, 500);
+            };
+            tr.ontouchend = () => {
+                clearTimeout(touchTimer);
+                setTimeout(() => tr.classList.remove('active-press'), 100);
+            };
 
             let tooltip = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
@@ -439,17 +464,18 @@
             });
             tooltip += `<div class="tooltip-summary"><div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div></div>`;
 
+            // УНИВЕРСАЛЬНАЯ ВЕРСТКА ДЛЯ ПК И ТЕЛЕФОНА
             tr.innerHTML = `
-                <td data-label="ДАТА">${row.date}</td>
-                <td data-label="КЛИЕНТ">
-                    <div style="font-weight:600;">${row.client}</div>
+                <td class="mobile-name-row" data-label="КЛИЕНТ">${row.client}</td>
+                <td class="mobile-date-row" data-label="ДАТА">${row.date}</td>
+                <td class="mobile-progress-row">
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
-                <td class="services-cell" style="position:relative;">${row.services}${tooltip}</td>
-                <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
-                <td data-label="ДЕЙСТВИЯ" style="text-align:right;">
-                    <i class="fas fa-wallet" style="color:#444; cursor:pointer; font-size:12px; margin-right:15px; transition:0.3s;" title="Доплатить" onclick="addPayment(${realIndex})"></i>
-                    <i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${realIndex})"></i>
+                <td class="services-cell mobile-services-row" style="position:relative;">${row.services}${tooltip}</td>
+                <td class="price-cell privacy-blur mobile-total-row" data-label="ВНЕСЕНО">${paid} ₽</td>
+                <td class="mobile-actions-row" data-label="ДЕЙСТВИЯ">
+                    <i class="fas fa-wallet" style="color:#444; cursor:pointer; font-size:16px; transition:0.3s;" title="Доплатить" onclick="addPayment(${realIndex})"></i>
+                    <i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:14px; margin-left:15px;" onclick="deleteRow(${realIndex})"></i>
                 </td>
             `;
             body.appendChild(tr);
@@ -489,6 +515,12 @@
         s[id] = { active: true, name: n };
         localStorage.setItem('spring_certs', JSON.stringify(s));
         updateCerts();
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.closest('.history-row')) {
+            document.querySelectorAll('.history-row').forEach(row => row.classList.remove('active-press'));
+        }
     }
 
     renderCalendar(); updateTable(); updateCerts();
