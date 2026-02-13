@@ -1214,31 +1214,38 @@
         document.getElementById('admin-overlay').style.display = 'none';
     }
 
-function checkAdminAuth() {
-    const loginVal = document.getElementById('admin-login').value.trim();
-    const passVal = document.getElementById('admin-pass').value.trim();
+function checkAdminAuth(e) {
+    // Останавливаем закрытие окна и перезагрузку страницы
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    const userLogin = document.getElementById('admin-login').value.trim();
+    const userPass = document.getElementById('admin-pass').value.trim();
     const btn = document.querySelector('#admin-panel button');
 
-    // Логин: admin ssl | Пароль: 080808
-    if (loginVal === 'admin ssl' && passVal === '080808') {
+    // ТВОИ ДАННЫЕ: admin ssl / 080808
+    if (userLogin === 'admin ssl' && userPass === '080808') {
         btn.innerHTML = 'ACCESS GRANTED...';
         btn.style.background = '#006400'; 
+        btn.style.boxShadow = '0 0 20px #00ff00';
         
-        // Маленькая задержка перед переходом
         setTimeout(() => {
             window.location.href = 'certificates.html'; 
         }, 600);
     } else {
-        // Если ошибка - окно НЕ закроется, кнопка просто станет красной
+        // Если данные неверны — окно НЕ закроется, кнопка просто станет красной
         btn.style.background = '#8B0000';
         btn.innerHTML = 'DENIED';
         
         setTimeout(() => {
             btn.style.background = 'var(--neon-purple)';
             btn.innerHTML = 'AUTHENTICATE';
-            document.getElementById('admin-pass').value = '';
+            document.getElementById('admin-pass').value = ''; 
         }, 1000);
     }
+    return false;
 }
 
     document.addEventListener('keypress', (e) => {
