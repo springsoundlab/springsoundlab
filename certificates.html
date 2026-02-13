@@ -124,7 +124,7 @@
 
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
-            padding: 15px; border-radius: 8px; z-index: 999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
+            padding: 15px; border-radius: 8px; z-index: 99; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
             pointer-events: none !important; transform: translate(15px, 15px);
             transition: opacity 0.3s ease;
         }
@@ -134,23 +134,17 @@
         }
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
 
-        /* КНОПКИ ДЕЙСТВИЙ - ДЕСКТОП ФИКС */
-        .action-icons-wrap { 
-            display: flex; align-items: center; gap: 15px; justify-content: flex-end; 
-            position: relative; z-index: 10000;
-        }
+        /* КНОПКИ ДЕЙСТВИЙ - ДЕЛЕГИРОВАНИЕ */
+        .action-icons-wrap { display: flex; align-items: center; gap: 15px; justify-content: flex-end; }
         .icon-btn-box { 
             display: flex; flex-direction: column; align-items: center; gap: 4px; 
-            cursor: pointer !important; transition: 0.3s; 
-            pointer-events: all !important; position: relative; z-index: 10001;
+            cursor: pointer; transition: 0.3s;
         }
-        .icon-btn-box i, .icon-btn-box span { pointer-events: none; }
+        .icon-btn-box i, .icon-btn-box span { pointer-events: none; } /* Важно: клик пролетает сквозь иконку в родительский box */
         .icon-btn-box i { font-size: 12px; color: #444; }
         .icon-btn-box span { font-family: 'Orbitron'; font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
-        .icon-btn-box:hover i { color: var(--neon-purple); }
-        .icon-btn-box:hover span { color: var(--neon-purple); }
-        .icon-delete:hover i { color: var(--artist-red); }
-        .icon-delete:hover span { color: var(--artist-red); }
+        .icon-btn-box:hover i, .icon-btn-box:hover span { color: var(--neon-purple); }
+        .icon-delete:hover i, .icon-delete:hover span { color: var(--artist-red); }
 
         @media (max-width: 992px) {
             body { padding: 10px; }
@@ -264,7 +258,7 @@
         </div>
 
         <div class="table-container">
-            <table>
+            <table id="mainHistoryTable">
                 <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th>ВНЕСЕНО</th><th style="text-align:right">ДЕЙСТВИЯ</th></tr></thead>
                 <tbody id="crmTableBody"></tbody>
             </table>
@@ -290,55 +284,61 @@
 </div>
 
 <script>
-    // ПРИВЯЗЫВАЕМ ФУНКЦИИ К WINDOW МАКСИМАЛЬНО ЖЕСТКО
-    window.addPayment = function(event, index) {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        
-        let data = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
-        let row = data[index];
-        if (!row) return;
-        
-        const full = row.fullTotal || row.total;
-        const paid = row.total;
-        const remaining = full - paid;
-        
-        if (remaining <= 0) {
-            alert('Оплата уже произведена полностью');
-            return;
-        }
-
-        const promptVal = prompt(`Доплата для: ${row.client}\nОстаток: ${remaining} ₽\n\nВведите сумму:`, remaining);
-        if (promptVal !== null) {
-            const amount = parseInt(promptVal);
-            if (!isNaN(amount) && amount > 0) {
-                row.total += amount;
-                localStorage.setItem('spring_crm_v3', JSON.stringify(data));
-                location.reload(); 
-            }
-        }
-    };
-
-    window.deleteRow = function(event, index) {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        if (confirm('Удалить эту сессию?')) {
-            let data = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
-            data.splice(index, 1);
-            localStorage.setItem('spring_crm_v3', JSON.stringify(data));
-            location.reload();
-        }
-    };
-
     let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
+
+    // ГЛОБАЛЬНЫЙ ОБРАБОТЧИК КЛИКОВ ПО ТАБЛИЦЕ (ДЛЯ ПК)
+    document.getElementById('mainHistoryTable').addEventListener('click', function(e) {
+        // Проверяем, нажал ли пользователь на блок кнопки (icon-btn-box)
+        const btn = e.target.closest('.icon-btn-box');
+        if (!btn) return;
+
+        const action = btn.getAttribute('data-action');
+        const index = parseInt(btn.getAttribute('data-index'));
+
+        if (action === 'payment') {
+            addPayment(index);
+        } else if (action === 'delete') {
+            deleteRow(index);
+        }
+    });
+
+    function addPayment(index) {
+        let data = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
+        let row = data[index];
+        if (!row) return;
+
+        const full = row.fullTotal || row.total;
+        const paid = row.total;
+        const remaining = full - paid;
+
+        if (remaining <= 0) {
+            alert('Все оплачено');
+            return;
+        }
+
+        const amountStr = prompt(`Доплата для: ${row.client}\nОсталось: ${remaining} ₽\n\nСумма:`, remaining);
+        if (amountStr) {
+            const amount = parseInt(amountStr);
+            if (!isNaN(amount) && amount > 0) {
+                row.total += amount;
+                localStorage.setItem('spring_crm_v3', JSON.stringify(data));
+                location.reload();
+            }
+        }
+    }
+
+    function deleteRow(index) {
+        if (confirm('Удалить?')) {
+            let data = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
+            data.splice(index, 1);
+            localStorage.setItem('spring_crm_v3', JSON.stringify(data));
+            location.reload();
+        }
+    }
 
     document.addEventListener('mousemove', (e) => {
         const tooltips = document.querySelectorAll('.history-tooltip');
@@ -512,11 +512,11 @@
                 <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
                 <td data-label="ДЕЙСТВИЯ">
                     <div class="action-icons-wrap">
-                        <div class="icon-btn-box" style="cursor:pointer !important; pointer-events:all !important; z-index:10001 !important;" onclick="window.addPayment(event, ${realIndex})">
+                        <div class="icon-btn-box" data-action="payment" data-index="${realIndex}">
                             <span>доплата</span>
                             <i class="fas fa-wallet"></i>
                         </div>
-                        <div class="icon-btn-box icon-delete" style="cursor:pointer !important; pointer-events:all !important; z-index:10001 !important;" onclick="window.deleteRow(event, ${realIndex})">
+                        <div class="icon-btn-box icon-delete" data-action="delete" data-index="${realIndex}">
                             <span>удалить</span>
                             <i class="fas fa-trash"></i>
                         </div>
