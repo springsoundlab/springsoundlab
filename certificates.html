@@ -62,17 +62,8 @@
         input:checked + .slider:before { transform: translateX(16px); }
 
         .controls-row { display: flex; align-items: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #111; flex-wrap: wrap; }
-        .btn-wrapper { position: relative; display: inline-block; }
         .action-btn { background: transparent; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.3s; position: relative; }
         
-        .btn-tooltip { 
-            visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
-            padding: 8px 12px; border-radius: 8px; z-index: 1000; width: auto; white-space: nowrap;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.9); transition: opacity 0.3s ease; pointer-events: none;
-            font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; bottom: 120%; left: 50%; transform: translateX(-50%);
-        }
-        .btn-wrapper:hover .btn-tooltip { visibility: visible; opacity: 1; }
-
         .btn-white { border: 1px solid #fff; }
         .btn-purple { border: 1px solid var(--neon-purple); }
         .btn-red { border: 1px solid var(--artist-red); }
@@ -113,15 +104,6 @@
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
         .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; }
 
-        .certs-container { flex-grow: 1; height: 300px; overflow-y: auto; padding-right: 15px; }
-        .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
-        .cert-id { font-family: 'Rajdhani'; font-weight: 700; color: var(--neon-purple); font-size: 14px; }
-
-        .filter-info { font-size: 10px; color: #888; margin: 15px 0 10px 0; display: flex; justify-content: space-between; font-weight: 600; text-transform: uppercase; }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
-
         /* Иконки действий */
         .action-icons-wrap { display: flex; align-items: center; gap: 15px; justify-content: flex-end; }
         .icon-btn-box { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.3s; }
@@ -131,6 +113,9 @@
         .icon-btn-box:hover span { color: var(--neon-purple); }
         .icon-delete:hover i { color: var(--artist-red); }
         .icon-delete:hover span { color: var(--artist-red); }
+
+        /* Временная подсветка - Удаляем старый тултип */
+        .history-tooltip { display: none !important; }
 
         @media (max-width: 992px) {
             table { table-layout: auto; }
@@ -145,10 +130,8 @@
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
             .controls-row { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; padding: 10px !important; margin-bottom: 15px !important; order: 1 !important; }
             .prepaid-toggle { grid-column: 1 / -1; border-right: none; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 5px; justify-content: center; }
-            .btn-wrapper { width: 100%; display: block; }
             .action-btn { width: 100% !important; height: 55px !important; font-size: 9px !important; display: flex; align-items: center; justify-content: center; text-align: center; box-sizing: border-box; }
             .platinum-group { grid-column: 1 / -1 !important; display: grid !important; grid-template-columns: repeat(2, 1fr) !important; border: none !important; padding: 0 !important; gap: 8px !important; }
-            .platinum-group .btn-wrapper:last-child { grid-column: 1 / -1 !important; }
             .plat-input { width: 100% !important; height: 55px !important; }
             .current-session-box { order: 2 !important; flex-direction: column !important; min-height: auto !important; padding: 15px !important; margin-bottom: 15px !important; }
             .cart-actions { width: 100% !important; margin-top: 15px !important; }
@@ -190,37 +173,16 @@
                     <span class="slider"></span>
                 </label>
             </div>
-            <div class="btn-wrapper">
-                <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
-                <div class="btn-tooltip">900 ₽ (Всегда 100%)</div>
-            </div>
-            <div class="btn-wrapper">
-                <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
-                <div class="btn-tooltip">3500 ₽</div>
-            </div>
-            <div class="btn-wrapper">
-                <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
-                <div class="btn-tooltip">6000 ₽</div>
-            </div>
-            <div class="btn-wrapper">
-                <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
-                <div class="btn-tooltip">1000 ₽</div>
-            </div>
-            <div class="btn-wrapper">
-                <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
-                <div class="btn-tooltip">500 ₽</div>
-            </div>
+            <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
+            <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
+            <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
+            <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
+            <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
             
             <div class="platinum-group">
                 <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
-                <div class="btn-wrapper">
-                    <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM EDITION</button>
-                    <div class="btn-tooltip">База (10000 ₽)</div>
-                </div>
-                <div class="btn-wrapper">
-                    <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
-                    <div class="btn-tooltip">300 ₽</div>
-                </div>
+                <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM EDITION</button>
+                <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
             </div>
         </div>
 
@@ -280,7 +242,6 @@
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
-    const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
     function checkPrivacyPassword() {
         const pass = prompt("Введите пароль:");
@@ -410,7 +371,7 @@
         const full = row.fullTotal || row.total;
         const remaining = full - row.total;
         if (remaining <= 0) return alert('Заказ уже полностью оплачен');
-        const amountStr = prompt(`Доплата для ${row.client}.\nОстаток к оплате: ${remaining} ₽.\nНажмите ОК, чтобы внести всю сумму.`, remaining);
+        const amountStr = prompt(`Доплата для ${row.client}.\nОстаток к оплате: ${remaining} ₽.`, remaining);
         if (amountStr !== null) {
             const amount = parseInt(amountStr);
             if (!isNaN(amount) && amount > 0) {
