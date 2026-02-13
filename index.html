@@ -1063,8 +1063,7 @@
                 <audio controls>
                     <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg">
                 </audio>
-     </div>
-            <div class="audio-card js-scroll-glow">
+<div class="audio-card js-scroll-glow">
                 <div class="audio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/oblojka.jfif');"></div>
                 <div class="audio-info">
                     <div class="audio-title">Оксана Шемановская - Необычайно</div>
@@ -1086,7 +1085,7 @@
         </div>
     </section>
 
-<section id="booking">
+    <section id="booking">
         <div class="booking-grid">
             <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="contact-card js-scroll-glow">
                 <div class="contact-label">АДРЕС</div>
@@ -1104,44 +1103,41 @@
 </div>
 
 <script>
-    // URL вашего развернутого Google Apps Script
+    // --- ИНИЦИАЛИЗАЦИЯ И КОНСТАНТЫ ---
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmdgojb9-sBiqBoAdCwcei5XEbNMAo3yqvHBnjFPSvjCAYDhKx1R1U39lSjKmkR9PCAQ/exec';
 
-    // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (БЕЗ ИЗМЕНЕНИЙ) ---
+    // Загружаем данные из памяти сразу, чтобы таблица не была пустой при F5
     let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
 
-    // --- УЛУЧШЕННЫЙ БЛОК СИНХРОНИЗАЦИИ (АНТИ-УДАЛЕНИЕ) ---
+    // --- ЛОГИКА СИНХРОНИЗАЦИИ (БЛОКИРОВКА УДАЛЕНИЯ) ---
     async function loadFromCloud() {
         try {
             const response = await fetch(GOOGLE_SCRIPT_URL);
-            if (!response.ok) throw new Error('Ошибка сети');
+            if (!response.ok) throw new Error('Network error');
             const cloudData = await response.json();
             
             if (cloudData && Array.isArray(cloudData)) {
-                // ПРОВЕРКА: Если в облаке данных МЕНЬШЕ, чем локально (защита от затирания при F5)
+                // ПРОВЕРКА: Если в облаке меньше данных, чем у нас локально, облако считается устаревшим
                 if (cloudData.length < crmData.length) {
-                    console.warn("В облаке неполные данные. Принудительное восстановление из локальной копии...");
+                    console.warn("Обнаружена попытка загрузки неполных данных. Восстановление облака...");
                     syncToCloud(); 
                 } else {
-                    // Синхронизируем, если в облаке актуальная или более полная версия
+                    // Обновляем локальные данные только если в облаке их больше или столько же
                     crmData = cloudData;
                     localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-                    if(typeof updateTable === "function") updateTable();
-                    if(typeof renderCalendar === "function") renderCalendar();
-                    if(typeof updateNextSession === "function") updateNextSession();
-                    console.log("Данные успешно синхронизированы.");
+                    refreshUI();
                 }
             }
         } catch (e) {
-            console.error("Ошибка загрузки данных:", e);
+            console.error("Ошибка связи с Google:", e);
         }
     }
 
     async function syncToCloud() {
-        // Сначала фиксируем в памяти устройства
+        // Жесткое сохранение в память браузера
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
@@ -1151,16 +1147,21 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(crmData)
             });
-            console.log("Данные отправлены в облако.");
+            console.log("Синхронизация с облаком выполнена.");
         } catch (e) {
-            console.error("Ошибка синхронизации:", e);
+            console.error("Ошибка отправки:", e);
         }
     }
 
-    // --- ЛОГИКА АУДИО-ПЛЕЕРОВ (БЕЗ ИЗМЕНЕНИЙ) ---
+    function refreshUI() {
+        if(typeof updateTable === "function") updateTable();
+        if(typeof renderCalendar === "function") renderCalendar();
+        if(typeof updateNextSession === "function") updateNextSession();
+    }
+
+    // --- ПЛЕЕРЫ ---
     document.addEventListener('play', function(e) {
-        const allAudios = document.querySelectorAll('audio');
-        allAudios.forEach(audio => {
+        document.querySelectorAll('audio').forEach(audio => {
             if (audio !== e.target) {
                 audio.pause();
                 audio.currentTime = 0;
@@ -1177,51 +1178,37 @@
 
     document.querySelectorAll('.play-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            const container = this.closest('div'); 
-            const audio = container.querySelector('audio') || this.parentElement.querySelector('audio');
+            const audio = this.closest('div').querySelector('audio') || this.parentElement.querySelector('audio');
             const icon = this.querySelector('i');
-            if (audio.paused) {
-                audio.play();
-                icon.className = 'fas fa-pause';
-            } else {
-                audio.pause();
-                icon.className = 'fas fa-play';
-            }
+            if (audio.paused) { audio.play(); icon.className = 'fas fa-pause'; } 
+            else { audio.pause(); icon.className = 'fas fa-play'; }
         });
     });
 
     document.querySelectorAll('audio').forEach(audio => {
         audio.addEventListener('timeupdate', function() {
-            const container = this.closest('div');
-            const bar = container.querySelector('.progress-bar') || this.parentElement.querySelector('.progress-bar');
+            const bar = this.closest('div').querySelector('.progress-bar') || this.parentElement.querySelector('.progress-bar');
             if (bar && this.duration) {
-                const percent = (this.currentTime / this.duration) * 100;
-                bar.style.width = percent + '%';
+                bar.style.width = (this.currentTime / this.duration) * 100 + '%';
             }
-        });
-        audio.addEventListener('ended', function() {
-            const container = this.closest('div');
-            const icon = container.querySelector('.play-btn i') || parent.parentElement.querySelector('.play-btn i');
-            if (icon) icon.className = 'fas fa-play';
-            this.currentTime = 0;
         });
     });
 
+    // --- ОБЩАЯ ЗАГРУЗКА ---
     document.addEventListener('DOMContentLoaded', () => {
-        loadFromCloud(); // Загрузка при старте
+        refreshUI(); // Показываем данные из памяти мгновенно
+        loadFromCloud(); // Проверяем обновления в облаке
         
+        // Анимация секции About
         const aboutSection = document.querySelector('#about-me');
         if (aboutSection) {
-            const aboutObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        aboutSection.classList.add('is-revealed');
-                    }
-                });
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) aboutSection.classList.add('is-revealed'); });
             }, { threshold: 0.5 });
-            aboutObserver.observe(aboutSection);
+            observer.observe(aboutSection);
         }
 
+        // Мобильная подсветка пакетов
         const handleMobileGlow = () => {
             if (window.innerWidth > 768) return;
             const modules = document.querySelectorAll('.module');
@@ -1236,10 +1223,9 @@
             });
         };
         window.addEventListener('scroll', handleMobileGlow, { passive: true });
-        handleMobileGlow();
     });
 
-    // Ускоренное обновление: каждые 15 секунд для связи ПК и телефона
+    // Опрос облака каждые 15 секунд
     setInterval(loadFromCloud, 15000);
 </script>
 
@@ -1260,9 +1246,7 @@
             adminBtn.onclick = function() {
                 document.getElementById('admin-panel').style.display = 'block';
                 document.getElementById('admin-overlay').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('admin-login').focus();
-                }, 100);
+                setTimeout(() => { document.getElementById('admin-login').focus(); }, 100);
             };
         }
     });
@@ -1280,28 +1264,17 @@
         if (userLogin === 'admin ssl' && userPass === '080808') {
             btn.innerHTML = 'ACCESS GRANTED...';
             btn.style.background = '#006400'; 
-            btn.style.boxShadow = 'none';
-            setTimeout(() => {
-                window.location.href = '#crm-section'; 
-                closeAdmin();
-            }, 600);
+            setTimeout(() => { window.location.href = '#crm-section'; closeAdmin(); }, 600);
         } else {
-            const originalColor = btn.style.background;
             btn.style.background = '#8B0000';
             btn.innerHTML = 'DENIED';
-            setTimeout(() => {
-                btn.style.background = originalColor;
+            setTimeout(() => { 
+                btn.style.background = 'var(--neon-purple)'; 
                 btn.innerHTML = 'AUTHENTICATE';
                 document.getElementById('admin-pass').value = '';
             }, 1000);
         }
     }
-
-    document.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && document.getElementById('admin-panel').style.display === 'block') {
-            checkAdminAuth();
-        }
-    });
     </script>
 </footer> 
 
@@ -1309,15 +1282,10 @@
 
 <div id="admin-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: #050505; border: 1px solid var(--neon-purple); padding: 30px; z-index: 10000; border-radius: 10px; box-shadow: 0 0 40px rgba(191, 0, 255, 0.3); font-family: 'Orbitron', sans-serif; text-align: center;">
     <div style="color: var(--neon-purple); font-size: 16px; margin-bottom: 25px; letter-spacing: 3px;">ADMIN ACCESS</div>
-    
-    <input type="text" id="admin-login" placeholder="LOGIN" autocomplete="off" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 15px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
-    
-    <input type="password" id="admin-pass" placeholder="PASSWORD" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 20px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
-    
-    <button onclick="checkAdminAuth()" style="width: 100%; padding: 12px; background: var(--neon-purple); border: none; color: #fff; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.3s; letter-spacing: 1px; font-family: 'Orbitron', sans-serif;">AUTHENTICATE</button>
-    
+    <input type="text" id="admin-login" placeholder="LOGIN" autocomplete="off" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 15px; border-radius: 4px; outline: none; text-align: center; box-sizing: border-box;">
+    <input type="password" id="admin-pass" placeholder="PASSWORD" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 20px; border-radius: 4px; outline: none; text-align: center; box-sizing: border-box;">
+    <button onclick="checkAdminAuth()" style="width: 100%; padding: 12px; background: var(--neon-purple); border: none; color: #fff; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.3s; font-family: 'Orbitron', sans-serif;">AUTHENTICATE</button>
     <div onclick="closeAdmin()" style="margin-top: 20px; color: #333; font-size: 9px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Abort Mission</div>
 </div>
-
 </body>
 </html>
