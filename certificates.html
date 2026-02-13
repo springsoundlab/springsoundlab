@@ -393,11 +393,8 @@
             thead tr { position: absolute; top: -9999px; left: -9999px; }
             tr { background: #0a0a0a; border: 1px solid #111; margin-bottom: 15px; border-radius: 12px; padding: 15px; }
             
-            /* Новая логика ячеек в мобильной версии */
             td { border: none; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; padding-left: 0 !important; text-align: left !important; min-height: 45px; display: flex; align-items: center; justify-content: space-between; }
-            td::before { position: static; width: auto; font-family: 'Orbitron'; font-size: 9px; color: #444; font-weight: bold; text-transform: uppercase; }
             
-            /* Стилизация конкретных строк отчета */
             .row-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 28px !important; color: var(--neon-purple); justify-content: center; }
             .row-client { flex-direction: row; justify-content: center; font-size: 22px !important; font-weight: 700; padding: 10px 0; }
             
@@ -405,13 +402,8 @@
             .row-time-progress .time-val { font-family: 'Rajdhani'; font-weight: 700; font-size: 20px; color: #fff !important; margin-bottom: 8px; display: block; }
             .progress-container { margin-top: 5px; height: 4px; }
 
-            .services-cell { display: block; padding: 10px 0 !important; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center !important; }
-            .services-cell::before { display: block; margin-bottom: 5px; content: 'УСЛУГИ'; }
-            
-            .row-price { border-bottom: none; padding-top: 15px; font-size: 24px; font-family: 'Rajdhani'; font-weight: 700; color: #fff; justify-content: center; }
-
-            /* Блок кнопок в самом низу */
-            .row-actions { border-bottom: none; padding-top: 10px; }
+            /* Блок кнопок ТЕПЕРЬ ВЫШЕ УСЛУГ В МОБИЛКЕ */
+            .row-actions { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px 0; order: 4; }
             .action-icons-wrap { display: flex; width: 100%; gap: 10px; margin-top: 0; justify-content: center; }
             .icon-btn-box { 
                 flex: 1; 
@@ -427,6 +419,12 @@
             .icon-btn-box span { font-size: 10px; }
             .icon-btn-box:first-child { border-color: var(--status-green); }
             .icon-delete { border-color: var(--artist-red); }
+
+            /* Блок услуг ТЕПЕРЬ НИЖЕ КНОПОК В МОБИЛКЕ */
+            .services-cell { display: block; padding: 15px 0 !important; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center !important; order: 5; }
+            .services-cell::before { display: block; margin-bottom: 5px; content: 'УСЛУГИ'; font-family: 'Orbitron'; font-size: 9px; color: #444; }
+            
+            .row-price { border-bottom: none; padding-top: 15px; font-size: 24px; font-family: 'Rajdhani'; font-weight: 700; color: #fff; justify-content: center; order: 6; }
 
             .current-session-box { flex-direction: column; align-items: stretch; gap: 20px; }
             .cart-actions { align-self: center; width: 100%; align-items: center; }
@@ -826,14 +824,14 @@
                     <span class="time-val">${row.time || '00:00'}</span>
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
+                <td data-label="УСЛУГИ" class="services-cell">${row.services}${tooltipHTML}</td>
+                <td data-label="ВНЕСЕНО" class="row-price privacy-blur">${paid} ₽</td>
                 <td data-label="ДЕЙСТВИЯ" class="row-actions">
                     <div class="action-icons-wrap">
                         <div class="icon-btn-box" onclick="addPayment(${realIndex})"><span>ДОПЛАТА</span><i class="fas fa-wallet"></i></div>
                         <div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})"><span>УДАЛИТЬ</span><i class="fas fa-trash"></i></div>
                     </div>
                 </td>
-                <td data-label="УСЛУГИ" class="services-cell">${row.services}${tooltipHTML}</td>
-                <td data-label="ВНЕСЕНО" class="row-price privacy-blur">${paid} ₽</td>
             `;
             body.appendChild(tr);
         });
