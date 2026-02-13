@@ -110,7 +110,7 @@
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
         th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
-        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; overflow: visible; }
+        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; overflow: visible; position: relative; }
         .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; }
 
         .certs-container { flex-grow: 1; height: 300px; overflow-y: auto; padding-right: 15px; }
@@ -122,29 +122,42 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
-        /* ИСПРАВЛЕННЫЙ ТУЛТИП ДЕТАЛИЗАЦИИ: БЕЗ FIXED, БЕЗ СКРИПТОВ ДВИЖЕНИЯ */
+        /* ИСПРАВЛЕННАЯ ЛОГИКА ТУЛТИПА - НУЛЕВАЯ ВЕРОЯТНОСТЬ ПЕРЕКРЫТИЯ */
         .history-tooltip { 
-            visibility: hidden; opacity: 0; 
+            display: none; 
             position: absolute; 
             background: #0a0a0a; border: 1px solid var(--neon-purple); 
-            padding: 15px; border-radius: 8px; z-index: 100; width: 280px; 
+            padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
             pointer-events: none;
             left: 0;
-            top: 100%;
-            transition: opacity 0.3s ease;
+            top: 40px;
         }
-        .services-cell:hover .history-tooltip { 
-            transition-delay: 0.5s; 
-            visibility: visible; opacity: 1; 
+        /* Тултип появляется ТОЛЬКО при наведении на ТЕКСТ услуг, а не на всю строку или ячейку */
+        .services-text:hover + .history-tooltip { 
+            display: block; 
         }
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
 
-        /* Иконки действий */
-        .action-icons-wrap { display: flex; align-items: center; gap: 15px; justify-content: flex-end; }
-        .icon-btn-box { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.3s; position: relative; z-index: 500; }
-        .icon-btn-box i { font-size: 12px; color: #444; pointer-events: none; }
-        .icon-btn-box span { font-family: 'Orbitron'; font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; pointer-events: none; }
+        /* Иконки действий - Прямое управление */
+        .action-icons-wrap { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            justify-content: flex-end; 
+            position: relative; 
+            z-index: 10; /* Всегда выше всего */
+        }
+        .icon-btn-box { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 4px; 
+            cursor: pointer !important; 
+            transition: 0.3s; 
+            position: relative;
+        }
+        .icon-btn-box i, .icon-btn-box span { pointer-events: none; }
         .icon-btn-box:hover i { color: var(--neon-purple); }
         .icon-btn-box:hover span { color: var(--neon-purple); }
         .icon-delete:hover i { color: var(--artist-red); }
@@ -460,18 +473,23 @@
             const realIndex = crmData.indexOf(row);
             const tr = document.createElement('tr');
             tr.className = 'history-row';
-            let tooltip = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+            
+            let tooltipHtml = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
-                tooltip += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                tooltipHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
-            tooltip += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
+            tooltipHtml += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
+
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
                 <td data-label="КЛИЕНТ">
                     <div style="font-weight:600;">${row.client}</div>
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
-                <td class="services-cell" style="position:relative; cursor:help;">${row.services}${tooltip}</td>
+                <td class="services-cell">
+                    <span class="services-text" style="cursor:help; border-bottom: 1px dashed rgba(255,255,255,0.2);">${row.services}</span>
+                    ${tooltipHtml}
+                </td>
                 <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
                 <td data-label="ДЕЙСТВИЯ">
                     <div class="action-icons-wrap">
