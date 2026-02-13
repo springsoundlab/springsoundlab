@@ -105,25 +105,33 @@
         .input-mini { background: #000; border: 1px solid #333; color: #fff; padding: 0 10px; height: 42px; border-radius: 6px; width: 155px; font-size: 13px; font-family: 'Orbitron'; text-align: center; outline: none; }
         .save-btn { background: var(--status-green); color: #fff; border: none; height: 42px; width: 155px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
         th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
-        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
-        .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; }
+        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; position: relative; z-index: 2; }
+        .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; width: 100px; text-align: right; }
 
-        /* СТИЛИ ШКАЛЫ ПРОГРЕССА */
-        .client-name-cell { position: relative; cursor: pointer; }
-        .progress-container { width: 100%; height: 2px; background: #222; margin-top: 6px; border-radius: 2px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--neon-purple); box-shadow: 0 0 5px var(--neon-purple); transition: 0.5s; }
-        
-        /* ТУЛТИП ПРОГРЕССА */
-        .progress-tooltip {
-            visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple);
-            padding: 10px; border-radius: 8px; z-index: 2000; width: 180px; pointer-events: none;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.8); transition: 0.3s; top: -10px; left: 105%;
+        /* НОВЫЙ СТИЛЬ: СТРОКА-ШКАЛА */
+        .history-row { position: relative; transition: 0.3s; }
+        .history-row::before {
+            content: ''; position: absolute; top: 0; left: 0; bottom: 0;
+            width: var(--progress-width, 0%);
+            background: linear-gradient(90deg, rgba(191, 0, 255, 0.08) 0%, rgba(191, 0, 255, 0) 100%);
+            z-index: 1; pointer-events: none; transition: width 0.8s ease;
         }
-        .client-name-cell:hover .progress-tooltip { visibility: visible; opacity: 1; }
-        .tooltip-row { display: flex; justify-content: space-between; font-family: 'Rajdhani'; font-weight: 700; font-size: 12px; margin-bottom: 4px; }
-        .tooltip-row span:first-child { color: #555; font-family: 'Orbitron'; font-size: 8px; }
+
+        /* ОКНО ДЕТАЛИЗАЦИИ СЛЕВА */
+        .history-tooltip { 
+            visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
+            padding: 15px; border-radius: 8px; z-index: 1000; width: 280px; box-shadow: -10px 10px 40px rgba(0,0,0,0.9); 
+            transition: opacity 0.3s ease; pointer-events: none; top: 0; 
+            right: 100%; left: auto; /* СМЕЩЕНИЕ ВЛЕВО */
+            margin-right: 15px;
+        }
+        .history-row:hover .history-tooltip { visibility: visible; opacity: 1; }
+
+        .tooltip-summary { margin-top: 15px; border-top: 1px solid #222; padding-top: 10px; }
+        .summary-line { display: flex; justify-content: space-between; font-family: 'Rajdhani'; font-weight: 700; margin-bottom: 4px; }
+        .summary-line span:first-child { font-family: 'Orbitron'; font-size: 8px; color: #555; }
 
         .certs-container { flex-grow: 1; height: 300px; overflow-y: auto; padding-right: 15px; }
         .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
@@ -134,13 +142,8 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
-        .history-tooltip { 
-            visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
-            padding: 15px; border-radius: 8px; z-index: 1000; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); transition: opacity 0.3s ease; pointer-events: none; top: 0; left: 100%;
-        }
-        .history-row:hover .history-tooltip { visibility: visible; opacity: 1; }
-
         @media (max-width: 992px) {
+            table { table-layout: auto; }
             body { padding: 10px; }
             header { flex-direction: column; gap: 15px; align-items: center; border-bottom: none; }
             .logo { text-align: center; font-size: 16px; width: 100%; margin-bottom: 5px; }
@@ -164,17 +167,17 @@
             .input-mini, .save-btn { width: 100% !important; height: 50px !important; }
             .table-container { order: 3 !important; }
             thead { display: none !important; }
-            .history-row { display: block !important; border: 1px solid #222 !important; margin-bottom: 10px !important; background: #0a0a0a !important; }
-            .history-row td { display: flex !important; justify-content: space-between !important; padding: 10px !important; border-bottom: 1px solid #111 !important; }
-            .history-row td::before { content: attr(data-label); font-family: 'Orbitron'; font-size: 8px; color: #555; }
+            .history-row { display: block !important; border: 1px solid #222 !important; margin-bottom: 10px !important; background: #0a0a0a !important; padding: 5px 0; }
+            .history-row td { display: flex !important; justify-content: space-between !important; padding: 12px 15px !important; border-bottom: 1px solid #111 !important; }
+            .history-row td::before { 
+                content: attr(data-label); font-family: 'Orbitron'; font-size: 8px; color: #555; 
+                display: block; margin-right: 20px; /* ИСПРАВЛЕНИЕ: разделение имени и ярлыка */
+            }
             .services-cell { display: none !important; }
             .history-tooltip { display: none !important; }
             .certs-section { order: 4 !important; height: 350px !important; margin-top: 20px !important; }
             .certs-container { height: 100% !important; }
-
-            /* Мобильный тултип прогресса */
-            .progress-tooltip { left: 0; top: 100%; width: 100%; box-sizing: border-box; }
-            .client-name-cell:active .progress-tooltip { visibility: visible; opacity: 1; }
+            .history-row::before { display: none; } /* На мобилке градиент мешает тексту */
         }
     </style>
 </head>
@@ -256,7 +259,14 @@
 
         <div class="table-container">
             <table>
-                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th>ИТОГО</th><th></th></tr></thead>
+                <colgroup>
+                    <col style="width: 100px;">
+                    <col style="width: 150px;">
+                    <col>
+                    <col style="width: 120px;">
+                    <col style="width: 50px;">
+                </colgroup>
+                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right">ВНЕСЕНО</th><th></th></tr></thead>
                 <tbody id="crmTableBody"></tbody>
             </table>
         </div>
@@ -355,18 +365,14 @@
         currentCart.items.push({ name: finalName, colorClass });
         currentCart.details.push({ name: finalName, price: finalPrice, colorClass });
         currentCart.total += finalPrice;
-        currentCart.fullPriceTotal += price; // Всегда считаем полный чек для прогресс-бара
+        currentCart.fullPriceTotal += price;
         renderCart();
     }
 
     function removeFromCart(index) {
-        // Чтобы корректно вычесть из fullPriceTotal, нам нужно знать оригинальную цену
-        // Для простоты мы храним в деталях только финальную цену, поэтому при удалении
-        // мы сбрасываем корзину и пересчитываем или просто вычитаем пропорционально
         const item = currentCart.details[index];
         const isPrepaid = item.name.includes('(50%)');
         const originalPrice = isPrepaid ? item.price * 2 : item.price;
-
         currentCart.total -= item.price;
         currentCart.fullPriceTotal -= originalPrice;
         currentCart.items.splice(index, 1);
@@ -414,7 +420,7 @@
             services: currentCart.items.map(i => i.name).join(', '), 
             details: [...currentCart.details], 
             total: currentCart.total, 
-            fullTotal: currentCart.fullPriceTotal, // Сохраняем полную стоимость для шкалы
+            fullTotal: currentCart.fullPriceTotal,
             timestamp: Date.now() 
         });
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
@@ -443,37 +449,38 @@
             const tr = document.createElement('tr');
             tr.className = 'history-row';
             
-            // Расчет прогресса
+            // Расчет прогресса для всей строки
             const fullVal = row.fullTotal || row.total;
             const paidVal = row.total;
             const remainVal = fullVal - paidVal;
             const progressPercent = (paidVal / fullVal) * 100;
+            tr.style.setProperty('--progress-width', `${progressPercent}%`);
 
-            let historyTooltipHtml = '<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ ЗАКАЗА:</div>';
+            let historyTooltipHtml = `<div class="history-tooltip">
+                <div style="color:#888; font-family:Orbitron; font-size:9px; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ ЗАКАЗА:</div>`;
+            
             if (row.details) {
                 row.details.forEach(item => {
                     const sColor = colorMap[item.colorClass] || '#fff';
                     historyTooltipHtml += `<div class="tooltip-item" style="border-left: 2px solid ${sColor}; margin-bottom:5px; padding-left:8px; display:flex; justify-content:space-between;"><span style="color: ${sColor}; font-size:11px; font-weight:600;">${item.name}</span><span style="color:#fff; font-family:Rajdhani; font-weight:700; font-size:13px;">${item.price} ₽</span></div>`;
                 });
             }
-            historyTooltipHtml += `<div style="text-align:right; margin-top:10px; font-family:Rajdhani; font-weight:700; font-size:16px; color:var(--neon-purple);">ИТОГО: ${row.total} ₽</div></div>`;
+
+            // Добавляем финансовую сводку в окно детализации (слева)
+            historyTooltipHtml += `
+                <div class="tooltip-summary">
+                    <div class="summary-line"><span>ПОЛНЫЙ ЧЕК</span><span>${fullVal} ₽</span></div>
+                    <div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paidVal} ₽</span></div>
+                    <div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${remainVal} ₽</span></div>
+                </div>
+            </div>`;
 
             tr.innerHTML = `
-                <td class="num-cell" data-label="ДАТА">${row.date}</td>
-                <td class="client-name-cell" data-label="КЛИЕНТ">
-                    <span style="font-weight:600;">${row.client}</span>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: ${progressPercent}%"></div>
-                    </div>
-                    <div class="progress-tooltip">
-                        <div class="tooltip-row"><span>ПОЛНЫЙ ЧЕК</span><span>${fullVal} ₽</span></div>
-                        <div class="tooltip-row"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paidVal} ₽</span></div>
-                        <div class="tooltip-row"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${remainVal} ₽</span></div>
-                    </div>
-                </td>
+                <td data-label="ДАТА">${row.date}</td>
+                <td data-label="КЛИЕНТ" style="font-weight:600;">${row.client}</td>
                 <td class="services-cell" style="position:relative;">${row.services}${historyTooltipHtml}</td>
-                <td class="num-cell price-cell privacy-blur" data-label="ИТОГО">${row.total} ₽</td>
-                <td data-label="ДЕЙСТВИЕ"><i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${crmData.indexOf(row)})"></i></td>
+                <td class="num-cell price-cell privacy-blur" data-label="ВНЕСЕНО">${row.total} ₽</td>
+                <td data-label="УДАЛИТЬ"><i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${crmData.indexOf(row)})"></i></td>
             `;
             body.appendChild(tr);
         });
