@@ -2,143 +2,86 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEBUG MODE | SPRING SOUND LAB</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>ULTRA-DEBUG | SPRING SOUND LAB</title>
     <style>
-        :root { --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; --red: #cc0000; --green: #008f39; }
-        body { background: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; padding: 20px; }
-        
-        .header-debug { border-bottom: 2px solid var(--neon-purple); padding-bottom: 10px; margin-bottom: 30px; }
-        .logo { font-family: 'Orbitron'; color: var(--neon-purple); font-size: 18px; }
-
-        .session-form { background: #111; padding: 20px; border-radius: 10px; margin-bottom: 30px; display: flex; gap: 10px; }
-        input { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; outline: none; }
-        .save-btn { background: var(--neon-purple); border: none; color: #fff; padding: 10px 20px; cursor: pointer; font-family: 'Orbitron'; }
-
-        /* СПИСОК ЗАПИСЕЙ ВМЕСТО ТАБЛИЦЫ */
-        .history-list { display: flex; flex-direction: column; gap: 15px; }
-        
-        .history-card { 
-            background: var(--card-bg); 
-            border: 1px solid #222; 
-            padding: 15px; 
-            border-radius: 8px; 
+        body { background: #050505; color: white; font-family: sans-serif; padding: 20px; }
+        .card { 
+            background: #111; 
+            border: 2px solid #333; 
+            padding: 20px; 
+            margin-bottom: 10px; 
             display: flex; 
-            justify-content: space-between; 
+            justify-content: space-between;
             align-items: center;
-            position: relative;
         }
-
-        .info-part { display: flex; flex-direction: column; gap: 5px; }
-        .client-name { font-family: 'Orbitron'; font-size: 14px; color: #fff; }
-        .service-name { color: #888; font-size: 12px; }
-        .price-val { font-weight: bold; color: var(--neon-purple); }
-
-        /* КНОПКИ ДЕЙСТВИЙ - МАКСИМАЛЬНО ПРОСТЫЕ */
-        .actions-part { 
-            display: flex; 
-            gap: 10px; 
-            position: relative; 
-            z-index: 9999; /* Самый высокий приоритет */
+        .btn-pay { 
+            background: #008f39; 
+            color: white; 
+            padding: 15px 25px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold;
+            pointer-events: all !important; /* Принудительный клик */
         }
-
-        .debug-btn {
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-family: 'Orbitron';
-            font-size: 10px;
-            cursor: pointer;
-            text-transform: uppercase;
-            border: 2px solid transparent;
-            transition: 0.2s;
+        .btn-del { 
+            background: #cc0000; 
+            color: white; 
+            padding: 15px 25px; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold;
+            margin-left: 10px;
+            pointer-events: all !important;
         }
-
-        .btn-pay { background: var(--green); color: #fff; border-color: #00ff00; }
-        .btn-del { background: var(--red); color: #fff; border-color: #ff0000; }
-        
-        .debug-btn:active { transform: scale(0.95); }
-
+        button:active { background: yellow !important; color: black !important; } /* Вспышка при нажатии */
     </style>
 </head>
 <body>
 
-<div class="header-debug">
-    <div class="logo">SPRING SOUND LAB | DEBUG MODE (No Tables)</div>
-</div>
+    <h2>ПРОВЕРКА КНОПОК (ПРЯМАЯ ЛОГИКА)</h2>
+    <div id="debugList"></div>
 
-<div class="session-form">
-    <input type="text" id="nameIn" placeholder="Имя клиента">
-    <input type="number" id="priceIn" placeholder="Сумма">
-    <button class="save-btn" onclick="quickSave()">СОХРАНИТЬ ТЕСТ</button>
-</div>
+    <script>
+        // Данные берем напрямую из памяти
+        let data = JSON.parse(localStorage.getItem('spring_crm_v3')) || [
+            {client: "ТЕСТОВЫЙ КЛИЕНТ", total: 1000, services: "Запись"}
+        ];
 
-<div class="history-list" id="historyList">
-    </div>
-
-<script>
-    let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
-
-    function quickSave() {
-        const name = document.getElementById('nameIn').value || 'Тест';
-        const price = parseInt(document.getElementById('priceIn').value) || 0;
-        
-        crmData.push({
-            client: name,
-            total: price,
-            services: "Тестовая услуга",
-            date: new Date().toLocaleDateString(),
-            timestamp: Date.now()
-        });
-        
-        localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-        renderList();
-    }
-
-    function renderList() {
-        const container = document.getElementById('historyList');
-        container.innerHTML = '';
-
-        crmData.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'history-card';
-            card.innerHTML = `
-                <div class="info-part">
-                    <div class="client-name">${item.client} (${item.date})</div>
-                    <div class="service-name">${item.services}</div>
-                    <div class="price-val">${item.total} ₽</div>
-                </div>
-                <div class="actions-part">
-                    <button class="debug-btn btn-pay" onclick="testPay(${index})">ДОПЛАТА</button>
-                    <button class="debug-btn btn-del" onclick="testDelete(${index})">УДАЛИТЬ</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    function testPay(idx) {
-        alert("Кнопка ДОПЛАТА работает! Индекс: " + idx);
-        const val = prompt("Сколько добавить?");
-        if(val) {
-            crmData[idx].total += parseInt(val);
-            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-            renderList();
+        function refresh() {
+            const list = document.getElementById('debugList');
+            list.innerHTML = '';
+            
+            data.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <div>
+                        <strong>${item.client}</strong> — ${item.total} ₽
+                    </div>
+                    <div>
+                        <button class="btn-pay" onclick="
+                            const add = prompt('Сколько добавить?');
+                            if(add) {
+                                data[${i}].total += parseInt(add);
+                                localStorage.setItem('spring_crm_v3', JSON.stringify(data));
+                                refresh();
+                            }
+                        ">ДОПЛАТА</button>
+                        
+                        <button class="btn-del" onclick="
+                            if(confirm('Удалить?')) {
+                                data.splice(${i}, 1);
+                                localStorage.setItem('spring_crm_v3', JSON.stringify(data));
+                                refresh();
+                            }
+                        ">УДАЛИТЬ</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
         }
-    }
 
-    function testDelete(idx) {
-        alert("Кнопка УДАЛИТЬ работает! Индекс: " + idx);
-        if(confirm("Точно удалить?")) {
-            crmData.splice(idx, 1);
-            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-            renderList();
-        }
-    }
-
-    // Запуск при загрузке
-    renderList();
-</script>
-
+        refresh();
+    </script>
 </body>
 </html>
