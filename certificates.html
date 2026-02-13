@@ -134,15 +134,16 @@
         }
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
 
-        /* КНОПКИ ДЕЙСТВИЙ: Увеличенный z-index и принудительный курсор */
+        /* КНОПКИ ДЕЙСТВИЙ: Максимальная изоляция событий */
         .action-icons-wrap { 
             display: flex; align-items: center; gap: 15px; justify-content: flex-end; 
-            position: relative; z-index: 9999 !important; 
+            position: relative; z-index: 10000 !important; 
         }
         .icon-btn-box { 
             display: flex; flex-direction: column; align-items: center; gap: 4px; 
             cursor: pointer !important; transition: 0.3s; 
-            pointer-events: auto !important; position: relative; z-index: 10000 !important;
+            pointer-events: auto !important; position: relative; z-index: 10001 !important;
+            user-select: none;
         }
         .icon-btn-box i, .icon-btn-box span { pointer-events: none; }
         .icon-btn-box i { font-size: 12px; color: #444; }
@@ -429,21 +430,22 @@
         renderCart(); updateTable(); renderCalendar();
     }
 
-    // КЛЮЧЕВАЯ ФУНКЦИЯ ДОПЛАТЫ
+    // ВЫНОС ФУНКЦИЙ В WINDOW ДЛЯ ГЛОБАЛЬНОГО ДОСТУПА
     window.addPayment = function(e, index) {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
-            if (e.stopImmediatePropagation) e.stopImmediatePropagation();
         }
         
         const row = crmData[index];
+        if (!row) return;
+        
         const full = row.fullTotal || row.total;
         const remaining = full - row.total;
         
         if (remaining <= 0) {
             alert('Оплата уже произведена полностью');
-            return false;
+            return;
         }
 
         const promptVal = prompt(`Доплата для: ${row.client}\nОстаток: ${remaining} ₽\n\nВведите сумму:`, remaining);
@@ -456,15 +458,12 @@
                 renderCalendar();
             }
         }
-        return false;
     };
 
-    // КЛЮЧЕВАЯ ФУНКЦИЯ УДАЛЕНИЯ
     window.deleteRow = function(e, index) {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
-            if (e.stopImmediatePropagation) e.stopImmediatePropagation();
         }
         if (confirm('Удалить эту сессию из базы?')) {
             crmData.splice(index, 1);
@@ -472,7 +471,6 @@
             updateTable();
             renderCalendar();
         }
-        return false;
     };
 
     function updateTable() {
@@ -504,6 +502,7 @@
             });
             tooltip += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
+            // Использование onmousedown гарантирует срабатывание до любых перехватов
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
                 <td data-label="КЛИЕНТ">
@@ -514,11 +513,11 @@
                 <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
                 <td data-label="ДЕЙСТВИЯ">
                     <div class="action-icons-wrap">
-                        <div class="icon-btn-box" onclick="window.addPayment(event, ${realIndex}); return false;">
+                        <div class="icon-btn-box" onmousedown="window.addPayment(event, ${realIndex})">
                             <span>доплата</span>
                             <i class="fas fa-wallet"></i>
                         </div>
-                        <div class="icon-btn-box icon-delete" onclick="window.deleteRow(event, ${realIndex}); return false;">
+                        <div class="icon-btn-box icon-delete" onmousedown="window.deleteRow(event, ${realIndex})">
                             <span>удалить</span>
                             <i class="fas fa-trash"></i>
                         </div>
