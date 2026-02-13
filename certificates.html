@@ -2,10 +2,18 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRING SOUND LAB | CRM & ANALYTICS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRING SOUND LAB | CRM</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SSL CRM">
+    
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlNQUklORyBTT1VORCBMQUIgQ1JNIiwKICAic2hvcnRfbmFtZSI6ICJTU0wgQ1JNIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwNTA1MDUiLAogICJ0aGVtZV9jb2xvciI6ICIjYmYwMGZmIgp9">
+
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         :root { 
             --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
@@ -24,6 +32,8 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            /* Чтобы контент не залезал под «челку» iPhone в режиме PWA */
+            padding-top: env(safe-area-inset-top);
         }
         
         header { 
@@ -353,7 +363,13 @@
 
         /* --- БЛОК МОБИЛЬНОЙ АДАПТАЦИИ --- */
         @media (max-width: 992px) {
-            body { overflow-y: auto; height: auto; padding: 10px; }
+            body { 
+                overflow-y: auto; 
+                height: 100vh; 
+                padding: 10px; 
+                padding-top: max(20px, env(safe-area-inset-top)); 
+                padding-bottom: env(safe-area-inset-bottom);
+            }
             .header-right-zone { width: 100%; }
             .admin-grid { display: flex !important; flex-direction: column !important; height: auto !important; overflow: visible; }
             .table-scroll-container { max-height: none; overflow-y: visible; }
@@ -394,11 +410,9 @@
             thead tr { position: absolute; top: -9999px; left: -9999px; }
             tr { background: #0a0a0a; border: 1px solid #111; margin-bottom: 15px; border-radius: 12px; padding: 15px; }
             
-            /* Новые стили для мобильного блока отчета */
             td { border: none !important; padding: 0 !important; text-align: left !important; min-height: auto !important; display: block !important; position: relative; }
             td::before { display: none !important; }
 
-            /* Элементы внутри карточки */
             .mobile-row-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; color: #555; margin-bottom: 4px; }
             .mobile-row-client { font-family: 'Inter'; font-weight: 600; font-size: 18px; color: #fff; margin-bottom: 12px; }
             .mobile-progress-wrapper { margin-bottom: 15px; }
@@ -583,7 +597,7 @@
         if(!tableBody) return;
         tableBody.addEventListener('mousemove', (e) => {
             const cell = e.target.closest('.services-cell');
-            if (!cell || window.innerWidth <= 992) return; // Не работаем на мобилках
+            if (!cell || window.innerWidth <= 992) return; 
             const allTooltips = document.querySelectorAll('.history-tooltip');
             clearTimeout(hoverTimer);
             allTooltips.forEach(t => t.classList.remove('active'));
@@ -800,7 +814,6 @@
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
             
-            // Генерация Tooltip для PC версии
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
@@ -811,24 +824,19 @@
             let timeDisplay = row.time ? `<span class="table-time-inline">${row.time}</span>` : '';
             const tr = document.createElement('tr');
 
-            // Проверка устройства через JS для разметки (адаптивная вставка)
             if (window.innerWidth <= 992) {
-                // МОБИЛЬНАЯ ВЕРСИЯ
                 tr.innerHTML = `
                     <td>
                         <div class="mobile-row-date">${row.date}</div>
                         <div class="mobile-row-client">${row.client}</div>
-                        
                         <div class="mobile-progress-wrapper">
                             <span class="mobile-time-label">${row.time || '--:--'}</span>
                             <div class="progress-container">
                                 <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
                             </div>
                         </div>
-
                         <div class="mobile-services-label">Оказанные услуги</div>
                         <div class="mobile-services-text">${row.services}</div>
-
                         <div class="mobile-actions-grid">
                             <div class="m-action-btn m-btn-pay" onclick="addPayment(${realIndex})">Доплата</div>
                             <div class="m-action-btn m-btn-del" onclick="deleteRow(${realIndex})">Удалить</div>
@@ -836,7 +844,6 @@
                     </td>
                 `;
             } else {
-                // КОМПЬЮТЕРНАЯ ВЕРСИЯ (Без изменений)
                 tr.innerHTML = `
                     <td data-label="ДАТА">${row.date}</td>
                     <td data-label="КЛИЕНТ">
@@ -927,9 +934,7 @@
         }
     }
 
-    // Слушатель изменения размера окна для перестроения таблицы
     window.addEventListener('resize', updateTable);
-
     renderCalendar(); updateTable(); updateCerts(); initTooltipLogic(); updateNextSession();
 </script>
 </body>
