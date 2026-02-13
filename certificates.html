@@ -1215,26 +1215,31 @@
     }
 
     function checkAdminAuth() {
-        const userLogin = document.getElementById('admin-login').value;
-        const userPass = document.getElementById('admin-pass').value;
+        // Добавил .trim(), чтобы случайный пробел в конце логина не мешал входу
+        const userLogin = document.getElementById('admin-login').value.trim();
+        const userPass = document.getElementById('admin-pass').value.trim();
         const btn = document.querySelector('#admin-panel button');
 
-        // ТВОИ НОВЫЕ ДАННЫЕ ДЛЯ ВХОДА
+        // ТВОИ ДАННЫЕ ДЛЯ ВХОДА: admin ssl / 080808
         if (userLogin === 'admin ssl' && userPass === '080808') {
             btn.innerHTML = 'ACCESS GRANTED...';
             btn.style.background = '#006400'; 
-            btn.style.boxShadow = 'none';
+            btn.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.4)';
+            
             setTimeout(() => {
+                // Переход на страницу CRM
                 window.location.href = 'certificates.html'; 
             }, 600);
         } else {
-            const originalColor = btn.style.background;
-            btn.style.background = '#8B0000';
+            // Если данные неверны
+            const originalColor = 'var(--neon-purple)'; // Возвращаем к фиолетовому
+            btn.style.background = '#8B0000'; // Красный при ошибке
             btn.innerHTML = 'DENIED';
+            
             setTimeout(() => {
                 btn.style.background = originalColor;
                 btn.innerHTML = 'AUTHENTICATE';
-                document.getElementById('admin-pass').value = '';
+                document.getElementById('admin-pass').value = ''; // Очищаем только пароль
             }, 1000);
         }
     }
