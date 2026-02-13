@@ -26,49 +26,48 @@
             flex-direction: column;
         }
         
+        /* УВЕЛИЧЕННАЯ ШАПКА */
         header { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 0 0 20px 0; 
+            padding: 40px 0; /* Увеличенные отступы сверху и снизу */
             border-bottom: 1px solid #111; 
             flex-shrink: 0; 
         }
 
-        /* ОБНОВЛЕННЫЙ БЛОК ЛОГОТИПА И ЧАСОВ */
         .header-left-info {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 12px;
         }
 
         .logo { 
             font-family: 'Orbitron', sans-serif; 
             color: var(--neon-purple); 
-            letter-spacing: 2px; 
-            font-size: 14px; 
+            letter-spacing: 3px; 
+            font-size: 18px; /* Чуть крупнее лого */
             text-transform: uppercase;
         }
 
         .header-datetime {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             font-family: 'Rajdhani', sans-serif;
-            color: #444;
-            font-size: 13px;
+            color: #555;
+            font-size: 14px;
             letter-spacing: 1px;
             font-weight: 600;
         }
 
         .header-clock {
-            color: #888;
+            color: #999;
             font-family: 'Orbitron', sans-serif;
-            font-size: 11px;
-            min-width: 70px;
+            font-size: 12px;
+            min-width: 80px;
         }
         
-        /* ПРАВЫЙ БЛОК ШАПКИ */
         .header-right-zone {
             width: 380px;
             display: flex;
@@ -78,7 +77,7 @@
 
         .total-box { 
             background: var(--neon-purple); 
-            height: 70px;
+            height: 80px; /* Соразмерно высокой шапке */
             border-radius: 10px; 
             text-align: center;
             display: flex;
@@ -91,10 +90,6 @@
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
-        }
-        .total-box:hover {
-            box-shadow: 0 4px 30px rgba(191, 0, 255, 0.4);
-            border-color: rgba(255,255,255,0.3);
         }
 
         .income-amount { 
@@ -132,9 +127,22 @@
             transition: 0.3s;
         }
 
-        .privacy-blur { filter: blur(15px); opacity: 0.3; }
-        .privacy-active .privacy-blur { filter: blur(0); opacity: 1; }
-        .privacy-active .unlock-overlay { opacity: 0; visibility: hidden; }
+        /* КОНТРОЛЬ БЛЮРА */
+        .privacy-blur { 
+            filter: blur(15px); 
+            opacity: 0.6; /* Сделал ярче (светлее) в заблюренном состоянии */
+            transition: filter 0.3s ease, opacity 0.3s ease;
+        }
+        
+        /* Состояние когда разблокировано */
+        .privacy-active .privacy-blur { 
+            filter: blur(0) !important; 
+            opacity: 1 !important; 
+        }
+        .privacy-active .unlock-overlay { 
+            opacity: 0; 
+            visibility: hidden; 
+        }
 
         .back-btn { 
             color: #555; 
@@ -324,7 +332,7 @@
             .header-right-zone { width: 100%; }
             .admin-grid { display: flex !important; flex-direction: column !important; height: auto !important; overflow: visible; }
             .table-scroll-container { max-height: none; overflow-y: visible; }
-            header { flex-direction: column; gap: 15px; align-items: center; border-bottom: none; }
+            header { flex-direction: column; gap: 20px; align-items: center; border-bottom: none; padding: 20px 0; }
             .logo { text-align: center; font-size: 16px; width: 100%; margin-bottom: 5px; }
             .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
@@ -468,45 +476,35 @@
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
-    // ФУНКЦИЯ ОБНОВЛЕНИЯ ЧАСОВ И ДАТЫ В ШАПКЕ
     function startHeaderClock() {
         const clockEl = document.getElementById('headerClock');
         const dateEl = document.getElementById('headerDate');
-        
         function update() {
             const now = new Date();
-            // Часы
             clockEl.innerText = now.toLocaleTimeString('ru-RU', { hour12: false });
-            // Дата
             const options = { day: '2-digit', month: 'long', year: 'numeric' };
             dateEl.innerText = now.toLocaleDateString('ru-RU', options).replace(' г.', '').toUpperCase();
         }
-        
         update();
         setInterval(update, 1000);
     }
 
     function initTooltipLogic() {
         const tableBody = document.getElementById('crmTableBody');
-        
         tableBody.addEventListener('mousemove', (e) => {
             const cell = e.target.closest('.services-cell');
             const allTooltips = document.querySelectorAll('.history-tooltip');
-            
             clearTimeout(hoverTimer);
             allTooltips.forEach(t => t.classList.remove('active'));
-
             if (cell) {
                 const tooltip = cell.querySelector('.history-tooltip');
                 tooltip.style.left = e.clientX + 'px';
                 tooltip.style.top = e.clientY + 'px';
-
                 hoverTimer = setTimeout(() => {
                     tooltip.classList.add('active');
                 }, hoverDelay);
             }
         });
-
         tableBody.addEventListener('mouseleave', () => {
             clearTimeout(hoverTimer);
             document.querySelectorAll('.history-tooltip').forEach(t => t.classList.remove('active'));
@@ -536,7 +534,6 @@
 
     function checkPrivacyPassword() {
         if(document.body.classList.contains('privacy-active')) return;
-        
         openModal("ВВЕДИТЕ ПАРОЛЬ АДМИНИСТРАТОРА", "password", function() {
             const pass = document.getElementById('modalInput').value;
             if (pass === '123') {
@@ -699,7 +696,6 @@
         if(!body) return;
         body.innerHTML = '';
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        
         const filteredData = crmData.filter(r => r.date.includes(mKey)).sort((a,b) => {
             const da = a.date.split('.').reverse().join('');
             const db = b.date.split('.').reverse().join('');
@@ -712,17 +708,16 @@
             const perc = Math.min((paid / full) * 100, 100);
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
-            
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
-
             const tr = document.createElement('tr');
             tr.className = 'history-row';
 
+            // Генерация детализации с блюром на цифрах
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
-                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="privacy-blur" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
-            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
+            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
@@ -731,7 +726,7 @@
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
                 <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
-                <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
+                <td class="price-cell privacy-blur" data-label="ВНЕСЕНО" style="font-size: 15px;">${paid} ₽</td>
                 <td data-label="ДЕЙСТВИЯ">
                     <div class="action-icons-wrap">
                         <div class="icon-btn-box" onclick="addPayment(${realIndex})">
@@ -785,15 +780,12 @@
         const dateEl = document.getElementById('nextSessionDate');
         const clientEl = document.getElementById('nextSessionClient');
         if (!dateEl || !clientEl) return;
-
         const now = new Date();
         const todayStr = now.toLocaleDateString('ru-RU');
         const tomorrow = new Date(now);
         tomorrow.setDate(now.getDate() + 1);
         const tomorrowStr = tomorrow.toLocaleDateString('ru-RU');
-
         const upcoming = crmData.filter(r => r.date === todayStr || r.date === tomorrowStr);
-        
         if (upcoming.length > 0) {
             upcoming.sort((a, b) => (a.date === todayStr ? -1 : 1));
             const next = upcoming[0];
@@ -805,7 +797,6 @@
         }
     }
 
-    // ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
     startHeaderClock();
     renderCalendar(); 
     updateTable(); 
