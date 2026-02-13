@@ -891,7 +891,6 @@
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
             
-            // Логика исчезновения времени
             let showTime = true;
             if (row.time && row.date === todayStr) {
                 const [h, m] = row.time.split(':').map(Number);
@@ -912,7 +911,6 @@
             const tr = document.createElement('tr');
 
             if (window.innerWidth <= 992) {
-                // МОБИЛЬНЫЙ ВАРИАНТ
                 let mobileItemsHTML = '';
                 row.details.forEach(d => {
                     mobileItemsHTML += `
@@ -924,7 +922,7 @@
 
                 tr.ondblclick = (e) => toggleMobileDetails(e, realIndex);
                 tr.innerHTML = `
-                    <td style="position:relative;">
+                    <td style="position:relative; padding-top: 20px;">
                         <div id="mobileDetails-${realIndex}" class="mobile-details-overlay">
                             <div class="mobile-details-close" onclick="event.stopPropagation(); document.getElementById('mobileDetails-${realIndex}').classList.remove('active')">×</div>
                             <div class="mobile-details-header">Детализация заказа</div>
@@ -937,12 +935,11 @@
                                 <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div>
                             </div>
                         </div>
-                        <div class="mobile-row-date" style="color: #fff; font-size: 14px; font-weight: bold;">${row.date}</div>
-                        ${(row.time && showTime) ? `<div class="mobile-row-time-top" style="position:absolute; top:10px; right:15px; color:#bf00ff; font-size:18px; font-weight:800; font-family:Orbitron;">${row.time}</div>` : ''}
+                        <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
+                        ${(row.time && showTime) ? `<div class="mobile-row-time-top" style="position:absolute; top:12px; right:15px; color:#bf00ff; font-size:20px; font-weight:900; font-family:Orbitron;">${row.time}</div>` : ''}
                         <div class="mobile-row-client">${row.client}</div>
                         <div class="mobile-row-services">${row.services}</div>
                         <div class="mobile-progress-wrapper">
-                            <span class="mobile-time-label">${row.time || '--:--'}</span>
                             <div class="progress-container">
                                 <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
                             </div>
@@ -954,7 +951,6 @@
                     </td>
                 `;
             } else {
-                // ПК ВАРИАНТ
                 tr.innerHTML = `
                     <td data-label="ДАТА">${row.date}</td>
                     <td data-label="КЛИЕНТ">
@@ -1045,7 +1041,6 @@
         }
     }
 
-    // Запуск проверки времени каждую минуту для авто-скрытия
     setInterval(updateTable, 60000);
 
     window.addEventListener('resize', updateTable);
