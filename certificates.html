@@ -377,7 +377,7 @@
                 padding-bottom: env(safe-area-inset-bottom);
             }
             header { 
-                margin-top: 0 !important; /* На мобилке сброс отступа */
+                margin-top: 0 !important;
                 flex-direction: column; gap: 15px; align-items: center; border-bottom: none; 
             }
             .header-right-zone { width: 100%; }
@@ -417,17 +417,24 @@
 
             table, thead, tbody, th, td, tr { display: block; width: 100% !important; box-sizing: border-box; }
             thead tr { position: absolute; top: -9999px; left: -9999px; }
-            tr { background: #0a0a0a; border: 1px solid #111; margin-bottom: 15px; border-radius: 12px; padding: 15px; }
+            
+            /* Стилизация мобильной карточки */
+            tr { 
+                background: #0a0a0a; 
+                border: 1px solid #111; 
+                margin-bottom: 15px; 
+                border-radius: 12px; 
+                padding: 15px; 
+                position: relative; 
+                overflow: hidden; 
+            }
             
             td { border: none !important; padding: 0 !important; text-align: left !important; min-height: auto !important; display: block !important; position: relative; }
-            td::before { display: none !important; }
 
             .mobile-row-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; color: #555; margin-bottom: 4px; }
             .mobile-row-client { font-family: 'Inter'; font-weight: 600; font-size: 18px; color: #fff; margin-bottom: 12px; }
             .mobile-progress-wrapper { margin-bottom: 15px; }
             .mobile-time-label { font-family: 'Orbitron'; font-size: 10px; color: var(--neon-purple); margin-bottom: 5px; display: block; }
-            .mobile-services-label { font-family: 'Orbitron'; font-size: 9px; color: #444; text-transform: uppercase; margin-bottom: 8px; margin-top: 15px; }
-            .mobile-services-text { font-size: 12px; color: #fff; line-height: 1.4; margin-bottom: 20px; }
             
             .mobile-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px; }
             
@@ -442,6 +449,47 @@
             .cart-actions { align-self: center; width: 100%; align-items: center; }
             .total-display-pc { text-align: center; width: 100%; }
             .save-btn { width: 100%; }
+
+            /* НОВОЕ: СТИЛИ ДЛЯ МОБИЛЬНОЙ ДЕТАЛИЗАЦИИ ПО ДВОЙНОМУ ТАПУ */
+            .mobile-details-overlay {
+                position: absolute;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: #050505;
+                z-index: 50;
+                padding: 15px;
+                display: none; /* По умолчанию скрыто */
+                box-sizing: border-box;
+                flex-direction: column;
+            }
+            .mobile-details-overlay.active { display: flex; }
+            
+            .mobile-details-close {
+                position: absolute;
+                top: 10px; right: 10px;
+                width: 30px; height: 30px;
+                background: rgba(255,255,255,0.05);
+                border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                color: #fff; font-size: 16px;
+                cursor: pointer;
+            }
+            .mobile-details-title {
+                font-family: 'Orbitron'; font-size: 9px; color: var(--neon-purple);
+                text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;
+            }
+            .mobile-details-list {
+                overflow-y: auto; flex-grow: 1;
+            }
+            .mobile-detail-item {
+                display: flex; justify-content: space-between; align-items: center;
+                border-bottom: 1px solid #111; padding: 10px 0;
+            }
+            .mobile-detail-name { font-size: 11px; color: #fff; }
+            .mobile-detail-price { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; color: var(--neon-purple); }
+            .mobile-detail-total {
+                margin-top: 10px; border-top: 1px solid #222; padding-top: 10px;
+                display: flex; justify-content: space-between; font-family: 'Rajdhani'; font-weight: 700;
+            }
         }
     </style>
 </head>
@@ -805,6 +853,13 @@
         });
     }
 
+    function toggleMobileDetails(e, index) {
+        // Предотвращаем срабатывание, если нажаты кнопки внутри карточки
+        if (e.target.closest('.m-action-btn')) return;
+        const overlay = document.getElementById(`mobileDetails-${index}`);
+        if (overlay) overlay.classList.toggle('active');
+    }
+
     function updateTable() {
         const body = document.getElementById('crmTableBody');
         if(!body) return;
@@ -834,8 +889,30 @@
             const tr = document.createElement('tr');
 
             if (window.innerWidth <= 992) {
+                // Мобильный шаблон с оверлеем детализации
+                let mobileDetailsHTML = '';
+                row.details.forEach(d => {
+                    mobileDetailsHTML += `
+                        <div class="mobile-detail-item">
+                            <span class="mobile-detail-name">${d.name}</span>
+                            <span class="mobile-detail-price privacy-blur">${d.price} ₽</span>
+                        </div>`;
+                });
+
+                tr.ondblclick = (e) => toggleMobileDetails(e, realIndex);
                 tr.innerHTML = `
                     <td>
+                        <div id="mobileDetails-${realIndex}" class="mobile-details-overlay">
+                            <div class="mobile-details-close" onclick="event.stopPropagation(); document.getElementById('mobileDetails-${realIndex}').classList.remove('active')">×</div>
+                            <div class="mobile-details-title">Детализация заказа</div>
+                            <div class="mobile-details-list">
+                                ${mobileDetailsHTML}
+                                <div class="mobile-detail-total">
+                                    <span>ВНЕСЕНО</span>
+                                    <span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="mobile-row-date">${row.date}</div>
                         <div class="mobile-row-client">${row.client}</div>
                         <div class="mobile-progress-wrapper">
@@ -844,8 +921,6 @@
                                 <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
                             </div>
                         </div>
-                        <div class="mobile-services-label">Оказанные услуги</div>
-                        <div class="mobile-services-text">${row.services}</div>
                         <div class="mobile-actions-grid">
                             <div class="m-action-btn m-btn-pay" onclick="addPayment(${realIndex})">Доплата</div>
                             <div class="m-action-btn m-btn-del" onclick="deleteRow(${realIndex})">Удалить</div>
