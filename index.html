@@ -988,7 +988,7 @@
                 <div class="module-description">
                     Идеальное решение для песен в подарок или корпоративных гимнов. Подойдет тем, кому нужен качественный, но быстрый результат без лишних сложностей.
                     <div class="sub-package">
-<span class="sub-package-title" style="color: var(--neon-purple);">БАЗОВЫЙ ПРОДАКШН</span>
+                        <span class="sub-package-title" style="color: var(--neon-purple);">БАЗОВЫЙ ПРОДАКШН</span>
                         • Чистый голос: уберу лишний шум и сделаю вокал разборчивым. <br>
                         • Стандартная обработка: громкость, плотность и приятное эхо. <br>
                         • Сведение с минусом: аккуратно вклеим твой голос в музыку.
@@ -1064,7 +1064,6 @@
                     <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg">
                 </audio>
             </div>
-
             <div class="audio-card js-scroll-glow">
                 <div class="audio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/oblojka.jfif');"></div>
                 <div class="audio-info">
@@ -1075,7 +1074,6 @@
                     <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3" type="audio/mpeg">
                 </audio>
             </div>
-
             <div class="audio-card js-scroll-glow">
                 <div class="audio-info">
                     <div class="audio-title">TRACK 04 // PLATINUM TRACK</div>
@@ -1088,7 +1086,7 @@
         </div>
     </section>
 
-    <section id="booking">
+<section id="booking">
         <div class="booking-grid">
             <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="contact-card js-scroll-glow">
                 <div class="contact-label">АДРЕС</div>
@@ -1099,85 +1097,25 @@
             <a href="tel:+79178382017" class="contact-card js-scroll-glow">
                 <div class="contact-label">ПОЗВОНИТЬ</div>
                 <div class="contact-main-text">+7 917 838 20 17</div>
-                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОСВОНИТЬ</div>
+                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</div>
             </a>
         </div>
     </section>
 </div>
 
 <script>
-    // --- ГЛОБАЛЬНЫЕ КОНСТАНТЫ И ЗАЩИЩЕННАЯ ИНИЦИАЛИЗАЦИЯ ---
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmdgojb9-sBiqBoAdCwcei5XEbNMAo3yqvHBnjFPSvjCAYDhKx1R1U39lSjKmkR9PCAQ/exec';
-    const LOCAL_STORAGE_KEY = 'spring_crm_v3';
-
-    // Мгновенная загрузка: Телефон верит только своей памяти в первую секунду
-    let crmData = (function() {
-        const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-        try {
-            const parsed = JSON.parse(stored);
-            return Array.isArray(parsed) ? parsed : [];
-        } catch (e) { return []; }
-    })();
-
-    let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-    let currentCalDate = new Date();
-    let selectedDate = null;
-
-    // --- УЛУЧШЕННАЯ СИНХРОНИЗАЦИЯ (ФИЛЬТР ПУСТЫХ ДАННЫХ) ---
-    async function loadFromCloud() {
-        try {
-            const response = await fetch(GOOGLE_SCRIPT_URL);
-            if (!response.ok) return;
-            const cloudData = await response.json();
-            
-            if (Array.isArray(cloudData)) {
-                // Если в облаке пусто, а у нас есть записи — игнорируем облако и чиним его
-                if (cloudData.length === 0 && crmData.length > 0) {
-                    console.warn("Cloud is empty. Fixing cloud from local backup...");
-                    syncToCloud();
-                    return;
-                }
-                
-                // Если в облаке больше или столько же данных — обновляемся
-                if (cloudData.length >= crmData.length) {
-                    crmData = cloudData;
-                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(crmData));
-                    refreshUI();
-                }
-            }
-        } catch (e) { console.error("Cloud offline"); }
-    }
-
-    async function syncToCloud() {
-        if (!crmData) return;
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(crmData));
-        try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                body: JSON.stringify(crmData)
-            });
-        } catch (e) { console.error("Sync error"); }
-    }
-
-    function refreshUI() {
-        if (typeof updateTable === "function") updateTable();
-        if (typeof renderCalendar === "function") renderCalendar();
-        if (typeof updateNextSession === "function") updateNextSession();
-    }
-
-    // --- ПЛЕЕРЫ ---
+    // 1. Логика аудио-плееров
     document.addEventListener('play', function(e) {
-        document.querySelectorAll('audio').forEach(audio => {
+        const allAudios = document.querySelectorAll('audio');
+        allAudios.forEach(audio => {
             if (audio !== e.target) {
                 audio.pause();
                 audio.currentTime = 0;
                 const parent = audio.parentElement;
                 if (parent) {
-                    const icon = parent.querySelector('.play-btn i');
+                    const icon = parent.querySelector('.play-btn i') || parent.parentElement.querySelector('.play-btn i');
                     if (icon) icon.className = 'fas fa-play';
-                    const bar = parent.querySelector('.progress-bar');
+                    const bar = parent.querySelector('.progress-bar') || parent.parentElement.querySelector('.progress-bar');
                     if (bar) bar.style.width = '0%';
                 }
             }
@@ -1185,89 +1123,143 @@
     }, true);
 
     document.querySelectorAll('.play-btn').forEach(btn => {
-        btn.onclick = function() {
-            const audio = this.closest('div').querySelector('audio');
+        btn.addEventListener('click', function() {
+            const container = this.closest('div'); 
+            const audio = container.querySelector('audio') || this.parentElement.querySelector('audio');
             const icon = this.querySelector('i');
-            if (audio.paused) { audio.play(); icon.className = 'fas fa-pause'; } 
-            else { audio.pause(); icon.className = 'fas fa-play'; }
-        };
+            if (audio.paused) {
+                audio.play();
+                icon.className = 'fas fa-pause';
+            } else {
+                audio.pause();
+                icon.className = 'fas fa-play';
+            }
+        });
     });
 
     document.querySelectorAll('audio').forEach(audio => {
-        audio.ontimeupdate = function() {
-            const bar = this.closest('div').querySelector('.progress-bar');
+        audio.addEventListener('timeupdate', function() {
+            const container = this.closest('div');
+            const bar = container.querySelector('.progress-bar') || this.parentElement.querySelector('.progress-bar');
             if (bar && this.duration) {
-                bar.style.width = (this.currentTime / this.duration) * 100 + '%';
+                const percent = (this.currentTime / this.duration) * 100;
+                bar.style.width = percent + '%';
             }
-        };
+        });
+        audio.addEventListener('ended', function() {
+            const container = this.closest('div');
+            const icon = container.querySelector('.play-btn i') || parent.parentElement.querySelector('.play-btn i');
+            if (icon) icon.className = 'fas fa-play';
+            this.currentTime = 0;
+        });
     });
 
-    // --- СТАРТ ---
     document.addEventListener('DOMContentLoaded', () => {
-        refreshUI(); // Показываем данные из памяти ТУТ ЖЕ
-        setTimeout(loadFromCloud, 500); // Облако проверяем через полсекунды
-
-        // About Intersection
-        const about = document.querySelector('#about-me');
-        if (about) {
-            new IntersectionObserver(entries => {
-                if (entries[0].isIntersecting) about.classList.add('is-revealed');
-            }, { threshold: 0.5 }).observe(about);
+        const aboutSection = document.querySelector('#about-me');
+        if (aboutSection) {
+            const aboutObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        aboutSection.classList.add('is-revealed');
+                    }
+                });
+            }, { threshold: 0.5 });
+            aboutObserver.observe(aboutSection);
         }
 
-        // Mobile Glow
-        const handleGlow = () => {
+        const handleMobileGlow = () => {
             if (window.innerWidth > 768) return;
             const modules = document.querySelectorAll('.module');
+            const triggerLine = window.innerHeight / 2;
             modules.forEach(mod => {
                 const rect = mod.getBoundingClientRect();
-                if (Math.abs(rect.top + rect.height/2 - window.innerHeight/2) < 150) {
+                const moduleCenter = rect.top + (rect.height / 2);
+                if (Math.abs(moduleCenter - triggerLine) < 150) {
                     modules.forEach(m => m.classList.remove('active-package'));
                     mod.classList.add('active-package');
                 }
             });
         };
-        window.onscroll = handleGlow;
+        window.addEventListener('scroll', handleMobileGlow, { passive: true });
+        handleMobileGlow();
     });
-
-    setInterval(loadFromCloud, 20000);
 </script>
 
-<footer style="background: #000; border-top: 1px solid #111; padding: 10px 20px;">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 25px;">
-        <div style="color: #444; font-size: 10px; letter-spacing: 2px; font-family: 'Orbitron', sans-serif;">
+<footer style="background: #000; border-top: 1px solid #111; padding: 8px 20px;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 25px;">
+        <div style="color: #444; font-size: 10px; letter-spacing: 2px; font-family: 'Orbitron', sans-serif; white-space: nowrap;">
             © 2026 <span style="color: var(--neon-purple);">SPRING SOUND LAB</span>
         </div>
-        <div id="admin-trigger" style="color: #555; font-size: 9px; letter-spacing: 2px; cursor: pointer; border: 1px solid #222; padding: 2px 8px; font-family: 'Orbitron', sans-serif; text-transform: uppercase;">
+        <div id="admin-trigger" style="color: #555; font-size: 9px; letter-spacing: 2px; cursor: pointer; border: 1px solid #222; padding: 2px 8px; font-family: 'Orbitron', sans-serif; transition: 0.3s; text-transform: uppercase;">
             LOG IN
         </div>
     </div>
-</footer>
 
-<div id="admin-overlay" onclick="closeAdmin()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; backdrop-filter: blur(8px);"></div>
-<div id="admin-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: #050505; border: 1px solid var(--neon-purple); padding: 30px; z-index: 10000; border-radius: 10px; text-align: center; font-family: 'Orbitron', sans-serif;">
-    <div style="color: var(--neon-purple); margin-bottom: 25px; letter-spacing: 2px;">ADMIN ACCESS</div>
-    <input type="text" id="admin-login" placeholder="LOGIN" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 15px; border-radius: 4px; text-align: center; box-sizing: border-box; outline: none;">
-    <input type="password" id="admin-pass" placeholder="PASSWORD" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 20px; border-radius: 4px; text-align: center; box-sizing: border-box; outline: none;">
-    <button onclick="checkAdminAuth()" style="width: 100%; padding: 12px; background: var(--neon-purple); border: none; color: #fff; cursor: pointer; font-weight: bold; border-radius: 4px;">AUTHENTICATE</button>
-</div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminBtn = document.getElementById('admin-trigger');
+        if (adminBtn) {
+            adminBtn.onclick = function() {
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('admin-overlay').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('admin-login').focus();
+                }, 100);
+            };
+        }
+    });
 
-<script>
     function closeAdmin() {
         document.getElementById('admin-panel').style.display = 'none';
         document.getElementById('admin-overlay').style.display = 'none';
     }
-    document.getElementById('admin-trigger').onclick = function() {
-        document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('admin-overlay').style.display = 'block';
-        setTimeout(() => document.getElementById('admin-login').focus(), 100);
-    };
+
     function checkAdminAuth() {
-        const l = document.getElementById('admin-login').value;
-        const p = document.getElementById('admin-pass').value;
-        if (l === 'admin ssl' && p === '080808') {
-            window.location.href = '#crm-section';
-            closeAdmin();
+        const userLogin = document.getElementById('admin-login').value;
+        const userPass = document.getElementById('admin-pass').value;
+        const btn = document.querySelector('#admin-panel button');
+
+        // ТВОИ НОВЫЕ ДАННЫЕ ДЛЯ ВХОДА
+        if (userLogin === 'admin ssl' && userPass === '080808') {
+            btn.innerHTML = 'ACCESS GRANTED...';
+            btn.style.background = '#006400'; 
+            btn.style.boxShadow = 'none';
+            setTimeout(() => {
+                window.location.href = 'certificates.html'; 
+            }, 600);
+        } else {
+            const originalColor = btn.style.background;
+            btn.style.background = '#8B0000';
+            btn.innerHTML = 'DENIED';
+            setTimeout(() => {
+                btn.style.background = originalColor;
+                btn.innerHTML = 'AUTHENTICATE';
+                document.getElementById('admin-pass').value = '';
+            }, 1000);
         }
     }
-</script>
+
+    document.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && document.getElementById('admin-panel').style.display === 'block') {
+            checkAdminAuth();
+        }
+    });
+    </script>
+</footer> 
+
+<div id="admin-overlay" onclick="closeAdmin()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; backdrop-filter: blur(8px);"></div>
+
+<div id="admin-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: #050505; border: 1px solid var(--neon-purple); padding: 30px; z-index: 10000; border-radius: 10px; box-shadow: 0 0 40px rgba(191, 0, 255, 0.3); font-family: 'Orbitron', sans-serif; text-align: center;">
+    <div style="color: var(--neon-purple); font-size: 16px; margin-bottom: 25px; letter-spacing: 3px;">ADMIN ACCESS</div>
+    
+    <input type="text" id="admin-login" placeholder="LOGIN" autocomplete="off" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 15px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
+    
+    <input type="password" id="admin-pass" placeholder="PASSWORD" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 20px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
+    
+    <button onclick="checkAdminAuth()" style="width: 100%; padding: 12px; background: var(--neon-purple); border: none; color: #fff; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.3s; letter-spacing: 1px; font-family: 'Orbitron', sans-serif;">AUTHENTICATE</button>
+    
+    <div onclick="closeAdmin()" style="margin-top: 20px; color: #333; font-size: 9px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Abort Mission</div>
+</div>
+
+</body>
+</html>
