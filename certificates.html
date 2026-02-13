@@ -10,7 +10,7 @@
         :root { 
             --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
-            --text-gray: #b0b0b0;
+            --azure-blue: #00ccff; --text-gray: #b0b0b0;
         }
         
         body { 
@@ -260,6 +260,7 @@
         .btn-purple { border: 1px solid var(--neon-purple); }
         .btn-red { border: 1px solid var(--artist-red); }
         .btn-green { border: 1px solid var(--status-green); }
+        .btn-blue { border: 1px solid var(--azure-blue); color: var(--azure-blue); }
         .btn-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
         .btn-dashed-green { border: 1px dashed var(--status-green) !important; }
         .btn-dashed-gold { border: 1px dashed var(--platinum-gold) !important; }
@@ -279,6 +280,7 @@
         .tag-purple { border: 1px solid var(--neon-purple); color: var(--neon-purple); }
         .tag-red { border: 1px solid var(--artist-red); color: var(--artist-red); }
         .tag-green { border: 1px solid var(--status-green); color: var(--status-green); }
+        .tag-blue { border: 1px solid var(--azure-blue); color: var(--azure-blue); }
         .tag-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
         .tag-remove { position: absolute; right: 0; top: 0; bottom: 0; width: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.5; }
         
@@ -364,6 +366,14 @@
             }
             .btn-wrapper, .action-btn { width: 100%; box-sizing: border-box; }
             .action-btn { padding: 12px 5px; font-size: 8px; }
+
+            /* Новая расстановка кнопок для симметрии */
+            .btn-wrapper:nth-of-type(1) { grid-column: span 2; } /* ЧАС ЗАПИСИ во всю ширину */
+            .btn-wrapper:nth-of-type(2) { grid-order: 2; } /* START */
+            .btn-wrapper:nth-of-type(3) { grid-order: 3; } /* ARTIST */
+            .btn-wrapper:nth-of-type(4) { grid-order: 4; } /* ТЮНИНГ */
+            .btn-wrapper:nth-of-type(5) { grid-order: 5; } /* АРАНЖИРОВКА */
+            .btn-wrapper:nth-of-type(6) { grid-order: 6; } /* ДОП ДОРОЖКА */
             
             .platinum-group { 
                 grid-column: span 2; 
@@ -429,6 +439,7 @@
                     <span class="slider"></span>
                 </label>
             </div>
+            
             <div class="btn-wrapper">
                 <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
                 <div class="btn-tooltip">900 ₽ (Всегда 100%)</div>
@@ -441,9 +452,14 @@
                 <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
                 <div class="btn-tooltip">6000 ₽</div>
             </div>
+
             <div class="btn-wrapper">
                 <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
                 <div class="btn-tooltip">1000 ₽</div>
+            </div>
+            <div class="btn-wrapper">
+                <button class="action-btn btn-blue" onclick="addCustomToCart('АРАНЖИРОВКА', 'blue')">АРАНЖИРОВКА</button>
+                <div class="btn-tooltip">Ввести цену в поле ниже</div>
             </div>
             <div class="btn-wrapper">
                 <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
@@ -453,8 +469,8 @@
             <div class="platinum-group">
                 <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
                 <div class="btn-wrapper">
-                    <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM EDITION</button>
-                    <div class="btn-tooltip">База (10000 ₽)</div>
+                    <button class="action-btn btn-gold" onclick="addCustomToCart('PLATINUM EDITION', 'gold')">+ PLATINUM EDITION</button>
+                    <div class="btn-tooltip">Ввести цену выше</div>
                 </div>
                 <div class="btn-wrapper">
                     <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
@@ -536,7 +552,7 @@
     let hoverTimer;
     const hoverDelay = 700;
 
-    const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
+    const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
     function toggleCerts() {
         document.getElementById('certsDropdown').classList.toggle('active');
@@ -684,10 +700,16 @@
         renderCart();
     }
 
-    function addPlatToCart() {
-        const p = parseInt(document.getElementById('platPrice').value) || 10000;
-        addToCart('PLATINUM EDITION', p, 'gold');
-        document.getElementById('platPrice').value = '';
+    function addCustomToCart(name, colorClass) {
+        const input = document.getElementById('platPrice');
+        const p = parseInt(input.value);
+        if(!p || isNaN(p)) {
+            alert('Сначала введите цену в поле внизу!');
+            input.focus();
+            return;
+        }
+        addToCart(name, p, colorClass);
+        input.value = '';
     }
 
     function renderCart() {
