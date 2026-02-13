@@ -110,31 +110,35 @@
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
         .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; }
 
-        .progress-container { width: 100%; height: 3px; background: #1a1a1a; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        /* Стиль полосы прогресса */
+        .progress-container { width: 100%; height: 4px; background: #1a1a1a; margin-top: 5px; border-radius: 2px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .progress-bar.complete { background: var(--status-green); box-shadow: 0 0 10px var(--status-green); }
 
-        /* ИСПРАВЛЕННЫЙ ТУЛТИП ДЛЯ ПК */
         .history-row { position: relative; }
+        
+        /* Мобильное модальное окно */
+        .mobile-detail-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
+        }
+        .mobile-detail-card {
+            background: #000; border: 1px solid var(--neon-purple); width: 100%; max-width: 400px;
+            border-radius: 12px; padding: 25px; position: relative; box-shadow: 0 0 30px rgba(191, 0, 255, 0.3);
+        }
+        .close-detail { position: absolute; right: 15px; top: 15px; color: #555; font-size: 20px; cursor: pointer; }
+
+        /* Десктопный тултип (оставляем как было для ПК) */
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 1000; width: 280px; box-shadow: -10px 10px 40px rgba(0,0,0,0.9); 
-            transition: opacity 0.4s ease; pointer-events: none; top: 0; right: 100%; margin-right: 20px;
+            transition: opacity 0.3s ease; pointer-events: none; top: 0; right: 100%; margin-right: 20px;
         }
+        .history-row:hover .history-tooltip { visibility: visible; opacity: 1; }
         
-        @media (min-width: 993px) {
-            .history-row:hover .history-tooltip { 
-                visibility: visible; 
-                opacity: 1; 
-                transition-delay: 0.8s; /* Большая задержка как ты просил */
-            }
-        }
-
         .tooltip-summary { margin-top: 15px; border-top: 1px solid #222; padding-top: 10px; }
         .summary-line { display: flex; justify-content: space-between; font-family: 'Rajdhani'; font-weight: 700; margin-bottom: 4px; }
         .summary-line span:first-child { font-family: 'Orbitron'; font-size: 8px; color: #555; }
-        
-        .tooltip-close { display: none; position: absolute; top: 12px; right: 12px; color: #666; font-size: 18px; cursor: pointer; z-index: 10; }
 
         .certs-container { flex-grow: 1; height: 300px; overflow-y: auto; padding-right: 15px; }
         .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
@@ -167,54 +171,14 @@
             .total-display-pc { width: 100% !important; text-align: center !important; font-size: 40px !important; margin-bottom: 10px !important; color: #fff !important; }
             .session-controls-row { width: 100% !important; flex-direction: column !important; }
             .input-mini, .save-btn { width: 100% !important; height: 50px !important; }
-            
-            /* МОБИЛЬНЫЙ ОТЧЕТ — НОВАЯ ЛОГИКА ШКАЛЫ И ЗАМЕНЫ ОКНА */
             thead { display: none !important; }
-            .history-row { 
-                display: block !important; border: 1px solid #222 !important; 
-                margin-bottom: 15px !important; background: #0a0a0a !important; 
-                padding: 0 !important; position: relative; min-height: 140px; 
-                overflow: hidden;
-            }
-            
-            /* Контент отчета */
-            .row-content { transition: opacity 0.3s; padding: 10px 0; }
-            .row-content.hidden { opacity: 0; pointer-events: none; }
-
-            /* Имя клиента сверху отдельно */
-            .mobile-name-row { 
-                width: 100%; text-align: center; padding: 12px 0; 
-                font-family: 'Orbitron'; font-weight: 700; font-size: 13px; 
-                letter-spacing: 1px; color: #fff; border-bottom: 1px solid #111;
-            }
-
-            /* Шкала прогресса на всю ширину отдельной строкой */
-            .mobile-progress-row { width: 100%; height: 6px; background: #111; position: relative; }
-            .mobile-progress-row .progress-bar { position: absolute; left: 0; top: 0; height: 100%; }
-
-            /* Инфо-строки: Дата слева, Сумма справа */
-            .mobile-info-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 12px 15px; align-items: center; }
-            .mobile-data-left { text-align: left; font-size: 11px; color: #666; font-family: 'Rajdhani'; font-weight: 600; }
-            .mobile-price-right { text-align: right; font-size: 16px; font-weight: 700; color: #fff; font-family: 'Rajdhani'; }
-
-            /* Действия (кошелек) посередине под инфой */
-            .mobile-actions-center { text-align: center; padding-bottom: 15px; }
-            
-            /* Детализация — заменяет всё окно */
-            .history-tooltip { 
-                visibility: hidden; opacity: 0; position: absolute !important; 
-                top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
-                width: 100% !important; height: 100% !important; margin: 0 !important;
-                background: #050505 !important; border: none !important; 
-                z-index: 100 !important; display: flex !important; flex-direction: column;
-                padding: 20px !important; box-sizing: border-box !important;
-                transition: opacity 0.3s; pointer-events: auto !important;
-            }
-            .history-tooltip.active { visibility: visible; opacity: 1; }
-            .tooltip-close { display: block !important; } /* Крестик только на мобилке */
-
+            .history-row { display: block !important; border: 1px solid #222 !important; margin-bottom: 10px !important; background: #0a0a0a !important; padding: 5px 0; }
+            .history-row td { display: flex !important; justify-content: space-between !important; padding: 12px 15px !important; border-bottom: 1px solid #111 !important; align-items: center; }
+            .history-row td::before { content: attr(data-label); font-family: 'Orbitron'; font-size: 8px; color: #555; margin-right: 15px; flex-shrink: 0; }
             .services-cell { display: none !important; }
+            .history-tooltip { display: none !important; }
             .certs-section { order: 4 !important; height: 350px !important; margin-top: 20px !important; }
+            .certs-container { height: 100% !important; }
         }
     </style>
 </head>
@@ -295,7 +259,7 @@
         </div>
 
         <div class="table-container">
-            <table id="crmTable">
+            <table>
                 <colgroup>
                     <col style="width: 100px;">
                     <col style="width: 180px;">
@@ -319,326 +283,18 @@
             </div>
             <div class="cal-grid" id="calendarDays"></div>
         </div>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRING SOUND LAB | CRM & ANALYTICS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { 
-            --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
-            --status-green: #00ff66; --artist-red: #cc0000; --platinum-gold: #b89600;
-            --text-gray: #b0b0b0;
-        }
-        body { background: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; overflow-x: hidden; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid #111; margin-bottom: 20px; }
-        .logo { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); letter-spacing: 2px; font-size: 14px; }
-        
-        .back-btn { color: #888; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #222; padding: 5px 10px; border-radius: 4px; transition: 0.3s; margin-left: 20px; }
-        .back-btn:hover { color: #fff; border-color: var(--neon-purple); }
 
-        .privacy-blur { filter: blur(5px); transition: filter 0.3s ease; }
-        .privacy-active .privacy-blur { filter: blur(0); }
-
-        .unlock-btn {
-            background: transparent; border: 1px solid rgba(255,255,255,0.1);
-            color: #444; font-size: 8px; padding: 2px 8px; border-radius: 4px;
-            cursor: pointer; font-family: 'Orbitron'; margin-bottom: 5px; transition: 0.3s; letter-spacing: 1px;
-        }
-        .unlock-btn:hover { color: var(--neon-purple); border-color: var(--neon-purple); }
-
-        .total-box { 
-            background: var(--neon-purple); padding: 5px 15px; border-radius: 6px; 
-            text-align: center; display: inline-flex; flex-direction: column;
-            justify-content: center; min-width: 120px; box-shadow: 0 4px 15px rgba(191, 0, 255, 0.2);
-        }
-        .income-amount { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: #fff; line-height: 1.1; }
-        #totalLabel { font-size: 7px; display: block; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.9); margin-top: 1px; font-weight: 600; }
-
-        .admin-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; max-width: 1600px; margin: 0 auto; align-items: stretch; }
-        .crm-panel, .side-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #111; display: flex; flex-direction: column; }
-
-        .prepaid-toggle {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 10px 15px; background: #111; border-radius: 6px; border: 1px solid #222;
-            cursor: pointer; transition: 0.3s; user-select: none;
-        }
-        .prepaid-toggle input { display: none; }
-        .prepaid-toggle .toggle-label { font-family: 'Orbitron'; font-size: 9px; color: #555; transition: 0.3s; }
-        .prepaid-toggle input:checked + .toggle-label { color: var(--neon-purple); text-shadow: 0 0 5px var(--neon-purple); }
-        .prepaid-toggle:hover { border-color: var(--neon-purple); }
-
-        .calendar-widget { margin-bottom: 20px; background: #000; border-radius: 10px; padding: 15px; border: 1px solid #222; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .month-name { font-family: 'Orbitron'; color: #fff; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .day-name { font-size: 9px; color: #666; font-weight: bold; padding-bottom: 5px; }
-        .day { font-size: 12px; padding: 8px 0; cursor: pointer; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
-        .day.today { border: 1px solid var(--neon-purple); }
-        .day.has-data { background: #008f39 !important; color: #fff !important; }
-        .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
-        .day:hover { background: #111; }
-
-        .controls-row { display: flex; align-items: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #111; flex-wrap: wrap; }
-        .btn-wrapper { position: relative; display: inline-block; }
-        .action-btn { background: transparent; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.3s; position: relative; }
-        
-        .btn-tooltip { 
-            visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
-            padding: 8px 12px; border-radius: 8px; z-index: 1000; width: auto; white-space: nowrap;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.9); transition: opacity 0.3s ease; pointer-events: none;
-            font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; bottom: 120%; left: 50%; transform: translateX(-50%);
-        }
-        .btn-wrapper:hover .btn-tooltip { visibility: visible; opacity: 1; }
-
-        .btn-white { border: 1px solid #fff; }
-        .btn-purple { border: 1px solid var(--neon-purple); }
-        .btn-red { border: 1px solid var(--artist-red); }
-        .btn-green { border: 1px solid #008f39; }
-        .btn-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
-        .btn-dashed-green { border: 1px dashed #008f39 !important; }
-        .btn-dashed-gold { border: 1px dashed var(--platinum-gold) !important; }
-
-        .platinum-group { display: flex; align-items: center; gap: 10px; border-left: 1px solid #222; padding-left: 10px; }
-        .plat-input { background: #000; border: 1px solid #222; color: var(--platinum-gold); width: 75px; padding: 8px; border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 13px; outline: none; text-align: center; }
-
-        .current-session-box { 
-            background: rgba(191, 0, 255, 0.05); border: 1px solid var(--neon-purple); 
-            padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; 
-            justify-content: space-between; min-height: 175px; align-items: flex-start; position: relative;
-        }
-        .cart-info { flex-grow: 1; display: flex; flex-direction: column; align-items: flex-start; }
-        #cartItems { display: flex; flex-wrap: wrap; gap: 8px; }
-        .cart-tag { font-size: 10px; font-family: 'Orbitron'; padding: 6px 30px 6px 10px; border-radius: 4px; display: inline-flex; align-items: center; position: relative; background: rgba(0,0,0,0.3); }
-        .tag-white { border: 1px solid #fff; color: #fff; }
-        .tag-purple { border: 1px solid var(--neon-purple); color: var(--neon-purple); }
-        .tag-red { border: 1px solid var(--artist-red); color: var(--artist-red); }
-        .tag-green { border: 1px solid #008f39; color: #008f39; }
-        .tag-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
-        .tag-remove { position: absolute; right: 0; top: 0; bottom: 0; width: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.5; }
-        .cart-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; align-self: flex-end; }
-        .total-display-pc { font-family: 'Rajdhani'; font-weight: 700; font-size: 34px; color: #fff; height: 42px; width: 155px; margin-bottom: 8px; text-align: right; }
-        .session-controls-row { display: flex; align-items: center; gap: 10px; width: 320px; }
-        .input-mini { background: #000; border: 1px solid #333; color: #fff; padding: 0 10px; height: 42px; border-radius: 6px; width: 155px; font-size: 13px; font-family: 'Orbitron'; text-align: center; outline: none; }
-        .save-btn { background: #008f39; color: #fff; border: none; height: 42px; width: 155px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
-
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
-        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
-        .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; }
-
-        .progress-container { width: 100%; height: 3px; background: #1a1a1a; margin-top: 5px; border-radius: 2px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .progress-bar.complete { background: var(--status-green); box-shadow: 0 0 10px var(--status-green); }
-
-        /* ИСПРАВЛЕННЫЙ ТУЛТИП ДЛЯ ПК */
-        .history-row { position: relative; }
-        .history-tooltip { 
-            visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
-            padding: 15px; border-radius: 8px; z-index: 1000; width: 280px; box-shadow: -10px 10px 40px rgba(0,0,0,0.9); 
-            transition: opacity 0.4s ease; pointer-events: none; top: 0; right: 100%; margin-right: 20px;
-        }
-        
-        @media (min-width: 993px) {
-            .history-row:hover .history-tooltip { 
-                visibility: visible; 
-                opacity: 1; 
-                transition-delay: 0.8s;
-            }
-        }
-
-        .tooltip-summary { margin-top: 15px; border-top: 1px solid #222; padding-top: 10px; }
-        .summary-line { display: flex; justify-content: space-between; font-family: 'Rajdhani'; font-weight: 700; margin-bottom: 4px; }
-        .summary-line span:first-child { font-family: 'Orbitron'; font-size: 8px; color: #555; }
-        
-        .tooltip-close { display: none; position: absolute; top: 12px; right: 12px; color: var(--neon-purple); font-size: 22px; cursor: pointer; z-index: 110; }
-
-        .certs-container { flex-grow: 1; height: 300px; overflow-y: auto; padding-right: 15px; }
-        .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
-        .cert-id { font-family: 'Rajdhani'; font-weight: 700; color: var(--neon-purple); font-size: 14px; }
-
-        .filter-info { font-size: 10px; color: #888; margin: 15px 0 10px 0; display: flex; justify-content: space-between; font-weight: 600; text-transform: uppercase; }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
-
-        @media (max-width: 992px) {
-            body { padding: 10px; }
-            header { flex-direction: column; gap: 15px; align-items: center; border-bottom: none; }
-            .logo { text-align: center; font-size: 16px; width: 100%; margin-bottom: 5px; }
-            header div[style*="display: flex"] { flex-direction: column !important; align-items: center !important; gap: 12px !important; width: 100%; }
-            .total-box { width: 140px; margin: 0 auto !important; }
-            .back-btn { margin-left: 0 !important; width: fit-content; text-align: center; margin-top: 0; }
-            .admin-grid { display: flex !important; flex-direction: column !important; }
-            .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
-            .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
-            .controls-row { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; padding: 10px !important; margin-bottom: 15px !important; order: 1 !important; }
-            .prepaid-toggle { grid-column: 1 / -1 !important; height: 50px !important; margin-bottom: 5px; }
-            .btn-wrapper { width: 100%; display: block; }
-            .action-btn { width: 100% !important; height: 55px !important; font-size: 9px !important; display: flex; align-items: center; justify-content: center; text-align: center; box-sizing: border-box; }
-            .platinum-group { grid-column: 1 / -1 !important; display: grid !important; grid-template-columns: repeat(2, 1fr) !important; border: none !important; padding: 0 !important; gap: 8px !important; margin-top: 2px; }
-            .platinum-group .btn-wrapper:last-child { grid-column: 1 / -1 !important; }
-            .plat-input { width: 100% !important; height: 55px !important; box-sizing: border-box; }
-            .current-session-box { order: 2 !important; flex-direction: column !important; min-height: auto !important; padding: 15px !important; margin-bottom: 15px !important; border: 1px solid var(--neon-purple) !important; }
-            .cart-actions { width: 100% !important; margin-top: 15px !important; }
-            .total-display-pc { width: 100% !important; text-align: center !important; font-size: 40px !important; margin-bottom: 10px !important; color: #fff !important; }
-            .session-controls-row { width: 100% !important; flex-direction: column !important; }
-            .input-mini, .save-btn { width: 100% !important; height: 50px !important; }
-            
-            /* МОБИЛЬНЫЙ ОТЧЕТ — ПОРЯДОК И ЛОГИКА */
-            thead { display: none !important; }
-            .history-row { 
-                display: block !important; border: 1px solid #222 !important; 
-                margin-bottom: 15px !important; background: #0a0a0a !important; 
-                padding: 0 !important; position: relative; min-height: 140px; 
-                overflow: hidden;
-            }
-            
-            .row-content { transition: opacity 0.3s; padding: 0; }
-            .row-content.hidden { opacity: 0; pointer-events: none; }
-
-            .mobile-name-row { 
-                width: 100%; text-align: center; padding: 15px 0; 
-                font-family: 'Orbitron'; font-weight: 700; font-size: 13px; 
-                letter-spacing: 1px; color: #fff; cursor: pointer;
-            }
-
-            .mobile-progress-row { width: 100%; height: 8px; background: #111; position: relative; }
-            .mobile-progress-row .progress-bar { position: absolute; left: 0; top: 0; height: 100%; }
-
-            .mobile-info-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 15px; align-items: center; }
-            .mobile-data-left { text-align: left; font-size: 12px; color: #666; font-family: 'Rajdhani'; font-weight: 600; }
-            .mobile-price-right { text-align: right; font-size: 18px; font-weight: 700; color: #fff; font-family: 'Rajdhani'; }
-
-            .mobile-actions-center { text-align: center; padding-bottom: 20px; }
-            
-            /* Детализация — заменяет всё окно */
-            .history-tooltip { 
-                visibility: hidden; opacity: 0; position: absolute !important; 
-                top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
-                width: 100% !important; height: 100% !important; margin: 0 !important;
-                background: #000 !important; border: 1px solid var(--neon-purple) !important; 
-                z-index: 100 !important; display: flex !important; flex-direction: column;
-                padding: 20px !important; box-sizing: border-box !important;
-                transition: opacity 0.3s; pointer-events: auto !important;
-            }
-            .history-tooltip.active { visibility: visible; opacity: 1; }
-            .tooltip-close { display: block !important; }
-
-            .services-cell { display: none !important; }
-            .certs-section { order: 4 !important; height: 350px !important; margin-top: 20px !important; }
-        }
-    </style>
-</head>
-<body>
-
-<header>
-    <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
-    <div style="display: flex; align-items: center;">
-        <div style="display: flex; flex-direction: column; align-items: center;">
-            <button class="unlock-btn" onclick="checkPrivacyPassword()">UNLOCK</button>
-            <div class="total-box">
-                <span id="monthTotal" class="income-amount privacy-blur">0 ₽</span>
-                <span id="totalLabel">ДОХОД ЗА МЕСЯЦ</span>
-            </div>
-        </div>
-        <a href="index.html" class="back-btn">Выйти на сайт</a>
-    </div>
-</header>
-
-<div class="admin-grid">
-    <div class="crm-panel">
-        <div class="controls-row">
-            <label class="prepaid-toggle">
-                <input type="checkbox" id="prepaidMode" onchange="applyPrepaidToggle()">
-                <span class="toggle-label">50% PREPAID</span>
-            </label>
-
-            <div class="btn-wrapper">
-                <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
-                <div class="btn-tooltip">900 ₽ (Всегда 100%)</div>
-            </div>
-            <div class="btn-wrapper">
-                <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
-                <div class="btn-tooltip">3500 ₽</div>
-            </div>
-            <div class="btn-wrapper">
-                <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
-                <div class="btn-tooltip">6000 ₽</div>
-            </div>
-            <div class="btn-wrapper">
-                <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
-                <div class="btn-tooltip">1000 ₽</div>
-            </div>
-            <div class="btn-wrapper">
-                <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
-                <div class="btn-tooltip">500 ₽</div>
-            </div>
-            
-            <div class="platinum-group">
-                <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
-                <div class="btn-wrapper">
-                    <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM EDITION</button>
-                    <div class="btn-tooltip">База (по умолч. 10к)</div>
-                </div>
-                <div class="btn-wrapper">
-                    <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
-                    <div class="btn-tooltip">300 ₽</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="currentSession" class="current-session-box">
-            <div class="cart-info">
-                <div id="sessionDateLabel" style="font-size: 10px; color: #444; margin-bottom: 12px; font-family:'Orbitron'; letter-spacing: 1px;">ТЕКУЩИЙ ЧЕК:</div>
-                <div id="cartItems">Пусто...</div>
-            </div>
-            <div class="cart-actions">
-                <div class="total-display-pc" id="cartTotal">0 ₽</div>
-                <div class="session-controls-row">
-                    <input type="text" id="clientName" class="input-mini" placeholder="ИМЯ КЛИЕНТА">
-                    <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-info">
-            <span id="currentViewText">ОТЧЕТ ЗА ФЕВРАЛЬ 2026</span>
-        </div>
-
-        <div class="table-container">
-            <table id="crmTable">
-                <colgroup>
-                    <col style="width: 100px;">
-                    <col style="width: 180px;">
-                    <col>
-                    <col style="width: 120px;">
-                    <col style="width: 80px;">
-                </colgroup>
-                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right">ВНЕСЕНО</th><th>ДЕЙСТВИЯ</th></tr></thead>
-                <tbody id="crmTableBody"></tbody>
-            </table>
-        </div>
-        <button onclick="clearFullHistory()" style="margin-top:40px; background:none; border:none; color:#222; font-size:8px; cursor:pointer; text-transform:uppercase;">Удалить всю историю</button>
-    </div>
-
-    <div class="side-panel">
-        <div class="calendar-widget">
-            <div class="cal-header">
-                <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(-1)"></i>
-                <div class="month-name" id="calMonthName" onclick="filterByMonth()">ФЕВРАЛЬ 2026</div>
-                <i class="fas fa-chevron-right" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(1)"></i>
-            </div>
-            <div class="cal-grid" id="calendarDays"></div>
-        </div>
         <div class="certs-section" style="display:flex; flex-direction:column; flex-grow:1;">
             <h2 style="font-family:'Orbitron'; font-size:14px; margin-bottom:15px; color:#fff;">СЕРТИФИКАТЫ</h2>
             <div class="certs-container" id="certsList"></div>
         </div>
+    </div>
+</div>
+
+<div id="mobileDetailOverlay" class="mobile-detail-overlay" onclick="closeMobileDetails()">
+    <div class="mobile-detail-card" onclick="event.stopPropagation()">
+        <span class="close-detail" onclick="closeMobileDetails()">×</span>
+        <div id="mobileDetailContent"></div>
     </div>
 </div>
 
@@ -647,6 +303,7 @@
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
+    let touchTimer; // Для мобильного зажатия
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
@@ -767,6 +424,7 @@
         const row = crmData[index];
         const remaining = row.fullTotal - row.total;
         const amount = prompt(`Доплата для ${row.client}.\nОстаток: ${remaining} ₽.\nВведите сумму доплаты:`, remaining);
+        
         if (amount !== null && !isNaN(amount) && amount !== "") {
             row.total += parseInt(amount);
             localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
@@ -774,34 +432,54 @@
         }
     }
 
-    // ИСПРАВЛЕННАЯ ЛОГИКА ЗАЖАТИЯ: Только на имени
-    function setupMobileDetailLogic(triggerElement, tooltipId, rowId) {
-        let pressTimer;
-        const tooltip = document.getElementById(tooltipId);
-        const row = document.getElementById(rowId);
-        const content = row.querySelector('.row-content');
+    /* ФУНКЦИИ ДЛЯ МОБИЛЬНОЙ ДЕТАЛИЗАЦИИ */
+    function showMobileDetails(index) {
+        const row = crmData[index];
+        const full = row.fullTotal || row.total;
+        const paid = row.total;
+        const content = document.getElementById('mobileDetailContent');
+        
+        let html = `<div style="color:var(--neon-purple); font-family:Orbitron; font-size:12px; margin-bottom:20px; text-align:center; letter-spacing:1px;">ДЕТАЛИЗАЦИЯ УСЛУГ</div>`;
+        
+        row.details.forEach(d => {
+            html += `
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:13px; border-left:3px solid ${colorMap[d.colorClass]}; padding-left:12px;">
+                <span style="color:${colorMap[d.colorClass]}">${d.name}</span>
+                <span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span>
+            </div>`;
+        });
 
-        const start = (e) => {
-            pressTimer = setTimeout(() => {
-                tooltip.classList.add('active');
-                content.classList.add('hidden');
-                if (window.navigator.vibrate) window.navigator.vibrate(50);
-            }, 600);
-        };
+        html += `
+        <div style="margin-top:25px; border-top:1px solid #222; padding-top:15px;">
+            <div style="display:flex; justify-content:space-between; font-family:Rajdhani; font-weight:700; font-size:16px; margin-bottom:8px;">
+                <span style="font-family:Orbitron; font-size:9px; color:#555;">ИТОГО ЧЕК</span>
+                <span>${full} ₽</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-family:Rajdhani; font-weight:700; font-size:16px; margin-bottom:8px;">
+                <span style="font-family:Orbitron; font-size:9px; color:#555;">ВНЕСЕНО</span>
+                <span style="color:var(--status-green)">${paid} ₽</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-family:Rajdhani; font-weight:700; font-size:16px;">
+                <span style="font-family:Orbitron; font-size:9px; color:#555;">ОСТАТОК</span>
+                <span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span>
+            </div>
+        </div>`;
 
-        const cancel = () => { clearTimeout(pressTimer); };
-
-        triggerElement.addEventListener('touchstart', start);
-        triggerElement.addEventListener('touchend', cancel);
-        triggerElement.addEventListener('touchmove', cancel);
+        content.innerHTML = html;
+        document.getElementById('mobileDetailOverlay').style.display = 'flex';
     }
 
-    function closeMobileDetail(tooltipId, rowId) {
-        const tooltip = document.getElementById(tooltipId);
-        const row = document.getElementById(rowId);
-        const content = row.querySelector('.row-content');
-        tooltip.classList.remove('active');
-        content.classList.remove('hidden');
+    function closeMobileDetails() {
+        document.getElementById('mobileDetailOverlay').style.display = 'none';
+    }
+
+    /* ОБРАБОТКА ЗАЖАТИЯ ДЛЯ МОБИЛОК */
+    function setupLongPress(element, index) {
+        element.addEventListener('touchstart', () => {
+            touchTimer = setTimeout(() => showMobileDetails(index), 600);
+        });
+        element.addEventListener('touchend', () => clearTimeout(touchTimer));
+        element.addEventListener('touchmove', () => clearTimeout(touchTimer));
     }
 
     function updateTable() {
@@ -811,87 +489,48 @@
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         
         const sorted = [...crmData].sort((a,b) => {
-            const dateA = a.date.split('.').reverse().join('');
-            const dateB = b.date.split('.').reverse().join('');
-            if (dateA !== dateB) return dateB.localeCompare(dateA);
-            return b.timestamp - a.timestamp;
+            const da = a.date.split('.').reverse().join('');
+            const db = b.date.split('.').reverse().join('');
+            return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
         });
 
-        sorted.forEach((row, idx) => {
+        sorted.forEach(row => {
             if (!row.date.includes(mKey)) return;
             const full = row.fullTotal || row.total;
             const paid = row.total;
             const perc = Math.min((paid / full) * 100, 100);
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
-            const tIdMobile = `tt-mob-${idx}`;
-            const tIdPc = `tt-pc-${idx}`;
-            const rId = `row-${idx}`;
             
-            let detailsHtml = '';
-            row.details.forEach(d => {
-                detailsHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
-            });
-
             const tr = document.createElement('tr');
             tr.className = 'history-row';
-            tr.id = rId;
+
+            // Десктопный тултип
+            let tooltip = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+            row.details.forEach(d => {
+                tooltip += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+            });
+            tooltip += `<div class="tooltip-summary"><div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div></div>`;
 
             tr.innerHTML = `
-                <td class="pc-only">${row.date}</td>
-                <td class="pc-only">
+                <td data-label="ДАТА">${row.date}</td>
+                <td data-label="КЛИЕНТ" class="client-cell-trigger">
                     <div style="font-weight:600;">${row.client}</div>
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
-                <td class="pc-only" style="position:relative;">
-                    ${row.services}
-                    <div class="history-tooltip" id="${tIdPc}">
-                        <div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:8px; margin-bottom:12px; text-align:left;">ДЕТАЛИЗАЦИЯ:</div>
-                        <div style="flex-grow:1; overflow-y:auto;">${detailsHtml}</div>
-                        <div class="tooltip-summary">
-                            <div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div>
-                            <div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div>
-                            <div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div>
-                        </div>
-                    </div>
-                </td>
-                <td class="price-cell privacy-blur pc-only">${paid} ₽</td>
-                <td class="pc-only" style="text-align:right;">
-                    <i class="fas fa-wallet" style="color:#444; cursor:pointer; font-size:12px; margin-right:15px;" onclick="addPayment(${realIndex})"></i>
+                <td class="services-cell" style="position:relative;">${row.services}${tooltip}</td>
+                <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
+                <td data-label="ДЕЙСТВИЯ" style="text-align:right;">
+                    <i class="fas fa-wallet" style="color:#444; cursor:pointer; font-size:12px; margin-right:15px; transition:0.3s;" title="Доплатить" onclick="addPayment(${realIndex})"></i>
                     <i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${realIndex})"></i>
                 </td>
-
-                <div class="row-content mobile-only">
-                    <div class="mobile-name-row" id="trigger-${idx}">${row.client}</div>
-                    <div class="mobile-progress-row">
-                        <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
-                    </div>
-                    <div class="mobile-info-grid">
-                        <div class="mobile-data-left">${row.date}</div>
-                        <div class="mobile-price-right privacy-blur">${paid} ₽</div>
-                    </div>
-                    <div class="mobile-actions-center">
-                         <i class="fas fa-wallet" style="color:#444; font-size:16px; margin: 0 20px;" onclick="addPayment(${realIndex})"></i>
-                         <i class="fas fa-trash" style="color:#222; font-size:14px;" onclick="deleteRow(${realIndex})"></i>
-                    </div>
-                </div>
-                
-                <div class="history-tooltip mobile-only" id="${tIdMobile}">
-                    <i class="fas fa-times tooltip-close" onclick="closeMobileDetail('${tIdMobile}', '${rId}')"></i>
-                    <div style="color:var(--neon-purple); font-family:Orbitron; font-size:10px; margin-bottom:15px; letter-spacing:1px;">ДЕТАЛИЗАЦИЯ УСЛУГ:</div>
-                    <div style="flex-grow:1; overflow-y:auto;">${detailsHtml}</div>
-                    <div class="tooltip-summary">
-                        <div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div>
-                        <div class="summary-line"><span>ОПЛАЧЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div>
-                    </div>
-                </div>
             `;
+
+            // Навешиваем зажатие на ячейку с именем
+            const cellTrigger = tr.querySelector('.client-cell-trigger');
+            setupLongPress(cellTrigger, realIndex);
+
             body.appendChild(tr);
-            
-            if (window.innerWidth <= 992) {
-                const trigger = document.getElementById(`trigger-${idx}`);
-                setupMobileDetailLogic(trigger, tIdMobile, rId);
-            }
         });
         updateMonthTotal();
     }
@@ -916,21 +555,21 @@
             const d = saved[id] || { active: false, name: '' };
             const div = document.createElement('div');
             div.className = 'cert-row';
-            div.innerHTML = `<span class="cert-id">${id}</span>${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:3px 7px; border-radius:3px; cursor:pointer;">ACTIVATE</button>`}`;
+            div.innerHTML = `<span class="cert-id">${id}</span>${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}`;
             list.appendChild(div);
         }
     }
 
     function activateCert(id) {
-        const name = document.getElementById('in-' + id).value || 'Клиент';
-        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
-        saved[id] = { active: true, name: name };
-        localStorage.setItem('spring_certs', JSON.stringify(saved));
+        const n = document.getElementById('in-' + id).value;
+        if (!n) return alert('Имя!');
+        const s = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        s[id] = { active: true, name: n };
+        localStorage.setItem('spring_certs', JSON.stringify(s));
         updateCerts();
     }
 
-    window.onload = () => { renderCalendar(); updateTable(); updateCerts(); renderCart(); };
+    renderCalendar(); updateTable(); updateCerts();
 </script>
-
 </body>
 </html>
