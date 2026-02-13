@@ -176,6 +176,44 @@
         .m-cancel { background: #222; color: #888; }
         .m-delete { background: var(--artist-red); color: #fff; }
 
+        /* СТИЛИ СЕРТИФИКАТОВ (ВЕРХНИЙ АККОРДЕОН) */
+        .certs-dropdown {
+            margin-bottom: 20px;
+            border: 1px solid #222;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #000;
+        }
+        .certs-header {
+            background: #000;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .certs-header:hover { background: #0a0a0a; }
+        .certs-header h2 {
+            font-family: 'Orbitron';
+            font-size: 11px;
+            margin: 0;
+            color: var(--neon-purple);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .certs-header i { color: var(--neon-purple); font-size: 10px; transition: 0.3s; }
+        .certs-content {
+            display: none;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 0 15px 15px 15px;
+            border-top: 1px solid #111;
+        }
+        .certs-dropdown.active .certs-content { display: block; }
+        .certs-dropdown.active .certs-header i { transform: rotate(180deg); }
+
         .calendar-widget { flex-shrink: 0; margin-bottom: 20px; background: #000; border-radius: 10px; padding: 15px; border: 1px solid #222; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .month-name { font-family: 'Orbitron'; color: #fff; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
@@ -201,12 +239,18 @@
 
         .future-sessions-widget {
             background: rgba(0,0,0,0.5); border: 1px solid #111; border-radius: 10px; padding: 15px; margin-bottom: 20px; flex-shrink: 0;
-            transition: 0.3s;
+            transition: 0.3s; max-height: 200px; overflow-y: auto;
         }
         .future-title { font-family: 'Orbitron'; font-size: 9px; color: #444; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
-        .future-info { display: flex; align-items: center; gap: 12px; }
-        .future-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: var(--neon-purple); line-height: 1; }
-        .future-client { font-family: 'Inter'; font-weight: 600; font-size: 14px; color: #fff; }
+        
+        .future-item { 
+            display: flex; align-items: center; gap: 12px; padding: 8px 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+        .future-item:last-child { border-bottom: none; }
+        
+        .future-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: var(--neon-purple); min-width: 55px; }
+        .future-client { font-family: 'Inter'; font-weight: 600; font-size: 13px; color: #fff; }
 
         .prepaid-toggle { display: flex; align-items: center; gap: 10px; margin-right: 15px; padding: 5px 12px; border-right: 1px solid #222; }
         .prepaid-toggle span { font-family: 'Orbitron'; font-size: 9px; color: var(--neon-purple); }
@@ -275,7 +319,6 @@
         th:nth-child(4), td:nth-child(4) { width: 110px; }
         th:nth-child(5), td:nth-child(5) { width: 120px; }
 
-        /* ВРЕМЯ СПРАВА ОТ ИМЕНИ */
         .table-time-inline { font-family: 'Rajdhani'; font-weight: 700; font-size: 16px; color: var(--neon-purple); margin-left: 10px; }
 
         .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
@@ -287,7 +330,6 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
-        /* ДЕТАЛИЗАЦИЯ: БЛЮР ЦИФР */
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
@@ -416,6 +458,16 @@
     </div>
 
     <div class="side-panel">
+        <div class="certs-dropdown" id="certsDropdown">
+            <div class="certs-header" onclick="toggleCerts()">
+                <h2>СЕРТИФИКАТЫ</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="certs-content">
+                <div class="certs-container" id="certsList"></div>
+            </div>
+        </div>
+
         <div class="calendar-widget">
             <div class="cal-header">
                 <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(-1)"></i>
@@ -435,15 +487,12 @@
 
         <div class="future-sessions-widget" id="nextSessionBox">
             <div class="future-title" id="futureTitleLabel">Ближайшая запись</div>
-            <div class="future-info">
-                <div class="future-date" id="nextSessionDate">--</div>
-                <div class="future-client" id="nextSessionClient">Нет записей</div>
+            <div id="futureListContainer">
+                <div class="future-item">
+                    <div class="future-date" id="nextSessionDate">--</div>
+                    <div class="future-client" id="nextSessionClient">Нет записей</div>
+                </div>
             </div>
-        </div>
-
-        <div class="certs-section" style="display:flex; flex-direction:column; flex-grow:1; overflow:hidden;">
-            <h2 style="font-family:'Orbitron'; font-size:14px; margin-bottom:15px; color:#fff; flex-shrink:0;">СЕРТИФИКАТЫ</h2>
-            <div class="certs-container" id="certsList"></div>
         </div>
     </div>
 </div>
@@ -458,6 +507,11 @@
     const hoverDelay = 700;
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
+
+    // Функция переключения видимости сертификатов
+    function toggleCerts() {
+        document.getElementById('certsDropdown').classList.toggle('active');
+    }
 
     function formatTimeInput(input) {
         let val = input.value.replace(/\D/g, '');
@@ -516,7 +570,7 @@
             if (pass === '123') {
                 document.body.classList.add('privacy-active');
                 closeModal();
-                updateTable(); // перерендер чтобы обновить блюр в тултипах
+                updateTable(); 
             } else { alert("Неверный пароль"); }
         });
     }
@@ -554,7 +608,7 @@
         const label = document.getElementById('sessionDateLabel');
         if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
         renderCalendar();
-        updateNextSession(date); // Показываем данные выбранного дня в виджете
+        updateNextSession(date); 
     }
 
     function changeMonth(dir) { 
@@ -707,7 +761,6 @@
             });
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
-            // ВРЕМЯ СПРАВА ОТ ИМЕНИ
             let timeDisplay = row.time ? `<span class="table-time-inline">${row.time}</span>` : '';
 
             tr.innerHTML = `
@@ -771,12 +824,10 @@
         updateCerts();
     }
 
-    // ОБНОВЛЕННАЯ ЛОГИКА «БЛИЖАЙШАЯ ЗАПИСЬ» (ИНТЕРАКТИВ С КАЛЕНДАРЕМ)
     function updateNextSession(clickedDate = null) {
-        const dateEl = document.getElementById('nextSessionDate');
-        const clientEl = document.getElementById('nextSessionClient');
+        const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
-        if (!dateEl || !clientEl) return;
+        if (!container) return;
 
         const now = new Date();
         const todayStr = now.toLocaleDateString('ru-RU');
@@ -786,7 +837,6 @@
 
         let targetDate = clickedDate;
         
-        // Если дата не нажата, ищем сегодня, потом завтра
         if (!targetDate) {
             const hasToday = crmData.some(r => r.date === todayStr && r.time);
             if (hasToday) targetDate = todayStr;
@@ -796,18 +846,31 @@
             }
         }
 
-        const sessions = crmData.filter(r => r.date === targetDate && r.time);
+        const sessions = crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
         
+        container.innerHTML = ''; 
+
         if (sessions.length > 0) {
-            const next = sessions[0];
-            titleEl.innerText = (targetDate === todayStr) ? "Запись на сегодня" : (targetDate === tomorrowStr ? "Запись на завтра" : `Запись на ${targetDate}`);
-            dateEl.innerText = next.time;
-            clientEl.innerText = next.client;
+            titleEl.innerText = (targetDate === todayStr) ? "Записи на сегодня" : (targetDate === tomorrowStr ? "Записи на завтра" : `Записи на ${targetDate}`);
+            
+            sessions.forEach(next => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'future-item';
+                itemDiv.innerHTML = `
+                    <div class="future-date">${next.time}</div>
+                    <div class="future-client">${next.client}</div>
+                `;
+                container.appendChild(itemDiv);
+            });
             document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
         } else {
             titleEl.innerText = "Ближайшая запись";
-            dateEl.innerText = "--";
-            clientEl.innerText = "Нет записей";
+            container.innerHTML = `
+                <div class="future-item">
+                    <div class="future-date">--</div>
+                    <div class="future-client">Нет записей</div>
+                </div>
+            `;
             document.getElementById('nextSessionBox').style.borderColor = '#111';
         }
     }
