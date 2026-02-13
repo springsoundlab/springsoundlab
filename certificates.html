@@ -1214,35 +1214,33 @@
         document.getElementById('admin-overlay').style.display = 'none';
     }
 
-function checkAdminAuth(e) {
-        if (e) e.preventDefault(); // Останавливаем любое всплытие события
+function checkAdminAuth(event) {
+    // 1. Остановка закрытия окна при клике
+    if (event) event.stopPropagation();
 
-        const userLogin = document.getElementById('admin-login').value.trim();
-        const userPass = document.getElementById('admin-pass').value.trim();
-        const btn = document.getElementById('auth-submit-btn'); // Ищем по ID
+    const userLogin = document.getElementById('admin-login').value.trim();
+    const userPass = document.getElementById('admin-pass').value.trim();
+    const btn = document.querySelector('#admin-panel button');
 
-        // ТВОИ ДАННЫЕ ДЛЯ ВХОДА: admin ssl / 080808
-        if (userLogin === 'admin ssl' && userPass === '080808') {
-            btn.innerHTML = 'ACCESS GRANTED...';
-            btn.style.background = '#006400'; 
-            btn.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.4)';
-            
-            setTimeout(() => {
-                window.location.href = 'certificates.html'; 
-            }, 600);
-        } else {
-            // Если данные неверны — окно НЕ закрывается, а кнопка краснеет
-            const originalColor = 'var(--neon-purple)';
-            btn.style.background = '#8B0000';
-            btn.innerHTML = 'DENIED';
-            
-            setTimeout(() => {
-                btn.style.background = originalColor;
-                btn.innerHTML = 'AUTHENTICATE';
-                document.getElementById('admin-pass').value = ''; 
-            }, 1000);
-        }
+    // 2. Проверка данных
+    if (userLogin === 'admin ssl' && userPass === '080808') {
+        btn.innerHTML = 'ACCESS GRANTED...';
+        btn.style.background = '#006400'; 
+        setTimeout(() => {
+            window.location.href = 'certificates.html'; 
+        }, 600);
+    } else {
+        // Если данные неверны, окно останется открытым
+        const originalColor = 'var(--neon-purple)';
+        btn.style.background = '#8B0000';
+        btn.innerHTML = 'DENIED';
+        setTimeout(() => {
+            btn.style.background = originalColor;
+            btn.innerHTML = 'AUTHENTICATE';
+            document.getElementById('admin-pass').value = '';
+        }, 1000);
     }
+}
 
     document.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && document.getElementById('admin-panel').style.display === 'block') {
@@ -1261,7 +1259,7 @@ function checkAdminAuth(e) {
     
     <input type="password" id="admin-pass" placeholder="PASSWORD" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 20px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
     
-    <button onclick="checkAdminAuth()" style="width: 100%; padding: 12px; background: var(--neon-purple); border: none; color: #fff; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.3s; letter-spacing: 1px; font-family: 'Orbitron', sans-serif;">AUTHENTICATE</button>
+    <button type="button" onclick="checkAdminAuth(event)" style="width: 100%; padding: 12px; background: var(--neon-purple); border: none; color: #fff; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.3s; letter-spacing: 1px; font-family: 'Orbitron', sans-serif;">AUTHENTICATE</button>
     
     <div onclick="closeAdmin()" style="margin-top: 20px; color: #333; font-size: 9px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Abort Mission</div>
 </div>
