@@ -126,11 +126,12 @@
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
-            pointer-events: none; transform: translate(15px, 15px);
+            pointer-events: none; /* ВАЖНО: КЛИКИ ПРОХОДЯТ СКВОЗЬ НЕГО */
+            transform: translate(15px, 15px);
             transition: opacity 0.3s ease;
         }
         .services-cell:hover .history-tooltip { 
-            transition-delay: 1s; /* Задержка 1 секунда */
+            transition-delay: 1s; /* Задержка 1 секунда как в оригинале */
             visibility: visible; opacity: 1; 
         }
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
@@ -287,10 +288,8 @@
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
-
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
-    // Обработка движения мыши для тултипа
     document.addEventListener('mousemove', (e) => {
         const tooltips = document.querySelectorAll('.history-tooltip');
         tooltips.forEach(t => {
@@ -317,11 +316,9 @@
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         monthName.innerText = `${monthNames[month]} ${year}`;
-        
         ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'].forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
         let startingSpace = firstDay === 0 ? 6 : firstDay - 1;
         for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
-        
         for(let d=1; d<=daysInMonth; d++) {
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
             const hasData = crmData.some(row => row.date === dateStr);
@@ -370,7 +367,6 @@
         const isPrepaid = document.getElementById('prepaidMode').checked;
         let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
         let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
-        
         currentCart.details.push({ name: finalName, price: finalPrice, basePrice: price, colorClass });
         currentCart.items.push({ name: finalName, colorClass });
         currentCart.total += finalPrice;
@@ -411,7 +407,6 @@
         if (currentCart.items.length === 0) return alert('Добавьте услуги!');
         const name = document.getElementById('clientName').value || 'Без имени';
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
-        
         crmData.push({ 
             date, client: name, 
             services: currentCart.items.map(i => i.name).join(', '), 
@@ -420,23 +415,18 @@
             fullTotal: currentCart.fullPriceTotal,
             timestamp: Date.now() 
         });
-        
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         document.getElementById('clientName').value = '';
         renderCart(); updateTable(); renderCalendar();
     }
 
-    // Улучшенная функция доплаты
     function addPayment(index) {
         const row = crmData[index];
         const full = row.fullTotal || row.total;
         const remaining = full - row.total;
-        
         if (remaining <= 0) return alert('Заказ уже полностью оплачен');
-
         const amountStr = prompt(`Доплата для ${row.client}.\nОстаток к оплате: ${remaining} ₽.\nНажмите ОК, чтобы внести всю сумму.`, remaining);
-        
         if (amountStr !== null) {
             const amount = parseInt(amountStr);
             if (!isNaN(amount) && amount > 0) {
@@ -452,13 +442,11 @@
         if(!body) return;
         body.innerHTML = '';
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        
         const sorted = [...crmData].sort((a,b) => {
             const da = a.date.split('.').reverse().join('');
             const db = b.date.split('.').reverse().join('');
             return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
         });
-
         sorted.forEach(row => {
             if (!row.date.includes(mKey)) return;
             const full = row.fullTotal || row.total;
@@ -466,16 +454,13 @@
             const perc = Math.min((paid / full) * 100, 100);
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
-            
             const tr = document.createElement('tr');
             tr.className = 'history-row';
-
             let tooltip = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
                 tooltip += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
             tooltip += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
-
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
                 <td data-label="КЛИЕНТ">
