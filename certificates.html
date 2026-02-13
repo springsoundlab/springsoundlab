@@ -427,80 +427,91 @@
         renderCart(); updateTable(); renderCalendar();
     }
 
-    // Улучшенная функция доплаты
     function addPayment(index) {
-        const row = crmData[index];
-        const full = row.fullTotal || row.total;
-        const remaining = full - row.total;
-        
-        if (remaining <= 0) return alert('Заказ уже полностью оплачен');
+    const row = crmData[index];
+    const full = row.fullTotal || row.total;
+    const paid = row.total;
+    const remaining = full - paid;
+    
+    if (remaining <= 0) {
+        alert('Заказ полностью оплачен!');
+        return;
+    }
 
-        const amountStr = prompt(`Доплата для ${row.client}.\nОстаток к оплате: ${remaining} ₽.\nНажмите ОК, чтобы внести всю сумму.`, remaining);
-        
-        if (amountStr !== null) {
-            const amount = parseInt(amountStr);
-            if (!isNaN(amount) && amount > 0) {
-                row.total += amount;
-                localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-                updateTable();
-            }
+    // Окно ввода сразу содержит остаток долга
+    const amountStr = prompt(`Клиент: ${row.client}\nОбщая сумма: ${full} ₽\nУже внесено: ${paid} ₽\n\nВведите сумму доплаты:`, remaining);
+    
+    if (amountStr !== null) {
+        const amount = parseInt(amountStr);
+        if (!isNaN(amount) && amount > 0) {
+            // Увеличиваем внесенную сумму
+            row.total += amount;
+            
+            // Сохраняем и обновляем визуал
+            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+            updateTable(); 
+            renderCalendar();
+        } else {
+            alert('Введите корректное число');
         }
     }
+}
 
     function updateTable() {
-        const body = document.getElementById('crmTableBody');
-        if(!body) return;
-        body.innerHTML = '';
-        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+    const body = document.getElementById('crmTableBody');
+    if(!body) return;
+    body.innerHTML = '';
+    const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+    
+    const sorted = [...crmData].sort((a,b) => {
+        const da = a.date.split('.').reverse().join('');
+        const db = b.date.split('.').reverse().join('');
+        return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
+    });
+
+    sorted.forEach(row => {
+        if (!row.date.includes(mKey)) return;
+        const full = row.fullTotal || row.total;
+        const paid = row.total;
+        const perc = Math.min((paid / full) * 100, 100);
+        const isComplete = perc >= 100;
+        const realIndex = crmData.indexOf(row);
         
-        const sorted = [...crmData].sort((a,b) => {
-            const da = a.date.split('.').reverse().join('');
-            const db = b.date.split('.').reverse().join('');
-            return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
+        const tr = document.createElement('tr');
+        tr.className = 'history-row';
+
+        // Тултип детализации (показывается через 1 сек наведения)
+        let tooltip = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+        row.details.forEach(d => {
+            tooltip += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
         });
+        tooltip += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
-        sorted.forEach(row => {
-            if (!row.date.includes(mKey)) return;
-            const full = row.fullTotal || row.total;
-            const paid = row.total;
-            const perc = Math.min((paid / full) * 100, 100);
-            const isComplete = perc >= 100;
-            const realIndex = crmData.indexOf(row);
-            
-            const tr = document.createElement('tr');
-            tr.className = 'history-row';
-
-            let tooltip = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
-            row.details.forEach(d => {
-                tooltip += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
-            });
-            tooltip += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
-
-            tr.innerHTML = `
-                <td data-label="ДАТА">${row.date}</td>
-                <td data-label="КЛИЕНТ">
-                    <div style="font-weight:600;">${row.client}</div>
-                    <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
-                </td>
-                <td class="services-cell" style="position:relative;">${row.services}${tooltip}</td>
-                <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
-                <td data-label="ДЕЙСТВИЯ">
-                    <div class="action-icons-wrap">
-                        <div class="icon-btn-box" onclick="addPayment(${realIndex})">
-                            <span>доплата</span>
-                            <i class="fas fa-wallet"></i>
-                        </div>
-                        <div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})">
-                            <span>удалить</span>
-                            <i class="fas fa-trash"></i>
-                        </div>
+        tr.innerHTML = `
+            <td data-label="ДАТА">${row.date}</td>
+            <td data-label="КЛИЕНТ">
+                <div style="font-weight:600;">${row.client}</div>
+                <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
+            </td>
+            <td class="services-cell" style="position:relative;">${row.services}${tooltip}</td>
+            <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
+            <td data-label="ДЕЙСТВИЯ">
+                <div class="action-icons-wrap">
+                    <div class="icon-btn-box" onclick="addPayment(${realIndex})" style="cursor:pointer;">
+                        <span>доплата</span>
+                        <i class="fas fa-wallet"></i>
                     </div>
-                </td>
-            `;
-            body.appendChild(tr);
-        });
-        updateMonthTotal();
-    }
+                    <div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})" style="cursor:pointer;">
+                        <span>удалить</span>
+                        <i class="fas fa-trash"></i>
+                    </div>
+                </div>
+            </td>
+        `;
+        body.appendChild(tr);
+    });
+    updateMonthTotal();
+}
 
     function updateMonthTotal() {
         const el = document.getElementById('monthTotal');
