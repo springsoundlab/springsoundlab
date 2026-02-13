@@ -105,30 +105,22 @@
         .input-mini { background: #000; border: 1px solid #333; color: #fff; padding: 0 10px; height: 42px; border-radius: 6px; width: 155px; font-size: 13px; font-family: 'Orbitron'; text-align: center; outline: none; }
         .save-btn { background: var(--status-green); color: #fff; border: none; height: 42px; width: 155px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
-        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; position: relative; z-index: 2; }
-        .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; width: 100px; text-align: right; }
+        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
+        .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; }
 
-        /* НОВЫЙ СТИЛЬ: СТРОКА-ШКАЛА */
-        .history-row { position: relative; transition: 0.3s; }
-        .history-row::before {
-            content: ''; position: absolute; top: 0; left: 0; bottom: 0;
-            width: var(--progress-width, 0%);
-            background: linear-gradient(90deg, rgba(191, 0, 255, 0.08) 0%, rgba(191, 0, 255, 0) 100%);
-            z-index: 1; pointer-events: none; transition: width 0.8s ease;
-        }
+        /* ЯРКАЯ УЗКАЯ ШКАЛА ПРОГРЕССА */
+        .progress-container { width: 100%; height: 3px; background: #1a1a1a; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        /* ОКНО ДЕТАЛИЗАЦИИ СЛЕВА */
+        .history-row { position: relative; }
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 1000; width: 280px; box-shadow: -10px 10px 40px rgba(0,0,0,0.9); 
-            transition: opacity 0.3s ease; pointer-events: none; top: 0; 
-            right: 100%; left: auto; /* СМЕЩЕНИЕ ВЛЕВО */
-            margin-right: 15px;
+            transition: opacity 0.3s ease; pointer-events: none; top: 0; right: 100%; margin-right: 20px;
         }
         .history-row:hover .history-tooltip { visibility: visible; opacity: 1; }
-
         .tooltip-summary { margin-top: 15px; border-top: 1px solid #222; padding-top: 10px; }
         .summary-line { display: flex; justify-content: space-between; font-family: 'Rajdhani'; font-weight: 700; margin-bottom: 4px; }
         .summary-line span:first-child { font-family: 'Orbitron'; font-size: 8px; color: #555; }
@@ -143,7 +135,6 @@
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
         @media (max-width: 992px) {
-            table { table-layout: auto; }
             body { padding: 10px; }
             header { flex-direction: column; gap: 15px; align-items: center; border-bottom: none; }
             .logo { text-align: center; font-size: 16px; width: 100%; margin-bottom: 5px; }
@@ -165,19 +156,14 @@
             .total-display-pc { width: 100% !important; text-align: center !important; font-size: 40px !important; margin-bottom: 10px !important; color: #fff !important; }
             .session-controls-row { width: 100% !important; flex-direction: column !important; }
             .input-mini, .save-btn { width: 100% !important; height: 50px !important; }
-            .table-container { order: 3 !important; }
             thead { display: none !important; }
             .history-row { display: block !important; border: 1px solid #222 !important; margin-bottom: 10px !important; background: #0a0a0a !important; padding: 5px 0; }
-            .history-row td { display: flex !important; justify-content: space-between !important; padding: 12px 15px !important; border-bottom: 1px solid #111 !important; }
-            .history-row td::before { 
-                content: attr(data-label); font-family: 'Orbitron'; font-size: 8px; color: #555; 
-                display: block; margin-right: 20px; /* ИСПРАВЛЕНИЕ: разделение имени и ярлыка */
-            }
+            .history-row td { display: flex !important; justify-content: space-between !important; padding: 12px 15px !important; border-bottom: 1px solid #111 !important; align-items: center; }
+            .history-row td::before { content: attr(data-label); font-family: 'Orbitron'; font-size: 8px; color: #555; margin-right: 15px; flex-shrink: 0; }
             .services-cell { display: none !important; }
             .history-tooltip { display: none !important; }
             .certs-section { order: 4 !important; height: 350px !important; margin-top: 20px !important; }
             .certs-container { height: 100% !important; }
-            .history-row::before { display: none; } /* На мобилке градиент мешает тексту */
         }
     </style>
 </head>
@@ -201,7 +187,7 @@
     <div class="crm-panel">
         <div class="controls-row">
             <label class="prepaid-toggle">
-                <input type="checkbox" id="prepaidMode">
+                <input type="checkbox" id="prepaidMode" onchange="applyPrepaidToggle()">
                 <span class="toggle-label">50% PREPAID</span>
             </label>
 
@@ -261,7 +247,7 @@
             <table>
                 <colgroup>
                     <col style="width: 100px;">
-                    <col style="width: 150px;">
+                    <col style="width: 180px;">
                     <col>
                     <col style="width: 120px;">
                     <col style="width: 50px;">
@@ -300,12 +286,8 @@
 
     function checkPrivacyPassword() {
         const pass = prompt("Введите пароль для просмотра финансовых данных:");
-        const correctPassword = '123'; 
-        if (pass === correctPassword) {
-            document.body.classList.add('privacy-active');
-        } else {
-            alert("Неверный пароль");
-        }
+        if (pass === '123') document.body.classList.add('privacy-active');
+        else alert("Неверный пароль");
     }
 
     function renderCalendar() {
@@ -320,11 +302,9 @@
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         monthName.innerText = `${monthNames[month]} ${year}`;
-        
         ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'].forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
         let startingSpace = firstDay === 0 ? 6 : firstDay - 1;
         for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
-        
         for(let d=1; d<=daysInMonth; d++) {
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
             const hasData = crmData.some(row => row.date === dateStr);
@@ -338,32 +318,35 @@
         updateMonthTotal();
     }
 
-    function selectCalendarDate(date) {
-        selectedDate = date;
-        const label = document.getElementById('sessionDateLabel');
-        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
-        renderCalendar();
-    }
+    function selectCalendarDate(date) { selectedDate = date; renderCalendar(); }
+    function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); selectedDate = null; updateTable(); renderCalendar(); }
 
-    function changeMonth(dir) { 
-        currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
-        selectedDate = null;
-        updateTable(); 
-        renderCalendar(); 
+    // НОВАЯ ФУНКЦИЯ: Пересчет корзины при переключении 50%
+    function applyPrepaidToggle() {
+        const isPrepaid = document.getElementById('prepaidMode').checked;
+        currentCart.total = 0;
+        currentCart.details.forEach(item => {
+            const isForceFull = item.name.includes('ЧАС ЗАПИСИ');
+            if (isPrepaid && !isForceFull) {
+                item.price = item.basePrice / 2;
+                if (!item.name.includes('(50%)')) item.name += ' (50%)';
+            } else {
+                item.price = item.basePrice;
+                item.name = item.name.replace(' (50%)', '');
+            }
+            currentCart.total += item.price;
+        });
+        currentCart.items = currentCart.details.map(d => ({ name: d.name, colorClass: d.colorClass }));
+        renderCart();
     }
 
     function addToCart(name, price, colorClass, forceFull = false) {
         const isPrepaid = document.getElementById('prepaidMode').checked;
-        let finalPrice = price;
-        let finalName = name;
+        let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
+        let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
 
-        if (isPrepaid && !forceFull) {
-            finalPrice = price / 2;
-            finalName = name + ' (50%)';
-        }
-
+        currentCart.details.push({ name: finalName, price: finalPrice, basePrice: price, colorClass });
         currentCart.items.push({ name: finalName, colorClass });
-        currentCart.details.push({ name: finalName, price: finalPrice, colorClass });
         currentCart.total += finalPrice;
         currentCart.fullPriceTotal += price;
         renderCart();
@@ -371,52 +354,39 @@
 
     function removeFromCart(index) {
         const item = currentCart.details[index];
-        const isPrepaid = item.name.includes('(50%)');
-        const originalPrice = isPrepaid ? item.price * 2 : item.price;
         currentCart.total -= item.price;
-        currentCart.fullPriceTotal -= originalPrice;
+        currentCart.fullPriceTotal -= item.basePrice;
         currentCart.items.splice(index, 1);
         currentCart.details.splice(index, 1);
         renderCart();
     }
 
     function addPlatToCart() {
-        const val = document.getElementById('platPrice').value;
-        const p = parseInt(val) || 10000;
+        const p = parseInt(document.getElementById('platPrice').value) || 10000;
         addToCart('PLATINUM EDITION', p, 'gold');
         document.getElementById('platPrice').value = '';
     }
 
     function renderCart() {
-        const itemsContainer = document.getElementById('cartItems');
-        const totalDisplay = document.getElementById('cartTotal');
-        if(!itemsContainer || !totalDisplay) return;
-        totalDisplay.innerText = currentCart.total + ' ₽';
-        itemsContainer.innerHTML = '';
-        if (currentCart.items.length === 0) { itemsContainer.innerHTML = 'Пусто...'; return; }
-        currentCart.items.forEach((item, index) => {
+        const container = document.getElementById('cartItems');
+        const total = document.getElementById('cartTotal');
+        if(!container || !total) return;
+        total.innerText = currentCart.total + ' ₽';
+        container.innerHTML = currentCart.items.length === 0 ? 'Пусто...' : '';
+        currentCart.items.forEach((item, i) => {
             const tag = document.createElement('div');
             tag.className = `cart-tag tag-${item.colorClass}`;
-            tag.innerHTML = `${item.name}<div class="tag-remove" onclick="removeFromCart(${index})">×</div>`;
-            itemsContainer.appendChild(tag);
+            tag.innerHTML = `${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div>`;
+            container.appendChild(tag);
         });
-    }
-
-    function clearCart() {
-        currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        const nameInput = document.getElementById('clientName');
-        if (nameInput) nameInput.value = '';
-        renderCart();
     }
 
     function saveSession() {
         if (currentCart.items.length === 0) return alert('Добавьте услуги!');
-        const nameInput = document.getElementById('clientName');
-        const name = (nameInput && nameInput.value) ? nameInput.value : 'Без имени';
-        const dateToSave = selectedDate || new Date().toLocaleDateString('ru-RU');
+        const name = document.getElementById('clientName').value || 'Без имени';
+        const date = selectedDate || new Date().toLocaleDateString('ru-RU');
         crmData.push({ 
-            date: dateToSave, 
-            client: name, 
+            date, client: name, 
             services: currentCart.items.map(i => i.name).join(', '), 
             details: [...currentCart.details], 
             total: currentCart.total, 
@@ -424,62 +394,45 @@
             timestamp: Date.now() 
         });
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-        clearCart(); updateTable(); renderCalendar();
+        currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        document.getElementById('clientName').value = '';
+        renderCart(); updateTable(); renderCalendar();
     }
 
     function updateTable() {
         const body = document.getElementById('crmTableBody');
         if(!body) return;
-        body.innerHTML = ''; 
-        const m = String(currentCalDate.getMonth() + 1).padStart(2, '0');
-        const y = currentCalDate.getFullYear();
-        const monthKey = `.${m}.${y}`;
-        const viewText = document.getElementById('currentViewText');
-        const calMonthName = document.getElementById('calMonthName');
-        if(viewText && calMonthName) viewText.innerText = `ОТЧЕТ ЗА ${calMonthName.innerText}`;
-
-        const sortedData = [...crmData].sort((a,b) => {
-            const dateA = a.date.split('.').reverse().join('');
-            const dateB = b.date.split('.').reverse().join('');
-            return dateA !== dateB ? dateA.localeCompare(dateB) : a.timestamp - b.timestamp;
+        body.innerHTML = '';
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+        
+        const sorted = [...crmData].sort((a,b) => {
+            const da = a.date.split('.').reverse().join('');
+            const db = b.date.split('.').reverse().join('');
+            return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
         });
 
-        sortedData.forEach((row) => {
-            if (!row.date.includes(monthKey)) return;
+        sorted.forEach(row => {
+            if (!row.date.includes(mKey)) return;
+            const full = row.fullTotal || row.total;
+            const paid = row.total;
+            const perc = (paid / full) * 100;
             const tr = document.createElement('tr');
             tr.className = 'history-row';
-            
-            // Расчет прогресса для всей строки
-            const fullVal = row.fullTotal || row.total;
-            const paidVal = row.total;
-            const remainVal = fullVal - paidVal;
-            const progressPercent = (paidVal / fullVal) * 100;
-            tr.style.setProperty('--progress-width', `${progressPercent}%`);
 
-            let historyTooltipHtml = `<div class="history-tooltip">
-                <div style="color:#888; font-family:Orbitron; font-size:9px; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ ЗАКАЗА:</div>`;
-            
-            if (row.details) {
-                row.details.forEach(item => {
-                    const sColor = colorMap[item.colorClass] || '#fff';
-                    historyTooltipHtml += `<div class="tooltip-item" style="border-left: 2px solid ${sColor}; margin-bottom:5px; padding-left:8px; display:flex; justify-content:space-between;"><span style="color: ${sColor}; font-size:11px; font-weight:600;">${item.name}</span><span style="color:#fff; font-family:Rajdhani; font-weight:700; font-size:13px;">${item.price} ₽</span></div>`;
-                });
-            }
-
-            // Добавляем финансовую сводку в окно детализации (слева)
-            historyTooltipHtml += `
-                <div class="tooltip-summary">
-                    <div class="summary-line"><span>ПОЛНЫЙ ЧЕК</span><span>${fullVal} ₽</span></div>
-                    <div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paidVal} ₽</span></div>
-                    <div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${remainVal} ₽</span></div>
-                </div>
-            </div>`;
+            let tooltip = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+            row.details.forEach(d => {
+                tooltip += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+            });
+            tooltip += `<div class="tooltip-summary"><div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${full-paid} ₽</span></div></div></div>`;
 
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
-                <td data-label="КЛИЕНТ" style="font-weight:600;">${row.client}</td>
-                <td class="services-cell" style="position:relative;">${row.services}${historyTooltipHtml}</td>
-                <td class="num-cell price-cell privacy-blur" data-label="ВНЕСЕНО">${row.total} ₽</td>
+                <td data-label="КЛИЕНТ">
+                    <div style="font-weight:600;">${row.client}</div>
+                    <div class="progress-container"><div class="progress-bar" style="width:${perc}%"></div></div>
+                </td>
+                <td class="services-cell" style="position:relative;">${row.services}${tooltip}</td>
+                <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
                 <td data-label="УДАЛИТЬ"><i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${crmData.indexOf(row)})"></i></td>
             `;
             body.appendChild(tr);
@@ -488,40 +441,36 @@
     }
 
     function updateMonthTotal() {
-        const monthTotal = document.getElementById('monthTotal');
-        if(!monthTotal) return;
-        const m = String(currentCalDate.getMonth() + 1).padStart(2, '0');
-        const y = currentCalDate.getFullYear();
-        const monthKey = `.${m}.${y}`;
-        let total = crmData.filter(row => row.date.includes(monthKey)).reduce((acc, curr) => acc + curr.total, 0);
-        monthTotal.innerText = total.toLocaleString() + ' ₽';
+        const el = document.getElementById('monthTotal');
+        if(!el) return;
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+        const sum = crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + b.total, 0);
+        el.innerText = sum.toLocaleString() + ' ₽';
     }
 
-    function deleteRow(index) { if(confirm('Удалить запись?')) { crmData.splice(index, 1); localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
-    function clearFullHistory() { if(confirm('Удалить ВСЕ данные?')) { crmData = []; localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
+    function deleteRow(i) { if(confirm('Удалить?')) { crmData.splice(i, 1); localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
+    function clearFullHistory() { if(confirm('Удалить всё?')) { crmData=[]; localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
 
     function updateCerts() {
         const list = document.getElementById('certsList');
-        if(!list) return;
-        const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
         list.innerHTML = '';
         for (let i = 1; i <= 300; i++) {
             const id = 'SSL-' + String(i).padStart(3, '0');
-            const data = savedCerts[id] || { active: false, name: '' };
+            const d = saved[id] || { active: false, name: '' };
             const div = document.createElement('div');
             div.className = 'cert-row';
-            div.innerHTML = `<span class="cert-id">${id}</span>${data.active ? `<span style="font-size:10px; color:#555">${data.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${data.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}`;
+            div.innerHTML = `<span class="cert-id">${id}</span>${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}`;
             list.appendChild(div);
         }
     }
 
     function activateCert(id) {
-        const input = document.getElementById('in-' + id);
-        const name = input ? input.value : '';
-        if (!name) return alert('Введите имя!');
-        const savedCerts = JSON.parse(localStorage.getItem('spring_certs')) || {};
-        savedCerts[id] = { active: true, name: name };
-        localStorage.setItem('spring_certs', JSON.stringify(savedCerts));
+        const n = document.getElementById('in-' + id).value;
+        if (!n) return alert('Имя!');
+        const s = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        s[id] = { active: true, name: n };
+        localStorage.setItem('spring_certs', JSON.stringify(s));
         updateCerts();
     }
 
