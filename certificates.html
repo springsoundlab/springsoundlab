@@ -176,39 +176,22 @@
         .m-cancel { background: #222; color: #888; }
         .m-delete { background: var(--artist-red); color: #fff; }
 
-        /* СТИЛИ СЕРТИФИКАТОВ (ВЕРХНИЙ АККОРДЕОН) */
         .certs-dropdown {
-            margin-bottom: 20px;
-            border: 1px solid #222;
-            border-radius: 10px;
-            overflow: hidden;
-            flex-shrink: 0;
-            background: #000;
+            margin-bottom: 20px; border: 1px solid #222; border-radius: 10px; overflow: hidden;
+            flex-shrink: 0; background: #000;
         }
         .certs-header {
-            background: #000;
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: 0.3s;
+            background: #000; padding: 12px 15px; display: flex; justify-content: space-between;
+            align-items: center; cursor: pointer; transition: 0.3s;
         }
         .certs-header:hover { background: #0a0a0a; }
         .certs-header h2 {
-            font-family: 'Orbitron';
-            font-size: 11px;
-            margin: 0;
-            color: var(--neon-purple);
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            font-family: 'Orbitron'; font-size: 11px; margin: 0; color: var(--neon-purple);
+            letter-spacing: 2px; text-transform: uppercase;
         }
         .certs-header i { color: var(--neon-purple); font-size: 10px; transition: 0.3s; }
         .certs-content {
-            display: none;
-            max-height: 350px;
-            overflow-y: auto;
-            padding: 0 15px 15px 15px;
+            display: none; max-height: 350px; overflow-y: auto; padding: 0 15px 15px 15px;
             border-top: 1px solid #111;
         }
         .certs-dropdown.active .certs-content { display: block; }
@@ -508,7 +491,6 @@
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
-    // Функция переключения видимости сертификатов
     function toggleCerts() {
         document.getElementById('certsDropdown').classList.toggle('active');
     }
@@ -735,6 +717,12 @@
         const body = document.getElementById('crmTableBody');
         if(!body) return;
         body.innerHTML = '';
+        
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+        const todayStr = now.toLocaleDateString('ru-RU');
+
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         
         const filteredData = crmData.filter(r => r.date.includes(mKey)).sort((a,b) => {
@@ -752,6 +740,20 @@
             
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
 
+            // ЛОГИКА ИСЧЕЗНОВЕНИЯ ВРЕМЕНИ
+            let showTime = true;
+            if (row.time && row.date === todayStr) {
+                const [h, m] = row.time.split(':').map(Number);
+                if (currentHour > h || (currentHour === h && currentMinute >= m)) {
+                    showTime = false;
+                }
+            } else if (row.date !== todayStr) {
+                // Если дата прошлая, время не показываем в таблице CRM
+                const da = row.date.split('.').reverse().join('');
+                const dt = todayStr.split('.').reverse().join('');
+                if (da < dt) showTime = false;
+            }
+
             const tr = document.createElement('tr');
             tr.className = 'history-row';
 
@@ -761,7 +763,7 @@
             });
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
-            let timeDisplay = row.time ? `<span class="table-time-inline">${row.time}</span>` : '';
+            let timeDisplay = (row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : '';
 
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
@@ -874,6 +876,11 @@
             document.getElementById('nextSessionBox').style.borderColor = '#111';
         }
     }
+
+    // Автоматическое обновление таблицы каждую минуту для проверки времени
+    setInterval(() => {
+        updateTable();
+    }, 60000);
 
     renderCalendar(); updateTable(); updateCerts(); initTooltipLogic(); updateNextSession();
 </script>
