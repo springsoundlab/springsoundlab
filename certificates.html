@@ -243,9 +243,24 @@
         input:checked + .slider { background-color: var(--neon-purple); }
         input:checked + .slider:before { transform: translateX(16px); }
 
-        .controls-row { display: flex; align-items: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #111; flex-wrap: wrap; flex-shrink: 0; }
-        .btn-wrapper { position: relative; display: inline-block; }
-        .action-btn { background: transparent; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.3s; position: relative; }
+        .controls-row { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            background: #000; 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+            border: 1px solid #111; 
+            flex-shrink: 0; 
+        }
+        
+        .btn-wrapper { position: relative; width: 100%; }
+        .action-btn { 
+            background: transparent; color: #fff; padding: 10px 10px; border-radius: 6px; 
+            cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; 
+            transition: 0.3s; position: relative; width: 100%; box-sizing: border-box;
+        }
         
         .btn-tooltip { 
             visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
@@ -264,8 +279,7 @@
         .btn-dashed-green { border: 1px dashed var(--status-green) !important; }
         .btn-dashed-gold { border: 1px dashed var(--platinum-gold) !important; }
 
-        .platinum-group { display: flex; align-items: center; gap: 10px; border-left: 1px solid #222; padding-left: 10px; }
-        .plat-input { background: #000; border: 1px solid #222; color: var(--platinum-gold); width: 75px; padding: 8px; border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 13px; outline: none; text-align: center; }
+        .platinum-group-full { grid-column: span 2; display: flex; flex-direction: column; gap: 10px; }
 
         .current-session-box { 
             background: rgba(191, 0, 255, 0.05); border: 1px solid var(--neon-purple); 
@@ -361,31 +375,8 @@
                 margin-right: 0; 
                 justify-content: center; 
                 padding-bottom: 10px;
+                margin-bottom: 5px;
             }
-            .btn-wrapper, .action-btn { width: 100%; box-sizing: border-box; }
-            .action-btn { padding: 12px 5px; font-size: 8px; }
-
-            .btn-wrapper:nth-of-type(1) { grid-column: span 2; order: 1; } /* ЧАС ЗАПИСИ */
-            .btn-wrapper:nth-of-type(2) { order: 2; } /* START */
-            .btn-wrapper:nth-of-type(3) { order: 3; } /* ARTIST */
-            .btn-wrapper:nth-of-type(4) { order: 4; } /* ТЮНИНГ */
-            .btn-wrapper:nth-of-type(5) { order: 5; } /* АРАНЖИРОВКА */
-            .btn-wrapper:nth-of-type(6) { order: 6; } /* ДОП ДОРОЖКА (теперь под Тюнингом) */
-            
-            .platinum-group { 
-                grid-column: span 2; 
-                display: grid; 
-                grid-template-columns: 1fr 1fr; 
-                gap: 8px; 
-                border-left: none; 
-                padding-left: 0; 
-                border-top: 1px solid #222; 
-                padding-top: 10px;
-                order: 7;
-            }
-            .plat-input { display: none; } /* Скрываем поле цены на мобильных */
-            .platinum-group .btn-wrapper:nth-child(2),
-            .platinum-group .btn-wrapper:nth-child(3) { grid-column: span 2; } /* Растягиваем Platinum и Плат дорожку */
 
             table, thead, tbody, th, td, tr { display: block; width: 100% !important; box-sizing: border-box; }
             thead tr { position: absolute; top: -9999px; left: -9999px; }
@@ -447,11 +438,11 @@
                 <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
                 <div class="btn-tooltip">3500 ₽</div>
             </div>
+
             <div class="btn-wrapper">
                 <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
                 <div class="btn-tooltip">6000 ₽</div>
             </div>
-
             <div class="btn-wrapper">
                 <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
                 <div class="btn-tooltip">1000 ₽</div>
@@ -461,14 +452,12 @@
                 <button class="action-btn btn-blue" onclick="openPriceModal('АРАНЖИРОВКА', 'blue', 10000)">АРАНЖИРОВКА</button>
                 <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
             </div>
-
             <div class="btn-wrapper">
                 <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
                 <div class="btn-tooltip">500 ₽</div>
             </div>
             
-            <div class="platinum-group">
-                <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
+            <div class="platinum-group-full">
                 <div class="btn-wrapper">
                     <button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">+ PLATINUM EDITION</button>
                     <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
@@ -549,21 +538,14 @@
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
-
     let hoverTimer;
     const hoverDelay = 700;
-
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
-    function toggleCerts() {
-        document.getElementById('certsDropdown').classList.toggle('active');
-    }
-
+    function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     function formatTimeInput(input) {
         let val = input.value.replace(/\D/g, '');
-        if (val.length >= 2) {
-            val = val.slice(0, 2) + ':' + val.slice(2, 4);
-        }
+        if (val.length >= 2) val = val.slice(0, 2) + ':' + val.slice(2, 4);
         input.value = val;
     }
 
@@ -599,8 +581,7 @@
         inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
         confirmBtn.className = 'm-btn ' + (type === 'delete' || type === 'confirm-delete' ? 'm-delete' : 'm-confirm');
         confirmBtn.onclick = confirmCallback;
-        modal.style.display = 'block';
-        overlay.style.display = 'block';
+        modal.style.display = 'block'; overlay.style.display = 'block';
         if(type !== 'confirm-delete') inputEl.focus();
     }
 
@@ -610,18 +591,13 @@
     }
 
     function openPriceModal(name, color, defaultPrice) {
-        // Если на ПК введено число в input, берем его, иначе дефолт
-        let manualPrice = parseInt(document.getElementById('platPrice').value);
-        let finalDefault = isNaN(manualPrice) ? defaultPrice : manualPrice;
-
         openModal(`УКАЖИТЕ СТОИМОСТЬ: ${name}`, "price", function() {
             const p = parseInt(document.getElementById('modalInput').value);
             if(!isNaN(p) && p > 0) {
                 addToCart(name, p, color);
-                document.getElementById('platPrice').value = '';
                 closeModal();
             } else { alert('Введите корректную сумму'); }
-        }, finalDefault);
+        }, defaultPrice);
     }
 
     function checkPrivacyPassword() {
@@ -630,8 +606,7 @@
             const pass = document.getElementById('modalInput').value;
             if (pass === '123') {
                 document.body.classList.add('privacy-active');
-                closeModal();
-                updateTable(); 
+                closeModal(); updateTable(); 
             } else { alert("Неверный пароль"); }
         });
     }
@@ -668,14 +643,12 @@
         selectedDate = date;
         const label = document.getElementById('sessionDateLabel');
         if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
-        renderCalendar();
-        updateNextSession(date); 
+        renderCalendar(); updateNextSession(date); 
     }
 
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
-        selectedDate = null;
-        updateTable(); renderCalendar(); 
+        selectedDate = null; updateTable(); renderCalendar(); 
     }
 
     function applyPrepaidToggle() {
@@ -734,9 +707,7 @@
         if (currentCart.items.length === 0) return alert('Добавьте услуги!');
         const name = document.getElementById('bookingClient').value || 'Без имени';
         let bookingTime = document.getElementById('bookingTime').value;
-        if (bookingTime === '00:00' || bookingTime === '') bookingTime = null;
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
-        
         crmData.push({ 
             date, client: name, time: bookingTime,
             services: currentCart.items.map(i => i.name).join(', '), 
@@ -785,16 +756,12 @@
         const body = document.getElementById('crmTableBody');
         if(!body) return;
         body.innerHTML = '';
-        const now = new Date();
-        const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        
         const filteredData = crmData.filter(r => r.date.includes(mKey)).sort((a,b) => {
             const da = a.date.split('.').reverse().join('');
             const db = b.date.split('.').reverse().join('');
             return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
         });
-
         filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total;
             const paid = row.total;
@@ -802,34 +769,14 @@
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
-
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
                 tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
-
             let timeDisplay = row.time ? `<span class="table-time-inline">${row.time}</span>` : '';
-
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td data-label="ДАТА">${row.date}</td>
-                <td data-label="КЛИЕНТ">
-                    <div style="display:flex; align-items:center;">
-                        <div style="font-weight:600;">${row.client}</div>
-                        ${timeDisplay}
-                    </div>
-                    <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
-                </td>
-                <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
-                <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
-                <td data-label="ДЕЙСТВИЯ">
-                    <div class="action-icons-wrap">
-                        <div class="icon-btn-box" onclick="addPayment(${realIndex})"><span>доплата</span><i class="fas fa-wallet"></i></div>
-                        <div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})"><span>удалить</span><i class="fas fa-trash"></i></div>
-                    </div>
-                </td>
-            `;
+            tr.innerHTML = `<td data-label="ДАТА">${row.date}</td><td data-label="КЛИЕНТ"><div style="display:flex; align-items:center;"><div style="font-weight:600;">${row.client}</div>${timeDisplay}</div><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></td><td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td><td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td><td data-label="ДЕЙСТВИЯ"><div class="action-icons-wrap"><div class="icon-btn-box" onclick="addPayment(${realIndex})"><span>доплата</span><i class="fas fa-wallet"></i></div><div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})"><span>удалить</span><i class="fas fa-trash"></i></div></div></td>`;
             body.appendChild(tr);
         });
         updateMonthTotal();
