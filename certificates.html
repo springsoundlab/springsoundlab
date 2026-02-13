@@ -689,7 +689,7 @@
         titleEl.innerText = title;
         inputEl.value = defaultValue;
         inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
-        confirmBtn.className = 'm-btn ' + (type === 'delete' || type === 'confirm-delete' ? 'm-delete' : 'm-confirm');
+        confirmBtn.className = 'm-btn ' + (type === 'delete' || type === 'confirm-delete' ? 'm-confirm' : 'm-confirm');
         confirmBtn.onclick = confirmCallback;
         modal.style.display = 'block'; overlay.style.display = 'block';
         if(type !== 'confirm-delete') inputEl.focus();
@@ -877,10 +877,26 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+        
+        // ОБНОВЛЕННАЯ ЛОГИКА СОРТИРОВКИ
         const filteredData = crmData.filter(r => r.date.includes(mKey)).sort((a,b) => {
             const da = a.date.split('.').reverse().join('');
             const db = b.date.split('.').reverse().join('');
-            return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
+            
+            // 1. Сначала сортируем по дате (хронологически)
+            if (da !== db) return da.localeCompare(db);
+            
+            // 2. Внутри одного дня — по времени записи (от раннего к позднему)
+            if (a.time && b.time) {
+                if (a.time !== b.time) return a.time.localeCompare(b.time);
+            } else if (a.time) {
+                return -1; // Запись с временем выше той, что без времени
+            } else if (b.time) {
+                return 1;
+            }
+            
+            // 3. Если время одинаковое или его нет — самая НОВАЯ запись (созданная позже) будет ВЫШЕ
+            return b.timestamp - a.timestamp;
         });
 
         filteredData.forEach((row, index) => {
