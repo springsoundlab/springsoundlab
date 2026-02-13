@@ -184,7 +184,6 @@
             background: #000; padding: 12px 15px; display: flex; justify-content: space-between;
             align-items: center; cursor: pointer; transition: 0.3s;
         }
-        .certs-header:hover { background: #0a0a0a; }
         .certs-header h2 {
             font-family: 'Orbitron'; font-size: 11px; margin: 0; color: var(--neon-purple);
             letter-spacing: 2px; text-transform: uppercase;
@@ -349,7 +348,6 @@
             .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
             
-            /* Упорядочивание кнопок услуг на мобильных */
             .controls-row { 
                 display: grid; 
                 grid-template-columns: 1fr 1fr; 
@@ -367,13 +365,12 @@
             .btn-wrapper, .action-btn { width: 100%; box-sizing: border-box; }
             .action-btn { padding: 12px 5px; font-size: 8px; }
 
-            /* Новая расстановка кнопок для симметрии */
-            .btn-wrapper:nth-of-type(1) { grid-column: span 2; } /* ЧАС ЗАПИСИ во всю ширину */
-            .btn-wrapper:nth-of-type(2) { grid-order: 2; } /* START */
-            .btn-wrapper:nth-of-type(3) { grid-order: 3; } /* ARTIST */
-            .btn-wrapper:nth-of-type(4) { grid-order: 4; } /* ТЮНИНГ */
-            .btn-wrapper:nth-of-type(5) { grid-order: 5; } /* АРАНЖИРОВКА */
-            .btn-wrapper:nth-of-type(6) { grid-order: 6; } /* ДОП ДОРОЖКА */
+            .btn-wrapper:nth-of-type(1) { grid-column: span 2; order: 1; } /* ЧАС ЗАПИСИ */
+            .btn-wrapper:nth-of-type(2) { order: 2; } /* START */
+            .btn-wrapper:nth-of-type(3) { order: 3; } /* ARTIST */
+            .btn-wrapper:nth-of-type(4) { order: 4; } /* ТЮНИНГ */
+            .btn-wrapper:nth-of-type(5) { order: 5; } /* АРАНЖИРОВКА */
+            .btn-wrapper:nth-of-type(6) { order: 6; } /* ДОП ДОРОЖКА (теперь под Тюнингом) */
             
             .platinum-group { 
                 grid-column: span 2; 
@@ -384,10 +381,12 @@
                 padding-left: 0; 
                 border-top: 1px solid #222; 
                 padding-top: 10px;
+                order: 7;
             }
-            .plat-input { grid-column: span 2; width: 100%; }
+            .plat-input { display: none; } /* Скрываем поле цены на мобильных */
+            .platinum-group .btn-wrapper:nth-child(2),
+            .platinum-group .btn-wrapper:nth-child(3) { grid-column: span 2; } /* Растягиваем Platinum и Плат дорожку */
 
-            /* Таблица превращается в карточки */
             table, thead, tbody, th, td, tr { display: block; width: 100% !important; box-sizing: border-box; }
             thead tr { position: absolute; top: -9999px; left: -9999px; }
             tr { background: #0a0a0a; border: 1px solid #111; margin-bottom: 15px; border-radius: 12px; padding: 15px; }
@@ -457,10 +456,12 @@
                 <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
                 <div class="btn-tooltip">1000 ₽</div>
             </div>
+            
             <div class="btn-wrapper">
-                <button class="action-btn btn-blue" onclick="addCustomToCart('АРАНЖИРОВКА', 'blue')">АРАНЖИРОВКА</button>
-                <div class="btn-tooltip">Ввести цену в поле ниже</div>
+                <button class="action-btn btn-blue" onclick="openPriceModal('АРАНЖИРОВКА', 'blue', 10000)">АРАНЖИРОВКА</button>
+                <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
             </div>
+
             <div class="btn-wrapper">
                 <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
                 <div class="btn-tooltip">500 ₽</div>
@@ -469,8 +470,8 @@
             <div class="platinum-group">
                 <input type="number" id="platPrice" class="plat-input" placeholder="Цена">
                 <div class="btn-wrapper">
-                    <button class="action-btn btn-gold" onclick="addCustomToCart('PLATINUM EDITION', 'gold')">+ PLATINUM EDITION</button>
-                    <div class="btn-tooltip">Ввести цену выше</div>
+                    <button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">+ PLATINUM EDITION</button>
+                    <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
                 </div>
                 <div class="btn-wrapper">
                     <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
@@ -608,6 +609,21 @@
         document.getElementById('modalOverlay').style.display = 'none';
     }
 
+    function openPriceModal(name, color, defaultPrice) {
+        // Если на ПК введено число в input, берем его, иначе дефолт
+        let manualPrice = parseInt(document.getElementById('platPrice').value);
+        let finalDefault = isNaN(manualPrice) ? defaultPrice : manualPrice;
+
+        openModal(`УКАЖИТЕ СТОИМОСТЬ: ${name}`, "price", function() {
+            const p = parseInt(document.getElementById('modalInput').value);
+            if(!isNaN(p) && p > 0) {
+                addToCart(name, p, color);
+                document.getElementById('platPrice').value = '';
+                closeModal();
+            } else { alert('Введите корректную сумму'); }
+        }, finalDefault);
+    }
+
     function checkPrivacyPassword() {
         if(document.body.classList.contains('privacy-active')) return;
         openModal("ВВЕДИТЕ ПАРОЛЬ АДМИНИСТРАТОРА", "password", function() {
@@ -700,18 +716,6 @@
         renderCart();
     }
 
-    function addCustomToCart(name, colorClass) {
-        const input = document.getElementById('platPrice');
-        const p = parseInt(input.value);
-        if(!p || isNaN(p)) {
-            alert('Сначала введите цену в поле внизу!');
-            input.focus();
-            return;
-        }
-        addToCart(name, p, colorClass);
-        input.value = '';
-    }
-
     function renderCart() {
         const container = document.getElementById('cartItems');
         const total = document.getElementById('cartTotal');
@@ -731,18 +735,13 @@
         const name = document.getElementById('bookingClient').value || 'Без имени';
         let bookingTime = document.getElementById('bookingTime').value;
         if (bookingTime === '00:00' || bookingTime === '') bookingTime = null;
-        
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
         
         crmData.push({ 
-            date, 
-            client: name, 
-            time: bookingTime,
+            date, client: name, time: bookingTime,
             services: currentCart.items.map(i => i.name).join(', '), 
-            details: [...currentCart.details], 
-            total: currentCart.total, 
-            fullTotal: currentCart.fullPriceTotal,
-            timestamp: Date.now() 
+            details: [...currentCart.details], total: currentCart.total, 
+            fullTotal: currentCart.fullPriceTotal, timestamp: Date.now() 
         });
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
@@ -786,12 +785,8 @@
         const body = document.getElementById('crmTableBody');
         if(!body) return;
         body.innerHTML = '';
-        
         const now = new Date();
-        const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
         const todayStr = now.toLocaleDateString('ru-RU');
-
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         
         const filteredData = crmData.filter(r => r.date.includes(mKey)).sort((a,b) => {
@@ -806,23 +801,7 @@
             const perc = Math.min((paid / full) * 100, 100);
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
-            
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
-
-            let showTime = true;
-            if (row.time && row.date === todayStr) {
-                const [h, m] = row.time.split(':').map(Number);
-                if (currentHour > h || (currentHour === h && currentMinute >= m)) {
-                    showTime = false;
-                }
-            } else if (row.date !== todayStr) {
-                const da = row.date.split('.').reverse().join('');
-                const dt = todayStr.split('.').reverse().join('');
-                if (da < dt) showTime = false;
-            }
-
-            const tr = document.createElement('tr');
-            tr.className = 'history-row';
 
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
@@ -830,8 +809,9 @@
             });
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
-            let timeDisplay = (row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : '';
+            let timeDisplay = row.time ? `<span class="table-time-inline">${row.time}</span>` : '';
 
+            const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
                 <td data-label="КЛИЕНТ">
@@ -845,14 +825,8 @@
                 <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
                 <td data-label="ДЕЙСТВИЯ">
                     <div class="action-icons-wrap">
-                        <div class="icon-btn-box" onclick="addPayment(${realIndex})">
-                            <span>доплата</span>
-                            <i class="fas fa-wallet"></i>
-                        </div>
-                        <div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})">
-                            <span>удалить</span>
-                            <i class="fas fa-trash"></i>
-                        </div>
+                        <div class="icon-btn-box" onclick="addPayment(${realIndex})"><span>доплата</span><i class="fas fa-wallet"></i></div>
+                        <div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})"><span>удалить</span><i class="fas fa-trash"></i></div>
                     </div>
                 </td>
             `;
@@ -897,56 +871,27 @@
         const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
         if (!container) return;
-
         const now = new Date();
         const todayStr = now.toLocaleDateString('ru-RU');
-        const tomorrow = new Date(now);
-        tomorrow.setDate(now.getDate() + 1);
-        const tomorrowStr = tomorrow.toLocaleDateString('ru-RU');
-
-        let targetDate = clickedDate;
-        
-        if (!targetDate) {
-            const hasToday = crmData.some(r => r.date === todayStr && r.time);
-            if (hasToday) targetDate = todayStr;
-            else {
-                const hasTomorrow = crmData.some(r => r.date === tomorrowStr && r.time);
-                if (hasTomorrow) targetDate = tomorrowStr;
-            }
-        }
-
+        const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
+        let targetDate = clickedDate || (crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr);
         const sessions = crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
-        
         container.innerHTML = ''; 
-
         if (sessions.length > 0) {
             titleEl.innerText = (targetDate === todayStr) ? "Записи на сегодня" : (targetDate === tomorrowStr ? "Записи на завтра" : `Записи на ${targetDate}`);
-            
             sessions.forEach(next => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'future-item';
-                itemDiv.innerHTML = `
-                    <div class="future-date">${next.time}</div>
-                    <div class="future-client">${next.client}</div>
-                `;
+                itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.client}</div>`;
                 container.appendChild(itemDiv);
             });
             document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
         } else {
             titleEl.innerText = "Ближайшая запись";
-            container.innerHTML = `
-                <div class="future-item">
-                    <div class="future-date">--</div>
-                    <div class="future-client">Нет записей</div>
-                </div>
-            `;
+            container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
             document.getElementById('nextSessionBox').style.borderColor = '#111';
         }
     }
-
-    setInterval(() => {
-        updateTable();
-    }, 60000);
 
     renderCalendar(); updateTable(); updateCerts(); initTooltipLogic(); updateNextSession();
 </script>
