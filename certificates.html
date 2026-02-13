@@ -134,16 +134,15 @@
         }
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
 
-        /* КНОПКИ ДЕЙСТВИЙ: Максимальная изоляция событий */
+        /* КНОПКИ ДЕЙСТВИЙ */
         .action-icons-wrap { 
             display: flex; align-items: center; gap: 15px; justify-content: flex-end; 
-            position: relative; z-index: 10000 !important; 
+            position: relative; z-index: 10; 
         }
         .icon-btn-box { 
             display: flex; flex-direction: column; align-items: center; gap: 4px; 
             cursor: pointer !important; transition: 0.3s; 
-            pointer-events: auto !important; position: relative; z-index: 10001 !important;
-            user-select: none;
+            pointer-events: auto !important; position: relative;
         }
         .icon-btn-box i, .icon-btn-box span { pointer-events: none; }
         .icon-btn-box i { font-size: 12px; color: #444; }
@@ -291,6 +290,55 @@
 </div>
 
 <script>
+    // Инициализируем функции в глобальном окне сразу
+    window.addPayment = function(event, index) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+        }
+        
+        let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
+        const row = crmData[index];
+        if (!row) return false;
+        
+        const full = row.fullTotal || row.total;
+        const paid = row.total;
+        const remaining = full - paid;
+        
+        if (remaining <= 0) {
+            alert('Оплата уже произведена полностью');
+            return false;
+        }
+
+        const promptVal = prompt(`Доплата для: ${row.client}\nОстаток: ${remaining} ₽\n\nВведите сумму доплаты:`, remaining);
+        if (promptVal !== null) {
+            const amount = parseInt(promptVal);
+            if (!isNaN(amount) && amount > 0) {
+                row.total += amount;
+                localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+                location.reload(); // Перезагружаем для чистоты данных
+            }
+        }
+        return false;
+    };
+
+    window.deleteRow = function(event, index) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+        }
+        
+        if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+            let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
+            crmData.splice(index, 1);
+            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+            location.reload();
+        }
+        return false;
+    };
+
     let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
@@ -430,49 +478,6 @@
         renderCart(); updateTable(); renderCalendar();
     }
 
-    // ВЫНОС ФУНКЦИЙ В WINDOW ДЛЯ ГЛОБАЛЬНОГО ДОСТУПА
-    window.addPayment = function(e, index) {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        const row = crmData[index];
-        if (!row) return;
-        
-        const full = row.fullTotal || row.total;
-        const remaining = full - row.total;
-        
-        if (remaining <= 0) {
-            alert('Оплата уже произведена полностью');
-            return;
-        }
-
-        const promptVal = prompt(`Доплата для: ${row.client}\nОстаток: ${remaining} ₽\n\nВведите сумму:`, remaining);
-        if (promptVal !== null) {
-            const amount = parseInt(promptVal);
-            if (!isNaN(amount) && amount > 0) {
-                row.total += amount;
-                localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-                updateTable();
-                renderCalendar();
-            }
-        }
-    };
-
-    window.deleteRow = function(e, index) {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        if (confirm('Удалить эту сессию из базы?')) {
-            crmData.splice(index, 1);
-            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-            updateTable();
-            renderCalendar();
-        }
-    };
-
     function updateTable() {
         const body = document.getElementById('crmTableBody');
         if(!body) return;
@@ -502,7 +507,6 @@
             });
             tooltip += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
-            // Использование onmousedown гарантирует срабатывание до любых перехватов
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
                 <td data-label="КЛИЕНТ">
@@ -513,11 +517,11 @@
                 <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
                 <td data-label="ДЕЙСТВИЯ">
                     <div class="action-icons-wrap">
-                        <div class="icon-btn-box" onmousedown="window.addPayment(event, ${realIndex})">
+                        <div class="icon-btn-box" style="pointer-events:all !important;" onclick="window.addPayment(event, ${realIndex})">
                             <span>доплата</span>
                             <i class="fas fa-wallet"></i>
                         </div>
-                        <div class="icon-btn-box icon-delete" onmousedown="window.deleteRow(event, ${realIndex})">
+                        <div class="icon-btn-box icon-delete" style="pointer-events:all !important;" onclick="window.deleteRow(event, ${realIndex})">
                             <span>удалить</span>
                             <i class="fas fa-trash"></i>
                         </div>
