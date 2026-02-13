@@ -872,6 +872,10 @@
         const body = document.getElementById('crmTableBody');
         if(!body) return;
         body.innerHTML = '';
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        const todayStr = now.toLocaleDateString('ru-RU');
+        
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         const filteredData = crmData.filter(r => r.date.includes(mKey)).sort((a,b) => {
             const da = a.date.split('.').reverse().join('');
@@ -887,7 +891,16 @@
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
             
-            // Тултип для ПК
+            // Логика исчезновения времени
+            let showTime = true;
+            if (row.time && row.date === todayStr) {
+                const [h, m] = row.time.split(':').map(Number);
+                const sessionTime = h * 60 + m;
+                if (currentTime >= sessionTime) {
+                    showTime = false;
+                }
+            }
+
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
@@ -895,7 +908,7 @@
             });
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
 
-            let timeDisplay = row.time ? `<span class="table-time-inline">${row.time}</span>` : '';
+            let timeDisplay = (row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : '';
             const tr = document.createElement('tr');
 
             if (window.innerWidth <= 992) {
@@ -911,7 +924,7 @@
 
                 tr.ondblclick = (e) => toggleMobileDetails(e, realIndex);
                 tr.innerHTML = `
-                    <td>
+                    <td style="position:relative;">
                         <div id="mobileDetails-${realIndex}" class="mobile-details-overlay">
                             <div class="mobile-details-close" onclick="event.stopPropagation(); document.getElementById('mobileDetails-${realIndex}').classList.remove('active')">×</div>
                             <div class="mobile-details-header">Детализация заказа</div>
@@ -924,7 +937,8 @@
                                 <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div>
                             </div>
                         </div>
-                        <div class="mobile-row-date">${row.date}</div>
+                        <div class="mobile-row-date" style="color: #fff; font-size: 14px; font-weight: bold;">${row.date}</div>
+                        ${(row.time && showTime) ? `<div class="mobile-row-time-top" style="position:absolute; top:10px; right:15px; color:#bf00ff; font-size:18px; font-weight:800; font-family:Orbitron;">${row.time}</div>` : ''}
                         <div class="mobile-row-client">${row.client}</div>
                         <div class="mobile-row-services">${row.services}</div>
                         <div class="mobile-progress-wrapper">
@@ -1030,6 +1044,9 @@
             document.getElementById('nextSessionBox').style.borderColor = '#111';
         }
     }
+
+    // Запуск проверки времени каждую минуту для авто-скрытия
+    setInterval(updateTable, 60000);
 
     window.addEventListener('resize', updateTable);
     renderCalendar(); updateTable(); updateCerts(); initTooltipLogic(); updateNextSession();
