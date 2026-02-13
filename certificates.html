@@ -187,7 +187,6 @@
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
         .day:hover { background: #111; }
 
-        /* ВИДЖЕТ БРОНИРОВАНИЯ: ЦЕНТРИРОВАНИЕ ТЕКСТА */
         .session-booking-widget {
             background: #000; border: 1px solid #222; border-radius: 10px; padding: 15px; margin-bottom: 20px;
         }
@@ -195,13 +194,14 @@
         .booking-field {
             background: #080808; border: 1px solid #1a1a1a; border-radius: 6px; padding: 8px; color: #fff; 
             font-family: 'Orbitron'; font-size: 11px; outline: none; width: 100%; transition: 0.3s;
-            text-align: center; /* Текст по центру как просил */
+            text-align: center;
         }
         .booking-field:focus { border-color: var(--neon-purple); }
         .booking-label { font-family: 'Orbitron'; font-size: 8px; color: #444; margin-bottom: 5px; text-transform: uppercase; }
 
         .future-sessions-widget {
             background: rgba(0,0,0,0.5); border: 1px solid #111; border-radius: 10px; padding: 15px; margin-bottom: 20px; flex-shrink: 0;
+            transition: 0.3s;
         }
         .future-title { font-family: 'Orbitron'; font-size: 9px; color: #444; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
         .future-info { display: flex; align-items: center; gap: 12px; }
@@ -255,11 +255,9 @@
         .tag-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
         .tag-remove { position: absolute; right: 0; top: 0; bottom: 0; width: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.5; }
         
-        /* КНОПКА СОХРАНИТЬ И ПОЛЕ ИМЕНИ РЯДОМ */
         .cart-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; align-self: flex-end; }
         .total-display-pc { font-family: 'Rajdhani'; font-weight: 700; font-size: 34px; color: #fff; height: 42px; width: 155px; margin-bottom: 8px; text-align: right; }
         .save-btn { background: var(--status-green); color: #fff; border: none; height: 42px; width: 155px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
-        .client-input-session { background: #000; border: 1px solid #222; color: #fff; padding: 10px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; outline: none; width: 155px; box-sizing: border-box; text-align: center; }
 
         .progress-container { width: 100%; height: 2px; background: #111; margin-top: 5px; border-radius: 1px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--neon-purple); transition: 0.5s; width: 0%; }
@@ -272,13 +270,13 @@
         .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; padding-right: 12px; }
 
         th:nth-child(1), td:nth-child(1) { width: 90px; }
-        th:nth-child(2), td:nth-child(2) { width: 160px; } /* Чуть расширил для времени */
+        th:nth-child(2), td:nth-child(2) { width: 180px; } 
         th:nth-child(3), td:nth-child(3) { width: auto; }
         th:nth-child(4), td:nth-child(4) { width: 110px; }
         th:nth-child(5), td:nth-child(5) { width: 120px; }
 
-        /* КРУПНОЕ ВРЕМЯ В ТАБЛИЦЕ */
-        .table-time-large { font-family: 'Rajdhani'; font-weight: 700; font-size: 16px; color: var(--neon-purple); margin-right: 8px; }
+        /* ВРЕМЯ СПРАВА ОТ ИМЕНИ */
+        .table-time-inline { font-family: 'Rajdhani'; font-weight: 700; font-size: 16px; color: var(--neon-purple); margin-left: 10px; }
 
         .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
         .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
@@ -289,15 +287,18 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
+        /* ДЕТАЛИЗАЦИЯ: БЛЮР ЦИФР */
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
             pointer-events: none; transition: opacity 0.4s ease;
         }
-        
         .history-tooltip.active { visibility: visible; opacity: 1; }
         .history-tooltip.pos-down { transform: translate(15px, 15px); }
         .history-tooltip.pos-up { transform: translate(15px, calc(-100% - 15px)); }
+        
+        .tooltip-sum { filter: blur(6px); transition: 0.3s; }
+        .privacy-active .tooltip-sum { filter: blur(0); }
 
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
 
@@ -397,7 +398,6 @@
             </div>
             <div class="cart-actions">
                 <div class="total-display-pc" id="cartTotal">0 ₽</div>
-                <input type="text" id="clientName" class="client-input-session" placeholder="Имя клиента..." oninput="syncClientNames(this.value)">
                 <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
             </div>
         </div>
@@ -428,13 +428,13 @@
         <div class="session-booking-widget">
             <div class="booking-label">Добавление на будущее</div>
             <div class="booking-row">
-                <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)">
-                <input type="text" id="bookingClient" class="booking-field" placeholder="Имя клиента" oninput="syncClientNames(this.value)">
+                <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)" onkeydown="if(event.key==='Enter') saveSession()">
+                <input type="text" id="bookingClient" class="booking-field" placeholder="Имя клиента" onkeydown="if(event.key==='Enter') saveSession()">
             </div>
         </div>
 
         <div class="future-sessions-widget" id="nextSessionBox">
-            <div class="future-title">Ближайшая запись</div>
+            <div class="future-title" id="futureTitleLabel">Ближайшая запись</div>
             <div class="future-info">
                 <div class="future-date" id="nextSessionDate">--</div>
                 <div class="future-client" id="nextSessionClient">Нет записей</div>
@@ -465,11 +465,6 @@
             val = val.slice(0, 2) + ':' + val.slice(2, 4);
         }
         input.value = val;
-    }
-
-    function syncClientNames(val) {
-        document.getElementById('clientName').value = val;
-        document.getElementById('bookingClient').value = val;
     }
 
     function initTooltipLogic() {
@@ -521,6 +516,7 @@
             if (pass === '123') {
                 document.body.classList.add('privacy-active');
                 closeModal();
+                updateTable(); // перерендер чтобы обновить блюр в тултипах
             } else { alert("Неверный пароль"); }
         });
     }
@@ -558,6 +554,7 @@
         const label = document.getElementById('sessionDateLabel');
         if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
         renderCalendar();
+        updateNextSession(date); // Показываем данные выбранного дня в виджете
     }
 
     function changeMonth(dir) { 
@@ -626,9 +623,8 @@
 
     function saveSession() {
         if (currentCart.items.length === 0) return alert('Добавьте услуги!');
-        const name = document.getElementById('clientName').value || 'Без имени';
+        const name = document.getElementById('bookingClient').value || 'Без имени';
         let bookingTime = document.getElementById('bookingTime').value;
-        // Очищаем время от пустых масок, если ничего не ввели
         if (bookingTime === '00:00' || bookingTime === '') bookingTime = null;
         
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
@@ -645,7 +641,6 @@
         });
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        document.getElementById('clientName').value = '';
         document.getElementById('bookingClient').value = '';
         document.getElementById('bookingTime').value = '';
         renderCart(); updateTable(); renderCalendar(); updateNextSession();
@@ -708,19 +703,19 @@
 
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
-                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
-            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
+            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
-            // ЛОГИКА ОТОБРАЖЕНИЯ ВРЕМЕНИ: Крупно, только если оно есть
-            let timeDisplay = row.time ? `<span class="table-time-large">${row.time}</span>` : '';
+            // ВРЕМЯ СПРАВА ОТ ИМЕНИ
+            let timeDisplay = row.time ? `<span class="table-time-inline">${row.time}</span>` : '';
 
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
                 <td data-label="КЛИЕНТ">
                     <div style="display:flex; align-items:center;">
-                        ${timeDisplay}
                         <div style="font-weight:600;">${row.client}</div>
+                        ${timeDisplay}
                     </div>
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
@@ -776,9 +771,11 @@
         updateCerts();
     }
 
-    function updateNextSession() {
+    // ОБНОВЛЕННАЯ ЛОГИКА «БЛИЖАЙШАЯ ЗАПИСЬ» (ИНТЕРАКТИВ С КАЛЕНДАРЕМ)
+    function updateNextSession(clickedDate = null) {
         const dateEl = document.getElementById('nextSessionDate');
         const clientEl = document.getElementById('nextSessionClient');
+        const titleEl = document.getElementById('futureTitleLabel');
         if (!dateEl || !clientEl) return;
 
         const now = new Date();
@@ -787,17 +784,31 @@
         tomorrow.setDate(now.getDate() + 1);
         const tomorrowStr = tomorrow.toLocaleDateString('ru-RU');
 
-        // Ищем записи с указанным временем на сегодня или завтра
-        const upcoming = crmData.filter(r => (r.date === todayStr || r.date === tomorrowStr) && r.time);
+        let targetDate = clickedDate;
         
-        if (upcoming.length > 0) {
-            upcoming.sort((a, b) => (a.date === todayStr ? -1 : 1));
-            const next = upcoming[0];
-            dateEl.innerText = next.date === todayStr ? 'СЕГОДНЯ' : 'ЗАВТРА';
-            clientEl.innerText = `${next.client} (${next.time})`;
+        // Если дата не нажата, ищем сегодня, потом завтра
+        if (!targetDate) {
+            const hasToday = crmData.some(r => r.date === todayStr && r.time);
+            if (hasToday) targetDate = todayStr;
+            else {
+                const hasTomorrow = crmData.some(r => r.date === tomorrowStr && r.time);
+                if (hasTomorrow) targetDate = tomorrowStr;
+            }
+        }
+
+        const sessions = crmData.filter(r => r.date === targetDate && r.time);
+        
+        if (sessions.length > 0) {
+            const next = sessions[0];
+            titleEl.innerText = (targetDate === todayStr) ? "Запись на сегодня" : (targetDate === tomorrowStr ? "Запись на завтра" : `Запись на ${targetDate}`);
+            dateEl.innerText = next.time;
+            clientEl.innerText = next.client;
+            document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
         } else {
-            dateEl.innerText = '--';
-            clientEl.innerText = 'Нет записей';
+            titleEl.innerText = "Ближайшая запись";
+            dateEl.innerText = "--";
+            clientEl.innerText = "Нет записей";
+            document.getElementById('nextSessionBox').style.borderColor = '#111';
         }
     }
 
