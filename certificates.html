@@ -122,24 +122,28 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
+        /* ИСПРАВЛЕННЫЙ ТУЛТИП ДЕТАЛИЗАЦИИ */
         .history-tooltip { 
-            display: none; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
-            padding: 15px; border-radius: 8px; z-index: 100; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
+            visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
+            padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
             pointer-events: none; transform: translate(15px, 15px);
+            transition: opacity 0.3s ease;
         }
-        .services-cell:hover .history-tooltip { display: block; }
+        .services-cell:hover .history-tooltip { 
+            transition-delay: 1s; /* Задержка 1 секунда */
+            visibility: visible; opacity: 1; 
+        }
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
 
-        /* КНОПКИ ДЕЙСТВИЙ - УПРОЩЕННЫЕ ДЛЯ ПК */
-        .action-cell { text-align: right; white-space: nowrap; }
-        .simple-btn {
-            background: transparent; border: 1px solid #333; color: #888;
-            font-family: 'Orbitron'; font-size: 8px; padding: 6px 10px;
-            border-radius: 4px; cursor: pointer; margin-left: 8px;
-            transition: 0.2s; text-transform: uppercase;
-        }
-        .simple-btn:hover { border-color: var(--neon-purple); color: #fff; }
-        .simple-btn-red:hover { border-color: var(--artist-red); color: var(--artist-red); }
+        /* Иконки действий */
+        .action-icons-wrap { display: flex; align-items: center; gap: 15px; justify-content: flex-end; }
+        .icon-btn-box { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.3s; }
+        .icon-btn-box i { font-size: 12px; color: #444; }
+        .icon-btn-box span { font-family: 'Orbitron'; font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
+        .icon-btn-box:hover i { color: var(--neon-purple); }
+        .icon-btn-box:hover span { color: var(--neon-purple); }
+        .icon-delete:hover i { color: var(--artist-red); }
+        .icon-delete:hover span { color: var(--artist-red); }
 
         @media (max-width: 992px) {
             body { padding: 10px; }
@@ -170,8 +174,7 @@
             .history-row td::before { content: attr(data-label); font-family: 'Orbitron'; font-size: 8px; color: #555; }
             .services-cell { display: none !important; }
             .history-tooltip { display: none !important; }
-            .action-cell { width: 100%; display: flex !important; justify-content: space-between !important; border-bottom: none !important; }
-            .simple-btn { margin: 0; width: 48%; text-align: center; padding: 12px 0; font-size: 10px; }
+            .action-icons-wrap { justify-content: space-between; width: 100%; }
         }
     </style>
 </head>
@@ -254,7 +257,7 @@
         </div>
 
         <div class="table-container">
-            <table id="mainHistoryTable">
+            <table>
                 <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th>ВНЕСЕНО</th><th style="text-align:right">ДЕЙСТВИЯ</th></tr></thead>
                 <tbody id="crmTableBody"></tbody>
             </table>
@@ -284,37 +287,10 @@
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
+
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
-    // ФУНКЦИИ ВЫЗЫВАЮТСЯ НАПРЯМУЮ ИЗ ИНЛАЙН-ОБРАБОТЧИКОВ
-    function addPayment(index) {
-        let row = crmData[index];
-        if (!row) return;
-        const full = row.fullTotal || row.total;
-        const paid = row.total;
-        const remaining = full - paid;
-        if (remaining <= 0) { alert('Оплачено полностью'); return; }
-        
-        const amountStr = prompt(`ДОПЛАТА: ${row.client}\nОсталось: ${remaining} ₽\nВведите сумму:`, remaining);
-        if (amountStr !== null) {
-            const amount = parseInt(amountStr);
-            if (!isNaN(amount) && amount > 0) {
-                crmData[index].total += amount;
-                localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-                updateTable();
-            }
-        }
-    }
-
-    function deleteRow(index) {
-        if (confirm('Удалить эту запись навсегда?')) {
-            crmData.splice(index, 1);
-            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-            updateTable(); renderCalendar();
-        }
-    }
-
-    // Слежение за мышкой для тултипа
+    // Обработка движения мыши для тултипа
     document.addEventListener('mousemove', (e) => {
         const tooltips = document.querySelectorAll('.history-tooltip');
         tooltips.forEach(t => {
@@ -394,6 +370,7 @@
         const isPrepaid = document.getElementById('prepaidMode').checked;
         let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
         let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
+        
         currentCart.details.push({ name: finalName, price: finalPrice, basePrice: price, colorClass });
         currentCart.items.push({ name: finalName, colorClass });
         currentCart.total += finalPrice;
@@ -434,6 +411,7 @@
         if (currentCart.items.length === 0) return alert('Добавьте услуги!');
         const name = document.getElementById('clientName').value || 'Без имени';
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
+        
         crmData.push({ 
             date, client: name, 
             services: currentCart.items.map(i => i.name).join(', '), 
@@ -442,10 +420,31 @@
             fullTotal: currentCart.fullPriceTotal,
             timestamp: Date.now() 
         });
+        
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         document.getElementById('clientName').value = '';
         renderCart(); updateTable(); renderCalendar();
+    }
+
+    // Улучшенная функция доплаты
+    function addPayment(index) {
+        const row = crmData[index];
+        const full = row.fullTotal || row.total;
+        const remaining = full - row.total;
+        
+        if (remaining <= 0) return alert('Заказ уже полностью оплачен');
+
+        const amountStr = prompt(`Доплата для ${row.client}.\nОстаток к оплате: ${remaining} ₽.\nНажмите ОК, чтобы внести всю сумму.`, remaining);
+        
+        if (amountStr !== null) {
+            const amount = parseInt(amountStr);
+            if (!isNaN(amount) && amount > 0) {
+                row.total += amount;
+                localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+                updateTable();
+            }
+        }
     }
 
     function updateTable() {
@@ -460,34 +459,42 @@
             return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
         });
 
-        sorted.forEach((row) => {
+        sorted.forEach(row => {
             if (!row.date.includes(mKey)) return;
             const full = row.fullTotal || row.total;
             const paid = row.total;
             const perc = Math.min((paid / full) * 100, 100);
             const isComplete = perc >= 100;
-            const realIdx = crmData.indexOf(row);
+            const realIndex = crmData.indexOf(row);
             
             const tr = document.createElement('tr');
             tr.className = 'history-row';
 
-            let tooltipHTML = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+            let tooltip = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
-                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                tooltip += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
-            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
+            tooltip += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
 
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
                 <td data-label="КЛИЕНТ">
-                    <div style="font-weight:600; font-size:12px;">${row.client}</div>
+                    <div style="font-weight:600;">${row.client}</div>
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
-                <td class="services-cell">${row.services}${tooltipHTML}</td>
+                <td class="services-cell" style="position:relative;">${row.services}${tooltip}</td>
                 <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
-                <td class="action-cell" data-label="ДЕЙСТВИЯ">
-                    <button class="simple-btn" onclick="addPayment(${realIdx})">Доплата</button>
-                    <button class="simple-btn simple-btn-red" onclick="deleteRow(${realIdx})">Удалить</button>
+                <td data-label="ДЕЙСТВИЯ">
+                    <div class="action-icons-wrap">
+                        <div class="icon-btn-box" onclick="addPayment(${realIndex})">
+                            <span>доплата</span>
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})">
+                            <span>удалить</span>
+                            <i class="fas fa-trash"></i>
+                        </div>
+                    </div>
                 </td>
             `;
             body.appendChild(tr);
@@ -503,11 +510,11 @@
         el.innerText = sum.toLocaleString() + ' ₽';
     }
 
+    function deleteRow(i) { if(confirm('Удалить?')) { crmData.splice(i, 1); localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
     function clearFullHistory() { if(confirm('Удалить всё?')) { crmData=[]; localStorage.setItem('spring_crm_v3', JSON.stringify(crmData)); updateTable(); renderCalendar(); } }
 
     function updateCerts() {
         const list = document.getElementById('certsList');
-        if(!list) return;
         const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
         list.innerHTML = '';
         for (let i = 1; i <= 300; i++) {
