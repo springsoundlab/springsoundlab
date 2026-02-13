@@ -362,6 +362,7 @@
             .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
             
+            /* Новая сетка для телефона по твоей просьбе */
             .controls-row { 
                 display: grid; 
                 grid-template-columns: 1fr 1fr; 
@@ -378,57 +379,38 @@
                 padding-bottom: 10px;
                 margin-bottom: 5px;
             }
-            .btn-order-1 { order: 1; }
-            .btn-order-2 { order: 2; }
-            .btn-order-3 { order: 3; }
-            .btn-order-4 { order: 4; }
-            .btn-order-5 { order: 5; }
-            .btn-order-6 { order: 6; }
-            .btn-order-7 { order: 7; grid-column: span 2; }
-            .btn-order-8 { order: 8; grid-column: span 2; }
+            /* Порядок для мобилок: 
+               Ряд 1: Час | Start
+               Ряд 2: Artist | Тюнинг
+               Ряд 3: Аранж | Доп. дор
+               Ряд 4: Platinum
+               Ряд 5: Плат. дор
+            */
+            .btn-order-1 { order: 1; } /* Час */
+            .btn-order-2 { order: 2; } /* Start */
+            .btn-order-3 { order: 3; } /* Artist */
+            .btn-order-4 { order: 4; } /* Тюнинг */
+            .btn-order-5 { order: 5; } /* Аранж */
+            .btn-order-6 { order: 6; } /* Доп дор */
+            .btn-order-7 { order: 7; grid-column: span 2; } /* Platinum */
+            .btn-order-8 { order: 8; grid-column: span 2; } /* Плат дор */
             
             .action-btn { width: 100%; }
 
             table, thead, tbody, th, td, tr { display: block; width: 100% !important; box-sizing: border-box; }
             thead tr { position: absolute; top: -9999px; left: -9999px; }
             tr { background: #0a0a0a; border: 1px solid #111; margin-bottom: 15px; border-radius: 12px; padding: 15px; }
+            td { border: none; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; padding-left: 40% !important; text-align: right !important; min-height: 40px; display: flex; align-items: center; justify-content: flex-end; }
+            td:last-child { border-bottom: none; }
+            td::before { content: attr(data-label); position: absolute; left: 15px; width: 35%; text-align: left; font-family: 'Orbitron'; font-size: 9px; color: #444; font-weight: bold; }
             
-            /* Новая логика ячеек в мобильной версии */
-            td { border: none; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; padding-left: 0 !important; text-align: left !important; min-height: 45px; display: flex; align-items: center; justify-content: space-between; }
-            td::before { position: static; width: auto; font-family: 'Orbitron'; font-size: 9px; color: #444; font-weight: bold; text-transform: uppercase; }
-            
-            /* Стилизация конкретных строк отчета */
-            .row-client { flex-direction: row; justify-content: space-between; }
-            .row-time-progress { display: block; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 10px 0; }
-            .row-time-progress .time-val { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: var(--neon-purple); margin-bottom: 8px; display: block; }
-            .progress-container { margin-top: 5px; height: 4px; }
-
-            .services-cell { display: block; padding: 10px 0 !important; border-bottom: 1px solid rgba(255,255,255,0.05); }
-            .services-cell::before { display: block; margin-bottom: 5px; }
-            
-            .row-price { border-bottom: none; padding-top: 15px; font-size: 20px; font-family: 'Rajdhani'; font-weight: 700; color: #fff; }
-
-            /* Блок кнопок в самом низу */
-            .action-icons-wrap { display: flex; width: 100%; gap: 10px; margin-top: 20px; }
-            .icon-btn-box { 
-                flex: 1; 
-                flex-direction: row !important; 
-                background: #111; 
-                padding: 15px !important; 
-                border-radius: 8px; 
-                justify-content: center; 
-                gap: 12px !important;
-                border: 1px solid #222;
-            }
-            .icon-btn-box i { font-size: 16px; }
-            .icon-btn-box span { font-size: 10px; }
-            .icon-btn-box:first-child { border-color: var(--status-green); }
-            .icon-delete { border-color: var(--artist-red); }
-
             .current-session-box { flex-direction: column; align-items: stretch; gap: 20px; }
             .cart-actions { align-self: center; width: 100%; align-items: center; }
             .total-display-pc { text-align: center; width: 100%; }
             .save-btn { width: 100%; }
+            .services-cell { padding-left: 15px !important; text-align: left !important; display: block; margin: 10px 0; }
+            .services-cell::before { position: static; display: block; margin-bottom: 8px; }
+            .price-cell { font-size: 20px; }
         }
     </style>
 </head>
@@ -593,12 +575,11 @@
         if(!tableBody) return;
         tableBody.addEventListener('mousemove', (e) => {
             const cell = e.target.closest('.services-cell');
+            const allTooltips = document.querySelectorAll('.history-tooltip');
+            clearTimeout(hoverTimer);
+            allTooltips.forEach(t => t.classList.remove('active'));
             if (cell) {
                 const tooltip = cell.querySelector('.history-tooltip');
-                if(!tooltip) return;
-                const allTooltips = document.querySelectorAll('.history-tooltip');
-                clearTimeout(hoverTimer);
-                allTooltips.forEach(t => t.classList.remove('active'));
                 tooltip.style.left = e.clientX + 'px';
                 tooltip.style.top = e.clientY + 'px';
                 hoverTimer = setTimeout(() => { tooltip.classList.add('active'); }, hoverDelay);
@@ -814,24 +795,9 @@
                 tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
-            
+            let timeDisplay = row.time ? `<span class="table-time-inline">${row.time}</span>` : '';
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td data-label="ДАТА" class="row-date">${row.date}</td>
-                <td data-label="КЛИЕНТ" class="row-client">${row.client}</td>
-                <td data-label="ВРЕМЯ" class="row-time-progress">
-                    <span class="time-val">${row.time || '00:00'}</span>
-                    <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
-                </td>
-                <td data-label="УСЛУГИ" class="services-cell">${row.services}${tooltipHTML}</td>
-                <td data-label="ВНЕСЕНО" class="row-price privacy-blur">${paid} ₽</td>
-                <td class="row-actions">
-                    <div class="action-icons-wrap">
-                        <div class="icon-btn-box" onclick="addPayment(${realIndex})"><span>ДОПЛАТА</span><i class="fas fa-wallet"></i></div>
-                        <div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})"><span>УДАЛИТЬ</span><i class="fas fa-trash"></i></div>
-                    </div>
-                </td>
-            `;
+            tr.innerHTML = `<td data-label="ДАТА">${row.date}</td><td data-label="КЛИЕНТ"><div style="display:flex; align-items:center;"><div style="font-weight:600;">${row.client}</div>${timeDisplay}</div><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></td><td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td><td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td><td data-label="ДЕЙСТВИЯ"><div class="action-icons-wrap"><div class="icon-btn-box" onclick="addPayment(${realIndex})"><span>доплата</span><i class="fas fa-wallet"></i></div><div class="icon-btn-box icon-delete" onclick="deleteRow(${realIndex})"><span>удалить</span><i class="fas fa-trash"></i></div></div></td>`;
             body.appendChild(tr);
         });
         updateMonthTotal();
