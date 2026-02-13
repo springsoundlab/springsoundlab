@@ -194,15 +194,6 @@
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
         .day:hover { background: #111; }
 
-        /* БЛИЖАЙШАЯ ЗАПИСЬ */
-        .next-session-widget {
-            background: rgba(0,0,0,0.5); border: 1px solid #222; border-radius: 10px; padding: 15px; margin-bottom: 20px; flex-shrink: 0;
-        }
-        .next-session-title { font-family: 'Orbitron'; font-size: 9px; color: #666; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
-        .next-session-info { display: flex; align-items: center; gap: 12px; }
-        .next-session-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: var(--neon-purple); line-height: 1; }
-        .next-session-client { font-family: 'Inter'; font-weight: 600; font-size: 14px; color: #fff; }
-
         .prepaid-toggle { display: flex; align-items: center; gap: 10px; margin-right: 15px; padding: 5px 12px; border-right: 1px solid #222; }
         .prepaid-toggle span { font-family: 'Orbitron'; font-size: 9px; color: var(--neon-purple); }
         .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
@@ -418,14 +409,6 @@
             <div class="cal-grid" id="calendarDays"></div>
         </div>
 
-        <div class="next-session-widget" id="nextSessionBox">
-            <div class="next-session-title">Ближайшая запись</div>
-            <div class="next-session-info">
-                <div class="next-session-date" id="nextSessionDate">--</div>
-                <div class="next-session-client" id="nextSessionClient">Нет записей</div>
-            </div>
-        </div>
-
         <div class="certs-section" style="display:flex; flex-direction:column; flex-grow:1; overflow:hidden;">
             <h2 style="font-family:'Orbitron'; font-size:14px; margin-bottom:15px; color:#fff; flex-shrink:0;">СЕРТИФИКАТЫ</h2>
             <div class="certs-container" id="certsList"></div>
@@ -618,7 +601,7 @@
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
         currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         document.getElementById('clientName').value = '';
-        renderCart(); updateTable(); renderCalendar(); updateNextSession();
+        renderCart(); updateTable(); renderCalendar();
     }
 
     function addPayment(index) {
@@ -640,7 +623,7 @@
         openModal("УДАЛИТЬ ЗАПИСЬ?", "confirm-delete", function() {
             crmData.splice(i, 1);
             localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-            updateTable(); renderCalendar(); updateNextSession(); closeModal();
+            updateTable(); renderCalendar(); closeModal();
         });
     }
 
@@ -648,7 +631,7 @@
         openModal("УДАЛИТЬ ВООБЩЕ ВСЮ ИСТОРИЮ?", "confirm-delete", function() {
             crmData = [];
             localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-            updateTable(); renderCalendar(); updateNextSession(); closeModal();
+            updateTable(); renderCalendar(); closeModal();
         });
     }
 
@@ -739,33 +722,7 @@
         updateCerts();
     }
 
-    function updateNextSession() {
-        const dateEl = document.getElementById('nextSessionDate');
-        const clientEl = document.getElementById('nextSessionClient');
-        if (!dateEl || !clientEl) return;
-
-        const now = new Date();
-        const todayStr = now.toLocaleDateString('ru-RU');
-        const tomorrow = new Date(now);
-        tomorrow.setDate(now.getDate() + 1);
-        const tomorrowStr = tomorrow.toLocaleDateString('ru-RU');
-
-        // Ищем записи на сегодня или завтра
-        const upcoming = crmData.filter(r => r.date === todayStr || r.date === tomorrowStr);
-        
-        if (upcoming.length > 0) {
-            // Сортируем: сначала те, что на сегодня
-            upcoming.sort((a, b) => (a.date === todayStr ? -1 : 1));
-            const next = upcoming[0];
-            dateEl.innerText = next.date === todayStr ? 'СЕГОДНЯ' : 'ЗАВТРА';
-            clientEl.innerText = next.client;
-        } else {
-            dateEl.innerText = '--';
-            clientEl.innerText = 'Нет записей';
-        }
-    }
-
-    renderCalendar(); updateTable(); updateCerts(); initTooltipLogic(); updateNextSession();
+    renderCalendar(); updateTable(); updateCerts(); initTooltipLogic();
 </script>
 </body>
 </html>
