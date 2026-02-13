@@ -351,66 +351,86 @@
         .icon-delete:hover i { color: var(--artist-red); }
         .icon-delete:hover span { color: var(--artist-red); }
 
-        /* --- БЛОК МОБИЛЬНОЙ АДАПТАЦИИ --- */
+        /* --- АДАПТАЦИЯ ТАБЛИЦЫ ОТЧЕТА ДЛЯ МОБИЛЬНЫХ (Android/iOS) --- */
         @media (max-width: 992px) {
             body { overflow-y: auto; height: auto; padding: 10px; }
-            .header-right-zone { width: 100%; }
             .admin-grid { display: flex !important; flex-direction: column !important; height: auto !important; overflow: visible; }
-            .table-scroll-container { max-height: none; overflow-y: visible; }
-            header { flex-direction: column; gap: 15px; align-items: center; border-bottom: none; }
-            .logo { text-align: center; font-size: 16px; width: 100%; margin-bottom: 5px; }
-            .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
-            .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
             
-            /* Новая сетка для телефона по твоей просьбе */
-            .controls-row { 
-                display: grid; 
-                grid-template-columns: 1fr 1fr; 
-                gap: 8px; 
-                padding: 10px; 
-                overflow-x: hidden;
-            }
-            .prepaid-toggle { 
-                grid-column: span 2; 
-                border-right: none; 
-                border-bottom: 1px solid #222; 
-                margin-right: 0; 
-                justify-content: center; 
-                padding-bottom: 10px;
-                margin-bottom: 5px;
-            }
-            /* Порядок для мобилок: 
-               Ряд 1: Час | Start
-               Ряд 2: Artist | Тюнинг
-               Ряд 3: Аранж | Доп. дор
-               Ряд 4: Platinum
-               Ряд 5: Плат. дор
-            */
-            .btn-order-1 { order: 1; } /* Час */
-            .btn-order-2 { order: 2; } /* Start */
-            .btn-order-3 { order: 3; } /* Artist */
-            .btn-order-4 { order: 4; } /* Тюнинг */
-            .btn-order-5 { order: 5; } /* Аранж */
-            .btn-order-6 { order: 6; } /* Доп дор */
-            .btn-order-7 { order: 7; grid-column: span 2; } /* Platinum */
-            .btn-order-8 { order: 8; grid-column: span 2; } /* Плат дор */
+            /* Блок отчета - переделываем в карточки */
+            .crm-panel { background: none; border: none; padding: 0; }
+            .table-scroll-container { overflow-y: visible; }
             
-            .action-btn { width: 100%; }
-
-            table, thead, tbody, th, td, tr { display: block; width: 100% !important; box-sizing: border-box; }
+            table, thead, tbody, th, td, tr { display: block; width: 100% !important; }
             thead tr { position: absolute; top: -9999px; left: -9999px; }
-            tr { background: #0a0a0a; border: 1px solid #111; margin-bottom: 15px; border-radius: 12px; padding: 15px; }
-            td { border: none; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; padding-left: 40% !important; text-align: right !important; min-height: 40px; display: flex; align-items: center; justify-content: flex-end; }
-            td:last-child { border-bottom: none; }
-            td::before { content: attr(data-label); position: absolute; left: 15px; width: 35%; text-align: left; font-family: 'Orbitron'; font-size: 9px; color: #444; font-weight: bold; }
             
-            .current-session-box { flex-direction: column; align-items: stretch; gap: 20px; }
-            .cart-actions { align-self: center; width: 100%; align-items: center; }
-            .total-display-pc { text-align: center; width: 100%; }
-            .save-btn { width: 100%; }
-            .services-cell { padding-left: 15px !important; text-align: left !important; display: block; margin: 10px 0; }
-            .services-cell::before { position: static; display: block; margin-bottom: 8px; }
-            .price-cell { font-size: 20px; }
+            /* Стилизация карточки записи */
+            tr { 
+                background: #0a0a0a; 
+                border: 1px solid #1a1a1a; 
+                margin-bottom: 20px; 
+                border-radius: 12px; 
+                padding: 15px; 
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            }
+            
+            td { 
+                border: none; 
+                border-bottom: 1px solid rgba(255,255,255,0.05); 
+                position: relative; 
+                padding-left: 45% !important; 
+                text-align: right !important; 
+                min-height: 45px; 
+                display: flex; 
+                align-items: center; 
+                justify-content: flex-end;
+            }
+            td:last-child { border-bottom: none; }
+            
+            /* Подписи для полей карточки */
+            td::before { 
+                content: attr(data-label); 
+                position: absolute; 
+                left: 15px; 
+                width: 40%; 
+                text-align: left; 
+                font-family: 'Orbitron'; 
+                font-size: 9px; 
+                color: #555; 
+                font-weight: 700;
+                text-transform: uppercase;
+            }
+
+            /* Особое оформление для услуг и прогресса */
+            .services-cell { 
+                display: block !important; 
+                padding-left: 15px !important; 
+                text-align: left !important; 
+                padding-top: 35px !important;
+                color: var(--text-gray) !important;
+                font-size: 11px;
+            }
+            .services-cell::before { top: 12px; }
+            
+            .progress-container { margin-top: 8px; width: 100%; }
+            
+            /* Цена в карточке */
+            .price-cell { 
+                font-size: 20px !important; 
+                color: var(--neon-purple) !important; 
+                font-family: 'Rajdhani';
+            }
+
+            /* Действия в карточке */
+            .action-icons-wrap { 
+                justify-content: space-around; 
+                padding-top: 10px;
+                width: 100%;
+            }
+            
+            /* Общие фиксы шапки для мобилок */
+            header { flex-direction: column; gap: 15px; align-items: center; }
+            .header-right-zone { width: 100%; }
+            .logo { text-align: center; }
         }
     </style>
 </head>
@@ -449,42 +469,42 @@
                 </label>
             </div>
             
-            <div class="btn-wrapper btn-order-1">
+            <div class="btn-wrapper">
                 <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
                 <div class="btn-tooltip">900 ₽ (Всегда 100%)</div>
             </div>
             
-            <div class="btn-wrapper btn-order-2">
+            <div class="btn-wrapper">
                 <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
                 <div class="btn-tooltip">3500 ₽</div>
             </div>
 
-            <div class="btn-wrapper btn-order-3">
+            <div class="btn-wrapper">
                 <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
                 <div class="btn-tooltip">6000 ₽</div>
             </div>
 
-            <div class="btn-wrapper btn-order-4">
+            <div class="btn-wrapper">
                 <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
                 <div class="btn-tooltip">1000 ₽</div>
             </div>
             
-            <div class="btn-wrapper btn-order-5">
+            <div class="btn-wrapper">
                 <button class="action-btn btn-blue" onclick="openPriceModal('АРАНЖИРОВКА', 'blue', 10000)">АРАНЖИРОВКА</button>
                 <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
             </div>
 
-            <div class="btn-wrapper btn-order-6">
+            <div class="btn-wrapper">
                 <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
                 <div class="btn-tooltip">500 ₽</div>
             </div>
             
-            <div class="btn-wrapper btn-order-7">
+            <div class="btn-wrapper">
                 <button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">PLATINUM EDITION</button>
                 <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
             </div>
 
-            <div class="btn-wrapper btn-order-8">
+            <div class="btn-wrapper">
                 <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
                 <div class="btn-tooltip">300 ₽</div>
             </div>
