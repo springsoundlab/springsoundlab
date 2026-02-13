@@ -336,8 +336,9 @@
         .icon-delete:hover i { color: var(--artist-red); }
         .icon-delete:hover span { color: var(--artist-red); }
 
+        /* --- НОВЫЙ БЛОК ДЛЯ МОБИЛЬНОЙ АДАПТАЦИИ --- */
         @media (max-width: 992px) {
-            body { overflow-y: auto; height: auto; }
+            body { overflow-y: auto; height: auto; padding: 10px; }
             .header-right-zone { width: 100%; }
             .admin-grid { display: flex !important; flex-direction: column !important; height: auto !important; overflow: visible; }
             .table-scroll-container { max-height: none; overflow-y: visible; }
@@ -345,6 +346,24 @@
             .logo { text-align: center; font-size: 16px; width: 100%; margin-bottom: 5px; }
             .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
+            
+            /* Таблица превращается в карточки */
+            table, thead, tbody, th, td, tr { display: block; width: 100% !important; box-sizing: border-box; }
+            thead tr { position: absolute; top: -9999px; left: -9999px; }
+            tr { background: #0a0a0a; border: 1px solid #111; margin-bottom: 15px; border-radius: 12px; padding: 15px; }
+            td { border: none; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; padding-left: 40% !important; text-align: right !important; min-height: 40px; display: flex; align-items: center; justify-content: flex-end; }
+            td:last-child { border-bottom: none; }
+            td::before { content: attr(data-label); position: absolute; left: 15px; width: 35%; text-align: left; font-family: 'Orbitron'; font-size: 9px; color: #444; font-weight: bold; }
+            
+            /* Специфические фиксы элементов */
+            .controls-row { justify-content: center; }
+            .current-session-box { flex-direction: column; align-items: stretch; gap: 20px; }
+            .cart-actions { align-self: center; width: 100%; align-items: center; }
+            .total-display-pc { text-align: center; width: 100%; }
+            .save-btn { width: 100%; }
+            .services-cell { padding-left: 15px !important; text-align: left !important; display: block; margin: 10px 0; }
+            .services-cell::before { position: static; display: block; margin-bottom: 8px; }
+            .price-cell { font-size: 20px; }
         }
     </style>
 </head>
@@ -748,7 +767,6 @@
                     showTime = false;
                 }
             } else if (row.date !== todayStr) {
-                // Если дата прошлая, время не показываем в таблице CRM
                 const da = row.date.split('.').reverse().join('');
                 const dt = todayStr.split('.').reverse().join('');
                 if (da < dt) showTime = false;
@@ -774,7 +792,7 @@
                     </div>
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
-                <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
+                <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
                 <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
                 <td data-label="ДЕЙСТВИЯ">
                     <div class="action-icons-wrap">
@@ -877,7 +895,6 @@
         }
     }
 
-    // Автоматическое обновление таблицы каждую минуту для проверки времени
     setInterval(() => {
         updateTable();
     }, 60000);
