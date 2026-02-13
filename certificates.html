@@ -9,7 +9,7 @@
     <style>
         :root { 
             --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
-            --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
+            --status-green: #00ff66; --artist-red: #cc0000; --platinum-gold: #b89600;
             --text-gray: #b0b0b0;
         }
         body { background: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; overflow-x: hidden; }
@@ -58,7 +58,7 @@
         .day-name { font-size: 9px; color: #666; font-weight: bold; padding-bottom: 5px; }
         .day { font-size: 12px; padding: 8px 0; cursor: pointer; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
         .day.today { border: 1px solid var(--neon-purple); }
-        .day.has-data { background: var(--status-green) !important; color: #fff !important; }
+        .day.has-data { background: #008f39 !important; color: #fff !important; }
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
         .day:hover { background: #111; }
 
@@ -77,9 +77,9 @@
         .btn-white { border: 1px solid #fff; }
         .btn-purple { border: 1px solid var(--neon-purple); }
         .btn-red { border: 1px solid var(--artist-red); }
-        .btn-green { border: 1px solid var(--status-green); }
+        .btn-green { border: 1px solid #008f39; }
         .btn-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
-        .btn-dashed-green { border: 1px dashed var(--status-green) !important; }
+        .btn-dashed-green { border: 1px dashed #008f39 !important; }
         .btn-dashed-gold { border: 1px dashed var(--platinum-gold) !important; }
 
         .platinum-group { display: flex; align-items: center; gap: 10px; border-left: 1px solid #222; padding-left: 10px; }
@@ -96,23 +96,23 @@
         .tag-white { border: 1px solid #fff; color: #fff; }
         .tag-purple { border: 1px solid var(--neon-purple); color: var(--neon-purple); }
         .tag-red { border: 1px solid var(--artist-red); color: var(--artist-red); }
-        .tag-green { border: 1px solid var(--status-green); color: var(--status-green); }
+        .tag-green { border: 1px solid #008f39; color: #008f39; }
         .tag-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
         .tag-remove { position: absolute; right: 0; top: 0; bottom: 0; width: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.5; }
         .cart-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; align-self: flex-end; }
         .total-display-pc { font-family: 'Rajdhani'; font-weight: 700; font-size: 34px; color: #fff; height: 42px; width: 155px; margin-bottom: 8px; text-align: right; }
         .session-controls-row { display: flex; align-items: center; gap: 10px; width: 320px; }
         .input-mini { background: #000; border: 1px solid #333; color: #fff; padding: 0 10px; height: 42px; border-radius: 6px; width: 155px; font-size: 13px; font-family: 'Orbitron'; text-align: center; outline: none; }
-        .save-btn { background: var(--status-green); color: #fff; border: none; height: 42px; width: 155px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
+        .save-btn { background: #008f39; color: #fff; border: none; height: 42px; width: 155px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
         .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; }
 
-        /* ЯРКАЯ УЗКАЯ ШКАЛА ПРОГРЕССА */
         .progress-container { width: 100%; height: 3px; background: #1a1a1a; margin-top: 5px; border-radius: 2px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .progress-bar.complete { background: var(--status-green); box-shadow: 0 0 10px var(--status-green); }
 
         .history-row { position: relative; }
         .history-tooltip { 
@@ -250,9 +250,9 @@
                     <col style="width: 180px;">
                     <col>
                     <col style="width: 120px;">
-                    <col style="width: 50px;">
+                    <col style="width: 80px;">
                 </colgroup>
-                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right">ВНЕСЕНО</th><th></th></tr></thead>
+                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right">ВНЕСЕНО</th><th>ДЕЙСТВИЯ</th></tr></thead>
                 <tbody id="crmTableBody"></tbody>
             </table>
         </div>
@@ -321,7 +321,6 @@
     function selectCalendarDate(date) { selectedDate = date; renderCalendar(); }
     function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); selectedDate = null; updateTable(); renderCalendar(); }
 
-    // НОВАЯ ФУНКЦИЯ: Пересчет корзины при переключении 50%
     function applyPrepaidToggle() {
         const isPrepaid = document.getElementById('prepaidMode').checked;
         currentCart.total = 0;
@@ -344,7 +343,6 @@
         const isPrepaid = document.getElementById('prepaidMode').checked;
         let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
         let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
-
         currentCart.details.push({ name: finalName, price: finalPrice, basePrice: price, colorClass });
         currentCart.items.push({ name: finalName, colorClass });
         currentCart.total += finalPrice;
@@ -399,6 +397,19 @@
         renderCart(); updateTable(); renderCalendar();
     }
 
+    // НОВАЯ ФУНКЦИЯ: Доплата
+    function addPayment(index) {
+        const row = crmData[index];
+        const remaining = row.fullTotal - row.total;
+        const amount = prompt(`Доплата для ${row.client}.\nОстаток: ${remaining} ₽.\nВведите сумму доплаты:`, remaining);
+        
+        if (amount !== null && !isNaN(amount) && amount !== "") {
+            row.total += parseInt(amount);
+            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+            updateTable();
+        }
+    }
+
     function updateTable() {
         const body = document.getElementById('crmTableBody');
         if(!body) return;
@@ -415,7 +426,10 @@
             if (!row.date.includes(mKey)) return;
             const full = row.fullTotal || row.total;
             const paid = row.total;
-            const perc = (paid / full) * 100;
+            const perc = Math.min((paid / full) * 100, 100);
+            const isComplete = perc >= 100;
+            const realIndex = crmData.indexOf(row);
+            
             const tr = document.createElement('tr');
             tr.className = 'history-row';
 
@@ -423,17 +437,20 @@
             row.details.forEach(d => {
                 tooltip += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
-            tooltip += `<div class="tooltip-summary"><div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${full-paid} ₽</span></div></div></div>`;
+            tooltip += `<div class="tooltip-summary"><div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div></div>`;
 
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
                 <td data-label="КЛИЕНТ">
                     <div style="font-weight:600;">${row.client}</div>
-                    <div class="progress-container"><div class="progress-bar" style="width:${perc}%"></div></div>
+                    <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
                 <td class="services-cell" style="position:relative;">${row.services}${tooltip}</td>
                 <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
-                <td data-label="УДАЛИТЬ"><i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${crmData.indexOf(row)})"></i></td>
+                <td data-label="ДЕЙСТВИЯ" style="text-align:right;">
+                    <i class="fas fa-wallet" style="color:#444; cursor:pointer; font-size:12px; margin-right:15px; transition:0.3s;" title="Доплатить" onclick="addPayment(${realIndex})"></i>
+                    <i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${realIndex})"></i>
+                </td>
             `;
             body.appendChild(tr);
         });
