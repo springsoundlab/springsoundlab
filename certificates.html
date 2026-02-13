@@ -44,10 +44,9 @@
             flex-shrink: 0; 
         }
 
-        /* ОТСТУП ДЛЯ КОМПЬЮТЕРНОЙ ВЕРСИИ */
         @media (min-width: 993px) {
             header {
-                margin-top: 30px; /* Отодвигаем шапку от верха браузера */
+                margin-top: 30px;
             }
         }
 
@@ -344,6 +343,7 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
+        /* Тултип (Компьютерная версия) */
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
@@ -418,7 +418,6 @@
             table, thead, tbody, th, td, tr { display: block; width: 100% !important; box-sizing: border-box; }
             thead tr { position: absolute; top: -9999px; left: -9999px; }
             
-            /* Стилизация мобильной карточки */
             tr { 
                 background: #0a0a0a; 
                 border: 1px solid #111; 
@@ -432,7 +431,9 @@
             td { border: none !important; padding: 0 !important; text-align: left !important; min-height: auto !important; display: block !important; position: relative; }
 
             .mobile-row-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; color: #555; margin-bottom: 4px; }
-            .mobile-row-client { font-family: 'Inter'; font-weight: 600; font-size: 18px; color: #fff; margin-bottom: 12px; }
+            .mobile-row-client { font-family: 'Inter'; font-weight: 600; font-size: 18px; color: #fff; margin-bottom: 8px; }
+            .mobile-row-services { font-size: 11px; color: #888; margin-bottom: 12px; line-height: 1.4; }
+            
             .mobile-progress-wrapper { margin-bottom: 15px; }
             .mobile-time-label { font-family: 'Orbitron'; font-size: 10px; color: var(--neon-purple); margin-bottom: 5px; display: block; }
             
@@ -450,45 +451,53 @@
             .total-display-pc { text-align: center; width: 100%; }
             .save-btn { width: 100%; }
 
-            /* НОВОЕ: СТИЛИ ДЛЯ МОБИЛЬНОЙ ДЕТАЛИЗАЦИИ ПО ДВОЙНОМУ ТАПУ */
+            /* АДАПТИРОВАННАЯ МОБИЛЬНАЯ ДЕТАЛИЗАЦИЯ (КАК НА ПК) */
             .mobile-details-overlay {
                 position: absolute;
                 top: 0; left: 0; width: 100%; height: 100%;
-                background: #050505;
+                background: #0a0a0a;
                 z-index: 50;
                 padding: 15px;
-                display: none; /* По умолчанию скрыто */
+                display: none;
                 box-sizing: border-box;
                 flex-direction: column;
+                border: 1px solid var(--neon-purple);
+                border-radius: 12px;
+                box-shadow: inset 0 0 20px rgba(191, 0, 255, 0.2);
             }
             .mobile-details-overlay.active { display: flex; }
             
             .mobile-details-close {
                 position: absolute;
-                top: 10px; right: 10px;
-                width: 30px; height: 30px;
+                top: 8px; right: 8px;
+                width: 26px; height: 26px;
                 background: rgba(255,255,255,0.05);
                 border-radius: 50%;
                 display: flex; align-items: center; justify-content: center;
-                color: #fff; font-size: 16px;
-                cursor: pointer;
+                color: #fff; font-size: 14px;
+                cursor: pointer; z-index: 60;
             }
-            .mobile-details-title {
-                font-family: 'Orbitron'; font-size: 9px; color: var(--neon-purple);
-                text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;
+            .mobile-details-header {
+                color: #888; font-family: 'Orbitron'; font-size: 9px; 
+                border-bottom: 1px solid #222; padding-bottom: 5px; 
+                margin-bottom: 12px; text-transform: uppercase;
             }
-            .mobile-details-list {
-                overflow-y: auto; flex-grow: 1;
-            }
+            .mobile-details-list { overflow-y: auto; flex-grow: 1; }
             .mobile-detail-item {
                 display: flex; justify-content: space-between; align-items: center;
-                border-bottom: 1px solid #111; padding: 10px 0;
+                margin-bottom: 6px; padding: 4px 0 4px 10px;
+                border-left: 2px solid #fff; /* Цвет меняется динамически через JS */
             }
             .mobile-detail-name { font-size: 11px; color: #fff; }
-            .mobile-detail-price { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; color: var(--neon-purple); }
-            .mobile-detail-total {
+            .mobile-detail-price { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; }
+            
+            .mobile-summary-section {
                 margin-top: 10px; border-top: 1px solid #222; padding-top: 10px;
-                display: flex; justify-content: space-between; font-family: 'Rajdhani'; font-weight: 700;
+            }
+            .mobile-summary-line {
+                display: flex; justify-content: space-between; 
+                margin-bottom: 4px; font-size: 12px; 
+                font-family: 'Rajdhani'; font-weight: 700;
             }
         }
     </style>
@@ -854,8 +863,7 @@
     }
 
     function toggleMobileDetails(e, index) {
-        // Предотвращаем срабатывание, если нажаты кнопки внутри карточки
-        if (e.target.closest('.m-action-btn')) return;
+        if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close')) return;
         const overlay = document.getElementById(`mobileDetails-${index}`);
         if (overlay) overlay.classList.toggle('active');
     }
@@ -874,27 +882,29 @@
         filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total;
             const paid = row.total;
+            const rest = Math.max(0, full - paid);
             const perc = Math.min((paid / full) * 100, 100);
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
             
+            // Тултип для ПК
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
                 tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
-            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div>`;
+            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
 
             let timeDisplay = row.time ? `<span class="table-time-inline">${row.time}</span>` : '';
             const tr = document.createElement('tr');
 
             if (window.innerWidth <= 992) {
-                // Мобильный шаблон с оверлеем детализации
-                let mobileDetailsHTML = '';
+                // МОБИЛЬНЫЙ ВАРИАНТ
+                let mobileItemsHTML = '';
                 row.details.forEach(d => {
-                    mobileDetailsHTML += `
-                        <div class="mobile-detail-item">
-                            <span class="mobile-detail-name">${d.name}</span>
+                    mobileItemsHTML += `
+                        <div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}">
+                            <span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span>
                             <span class="mobile-detail-price privacy-blur">${d.price} ₽</span>
                         </div>`;
                 });
@@ -904,17 +914,19 @@
                     <td>
                         <div id="mobileDetails-${realIndex}" class="mobile-details-overlay">
                             <div class="mobile-details-close" onclick="event.stopPropagation(); document.getElementById('mobileDetails-${realIndex}').classList.remove('active')">×</div>
-                            <div class="mobile-details-title">Детализация заказа</div>
+                            <div class="mobile-details-header">Детализация заказа</div>
                             <div class="mobile-details-list">
-                                ${mobileDetailsHTML}
-                                <div class="mobile-detail-total">
-                                    <span>ВНЕСЕНО</span>
-                                    <span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span>
-                                </div>
+                                ${mobileItemsHTML}
+                            </div>
+                            <div class="mobile-summary-section">
+                                <div class="mobile-summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur">${full} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div>
                             </div>
                         </div>
                         <div class="mobile-row-date">${row.date}</div>
                         <div class="mobile-row-client">${row.client}</div>
+                        <div class="mobile-row-services">${row.services}</div>
                         <div class="mobile-progress-wrapper">
                             <span class="mobile-time-label">${row.time || '--:--'}</span>
                             <div class="progress-container">
@@ -928,6 +940,7 @@
                     </td>
                 `;
             } else {
+                // ПК ВАРИАНТ
                 tr.innerHTML = `
                     <td data-label="ДАТА">${row.date}</td>
                     <td data-label="КЛИЕНТ">
