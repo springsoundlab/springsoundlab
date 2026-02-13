@@ -3,269 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRING SOUND LAB | CRM & ANALYTICS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>DEBUG MODE | SPRING SOUND LAB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
-            --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
-            --text-gray: #b0b0b0;
-        }
-        body { background: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; overflow-x: hidden; }
+        :root { --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; --red: #cc0000; --green: #008f39; }
+        body { background: var(--bg-dark); color: #fff; font-family: 'Inter', sans-serif; padding: 20px; }
         
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid #111; margin-bottom: 20px; }
-        .logo { font-family: 'Orbitron', sans-serif; color: var(--neon-purple); letter-spacing: 2px; font-size: 14px; }
+        .header-debug { border-bottom: 2px solid var(--neon-purple); padding-bottom: 10px; margin-bottom: 30px; }
+        .logo { font-family: 'Orbitron'; color: var(--neon-purple); font-size: 18px; }
+
+        .session-form { background: #111; padding: 20px; border-radius: 10px; margin-bottom: 30px; display: flex; gap: 10px; }
+        input { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; outline: none; }
+        .save-btn { background: var(--neon-purple); border: none; color: #fff; padding: 10px 20px; cursor: pointer; font-family: 'Orbitron'; }
+
+        /* СПИСОК ЗАПИСЕЙ ВМЕСТО ТАБЛИЦЫ */
+        .history-list { display: flex; flex-direction: column; gap: 15px; }
         
-        .back-btn { color: #888; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #222; padding: 5px 10px; border-radius: 4px; transition: 0.3s; margin-left: 20px; }
-        .back-btn:hover { color: #fff; border-color: var(--neon-purple); }
-
-        /* УДАЛЕНО: Privacy Blur эффекты */
-
-        .unlock-btn {
-            background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #444; font-size: 8px;
-            padding: 2px 8px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron';
-            margin-bottom: 5px; transition: 0.3s; letter-spacing: 1px;
+        .history-card { 
+            background: var(--card-bg); 
+            border: 1px solid #222; 
+            padding: 15px; 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            position: relative;
         }
 
-        .total-box { 
-            background: var(--neon-purple); padding: 5px 15px; border-radius: 6px; text-align: center;
-            display: inline-flex; flex-direction: column; justify-content: center; min-width: 120px;
+        .info-part { display: flex; flex-direction: column; gap: 5px; }
+        .client-name { font-family: 'Orbitron'; font-size: 14px; color: #fff; }
+        .service-name { color: #888; font-size: 12px; }
+        .price-val { font-weight: bold; color: var(--neon-purple); }
+
+        /* КНОПКИ ДЕЙСТВИЙ - МАКСИМАЛЬНО ПРОСТЫЕ */
+        .actions-part { 
+            display: flex; 
+            gap: 10px; 
+            position: relative; 
+            z-index: 9999; /* Самый высокий приоритет */
         }
-        .income-amount { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: #fff; line-height: 1.1; }
-        #totalLabel { font-size: 7px; display: block; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.9); margin-top: 1px; font-weight: 600; }
 
-        .admin-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; max-width: 1600px; margin: 0 auto; }
-        .crm-panel, .side-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid #111; position: relative; z-index: 1; }
+        .debug-btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: 'Orbitron';
+            font-size: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
 
-        .calendar-widget { margin-bottom: 20px; background: #000; border-radius: 10px; padding: 15px; border: 1px solid #222; }
-        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .month-name { font-family: 'Orbitron'; color: #fff; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .day-name { font-size: 9px; color: #666; font-weight: bold; padding-bottom: 5px; }
-        .day { font-size: 12px; padding: 8px 0; cursor: pointer; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
-        .day.today { border: 1px solid var(--neon-purple); }
-        .day.has-data { background: var(--status-green) !important; color: #fff !important; }
-        .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
-
-        .controls-row { display: flex; align-items: center; gap: 10px; background: #000; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #111; flex-wrap: wrap; }
-        .action-btn { background: transparent; color: #fff; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; transition: 0.3s; border: 1px solid #222; }
+        .btn-pay { background: var(--green); color: #fff; border-color: #00ff00; }
+        .btn-del { background: var(--red); color: #fff; border-color: #ff0000; }
         
-        .btn-white { border-color: #fff; }
-        .btn-purple { border-color: var(--neon-purple); }
-        .btn-red { border-color: var(--artist-red); }
-        .btn-green { border-color: var(--status-green); }
-        .btn-gold { border-color: var(--platinum-gold); color: var(--platinum-gold); }
+        .debug-btn:active { transform: scale(0.95); }
 
-        .current-session-box { 
-            background: rgba(191, 0, 255, 0.05); border: 1px solid var(--neon-purple); 
-            padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; 
-            justify-content: space-between; min-height: 120px; position: relative;
-        }
-        .cart-tag { font-size: 10px; font-family: 'Orbitron'; padding: 6px 10px; border-radius: 4px; display: inline-flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid #333; margin-right: 5px; margin-bottom: 5px; }
-        .total-display-pc { font-family: 'Rajdhani'; font-weight: 700; font-size: 34px; color: #fff; text-align: right; }
-        .input-mini { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px; width: 150px; outline: none; }
-        .save-btn { background: var(--status-green); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-family: 'Orbitron'; cursor: pointer; }
-
-        .progress-container { width: 100%; height: 2px; background: #111; margin-top: 5px; }
-        .progress-bar { height: 100%; background: var(--neon-purple); }
-        .progress-bar.complete { background: var(--status-green); }
-
-        /* Упрощение таблицы */
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; }
-        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff; position: relative; }
-
-        .action-icons-wrap { display: flex; gap: 15px; justify-content: flex-end; }
-        .icon-btn-box { cursor: pointer; text-align: center; color: #444; transition: 0.2s; }
-        .icon-btn-box:hover { color: var(--neon-purple); }
-        .icon-btn-box i { font-size: 14px; display: block; margin-bottom: 2px; }
-        .icon-btn-box span { font-size: 7px; text-transform: uppercase; font-family: 'Orbitron'; }
-        .icon-delete:hover { color: var(--artist-red); }
-
-        @media (max-width: 992px) {
-            .admin-grid { display: block; }
-            .side-panel { margin-top: 20px; }
-            .history-row td { display: block; text-align: right; padding-left: 50%; position: relative; }
-            .history-row td::before { content: attr(data-label); position: absolute; left: 10px; font-family: 'Orbitron'; font-size: 8px; color: #555; }
-        }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
-    <div style="display: flex; align-items: center;">
-        <div class="total-box">
-            <span id="monthTotal" class="income-amount">0 ₽</span>
-            <span id="totalLabel">ДОХОД ЗА МЕСЯЦ</span>
-        </div>
-        <a href="index.html" class="back-btn">Выйти на сайт</a>
-    </div>
-</header>
-
-<div class="admin-grid">
-    <div class="crm-panel">
-        <div class="controls-row">
-            <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
-            <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
-            <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
-            <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
-            
-            <div style="display:flex; gap:10px; border-left: 1px solid #222; padding-left: 10px;">
-                <input type="number" id="platPrice" class="plat-input" placeholder="Цена" style="width:70px; background:#000; border:1px solid #222; color:gold; padding:5px;">
-                <button class="action-btn btn-gold" onclick="addPlatToCart()">+ PLATINUM</button>
-            </div>
-        </div>
-
-        <div id="currentSession" class="current-session-box">
-            <div id="cartItems">Пусто...</div>
-            <div style="text-align:right">
-                <div class="total-display-pc" id="cartTotal">0 ₽</div>
-                <input type="text" id="clientName" class="input-mini" placeholder="ИМЯ КЛИЕНТА">
-                <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
-            </div>
-        </div>
-
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ДАТА</th>
-                        <th>КЛИЕНТ</th>
-                        <th>УСЛУГИ</th>
-                        <th>ВНЕСЕНО</th>
-                        <th style="text-align:right">ДЕЙСТВИЯ</th>
-                    </tr>
-                </thead>
-                <tbody id="crmTableBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="side-panel">
-        <div class="calendar-widget">
-            <div class="cal-header">
-                <span class="month-name" id="calMonthName">ФЕВРАЛЬ 2026</span>
-            </div>
-            <div class="cal-grid" id="calendarDays"></div>
-        </div>
-        <div id="certsList" style="max-height: 300px; overflow-y:auto;"></div>
-    </div>
+<div class="header-debug">
+    <div class="logo">SPRING SOUND LAB | DEBUG MODE (No Tables)</div>
 </div>
+
+<div class="session-form">
+    <input type="text" id="nameIn" placeholder="Имя клиента">
+    <input type="number" id="priceIn" placeholder="Сумма">
+    <button class="save-btn" onclick="quickSave()">СОХРАНИТЬ ТЕСТ</button>
+</div>
+
+<div class="history-list" id="historyList">
+    </div>
 
 <script>
     let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
-    let currentCart = { items: [], details: [], total: 0 };
-    let currentCalDate = new Date();
 
-    function renderCalendar() {
-        const grid = document.getElementById('calendarDays');
-        if(!grid) return;
-        grid.innerHTML = '';
-        const year = currentCalDate.getFullYear();
-        const month = currentCalDate.getMonth();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+    function quickSave() {
+        const name = document.getElementById('nameIn').value || 'Тест';
+        const price = parseInt(document.getElementById('priceIn').value) || 0;
         
-        for(let d=1; d<=daysInMonth; d++) {
-            const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
-            const hasData = crmData.some(row => row.date === dateStr);
-            grid.innerHTML += `<div class="day ${hasData ? 'has-data' : ''}">${d}</div>`;
-        }
-        updateMonthTotal();
-    }
-
-    function addToCart(name, price, color, forceFull = false) {
-        currentCart.items.push(name);
-        currentCart.details.push({name, price});
-        currentCart.total += price;
-        renderCart();
-    }
-
-    function renderCart() {
-        document.getElementById('cartTotal').innerText = currentCart.total + ' ₽';
-        document.getElementById('cartItems').innerHTML = currentCart.items.map(name => `<span class="cart-tag">${name}</span>`).join('');
-    }
-
-    function saveSession() {
-        if (currentCart.items.length === 0) return;
-        const name = document.getElementById('clientName').value || 'Клиент';
-        const date = new Date().toLocaleDateString('ru-RU');
-        crmData.push({ 
-            date, client: name, 
-            services: currentCart.items.join(', '), 
-            total: currentCart.total,
-            fullTotal: currentCart.total,
-            timestamp: Date.now() 
+        crmData.push({
+            client: name,
+            total: price,
+            services: "Тестовая услуга",
+            date: new Date().toLocaleDateString(),
+            timestamp: Date.now()
         });
+        
         localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-        currentCart = { items: [], details: [], total: 0 };
-        document.getElementById('clientName').value = '';
-        renderCart(); updateTable(); renderCalendar();
+        renderList();
     }
 
-    function addPayment(index) {
-        // Прямой вызов функции для теста
-        console.log("Нажата доплата для индекса:", index);
-        const amount = prompt("Введите сумму доплаты:");
-        if (amount) {
-            crmData[index].total += parseInt(amount);
-            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-            updateTable();
-        }
-    }
+    function renderList() {
+        const container = document.getElementById('historyList');
+        container.innerHTML = '';
 
-    function deleteRow(index) {
-        console.log("Нажато удаление для индекса:", index);
-        if(confirm('Удалить запись?')) {
-            crmData.splice(index, 1);
-            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
-            updateTable();
-            renderCalendar();
-        }
-    }
-
-    function updateTable() {
-        const body = document.getElementById('crmTableBody');
-        if(!body) return;
-        body.innerHTML = '';
-        
-        crmData.forEach((row, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${row.date}</td>
-                <td>${row.client}</td>
-                <td>${row.services}</td>
-                <td>${row.total} ₽</td>
-                <td>
-                    <div class="action-icons-wrap">
-                        <div class="icon-btn-box" onclick="addPayment(${index})">
-                            <i class="fas fa-wallet"></i>
-                            <span>доплата</span>
-                        </div>
-                        <div class="icon-btn-box icon-delete" onclick="deleteRow(${index})">
-                            <i class="fas fa-trash"></i>
-                            <span>удалить</span>
-                        </div>
-                    </div>
-                </td>
+        crmData.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'history-card';
+            card.innerHTML = `
+                <div class="info-part">
+                    <div class="client-name">${item.client} (${item.date})</div>
+                    <div class="service-name">${item.services}</div>
+                    <div class="price-val">${item.total} ₽</div>
+                </div>
+                <div class="actions-part">
+                    <button class="debug-btn btn-pay" onclick="testPay(${index})">ДОПЛАТА</button>
+                    <button class="debug-btn btn-del" onclick="testDelete(${index})">УДАЛИТЬ</button>
+                </div>
             `;
-            body.appendChild(tr);
+            container.appendChild(card);
         });
-        updateMonthTotal();
     }
 
-    function updateMonthTotal() {
-        const sum = crmData.reduce((a, b) => a + b.total, 0);
-        document.getElementById('monthTotal').innerText = sum.toLocaleString() + ' ₽';
+    function testPay(idx) {
+        alert("Кнопка ДОПЛАТА работает! Индекс: " + idx);
+        const val = prompt("Сколько добавить?");
+        if(val) {
+            crmData[idx].total += parseInt(val);
+            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+            renderList();
+        }
     }
 
-    function addPlatToCart() {
-        const p = parseInt(document.getElementById('platPrice').value) || 10000;
-        addToCart('PLATINUM', p, 'gold');
+    function testDelete(idx) {
+        alert("Кнопка УДАЛИТЬ работает! Индекс: " + idx);
+        if(confirm("Точно удалить?")) {
+            crmData.splice(idx, 1);
+            localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+            renderList();
+        }
     }
 
-    renderCalendar(); updateTable();
+    // Запуск при загрузке
+    renderList();
 </script>
+
 </body>
 </html>
