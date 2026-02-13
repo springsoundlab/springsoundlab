@@ -35,12 +35,30 @@
             flex-shrink: 0; 
         }
 
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            padding-top: 15px;
+        }
+
         .logo { 
             font-family: 'Orbitron', sans-serif; 
             color: var(--neon-purple); 
             letter-spacing: 2px; 
             font-size: 14px; 
-            padding-top: 15px;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .header-clock {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 42px;
+            color: #fff;
+            line-height: 0.9;
+            text-align: justify;
+            text-align-last: justify; /* Растягивает время по ширине логотипа */
+            letter-spacing: 2px;
         }
         
         .header-right-zone {
@@ -342,7 +360,9 @@
             .admin-grid { display: flex !important; flex-direction: column !important; height: auto !important; overflow: visible; }
             .table-scroll-container { max-height: none; overflow-y: visible; }
             header { flex-direction: column; gap: 15px; align-items: center; border-bottom: none; }
-            .logo { text-align: center; font-size: 16px; width: 100%; margin-bottom: 5px; }
+            .logo-container { width: 100%; text-align: center; }
+            .logo { font-size: 16px; margin-bottom: 5px; }
+            .header-clock { text-align: center; text-align-last: center; }
             .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
         }
@@ -361,7 +381,10 @@
 </div>
 
 <header>
-    <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
+    <div class="logo-container">
+        <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
+        <div class="header-clock" id="mainClock">00:00</div>
+    </div>
     <div class="header-right-zone">
         <div class="total-box" onclick="checkPrivacyPassword()">
             <div class="unlock-overlay">CLICK TO UNLOCK</div>
@@ -490,6 +513,17 @@
     const hoverDelay = 700;
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
+
+    // Функция обновления часов
+    function updateClock() {
+        const now = new Date();
+        const clockEl = document.getElementById('mainClock');
+        if (clockEl) {
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            clockEl.innerText = `${h}:${m}`;
+        }
+    }
 
     function toggleCerts() {
         document.getElementById('certsDropdown').classList.toggle('active');
@@ -740,7 +774,6 @@
             
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
 
-            // ЛОГИКА ИСЧЕЗНОВЕНИЯ ВРЕМЕНИ
             let showTime = true;
             if (row.time && row.date === todayStr) {
                 const [h, m] = row.time.split(':').map(Number);
@@ -748,7 +781,6 @@
                     showTime = false;
                 }
             } else if (row.date !== todayStr) {
-                // Если дата прошлая, время не показываем в таблице CRM
                 const da = row.date.split('.').reverse().join('');
                 const dt = todayStr.split('.').reverse().join('');
                 if (da < dt) showTime = false;
@@ -877,11 +909,12 @@
         }
     }
 
-    // Автоматическое обновление таблицы каждую минуту для проверки времени
     setInterval(() => {
         updateTable();
-    }, 60000);
+        updateClock();
+    }, 10000); // Чаще проверяем время для часов и исчезновения записи
 
+    updateClock();
     renderCalendar(); updateTable(); updateCerts(); initTooltipLogic(); updateNextSession();
 </script>
 </body>
