@@ -1195,16 +1195,19 @@
         </div>
     </div>
 
- <script>
-    // 1. ИСПРАВЛЕННАЯ ЛОГИКА ВХОДА (CRM LOGIN)
-    const adminBtn = document.getElementById('admin-trigger');
-    if (adminBtn) {
-        adminBtn.onclick = function() {
-            document.getElementById('admin-panel').style.display = 'block';
-            document.getElementById('admin-overlay').style.display = 'block';
-            document.getElementById('admin-login').focus();
-        };
-    }
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const adminBtn = document.getElementById('admin-trigger');
+        if (adminBtn) {
+            adminBtn.onclick = function() {
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('admin-overlay').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('admin-login').focus();
+                }, 100);
+            };
+        }
+    });
 
     function closeAdmin() {
         document.getElementById('admin-panel').style.display = 'none';
@@ -1214,56 +1217,49 @@
     function checkAdminAuth() {
         const userLogin = document.getElementById('admin-login').value;
         const userPass = document.getElementById('admin-pass').value;
-        const btn = document.getElementById('auth-btn');
+        const btn = document.querySelector('#admin-panel button');
 
-        // ЛОГИКА ПРОВЕРКИ: admin ssl / 080808
+        // ТВОИ НОВЫЕ ДАННЫЕ ДЛЯ ВХОДА
         if (userLogin === 'admin ssl' && userPass === '080808') {
-            btn.innerHTML = 'ACCESS GRANTED';
-            btn.style.background = '#00ff41'; // Зеленый при успехе
-            btn.style.color = '#000';
+            btn.innerHTML = 'ACCESS GRANTED...';
+            btn.style.background = '#006400'; 
+            btn.style.boxShadow = 'none';
             setTimeout(() => {
                 window.location.href = 'certificates.html'; 
-            }, 800);
+            }, 600);
         } else {
+            const originalColor = btn.style.background;
+            btn.style.background = '#8B0000';
             btn.innerHTML = 'DENIED';
-            btn.style.background = '#ff003c'; // Красный при ошибке
             setTimeout(() => {
+                btn.style.background = originalColor;
                 btn.innerHTML = 'AUTHENTICATE';
-                btn.style.background = '#bc13fe';
                 document.getElementById('admin-pass').value = '';
-            }, 1500);
+            }, 1000);
         }
     }
 
-    // Поддержка Enter в форме CRM
     document.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && document.getElementById('admin-panel').style.display === 'block') {
             checkAdminAuth();
         }
     });
+    </script>
+</footer> 
 
-    // 2. SCROLL REVEAL (Анимация Fader в About Me)
-    document.addEventListener('DOMContentLoaded', () => {
-        const aboutSection = document.querySelector('#about-me');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    aboutSection.classList.add('is-revealed');
-                }
-            });
-        }, { threshold: 0.4 });
-        observer.observe(aboutSection);
+<div id="admin-overlay" onclick="closeAdmin()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; backdrop-filter: blur(8px);"></div>
 
-        // Стоп других плееров при запуске одного
-        document.addEventListener('play', function(e) {
-            const allAudios = document.querySelectorAll('audio');
-            allAudios.forEach(audio => {
-                if (audio !== e.target) {
-                    audio.pause();
-                }
-            });
-        }, true);
-    });
-</script>
+<div id="admin-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: #050505; border: 1px solid var(--neon-purple); padding: 30px; z-index: 10000; border-radius: 10px; box-shadow: 0 0 40px rgba(191, 0, 255, 0.3); font-family: 'Orbitron', sans-serif; text-align: center;">
+    <div style="color: var(--neon-purple); font-size: 16px; margin-bottom: 25px; letter-spacing: 3px;">ADMIN ACCESS</div>
+    
+    <input type="text" id="admin-login" placeholder="LOGIN" autocomplete="off" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 15px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
+    
+    <input type="password" id="admin-pass" placeholder="PASSWORD" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 20px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
+    
+    <button onclick="checkAdminAuth()" style="width: 100%; padding: 12px; background: var(--neon-purple); border: none; color: #fff; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.3s; letter-spacing: 1px; font-family: 'Orbitron', sans-serif;">AUTHENTICATE</button>
+    
+    <div onclick="closeAdmin()" style="margin-top: 20px; color: #333; font-size: 9px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Abort Mission</div>
+</div>
+
 </body>
 </html>
