@@ -29,10 +29,17 @@
         header { 
             display: flex; 
             justify-content: space-between; 
-            align-items: flex-start; 
+            align-items: center; 
             padding: 0 0 20px 0; 
             border-bottom: 1px solid #111; 
             flex-shrink: 0; 
+        }
+
+        /* ОБНОВЛЕННЫЙ БЛОК ЛОГОТИПА И ЧАСОВ */
+        .header-left-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
         .logo { 
@@ -40,10 +47,28 @@
             color: var(--neon-purple); 
             letter-spacing: 2px; 
             font-size: 14px; 
-            padding-top: 15px;
+            text-transform: uppercase;
+        }
+
+        .header-datetime {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-family: 'Rajdhani', sans-serif;
+            color: #444;
+            font-size: 13px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .header-clock {
+            color: #888;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            min-width: 70px;
         }
         
-        /* ПРАВЫЙ БЛОК ШАПКИ (ШИРИНА КАЛЕНДАРЯ) */
+        /* ПРАВЫЙ БЛОК ШАПКИ */
         .header-right-zone {
             width: 380px;
             display: flex;
@@ -91,7 +116,6 @@
             font-family: 'Orbitron';
         }
 
-        /* ТЕКСТ UNLOCK ПОВЕРХ БЛЮРА */
         .unlock-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -109,8 +133,6 @@
         }
 
         .privacy-blur { filter: blur(15px); opacity: 0.3; }
-        
-        /* Состояние когда разблокировано */
         .privacy-active .privacy-blur { filter: blur(0); opacity: 1; }
         .privacy-active .unlock-overlay { opacity: 0; visibility: hidden; }
 
@@ -134,7 +156,6 @@
             background: rgba(191, 0, 255, 0.05);
         }
 
-        /* ОСНОВНАЯ СЕТКА */
         .admin-grid { 
             display: grid; 
             grid-template-columns: 1fr 380px; 
@@ -161,7 +182,6 @@
             padding-right: 5px;
         }
 
-        /* МОДАЛЬНОЕ ОКНО */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); z-index: 99999; backdrop-filter: blur(5px);
@@ -182,7 +202,6 @@
         .m-cancel { background: #222; color: #888; }
         .m-delete { background: var(--artist-red); color: #fff; }
 
-        /* КАЛЕНДАРЬ */
         .calendar-widget { flex-shrink: 0; margin-bottom: 20px; background: #000; border-radius: 10px; padding: 15px; border: 1px solid #222; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .month-name { font-family: 'Orbitron'; color: #fff; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
@@ -194,7 +213,6 @@
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
         .day:hover { background: #111; }
 
-        /* БЛИЖАЙШАЯ ЗАПИСЬ */
         .next-session-widget {
             background: rgba(0,0,0,0.5); border: 1px solid #222; border-radius: 10px; padding: 15px; margin-bottom: 20px; flex-shrink: 0;
         }
@@ -326,7 +344,13 @@
 </div>
 
 <header>
-    <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
+    <div class="header-left-info">
+        <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
+        <div class="header-datetime">
+            <span id="headerDate">--.--.----</span>
+            <span class="header-clock" id="headerClock">00:00:00</span>
+        </div>
+    </div>
     <div class="header-right-zone">
         <div class="total-box" onclick="checkPrivacyPassword()">
             <div class="unlock-overlay">CLICK TO UNLOCK</div>
@@ -396,7 +420,7 @@
         </div>
 
         <div class="filter-info">
-            <span id="currentViewText">ОТЧЕТ ЗА ФЕВРАЛЬ 2026</span>
+            <span id="currentViewText">ОТЧЕТ ЗА ТЕКУЩИЙ МЕСЯЦ</span>
         </div>
 
         <div class="table-scroll-container">
@@ -443,6 +467,24 @@
     const hoverDelay = 700;
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
+
+    // ФУНКЦИЯ ОБНОВЛЕНИЯ ЧАСОВ И ДАТЫ В ШАПКЕ
+    function startHeaderClock() {
+        const clockEl = document.getElementById('headerClock');
+        const dateEl = document.getElementById('headerDate');
+        
+        function update() {
+            const now = new Date();
+            // Часы
+            clockEl.innerText = now.toLocaleTimeString('ru-RU', { hour12: false });
+            // Дата
+            const options = { day: '2-digit', month: 'long', year: 'numeric' };
+            dateEl.innerText = now.toLocaleDateString('ru-RU', options).replace(' г.', '').toUpperCase();
+        }
+        
+        update();
+        setInterval(update, 1000);
+    }
 
     function initTooltipLogic() {
         const tableBody = document.getElementById('crmTableBody');
@@ -750,11 +792,9 @@
         tomorrow.setDate(now.getDate() + 1);
         const tomorrowStr = tomorrow.toLocaleDateString('ru-RU');
 
-        // Ищем записи на сегодня или завтра
         const upcoming = crmData.filter(r => r.date === todayStr || r.date === tomorrowStr);
         
         if (upcoming.length > 0) {
-            // Сортируем: сначала те, что на сегодня
             upcoming.sort((a, b) => (a.date === todayStr ? -1 : 1));
             const next = upcoming[0];
             dateEl.innerText = next.date === todayStr ? 'СЕГОДНЯ' : 'ЗАВТРА';
@@ -765,7 +805,13 @@
         }
     }
 
-    renderCalendar(); updateTable(); updateCerts(); initTooltipLogic(); updateNextSession();
+    // ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
+    startHeaderClock();
+    renderCalendar(); 
+    updateTable(); 
+    updateCerts(); 
+    initTooltipLogic(); 
+    updateNextSession();
 </script>
 </body>
 </html>
