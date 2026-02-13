@@ -114,20 +114,19 @@
         .progress-bar { height: 100%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .progress-bar.complete { background: var(--status-green); box-shadow: 0 0 10px var(--status-green); }
 
-        /* ИСПРАВЛЕННЫЙ ТУЛТИП ДЕТАЛИЗАЦИИ */
+        /* ИСПРАВЛЕННЫЙ ТУЛТИП ДЛЯ ПК */
         .history-row { position: relative; }
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 1000; width: 280px; box-shadow: -10px 10px 40px rgba(0,0,0,0.9); 
-            transition: opacity 0.3s ease; pointer-events: none; top: 0; right: 100%; margin-right: 20px;
+            transition: opacity 0.4s ease; pointer-events: none; top: 0; right: 100%; margin-right: 20px;
         }
-        /* Задержка при наведении на ПК */
+        
         @media (min-width: 993px) {
             .history-row:hover .history-tooltip { 
                 visibility: visible; 
                 opacity: 1; 
-                transition-delay: 0.6s; /* Задержка появления */
-                pointer-events: auto;
+                transition-delay: 0.8s; /* Большая задержка как ты просил */
             }
         }
 
@@ -135,11 +134,7 @@
         .summary-line { display: flex; justify-content: space-between; font-family: 'Rajdhani'; font-weight: 700; margin-bottom: 4px; }
         .summary-line span:first-child { font-family: 'Orbitron'; font-size: 8px; color: #555; }
         
-        /* КНОПКА ЗАКРЫТИЯ В ТУЛТИПЕ */
-        .tooltip-close { 
-            display: none; position: absolute; top: 10px; right: 10px; 
-            color: #444; font-size: 16px; cursor: pointer; padding: 5px; 
-        }
+        .tooltip-close { display: none; position: absolute; top: 12px; right: 12px; color: #666; font-size: 18px; cursor: pointer; z-index: 10; }
 
         .certs-container { flex-grow: 1; height: 300px; overflow-y: auto; padding-right: 15px; }
         .cert-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
@@ -173,41 +168,53 @@
             .session-controls-row { width: 100% !important; flex-direction: column !important; }
             .input-mini, .save-btn { width: 100% !important; height: 50px !important; }
             
-            /* МОБИЛЬНАЯ ТАБЛИЦА */
+            /* МОБИЛЬНЫЙ ОТЧЕТ — НОВАЯ ЛОГИКА ШКАЛЫ И ЗАМЕНЫ ОКНА */
             thead { display: none !important; }
-            .history-row { display: block !important; border: 1px solid #222 !important; margin-bottom: 15px !important; background: #0a0a0a !important; padding: 10px 0; position: relative; }
-            .history-row td { display: flex !important; justify-content: space-between !important; padding: 10px 15px !important; border-bottom: 1px solid #111 !important; align-items: center; }
-            
-            /* ИМЯ КЛИЕНТА В ОТДЕЛЬНУЮ СТРОКУ СВЕРХУ */
-            .history-row td[data-label="КЛИЕНТ"] { 
-                display: block !important; 
-                text-align: center !important; 
-                border-bottom: 1px solid #222 !important; 
-                margin-bottom: 5px;
+            .history-row { 
+                display: block !important; border: 1px solid #222 !important; 
+                margin-bottom: 15px !important; background: #0a0a0a !important; 
+                padding: 0 !important; position: relative; min-height: 140px; 
+                overflow: hidden;
             }
-            .history-row td[data-label="КЛИЕНТ"]::before { display: none !important; }
-            .history-row td[data-label="КЛИЕНТ"] .progress-container { width: 60%; margin: 8px auto 0 auto; }
+            
+            /* Контент отчета */
+            .row-content { transition: opacity 0.3s; padding: 10px 0; }
+            .row-content.hidden { opacity: 0; pointer-events: none; }
 
-            .history-row td::before { content: attr(data-label); font-family: 'Orbitron'; font-size: 8px; color: #555; margin-right: 15px; flex-shrink: 0; }
-            
-            /* ПОВЕДЕНИЕ ТУЛТИПА НА МОБИЛКЕ */
-            .history-tooltip { 
-                position: fixed !important; 
-                top: 50% !important; 
-                left: 50% !important; 
-                right: auto !important;
-                transform: translate(-50%, -50%) !important; 
-                margin: 0 !important; 
-                width: 85% !important; 
-                pointer-events: auto !important;
-                background: #050505 !important;
-                box-shadow: 0 0 100px rgba(0,0,0,1) !important;
-                border: 2px solid var(--neon-purple) !important;
+            /* Имя клиента сверху отдельно */
+            .mobile-name-row { 
+                width: 100%; text-align: center; padding: 12px 0; 
+                font-family: 'Orbitron'; font-weight: 700; font-size: 13px; 
+                letter-spacing: 1px; color: #fff; border-bottom: 1px solid #111;
             }
-            .tooltip-close { display: block; } /* Показываем крестик на мобилках */
+
+            /* Шкала прогресса на всю ширину отдельной строкой */
+            .mobile-progress-row { width: 100%; height: 6px; background: #111; position: relative; }
+            .mobile-progress-row .progress-bar { position: absolute; left: 0; top: 0; height: 100%; }
+
+            /* Инфо-строки: Дата слева, Сумма справа */
+            .mobile-info-grid { display: grid; grid-template-columns: 1fr 1fr; padding: 12px 15px; align-items: center; }
+            .mobile-data-left { text-align: left; font-size: 11px; color: #666; font-family: 'Rajdhani'; font-weight: 600; }
+            .mobile-price-right { text-align: right; font-size: 16px; font-weight: 700; color: #fff; font-family: 'Rajdhani'; }
+
+            /* Действия (кошелек) посередине под инфой */
+            .mobile-actions-center { text-align: center; padding-bottom: 15px; }
+            
+            /* Детализация — заменяет всё окно */
+            .history-tooltip { 
+                visibility: hidden; opacity: 0; position: absolute !important; 
+                top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+                width: 100% !important; height: 100% !important; margin: 0 !important;
+                background: #050505 !important; border: none !important; 
+                z-index: 100 !important; display: flex !important; flex-direction: column;
+                padding: 20px !important; box-sizing: border-box !important;
+                transition: opacity 0.3s; pointer-events: auto !important;
+            }
+            .history-tooltip.active { visibility: visible; opacity: 1; }
+            .tooltip-close { display: block !important; } /* Крестик только на мобилке */
+
             .services-cell { display: none !important; }
             .certs-section { order: 4 !important; height: 350px !important; margin-top: 20px !important; }
-            .certs-container { height: 100% !important; }
         }
     </style>
 </head>
@@ -288,7 +295,7 @@
         </div>
 
         <div class="table-container">
-            <table>
+            <table id="crmTable">
                 <colgroup>
                     <col style="width: 100px;">
                     <col style="width: 180px;">
@@ -452,31 +459,33 @@
         }
     }
 
-    // ЛОГИКА ДОЛГОГО НАЖАТИЯ ДЛЯ МОБИЛОК
-    function setupLongPress(element, tooltipId) {
-        let timer;
+    // НОВАЯ ЛОГИКА ДЛЯ МОБИЛОК: ЗАМЕНА ОКНА
+    function setupMobileDetailLogic(rowElement, tooltipId) {
+        let pressTimer;
         const tooltip = document.getElementById(tooltipId);
+        const content = rowElement.querySelector('.row-content');
 
-        function start() {
-            timer = setTimeout(() => {
-                tooltip.style.visibility = 'visible';
-                tooltip.style.opacity = '1';
-            }, 600); // 0.6 сек для срабатывания
-        }
+        const start = (e) => {
+            if (e.type === 'click' && window.innerWidth > 992) return;
+            pressTimer = setTimeout(() => {
+                tooltip.classList.add('active');
+                content.classList.add('hidden');
+            }, 700);
+        };
 
-        function stop() {
-            clearTimeout(timer);
-        }
+        const cancel = () => { clearTimeout(pressTimer); };
 
-        element.addEventListener('touchstart', start);
-        element.addEventListener('touchend', stop);
-        element.addEventListener('touchmove', stop);
+        rowElement.addEventListener('touchstart', start);
+        rowElement.addEventListener('touchend', cancel);
+        rowElement.addEventListener('touchmove', cancel);
     }
 
-    function closeTooltip(id) {
-        const el = document.getElementById(id);
-        el.style.visibility = 'hidden';
-        el.style.opacity = '0';
+    function closeMobileDetail(tooltipId, rowId) {
+        const tooltip = document.getElementById(tooltipId);
+        const row = document.getElementById(rowId);
+        const content = row.querySelector('.row-content');
+        tooltip.classList.remove('active');
+        content.classList.remove('hidden');
     }
 
     function updateTable() {
@@ -485,10 +494,12 @@
         body.innerHTML = '';
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         
+        // СОРТИРОВКА: сначала по дате, потом по времени создания
         const sorted = [...crmData].sort((a,b) => {
-            const da = a.date.split('.').reverse().join('');
-            const db = b.date.split('.').reverse().join('');
-            return da !== db ? da.localeCompare(db) : a.timestamp - b.timestamp;
+            const dateA = a.date.split('.').reverse().join('');
+            const dateB = b.date.split('.').reverse().join('');
+            if (dateA !== dateB) return dateB.localeCompare(dateA); // Свежие даты выше
+            return b.timestamp - a.timestamp; // Свежие записи внутри дня выше
         });
 
         sorted.forEach((row, idx) => {
@@ -498,41 +509,68 @@
             const perc = Math.min((paid / full) * 100, 100);
             const isComplete = perc >= 100;
             const realIndex = crmData.indexOf(row);
-            const tooltipId = `tt-${idx}`;
+            const tId = `tt-${idx}`;
+            const rId = `row-${idx}`;
             
             const tr = document.createElement('tr');
             tr.className = 'history-row';
-            tr.id = `row-${idx}`;
+            tr.id = rId;
 
-            let tooltipHtml = `
-                <div class="history-tooltip" id="${tooltipId}">
-                    <i class="fas fa-times tooltip-close" onclick="closeTooltip('${tooltipId}')"></i>
-                    <div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px; text-align:left;">ДЕТАЛИЗАЦИЯ:</div>
-            `;
+            // Конструктор детализации
+            let detailsHtml = '';
             row.details.forEach(d => {
-                tooltipHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                detailsHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
-            tooltipHtml += `<div class="tooltip-summary"><div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div></div></div>`;
+
+            const tooltipHtml = `
+                <div class="history-tooltip" id="${tId}">
+                    <i class="fas fa-times tooltip-close" onclick="closeMobileDetail('${tId}', '${rId}')"></i>
+                    <div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:8px; margin-bottom:12px; text-align:left;">ДЕТАЛИЗАЦИЯ:</div>
+                    <div style="flex-grow:1; overflow-y:auto;">${detailsHtml}</div>
+                    <div class="tooltip-summary">
+                        <div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div>
+                        <div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div>
+                        <div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span></div>
+                    </div>
+                </div>
+            `;
 
             tr.innerHTML = `
-                <td data-label="ДАТА">${row.date}</td>
-                <td data-label="КЛИЕНТ">
-                    <div style="font-weight:600; text-transform:uppercase; letter-spacing:1px;">${row.client}</div>
+                <td class="pc-only" data-label="ДАТА">${row.date}</td>
+                <td class="pc-only" data-label="КЛИЕНТ">
+                    <div style="font-weight:600;">${row.client}</div>
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
-                <td class="services-cell" style="position:relative;">${row.services}${tooltipHtml}</td>
-                <td class="price-cell privacy-blur" data-label="ВНЕСЕНО">${paid} ₽</td>
-                <td data-label="ДЕЙСТВИЯ" style="text-align:right;">
-                    <i class="fas fa-wallet" style="color:#444; cursor:pointer; font-size:12px; margin-right:15px; transition:0.3s;" title="Доплатить" onclick="addPayment(${realIndex})"></i>
+                <td class="services-cell pc-only" style="position:relative;">
+                    ${row.services}
+                    ${tooltipHtml}
+                </td>
+                <td class="price-cell privacy-blur pc-only" data-label="ВНЕСЕНО">${paid} ₽</td>
+                <td class="pc-only" data-label="ДЕЙСТВИЯ" style="text-align:right;">
+                    <i class="fas fa-wallet" style="color:#444; cursor:pointer; font-size:12px; margin-right:15px;" onclick="addPayment(${realIndex})"></i>
                     <i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${realIndex})"></i>
                 </td>
-                <div class="mobile-only-tooltip-anchor">${tooltipHtml}</div>
+
+                <div class="row-content mobile-only">
+                    <div class="mobile-name-row">${row.client}</div>
+                    <div class="mobile-progress-row">
+                        <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
+                    </div>
+                    <div class="mobile-info-grid">
+                        <div class="mobile-data-left">${row.date}</div>
+                        <div class="mobile-price-right privacy-blur">${paid} ₽</div>
+                    </div>
+                    <div class="mobile-actions-center">
+                         <i class="fas fa-wallet" style="color:#444; font-size:16px; margin: 0 20px;" onclick="addPayment(${realIndex})"></i>
+                         <i class="fas fa-trash" style="color:#222; font-size:14px;" onclick="deleteRow(${realIndex})"></i>
+                    </div>
+                </div>
+                <div class="mobile-only">${tooltipHtml}</div>
             `;
             body.appendChild(tr);
-
-            // Инициализация лонг-пресса для мобилок
+            
             if (window.innerWidth <= 992) {
-                setupLongPress(tr, tooltipId);
+                setupMobileDetailLogic(tr, tId);
             }
         });
         updateMonthTotal();
