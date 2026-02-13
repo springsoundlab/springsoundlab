@@ -1223,10 +1223,61 @@
         };
         window.addEventListener('scroll', handleMobileGlow, { passive: true });
         handleMobileGlow();
-    });
+});
     
-    // Авто-обновление из облака каждые 2 минуты
-    setInterval(loadFromCloud, 120000);
+    // --- САМАЯ АКТУАЛЬНАЯ ЛОГИКА СИНХРОНИЗАЦИИ (ИСПРАВЛЕННАЯ) ---
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmdgojb9-sBiqBoAdCwcei5XEbNMAo3yqvHBnjFPSvjCAYDhKx1R1U39lSjKmkR9PCAQ/exec';
+    
+    // Инициализация данных: сразу берем из памяти устройства, чтобы сайт не «тупил»
+    let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
+
+    async function loadFromCloud() {
+        try {
+            const response = await fetch(GOOGLE_SCRIPT_URL);
+            if (!response.ok) throw new Error('Ошибка сети');
+            const cloudData = await response.json();
+            
+            if (cloudData && Array.isArray(cloudData)) {
+                // ЗАЩИТА ПРИ F5: Если в облаке записей меньше, чем у нас локально — не затираем данные.
+                // Это предотвращает исчезновение только что введенных услуг.
+                if (cloudData.length >= crmData.length) {
+                    crmData = cloudData;
+                    localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+                    // Проверяем наличие функций перед вызовом, чтобы не было ошибок
+                    if (typeof updateTable === "function") updateTable();
+                    if (typeof renderCalendar === "function") renderCalendar();
+                    if (typeof updateNextSession === "function") updateNextSession();
+                    console.log("Данные из облака успешно подгружены.");
+                } else {
+                    console.warn("В облаке старые данные. Синхронизируем локальную версию в облако...");
+                    syncToCloud();
+                }
+            }
+        } catch (e) {
+            console.error("Ошибка связи с Google:", e);
+        }
+    }
+
+    async function syncToCloud() {
+        // Мгновенно сохраняем в память браузера (защита от перезагрузки)
+        localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(crmData)
+            });
+            console.log("Данные успешно отправлены в Google Таблицу.");
+        } catch (e) {
+            console.error("Ошибка отправки данных:", e);
+        }
+    }
+
+    // Ускоренное обновление: каждые 20 секунд (телефон увидит изменения с ПК быстрее)
+    setInterval(loadFromCloud, 20000);
+    // --------------------------------------------------------
 </script>
 
 <footer style="background: #000; border-top: 1px solid #111; padding: 8px 20px;">
@@ -1269,7 +1320,6 @@
             btn.style.background = '#006400'; 
             btn.style.boxShadow = 'none';
             setTimeout(() => {
-                // Здесь будет переход или открытие CRM
                 window.location.href = '#crm-section'; 
                 closeAdmin();
             }, 600);
