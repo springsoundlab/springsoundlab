@@ -110,32 +110,17 @@
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; }
         .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; }
 
-        /* Стиль полосы прогресса */
-        .progress-container { width: 100%; height: 4px; background: #1a1a1a; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .progress-container { width: 100%; height: 3px; background: #1a1a1a; margin-top: 5px; border-radius: 2px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .progress-bar.complete { background: var(--status-green); box-shadow: 0 0 10px var(--status-green); }
 
         .history-row { position: relative; }
-        
-        /* Мобильное модальное окно */
-        .mobile-detail-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
-        }
-        .mobile-detail-card {
-            background: #000; border: 1px solid var(--neon-purple); width: 100%; max-width: 400px;
-            border-radius: 12px; padding: 25px; position: relative; box-shadow: 0 0 30px rgba(191, 0, 255, 0.3);
-        }
-        .close-detail { position: absolute; right: 15px; top: 15px; color: #555; font-size: 20px; cursor: pointer; }
-
-        /* Десктопный тултип (оставляем как было для ПК) */
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: absolute; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 1000; width: 280px; box-shadow: -10px 10px 40px rgba(0,0,0,0.9); 
             transition: opacity 0.3s ease; pointer-events: none; top: 0; right: 100%; margin-right: 20px;
         }
         .history-row:hover .history-tooltip { visibility: visible; opacity: 1; }
-        
         .tooltip-summary { margin-top: 15px; border-top: 1px solid #222; padding-top: 10px; }
         .summary-line { display: flex; justify-content: space-between; font-family: 'Rajdhani'; font-weight: 700; margin-bottom: 4px; }
         .summary-line span:first-child { font-family: 'Orbitron'; font-size: 8px; color: #555; }
@@ -291,19 +276,11 @@
     </div>
 </div>
 
-<div id="mobileDetailOverlay" class="mobile-detail-overlay" onclick="closeMobileDetails()">
-    <div class="mobile-detail-card" onclick="event.stopPropagation()">
-        <span class="close-detail" onclick="closeMobileDetails()">×</span>
-        <div id="mobileDetailContent"></div>
-    </div>
-</div>
-
 <script>
     let crmData = JSON.parse(localStorage.getItem('spring_crm_v3')) || [];
     let currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
-    let touchTimer; // Для мобильного зажатия
 
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600' };
 
@@ -420,6 +397,7 @@
         renderCart(); updateTable(); renderCalendar();
     }
 
+    // НОВАЯ ФУНКЦИЯ: Доплата
     function addPayment(index) {
         const row = crmData[index];
         const remaining = row.fullTotal - row.total;
@@ -430,56 +408,6 @@
             localStorage.setItem('spring_crm_v3', JSON.stringify(crmData));
             updateTable();
         }
-    }
-
-    /* ФУНКЦИИ ДЛЯ МОБИЛЬНОЙ ДЕТАЛИЗАЦИИ */
-    function showMobileDetails(index) {
-        const row = crmData[index];
-        const full = row.fullTotal || row.total;
-        const paid = row.total;
-        const content = document.getElementById('mobileDetailContent');
-        
-        let html = `<div style="color:var(--neon-purple); font-family:Orbitron; font-size:12px; margin-bottom:20px; text-align:center; letter-spacing:1px;">ДЕТАЛИЗАЦИЯ УСЛУГ</div>`;
-        
-        row.details.forEach(d => {
-            html += `
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:13px; border-left:3px solid ${colorMap[d.colorClass]}; padding-left:12px;">
-                <span style="color:${colorMap[d.colorClass]}">${d.name}</span>
-                <span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span>
-            </div>`;
-        });
-
-        html += `
-        <div style="margin-top:25px; border-top:1px solid #222; padding-top:15px;">
-            <div style="display:flex; justify-content:space-between; font-family:Rajdhani; font-weight:700; font-size:16px; margin-bottom:8px;">
-                <span style="font-family:Orbitron; font-size:9px; color:#555;">ИТОГО ЧЕК</span>
-                <span>${full} ₽</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-family:Rajdhani; font-weight:700; font-size:16px; margin-bottom:8px;">
-                <span style="font-family:Orbitron; font-size:9px; color:#555;">ВНЕСЕНО</span>
-                <span style="color:var(--status-green)">${paid} ₽</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-family:Rajdhani; font-weight:700; font-size:16px;">
-                <span style="font-family:Orbitron; font-size:9px; color:#555;">ОСТАТОК</span>
-                <span style="color:var(--artist-red)">${Math.max(0, full-paid)} ₽</span>
-            </div>
-        </div>`;
-
-        content.innerHTML = html;
-        document.getElementById('mobileDetailOverlay').style.display = 'flex';
-    }
-
-    function closeMobileDetails() {
-        document.getElementById('mobileDetailOverlay').style.display = 'none';
-    }
-
-    /* ОБРАБОТКА ЗАЖАТИЯ ДЛЯ МОБИЛОК */
-    function setupLongPress(element, index) {
-        element.addEventListener('touchstart', () => {
-            touchTimer = setTimeout(() => showMobileDetails(index), 600);
-        });
-        element.addEventListener('touchend', () => clearTimeout(touchTimer));
-        element.addEventListener('touchmove', () => clearTimeout(touchTimer));
     }
 
     function updateTable() {
@@ -505,7 +433,6 @@
             const tr = document.createElement('tr');
             tr.className = 'history-row';
 
-            // Десктопный тултип
             let tooltip = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             row.details.forEach(d => {
                 tooltip += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
@@ -514,7 +441,7 @@
 
             tr.innerHTML = `
                 <td data-label="ДАТА">${row.date}</td>
-                <td data-label="КЛИЕНТ" class="client-cell-trigger">
+                <td data-label="КЛИЕНТ">
                     <div style="font-weight:600;">${row.client}</div>
                     <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                 </td>
@@ -525,11 +452,6 @@
                     <i class="fas fa-trash" style="color:#222; cursor:pointer; font-size:10px;" onclick="deleteRow(${realIndex})"></i>
                 </td>
             `;
-
-            // Навешиваем зажатие на ячейку с именем
-            const cellTrigger = tr.querySelector('.client-cell-trigger');
-            setupLongPress(cellTrigger, realIndex);
-
             body.appendChild(tr);
         });
         updateMonthTotal();
