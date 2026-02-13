@@ -244,8 +244,8 @@
         input:checked + .slider:before { transform: translateX(16px); }
 
         .controls-row { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
+            display: flex; 
+            align-items: center; 
             gap: 10px; 
             background: #000; 
             padding: 15px; 
@@ -253,13 +253,15 @@
             margin-bottom: 20px; 
             border: 1px solid #111; 
             flex-shrink: 0; 
+            flex-wrap: nowrap;
+            overflow-x: auto;
         }
         
-        .btn-wrapper { position: relative; width: 100%; }
+        .btn-wrapper { position: relative; flex-shrink: 0; }
         .action-btn { 
-            background: transparent; color: #fff; padding: 10px 10px; border-radius: 6px; 
+            background: transparent; color: #fff; padding: 10px 15px; border-radius: 6px; 
             cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; 
-            transition: 0.3s; position: relative; width: 100%; box-sizing: border-box;
+            transition: 0.3s; position: relative; white-space: nowrap;
         }
         
         .btn-tooltip { 
@@ -278,8 +280,6 @@
         .btn-gold { border: 1px solid var(--platinum-gold); color: var(--platinum-gold); }
         .btn-dashed-green { border: 1px dashed var(--status-green) !important; }
         .btn-dashed-gold { border: 1px dashed var(--platinum-gold) !important; }
-
-        .platinum-group-full { grid-column: span 2; display: flex; flex-direction: column; gap: 10px; }
 
         .current-session-box { 
             background: rgba(191, 0, 255, 0.05); border: 1px solid var(--neon-purple); 
@@ -362,11 +362,13 @@
             .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
             
+            /* Новая сетка для телефона по твоей просьбе */
             .controls-row { 
                 display: grid; 
                 grid-template-columns: 1fr 1fr; 
                 gap: 8px; 
                 padding: 10px; 
+                overflow-x: hidden;
             }
             .prepaid-toggle { 
                 grid-column: span 2; 
@@ -377,6 +379,23 @@
                 padding-bottom: 10px;
                 margin-bottom: 5px;
             }
+            /* Порядок для мобилок: 
+               Ряд 1: Час | Start
+               Ряд 2: Artist | Тюнинг
+               Ряд 3: Аранж | Доп. дор
+               Ряд 4: Platinum
+               Ряд 5: Плат. дор
+            */
+            .btn-order-1 { order: 1; } /* Час */
+            .btn-order-2 { order: 2; } /* Start */
+            .btn-order-3 { order: 3; } /* Artist */
+            .btn-order-4 { order: 4; } /* Тюнинг */
+            .btn-order-5 { order: 5; } /* Аранж */
+            .btn-order-6 { order: 6; } /* Доп дор */
+            .btn-order-7 { order: 7; grid-column: span 2; } /* Platinum */
+            .btn-order-8 { order: 8; grid-column: span 2; } /* Плат дор */
+            
+            .action-btn { width: 100%; }
 
             table, thead, tbody, th, td, tr { display: block; width: 100% !important; box-sizing: border-box; }
             thead tr { position: absolute; top: -9999px; left: -9999px; }
@@ -430,42 +449,44 @@
                 </label>
             </div>
             
-            <div class="btn-wrapper">
+            <div class="btn-wrapper btn-order-1">
                 <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
                 <div class="btn-tooltip">900 ₽ (Всегда 100%)</div>
             </div>
-            <div class="btn-wrapper">
+            
+            <div class="btn-wrapper btn-order-2">
                 <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
                 <div class="btn-tooltip">3500 ₽</div>
             </div>
 
-            <div class="btn-wrapper">
+            <div class="btn-wrapper btn-order-3">
                 <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
                 <div class="btn-tooltip">6000 ₽</div>
             </div>
-            <div class="btn-wrapper">
+
+            <div class="btn-wrapper btn-order-4">
                 <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
                 <div class="btn-tooltip">1000 ₽</div>
             </div>
             
-            <div class="btn-wrapper">
+            <div class="btn-wrapper btn-order-5">
                 <button class="action-btn btn-blue" onclick="openPriceModal('АРАНЖИРОВКА', 'blue', 10000)">АРАНЖИРОВКА</button>
                 <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
             </div>
-            <div class="btn-wrapper">
+
+            <div class="btn-wrapper btn-order-6">
                 <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
                 <div class="btn-tooltip">500 ₽</div>
             </div>
             
-            <div class="platinum-group-full">
-                <div class="btn-wrapper">
-                    <button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">+ PLATINUM EDITION</button>
-                    <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
-                </div>
-                <div class="btn-wrapper">
-                    <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
-                    <div class="btn-tooltip">300 ₽</div>
-                </div>
+            <div class="btn-wrapper btn-order-7">
+                <button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">PLATINUM EDITION</button>
+                <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
+            </div>
+
+            <div class="btn-wrapper btn-order-8">
+                <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
+                <div class="btn-tooltip">300 ₽</div>
             </div>
         </div>
 
