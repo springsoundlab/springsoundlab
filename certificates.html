@@ -785,6 +785,7 @@
         });
         window.currentCart.items = window.currentCart.details.map(d => ({ name: d.name, colorClass: d.colorClass }));
         renderCart();
+        if(activeCertTarget) updateCerts(); // Обновляем превью в списке
     }
 
     function addToCart(name, price, colorClass, forceFull = false) {
@@ -796,6 +797,7 @@
         window.currentCart.total += finalPrice;
         window.currentCart.fullPriceTotal += price;
         renderCart();
+        if(activeCertTarget) updateCerts(); // Обновляем живой тултип
     }
 
     function removeFromCart(index) {
@@ -805,6 +807,7 @@
         window.currentCart.items.splice(index, 1);
         window.currentCart.details.splice(index, 1);
         renderCart();
+        if(activeCertTarget) updateCerts(); // Обновляем живой тултип
     }
 
     function exitCertMode() {
@@ -813,6 +816,7 @@
         const label = document.getElementById('sessionDateLabel');
         if(label) label.innerText = selectedDate ? `ТЕКУЩИЙ ЧЕК (${selectedDate}):` : 'ТЕКУЩИЙ ЧЕК:';
         renderCart();
+        updateCerts();
     }
 
     function renderCart() {
@@ -824,13 +828,15 @@
 
         if (activeCertTarget) {
             cartBox.style.border = '2px solid var(--neon-gold)';
-            cartBox.style.boxShadow = '0 0 15px rgba(184, 150, 0, 0.3)';
-            label.innerHTML = `НАПОЛНЕНИЕ ${activeCertTarget} <span onclick="exitCertMode()" style="cursor:pointer; color:var(--artist-red); margin-left:10px; font-size:14px;">[×]</span>`;
+            cartBox.style.boxShadow = '0 0 20px rgba(184, 150, 0, 0.4)';
+            cartBox.style.position = 'relative';
+            label.innerHTML = `НАПОЛНЕНИЕ ${activeCertTarget} <span onclick="exitCertMode()" style="position:absolute; top:10px; right:15px; cursor:pointer; color:var(--artist-red); font-size:18px; font-weight:bold;">×</span>`;
             
             const saveBtn = document.querySelector('.save-btn');
             if(saveBtn) {
                 saveBtn.innerText = `СОХРАНИТЬ В ${activeCertTarget}`;
-                saveBtn.style.background = 'var(--neon-gold)';
+                saveBtn.style.background = 'var(--status-green)';
+                saveBtn.style.color = '#fff';
                 saveBtn.onclick = saveCertContent;
             }
         } else {
@@ -842,7 +848,8 @@
             const saveBtn = document.querySelector('.save-btn');
             if(saveBtn) {
                 saveBtn.innerText = 'СОХРАНИТЬ В SSL CRM';
-                saveBtn.style.background = 'var(--neon-purple)';
+                saveBtn.style.background = 'var(--status-green)';
+                saveBtn.style.color = '#fff';
                 saveBtn.onclick = saveSession;
             }
         }
@@ -967,19 +974,36 @@
             for (let i = 1; i <= 300; i++) {
                 const id = 'SSL-' + String(i).padStart(3, '0');
                 const d = certsData[id] || { active: false, name: '', items: [] };
-                const div = document.createElement('div');
-                div.className = 'cert-row';
                 
+                // РАБОТА С ТУЛТИПОМ (Живой предпросмотр + База)
+                let itemsToShow = d.items || [];
+                let totalSum = itemsToShow.reduce((acc, val) => acc + val.price, 0);
+
+                // Если это активный сертификат - подменяем данные на текущую корзину (живое обновление)
+                if (activeCertTarget === id) {
+                    itemsToShow = window.currentCart.details;
+                    totalSum = window.currentCart.total;
+                }
+
                 let itemsTooltip = "";
-                if(d.items && d.items.length > 0) {
-                    itemsTooltip = `<div class="history-tooltip pos-up" style="min-width:150px; left:50%; transform:translateX(-50%);">
-                        <div style="color:var(--neon-gold); font-size:9px; margin-bottom:5px;">СОСТАВ СЕРТИФИКАТА:</div>
-                        ${d.items.map(it => `<div style="font-size:10px; margin-bottom:2px; border-left:2px solid ${colorMap[it.colorClass] || '#555'}; padding-left:5px;">${it.name}</div>`).join('')}
+                if(itemsToShow.length > 0) {
+                    itemsTooltip = `<div class="history-tooltip pos-up" style="min-width:180px; left:50%; transform:translateX(-50%);">
+                        <div style="color:var(--neon-gold); font-size:9px; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ:</div>
+                        ${itemsToShow.map(it => `
+                            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[it.colorClass] || '#555'}; padding-left:8px;">
+                                <span style="color:${colorMap[it.colorClass] || '#fff'}">${it.name}</span>
+                                <span style="font-family:Rajdhani; font-weight:700;">${it.price} ₽</span>
+                            </div>`).join('')}
+                        <div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:5px; border-top:1px solid #222; font-family:Orbitron; font-size:11px;">
+                            <span>ИТОГО:</span><span style="color:var(--neon-gold)">${totalSum} ₽</span>
+                        </div>
                     </div>`;
                 }
 
+                const div = document.createElement('div');
+                div.className = 'cert-row';
                 div.innerHTML = `
-                    <span class="cert-id" onclick="startCertBinding('${id}')" style="cursor:pointer; position:relative;">${id}${itemsTooltip}</span>
+                    <span class="cert-id" onclick="startCertBinding('${id}')" style="cursor:pointer; position:relative; ${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}${itemsTooltip}</span>
                     ${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
                     ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
                 `;
@@ -993,6 +1017,7 @@
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         document.getElementById('certsDropdown').classList.remove('active');
         renderCart();
+        updateCerts(); // Обновляем список, чтобы подсветить активный SSL
     }
 
     async function saveCertContent() {
@@ -1003,7 +1028,6 @@
             }, { merge: true });
             
             exitCertMode(); 
-            updateCerts();
         } catch (e) { alert("Ошибка сохранения состава"); }
     }
 
