@@ -659,7 +659,6 @@
             pointer-events: none;
         }
 
-        /* УВЕЛИЧЕННЫЙ ТЕКСТ ДЛЯ ТЕЛЕФОНА */
         @media (max-width: 992px) {
             .cert-tooltip-base.mobile-active {
                 display: block !important;
@@ -693,27 +692,24 @@
         }
         .cert-close-btn { display: none; }
 
-        /* ПРАВИЛА ДЛЯ СЕРТИФИКАТОВ */
         .cert-row {
             user-select: none !important;
             -webkit-user-select: none !important;
             transition: background 0.2s ease;
         }
-        /* Неактивные: палец и подсветка */
         .cert-row.not-active { cursor: pointer !important; }
         .cert-row.not-active:hover { background: rgba(191, 0, 255, 0.1) !important; }
-        
-        /* Активные: стрелка и НЕТ подсветки */
         .cert-row.is-active { cursor: default !important; }
         .cert-row.is-active:hover { background: transparent !important; }
-        
-        /* Текст внутри тоже не должен менять курсор */
         .cert-row span, .cert-row div { cursor: inherit !important; }
     </style>
 
 <script>
     window.crmData = [];
     window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+    // Глобальное хранилище для временных имен в инпутах, чтобы они не стирались
+    window.tempCertNames = {}; 
+    
     var currentCart = window.currentCart; 
     let currentCalDate = new Date();
     let selectedDate = null;
@@ -757,23 +753,19 @@
     function openModal(title, type, confirmCallback, defaultValue = '') {
         const modal = document.getElementById('customModal');
         const overlay = document.getElementById('modalOverlay');
-        const titleEl = document.getElementById('modalTitle');
-        const inputEl = document.getElementById('modalInput');
-        const confirmBtn = document.getElementById('modalConfirmBtn');
         if(!modal) return;
-        titleEl.innerText = title;
+        document.getElementById('modalTitle').innerText = title;
+        const inputEl = document.getElementById('modalInput');
         inputEl.value = defaultValue;
         inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
-        confirmBtn.className = 'm-btn m-confirm';
-        confirmBtn.onclick = confirmCallback;
+        document.getElementById('modalConfirmBtn').onclick = confirmCallback;
         modal.style.display = 'block'; overlay.style.display = 'block';
         if(type !== 'confirm-delete') inputEl.focus();
     }
 
     function closeModal() {
         document.getElementById('customModal').style.display = 'none';
-        const overlay = document.getElementById('modalOverlay');
-        if(overlay) overlay.style.display = 'none';
+        document.getElementById('modalOverlay').style.display = 'none';
     }
 
     function openPriceModal(name, color, defaultPrice) {
@@ -784,17 +776,6 @@
                 closeModal();
             } else { alert('Введите корректную сумму'); }
         }, defaultPrice);
-    }
-
-    function checkPrivacyPassword() {
-        if(document.body.classList.contains('privacy-active')) return;
-        openModal("ВВЕДИТЕ ПАРОЛЬ АДМИНИСТРАТОРА", "password", function() {
-            const pass = document.getElementById('modalInput').value;
-            if (pass === '123') {
-                document.body.classList.add('privacy-active');
-                closeModal(); updateTable(); 
-            } else { alert("Неверный пароль"); }
-        });
     }
 
     function renderCalendar() {
@@ -837,25 +818,6 @@
         selectedDate = null; updateTable(); renderCalendar(); 
     }
 
-    function applyPrepaidToggle() {
-        const isPrepaid = document.getElementById('prepaidMode').checked;
-        window.currentCart.total = 0;
-        window.currentCart.details.forEach(item => {
-            const isForceFull = item.name.includes('ЧАС ЗАПИСИ');
-            if (isPrepaid && !isForceFull) {
-                item.price = item.basePrice / 2;
-                if (!item.name.includes('(50%)')) item.name += ' (50%)';
-            } else {
-                item.price = item.basePrice;
-                item.name = item.name.replace(' (50%)', '');
-            }
-            window.currentCart.total += item.price;
-        });
-        window.currentCart.items = window.currentCart.details.map(d => ({ name: d.name, colorClass: d.colorClass }));
-        renderCart();
-        if(activeCertTarget) updateCerts();
-    }
-
     function addToCart(name, price, colorClass, forceFull = false) {
         const isPrepaid = document.getElementById('prepaidMode')?.checked;
         let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
@@ -881,8 +843,6 @@
     function exitCertMode() {
         activeCertTarget = null;
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        const label = document.getElementById('sessionDateLabel');
-        if(label) label.innerText = selectedDate ? `ТЕКУЩИЙ ЧЕК (${selectedDate}):` : 'ТЕКУЩИЙ ЧЕК:';
         renderCart();
         updateCerts();
     }
@@ -954,17 +914,7 @@
                     </div>
                 </td>`;
             } else {
-                tr.innerHTML = `
-                    <td data-label="ДАТА">${row.date}</td>
-                    <td data-label="КЛИЕНТ">${row.client}</td>
-                    <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
-                    <td class="price-cell privacy-blur">${paid} ₽</td>
-                    <td>
-                        <div class="action-icons-wrap">
-                            <div class="icon-btn-box" onclick="addPayment('${row.id}')"><i class="fas fa-wallet"></i></div>
-                            <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><i class="fas fa-trash"></i></div>
-                        </div>
-                    </td>`;
+                tr.innerHTML = `<td data-label="ДАТА">${row.date}</td><td data-label="КЛИЕНТ">${row.client}</td><td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td><td class="price-cell privacy-blur">${paid} ₽</td><td><div class="action-icons-wrap"><div class="icon-btn-box" onclick="addPayment('${row.id}')"><i class="fas fa-wallet"></i></div><div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><i class="fas fa-trash"></i></div></div></td>`;
             }
             body.appendChild(tr);
         });
@@ -982,22 +932,13 @@
     function showCertTooltip(e, id, items) {
         const tooltip = document.getElementById('cert-global-tooltip');
         if (!items || items.length === 0) return;
-        
         let total = items.reduce((s, i) => s + i.price, 0);
-        let html = `<div class="cert-close-btn" onclick="hideCertTooltip()">×</div>`;
-        html += `<div class="tooltip-title" style="color:#888; font-family:Orbitron; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom:15px;">ДЕТАЛИЗАЦИЯ ${id}:</div>`;
+        let html = `<div class="cert-close-btn" onclick="hideCertTooltip()">×</div><div class="tooltip-title" style="color:#888; font-family:Orbitron; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom:15px;">ДЕТАЛИЗАЦИЯ ${id}:</div>`;
         items.forEach(it => {
-            html += `<div class="tooltip-item" style="display:flex; justify-content:space-between; border-left:3px solid ${colorMap[it.colorClass] || '#555'}; padding-left:12px;">
-                        <span style="color:${colorMap[it.colorClass] || '#fff'}">${it.name}</span>
-                        <span style="font-weight:700;">${it.price} ₽</span>
-                    </div>`;
+            html += `<div class="tooltip-item" style="display:flex; justify-content:space-between; border-left:3px solid ${colorMap[it.colorClass] || '#555'}; padding-left:12px;"><span style="color:${colorMap[it.colorClass] || '#fff'}">${it.name}</span><span style="font-weight:700;">${it.price} ₽</span></div>`;
         });
-        html += `<div class="tooltip-total" style="display:flex; justify-content:space-between; border-top:1px solid #222; font-family:Orbitron;">
-                    <span>ИТОГО SSL</span><span style="color:var(--neon-gold); font-weight:700;">${total} ₽</span>
-                </div>`;
-        
+        html += `<div class="tooltip-total" style="display:flex; justify-content:space-between; border-top:1px solid #222; font-family:Orbitron;"><span>ИТОГО SSL</span><span style="color:var(--neon-gold); font-weight:700;">${total} ₽</span></div>`;
         tooltip.innerHTML = html;
-        
         if (window.innerWidth <= 992) {
             tooltip.classList.add('mobile-active');
         } else {
@@ -1011,6 +952,11 @@
         const tooltip = document.getElementById('cert-global-tooltip');
         tooltip.style.display = 'none';
         tooltip.classList.remove('mobile-active');
+    }
+
+    // Сохранение имени в память при вводе
+    function saveTempName(id, val) {
+        window.tempCertNames[id] = val;
     }
 
     async function updateCerts() {
@@ -1027,12 +973,14 @@
                 const d = certsData[id] || { active: false, name: '', items: [] };
                 const itemsToShow = (activeCertTarget === id) ? window.currentCart.details : (d.items || []);
                 const div = document.createElement('div');
-                
                 div.className = `cert-row ${d.active ? 'is-active' : 'not-active'}`;
                 
+                // Берем имя либо из базы (для активных), либо из временной памяти (для новых)
+                const savedName = window.tempCertNames[id] || '';
+
                 div.innerHTML = `
                     <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}</span>
-                    ${d.active ? `<span class="cert-client-name" style="font-size:10px; color:#ccc;">${d.name || ''}</span>` : `<input type="text" id="in-${id}" onmousedown="stopProp(event)" onclick="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
+                    ${d.active ? `<span class="cert-client-name" style="font-size:10px; color:#ccc;">${d.name || ''}</span>` : `<input type="text" id="in-${id}" oninput="saveTempName('${id}', this.value)" onmousedown="stopProp(event)" onclick="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя" value="${savedName}">`}
                     ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px; font-weight:900;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
                 `;
 
@@ -1061,21 +1009,22 @@
 
     async function saveCertContent() {
         if (!activeCertTarget) return;
+        const name = document.getElementById('in-' + activeCertTarget)?.value || window.tempCertNames[activeCertTarget] || 'Без имени';
         if (!window.currentCart.details.length) return alert("Чек пуст!");
         try {
-            const name = document.getElementById('in-' + activeCertTarget)?.value || 'Без имени';
             await db.collection("certs").doc(activeCertTarget).set({
                 active: true,
                 items: JSON.parse(JSON.stringify(window.currentCart.details)),
                 name: name,
                 date: new Date().toLocaleDateString('ru-RU')
             }, { merge: true });
+            delete window.tempCertNames[activeCertTarget]; // Очищаем память после сохранения
             exitCertMode(); 
         } catch (e) { console.error(e); }
     }
 
     async function activateCert(id) {
-        const n = document.getElementById('in-' + id).value;
+        const n = document.getElementById('in-' + id)?.value || window.tempCertNames[id];
         if (!n) return alert('Введите имя!');
         if (activeCertTarget === id) saveCertContent();
         else alert('Сначала выберите этот SSL номер для наполнения!');
@@ -1106,8 +1055,8 @@
                 timestamp: Date.now()
             });
             window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-            document.getElementById('bookingClient').value = '';
-            document.getElementById('bookingTime').value = '';
+            if(document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
+            if(document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
             renderCart();
         } catch (error) { console.error(error); }
     };
