@@ -500,6 +500,39 @@
                 font-family: 'Rajdhani'; font-weight: 700;
             }
         }
+        .mobile-summary-line {
+                display: flex; justify-content: space-between; 
+                margin-bottom: 4px; font-size: 12px; 
+                font-family: 'Rajdhani'; font-weight: 700;
+            }
+        }
+
+        /* --- НОВЫЙ БЛОК ЦВЕТОВ КАЛЕНДАРЯ --- */
+        
+        /* Прошлые записи и Сегодня (Зеленый) */
+        .day.has-data.past-session { 
+            background: rgba(0, 143, 57, 0.8) !important; 
+            border: 1px solid #00ff66 !important; 
+        }
+        
+        /* Будущие записи (Красный + Белые цифры) */
+        .day.has-data.future-session { 
+            background: rgba(204, 0, 0, 0.8) !important; 
+            border: 1px solid #ff0000 !important; 
+        }
+
+        /* Общие правила для ячеек с записями */
+        .day.has-data { 
+            color: #fff !important; /* Всегда белые цифры, если есть запись */
+            font-weight: 700 !important;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        /* Выбранный день (белая рамка) */
+        .day.selected {
+            outline: 2px solid #fff !important;
+            outline-offset: -3px;
+        }
     </style>
 </head>
 <body>
@@ -727,32 +760,51 @@
 
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
-        const monthName = document.getElementById('calMonthName');
-        if(!grid || !monthName) return;
         grid.innerHTML = '';
-        const now = new Date();
-        const year = currentCalDate.getFullYear();
-        const month = currentCalDate.getMonth();
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        monthName.innerText = `${monthNames[month]} ${year}`;
-        ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'].forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
-        let startingSpace = firstDay === 0 ? 6 : firstDay - 1;
-        for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
-        for(let d=1; d<=daysInMonth; d++) {
-            const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
-            const hasData = window.crmData.some(row => row.date === dateStr);
-            const isToday = now.toLocaleDateString('ru-RU') === dateStr;
-            let classes = ['day'];
-            if (isToday) classes.push('today');
-            if (hasData) classes.push('has-data');
-            if (selectedDate === dateStr) classes.push('selected-day');
-            grid.innerHTML += `<div class="${classes.join(' ')}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
-        }
-        updateMonthTotal();
-    }
+        const monthName = document.getElementById('calMonthName');
+        
+        const y = currentCalDate.getFullYear();
+        const m = currentCalDate.getMonth();
+        const firstDay = new Date(y, m, 1).getDay();
+        const lastDate = new Date(y, m + 1, 0).getDate();
+        
+        // Массив названий месяцев для заголовка
+        const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", 
+                            "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+        monthName.innerText = `${monthNames[m]} ${y}`;
 
+        // Пустые ячейки в начале
+        const shift = firstDay === 0 ? 6 : firstDay - 1;
+        for (let i = 0; i < shift; i++) {
+            grid.innerHTML += '<div></div>';
+        }
+
+        // Сегодняшняя дата для сравнения (обнуляем время для точности)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        for (let d = 1; d <= lastDate; d++) {
+            const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const hasData = window.crmData.some(s => s.date === dateStr);
+            
+            let classList = 'day';
+            if (hasData) {
+                classList += ' has-data';
+                
+                // Проверяем: прошлое/сегодня или будущее
+                const cellDate = new Date(y, m, d);
+                if (cellDate >= today) {
+                    classList += ' future-session'; // Будущее (Красный)
+                } else {
+                    classList += ' past-session';   // Прошлое (Зеленый)
+                }
+            }
+            
+            if (selectedDate === dateStr) classList += ' selected';
+
+            grid.innerHTML += `<div class="${classList}" onclick="selectDate('${dateStr}')">${d}</div>`;
+        }
+    }
     function selectCalendarDate(date) {
         selectedDate = date;
         const label = document.getElementById('sessionDateLabel');
