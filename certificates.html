@@ -610,6 +610,28 @@
                     .btn-order-7 { order: 6; } /* PLATINUM EDITION */
                     .btn-order-8 { order: 7; } /* + ПЛАТ. ДОРОЖКА */
                     .btn-order-5 { order: 8; } /* АРАНЖИРОВКА — ТЕПЕРЬ ПОСЛЕДНЯЯ */
+
+                    /* Настройка сетки таблицы для равномерных зазоров */
+                    table {
+                        table-layout: fixed;
+                        width: 100%;
+                        border-collapse: separate;
+                        border-spacing: 0 5px;
+                    }
+                    
+                    th, td {
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+                    /* Ширина колонок */
+                    th:nth-child(1), td:nth-child(1) { width: 60px; }  /* Дата */
+                    th:nth-child(2), td:nth-child(2) { width: 140px; } /* Клиент */
+                    th:nth-child(3), td:nth-child(3) { width: 100px; } /* Прогресс */
+                    th:nth-child(4), td:nth-child(4) { width: 220px; } /* Услуги */
+                    th:nth-child(5), td:nth-child(5) { width: 110px; } /* Внесено */
+                    th:nth-child(6), td:nth-child(6) { width: 100px; } /* Действия */
                 }
                 
                 /* На мобильных устройствах порядок будет стандартным (по коду) */
@@ -626,13 +648,23 @@
 
                 /* УВЕЛИЧЕННЫЙ РАЗМЕР ЦИФР В ТАБЛИЦЕ */
                 .price-cell {
-                    font-size: 18px !important; /* Основная сумма стала крупнее */
+                    font-size: 18px !important;
                 }
 
                 .price-cell small {
-                    font-size: 13px !important; /* Остаток долга стал крупнее */
+                    font-size: 13px !important;
                     display: block;
                     margin-top: 2px;
+                }
+
+                /* Центрирование прогресс-бара в новой колонке */
+                .progress-cell {
+                    vertical-align: middle;
+                    padding-right: 15px;
+                }
+                .progress-cell .progress-container {
+                    margin-top: 0 !important;
+                    width: 100%;
                 }
             </style>
 
@@ -694,7 +726,16 @@
 
         <div class="table-scroll-container">
             <table>
-                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right; padding-right:12px;">ВНЕСЕНО</th><th style="text-align:right">ДЕЙСТВИЯ</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>ДАТА</th>
+                        <th>КЛИЕНТ</th>
+                        <th>СТАТУС</th>
+                        <th>УСЛУГИ</th>
+                        <th style="text-align:right; padding-right:12px;">ВНЕСЕНО</th>
+                        <th style="text-align:right">ДЕЙСТВИЯ</th>
+                    </tr>
+                </thead>
                 <tbody id="crmTableBody"></tbody>
             </table>
         </div>
@@ -714,50 +755,37 @@
 
         <div class="calendar-widget">
             <style>
-                /* БАЗОВЫЙ СТИЛЬ ДНЯ - СТРОГО БЕЛЫЙ ЦВЕТ ЦИФР */
                 .cal-grid .day {
                     transition: all 0.2s ease;
                     border: 1px solid transparent !important;
                     position: relative;
                     color: #ffffff !important;
                 }
-                
-                /* Обводка ТОЛЬКО для пустых дат при наведении */
                 .cal-grid .day:not(.has-data):hover {
                     border: 1px solid #00ff66 !important;
                     cursor: pointer;
                 }
-
-                /* Выделенная дата */
                 .cal-grid .day.selected {
                     background: #333 !important; 
                     border: 1px solid #00ff66 !important;
                     color: #ffffff !important;
                 }
-
-                /* Прошлые записи: Тёмно-голубой ненасыщенный (БЕЗ ОБВОДКИ) */
                 .cal-grid .day.past-session {
                     background: #36648B !important; 
                     border: 1px solid transparent !important;
                     font-weight: bold;
                     color: #ffffff !important;
                 }
-                
-                /* Будущие сессии: Красный фон (БЕЗ ОБВОДКИ) */
                 .cal-grid .day.future-session {
                     background: #cc0000 !important;
                     border: 1px solid transparent !important;
                     color: #ffffff !important;
                 }
-
-                /* Текущий день: Зеленый фон (БЕЗ ОБВОДКИ) */
                 .cal-grid .day.today-session {
                     background: #008f39 !important;
                     border: 1px solid transparent !important;
                     color: #ffffff !important;
                 }
-
-                /* Скрываем точки-индикаторы */
                 .cal-grid .day::after {
                     display: none !important;
                 }
@@ -861,62 +889,36 @@
         }, defaultPrice);
     }
 
-    function checkPrivacyPassword() {
-        if(document.body.classList.contains('privacy-active')) return;
-        openModal("ВВЕДИТЕ ПАРОЛЬ АДМИНИСТРАТОРА", "password", function() {
-            const pass = document.getElementById('modalInput').value;
-            if (pass === '123') {
-                document.body.classList.add('privacy-active');
-                closeModal(); updateTable(); 
-            } else { alert("Неверный пароль"); }
-        });
-    }
-
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
         if (!grid) return;
         grid.innerHTML = '';
-        
         const y = currentCalDate.getFullYear();
         const m = currentCalDate.getMonth();
-        
-        const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", 
-                            "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+        const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
         document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
-
         const firstDay = new Date(y, m, 1).getDay();
         const lastDate = new Date(y, m + 1, 0).getDate();
         const shift = firstDay === 0 ? 6 : firstDay - 1;
-
         for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
-
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const todayStr = today.toLocaleDateString('ru-RU');
-
         for (let d = 1; d <= lastDate; d++) {
             const dayStr = String(d).padStart(2, '0');
             const monthStr = String(m + 1).padStart(2, '0');
             const dateStr = `${dayStr}.${monthStr}.${y}`;
-            
             const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
-            
             let classList = 'day';
             if (hasData) {
                 classList += ' has-data';
                 const [cellD, cellM, cellY] = dateStr.split('.').map(Number);
                 const cellDate = new Date(cellY, cellM - 1, cellD);
                 cellDate.setHours(0, 0, 0, 0);
-
-                if (dateStr === todayStr) {
-                    classList += ' today-session'; 
-                } else if (cellDate < today) {
-                    classList += ' past-session';   
-                } else {
-                    classList += ' future-session'; 
-                }
+                if (dateStr === todayStr) classList += ' today-session'; 
+                else if (cellDate < today) classList += ' past-session';   
+                else classList += ' future-session'; 
             }
-            
             if (selectedDate === dateStr) classList += ' selected';
             grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
@@ -933,8 +935,6 @@
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
         selectedDate = null; 
-        const label = document.getElementById('sessionDateLabel');
-        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК:`;
         updateTable(); renderCalendar(); 
     }
 
@@ -995,13 +995,10 @@
         if(!body || !window.crmData) return;
         body.innerHTML = '';
         const now = new Date();
-        const currentTime = now.getHours() * 60 + now.getMinutes();
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
-            return b.timestamp - a.timestamp;
-        });
+        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
         filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total || 0;
@@ -1010,28 +1007,20 @@
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
             
-            let showTime = true;
-            if (row.time && row.date === todayStr) {
-                const [h, m] = row.time.split(':').map(Number);
-                if (currentTime >= (h * 60 + m)) showTime = false;
-            }
-
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
-            if (row.details && Array.isArray(row.details)) {
-                row.details.forEach(d => {
-                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
-                });
-            }
+            if (row.details) row.details.forEach(d => {
+                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+            });
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
 
             const tr = document.createElement('tr');
             if (window.innerWidth <= 992) {
+                // Мобильный вид (без изменений)
                 let mobileItemsHTML = '';
                 if(row.details) row.details.forEach(d => {
                     mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur">${d.price} ₽</span></div>`;
                 });
-
                 tr.ondblclick = (e) => toggleMobileDetails(e, index);
                 tr.innerHTML = `
                     <td style="position:relative; padding-top: 20px;">
@@ -1046,7 +1035,6 @@
                             </div>
                         </div>
                         <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
-                        ${(row.time && showTime) ? `<div class="mobile-row-time-top" style="position:absolute; top:12px; right:15px; color:#bf00ff; font-size:20px; font-weight:900; font-family:Orbitron;">${row.time}</div>` : ''}
                         <div class="mobile-row-client">${row.client}</div>
                         <div class="mobile-row-services">${row.services}</div>
                         <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
@@ -1056,21 +1044,17 @@
                         </div>
                     </td>`;
             } else {
+                // ПК вид (НОВАЯ СТРУКТУРА)
                 tr.innerHTML = `
-                    <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
-                    <td data-label="КЛИЕНТ" class="artist-cell">
-                        <div style="position:relative;">
-                            <span class="artist-name" style="font-weight:600;">${row.client}</span>
-                            ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
-                            <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
-                        </div>
-                    </td>
-                    <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
+                    <td><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
+                    <td class="artist-cell"><span class="artist-name" style="font-weight:600;">${row.client}</span></td>
+                    <td class="progress-cell"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></td>
+                    <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
                     <td class="price-cell privacy-blur" style="text-align:right;">
                         <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
                         ${!isComplete ? `<small style="color:var(--artist-red); opacity:0.9;">-${rest}</small>` : ''}
                     </td>
-                    <td data-label="ДЕЙСТВИЯ">
+                    <td>
                         <div class="action-icons-wrap">
                             <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
                             <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
@@ -1087,7 +1071,7 @@
         if(!el || !window.crmData) return;
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         const sum = window.crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + Number(b.total), 0);
-        el.innerText = sum.toLocaleString() + ' ₽';
+        if(el) el.innerText = sum.toLocaleString() + ' ₽';
     }
 
     function updateCerts() {
@@ -1184,16 +1168,10 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
 window.saveSession = async function(event) {
     if (event) event.preventDefault();
     let cart = window.currentCart;
-
-    if (!cart || !cart.items || cart.items.length === 0) {
-        alert('Чек в SSL CRM пуст! Добавьте услуги.');
-        return;
-    }
-
+    if (!cart || !cart.items || cart.items.length === 0) return;
     const name = document.getElementById('bookingClient')?.value || 'Без имени';
     const time = document.getElementById('bookingTime')?.value || '';
     const date = selectedDate || new Date().toLocaleDateString('ru-RU');
-
     try {
         await crmCollection.add({
             date: date,
@@ -1205,22 +1183,18 @@ window.saveSession = async function(event) {
             fullTotal: Number(cart.fullPriceTotal),
             timestamp: Date.now()
         });
-
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
         if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
         renderCart();
-    } catch (error) {
-        console.error("Ошибка сохранения:", error);
-    }
+    } catch (e) {}
 };
 
 window.addPayment = function(id) {
     const row = window.crmData.find(r => r.id === id);
     const full = row.fullTotal || row.total;
     const remaining = full - row.total;
-    if (remaining <= 0) return alert('Заказ уже полностью оплачен');
-    
+    if (remaining <= 0) return;
     openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, "pay", function() {
         const amount = parseInt(document.getElementById('modalInput').value);
         if (!isNaN(amount) && amount > 0) {
