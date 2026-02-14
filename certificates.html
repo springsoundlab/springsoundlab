@@ -612,37 +612,9 @@
                     .btn-order-5 { order: 8; } /* АРАНЖИРОВКА — ТЕПЕРЬ ПОСЛЕДНЯЯ */
                 }
                 
+                /* На мобильных устройствах порядок будет стандартным (по коду) */
                 @media (max-width: 992px) {
                     .btn-wrapper { order: unset !important; }
-                }
-
-                /* СТИЛЬ ДЛЯ ФИНАНСОВЫХ БЛОКОВ */
-                #currentViewText, .price-cell, .price-cell small {
-                    font-family: 'Rajdhani', sans-serif !important;
-                    font-weight: 700 !important;
-                    letter-spacing: 1px;
-                }
-
-                /* УВЕЛИЧЕННЫЙ РАЗМЕР ЦИФР В ТАБЛИЦЕ */
-                .price-cell {
-                    font-size: 18px !important;
-                }
-
-                .price-cell small {
-                    font-size: 13px !important;
-                    display: block;
-                    margin-top: 2px;
-                }
-
-                /* ФИНАНСОВАЯ ПРИВАТНОСТЬ (CLICK TO UNLOCK) */
-                .privacy-blur {
-                    filter: blur(5px);
-                    cursor: pointer;
-                    transition: filter 0.3s ease;
-                    user-select: none;
-                }
-                .privacy-blur.unlocked {
-                    filter: blur(0) !important;
                 }
             </style>
 
@@ -745,7 +717,7 @@
                     color: #ffffff !important;
                 }
 
-                /* Прошлые записи: Тёмно-голубой ненасыщенный */
+                /* Прошлые записи: Тёмно-голубой ненасыщенный (БЕЗ ОБВОДКИ) */
                 .cal-grid .day.past-session {
                     background: #36648B !important; 
                     border: 1px solid transparent !important;
@@ -753,14 +725,14 @@
                     color: #ffffff !important;
                 }
                 
-                /* Будущие сессии: Красный фон */
+                /* Будущие сессии: Красный фон (БЕЗ ОБВОДКИ) */
                 .cal-grid .day.future-session {
                     background: #cc0000 !important;
                     border: 1px solid transparent !important;
                     color: #ffffff !important;
                 }
 
-                /* Текущий день: Зеленый фон */
+                /* Текущий день: Зеленый фон (БЕЗ ОБВОДКИ) */
                 .cal-grid .day.today-session {
                     background: #008f39 !important;
                     border: 1px solid transparent !important;
@@ -817,13 +789,6 @@
         input.value = val;
     }
 
-    // ЛОГИКА СНЯТИЯ БЛЮРА ПРИ КЛИКЕ
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('privacy-blur')) {
-            e.target.classList.toggle('unlocked');
-        }
-    });
-
     function initTooltipLogic() {
         const tableBody = document.getElementById('crmTableBody');
         if(!tableBody) return;
@@ -854,7 +819,6 @@
         const titleEl = document.getElementById('modalTitle');
         const inputEl = document.getElementById('modalInput');
         const confirmBtn = document.getElementById('modalConfirmBtn');
-        if(!modal) return;
         titleEl.innerText = title;
         inputEl.value = defaultValue;
         inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
@@ -877,6 +841,17 @@
                 closeModal();
             } else { alert('Введите корректную сумму'); }
         }, defaultPrice);
+    }
+
+    function checkPrivacyPassword() {
+        if(document.body.classList.contains('privacy-active')) return;
+        openModal("ВВЕДИТЕ ПАРОЛЬ АДМИНИСТРАТОРА", "password", function() {
+            const pass = document.getElementById('modalInput').value;
+            if (pass === '123') {
+                document.body.classList.add('privacy-active');
+                closeModal(); updateTable(); 
+            } else { alert("Неверный пароль"); }
+        });
     }
 
     function renderCalendar() {
@@ -902,7 +877,10 @@
         const todayStr = today.toLocaleDateString('ru-RU');
 
         for (let d = 1; d <= lastDate; d++) {
-            const dateStr = `${String(d).padStart(2, '0')}.${String(m + 1).padStart(2, '0')}.${y}`;
+            const dayStr = String(d).padStart(2, '0');
+            const monthStr = String(m + 1).padStart(2, '0');
+            const dateStr = `${dayStr}.${monthStr}.${y}`;
+            
             const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
             
             let classList = 'day';
@@ -912,9 +890,13 @@
                 const cellDate = new Date(cellY, cellM - 1, cellD);
                 cellDate.setHours(0, 0, 0, 0);
 
-                if (dateStr === todayStr) classList += ' today-session'; 
-                else if (cellDate < today) classList += ' past-session';   
-                else classList += ' future-session'; 
+                if (dateStr === todayStr) {
+                    classList += ' today-session'; 
+                } else if (cellDate < today) {
+                    classList += ' past-session';   
+                } else {
+                    classList += ' future-session'; 
+                }
             }
             
             if (selectedDate === dateStr) classList += ' selected';
@@ -995,8 +977,13 @@
         if(!body || !window.crmData) return;
         body.innerHTML = '';
         const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
+
+        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
+            return b.timestamp - a.timestamp;
+        });
 
         filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total || 0;
@@ -1004,69 +991,147 @@
             const rest = Math.max(0, full - paid);
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
+            
+            let showTime = true;
+            if (row.time && row.date === todayStr) {
+                const [h, m] = row.time.split(':').map(Number);
+                if (currentTime >= (h * 60 + m)) showTime = false;
+            }
 
             const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             if (row.details && Array.isArray(row.details)) {
                 row.details.forEach(d => {
-                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum privacy-blur" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
                 });
             }
-            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum privacy-blur">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
+            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
 
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
-                <td data-label="КЛИЕНТ" class="artist-cell">
-                    <div style="position:relative;">
-                        <span class="artist-name" style="font-weight:600;">${row.client}</span>
-                        ${row.time ? `<span class="table-time-inline">${row.time}</span>` : ''}
-                        <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
-                    </div>
-                </td>
-                <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
-                <td class="price-cell privacy-blur" style="text-align:right;">
-                    <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
-                    ${!isComplete ? `<small style="color:var(--artist-red); opacity:0.9;">-${rest}</small>` : ''}
-                </td>
-                <td data-label="ДЕЙСТВИЯ">
-                    <div class="action-icons-wrap">
-                        <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
-                        <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
-                    </div>
-                </td>`;
+            if (window.innerWidth <= 992) {
+                let mobileItemsHTML = '';
+                if(row.details) row.details.forEach(d => {
+                    mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur">${d.price} ₽</span></div>`;
+                });
+
+                tr.ondblclick = (e) => toggleMobileDetails(e, index);
+                tr.innerHTML = `
+                    <td style="position:relative; padding-top: 20px;">
+                        <div id="mobileDetails-${index}" class="mobile-details-overlay">
+                            <div class="mobile-details-close" onclick="event.stopPropagation(); this.parentElement.classList.remove('active')">×</div>
+                            <div class="mobile-details-header">Детализация заказа</div>
+                            <div class="mobile-details-list">${mobileItemsHTML}</div>
+                            <div class="mobile-summary-section">
+                                <div class="mobile-summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur">${full} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div>
+                            </div>
+                        </div>
+                        <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
+                        ${(row.time && showTime) ? `<div class="mobile-row-time-top" style="position:absolute; top:12px; right:15px; color:#bf00ff; font-size:20px; font-weight:900; font-family:Orbitron;">${row.time}</div>` : ''}
+                        <div class="mobile-row-client">${row.client}</div>
+                        <div class="mobile-row-services">${row.services}</div>
+                        <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
+                        <div class="mobile-actions-grid">
+                            <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
+                            <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
+                        </div>
+                    </td>`;
+            } else {
+                tr.innerHTML = `
+                    <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
+                    <td data-label="КЛИЕНТ" class="artist-cell">
+                        <div style="position:relative;">
+                            <span class="artist-name" style="font-weight:600;">${row.client}</span>
+                            ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
+                            <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
+                        </div>
+                    </td>
+                    <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
+                    <td class="price-cell privacy-blur" style="font-family:Orbitron; font-size:11px; text-align:right;">
+                        <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
+                        ${!isComplete ? `<br><small style="color:var(--artist-red); font-size:9px;">-${rest}</small>` : ''}
+                    </td>
+                    <td data-label="ДЕЙСТВИЯ">
+                        <div class="action-icons-wrap">
+                            <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
+                            <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
+                        </div>
+                    </td>`;
+            }
             body.appendChild(tr);
         });
+        updateMonthTotal();
+    }
+
+    function updateMonthTotal() {
+        const el = document.getElementById('monthTotal');
+        if(!el || !window.crmData) return;
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+        const sum = window.crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + Number(b.total), 0);
+        el.innerText = sum.toLocaleString() + ' ₽';
+    }
+
+    function updateCerts() {
+        const list = document.getElementById('certsList');
+        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        if(!list) return;
+        list.innerHTML = '';
+        for (let i = 1; i <= 300; i++) {
+            const id = 'SSL-' + String(i).padStart(3, '0');
+            const d = saved[id] || { active: false, name: '' };
+            const div = document.createElement('div');
+            div.className = 'cert-row';
+            div.innerHTML = `<span class="cert-id">${id}</span>${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}`;
+            list.appendChild(div);
+        }
+    }
+
+    function activateCert(id) {
+        const n = document.getElementById('in-' + id).value;
+        if (!n) return alert('Имя!');
+        const s = JSON.parse(localStorage.getItem('spring_certs')) || {};
+        s[id] = { active: true, name: n };
+        localStorage.setItem('spring_certs', JSON.stringify(s));
+        updateCerts();
     }
 
     function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
         if (!container || !window.crmData) return;
-        
         const now = new Date();
         const todayStr = now.toLocaleDateString('ru-RU');
-        let targetDate = clickedDate || todayStr;
-        
-        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a,b) => a.time.localeCompare(b.time));
-
-        container.innerHTML = '';
+        const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
+        let targetDate = clickedDate || (window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr);
+        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
+        container.innerHTML = ''; 
         if (sessions.length > 0) {
-            titleEl.innerText = `Записи на ${targetDate}`;
-            sessions.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'future-item';
-                div.innerHTML = `<div class="future-date">${s.time}</div><div class="future-client">${s.client}</div>`;
-                container.appendChild(div);
+            titleEl.innerText = (targetDate === todayStr) ? "Записи на сегодня" : (targetDate === tomorrowStr ? "Записи на завтра" : `Записи на ${targetDate}`);
+            sessions.forEach(next => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'future-item';
+                itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.client}</div>`;
+                container.appendChild(itemDiv);
             });
+            document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
         } else {
             titleEl.innerText = "Ближайшая запись";
             container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
+            document.getElementById('nextSessionBox').style.borderColor = '#111';
         }
     }
 
+    function toggleMobileDetails(e, index) {
+        if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close')) return;
+        const overlay = document.getElementById(`mobileDetails-${index}`);
+        if (overlay) overlay.classList.toggle('active');
+    }
+
+    window.addEventListener('resize', updateTable);
     window.addEventListener('load', () => {
         renderCalendar();
+        updateCerts();
         initTooltipLogic();
     });
 </script>
@@ -1090,41 +1155,57 @@ const crmCollection = db.collection("sessions");
 
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
-    snapshot.forEach((doc) => { window.crmData.push({ id: doc.id, ...doc.data() }); });
+    snapshot.forEach((doc) => {
+        window.crmData.push({ id: doc.id, ...doc.data() });
+    });
     updateTable();
     renderCalendar();
     updateNextSession();
 });
 
-window.saveSession = async function() {
+window.saveSession = async function(event) {
+    if (event) event.preventDefault();
     let cart = window.currentCart;
-    if (!cart || cart.items.length === 0) return;
-    const name = document.getElementById('bookingClient').value || 'Без имени';
-    const time = document.getElementById('bookingTime').value || '';
+
+    if (!cart || !cart.items || cart.items.length === 0) {
+        alert('Чек в SSL CRM пуст! Добавьте услуги.');
+        return;
+    }
+
+    const name = document.getElementById('bookingClient')?.value || 'Без имени';
+    const time = document.getElementById('bookingTime')?.value || '';
     const date = selectedDate || new Date().toLocaleDateString('ru-RU');
-    await crmCollection.add({
-        date, client: name, time,
-        services: cart.items.map(i => i.name).join(', '),
-        details: JSON.parse(JSON.stringify(cart.details)),
-        total: Number(cart.total),
-        fullTotal: Number(cart.fullPriceTotal),
-        timestamp: Date.now()
-    });
-    window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-    document.getElementById('bookingClient').value = '';
-    document.getElementById('bookingTime').value = '';
-    renderCart();
+
+    try {
+        await crmCollection.add({
+            date: date,
+            client: name,
+            time: time,
+            services: cart.items.map(i => i.name).join(', '),
+            details: JSON.parse(JSON.stringify(cart.details)),
+            total: Number(cart.total),
+            fullTotal: Number(cart.fullPriceTotal),
+            timestamp: Date.now()
+        });
+
+        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
+        if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
+        renderCart();
+    } catch (error) {
+        console.error("Ошибка сохранения:", error);
+    }
 };
 
 window.addPayment = function(id) {
     const row = window.crmData.find(r => r.id === id);
     const full = row.fullTotal || row.total;
     const remaining = full - row.total;
-    if (remaining <= 0) return alert('Оплачено полностью');
+    if (remaining <= 0) return alert('Заказ уже полностью оплачен');
     
     openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, "pay", function() {
         const amount = parseInt(document.getElementById('modalInput').value);
-        if (amount > 0) {
+        if (!isNaN(amount) && amount > 0) {
             crmCollection.doc(id).update({ total: row.total + amount });
             closeModal();
         }
@@ -1132,7 +1213,10 @@ window.addPayment = function(id) {
 };
 
 window.deleteRow = function(id) {
-    if(confirm("Удалить запись?")) crmCollection.doc(id).delete();
+    openModal("УДАЛИТЬ ЗАПИСЬ?", "confirm-delete", function() {
+        crmCollection.doc(id).delete();
+        closeModal();
+    });
 };
 </script>
 </body>
