@@ -611,7 +611,7 @@
                     .btn-order-8 { order: 7; } /* + ПЛАТ. ДОРОЖКА */
                     .btn-order-5 { order: 8; } /* АРАНЖИРОВКА — ТЕПЕРЬ ПОСЛЕДНЯЯ */
 
-                    /* Настройка сетки таблицы для плотного расположения */
+                    /* Настройка сетки таблицы для плотности */
                     table {
                         table-layout: fixed;
                         width: 100%;
@@ -625,45 +625,33 @@
                         white-space: nowrap;
                     }
 
-                    /* НОВАЯ ШИРИНА КОЛОНОК ДЛЯ ПЛОТНОСТИ */
-                    th:nth-child(1), td:nth-child(1) { width: 110px; } /* Дата (шире для ГГГГ) */
-                    th:nth-child(2), td:nth-child(2) { width: 150px; } /* Клиент (крупнее) */
-                    th:nth-child(3), td:nth-child(3) { width: 90px; }  /* Статус (вплотную) */
-                    th:nth-child(4), td:nth-child(4) { width: 250px; } /* Услуги (вплотную) */
+                    /* ОПТИМИЗИРОВАННАЯ ШИРИНА КОЛОНОК */
+                    th:nth-child(1), td:nth-child(1) { width: 110px; } /* Дата */
+                    th:nth-child(2), td:nth-child(2) { width: 130px; } /* Клиент (чуть уже для прижима) */
+                    th:nth-child(3), td:nth-child(3) { width: 100px; } /* Статус (бар) */
+                    th:nth-child(4), td:nth-child(4) { width: 260px; } /* Услуги */
                     th:nth-child(5), td:nth-child(5) { width: 110px; } /* Внесено */
                     th:nth-child(6), td:nth-child(6) { width: 90px; }  /* Действия */
                 }
                 
-                /* На мобильных устройствах порядок будет стандартным */
                 @media (max-width: 992px) {
                     .btn-wrapper { order: unset !important; }
                 }
 
-                /* СТИЛЬ ДЛЯ ФИНАНСОВЫХ БЛОКОВ */
+                /* ФИНАНСЫ */
                 #currentViewText, .price-cell, .price-cell small {
                     font-family: 'Rajdhani', sans-serif !important;
                     font-weight: 700 !important;
                     letter-spacing: 1px;
                 }
 
-                /* УВЕЛИЧЕННЫЙ РАЗМЕР ЦИФР В ТАБЛИЦЕ */
-                .price-cell {
-                    font-size: 18px !important;
-                }
+                .price-cell { font-size: 18px !important; }
+                .price-cell small { font-size: 13px !important; display: block; margin-top: 2px; }
 
-                .price-cell small {
-                    font-size: 13px !important;
-                    display: block;
-                    margin-top: 2px;
-                }
+                /* КЛИЕНТ */
+                .artist-name { font-size: 16px !important; color: #fff; }
 
-                /* КРУПНОЕ ИМЯ КЛИЕНТА */
-                .artist-name {
-                    font-size: 16px !important;
-                    color: #fff;
-                }
-
-                /* КРУПНАЯ БЕЛАЯ ДАТА */
+                /* ДАТА */
                 .full-date-cell {
                     color: #ffffff !important;
                     font-size: 13px !important;
@@ -671,14 +659,23 @@
                     font-family: 'Orbitron', sans-serif;
                 }
 
-                /* Центрирование прогресс-бара */
+                /* СТАТУС БАР (ПРОГРЕСС) */
                 .progress-cell {
                     vertical-align: middle;
-                    padding-right: 5px; /* Уменьшен зазор */
+                    padding-left: 0 !important; /* Убираем левый отступ ячейки */
                 }
+                
                 .progress-cell .progress-container {
-                    margin-top: 0 !important;
-                    width: 80px; /* Фиксированная длина полоски */
+                    margin: 0 0 0 2px !important; /* Прижимаем влево к имени */
+                    width: 90px;
+                    height: 8px !important; /* СДЕЛАЛ ПОЛОСКУ ШИРЕ (ВЫШЕ) */
+                    background: #1a1a1a;
+                    border-radius: 2px;
+                }
+                
+                .progress-cell .progress-bar {
+                    height: 100% !important;
+                    border-radius: 2px;
                 }
             </style>
 
@@ -1028,7 +1025,7 @@
 
             const tr = document.createElement('tr');
             if (window.innerWidth <= 992) {
-                // Мобильный вид (без изменений)
+                // Мобильный вид
                 let mobileItemsHTML = '';
                 if(row.details) row.details.forEach(d => {
                     mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur">${d.price} ₽</span></div>`;
@@ -1056,7 +1053,7 @@
                         </div>
                     </td>`;
             } else {
-                // ПК вид (ПОЛНАЯ ДАТА И ПЛОТНАЯ СТРУКТУРА)
+                // ПК вид
                 tr.innerHTML = `
                     <td class="full-date-cell">${row.date}</td>
                     <td class="artist-cell"><span class="artist-name" style="font-weight:600;">${row.client}</span></td>
