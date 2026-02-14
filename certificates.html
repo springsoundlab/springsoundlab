@@ -659,7 +659,10 @@
             pointer-events: none;
         }
 
-        /* УВЕЛИЧЕННЫЙ ТЕКСТ ДЛЯ ТЕЛЕФОНА */
+        /* Цвета календаря */
+        .day.has-data.past-session { background: rgba(0, 143, 57, 0.4) !important; border: 1px solid #00ff66; }
+        .day.has-data.future-session { background: rgba(0, 204, 255, 0.4) !important; border: 1px solid #00ccff; }
+
         @media (max-width: 992px) {
             .cert-tooltip-base.mobile-active {
                 display: block !important;
@@ -691,7 +694,6 @@
                 z-index: 100;
             }
 
-            /* КРУПНАЯ БЕЛАЯ ДАТА НА МОБИЛКЕ */
             .mobile-row-date {
                 font-size: 22px !important;
                 color: #fff !important;
@@ -707,7 +709,6 @@
         }
         .cert-close-btn { display: none; }
 
-        /* ПРАВИЛА ДЛЯ СЕРТИФИКАТОВ */
         .cert-row {
             user-select: none !important;
             -webkit-user-select: none !important;
@@ -812,6 +813,7 @@
         if(!grid || !monthName) return;
         grid.innerHTML = '';
         const now = new Date();
+        now.setHours(0,0,0,0);
         const year = currentCalDate.getFullYear();
         const month = currentCalDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
@@ -821,13 +823,26 @@
         ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'].forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
         let startingSpace = (firstDay === 0) ? 6 : firstDay - 1;
         for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
+        
         for(let d=1; d<=daysInMonth; d++) {
-            const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
+            const dateParts = [String(d).padStart(2,'0'), String(month+1).padStart(2,'0'), year];
+            const dateStr = dateParts.join('.');
             const hasData = window.crmData.some(row => row.date === dateStr);
-            const isToday = now.toLocaleDateString('ru-RU') === dateStr;
+            
+            const cellDate = new Date(year, month, d);
+            const isToday = now.getTime() === cellDate.getTime();
+            
             let classes = ['day'];
             if (isToday) classes.push('today');
-            if (hasData) classes.push('has-data');
+            
+            if (hasData) {
+                if (cellDate >= now) {
+                    classes.push('future-session');
+                } else {
+                    classes.push('past-session');
+                }
+            }
+            
             if (selectedDate === dateStr) classes.push('selected-day');
             grid.innerHTML += `<div class="${classes.join(' ')}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
@@ -934,10 +949,23 @@
 
     function updateTable() {
         const body = document.getElementById('crmTableBody');
+        const head = document.querySelector('.crm-table thead tr');
         if(!body) return;
         body.innerHTML = '';
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
+
+        // Обновляем заголовок для ПК
+        if (window.innerWidth > 992 && head) {
+            head.innerHTML = `
+                <th>ДАТА</th>
+                <th>КЛИЕНТ</th>
+                <th>ОПЛАТА</th>
+                <th>УСЛУГИ</th>
+                <th>СУММА</th>
+                <th>ДЕЙСТВИЯ</th>
+            `;
+        }
 
         filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total || 0;
@@ -970,9 +998,9 @@
             } else {
                 tr.innerHTML = `
                     <td data-label="ДАТА">${row.date}</td>
-                    <td data-label="КЛИЕНТ">
-                        <div>${row.client}</div>
-                        <div class="progress-container" style="width:80px; height:6px; margin-top:5px;">
+                    <td data-label="КЛИЕНТ">${row.client}</td>
+                    <td data-label="ОПЛАТА">
+                        <div class="progress-container" style="width:70px; height:6px;">
                             <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
                         </div>
                     </td>
