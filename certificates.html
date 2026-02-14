@@ -642,110 +642,105 @@
     </div>
 </div>
 
-</div> <div id="cert-global-tooltip" class="cert-tooltip-base"></div>
+<div id="cert-global-tooltip" class="cert-tooltip-base"></div>
 
-    <style>
-        /* ШРИФТ ДЛЯ ЦИФР */
-        .price-cell, .tooltip-total, .tooltip-item span, #cartTotal, #monthTotal, .future-date, .mobile-row-date {
-            font-family: 'Rajdhani', sans-serif !important;
-            font-weight: 700 !important;
-        }
+<style>
+    /* ШРИФТ ДЛЯ ЦИФР */
+    .price-cell, .tooltip-total, .tooltip-item span, #cartTotal, #monthTotal, .future-date, .mobile-row-date {
+        font-family: 'Rajdhani', sans-serif !important;
+        font-weight: 700 !important;
+    }
 
-        .cert-tooltip-base {
-            position: fixed;
-            display: none;
-            z-index: 99999999;
-            background: rgba(0,0,0,0.98);
-            border: 1px solid var(--neon-gold);
-            box-shadow: 0 0 25px rgba(0,0,0,0.9);
-            padding: 15px;
-            border-radius: 5px;
-            color: #fff;
-            pointer-events: none;
-        }
+    .cert-tooltip-base {
+        position: fixed;
+        display: none;
+        z-index: 99999999;
+        background: rgba(0,0,0,0.98);
+        border: 1px solid var(--neon-gold);
+        box-shadow: 0 0 25px rgba(0,0,0,0.9);
+        padding: 15px;
+        border-radius: 5px;
+        color: #fff;
+        pointer-events: none;
+    }
 
-        /* МОБИЛЬНЫЕ ПРАВКИ: БОЛЬШАЯ БЕЛАЯ ДАТА */
-        @media (max-width: 992px) {
-            .cert-tooltip-base.mobile-active {
-                display: block !important;
-                pointer-events: auto;
-                width: 90%;
-                max-width: 340px;
-                left: 50% !important;
-                top: 20% !important;
-                transform: translateX(-50%);
-                padding: 25px;
-            }
-            .mobile-row-date {
-                color: #ffffff !important;
-                font-size: 18px !important;
-                margin-bottom: 8px !important;
-                display: block;
-            }
-            .cert-close-btn {
-                display: block !important;
-                position: absolute;
-                top: 10px;
-                right: 15px;
-                color: var(--artist-red);
-                font-size: 32px;
-                cursor: pointer;
-            }
+    @media (max-width: 992px) {
+        .cert-tooltip-base.mobile-active {
+            display: block !important;
+            pointer-events: auto;
+            width: 90%;
+            max-width: 340px;
+            left: 50% !important;
+            top: 20% !important;
+            transform: translateX(-50%);
+            padding: 25px;
         }
+        .mobile-row-date {
+            color: #ffffff !important;
+            font-size: 20px !important;
+            margin-bottom: 8px !important;
+            display: block;
+        }
+        .cert-close-btn {
+            display: block !important;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: var(--artist-red);
+            font-size: 32px;
+            cursor: pointer;
+        }
+    }
 
-        /* ПРОГРЕСС БАРЫ ПК */
-        .pc-progress-mini {
-            width: 100%;
-            height: 3px;
-            background: rgba(255,255,255,0.05);
-            margin-top: 4px;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .pc-progress-fill {
-            height: 100%;
-            background: var(--neon-purple);
-        }
-        .pc-progress-fill.complete { background: var(--status-green); }
+    .pc-progress-mini {
+        width: 100%;
+        height: 3px;
+        background: rgba(255,255,255,0.05);
+        margin-top: 4px;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    .pc-progress-fill { height: 100%; background: var(--neon-purple); }
+    .pc-progress-fill.complete { background: var(--status-green); }
 
-        /* КРАСИВОЕ ОКНО ПАРОЛЯ */
-        .password-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 1000000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        .password-box {
-            background: #111;
-            padding: 30px;
-            border: 2px solid var(--neon-purple);
-            box-shadow: 0 0 20px var(--neon-purple);
-            text-align: center;
-            border-radius: 10px;
-        }
-        .password-box input {
-            background: #000;
-            border: 1px solid var(--neon-purple);
-            color: #fff;
-            padding: 10px;
-            margin: 15px 0;
-            width: 100%;
-            text-align: center;
-            outline: none;
-        }
-    </style>
+    .password-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85);
+        z-index: 1000000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+    .password-box {
+        background: #111;
+        padding: 30px;
+        border: 2px solid var(--neon-purple);
+        box-shadow: 0 0 20px var(--neon-purple);
+        text-align: center;
+        border-radius: 10px;
+    }
+    .password-box input {
+        background: #000;
+        border: 1px solid var(--neon-purple);
+        color: #fff;
+        padding: 10px;
+        margin: 15px 0;
+        width: 100%;
+        text-align: center;
+        outline: none;
+    }
+    .cert-row { cursor: pointer; transition: 0.2s; }
+</style>
 
-    <div id="pwdOverlay" class="password-overlay">
-        <div class="password-box">
-            <h3 style="color:var(--neon-purple); font-family:Orbitron;">ACCESS REQUIRED</h3>
-            <input type="password" id="adminPwd" placeholder="ENTER PASSWORD">
-            <button class="m-btn m-confirm" onclick="verifyPass()">UNLOCK</button>
-            <button class="m-btn m-del" style="margin-top:10px;" onclick="document.getElementById('pwdOverlay').style.display='none'">CANCEL</button>
-        </div>
+<div id="pwdOverlay" class="password-overlay">
+    <div class="password-box">
+        <h3 style="color:var(--neon-purple); font-family:Orbitron;">ACCESS REQUIRED</h3>
+        <input type="password" id="adminPwd" placeholder="ENTER PASSWORD">
+        <button class="m-btn m-confirm" onclick="verifyPass()">UNLOCK</button>
+        <button class="m-btn m-del" style="margin-top:10px;" onclick="document.getElementById('pwdOverlay').style.display='none'">CANCEL</button>
     </div>
+</div>
 
 <script>
     window.crmData = [];
@@ -753,11 +748,12 @@
     window.tempCertNames = {}; 
     let currentCalDate = new Date();
     let selectedDate = null;
-    let hoverTimer;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
     let activeCertTarget = null; 
 
-    // ФУНКЦИИ КАЛЕНДАРЯ
+    function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
+    function stopProp(e) { e.stopPropagation(); }
+
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
         const monthName = document.getElementById('calMonthName');
@@ -777,11 +773,8 @@
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
             const hasData = window.crmData.some(row => row.date === dateStr);
             const isToday = now.toLocaleDateString('ru-RU') === dateStr;
-            let classes = ['day'];
-            if (isToday) classes.push('today');
-            if (hasData) classes.push('has-data');
-            if (selectedDate === dateStr) classes.push('selected-day');
-            grid.innerHTML += `<div class="${classes.join(' ')}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
+            let cls = 'day' + (isToday ? ' today' : '') + (hasData ? ' has-data' : '') + (selectedDate === dateStr ? ' selected-day' : '');
+            grid.innerHTML += `<div class="${cls}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
         updateMonthTotal();
     }
@@ -791,7 +784,7 @@
         const label = document.getElementById('sessionDateLabel');
         if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
         renderCalendar(); 
-        updateNextSession(date);
+        if(typeof updateNextSession === 'function') updateNextSession(date);
     }
 
     function changeMonth(dir) { 
@@ -801,7 +794,6 @@
         updateTable();
     }
 
-    // ПАРОЛЬ И РАЗБЛОКИРОВКА
     function checkPrivacyPassword() {
         if(document.body.classList.contains('privacy-active')) return;
         document.getElementById('pwdOverlay').style.display = 'flex';
@@ -809,15 +801,13 @@
     }
 
     function verifyPass() {
-        const p = document.getElementById('adminPwd').value;
-        if(p === '123') {
+        if (document.getElementById('adminPwd').value === '123') {
             document.body.classList.add('privacy-active');
             document.getElementById('pwdOverlay').style.display = 'none';
             updateTable();
         } else { alert("WRONG PASSWORD"); }
     }
 
-    // КОРЗИНА И СОХРАНЕНИЕ (ДЛЯ ПАКЕТОВ)
     function addToCart(name, price, colorClass, forceFull = false) {
         const isPrepaid = document.getElementById('prepaidMode')?.checked;
         let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
@@ -831,10 +821,9 @@
     }
 
     function openPriceModal(name, color, defaultPrice) {
-        openModal(`УКАЖИТЕ СТОИМОСТЬ: ${name}`, "price", function() {
-            const p = parseInt(document.getElementById('modalInput').value);
-            if(!isNaN(p) && p > 0) { addToCart(name, p, color); closeModal(); }
-        }, defaultPrice);
+        const p = prompt(`УКАЖИТЕ СТОИМОСТЬ ДЛЯ ${name}:`, defaultPrice);
+        const val = parseInt(p);
+        if(!isNaN(val) && val > 0) addToCart(name, val, color);
     }
 
     function renderCart() {
@@ -843,7 +832,7 @@
         const label = document.getElementById('sessionDateLabel');
         const saveBtn = document.querySelector('.save-btn');
         if(!container || !total) return;
-        
+
         if (activeCertTarget) {
             label.innerHTML = `НАПОЛНЕНИЕ ${activeCertTarget} <span onclick="exitCertMode()" style="cursor:pointer; color:var(--artist-red); margin-left:10px;">×</span>`;
             if(saveBtn) { saveBtn.innerText = `СОХРАНИТЬ В ${activeCertTarget}`; saveBtn.onclick = saveCertContent; }
@@ -873,22 +862,22 @@
             const paid = row.total || 0;
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
-            
             const tr = document.createElement('tr');
-            tr.setAttribute('ondblclick', `showCertTooltip(event, '${row.client}', ${JSON.stringify(row.details).replace(/"/g, '&quot;')})`);
+            
+            tr.onclick = (e) => { if(window.innerWidth <= 992) showCertTooltip(e, row.client, row.details); };
+            tr.ondblclick = (e) => showCertTooltip(e, row.client, row.details);
             
             if (window.innerWidth <= 992) {
-                tr.innerHTML = `
-                    <td style="padding: 20px;">
-                        <div class="mobile-row-date">${row.date}</div>
-                        <div class="mobile-row-client">${row.client}</div>
-                        <div class="mobile-row-services">${row.services}</div>
-                        <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
-                        <div class="mobile-actions-grid">
-                            <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
-                            <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
-                        </div>
-                    </td>`;
+                tr.innerHTML = `<td style="padding: 20px;">
+                    <div class="mobile-row-date">${row.date}</div>
+                    <div class="mobile-row-client">${row.client}</div>
+                    <div class="mobile-row-services">${row.services}</div>
+                    <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
+                    <div class="mobile-actions-grid">
+                        <div class="m-action-btn m-btn-pay" onclick="event.stopPropagation(); addPayment('${row.id}')">Доплата</div>
+                        <div class="m-action-btn m-btn-del" onclick="event.stopPropagation(); deleteRow('${row.id}')">Удалить</div>
+                    </div>
+                </td>`;
             } else {
                 tr.innerHTML = `
                     <td>${row.date}</td>
@@ -896,7 +885,7 @@
                         <div>${row.client}</div>
                         <div class="pc-progress-mini"><div class="pc-progress-fill ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                     </td>
-                    <td class="services-cell" style="position:relative;">${row.services}</td>
+                    <td class="services-cell">${row.services}</td>
                     <td class="price-cell privacy-blur">${paid} ₽</td>
                     <td>
                         <div class="action-icons-wrap">
@@ -918,7 +907,6 @@
         el.innerText = sum.toLocaleString() + ' ₽';
     }
 
-    // СЕРТИФИКАТЫ
     async function updateCerts() {
         const list = document.getElementById('certsList');
         if(!list) return;
@@ -930,23 +918,21 @@
             for (let i = 1; i <= 300; i++) {
                 const id = 'SSL-' + String(i).padStart(3, '0');
                 const d = certsData[id] || { active: false, name: '', items: [] };
-                const itemsToShow = (activeCertTarget === id) ? window.currentCart.details : (d.items || []);
                 const div = document.createElement('div');
                 div.className = `cert-row ${d.active ? 'is-active' : 'not-active'}`;
-                const savedName = window.tempCertNames[id] || '';
                 div.innerHTML = `
                     <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold);' : ''}">${id}</span>
-                    ${d.active ? `<span style="font-size:10px; color:#ccc;">${d.name}</span>` : `<input type="text" id="in-${id}" oninput="window.tempCertNames['${id}']=this.value" onmousedown="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; width:90px;" placeholder="Имя" value="${savedName}">`}
+                    ${d.active ? `<span style="font-size:10px; color:#ccc;">${d.name}</span>` : `<input type="text" id="in-${id}" oninput="window.tempCertNames['${id}']=this.value" onmousedown="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; width:90px;" placeholder="Имя" value="${window.tempCertNames[id] || ''}">`}
                     ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; cursor:pointer;">АКТИВ</button>`}
                 `;
                 div.onclick = (e) => {
                     if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
-                        if (window.innerWidth <= 992) showCertTooltip(e, id, itemsToShow);
+                        if (window.innerWidth <= 992) showCertTooltip(e, id, d.items || []);
                         if (!d.active) startCertBinding(id);
                     }
                 };
                 if (window.innerWidth > 992) {
-                    div.onmousemove = (e) => showCertTooltip(e, id, itemsToShow);
+                    div.onmousemove = (e) => showCertTooltip(e, id, d.items || []);
                     div.onmouseleave = hideCertTooltip;
                 }
                 list.appendChild(div);
@@ -954,22 +940,51 @@
         } catch (e) { console.error(e); }
     }
 
-    // FIREBASE INIT
+    function showCertTooltip(e, title, items) {
+        const t = document.getElementById('cert-global-tooltip');
+        if(!items || items.length === 0) return;
+        let total = items.reduce((s, i) => s + i.price, 0);
+        let html = `<div class="cert-close-btn" onclick="hideCertTooltip()">×</div><div style="color:var(--neon-gold); margin-bottom:10px;">${title}</div>`;
+        items.forEach(it => html += `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px;"><span>${it.name}</span><span style="margin-left:20px;">${it.price} ₽</span></div>`);
+        html += `<div style="border-top:1px solid #333; margin-top:10px; padding-top:5px; text-align:right; color:var(--neon-gold);">ИТОГО: ${total} ₽</div>`;
+        t.innerHTML = html;
+        if(window.innerWidth <= 992) t.classList.add('mobile-active');
+        else { t.style.display='block'; t.style.left=(e.clientX+15)+'px'; t.style.top=(e.clientY+15)+'px'; }
+    }
+
+    function hideCertTooltip() { const t=document.getElementById('cert-global-tooltip'); t.style.display='none'; t.classList.remove('mobile-active'); }
+
+    window.saveSession = async function() {
+        const cart = window.currentCart;
+        if(!cart.items.length) return alert("Чек пуст!");
+        const name = document.getElementById('bookingClient').value || "Без имени";
+        const date = selectedDate || new Date().toLocaleDateString('ru-RU');
+        await db.collection("sessions").add({
+            client: name, date: date, services: cart.items.map(i => i.name).join(', '),
+            details: JSON.parse(JSON.stringify(cart.details)), total: cart.total, fullTotal: cart.fullPriceTotal, timestamp: Date.now()
+        });
+        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        document.getElementById('bookingClient').value = ''; renderCart();
+    };
+
+    window.deleteRow = async function(id) { if(confirm("Удалить запись?")) await db.collection("sessions").doc(id).delete(); };
+
+    window.addPayment = async function(id) {
+        const row = window.crmData.find(r => r.id === id);
+        const amount = prompt("Сумма доплаты:", (row.fullTotal - row.total));
+        if(amount) await db.collection("sessions").doc(id).update({ total: row.total + Number(amount) });
+    };
+
     window.addEventListener('load', () => {
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         window.db = firebase.firestore();
-        
-        db.collection("sessions").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+        db.collection("sessions").orderBy("timestamp", "desc").onSnapshot(snap => {
             window.crmData = [];
-            snapshot.forEach((doc) => { window.crmData.push({ id: doc.id, ...doc.data() }); });
+            snap.forEach(doc => window.crmData.push({ id: doc.id, ...doc.data() }));
             updateTable(); renderCalendar();
         });
         updateCerts(); renderCart(); renderCalendar();
-    });
-
-    // LOCK ICON LISTENER
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.lock-icon')) checkPrivacyPassword();
+        document.addEventListener('click', e => { if(e.target.closest('.lock-icon')) checkPrivacyPassword(); });
     });
 </script>
 
