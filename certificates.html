@@ -1086,41 +1086,87 @@
         }
     }
 
-    function hideCertTooltip() {
-        const tooltip = document.getElementById('cert-global-tooltip');
-        tooltip.style.display = 'none'; tooltip.classList.remove('mobile-active');
-    }
+    // --- ПУНКТ №1: ОБЛАЧНЫЕ СЕРТИФИКАТЫ И ПОДСКАЗКИ (ОБНОВЛЕННЫЙ) ---
 
-    async function updateCerts() {
+    window.hideCertTooltip = function() {
+        const tooltip = document.getElementById('cert-global-tooltip');
+        if (tooltip) {
+            tooltip.style.display = 'none';
+            tooltip.classList.remove('mobile-active');
+        }
+    };
+
+    window.updateCerts = function() {
         const list = document.getElementById('certsList');
         if(!list) return;
-        try {
-            const snapshot = await db.collection("certs").get();
-            const certsData = {};
-            snapshot.forEach(doc => certsData[doc.id] = doc.data());
+
+        // Включаем "живое" прослушивание базы данных (onSnapshot)
+        db.collection("certificates").onSnapshot((snapshot) => {
+            const savedCerts = {};
+            snapshot.forEach(doc => {
+                savedCerts[doc.id] = doc.data();
+            });
+
             list.innerHTML = '';
             for (let i = 1; i <= 300; i++) {
                 const id = 'SSL-' + String(i).padStart(3, '0');
-                const d = certsData[id] || { active: false, name: '', items: [] };
-                const itemsToShow = (activeCertTarget === id) ? window.currentCart.details : (d.items || []);
+                const d = savedCerts[id] || { active: false, name: '', items: [] };
+                
+                // Данные для подсказки (теперь берутся из базы)
+                const itemsToShow = d.items || [];
+                
                 const div = document.createElement('div');
                 div.className = `cert-row ${d.active ? 'is-active' : 'not-active'}`;
+                
                 div.innerHTML = `
-                    <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}</span>
-                    ${d.active ? `<span class="cert-client-name" style="font-size:10px; color:#ccc;">${d.name || ''}</span>` : `<input type="text" id="in-${id}" onmousedown="stopProp(event)" onclick="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
-                    ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px; font-weight:900;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
+                    <span class="cert-id">${id}</span>
+                    ${d.active 
+                        ? `<span class="cert-client-name" style="font-size:10px; color:#ccc;">${d.name || ''}</span>` 
+                        : `<input type="text" id="in-${id}" onmousedown="event.stopPropagation()" onclick="event.stopPropagation()" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
+                    ${d.active 
+                        ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px; font-weight:900;">OK</span>` 
+                        : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
                 `;
+
+                // Возвращаем логику подсказок (Tooltip)
                 if (window.innerWidth > 992) {
                     div.addEventListener('mousemove', (e) => showCertTooltip(e, id, itemsToShow));
                     div.addEventListener('mouseleave', hideCertTooltip);
                 } else {
-                    div.addEventListener('click', (e) => { if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') showCertTooltip(e, id, itemsToShow); });
+                    div.addEventListener('click', (e) => { 
+                        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') showCertTooltip(e, id, itemsToShow); 
+                    });
                 }
-                if(!d.active) div.addEventListener('click', (e) => { if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') startCertBinding(id); });
+                
                 list.appendChild(div);
             }
-        } catch (e) { console.error(e); }
-    }
+        }, (error) => {
+            console.error("Ошибка синхронизации сертификатов:", error);
+        });
+    };
+
+    window.activateCert = function(id) {
+        const input = document.getElementById('in-' + id);
+        const nameInput = input ? input.value.trim() : "";
+        if (!nameInput) return alert('Введите имя клиента!');
+
+        // Сохраняем в Firebase. 
+        // Если при активации в корзине были услуги, они тоже сохранятся (если это нужно)
+        db.collection("certificates").doc(id).set({
+            active: true,
+            name: nameInput,
+            items: window.currentCart ? window.currentCart.details : [],
+            timestamp: Date.now()
+        }).then(() => {
+            console.log("Сертификат " + id + " активирован в облаке");
+            if(window.currentCart) { 
+                // Очистка после активации, если нужно
+                alert("Сертификат успешно активирован!");
+            }
+        }).catch((error) => {
+            alert("Ошибка Firebase: " + error);
+        });
+    };
 
     function startCertBinding(id) {
         activeCertTarget = id; window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
