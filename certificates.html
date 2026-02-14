@@ -602,16 +602,15 @@
             <style>
                 /* Специфический порядок ТОЛЬКО для компьютерной версии */
                 @media (min-width: 993px) {
-                    .btn-order-1 { order: 1; } /* + 1 ЧАС */
-                    .btn-order-2 { order: 2; } /* START EDITION */
-                    .btn-order-3 { order: 3; } /* ARTIST EDITION */
-                    .btn-order-4 { order: 4; } /* ТЮНИНГ ВОКАЛА */
-                    .btn-order-6 { order: 5; } /* + ДОП. ДОРОЖКА */
-                    .btn-order-7 { order: 6; } /* PLATINUM EDITION */
-                    .btn-order-8 { order: 7; } /* + ПЛАТ. ДОРОЖКА */
-                    .btn-order-5 { order: 8; } /* АРАНЖИРОВКА — ТЕПЕРЬ ПОСЛЕДНЯЯ */
+                    .btn-order-1 { order: 1; }
+                    .btn-order-2 { order: 2; }
+                    .btn-order-3 { order: 3; }
+                    .btn-order-4 { order: 4; }
+                    .btn-order-6 { order: 5; }
+                    .btn-order-7 { order: 6; }
+                    .btn-order-8 { order: 7; }
+                    .btn-order-5 { order: 8; }
 
-                    /* Настройка сетки таблицы для плотности */
                     table {
                         table-layout: fixed;
                         width: 100%;
@@ -625,33 +624,40 @@
                         white-space: nowrap;
                     }
 
-                    /* ОПТИМИЗИРОВАННАЯ ШИРИНА КОЛОНОК */
-                    th:nth-child(1), td:nth-child(1) { width: 110px; } /* Дата */
-                    th:nth-child(2), td:nth-child(2) { width: 130px; } /* Клиент (чуть уже для прижима) */
-                    th:nth-child(3), td:nth-child(3) { width: 100px; } /* Статус (бар) */
-                    th:nth-child(4), td:nth-child(4) { width: 260px; } /* Услуги */
-                    th:nth-child(5), td:nth-child(5) { width: 110px; } /* Внесено */
-                    th:nth-child(6), td:nth-child(6) { width: 90px; }  /* Действия */
+                    th:nth-child(1), td:nth-child(1) { width: 110px; } 
+                    th:nth-child(2), td:nth-child(2) { width: 130px; } 
+                    th:nth-child(3), td:nth-child(3) { width: 100px; } 
+                    th:nth-child(4), td:nth-child(4) { width: 260px; } 
+                    th:nth-child(5), td:nth-child(5) { width: 110px; } 
+                    th:nth-child(6), td:nth-child(6) { width: 90px; }  
                 }
                 
                 @media (max-width: 992px) {
                     .btn-wrapper { order: unset !important; }
                 }
 
-                /* ФИНАНСЫ */
+                /* ФИНАНСЫ И БЛЮР */
                 #currentViewText, .price-cell, .price-cell small {
                     font-family: 'Rajdhani', sans-serif !important;
                     font-weight: 700 !important;
                     letter-spacing: 1px;
                 }
 
+                .privacy-blur {
+                    filter: blur(5px);
+                    cursor: pointer;
+                    transition: filter 0.3s ease;
+                    user-select: none;
+                }
+                .privacy-blur.unlocked {
+                    filter: blur(0);
+                }
+
                 .price-cell { font-size: 18px !important; }
                 .price-cell small { font-size: 13px !important; display: block; margin-top: 2px; }
 
-                /* КЛИЕНТ */
+                /* КЛИЕНТ И ДАТА */
                 .artist-name { font-size: 16px !important; color: #fff; }
-
-                /* ДАТА */
                 .full-date-cell {
                     color: #ffffff !important;
                     font-size: 13px !important;
@@ -659,23 +665,28 @@
                     font-family: 'Orbitron', sans-serif;
                 }
 
-                /* СТАТУС БАР (ПРОГРЕСС) */
+                /* СТАТУС БАР */
                 .progress-cell {
                     vertical-align: middle;
-                    padding-left: 0 !important; /* Убираем левый отступ ячейки */
+                    padding-left: 0 !important;
                 }
                 
                 .progress-cell .progress-container {
-                    margin: 0 0 0 2px !important; /* Прижимаем влево к имени */
+                    margin: 0 0 0 2px !important;
                     width: 90px;
-                    height: 8px !important; /* СДЕЛАЛ ПОЛОСКУ ШИРЕ (ВЫШЕ) */
+                    height: 8px !important; 
                     background: #1a1a1a;
                     border-radius: 2px;
+                    overflow: hidden;
                 }
                 
                 .progress-cell .progress-bar {
                     height: 100% !important;
                     border-radius: 2px;
+                    background: var(--neon-purple); /* Цвет по умолчанию */
+                }
+                .progress-bar.complete {
+                    background: var(--status-green) !important;
                 }
             </style>
 
@@ -687,37 +698,14 @@
                 </label>
             </div>
             
-            <div class="btn-wrapper btn-order-1">
-                <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
-            </div>
-            
-            <div class="btn-wrapper btn-order-2">
-                <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
-            </div>
-
-            <div class="btn-wrapper btn-order-3">
-                <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
-            </div>
-
-            <div class="btn-wrapper btn-order-4">
-                <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
-            </div>
-            
-            <div class="btn-wrapper btn-order-5">
-                <button class="action-btn btn-blue" onclick="openPriceModal('АРАНЖИРОВКА', 'blue', 10000)">АРАНЖИРОВКА</button>
-            </div>
-
-            <div class="btn-wrapper btn-order-6">
-                <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
-            </div>
-            
-            <div class="btn-wrapper btn-order-7">
-                <button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">PLATINUM EDITION</button>
-            </div>
-
-            <div class="btn-wrapper btn-order-8">
-                <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
-            </div>
+            <div class="btn-wrapper btn-order-1"><button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button></div>
+            <div class="btn-wrapper btn-order-2"><button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button></div>
+            <div class="btn-wrapper btn-order-3"><button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button></div>
+            <div class="btn-wrapper btn-order-4"><button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button></div>
+            <div class="btn-wrapper btn-order-5"><button class="action-btn btn-blue" onclick="openPriceModal('АРАНЖИРОВКА', 'blue', 10000)">АРАНЖИРОВКА</button></div>
+            <div class="btn-wrapper btn-order-6"><button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button></div>
+            <div class="btn-wrapper btn-order-7"><button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">PLATINUM EDITION</button></div>
+            <div class="btn-wrapper btn-order-8"><button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button></div>
         </div>
 
         <div id="currentSession" class="current-session-box">
@@ -747,7 +735,7 @@
                         <th style="text-align:right">ДЕЙСТВИЯ</th>
                     </tr>
                 </thead>
-                <tbody id="crmTableBody"></tbody>
+                <tbody id="crmTableBody" onclick="handleTableClick(event)"></tbody>
             </table>
         </div>
         <button onclick="clearFullHistory()" style="margin-top:20px; background:none; border:none; color:#222; font-size:8px; cursor:pointer; text-transform:uppercase; flex-shrink:0;">Удалить всю историю</button>
@@ -765,42 +753,6 @@
         </div>
 
         <div class="calendar-widget">
-            <style>
-                .cal-grid .day {
-                    transition: all 0.2s ease;
-                    border: 1px solid transparent !important;
-                    position: relative;
-                    color: #ffffff !important;
-                }
-                .cal-grid .day:not(.has-data):hover {
-                    border: 1px solid #00ff66 !important;
-                    cursor: pointer;
-                }
-                .cal-grid .day.selected {
-                    background: #333 !important; 
-                    border: 1px solid #00ff66 !important;
-                    color: #ffffff !important;
-                }
-                .cal-grid .day.past-session {
-                    background: #36648B !important; 
-                    border: 1px solid transparent !important;
-                    font-weight: bold;
-                    color: #ffffff !important;
-                }
-                .cal-grid .day.future-session {
-                    background: #cc0000 !important;
-                    border: 1px solid transparent !important;
-                    color: #ffffff !important;
-                }
-                .cal-grid .day.today-session {
-                    background: #008f39 !important;
-                    border: 1px solid transparent !important;
-                    color: #ffffff !important;
-                }
-                .cal-grid .day::after {
-                    display: none !important;
-                }
-            </style>
             <div class="cal-header">
                 <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(-1)"></i>
                 <div class="month-name" id="calMonthName">ФЕВРАЛЬ 2026</div>
@@ -812,62 +764,42 @@
         <div class="session-booking-widget">
             <div class="booking-label">Добавление на будущее</div>
             <div class="booking-row">
-                <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)" onkeydown="if(event.key==='Enter') saveSession()">
-                <input type="text" id="bookingClient" class="booking-field" placeholder="Имя клиента" onkeydown="if(event.key==='Enter') saveSession()">
+                <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)">
+                <input type="text" id="bookingClient" class="booking-field" placeholder="Имя клиента">
             </div>
         </div>
 
         <div class="future-sessions-widget" id="nextSessionBox">
             <div class="future-title" id="futureTitleLabel">Ближайшая запись</div>
-            <div id="futureListContainer">
-                <div class="future-item">
-                    <div class="future-date" id="nextSessionDate">--</div>
-                    <div class="future-client" id="nextSessionClient">Нет записей</div>
-                </div>
-            </div>
+            <div id="futureListContainer"></div>
         </div>
     </div>
 </div>
 
 <script>
+    // Инициализация данных
     window.crmData = [];
     window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-    var currentCart = window.currentCart; 
     let currentCalDate = new Date();
     let selectedDate = null;
     let hoverTimer;
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
+    // Функция разблокировки блюра
+    function handleTableClick(e) {
+        const blurEl = e.target.closest('.privacy-blur');
+        if (blurEl) {
+            blurEl.classList.toggle('unlocked');
+        }
+    }
+
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
+    
     function formatTimeInput(input) {
         let val = input.value.replace(/\D/g, '');
         if (val.length >= 2) val = val.slice(0, 2) + ':' + val.slice(2, 4);
         input.value = val;
-    }
-
-    function initTooltipLogic() {
-        const tableBody = document.getElementById('crmTableBody');
-        if(!tableBody) return;
-        tableBody.addEventListener('mousemove', (e) => {
-            const cell = e.target.closest('.services-cell');
-            if (!cell || window.innerWidth <= 992) return; 
-            const allTooltips = document.querySelectorAll('.history-tooltip');
-            clearTimeout(hoverTimer);
-            allTooltips.forEach(t => t.classList.remove('active'));
-            if (cell) {
-                const tooltip = cell.querySelector('.history-tooltip');
-                if (tooltip) {
-                    tooltip.style.left = e.clientX + 'px';
-                    tooltip.style.top = e.clientY + 'px';
-                    hoverTimer = setTimeout(() => { tooltip.classList.add('active'); }, hoverDelay);
-                }
-            }
-        });
-        tableBody.addEventListener('mouseleave', () => {
-            clearTimeout(hoverTimer);
-            document.querySelectorAll('.history-tooltip').forEach(t => t.classList.remove('active'));
-        });
     }
 
     function openModal(title, type, confirmCallback, defaultValue = '') {
@@ -876,10 +808,10 @@
         const titleEl = document.getElementById('modalTitle');
         const inputEl = document.getElementById('modalInput');
         const confirmBtn = document.getElementById('modalConfirmBtn');
+        if(!modal) return;
         titleEl.innerText = title;
         inputEl.value = defaultValue;
         inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
-        confirmBtn.className = 'm-btn m-confirm';
         confirmBtn.onclick = confirmCallback;
         modal.style.display = 'block'; overlay.style.display = 'block';
         if(type !== 'confirm-delete') inputEl.focus();
@@ -896,7 +828,7 @@
             if(!isNaN(p) && p > 0) {
                 addToCart(name, p, color);
                 closeModal();
-            } else { alert('Введите корректную сумму'); }
+            }
         }, defaultPrice);
     }
 
@@ -908,24 +840,26 @@
         const m = currentCalDate.getMonth();
         const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
         document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
+        
         const firstDay = new Date(y, m, 1).getDay();
         const lastDate = new Date(y, m + 1, 0).getDate();
         const shift = firstDay === 0 ? 6 : firstDay - 1;
+
         for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
+
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        today.setHours(0,0,0,0);
         const todayStr = today.toLocaleDateString('ru-RU');
+
         for (let d = 1; d <= lastDate; d++) {
-            const dayStr = String(d).padStart(2, '0');
-            const monthStr = String(m + 1).padStart(2, '0');
-            const dateStr = `${dayStr}.${monthStr}.${y}`;
-            const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
+            const dateStr = `${String(d).padStart(2, '0')}.${String(m + 1).padStart(2, '0')}.${y}`;
+            const hasData = window.crmData.some(s => s.date === dateStr);
             let classList = 'day';
+            
             if (hasData) {
                 classList += ' has-data';
                 const [cellD, cellM, cellY] = dateStr.split('.').map(Number);
                 const cellDate = new Date(cellY, cellM - 1, cellD);
-                cellDate.setHours(0, 0, 0, 0);
                 if (dateStr === todayStr) classList += ' today-session'; 
                 else if (cellDate < today) classList += ' past-session';   
                 else classList += ' future-session'; 
@@ -937,8 +871,7 @@
 
     function selectCalendarDate(date) {
         selectedDate = date;
-        const label = document.getElementById('sessionDateLabel');
-        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
+        document.getElementById('sessionDateLabel').innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
         renderCalendar(); 
         updateNextSession(date); 
     }
@@ -946,25 +879,8 @@
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
         selectedDate = null; 
-        updateTable(); renderCalendar(); 
-    }
-
-    function applyPrepaidToggle() {
-        const isPrepaid = document.getElementById('prepaidMode').checked;
-        window.currentCart.total = 0;
-        window.currentCart.details.forEach(item => {
-            const isForceFull = item.name.includes('ЧАС ЗАПИСИ');
-            if (isPrepaid && !isForceFull) {
-                item.price = item.basePrice / 2;
-                if (!item.name.includes('(50%)')) item.name += ' (50%)';
-            } else {
-                item.price = item.basePrice;
-                item.name = item.name.replace(' (50%)', '');
-            }
-            window.currentCart.total += item.price;
-        });
-        window.currentCart.items = window.currentCart.details.map(d => ({ name: d.name, colorClass: d.colorClass }));
-        renderCart();
+        renderCalendar(); 
+        updateTable();
     }
 
     function addToCart(name, price, colorClass, forceFull = false) {
@@ -978,6 +894,16 @@
         renderCart();
     }
 
+    function renderCart() {
+        const container = document.getElementById('cartItems');
+        const total = document.getElementById('cartTotal');
+        total.innerText = window.currentCart.total + ' ₽';
+        container.innerHTML = window.currentCart.items.length === 0 ? 'Пусто...' : '';
+        window.currentCart.items.forEach((item, i) => {
+            container.innerHTML += `<div class="cart-tag tag-${item.colorClass}">${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div></div>`;
+        });
+    }
+
     function removeFromCart(index) {
         const item = window.currentCart.details[index];
         window.currentCart.total -= item.price;
@@ -987,27 +913,12 @@
         renderCart();
     }
 
-    function renderCart() {
-        const container = document.getElementById('cartItems');
-        const total = document.getElementById('cartTotal');
-        if(!container || !total) return;
-        total.innerText = window.currentCart.total + ' ₽';
-        container.innerHTML = window.currentCart.items.length === 0 ? 'Пусто...' : '';
-        window.currentCart.items.forEach((item, i) => {
-            const tag = document.createElement('div');
-            tag.className = `cart-tag tag-${item.colorClass}`;
-            tag.innerHTML = `${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div>`;
-            container.appendChild(tag);
-        });
-    }
-
     function updateTable() {
         const body = document.getElementById('crmTableBody');
-        if(!body || !window.crmData) return;
+        if(!body) return;
         body.innerHTML = '';
-        const now = new Date();
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
+        const filteredData = window.crmData.filter(r => r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
         filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total || 0;
@@ -1015,141 +926,62 @@
             const rest = Math.max(0, full - paid);
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
-            
-            const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
-            let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
-            if (row.details) row.details.forEach(d => {
-                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
-            });
-            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
 
             const tr = document.createElement('tr');
-            if (window.innerWidth <= 992) {
-                // Мобильный вид
-                let mobileItemsHTML = '';
-                if(row.details) row.details.forEach(d => {
-                    mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur">${d.price} ₽</span></div>`;
-                });
-                tr.ondblclick = (e) => toggleMobileDetails(e, index);
-                tr.innerHTML = `
-                    <td style="position:relative; padding-top: 20px;">
-                        <div id="mobileDetails-${index}" class="mobile-details-overlay">
-                            <div class="mobile-details-close" onclick="event.stopPropagation(); this.parentElement.classList.remove('active')">×</div>
-                            <div class="mobile-details-header">Детализация заказа</div>
-                            <div class="mobile-details-list">${mobileItemsHTML}</div>
-                            <div class="mobile-summary-section">
-                                <div class="mobile-summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur">${full} ₽</span></div>
-                                <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div>
-                                <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div>
-                            </div>
-                        </div>
-                        <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
-                        <div class="mobile-row-client">${row.client}</div>
-                        <div class="mobile-row-services">${row.services}</div>
-                        <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
-                        <div class="mobile-actions-grid">
-                            <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
-                            <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
-                        </div>
-                    </td>`;
-            } else {
-                // ПК вид
-                tr.innerHTML = `
-                    <td class="full-date-cell">${row.date}</td>
-                    <td class="artist-cell"><span class="artist-name" style="font-weight:600;">${row.client}</span></td>
-                    <td class="progress-cell"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></td>
-                    <td class="services-cell" style="position:relative; padding-left:0;">${row.services}${tooltipHTML}</td>
-                    <td class="price-cell privacy-blur" style="text-align:right;">
-                        <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
-                        ${!isComplete ? `<small style="color:var(--artist-red); opacity:0.9;">-${rest}</small>` : ''}
-                    </td>
-                    <td>
-                        <div class="action-icons-wrap">
-                            <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
-                            <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
-                        </div>
-                    </td>`;
-            }
+            tr.innerHTML = `
+                <td class="full-date-cell">${row.date}</td>
+                <td class="artist-cell"><span class="artist-name">${row.client}</span></td>
+                <td class="progress-cell"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></td>
+                <td class="services-cell">${row.services}</td>
+                <td class="price-cell privacy-blur" style="text-align:right;">
+                    <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
+                    ${!isComplete ? `<small style="color:var(--artist-red); opacity:0.9;">-${rest}</small>` : ''}
+                </td>
+                <td>
+                    <div class="action-icons-wrap">
+                        <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
+                        <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
+                    </div>
+                </td>`;
             body.appendChild(tr);
         });
-        updateMonthTotal();
-    }
-
-    function updateMonthTotal() {
-        const el = document.getElementById('monthTotal');
-        if(!el || !window.crmData) return;
-        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        const sum = window.crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + Number(b.total), 0);
-        if(el) el.innerText = sum.toLocaleString() + ' ₽';
-    }
-
-    function updateCerts() {
-        const list = document.getElementById('certsList');
-        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
-        if(!list) return;
-        list.innerHTML = '';
-        for (let i = 1; i <= 300; i++) {
-            const id = 'SSL-' + String(i).padStart(3, '0');
-            const d = saved[id] || { active: false, name: '' };
-            const div = document.createElement('div');
-            div.className = 'cert-row';
-            div.innerHTML = `<span class="cert-id">${id}</span>${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}`;
-            list.appendChild(div);
-        }
-    }
-
-    function activateCert(id) {
-        const n = document.getElementById('in-' + id).value;
-        if (!n) return alert('Имя!');
-        const s = JSON.parse(localStorage.getItem('spring_certs')) || {};
-        s[id] = { active: true, name: n };
-        localStorage.setItem('spring_certs', JSON.stringify(s));
-        updateCerts();
     }
 
     function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
-        if (!container || !window.crmData) return;
         const now = new Date();
         const todayStr = now.toLocaleDateString('ru-RU');
-        const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
-        let targetDate = clickedDate || (window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr);
-        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
-        container.innerHTML = ''; 
+        
+        let targetDate = clickedDate || todayStr;
+        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a,b) => a.time.localeCompare(b.time));
+
+        container.innerHTML = '';
         if (sessions.length > 0) {
-            titleEl.innerText = (targetDate === todayStr) ? "Записи на сегодня" : (targetDate === tomorrowStr ? "Записи на завтра" : `Записи на ${targetDate}`);
-            sessions.forEach(next => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'future-item';
-                itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.client}</div>`;
-                container.appendChild(itemDiv);
+            titleEl.innerText = `Записи на ${targetDate}`;
+            sessions.forEach(s => {
+                container.innerHTML += `<div class="future-item"><div class="future-date">${s.time}</div><div class="future-client">${s.client}</div></div>`;
             });
-            document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
         } else {
             titleEl.innerText = "Ближайшая запись";
             container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
-            document.getElementById('nextSessionBox').style.borderColor = '#111';
         }
     }
 
-    function toggleMobileDetails(e, index) {
-        if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close')) return;
-        const overlay = document.getElementById(`mobileDetails-${index}`);
-        if (overlay) overlay.classList.toggle('active');
+    function clearFullHistory() {
+        if(confirm("Удалить ВСЮ историю записей навсегда?")) {
+            crmCollection.get().then(qs => qs.forEach(doc => doc.ref.delete()));
+        }
     }
 
-    window.addEventListener('resize', updateTable);
     window.addEventListener('load', () => {
         renderCalendar();
-        updateCerts();
-        initTooltipLogic();
+        updateNextSession();
     });
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
 <script>
 const firebaseConfig = {
     apiKey: "AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",
@@ -1159,65 +991,53 @@ const firebaseConfig = {
     messagingSenderId: "971140334464",
     appId: "1:971140334464:web:dde090a90bdcd5563cb765"
 };
-
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
 
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
-    snapshot.forEach((doc) => {
-        window.crmData.push({ id: doc.id, ...doc.data() });
-    });
+    snapshot.forEach((doc) => { window.crmData.push({ id: doc.id, ...doc.data() }); });
     updateTable();
     renderCalendar();
     updateNextSession();
 });
 
-window.saveSession = async function(event) {
-    if (event) event.preventDefault();
+window.saveSession = async function() {
     let cart = window.currentCart;
-    if (!cart || !cart.items || cart.items.length === 0) return;
-    const name = document.getElementById('bookingClient')?.value || 'Без имени';
-    const time = document.getElementById('bookingTime')?.value || '';
+    if (cart.items.length === 0) return;
+    const name = document.getElementById('bookingClient').value || 'Без имени';
+    const time = document.getElementById('bookingTime').value || '';
     const date = selectedDate || new Date().toLocaleDateString('ru-RU');
-    try {
-        await crmCollection.add({
-            date: date,
-            client: name,
-            time: time,
-            services: cart.items.map(i => i.name).join(', '),
-            details: JSON.parse(JSON.stringify(cart.details)),
-            total: Number(cart.total),
-            fullTotal: Number(cart.fullPriceTotal),
-            timestamp: Date.now()
-        });
-        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
-        if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
-        renderCart();
-    } catch (e) {}
+    await crmCollection.add({
+        date, client: name, time,
+        services: cart.items.map(i => i.name).join(', '),
+        details: cart.details,
+        total: cart.total,
+        fullTotal: cart.fullPriceTotal,
+        timestamp: Date.now()
+    });
+    window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+    document.getElementById('bookingClient').value = '';
+    document.getElementById('bookingTime').value = '';
+    renderCart();
 };
 
 window.addPayment = function(id) {
     const row = window.crmData.find(r => r.id === id);
-    const full = row.fullTotal || row.total;
-    const remaining = full - row.total;
+    const remaining = (row.fullTotal || row.total) - row.total;
     if (remaining <= 0) return;
-    openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, "pay", function() {
-        const amount = parseInt(document.getElementById('modalInput').value);
-        if (!isNaN(amount) && amount > 0) {
-            crmCollection.doc(id).update({ total: row.total + amount });
+    openModal(`ДОПЛАТА: ${row.client}`, "pay", function() {
+        const val = parseInt(document.getElementById('modalInput').value);
+        if (val > 0) {
+            crmCollection.doc(id).update({ total: row.total + val });
             closeModal();
         }
     }, remaining);
 };
 
 window.deleteRow = function(id) {
-    openModal("УДАЛИТЬ ЗАПИСЬ?", "confirm-delete", function() {
-        crmCollection.doc(id).delete();
-        closeModal();
-    });
+    if(confirm("Удалить?")) crmCollection.doc(id).delete();
 };
 </script>
 </body>
