@@ -952,47 +952,62 @@
         updateCerts();
     }
 
-   function updateNextSession(clickedDate = null) {
+  function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
         if (!container || !window.crmData) return;
 
+        // Получаем текущую дату без времени (00:00:00)
         const now = new Date();
-        now.setHours(0, 0, 0, 0); // Сбрасываем время для корректного сравнения дат
-        const todayStr = new Date().toLocaleDateString('ru-RU');
-        
-        // Находим все записи, у которых есть время, и преобразуем их даты для сравнения
-        const futureSessions = window.crmData.filter(r => {
-            if (!r.time || !r.date) return false;
-            const [d, m, y] = r.date.split('.').map(Number);
-            const sessionDate = new Date(y, m - 1, d);
-            return sessionDate >= now; // Берем сегодня и всё что в будущем
-        }).sort((a, b) => {
-            // Сортируем сначала по дате, потом по времени
-            const [da, ma, ya] = a.date.split('.').map(Number);
-            const [db, mb, yb] = b.date.split('.').map(Number);
-            const dateA = new Date(ya, ma - 1, da);
-            const dateB = new Date(yb, mb - 1, db);
-            return dateA - dateB || a.time.localeCompare(b.time);
-        });
+        now.setHours(0, 0, 0, 0);
 
-        let targetDate = clickedDate;
         let sessionsToShow = [];
+        let displayTitle = "Ближайшая запись";
 
-        if (targetDate) {
-            // Если кликнули на календарь — показываем записи именно на этот день
-            sessionsToShow = window.crmData.filter(r => r.date === targetDate && r.time);
-            titleEl.innerText = `Записи на ${targetDate}`;
+        if (clickedDate) {
+            // Если мы выбрали дату в календаре
+            sessionsToShow = window.crmData.filter(r => r.date === clickedDate && r.time);
+            displayTitle = `Записи на ${clickedDate}`;
         } else {
-            // Если ничего не кликнуто — ищем самую ближайшую запись (сегодня или позже)
-            if (futureSessions.length > 0) {
-                const closestDate = futureSessions[0].date;
-                sessionsToShow = futureSessions.filter(r => r.date === closestDate);
-                titleEl.innerText = (closestDate === todayStr) ? "Записи на сегодня" : `Записи на ${closestDate}`;
-            } else {
-                titleEl.innerText = "Ближайшая запись";
+            // Автоматический поиск: фильтруем все записи, которые сегодня или в будущем
+            const futureAll = window.crmData.filter(r => {
+                if (!r.time || !r.date) return false;
+                const [d, m, y] = r.date.split('.').map(Number);
+                const sessionDate = new Date(y, m - 1, d);
+                sessionDate.setHours(0, 0, 0, 0);
+                return sessionDate >= now;
+            }).sort((a, b) => {
+                const [da, ma, ya] = a.date.split('.').map(Number);
+                const [db, mb, yb] = b.date.split('.').map(Number);
+                const dateA = new Date(ya, ma - 1, da);
+                const dateB = new Date(yb, mb - 1, db);
+                return dateA - dateB || a.time.localeCompare(b.time);
+            });
+
+            if (futureAll.length > 0) {
+                const closestDate = futureAll[0].date;
+                sessionsToShow = futureAll.filter(r => r.date === closestDate);
+                const todayStr = new Date().toLocaleDateString('ru-RU');
+                displayTitle = (closestDate === todayStr) ? "Записи на сегодня" : `Записи на ${closestDate}`;
             }
         }
+
+        titleEl.innerText = displayTitle;
+        container.innerHTML = ''; 
+
+        if (sessionsToShow.length > 0) {
+            sessionsToShow.sort((a,b) => a.time.localeCompare(b.time)).forEach(next => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'future-item';
+                itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.client}</div>`;
+                container.appendChild(itemDiv);
+            });
+            document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
+        } else {
+            container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
+            document.getElementById('nextSessionBox').style.borderColor = '#111';
+        }
+    }
 
         container.innerHTML = ''; 
         if (sessionsToShow.length > 0) {
