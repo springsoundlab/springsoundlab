@@ -486,7 +486,7 @@
             .mobile-detail-item {
                 display: flex; justify-content: space-between; align-items: center;
                 margin-bottom: 6px; padding: 4px 0 4px 10px;
-                border-left: 2px solid #fff; /* Цвет меняется динамически через JS */
+                border-left: 2px solid #fff; 
             }
             .mobile-detail-name { font-size: 11px; color: #fff; }
             .mobile-detail-price { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; }
@@ -495,12 +495,6 @@
                 margin-top: 10px; border-top: 1px solid #222; padding-top: 10px;
             }
             .mobile-summary-line {
-                display: flex; justify-content: space-between; 
-                margin-bottom: 4px; font-size: 12px; 
-                font-family: 'Rajdhani'; font-weight: 700;
-            }
-        }
-        .mobile-summary-line {
                 display: flex; justify-content: space-between; 
                 margin-bottom: 4px; font-size: 12px; 
                 font-family: 'Rajdhani'; font-weight: 700;
@@ -537,8 +531,6 @@
 
         /* Убираем прозрачность, если она была */
         .day { opacity: 1 !important; }
-       }
-    }
         
     </style>
 </head>
@@ -565,7 +557,6 @@
         <a href="index.html" class="back-btn">Выйти на сайт</a>
     </div>
 </header>
-
 <div class="admin-grid">
     <div class="crm-panel">
         <div class="controls-row">
@@ -787,9 +778,10 @@
         today.setHours(0, 0, 0, 0);
 
         for (let d = 1; d <= lastDate; d++) {
-            const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const dayStr = String(d).padStart(2, '0');
+            const monthStr = String(m + 1).padStart(2, '0');
+            const dateStr = `${dayStr}.${monthStr}.${y}`;
             
-            // Проверяем наличие данных в crmData
             const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
             
             let classList = 'day';
@@ -799,26 +791,31 @@
                 cellDate.setHours(0, 0, 0, 0);
 
                 if (cellDate > today) {
-                    classList += ' future-session'; // Красный
+                    classList += ' future-session'; 
                 } else {
-                    classList += ' past-session';   // Зеленый
+                    classList += ' past-session';   
                 }
             }
             
             if (selectedDate === dateStr) classList += ' selected';
-            grid.innerHTML += `<div class="${classList}" onclick="selectDate('${dateStr}')">${d}</div>`;
+            grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
     }
+
     function selectCalendarDate(date) {
         selectedDate = date;
         const label = document.getElementById('sessionDateLabel');
         if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
-        renderCalendar(); updateNextSession(date); 
+        renderCalendar(); 
+        updateNextSession(date); 
     }
 
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
-        selectedDate = null; updateTable(); renderCalendar(); 
+        selectedDate = null; 
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК:`;
+        updateTable(); renderCalendar(); 
     }
 
     function applyPrepaidToggle() {
@@ -882,7 +879,6 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        // СОРТИРОВКА: Самые новые по timestamp идут первыми (вверху)
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
             return b.timestamp - a.timestamp;
         });
@@ -940,7 +936,6 @@
                         </div>
                     </td>`;
             } else {
-                // УБРАН privacy-blur с ячейки клиента и прогресс-бара
                 tr.innerHTML = `
                     <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
@@ -1056,7 +1051,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
 
-// Слушаем изменения: новые сверху за счет orderBy по timestamp desc
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
     snapshot.forEach((doc) => {
@@ -1123,6 +1117,3 @@ window.deleteRow = function(id) {
     });
 };
 </script>
-    
-</body>
-</html>
