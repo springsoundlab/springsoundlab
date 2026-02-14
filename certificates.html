@@ -249,9 +249,13 @@
         .future-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: var(--neon-purple); min-width: 55px; }
         .future-client { font-family: 'Inter'; font-weight: 600; font-size: 13px; color: #fff; }
 
-        .prepaid-toggle { display: flex; align-items: center; gap: 10px; margin-right: 15px; padding: 5px 12px; border-right: 1px solid #222; }
-        .prepaid-toggle span { font-family: 'Orbitron'; font-size: 9px; color: var(--neon-purple); }
-        .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
+        /* СТИЛЬ ПЕРЕКЛЮЧАТЕЛЯ (ТУМБЛЕРА) */
+        .prepaid-toggle { 
+            display: flex; align-items: center; gap: 10px; margin-right: 15px; padding: 5px 12px; border-right: 1px solid #222;
+            cursor: pointer; user-select: none;
+        }
+        .prepaid-toggle span { font-family: 'Orbitron'; font-size: 9px; color: var(--neon-purple); transition: 0.3s; }
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; pointer-events: none; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 34px; border: 1px solid #333; }
         .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
@@ -343,29 +347,17 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
-        /* Тултип (Компьютерная версия) */
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
             pointer-events: none; transition: opacity 0.4s ease;
         }
         .history-tooltip.active { visibility: visible; opacity: 1; }
-        .history-tooltip.pos-down { transform: translate(15px, 15px); }
-        .history-tooltip.pos-up { transform: translate(15px, calc(-100% - 15px)); }
         
         .tooltip-sum { filter: blur(6px); transition: 0.3s; }
         .privacy-active .tooltip-sum { filter: blur(0); }
 
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
-
-        .action-icons-wrap { display: flex; align-items: center; gap: 15px; justify-content: flex-end; }
-        .icon-btn-box { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.3s; }
-        .icon-btn-box i { font-size: 12px; color: #444; }
-        .icon-btn-box span { font-family: 'Orbitron'; font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
-        .icon-btn-box:hover i { color: var(--neon-purple); }
-        .icon-btn-box:hover span { color: var(--neon-purple); }
-        .icon-delete:hover i { color: var(--artist-red); }
-        .icon-delete:hover span { color: var(--artist-red); }
 
         /* --- БЛОК МОБИЛЬНОЙ АДАПТАЦИИ --- */
         @media (max-width: 992px) {
@@ -382,7 +374,6 @@
             }
             .header-right-zone { width: 100%; }
             .admin-grid { display: flex !important; flex-direction: column !important; height: auto !important; overflow: visible; }
-            .table-scroll-container { max-height: none; overflow-y: visible; }
             .logo { text-align: center; font-size: 16px; width: 100%; margin-bottom: 5px; }
             .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
@@ -394,15 +385,23 @@
                 padding: 10px; 
                 overflow-x: hidden;
             }
+
+            /* ИСПРАВЛЕННЫЙ ТУМБЛЕР ДЛЯ МОБИЛОК */
             .prepaid-toggle { 
                 grid-column: span 2; 
                 border-right: none; 
                 border-bottom: 1px solid #222; 
                 margin-right: 0; 
                 justify-content: center; 
-                padding-bottom: 10px;
-                margin-bottom: 5px;
+                padding-bottom: 15px;
+                margin-bottom: 10px;
+                width: 100%;
+                box-sizing: border-box;
             }
+            .switch { width: 44px; height: 22px; }
+            .slider:before { height: 16px; width: 16px; left: 3px; bottom: 2px; }
+            input:checked + .slider:before { transform: translateX(22px); }
+            /* Конец исправления тумблера */
 
             .btn-order-1 { order: 1; } 
             .btn-order-2 { order: 2; } 
@@ -432,10 +431,6 @@
 
             .mobile-row-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; color: #555; margin-bottom: 4px; }
             .mobile-row-client { font-family: 'Inter'; font-weight: 600; font-size: 18px; color: #fff; margin-bottom: 8px; }
-            .mobile-row-services { font-size: 11px; color: #888; margin-bottom: 12px; line-height: 1.4; }
-            
-            .mobile-progress-wrapper { margin-bottom: 15px; }
-            .mobile-time-label { font-family: 'Orbitron'; font-size: 10px; color: var(--neon-purple); margin-bottom: 5px; display: block; }
             
             .mobile-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px; }
             
@@ -450,57 +445,21 @@
             .cart-actions { align-self: center; width: 100%; align-items: center; }
             .total-display-pc { text-align: center; width: 100%; }
             .save-btn { width: 100%; }
-
-            /* АДАПТИРОВАННАЯ МОБИЛЬНАЯ ДЕТАЛИЗАЦИЯ (КАК НА ПК) */
-            .mobile-details-overlay {
-                position: absolute;
-                top: 0; left: 0; width: 100%; height: 100%;
-                background: #0a0a0a;
-                z-index: 50;
-                padding: 15px;
-                display: none;
-                box-sizing: border-box;
-                flex-direction: column;
-                border: 1px solid var(--neon-purple);
-                border-radius: 12px;
-                box-shadow: inset 0 0 20px rgba(191, 0, 255, 0.2);
-            }
-            .mobile-details-overlay.active { display: flex; }
-            
-            .mobile-details-close {
-                position: absolute;
-                top: 8px; right: 8px;
-                width: 26px; height: 26px;
-                background: rgba(255,255,255,0.05);
-                border-radius: 50%;
-                display: flex; align-items: center; justify-content: center;
-                color: #fff; font-size: 14px;
-                cursor: pointer; z-index: 60;
-            }
-            .mobile-details-header {
-                color: #888; font-family: 'Orbitron'; font-size: 9px; 
-                border-bottom: 1px solid #222; padding-bottom: 5px; 
-                margin-bottom: 12px; text-transform: uppercase;
-            }
-            .mobile-details-list { overflow-y: auto; flex-grow: 1; }
-            .mobile-detail-item {
-                display: flex; justify-content: space-between; align-items: center;
-                margin-bottom: 6px; padding: 4px 0 4px 10px;
-                border-left: 2px solid #fff; /* Цвет меняется динамически через JS */
-            }
-            .mobile-detail-name { font-size: 11px; color: #fff; }
-            .mobile-detail-price { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; }
-            
-            .mobile-summary-section {
-                margin-top: 10px; border-top: 1px solid #222; padding-top: 10px;
-            }
-            .mobile-summary-line {
-                display: flex; justify-content: space-between; 
-                margin-bottom: 4px; font-size: 12px; 
-                font-family: 'Rajdhani'; font-weight: 700;
-            }
         }
     </style>
+
+    <script>
+        document.querySelector('.prepaid-toggle').addEventListener('click', function() {
+            const checkbox = this.querySelector('input');
+            checkbox.checked = !checkbox.checked;
+            // Здесь можно добавить логику изменения текста или цвета, если нужно
+            if(checkbox.checked) {
+                this.querySelector('span').style.color = '#fff';
+            } else {
+                this.querySelector('span').style.color = 'var(--neon-purple)';
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -653,95 +612,6 @@
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
-    // ЖЕСТКИЕ СТИЛИ ДЛЯ МАКСИМАЛЬНОЙ КЛИКАБЕЛЬНОСТИ
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @media (max-width: 992px) {
-            /* Делаем всю плашку ОГРОМНОЙ КНОПКОЙ */
-            .prepaid-wrapper {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                width: 100% !important;
-                height: 55px !important; /* Увеличил высоту для удобства нажатия */
-                background: #0a0a0a !important;
-                border: 1px solid #222 !important;
-                border-radius: 10px !important;
-                padding: 0 20px !important;
-                margin: 15px 0 !important;
-                cursor: pointer !important;
-                box-sizing: border-box !important;
-                transition: all 0.2s ease !important;
-                -webkit-tap-highlight-color: transparent !important;
-            }
-
-            /* Текст слева */
-            .prepaid-wrapper span {
-                font-family: 'Orbitron', sans-serif !important;
-                font-size: 12px !important;
-                font-weight: 800 !important;
-                color: #666 !important;
-                letter-spacing: 1px !important;
-                pointer-events: none !important; /* Чтобы клик пролетал сквозь текст на плашку */
-            }
-
-            /* Тумблер справа (сделал его крупнее и "вытянул") */
-            .prepaid-wrapper .switch {
-                width: 65px !important;
-                height: 32px !important;
-                margin: 0 !important;
-                pointer-events: none !important; /* Чтобы клик пролетал на плашку */
-            }
-
-            .prepaid-wrapper .slider:before {
-                height: 24px !important;
-                width: 24px !important;
-                left: 4px !important;
-                bottom: 4px !important;
-                background-color: #333 !important;
-            }
-
-            /* Эффект при активации (вся плашка загорается) */
-            .prepaid-wrapper.active-mode {
-                border-color: var(--neon-purple) !important;
-                background: rgba(191, 0, 255, 0.1) !important;
-                box-shadow: 0 0 15px rgba(191, 0, 255, 0.2) !important;
-            }
-
-            .prepaid-wrapper.active-mode span {
-                color: var(--neon-purple) !important;
-                text-shadow: 0 0 8px rgba(191, 0, 255, 0.5) !important;
-            }
-
-            .prepaid-wrapper.active-mode .slider {
-                background-color: var(--neon-purple) !important;
-            }
-            
-            .prepaid-wrapper.active-mode .slider:before {
-                background-color: #fff !important;
-            }
-        }
-    `;
-    document.head.appendChild(style);
-
-    // ФУНКЦИЯ ДЛЯ ТОГО, ЧТОБЫ ВСЯ ПЛАШКА СТАЛА КНОПКОЙ
-    function makePrepaidSuperClickable() {
-        const wrapper = document.querySelector('.prepaid-wrapper');
-        if (!wrapper) return;
-
-        // Убираем лишние обработчики, если они были
-        wrapper.onclick = null;
-
-        // Вешаем новый жирный клик на всю область
-        wrapper.addEventListener('click', function(e) {
-            const checkbox = document.getElementById('prepaidMode');
-            if (checkbox) {
-                checkbox.checked = !checkbox.checked;
-                applyPrepaidToggle();
-            }
-        });
-    }
-
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     function formatTimeInput(input) {
         let val = input.value.replace(/\D/g, '');
@@ -855,16 +725,7 @@
     }
 
     function applyPrepaidToggle() {
-        const checkbox = document.getElementById('prepaidMode');
-        const wrapper = document.querySelector('.prepaid-wrapper');
-        const isPrepaid = checkbox.checked;
-
-        if (isPrepaid) {
-            wrapper.classList.add('active-mode');
-        } else {
-            wrapper.classList.remove('active-mode');
-        }
-
+        const isPrepaid = document.getElementById('prepaidMode').checked;
         window.currentCart.total = 0;
         window.currentCart.details.forEach(item => {
             const isForceFull = item.name.includes('ЧАС ЗАПИСИ');
@@ -924,6 +785,7 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
+        // СОРТИРОВКА: Самые новые по timestamp идут первыми (вверху)
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
             return b.timestamp - a.timestamp;
         });
@@ -981,6 +843,7 @@
                         </div>
                     </td>`;
             } else {
+                // УБРАН privacy-blur с ячейки клиента и прогресс-бара
                 tr.innerHTML = `
                     <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
@@ -1071,16 +934,11 @@
         if (overlay) overlay.classList.toggle('active');
     }
 
-    window.addEventListener('resize', () => {
-        updateTable();
-        makePrepaidSuperClickable();
-    });
-    
+    window.addEventListener('resize', updateTable);
     window.addEventListener('load', () => {
         renderCalendar();
         updateCerts();
         initTooltipLogic();
-        makePrepaidSuperClickable();
     });
 </script>
 
@@ -1101,6 +959,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
 
+// Слушаем изменения: новые сверху за счет orderBy по timestamp desc
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
     snapshot.forEach((doc) => {
@@ -1139,11 +998,6 @@ window.saveSession = async function(event) {
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
         if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
-        
-        const wrapper = document.querySelector('.prepaid-wrapper');
-        if (wrapper) wrapper.classList.remove('active-mode');
-        document.getElementById('prepaidMode').checked = false;
-
         renderCart();
     } catch (error) {
         console.error("Ошибка сохранения:", error);
