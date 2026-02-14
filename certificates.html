@@ -691,7 +691,16 @@
                 z-index: 100;
             }
 
-            /* Подсветка при клике на мобильном для понимания кликабельности */
+            /* КРУПНАЯ БЕЛАЯ ДАТА НА МОБИЛКЕ */
+            .mobile-row-date {
+                font-size: 22px !important;
+                color: #fff !important;
+                font-weight: 800 !important;
+                margin-bottom: 10px !important;
+                display: block !important;
+                font-family: 'Orbitron', sans-serif;
+            }
+
             .mobile-clickable-row:active {
                 background: rgba(255,255,255,0.05);
             }
@@ -704,15 +713,10 @@
             -webkit-user-select: none !important;
             transition: background 0.2s ease;
         }
-        /* Неактивные: палец и подсветка */
         .cert-row.not-active { cursor: pointer !important; }
         .cert-row.not-active:hover { background: rgba(191, 0, 255, 0.1) !important; }
-        
-        /* Активные: стрелка и НЕТ подсветки */
         .cert-row.is-active { cursor: default !important; }
         .cert-row.is-active:hover { background: transparent !important; }
-        
-        /* Текст внутри тоже не должен менять курсор */
         .cert-row span, .cert-row div { cursor: inherit !important; }
     </style>
 
@@ -950,7 +954,6 @@
             if (window.innerWidth <= 992) {
                 tr.className = 'mobile-clickable-row';
                 tr.onclick = (e) => {
-                    // Предотвращаем срабатывание при клике на кнопки
                     if (e.target.closest('.m-action-btn')) return;
                     showCertTooltip(e, row.client, row.details);
                 };
@@ -970,6 +973,11 @@
                     <td data-label="КЛИЕНТ">${row.client}</td>
                     <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
                     <td class="price-cell privacy-blur">${paid} ₽</td>
+                    <td data-label="ПРОГРЕСС">
+                        <div class="progress-container" style="width:100px; height:8px;">
+                            <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
+                        </div>
+                    </td>
                     <td>
                         <div class="action-icons-wrap">
                             <div class="icon-btn-box" onclick="addPayment('${row.id}')"><i class="fas fa-wallet"></i></div>
