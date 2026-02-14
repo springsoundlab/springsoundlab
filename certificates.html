@@ -817,7 +817,6 @@
         });
     }
 
-    // ОБЛАЧНАЯ ТАБЛИЦА (Интеграция твоего стиля и Firebase)
     function updateTable() {
         const body = document.getElementById('crmTableBody');
         if(!body || !window.crmData) return;
@@ -859,7 +858,6 @@
 
             const tr = document.createElement('tr');
             if (window.innerWidth <= 992) {
-                // Мобильная версия (Твой стиль)
                 let mobileItemsHTML = '';
                 if(row.details) row.details.forEach(d => {
                     mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur">${d.price} ₽</span></div>`;
@@ -889,7 +887,6 @@
                         </div>
                     </td>`;
             } else {
-                // Десктоп версия (Твой стиль)
                 tr.innerHTML = `
                     <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
@@ -956,7 +953,7 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
         let targetDate = clickedDate || (window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr);
-        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.compare(b.time));
+        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
         container.innerHTML = ''; 
         if (sessions.length > 0) {
             titleEl.innerText = (targetDate === todayStr) ? "Записи на сегодня" : (targetDate === tomorrowStr ? "Записи на завтра" : `Записи на ${targetDate}`);
@@ -1040,13 +1037,13 @@ window.saveSession = async function(event) {
             timestamp: Date.now()
         });
 
-        alert("ОТПРАВЛЕНО В ОБЛАКО!"); 
+        // ПЛАШКА УДАЛЕНА. Очистка происходит молча.
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
         if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
         renderCart();
     } catch (error) {
-        alert("ОШИБКА: " + error.message);
+        console.error("Ошибка сохранения:", error);
     }
 };
 
