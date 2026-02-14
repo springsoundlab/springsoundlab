@@ -973,33 +973,51 @@
                 let itemsToShow = (activeCertTarget === id) ? window.currentCart.details : (d.items || []);
                 let totalSum = itemsToShow.reduce((acc, val) => acc + val.price, 0);
 
+                // ФОРМИРУЕМ ТУЛТИП (КАК В ОТЧЕТЕ)
                 let itemsTooltip = "";
                 if(itemsToShow.length > 0) {
-                    itemsTooltip = `<div class="history-tooltip pos-up" style="min-width:180px; left:50%; transform:translateX(-50%);">
-                        <div style="color:var(--neon-gold); font-size:9px; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ ${id}:</div>
+                    itemsTooltip = `<div class="history-tooltip pos-up" style="min-width:200px; left:50%; transform:translateX(-50%); z-index:10000; display:none;">
+                        <div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ ${id}:</div>
                         ${itemsToShow.map(it => `
                             <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[it.colorClass] || '#555'}; padding-left:8px;">
                                 <span style="color:${colorMap[it.colorClass] || '#fff'}">${it.name}</span>
                                 <span style="font-family:Rajdhani; font-weight:700;">${it.price} ₽</span>
                             </div>`).join('')}
                         <div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:5px; border-top:1px solid #222; font-family:Orbitron; font-size:11px;">
-                            <span>ИТОГО:</span><span style="color:var(--neon-gold)">${totalSum} ₽</span>
+                            <span>ИТОГО ЧЕК</span><span style="color:var(--neon-gold); font-weight:700;">${totalSum} ₽</span>
                         </div>
                     </div>`;
                 }
 
                 const div = document.createElement('div');
                 div.className = 'cert-row';
+                div.style.position = 'relative'; // Для позиционирования тултипа
                 
-                // Блокируем клик, если активен (есть OK)
                 const clickHandler = d.active ? '' : `onclick="startCertBinding('${id}')"`;
                 const cursorStyle = d.active ? 'cursor:default' : 'cursor:pointer';
 
                 div.innerHTML = `
-                    <span class="cert-id" ${clickHandler} style="${cursorStyle}; position:relative; ${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}${itemsTooltip}</span>
+                    <span class="cert-id" style="${cursorStyle}; ${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}</span>
                     ${d.active ? `<span style="font-size:10px; color:#555">${d.name || ''}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
                     ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
+                    ${itemsTooltip}
                 `;
+
+                // ЛОГИКА НАВЕДЕНИЯ НА ВСЮ СТРОКУ
+                if(itemsToShow.length > 0) {
+                    div.addEventListener('mouseenter', () => {
+                        const tt = div.querySelector('.history-tooltip');
+                        if(tt) tt.style.display = 'block';
+                    });
+                    div.addEventListener('mouseleave', () => {
+                        const tt = div.querySelector('.history-tooltip');
+                        if(tt) tt.style.display = 'none';
+                    });
+                }
+
+                // Клик только на незанятый
+                if(!d.active) div.setAttribute('onclick', `startCertBinding('${id}')`);
+
                 list.appendChild(div);
             }
         } catch (e) { console.error("Ошибка сертификатов:", e); }
@@ -1018,9 +1036,9 @@
         if (window.currentCart.items.length === 0) return alert("Добавьте услуги!");
         
         try {
-            const inputName = document.getElementById('in-' + activeCertTarget)?.value || '';
+            const inputName = document.getElementById('in-' + activeCertTarget)?.value || 'Без имени';
             await db.collection("certs").doc(activeCertTarget).set({
-                active: true, // Авто-активация при сохранении
+                active: true,
                 items: JSON.parse(JSON.stringify(window.currentCart.details)),
                 name: inputName,
                 date: new Date().toLocaleDateString('ru-RU')
@@ -1071,7 +1089,6 @@
         if (overlay) overlay.classList.toggle('active');
     }
 
-    // Слушатель Enter
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             if (activeCertTarget) {
