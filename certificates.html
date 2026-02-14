@@ -645,8 +645,8 @@
 </div> <div id="cert-global-tooltip" class="cert-tooltip-base"></div>
 
     <style>
-        /* ЧИСТЫЕ ЦИФРЫ БЕЗ ПОЛОСОК */
-        .price-cell, .tooltip-total, .tooltip-item span, #cartTotal, #monthTotal {
+        /* ШРИФТ ДЛЯ ЦИФР */
+        .price-cell, .tooltip-total, .tooltip-item span, #cartTotal, #monthTotal, .future-date, .mobile-row-date {
             font-family: 'Rajdhani', sans-serif !important;
             font-weight: 700 !important;
         }
@@ -664,7 +664,7 @@
             pointer-events: none;
         }
 
-        /* МОБИЛЬНАЯ ДЕТАЛИЗАЦИЯ */
+        /* МОБИЛЬНЫЕ ПРАВКИ: БОЛЬШАЯ БЕЛАЯ ДАТА */
         @media (max-width: 992px) {
             .cert-tooltip-base.mobile-active {
                 display: block !important;
@@ -674,24 +674,26 @@
                 left: 50% !important;
                 top: 20% !important;
                 transform: translateX(-50%);
-                height: auto;
-                min-height: 200px;
-                max-height: 450px;
                 padding: 25px;
             }
-            .cert-tooltip-base.mobile-active .tooltip-item { font-size: 20px !important; margin-bottom: 12px !important; }
-            .cert-tooltip-base.mobile-active .tooltip-total { font-size: 24px !important; margin-top: 20px !important; }
-            
-            /* ВОЗВРАТ ЦВЕТА ДАТЫ */
             .mobile-row-date {
-                color: var(--neon-purple) !important;
-                font-size: 12px !important;
-                font-weight: bold !important;
-                margin-bottom: 4px;
+                color: #ffffff !important;
+                font-size: 18px !important;
+                margin-bottom: 8px !important;
+                display: block;
+            }
+            .cert-close-btn {
+                display: block !important;
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                color: var(--artist-red);
+                font-size: 32px;
+                cursor: pointer;
             }
         }
 
-        /* ПРОГРЕСС БАРЫ ПОД ИМЕНЕМ (ПК) */
+        /* ПРОГРЕСС БАРЫ ПК */
         .pc-progress-mini {
             width: 100%;
             height: 3px;
@@ -703,17 +705,47 @@
         .pc-progress-fill {
             height: 100%;
             background: var(--neon-purple);
-            transition: width 0.3s ease;
         }
         .pc-progress-fill.complete { background: var(--status-green); }
 
-        /* КУРСОРЫ ДЛЯ СЕРТИФИКАТОВ */
-        .cert-row { user-select: none !important; transition: background 0.2s ease; }
-        .cert-row.not-active { cursor: pointer !important; }
-        .cert-row.not-active:hover { background: rgba(191, 0, 255, 0.1) !important; }
-        .cert-row.is-active { cursor: default !important; }
-        .cert-row span, .cert-row div { cursor: inherit !important; }
+        /* КРАСИВОЕ ОКНО ПАРОЛЯ */
+        .password-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .password-box {
+            background: #111;
+            padding: 30px;
+            border: 2px solid var(--neon-purple);
+            box-shadow: 0 0 20px var(--neon-purple);
+            text-align: center;
+            border-radius: 10px;
+        }
+        .password-box input {
+            background: #000;
+            border: 1px solid var(--neon-purple);
+            color: #fff;
+            padding: 10px;
+            margin: 15px 0;
+            width: 100%;
+            text-align: center;
+            outline: none;
+        }
     </style>
+
+    <div id="pwdOverlay" class="password-overlay">
+        <div class="password-box">
+            <h3 style="color:var(--neon-purple); font-family:Orbitron;">ACCESS REQUIRED</h3>
+            <input type="password" id="adminPwd" placeholder="ENTER PASSWORD">
+            <button class="m-btn m-confirm" onclick="verifyPass()">UNLOCK</button>
+            <button class="m-btn m-del" style="margin-top:10px;" onclick="document.getElementById('pwdOverlay').style.display='none'">CANCEL</button>
+        </div>
+    </div>
 
 <script>
     window.crmData = [];
@@ -725,43 +757,67 @@
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
     let activeCertTarget = null; 
 
-    // CLICK-TO-UNLOCK (FIX)
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('lock-screen') || e.target.closest('.lock-icon')) {
-            checkPrivacyPassword();
+    // ФУНКЦИИ КАЛЕНДАРЯ
+    function renderCalendar() {
+        const grid = document.getElementById('calendarDays');
+        const monthName = document.getElementById('calMonthName');
+        if(!grid || !monthName) return;
+        grid.innerHTML = '';
+        const now = new Date();
+        const year = currentCalDate.getFullYear();
+        const month = currentCalDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        monthName.innerText = `${monthNames[month]} ${year}`;
+        ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'].forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
+        let startingSpace = (firstDay === 0) ? 6 : firstDay - 1;
+        for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
+        for(let d=1; d<=daysInMonth; d++) {
+            const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
+            const hasData = window.crmData.some(row => row.date === dateStr);
+            const isToday = now.toLocaleDateString('ru-RU') === dateStr;
+            let classes = ['day'];
+            if (isToday) classes.push('today');
+            if (hasData) classes.push('has-data');
+            if (selectedDate === dateStr) classes.push('selected-day');
+            grid.innerHTML += `<div class="${classes.join(' ')}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
-    });
-
-    function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
-    function stopProp(e) { e.stopPropagation(); }
-
-    function openModal(title, type, confirmCallback, defaultValue = '') {
-        const modal = document.getElementById('customModal');
-        const overlay = document.getElementById('modalOverlay');
-        if(!modal) return;
-        document.getElementById('modalTitle').innerText = title;
-        const inputEl = document.getElementById('modalInput');
-        inputEl.value = defaultValue;
-        inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
-        document.getElementById('modalConfirmBtn').onclick = confirmCallback;
-        modal.style.display = 'block'; overlay.style.display = 'block';
-        if(type !== 'confirm-delete') inputEl.focus();
+        updateMonthTotal();
     }
 
-    function closeModal() {
-        document.getElementById('customModal').style.display = 'none';
-        document.getElementById('modalOverlay').style.display = 'none';
+    function selectCalendarDate(date) {
+        selectedDate = date;
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
+        renderCalendar(); 
+        updateNextSession(date);
     }
 
+    function changeMonth(dir) { 
+        currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
+        selectedDate = null; 
+        renderCalendar(); 
+        updateTable();
+    }
+
+    // ПАРОЛЬ И РАЗБЛОКИРОВКА
     function checkPrivacyPassword() {
         if(document.body.classList.contains('privacy-active')) return;
-        let pass = prompt("ВВЕДИТЕ ПАРОЛЬ:");
-        if (pass === '123') {
-            document.body.classList.add('privacy-active');
-            updateTable(); 
-        } else if (pass !== null) { alert("Неверный пароль"); }
+        document.getElementById('pwdOverlay').style.display = 'flex';
+        document.getElementById('adminPwd').focus();
     }
 
+    function verifyPass() {
+        const p = document.getElementById('adminPwd').value;
+        if(p === '123') {
+            document.body.classList.add('privacy-active');
+            document.getElementById('pwdOverlay').style.display = 'none';
+            updateTable();
+        } else { alert("WRONG PASSWORD"); }
+    }
+
+    // КОРЗИНА И СОХРАНЕНИЕ (ДЛЯ ПАКЕТОВ)
     function addToCart(name, price, colorClass, forceFull = false) {
         const isPrepaid = document.getElementById('prepaidMode')?.checked;
         let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
@@ -774,13 +830,20 @@
         if(activeCertTarget) updateCerts();
     }
 
+    function openPriceModal(name, color, defaultPrice) {
+        openModal(`УКАЖИТЕ СТОИМОСТЬ: ${name}`, "price", function() {
+            const p = parseInt(document.getElementById('modalInput').value);
+            if(!isNaN(p) && p > 0) { addToCart(name, p, color); closeModal(); }
+        }, defaultPrice);
+    }
+
     function renderCart() {
         const container = document.getElementById('cartItems');
         const total = document.getElementById('cartTotal');
         const label = document.getElementById('sessionDateLabel');
         const saveBtn = document.querySelector('.save-btn');
         if(!container || !total) return;
-
+        
         if (activeCertTarget) {
             label.innerHTML = `НАПОЛНЕНИЕ ${activeCertTarget} <span onclick="exitCertMode()" style="cursor:pointer; color:var(--artist-red); margin-left:10px;">×</span>`;
             if(saveBtn) { saveBtn.innerText = `СОХРАНИТЬ В ${activeCertTarget}`; saveBtn.onclick = saveCertContent; }
@@ -811,24 +874,21 @@
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
             
-            const tooltipHTML = `<div class="history-tooltip"><div style="color:#888; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>` + 
-                (row.details || []).map(d => `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span>${d.price} ₽</span></div>`).join('') +
-                `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div></div>`;
-
             const tr = document.createElement('tr');
             tr.setAttribute('ondblclick', `showCertTooltip(event, '${row.client}', ${JSON.stringify(row.details).replace(/"/g, '&quot;')})`);
             
             if (window.innerWidth <= 992) {
-                tr.innerHTML = `<td style="position:relative; padding: 20px;">
-                    <div class="mobile-row-date">${row.date}</div>
-                    <div class="mobile-row-client">${row.client}</div>
-                    <div class="mobile-row-services">${row.services}</div>
-                    <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
-                    <div class="mobile-actions-grid">
-                        <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
-                        <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
-                    </div>
-                </td>`;
+                tr.innerHTML = `
+                    <td style="padding: 20px;">
+                        <div class="mobile-row-date">${row.date}</div>
+                        <div class="mobile-row-client">${row.client}</div>
+                        <div class="mobile-row-services">${row.services}</div>
+                        <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
+                        <div class="mobile-actions-grid">
+                            <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
+                            <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
+                        </div>
+                    </td>`;
             } else {
                 tr.innerHTML = `
                     <td>${row.date}</td>
@@ -836,7 +896,7 @@
                         <div>${row.client}</div>
                         <div class="pc-progress-mini"><div class="pc-progress-fill ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                     </td>
-                    <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
+                    <td class="services-cell" style="position:relative;">${row.services}</td>
                     <td class="price-cell privacy-blur">${paid} ₽</td>
                     <td>
                         <div class="action-icons-wrap">
@@ -850,29 +910,15 @@
         updateMonthTotal();
     }
 
-    function showCertTooltip(e, id, items) {
-        const tooltip = document.getElementById('cert-global-tooltip');
-        if (!items || items.length === 0) return;
-        let total = items.reduce((s, i) => s + i.price, 0);
-        let html = `<div class="cert-close-btn" onclick="hideCertTooltip()">×</div><div class="tooltip-title" style="color:#888; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom:15px;">ДЕТАЛИЗАЦИЯ:</div>`;
-        items.forEach(it => {
-            html += `<div class="tooltip-item" style="display:flex; justify-content:space-between; border-left:3px solid ${colorMap[it.colorClass] || '#555'}; padding-left:12px;"><span style="color:${colorMap[it.colorClass] || '#fff'}">${it.name}</span><span>${it.price} ₽</span></div>`;
-        });
-        html += `<div class="tooltip-total" style="display:flex; justify-content:space-between; border-top:1px solid #222;"><span>ИТОГО</span><span style="color:var(--neon-gold);">${total} ₽</span></div>`;
-        tooltip.innerHTML = html;
-        if (window.innerWidth <= 992) {
-            tooltip.classList.add('mobile-active');
-        } else {
-            tooltip.style.display = 'block';
-            tooltip.style.left = (e.clientX + 15) + 'px'; tooltip.style.top = (e.clientY + 15) + 'px';
-        }
+    function updateMonthTotal() {
+        const el = document.getElementById('monthTotal');
+        if(!el) return;
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+        const sum = window.crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + Number(b.total), 0);
+        el.innerText = sum.toLocaleString() + ' ₽';
     }
 
-    function hideCertTooltip() {
-        const t = document.getElementById('cert-global-tooltip');
-        t.style.display = 'none'; t.classList.remove('mobile-active');
-    }
-
+    // СЕРТИФИКАТЫ
     async function updateCerts() {
         const list = document.getElementById('certsList');
         if(!list) return;
@@ -908,7 +954,7 @@
         } catch (e) { console.error(e); }
     }
 
-    // Инициализация Firebase и загрузка
+    // FIREBASE INIT
     window.addEventListener('load', () => {
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         window.db = firebase.firestore();
@@ -918,7 +964,12 @@
             snapshot.forEach((doc) => { window.crmData.push({ id: doc.id, ...doc.data() }); });
             updateTable(); renderCalendar();
         });
-        updateCerts(); renderCart();
+        updateCerts(); renderCart(); renderCalendar();
+    });
+
+    // LOCK ICON LISTENER
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.lock-icon')) checkPrivacyPassword();
     });
 </script>
 
