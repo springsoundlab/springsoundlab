@@ -685,9 +685,6 @@
                 overflow-y: auto;
                 padding: 25px;
             }
-            .cert-tooltip-base.mobile-active .tooltip-title { font-size: 16px !important; margin-bottom: 20px !important; }
-            .cert-tooltip-base.mobile-active .tooltip-item { font-size: 20px !important; margin-bottom: 12px !important; }
-            .cert-tooltip-base.mobile-active .tooltip-total { font-size: 22px !important; margin-top: 20px !important; padding-top: 10px !important; }
             
             .cert-close-btn {
                 display: block !important;
@@ -709,74 +706,52 @@
                 display: block !important;
                 font-family: 'Orbitron', sans-serif;
             }
-
-            .mobile-clickable-row:active {
-                background: rgba(255,255,255,0.05);
-            }
         }
         .cert-close-btn { display: none; }
 
-        .cert-row {
-            user-select: none !important;
-            -webkit-user-select: none !important;
-            transition: background 0.2s ease;
-        }
-        .cert-row.not-active { cursor: pointer !important; }
-        .cert-row.not-active:hover { background: rgba(191, 0, 255, 0.1) !important; }
-        .cert-row.is-active { cursor: default !important; }
-        .cert-row.is-active:hover { background: transparent !important; }
-        .cert-row span, .cert-row div { cursor: inherit !important; }
-
-        /* ЖЕСТКАЯ СТРУКТУРА ДЛЯ ПК (БЕЗ НАСЛОЕНИЙ) */
+        /* ГОРИЗОНТАЛЬНОЕ РАСПРЕДЕЛЕНИЕ ДЛЯ ПК */
         @media (min-width: 993px) {
+            .crm-table {
+                width: 100%;
+                display: block;
+            }
+
             .crm-table thead tr, #crmTableBody tr {
-                display: grid !important;
-                grid-template-columns: 100px 180px 220px 1fr 120px 140px !important;
-                align-items: center;
-                gap: 15px;
-                padding: 0 15px;
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 10px 20px;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                width: 100%;
+                box-sizing: border-box;
             }
 
-            .crm-table th, .crm-table td {
-                display: block !important;
-                padding: 15px 0 !important;
-                border: none !important;
-                overflow: hidden;
-                white-space: nowrap;
-                text-align: left;
-            }
-
-            /* Услуги - тянутся, но не лезут на соседа */
-            .col-services {
+            /* Каждому блоку свое место и равные отступы */
+            .col-date { width: 90px; flex-shrink: 0; }
+            .col-client { width: 160px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; }
+            .col-progress { width: 200px; flex-shrink: 0; }
+            .col-services { 
+                flex-grow: 1; 
+                margin: 0 30px; 
+                display: flex !important; 
+                flex-direction: row !important; /* Строго в линию */
+                white-space: nowrap !important; 
+                overflow: hidden; 
                 text-overflow: ellipsis;
-                overflow: hidden;
                 color: #fff;
-                padding-left: 10px !important;
             }
-
-            /* Сумма и Действия */
-            .col-price { 
-                text-align: right !important; 
-                font-weight: 700; 
-                color: var(--status-green);
-                font-family: 'Rajdhani', sans-serif;
-                font-size: 18px;
-            }
-            
-            .col-actions { 
-                text-align: right !important; 
-                padding-right: 35px !important; /* Отступ от скролла */
-            }
+            .col-price { width: 110px; flex-shrink: 0; text-align: right; }
+            .col-actions { width: 130px; flex-shrink: 0; text-align: right; }
 
             .progress-container-long {
-                width: 210px !important; 
-                height: 8px !important;
+                width: 180px;
+                height: 8px;
                 background: rgba(255,255,255,0.05);
                 border-radius: 4px;
                 overflow: hidden;
-                display: block;
             }
-            
+
             .crm-table th {
                 font-family: 'Orbitron', sans-serif;
                 font-size: 10px;
@@ -784,9 +759,15 @@
                 text-transform: uppercase;
                 letter-spacing: 1px;
             }
+
+            .price-cell {
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--status-green);
+            }
         }
 
-        /* Tooltip History */
         .history-tooltip {
             position: fixed;
             display: none;
@@ -795,17 +776,8 @@
             padding: 10px;
             z-index: 10000;
             border-radius: 4px;
-            min-width: 150px;
         }
         .history-tooltip.active { display: block; }
-        .summary-line {
-            display: flex;
-            justify-content: space-between;
-            border-top: 1px solid #333;
-            margin-top: 8px;
-            padding-top: 5px;
-            font-weight: bold;
-        }
     </style>
 
 <script>
@@ -1032,12 +1004,12 @@
 
         if (window.innerWidth > 992 && head) {
             head.innerHTML = `
-                <th class="col-date">ДАТА</th>
-                <th class="col-client">КЛИЕНТ</th>
-                <th class="col-progress">ПРЕДОПЛАТА</th>
-                <th class="col-services">УСЛУГИ</th>
-                <th class="col-price" style="text-align:right;">ВНЕСЕНО</th>
-                <th class="col-actions" style="text-align:right; padding-right:35px;">ДЕЙСТВИЯ</th>
+                <div class="col-date">ДАТА</div>
+                <div class="col-client">КЛИЕНТ</div>
+                <div class="col-progress">ПРЕДОПЛАТА</div>
+                <div class="col-services">УСЛУГИ</div>
+                <div class="col-price" style="text-align:right;">ВНЕСЕНО</div>
+                <div class="col-actions" style="text-align:right;">ДЕЙСТВИЯ</div>
             `;
         }
 
@@ -1049,7 +1021,7 @@
             
             const tooltipHTML = `<div class="history-tooltip"><div style="color:#888; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>` + 
                 (row.details || []).map(d => `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span>${d.price} ₽</span></div>`).join('') +
-                `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div></div>`;
+                `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div></div>`;
 
             const tr = document.createElement('tr');
             if (window.innerWidth <= 992) {
@@ -1067,21 +1039,21 @@
                 </td>`;
             } else {
                 tr.innerHTML = `
-                    <td class="col-date">${row.date}</td>
-                    <td class="col-client" style="font-size: 16px; font-weight: 800; color: #fff;">${row.client}</td>
-                    <td class="col-progress">
+                    <div class="col-date">${row.date}</div>
+                    <div class="col-client" style="font-size: 15px; font-weight: 800; color: #fff;">${row.client}</div>
+                    <div class="col-progress">
                         <div class="progress-container-long">
                             <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
                         </div>
-                    </td>
-                    <td class="col-services" style="position:relative;">${row.services}${tooltipHTML}</td>
-                    <td class="col-price privacy-blur">${paid} ₽</td>
-                    <td class="col-actions">
+                    </div>
+                    <div class="col-services">${row.services}${tooltipHTML}</div>
+                    <div class="col-price price-cell privacy-blur">${paid} ₽</div>
+                    <div class="col-actions">
                         <div class="action-icons-wrap" style="justify-content:flex-end; gap: 15px;">
                             <div class="icon-btn-box" onclick="addPayment('${row.id}')"><i class="fas fa-wallet"></i></div>
                             <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><i class="fas fa-trash"></i></div>
                         </div>
-                    </td>`;
+                    </div>`;
             }
             body.appendChild(tr);
         });
@@ -1101,16 +1073,14 @@
         if (!items || items.length === 0) return;
         let total = items.reduce((s, i) => s + i.price, 0);
         let html = `<div class="cert-close-btn" onclick="hideCertTooltip()">×</div>`;
-        html += `<div class="tooltip-title" style="color:#888; font-family:Orbitron; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom:15px;">ДЕТАЛИЗАЦИЯ ${id}:</div>`;
+        html += `<div class="tooltip-title">ДЕТАЛИЗАЦИЯ ${id}:</div>`;
         items.forEach(it => {
-            html += `<div class="tooltip-item" style="display:flex; justify-content:space-between; border-left:3px solid ${colorMap[it.colorClass] || '#555'}; padding-left:12px;">
-                        <span style="color:${colorMap[it.colorClass] || '#fff'}">${it.name}</span>
-                        <span style="font-weight:700;">${it.price} ₽</span>
+            html += `<div class="tooltip-item" style="display:flex; justify-content:space-between; border-left:3px solid ${colorMap[it.colorClass]}; padding-left:12px;">
+                        <span style="color:${colorMap[it.colorClass]}">${it.name}</span>
+                        <span>${it.price} ₽</span>
                     </div>`;
         });
-        html += `<div class="tooltip-total" style="display:flex; justify-content:space-between; border-top:1px solid #222; font-family:Orbitron;">
-                    <span>ИТОГО SSL</span><span style="color:var(--neon-gold); font-weight:700;">${total} ₽</span>
-                </div>`;
+        html += `<div class="tooltip-total"><span>ИТОГО SSL</span><span>${total} ₽</span></div>`;
         tooltip.innerHTML = html;
         if (window.innerWidth <= 992) tooltip.classList.add('mobile-active');
         else {
@@ -1139,9 +1109,9 @@
                 const div = document.createElement('div');
                 div.className = `cert-row ${d.active ? 'is-active' : 'not-active'}`;
                 div.innerHTML = `
-                    <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}</span>
-                    ${d.active ? `<span class="cert-client-name" style="font-size:10px; color:#ccc;">${d.name || ''}</span>` : `<input type="text" id="in-${id}" onmousedown="stopProp(event)" onclick="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
-                    ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px; font-weight:900;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
+                    <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold);' : ''}">${id}</span>
+                    ${d.active ? `<span class="cert-client-name">${d.name || ''}</span>` : `<input type="text" id="in-${id}" placeholder="Имя" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px;">`}
+                    ${d.active ? `<span style="font-size:8px; color:#00ff66;">OK</span>` : `<button onclick="activateCert('${id}')">АКТИВ</button>`}
                 `;
                 if (window.innerWidth > 992) {
                     div.addEventListener('mousemove', (e) => showCertTooltip(e, id, itemsToShow));
