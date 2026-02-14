@@ -898,10 +898,18 @@
         renderCalendar(); updateNextSession(date); 
     }
 
-    function changeMonth(dir) { 
-        currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
-        selectedDate = null; updateTable(); renderCalendar(); 
-    }
+    window.changeMonth = function(dir) {
+        currentCalDate.setMonth(currentCalDate.getMonth() + dir);
+        selectedDate = null;
+        
+        // Перезапускаем синхронизацию данных для нового месяца
+        if (typeof initDataSync === 'function') {
+            initDataSync(); 
+        }
+        
+        renderCalendar();
+        updateTable();
+    };
 
     function applyPrepaidToggle() {
         const isPrepaid = document.getElementById('prepaidMode').checked;
@@ -989,50 +997,47 @@
         });
     }
 
-    function updateTable() {
+    window.updateTable = function() {
         const body = document.getElementById('crmTableBody');
-        const head = document.querySelector('.crm-table thead tr');
         if(!body) return;
         body.innerHTML = '';
+
+        // Фильтруем данные только для текущего месяца
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
-        if (window.innerWidth > 992 && head) {
-            head.innerHTML = `
-                <th class="col-date">ДАТА</th>
-                <th class="col-client">КЛИЕНТ</th>
-                <th class="col-progress">ПРЕДОПЛАТА</th>
-                <th class="col-services">ПРЕДОСТАВЛЕННЫЕ УСЛУГИ</th>
-                <th class="col-price" style="text-align:right;">ВНЕСЕНО</th>
-                <th class="col-actions" style="text-align:center;">ДЕЙСТВИЯ</th>
-            `;
-        }
-
-        filteredData.forEach((row, index) => {
-            const full = row.fullTotal || row.total || 0;
-            const paid = row.total || 0;
+        filteredData.forEach((row) => {
+            const isPrivacy = document.body.classList.contains('privacy-active');
+            const full = Number(row.fullTotal) || Number(row.total) || 0;
+            const paid = Number(row.total) || 0;
+            const remaining = full - paid;
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
-            
-            const tooltipHTML = `<div class="history-tooltip"><div style="color:#888; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>` + 
-                (row.details || []).map(d => `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span>${d.price} ₽</span></div>`).join('') +
-                `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div></div>`;
 
+            const displayPaid = isPrivacy ? '***' : paid.toLocaleString() + ' ₽';
+            
             const tr = document.createElement('tr');
+            
             if (window.innerWidth <= 992) {
+                // Мобильная версия
                 tr.className = 'mobile-clickable-row';
                 tr.onclick = (e) => { if (!e.target.closest('.m-action-btn')) showCertTooltip(e, row.client, row.details); };
                 tr.innerHTML = `<td style="position:relative; padding: 20px;">
-                    <div class="mobile-row-date">${row.date}</div>
+                    <div class="mobile-row-date">${row.date} ${row.time || ''}</div>
                     <div class="mobile-row-client">${row.client}</div>
                     <div class="mobile-row-services">${row.services}</div>
                     <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
                     <div class="mobile-actions-grid">
-                        <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
-                        <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
+                        <div class="m-action-btn m-btn-pay" onclick="event.stopPropagation(); addPayment('${row.id}')">Доплата</div>
+                        <div class="m-action-btn m-btn-del" onclick="event.stopPropagation(); deleteRow('${row.id}')">Удалить</div>
                     </div>
                 </td>`;
             } else {
+                // ПК версия
+                const tooltipHTML = `<div class="history-tooltip"><div style="color:#888; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>` + 
+                    (row.details || []).map(d => `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span>${d.price} ₽</span></div>`).join('') +
+                    `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div></div>`;
+
                 tr.innerHTML = `
                     <td class="col-date">${row.date}</td>
                     <td class="col-client" style="font-size: 15px; font-weight: 800; color: #fff;">${row.client}</td>
@@ -1042,7 +1047,7 @@
                         </div>
                     </td>
                     <td class="col-services services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
-                    <td class="col-price price-cell privacy-blur" style="text-align:right; font-weight:700;">${paid} ₽</td>
+                    <td class="col-price price-cell privacy-blur" style="text-align:right; font-weight:700;">${displayPaid}</td>
                     <td class="col-actions">
                         <div class="action-icons-wrap" style="justify-content:center; gap: 15px;">
                             <div class="icon-btn-box" onclick="addPayment('${row.id}')"><i class="fas fa-wallet"></i></div>
@@ -1053,7 +1058,7 @@
             body.appendChild(tr);
         });
         updateMonthTotal();
-    }
+    };
 
     function updateMonthTotal() {
         const el = document.getElementById('monthTotal');
@@ -1265,7 +1270,29 @@ db.collection("sessions").orderBy("timestamp", "desc").onSnapshot((snapshot) => 
     snapshot.forEach((doc) => { window.crmData.push({ id: doc.id, ...doc.data() }); });
     updateTable(); renderCalendar(); updateNextSession();
 });
+    function initDataSync() {
+        const month = String(currentCalDate.getMonth() + 1).padStart(2, '0');
+        const year = currentCalDate.getFullYear();
+        
+        // Слушаем только записи текущего месяца для скорости
+        db.collection("sessions")
+            .onSnapshot((snapshot) => {
+                window.crmData = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    // Фильтруем на стороне клиента для надежности
+                    if (data.date && data.date.includes(`.${month}.${year}`)) {
+                        window.crmData.push({ id: doc.id, ...data });
+                    }
+                });
+                updateTable();
+                renderCalendar();
+                updateNextSession();
+            });
+    }
+
+    // Запускаем при загрузке
+    initDataSync();
 </script>
-    
 </body>
 </html>
