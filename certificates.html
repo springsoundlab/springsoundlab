@@ -653,126 +653,94 @@
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
-    // СТИЛИ: ПРИНУДИТЕЛЬНОЕ ПЕРЕОПРЕДЕЛЕНИЕ ДЛЯ МОБИЛОК
+    // ЖЕСТКИЕ СТИЛИ ДЛЯ МАКСИМАЛЬНОЙ КЛИКАБЕЛЬНОСТИ
     const style = document.createElement('style');
     style.innerHTML = `
         @media (max-width: 992px) {
-            /* Убиваем старый контейнер и создаем сетку */
+            /* Делаем всю плашку ОГРОМНОЙ КНОПКОЙ */
             .prepaid-wrapper {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                gap: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
                 width: 100% !important;
-                max-width: 100% !important;
-                background: none !important;
-                border: none !important;
-                padding: 0 !important;
+                height: 55px !important; /* Увеличил высоту для удобства нажатия */
+                background: #0a0a0a !important;
+                border: 1px solid #222 !important;
+                border-radius: 10px !important;
+                padding: 0 20px !important;
                 margin: 15px 0 !important;
-                height: auto !important;
-                box-shadow: none !important;
-            }
-
-            /* Левая кнопка с текстом */
-            .mobile-prepaid-btn-text {
-                background: #0a0a0a !important;
-                border: 1px solid #222 !important;
-                border-radius: 8px !important;
-                height: 50px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
                 cursor: pointer !important;
-                transition: 0.3s !important;
+                box-sizing: border-box !important;
+                transition: all 0.2s ease !important;
+                -webkit-tap-highlight-color: transparent !important;
             }
 
-            /* Правая кнопка с тумблером */
-            .mobile-prepaid-btn-toggle {
-                background: #0a0a0a !important;
-                border: 1px solid #222 !important;
-                border-radius: 8px !important;
-                height: 50px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                cursor: pointer !important;
-                transition: 0.3s !important;
-            }
-
-            /* Текст 50% */
-            .mobile-prepaid-btn-text span {
+            /* Текст слева */
+            .prepaid-wrapper span {
                 font-family: 'Orbitron', sans-serif !important;
-                font-size: 10px !important;
-                font-weight: 700 !important;
-                color: #555 !important;
+                font-size: 12px !important;
+                font-weight: 800 !important;
+                color: #666 !important;
                 letter-spacing: 1px !important;
-                text-transform: uppercase !important;
-                pointer-events: none !important;
+                pointer-events: none !important; /* Чтобы клик пролетал сквозь текст на плашку */
             }
 
-            /* Тумблер внутри кнопки */
-            .mobile-prepaid-btn-toggle .switch {
-                transform: scale(1.1) !important;
+            /* Тумблер справа (сделал его крупнее и "вытянул") */
+            .prepaid-wrapper .switch {
+                width: 65px !important;
+                height: 32px !important;
                 margin: 0 !important;
+                pointer-events: none !important; /* Чтобы клик пролетал на плашку */
             }
 
-            /* Состояния при активации */
-            .prepaid-wrapper.active-mode .mobile-prepaid-btn-text,
-            .prepaid-wrapper.active-mode .mobile-prepaid-btn-toggle {
-                border-color: var(--neon-purple) !important;
-                background: rgba(191, 0, 255, 0.05) !important;
-                box-shadow: 0 0 10px rgba(191, 0, 255, 0.1) !important;
+            .prepaid-wrapper .slider:before {
+                height: 24px !important;
+                width: 24px !important;
+                left: 4px !important;
+                bottom: 4px !important;
+                background-color: #333 !important;
             }
+
+            /* Эффект при активации (вся плашка загорается) */
+            .prepaid-wrapper.active-mode {
+                border-color: var(--neon-purple) !important;
+                background: rgba(191, 0, 255, 0.1) !important;
+                box-shadow: 0 0 15px rgba(191, 0, 255, 0.2) !important;
+            }
+
             .prepaid-wrapper.active-mode span {
                 color: var(--neon-purple) !important;
-                text-shadow: 0 0 5px rgba(191, 0, 255, 0.5) !important;
+                text-shadow: 0 0 8px rgba(191, 0, 255, 0.5) !important;
+            }
+
+            .prepaid-wrapper.active-mode .slider {
+                background-color: var(--neon-purple) !important;
+            }
+            
+            .prepaid-wrapper.active-mode .slider:before {
+                background-color: #fff !important;
             }
         }
     `;
     document.head.appendChild(style);
 
-    // Функция жесткой перестройки блока
-    function forceRebuildPrepaid() {
-        if (window.innerWidth > 992) return;
+    // ФУНКЦИЯ ДЛЯ ТОГО, ЧТОБЫ ВСЯ ПЛАШКА СТАЛА КНОПКОЙ
+    function makePrepaidSuperClickable() {
         const wrapper = document.querySelector('.prepaid-wrapper');
-        if (!wrapper || wrapper.querySelector('.mobile-prepaid-btn-text')) return;
+        if (!wrapper) return;
 
-        const originalCheckbox = document.getElementById('prepaidMode');
-        const originalSwitch = wrapper.querySelector('.switch');
-        
-        // Создаем новые элементы
-        const leftBtn = document.createElement('div');
-        leftBtn.className = 'mobile-prepaid-btn-text';
-        leftBtn.innerHTML = '<span>ПРЕДОПЛАТА 50%</span>';
+        // Убираем лишние обработчики, если они были
+        wrapper.onclick = null;
 
-        const rightBtn = document.createElement('div');
-        rightBtn.className = 'mobile-prepaid-btn-toggle';
-        
-        // Переносим тумблер в правую кнопку
-        if (originalSwitch) {
-            rightBtn.appendChild(originalSwitch);
-        }
-
-        // Очищаем и заменяем
-        wrapper.innerHTML = '';
-        wrapper.appendChild(leftBtn);
-        wrapper.appendChild(rightBtn);
-
-        // Вешаем клик на весь блок
-        const clickHandler = (e) => {
-            if (originalCheckbox) {
-                originalCheckbox.checked = !originalCheckbox.checked;
+        // Вешаем новый жирный клик на всю область
+        wrapper.addEventListener('click', function(e) {
+            const checkbox = document.getElementById('prepaidMode');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
                 applyPrepaidToggle();
             }
-        };
-        leftBtn.onclick = clickHandler;
-        rightBtn.onclick = clickHandler;
+        });
     }
-
-    // Следим за изменениями в DOM, чтобы никто не вернул старый вид
-    const observer = new MutationObserver(() => {
-        forceRebuildPrepaid();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
 
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     function formatTimeInput(input) {
@@ -1105,14 +1073,14 @@
 
     window.addEventListener('resize', () => {
         updateTable();
-        forceRebuildPrepaid();
+        makePrepaidSuperClickable();
     });
     
     window.addEventListener('load', () => {
         renderCalendar();
         updateCerts();
         initTooltipLogic();
-        forceRebuildPrepaid();
+        makePrepaidSuperClickable();
     });
 </script>
 
@@ -1204,7 +1172,6 @@ window.deleteRow = function(id) {
     });
 };
 </script>
-    
     
 </body>
 </html>
