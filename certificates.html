@@ -869,62 +869,107 @@
     }
 
     function updateTable() {
-        const body = document.getElementById('crmTableBody');
-        if(!body) return;
-        body.innerHTML = '';
-        const now = new Date();
-        const currentTime = now.getHours() * 60 + now.getMinutes();
-        const todayStr = now.toLocaleDateString('ru-RU');
-        
-        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        
-        // ОБНОВЛЕННАЯ ЛОГИКА СОРТИРОВКИ
-        const filteredData = crmData.filter(r => r.date.includes(mKey)).sort((a,b) => {
-            const da = a.date.split('.').reverse().join('');
-            const db = b.date.split('.').reverse().join('');
-            
-            // 1. Сначала сортируем по дате (хронологически)
-            if (da !== db) return da.localeCompare(db);
-            
-            // 2. Внутри одного дня — по времени записи (от раннего к позднему)
-            if (a.time && b.time) {
-                if (a.time !== b.time) return a.time.localeCompare(b.time);
-            } else if (a.time) {
-                return -1; // Запись с временем выше той, что без времени
-            } else if (b.time) {
-                return 1;
-            }
-            
-            // 3. Если время одинаковое или его нет — самая НОВАЯ запись (созданная позже) будет ВЫШЕ
-            return b.timestamp - a.timestamp;
-        });
+    const body = document.getElementById('crmTableBody');
+    if(!body) return;
+    body.innerHTML = '';
+    
+    // Если данных в облаке ещё нет
+    if (!window.crmData || window.crmData.length === 0) return;
 
-        filteredData.forEach((row, index) => {
-            const full = row.fullTotal || row.total;
-            const paid = row.total;
-            const rest = Math.max(0, full - paid);
-            const perc = Math.min((paid / full) * 100, 100);
-            const isComplete = perc >= 100;
-            const realIndex = crmData.indexOf(row);
-            
-            let showTime = true;
-            if (row.time && row.date === todayStr) {
-                const [h, m] = row.time.split(':').map(Number);
-                const sessionTime = h * 60 + m;
-                if (currentTime >= sessionTime) {
-                    showTime = false;
-                }
-            }
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    const todayStr = now.toLocaleDateString('ru-RU');
+    
+    // Используем дату из твоего календаря для фильтрации (по месяцам)
+    const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+    
+    // Цветовая карта для детализации (твои цвета)
+    const colorMap = {
+        'purple': '#bf00ff',
+        'white': '#ffffff',
+        'red': '#ff3333'
+    };
 
-            const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
-            let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+    // 1. ФИЛЬТРАЦИЯ И СОРТИРОВКА (Твоя логика)
+    const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
+        const da = a.date.split('.').reverse().join('');
+        const db = b.date.split('.').reverse().join('');
+        
+        if (da !== db) return da.localeCompare(db);
+        
+        if (a.time && b.time) {
+            if (a.time !== b.time) return a.time.localeCompare(b.time);
+        } else if (a.time) {
+            return -1;
+        } else if (b.time) {
+            return 1;
+        }
+        return b.timestamp - a.timestamp;
+    });
+
+    // 2. ОТРИСОВКА СТРОК
+    filteredData.forEach((row, index) => {
+        const full = row.fullTotal || row.total || 0;
+        const paid = row.total || 0;
+        const rest = Math.max(0, full - paid);
+        const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
+        const isComplete = perc >= 100;
+        
+        // Скрываем время, если оно уже прошло сегодня
+        let showTime = true;
+        if (row.time && row.date === todayStr) {
+            const [h, m] = row.time.split(':').map(Number);
+            const sessionTime = h * 60 + m;
+            if (currentTime >= sessionTime) showTime = false;
+        }
+
+        // Формируем Твой Tooltip (детализация)
+        const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
+        let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+        
+        // Если детализация есть в базе (массив), выводим её
+        if (row.details && Array.isArray(row.details)) {
             row.details.forEach(d => {
-                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
             });
-            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
+        } else {
+            // Если деталей нет, выводим просто услуги строкой
+            tooltipHTML += `<div style="font-size:11px; color:#ccc; margin-bottom:10px;">${row.services || 'Услуги не указаны'}</div>`;
+        }
+        
+        tooltipHTML += `
+            <div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div>
+            <div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div>
+            <div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div>
+        </div>`;
 
-            let timeDisplay = (row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : '';
-            const tr = document.createElement('tr');
+        let timeDisplay = (row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : '';
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
+            <td class="artist-cell">
+                <div class="privacy-blur" style="position:relative;">
+                    <span class="artist-name">${row.client}</span>
+                    ${timeDisplay}
+                    ${tooltipHTML}
+                </div>
+            </td>
+            <td>
+                <div class="progress-mini"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
+            </td>
+            <td style="font-family:Orbitron; font-size:11px; text-align:right;">
+                <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid}</span>
+                ${!isComplete ? `<br><small style="color:var(--artist-red); font-size:9px;">-${rest}</small>` : ''}
+            </td>
+            <td><i class="fas fa-trash-alt delete-btn" onclick="deleteRow('${row.id}')"></i></td>
+        `;
+        body.appendChild(tr);
+    });
+
+    // Обновляем итоговую сумму (если функция есть)
+    if (typeof updateStats === "function") updateStats();
+}
 
             if (window.innerWidth <= 992) {
                 let mobileItemsHTML = '';
