@@ -652,6 +652,9 @@
     let hoverTimer;
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
+    
+    // Новые переменные для сертификатов
+    let activeCertTarget = null; 
 
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     function formatTimeInput(input) {
@@ -806,7 +809,32 @@
     function renderCart() {
         const container = document.getElementById('cartItems');
         const total = document.getElementById('cartTotal');
+        const cartBox = document.querySelector('.current-session-box');
         if(!container || !total) return;
+
+        // Если активен режим сертификата - меняем вид чека
+        if (activeCertTarget) {
+            cartBox.style.border = '2px solid var(--neon-gold)';
+            cartBox.style.boxShadow = '0 0 15px rgba(184, 150, 0, 0.3)';
+            document.getElementById('sessionDateLabel').innerText = `НАПОЛНЕНИЕ ${activeCertTarget}:`;
+            // Заменяем кнопку сохранить на ENTER
+            const saveBtn = document.querySelector('.save-btn');
+            if(saveBtn) {
+                saveBtn.innerText = 'ПРИМЕНИТЬ К SSL';
+                saveBtn.style.background = 'var(--neon-gold)';
+                saveBtn.onclick = saveCertContent;
+            }
+        } else {
+            cartBox.style.border = '1px solid #111';
+            cartBox.style.boxShadow = 'none';
+            const saveBtn = document.querySelector('.save-btn');
+            if(saveBtn) {
+                saveBtn.innerText = 'СОХРАНИТЬ В SSL CRM';
+                saveBtn.style.background = 'var(--neon-purple)';
+                saveBtn.onclick = saveSession;
+            }
+        }
+
         total.innerText = window.currentCart.total + ' ₽';
         container.innerHTML = window.currentCart.items.length === 0 ? 'Пусто...' : '';
         window.currentCart.items.forEach((item, i) => {
@@ -826,10 +854,7 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        // СОРТИРОВКА: Самые новые по timestamp идут первыми (вверху)
-        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
-            return b.timestamp - a.timestamp;
-        });
+        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
         filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total || 0;
@@ -859,7 +884,6 @@
                 if(row.details) row.details.forEach(d => {
                     mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur">${d.price} ₽</span></div>`;
                 });
-
                 tr.ondblclick = (e) => toggleMobileDetails(e, index);
                 tr.innerHTML = `
                     <td style="position:relative; padding-top: 20px;">
@@ -884,7 +908,6 @@
                         </div>
                     </td>`;
             } else {
-                // УБРАН privacy-blur с ячейки клиента и прогресс-бара
                 tr.innerHTML = `
                     <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
@@ -919,28 +942,73 @@
         el.innerText = sum.toLocaleString() + ' ₽';
     }
 
-    function updateCerts() {
+    // ЛОГИКА СЕРТИФИКАТОВ (FIREBASE)
+    async function updateCerts() {
         const list = document.getElementById('certsList');
-        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
         if(!list) return;
-        list.innerHTML = '';
-        for (let i = 1; i <= 300; i++) {
-            const id = 'SSL-' + String(i).padStart(3, '0');
-            const d = saved[id] || { active: false, name: '' };
-            const div = document.createElement('div');
-            div.className = 'cert-row';
-            div.innerHTML = `<span class="cert-id">${id}</span>${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}`;
-            list.appendChild(div);
-        }
+        
+        try {
+            const snapshot = await db.collection("certs").get();
+            const certsData = {};
+            snapshot.forEach(doc => certsData[doc.id] = doc.data());
+
+            list.innerHTML = '';
+            for (let i = 1; i <= 300; i++) {
+                const id = 'SSL-' + String(i).padStart(3, '0');
+                const d = certsData[id] || { active: false, name: '', items: [] };
+                const div = document.createElement('div');
+                div.className = 'cert-row';
+                
+                // Тултип для услуг внутри сертификата
+                let itemsTooltip = "";
+                if(d.items && d.items.length > 0) {
+                    itemsTooltip = `<div class="history-tooltip pos-up" style="min-width:150px; left:50%; transform:translateX(-50%);">
+                        <div style="color:var(--neon-gold); font-size:9px; margin-bottom:5px;">СОСТАВ СЕРТИФИКАТА:</div>
+                        ${d.items.map(it => `<div style="font-size:10px; margin-bottom:2px; border-left:2px solid ${colorMap[it.colorClass]}; padding-left:5px;">${it.name}</div>`).join('')}
+                    </div>`;
+                }
+
+                div.innerHTML = `
+                    <span class="cert-id" onclick="startCertBinding('${id}')" style="cursor:pointer; position:relative;">${id}${itemsTooltip}</span>
+                    ${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
+                    ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
+                `;
+                list.appendChild(div);
+            }
+        } catch (e) { console.error("Ошибка сертификатов:", e); }
     }
 
-    function activateCert(id) {
+    // Режим добавления услуг в сертификат
+    function startCertBinding(id) {
+        activeCertTarget = id;
+        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        document.getElementById('certsDropdown').classList.remove('active');
+        renderCart();
+        alert(`Режим настройки ${id} включен. Выбирайте услуги в прайсе.`);
+    }
+
+    async function saveCertContent() {
+        if (!activeCertTarget) return;
+        try {
+            await db.collection("certs").doc(activeCertTarget).set({
+                items: JSON.parse(JSON.stringify(window.currentCart.details))
+            }, { merge: true });
+            
+            alert(`Услуги для ${activeCertTarget} сохранены!`);
+            activeCertTarget = null;
+            window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+            renderCart();
+            updateCerts();
+        } catch (e) { alert("Ошибка сохранения состава"); }
+    }
+
+    async function activateCert(id) {
         const n = document.getElementById('in-' + id).value;
         if (!n) return alert('Имя!');
-        const s = JSON.parse(localStorage.getItem('spring_certs')) || {};
-        s[id] = { active: true, name: n };
-        localStorage.setItem('spring_certs', JSON.stringify(s));
-        updateCerts();
+        try {
+            await db.collection("certs").doc(id).set({ active: true, name: n, date: new Date().toLocaleDateString('ru-RU') }, { merge: true });
+            updateCerts();
+        } catch (e) { alert("Ошибка активации"); }
     }
 
     function updateNextSession(clickedDate = null) {
@@ -1000,7 +1068,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
 
-// Слушаем изменения: новые сверху за счет orderBy по timestamp desc
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
     snapshot.forEach((doc) => {
