@@ -507,31 +507,37 @@
             }
         }
 
-        /* --- НОВЫЙ БЛОК ЦВЕТОВ КАЛЕНДАРЯ --- */
-        
-        /* Прошлые записи и Сегодня (Зеленый) */
-        .day.has-data.past-session { 
-            background: rgba(0, 143, 57, 0.8) !important; 
-            border: 1px solid #00ff66 !important; 
+        /* ГАРАНТИРОВАННЫЕ ЦВЕТА КАЛЕНДАРЯ */
+        /* Прошлое и Сегодня — Зеленый */
+        .day.has-data.past-session, 
+        .day.past-session { 
+            background: #008f39 !important; 
+            color: #fff !important; 
+            border: 1px solid #00ff66 !important;
+            opacity: 1 !important;
         }
         
-        /* Будущие записи (Красный + Белые цифры) */
-        .day.has-data.future-session { 
-            background: rgba(204, 0, 0, 0.8) !important; 
-            border: 1px solid #ff0000 !important; 
+        /* Будущее — Красный */
+        .day.has-data.future-session, 
+        .day.future-session { 
+            background: #cc0000 !important; 
+            color: #fff !important; 
+            border: 1px solid #ff4d4d !important;
+            opacity: 1 !important;
         }
 
-        /* Общие правила для ячеек с записями */
-        .day.has-data { 
-            color: #fff !important; /* Всегда белые цифры, если есть запись */
-            font-weight: 700 !important;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        /* Общие свойства для всех дней с записями */
+        .day.has-data {
+            font-weight: 800 !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Выбранный день (белая рамка) */
-        .day.selected {
-            outline: 2px solid #fff !important;
-            outline-offset: -3px;
+        /* Убираем прозрачность, если она была */
+        .day { opacity: 1 !important; }
+       
         }
         
     </style>
@@ -763,48 +769,43 @@
         const grid = document.getElementById('calendarDays');
         if (!grid) return;
         grid.innerHTML = '';
-        const monthName = document.getElementById('calMonthName');
         
         const y = currentCalDate.getFullYear();
         const m = currentCalDate.getMonth();
-        const firstDay = new Date(y, m, 1).getDay();
-        const lastDate = new Date(y, m + 1, 0).getDate();
         
         const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", 
                             "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
-        if (monthName) monthName.innerText = `${monthNames[m]} ${y}`;
+        document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
 
+        const firstDay = new Date(y, m, 1).getDay();
+        const lastDate = new Date(y, m + 1, 0).getDate();
         const shift = firstDay === 0 ? 6 : firstDay - 1;
-        for (let i = 0; i < shift; i++) {
-            grid.innerHTML += '<div></div>';
-        }
 
-        // Берем текущую дату и обнуляем время для честного сравнения
+        for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
         for (let d = 1; d <= lastDate; d++) {
             const dateStr = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-            const hasData = window.crmData.some(s => s.date === dateStr);
+            
+            // Проверяем наличие данных в crmData
+            const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
             
             let classList = 'day';
             if (hasData) {
                 classList += ' has-data';
-                
-                // Создаем дату текущей ячейки календаря
                 const cellDate = new Date(y, m, d);
                 cellDate.setHours(0, 0, 0, 0);
 
-                // ЛОГИКА ЦВЕТА:
                 if (cellDate > today) {
-                    classList += ' future-session'; // Будущее -> Красный
+                    classList += ' future-session'; // Красный
                 } else {
-                    classList += ' past-session';   // Прошлое и Сегодня -> Зеленый
+                    classList += ' past-session';   // Зеленый
                 }
             }
             
             if (selectedDate === dateStr) classList += ' selected';
-
             grid.innerHTML += `<div class="${classList}" onclick="selectDate('${dateStr}')">${d}</div>`;
         }
     }
