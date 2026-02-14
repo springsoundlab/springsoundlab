@@ -1095,26 +1095,47 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
 
 // ЗАМЕНИ СВОЮ ФУНКЦИЮ saveSession НА ЭТУ (Облачную):
 window.saveSession = function() {
-    const name = document.getElementById('bookingClient').value || 'Без имени';
-    const time = document.getElementById('bookingTime').value;
+    // 1. Проверяем поля ввода
+    const clientInput = document.getElementById('bookingClient');
+    const timeInput = document.getElementById('bookingTime');
+    
+    const name = (clientInput ? clientInput.value : '') || 'Без имени';
+    const time = (timeInput ? timeInput.value : '') || '';
     const date = window.selectedDate || new Date().toLocaleDateString('ru-RU');
 
-    if (!window.currentCart || window.currentCart.items.length === 0) return alert('Добавьте услуги!');
+    // 2. ГИБКАЯ ПРОВЕРКА КОРЗИНЫ (пробуем все варианты имен)
+    const cart = window.currentCart || currentCart;
 
+    if (!cart || !cart.items || cart.items.length === 0) {
+        alert('Сначала добавьте услуги в чек!');
+        return;
+    }
+
+    // 3. ОТПРАВКА В FIREBASE
     crmCollection.add({
         date: date,
         client: name,
         time: time,
-        services: window.currentCart.items.map(i => i.name).join(', '),
-        total: window.currentCart.total,
-        fullTotal: window.currentCart.fullPriceTotal || window.currentCart.total,
+        services: cart.items.map(i => i.name).join(', '),
+        total: cart.total,
+        fullTotal: cart.fullPriceTotal || cart.total,
         timestamp: Date.now()
     }).then(() => {
-        // Очистка полей (твоя логика)
-        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        document.getElementById('bookingClient').value = '';
-        document.getElementById('bookingTime').value = '';
+        // 4. ОЧИСТКА (обнуляем оба варианта переменной для надежности)
+        const emptyCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        if (window.currentCart) window.currentCart = emptyCart;
+        if (typeof currentCart !== 'undefined') currentCart = emptyCart;
+
+        // Очищаем поля на экране
+        if (clientInput) clientInput.value = '';
+        if (timeInput) timeInput.value = '';
+        
+        // Обновляем визуальную корзину
         if (typeof renderCart === "function") renderCart();
+        
+        console.log("Успешно сохранено в облако Spring Sound Lab");
+    }).catch((error) => {
+        alert("Ошибка сохранения: " + error.message);
     });
 };
 
