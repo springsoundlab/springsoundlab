@@ -653,28 +653,58 @@
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
-    // СТИЛИ: Растягиваем плашку 50% по ширине, но оставляем узкой
+    // НОВЫЕ СТИЛИ: Плашка-тумблер для телефона
     const style = document.createElement('style');
     style.innerHTML = `
         @media (max-width: 992px) {
             .prepaid-wrapper {
                 width: 100% !important;
                 max-width: none !important;
-                margin: 8px 0 !important;
-                padding: 6px 12px !important;
+                margin: 10px 0 !important;
+                padding: 0 !important; /* Убираем падинги, чтобы инпут был во всю площадь */
+                height: 45px !important;
+                position: relative !important;
+                border: 1px solid #222 !important;
+                border-radius: 6px !important;
+                background: #0a0a0a !important;
                 display: flex !important;
-                justify-content: space-between !important;
                 align-items: center !important;
-                background: rgba(255, 255, 255, 0.02) !important;
-                border: 1px solid #1a1a1a !important;
-                border-radius: 4px !important;
-                box-sizing: border-box !important;
-                height: 40px !important; /* Узкая высота */
+                justify-content: center !important;
+                transition: all 0.3s ease !important;
+                overflow: hidden !important;
+                cursor: pointer !important;
             }
+            /* Скрываем стандартный кружок на мобилке */
+            .prepaid-wrapper .switch {
+                position: absolute !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                opacity: 0 !important; /* Делаем невидимым, но кликабельным */
+                z-index: 2 !important;
+            }
+            .prepaid-wrapper .slider { display: none !important; }
+            
+            /* Текст внутри плашки */
             .prepaid-wrapper span {
-                font-size: 11px !important;
-                letter-spacing: 1px !important;
-                color: #888 !important;
+                font-family: 'Orbitron', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                letter-spacing: 2px !important;
+                color: #444 !important;
+                transition: color 0.3s ease !important;
+                z-index: 1 !important;
+                text-transform: uppercase !important;
+            }
+
+            /* Состояние, когда чекбокс нажат (через родительский селектор в JS мы добавим класс) */
+            .prepaid-wrapper.active-mode {
+                background: var(--neon-purple) !important;
+                border-color: var(--neon-purple) !important;
+                box-shadow: 0 0 15px rgba(191, 0, 255, 0.3) !important;
+            }
+            .prepaid-wrapper.active-mode span {
+                color: #fff !important;
             }
         }
     `;
@@ -793,7 +823,17 @@
     }
 
     function applyPrepaidToggle() {
-        const isPrepaid = document.getElementById('prepaidMode').checked;
+        const checkbox = document.getElementById('prepaidMode');
+        const wrapper = checkbox.closest('.prepaid-wrapper');
+        const isPrepaid = checkbox.checked;
+
+        // Визуальный эффект для всей плашки на мобилке
+        if (isPrepaid) {
+            wrapper.classList.add('active-mode');
+        } else {
+            wrapper.classList.remove('active-mode');
+        }
+
         window.currentCart.total = 0;
         window.currentCart.details.forEach(item => {
             const isForceFull = item.name.includes('ЧАС ЗАПИСИ');
@@ -1063,6 +1103,12 @@ window.saveSession = async function(event) {
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
         if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
+        
+        // Сброс визуального состояния плашки на мобилке
+        const wrapper = document.getElementById('prepaidMode').closest('.prepaid-wrapper');
+        if (wrapper) wrapper.classList.remove('active-mode');
+        document.getElementById('prepaidMode').checked = false;
+
         renderCart();
     } catch (error) {
         console.error("Ошибка сохранения:", error);
