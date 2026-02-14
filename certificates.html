@@ -531,6 +531,45 @@
 
         /* Убираем прозрачность, если она была */
         .day { opacity: 1 !important; }
+
+        /* Стили для интерактивности календаря */
+.cal-grid .day {
+    transition: all 0.2s ease;
+    border: 1px solid transparent; /* Резерв под обводку, чтобы ячейки не прыгали */
+    position: relative;
+}
+
+/* Тонкая зеленая обводка при наведении курсора */
+.cal-grid .day:hover {
+    border: 1px solid #00ff66 !important;
+    cursor: pointer;
+}
+
+/* Выделенная дата: серый фон внутри и зеленая окантовка */
+.cal-grid .day.selected {
+    background: #333 !important; 
+    border: 1px solid #00ff66 !important;
+    color: #fff !important;
+}
+
+/* Прошлые записи: желтый цвет для текста и индикатора */
+.cal-grid .day.past-session {
+    color: #ffcc00 !important;
+    font-weight: bold;
+}
+
+.cal-grid .day.past-session::after {
+    background: #ffcc00 !important; /* Желтая точка-индикатор */
+}
+
+/* Будущие и сегодняшние записи: остаются фиолетовыми */
+.cal-grid .day.future-session {
+    color: #bf00ff !important;
+}
+
+.cal-grid .day.future-session::after {
+    background: #bf00ff !important;
+}
         
     </style>
 </head>
@@ -757,50 +796,53 @@
     }
 
     function renderCalendar() {
-        const grid = document.getElementById('calendarDays');
-        if (!grid) return;
-        grid.innerHTML = '';
+    const grid = document.getElementById('calendarDays');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    const y = currentCalDate.getFullYear();
+    const m = currentCalDate.getMonth();
+    
+    const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", 
+                        "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+    document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
+
+    const firstDay = new Date(y, m, 1).getDay();
+    const lastDate = new Date(y, m + 1, 0).getDate();
+    const shift = firstDay === 0 ? 6 : firstDay - 1;
+
+    for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let d = 1; d <= lastDate; d++) {
+        const dayStr = String(d).padStart(2, '0');
+        const monthStr = String(m + 1).padStart(2, '0');
+        const dateStr = `${dayStr}.${monthStr}.${y}`;
         
-        const y = currentCalDate.getFullYear();
-        const m = currentCalDate.getMonth();
+        const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
         
-        const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", 
-                            "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
-        document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
+        let classList = 'day';
+        if (hasData) {
+            classList += ' has-data';
+            // Разбиваем строку даты обратно в объект для сравнения
+            const [cellD, cellM, cellY] = dateStr.split('.').map(Number);
+            const cellDate = new Date(cellY, cellM - 1, cellD);
+            cellDate.setHours(0, 0, 0, 0);
 
-        const firstDay = new Date(y, m, 1).getDay();
-        const lastDate = new Date(y, m + 1, 0).getDate();
-        const shift = firstDay === 0 ? 6 : firstDay - 1;
-
-        for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        for (let d = 1; d <= lastDate; d++) {
-            const dayStr = String(d).padStart(2, '0');
-            const monthStr = String(m + 1).padStart(2, '0');
-            const dateStr = `${dayStr}.${monthStr}.${y}`;
-            
-            const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
-            
-            let classList = 'day';
-            if (hasData) {
-                classList += ' has-data';
-                const cellDate = new Date(y, m, d);
-                cellDate.setHours(0, 0, 0, 0);
-
-                if (cellDate > today) {
-                    classList += ' future-session'; 
-                } else {
-                    classList += ' past-session';   
-                }
+            // Если дата меньше сегодняшней — помечаем как прошлое
+            if (cellDate < today) {
+                classList += ' past-session';   
+            } else {
+                classList += ' future-session'; 
             }
-            
-            if (selectedDate === dateStr) classList += ' selected';
-            grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
+        
+        if (selectedDate === dateStr) classList += ' selected';
+        grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
     }
+}
 
     function selectCalendarDate(date) {
         selectedDate = date;
