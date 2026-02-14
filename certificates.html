@@ -594,8 +594,17 @@
         </div>
 
         <div class="table-scroll-container">
-            <table>
-                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right; padding-right:12px;">ВНЕСЕНО</th><th style="text-align:right">ДЕЙСТВИЯ</th></tr></thead>
+            <table class="crm-table">
+                <thead>
+                    <tr>
+                        <th class="col-date">ДАТА</th>
+                        <th class="col-client">КЛИЕНТ</th>
+                        <th class="col-progress">СТАТУС</th>
+                        <th class="col-services">УСЛУГИ</th>
+                        <th class="col-price" style="text-align: right;">ВНЕСЕНО</th>
+                        <th class="col-actions" style="text-align: right;">ДЕЙСТВИЯ</th>
+                    </tr>
+                </thead>
                 <tbody id="crmTableBody"></tbody>
             </table>
         </div>
@@ -642,7 +651,7 @@
     </div>
 </div>
 
-</div> <div id="cert-global-tooltip" class="cert-tooltip-base"></div>
+<div id="cert-global-tooltip" class="cert-tooltip-base"></div>
 
     <style>
         .cert-tooltip-base {
@@ -650,7 +659,7 @@
             display: none;
             z-index: 99999999;
             background: rgba(0,0,0,0.98);
-            border: 1px solid var(--neon-gold);
+            border: 1px solid var(--platinum-gold);
             box-shadow: 0 0 25px rgba(0,0,0,0.9);
             padding: 15px;
             border-radius: 5px;
@@ -659,9 +668,9 @@
             pointer-events: none;
         }
 
-        /* Цвета календаря */
-        .day.has-data.past-session { background: rgba(0, 143, 57, 0.6) !important; border: 1px solid #00ff66; }
-        .day.has-data.future-session { background: rgba(0, 204, 255, 0.6) !important; border: 1px solid #00ccff; }
+        /* Цвета календаря: Прошлое/Сегодня - Зеленый, Будущее - Красный */
+        .day.has-data.past-session { background: rgba(0, 143, 57, 0.8) !important; border: 1px solid #00ff66; }
+        .day.has-data.future-session { background: rgba(204, 0, 0, 0.8) !important; border: 1px solid #ff0000; }
 
         @media (max-width: 992px) {
             .cert-tooltip-base.mobile-active {
@@ -693,7 +702,6 @@
                 cursor: pointer;
                 z-index: 100;
             }
-
             .mobile-row-date {
                 font-size: 22px !important;
                 color: #fff !important;
@@ -702,7 +710,6 @@
                 display: block !important;
                 font-family: 'Orbitron', sans-serif;
             }
-
             .mobile-clickable-row:active {
                 background: rgba(255,255,255,0.05);
             }
@@ -720,38 +727,38 @@
         .cert-row.is-active:hover { background: transparent !important; }
         .cert-row span, .cert-row div { cursor: inherit !important; }
 
-        /* ПРАВКИ ДЛЯ КОМПЬЮТЕРА (ОТЧЕТ ЗА МЕСЯЦ) */
+        /* ПРАВКИ ВЫРАВНИВАНИЯ ДЛЯ КОМПЬЮТЕРА (СТРОГО ДЛЯ ДЕЙСТВИЙ И ЦЕНЫ) */
         @media (min-width: 993px) {
             .crm-table {
                 width: 100%;
                 border-collapse: collapse;
-                table-layout: auto; /* Позволяем таблице тянуться */
+                table-layout: fixed;
             }
             
-            .col-date { width: 90px; }
-            .col-client { width: 150px; }
-            .col-progress { width: 220px; }
-            .col-services { width: auto; } /* Услуги забирают всё свободное место */
-            .col-price { width: 110px; white-space: nowrap; }
-            .col-actions { width: 130px; padding-right: 30px !important; } /* Отступ от скролла */
+            .col-date { width: 85px; }
+            .col-client { width: 130px; }
+            .col-progress { width: 160px; }
+            .col-services { width: auto; }
+            .col-price { width: 110px; text-align: right; }
+            .col-actions { width: 140px; text-align: right; }
 
-            .services-cell {
-                white-space: nowrap !important;
-                overflow: visible !important;
-                padding-left: 5px !important; /* Придвигаем к шкале */
-                color: #fff;
+            .price-cell {
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 16px;
+                color: var(--status-green);
+                text-align: right !important;
+                padding-right: 25px !important; /* Отступ от иконок действий */
             }
 
-            .progress-container-long {
-                width: 200px !important; 
-                height: 8px !important;
-                background: rgba(255,255,255,0.05);
-                border-radius: 4px;
-                overflow: hidden;
+            .action-icons-wrap {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                justify-content: flex-end !important; /* Прижать вправо */
+                padding-right: 5px;
             }
-            
+
             .crm-table th {
-                text-align: left;
                 padding: 12px 10px;
                 font-family: 'Orbitron', sans-serif;
                 font-size: 10px;
@@ -759,10 +766,9 @@
                 text-transform: uppercase;
             }
             
-            .price-cell {
-                font-family: 'Rajdhani', sans-serif;
-                font-size: 16px;
-                color: var(--status-green);
+            /* Чтобы заголовки колонок тоже были справа */
+            .col-price, .col-actions {
+                text-align: right !important;
             }
         }
     </style>
