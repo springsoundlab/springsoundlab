@@ -645,7 +645,6 @@
 </div> <div id="cert-global-tooltip" class="cert-tooltip-base"></div>
 
     <style>
-        /* Базовые стили тултипа */
         .cert-tooltip-base {
             position: fixed;
             display: none;
@@ -657,34 +656,57 @@
             border-radius: 5px;
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
-            pointer-events: none; /* По умолчанию пропускает клики (для десктопа) */
+            pointer-events: none;
         }
 
-        /* Специфические стили для ТЕЛЕФОНА */
+        /* УВЕЛИЧЕННЫЙ ТЕКСТ ДЛЯ ТЕЛЕФОНА */
         @media (max-width: 992px) {
             .cert-tooltip-base.mobile-active {
                 display: block !important;
-                pointer-events: auto; /* На телефоне можно нажимать на крестик */
-                width: 90%; /* Ширина почти как у контейнера сертификатов */
-                max-width: 320px;
+                pointer-events: auto;
+                width: 90%;
+                max-width: 340px;
                 left: 50% !important;
                 top: 20% !important;
                 transform: translateX(-50%);
-                height: 220px; /* Высота примерно на 5 сертификатов */
+                height: auto;
+                min-height: 200px;
+                max-height: 350px;
                 overflow-y: auto;
+                padding: 20px;
             }
+            .cert-tooltip-base.mobile-active .tooltip-title { font-size: 14px; margin-bottom: 15px !important; }
+            .cert-tooltip-base.mobile-active .tooltip-item { font-size: 18px !important; margin-bottom: 8px !important; }
+            .cert-tooltip-base.mobile-active .tooltip-total { font-size: 20px !important; margin-top: 15px !important; }
+            
             .cert-close-btn {
                 display: block !important;
                 position: absolute;
-                top: 8px;
-                right: 12px;
+                top: 10px;
+                right: 15px;
                 color: var(--artist-red);
-                font-size: 22px;
+                font-size: 28px;
                 font-weight: bold;
                 cursor: pointer;
+                z-index: 10;
             }
         }
         .cert-close-btn { display: none; }
+
+        /* ПОДСВЕТКА СЕРТИФИКАТОВ */
+        .cert-row {
+            cursor: pointer !important; /* Везде палец */
+            user-select: none !important;
+            transition: background 0.2s ease;
+        }
+        /* Только для неактивных - легкий фиолетовый */
+        .cert-row.not-active:hover {
+            background: rgba(191, 0, 255, 0.1) !important;
+        }
+        /* Для активных - подсветку выключаем */
+        .cert-row.is-active:hover {
+            background: transparent !important;
+        }
     </style>
 
 <script>
@@ -695,7 +717,6 @@
     let selectedDate = null;
     let hoverTimer;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
-    
     let activeCertTarget = null; 
 
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
@@ -908,9 +929,6 @@
         const body = document.getElementById('crmTableBody');
         if(!body || !window.crmData) return;
         body.innerHTML = '';
-        const now = new Date();
-        const currentTime = now.getHours() * 60 + now.getMinutes();
-        const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
@@ -921,82 +939,23 @@
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
             
-            let showTime = true;
-            if (row.time && row.date === todayStr) {
-                const [h, m] = row.time.split(':').map(Number);
-                if (currentTime >= (h * 60 + m)) showTime = false;
-            }
-
-            const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
-            let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
-            if (row.details && Array.isArray(row.details)) {
-                row.details.forEach(d => {
-                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
-                });
-            }
-            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
+            const tooltipHTML = `<div class="history-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>` + 
+                (row.details || []).map(d => `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span>${d.price} ₽</span></div>`).join('') +
+                `<div class="summary-line"><span>ИТОГО</span><span>${full} ₽</span></div></div>`;
 
             const tr = document.createElement('tr');
             if (window.innerWidth <= 992) {
-                let mobileItemsHTML = '';
-                if(row.details) row.details.forEach(d => {
-                    mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur">${d.price} ₽</span></div>`;
-                });
-                tr.ondblclick = (e) => toggleMobileDetails(e, index);
-                tr.innerHTML = `<td style="position:relative; padding-top: 20px;">
-                        <div id="mobileDetails-${index}" class="mobile-details-overlay">
-                            <div class="mobile-details-close" onclick="event.stopPropagation(); this.parentElement.classList.remove('active')">×</div>
-                            <div class="mobile-details-header">Детализация заказа</div>
-                            <div class="mobile-details-list">${mobileItemsHTML}</div>
-                            <div class="mobile-summary-section">
-                                <div class="mobile-summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur">${full} ₽</span></div>
-                                <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div>
-                                <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div>
-                            </div>
-                        </div>
-                        <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
-                        ${(row.time && showTime) ? `<div class="mobile-row-time-top" style="position:absolute; top:12px; right:15px; color:#bf00ff; font-size:20px; font-weight:900; font-family:Orbitron;">${row.time}</div>` : ''}
-                        <div class="mobile-row-client">${row.client}</div>
-                        <div class="mobile-row-services">${row.services}</div>
-                        <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
-                        <div class="mobile-actions-grid">
-                            <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
-                            <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
-                        </div>
-                    </td>`;
+                tr.innerHTML = `<td style="position:relative; padding: 20px;">
+                    <div class="mobile-row-date">${row.date}</div>
+                    <div class="mobile-row-client">${row.client}</div>
+                    <div class="mobile-row-services">${row.services}</div>
+                    <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
+                </td>`;
             } else {
-                tr.innerHTML = `
-                    <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
-                    <td data-label="КЛИЕНТ" class="artist-cell">
-                        <div style="position:relative;">
-                            <span class="artist-name" style="font-weight:600;">${row.client}</span>
-                            ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
-                            <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
-                        </div>
-                    </td>
-                    <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
-                    <td class="price-cell privacy-blur" style="font-family:Orbitron; font-size:11px; text-align:right;">
-                        <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
-                        ${!isComplete ? `<br><small style="color:var(--artist-red); font-size:9px;">-${rest}</small>` : ''}
-                    </td>
-                    <td data-label="ДЕЙСТВИЯ">
-                        <div class="action-icons-wrap">
-                            <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
-                            <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
-                        </div>
-                    </td>`;
+                tr.innerHTML = `<td data-label="ДАТА">${row.date}</td><td data-label="КЛИЕНТ">${row.client}</td><td class="services-cell">${row.services}${tooltipHTML}</td><td class="price-cell">${paid} ₽</td><td><button onclick="deleteRow('${row.id}')">Удалить</button></td>`;
             }
             body.appendChild(tr);
         });
-        updateMonthTotal();
-    }
-
-    function updateMonthTotal() {
-        const el = document.getElementById('monthTotal');
-        if(!el || !window.crmData) return;
-        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        const sum = window.crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + Number(b.total), 0);
-        el.innerText = sum.toLocaleString() + ' ₽';
     }
 
     function showCertTooltip(e, id, items) {
@@ -1005,14 +964,14 @@
         
         let total = items.reduce((s, i) => s + i.price, 0);
         let html = `<div class="cert-close-btn" onclick="hideCertTooltip()">×</div>`;
-        html += `<div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ ${id}:</div>`;
+        html += `<div class="tooltip-title" style="color:#888; font-family:Orbitron; font-size:10px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ ${id}:</div>`;
         items.forEach(it => {
-            html += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[it.colorClass] || '#555'}; padding-left:8px;">
+            html += `<div class="tooltip-item" style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[it.colorClass] || '#555'}; padding-left:8px;">
                         <span style="color:${colorMap[it.colorClass] || '#fff'}">${it.name}</span>
                         <span style="font-weight:700;">${it.price} ₽</span>
                     </div>`;
         });
-        html += `<div style="display:flex; justify-content:space-between; margin-top:10px; padding-top:5px; border-top:1px solid #222; font-family:Orbitron; font-size:11px;">
+        html += `<div class="tooltip-total" style="display:flex; justify-content:space-between; margin-top:10px; padding-top:5px; border-top:1px solid #222; font-family:Orbitron; font-size:12px;">
                     <span>ИТОГО SSL</span><span style="color:var(--neon-gold); font-weight:700;">${total} ₽</span>
                 </div>`;
         
@@ -1047,40 +1006,31 @@
                 const d = certsData[id] || { active: false, name: '', items: [] };
                 const itemsToShow = (activeCertTarget === id) ? window.currentCart.details : (d.items || []);
                 const div = document.createElement('div');
-                div.className = 'cert-row';
                 
-                if(d.active) {
-                    div.style.cursor = 'default';
-                    div.style.userSelect = 'none';
-                    div.style.webkitUserSelect = 'none';
-                }
-
+                // Классы для стилей и курсоров
+                div.className = `cert-row ${d.active ? 'is-active' : 'not-active'}`;
+                
                 div.innerHTML = `
-                    <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''} ${d.active ? 'cursor:default;' : ''}">${id}</span>
-                    ${d.active ? `<span style="font-size:10px; color:#ccc; font-weight:600; cursor:default;">${d.name || ''}</span>` : `<input type="text" id="in-${id}" onmousedown="stopProp(event)" onclick="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none; cursor:text;" placeholder="Имя">`}
-                    ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px; font-weight:900; cursor:default;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
+                    <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}</span>
+                    ${d.active ? `<span class="cert-client-name" style="font-size:10px; color:#ccc; font-weight:600;">${d.name || ''}</span>` : `<input type="text" id="in-${id}" onmousedown="stopProp(event)" onclick="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none; cursor:text;" placeholder="Имя">`}
+                    ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px; font-weight:900;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
                 `;
 
-                // На десктопе - наведение, на мобиле - клик
                 if (window.innerWidth > 992) {
                     div.addEventListener('mousemove', (e) => showCertTooltip(e, id, itemsToShow));
                     div.addEventListener('mouseleave', hideCertTooltip);
                 } else {
                     div.addEventListener('click', (e) => {
-                        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
-                            showCertTooltip(e, id, itemsToShow);
-                        }
+                        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') showCertTooltip(e, id, itemsToShow);
                     });
                 }
 
                 if(!d.active) div.addEventListener('click', (e) => {
-                    if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
-                        if (window.innerWidth > 992) startCertBinding(id);
-                    }
+                    if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && window.innerWidth > 992) startCertBinding(id);
                 });
                 list.appendChild(div);
             }
-        } catch (e) { console.error("Ошибка:", e); }
+        } catch (e) { console.error(e); }
     }
 
     function startCertBinding(id) {
@@ -1091,56 +1041,32 @@
 
     async function saveCertContent() {
         if (!activeCertTarget) return;
-        if (!window.currentCart.details || window.currentCart.details.length === 0) {
-            alert("Сначала добавьте услуги в чек!"); return;
-        }
+        if (!window.currentCart.details.length) return alert("Чек пуст!");
         try {
-            const inputName = document.getElementById('in-' + activeCertTarget)?.value || 'Без имени';
+            const name = document.getElementById('in-' + activeCertTarget)?.value || 'Без имени';
             await db.collection("certs").doc(activeCertTarget).set({
                 active: true,
                 items: JSON.parse(JSON.stringify(window.currentCart.details)),
-                name: inputName,
+                name: name,
                 date: new Date().toLocaleDateString('ru-RU')
             }, { merge: true });
             exitCertMode(); 
-        } catch (e) { alert("Ошибка сохранения"); }
+        } catch (e) { console.error(e); }
     }
 
     async function activateCert(id) {
         const n = document.getElementById('in-' + id).value;
-        if (!n) return alert('Введите имя клиента!');
-        if (activeCertTarget === id) {
-            if (window.currentCart.details.length === 0) return alert('Сначала добавьте услуги в чек!');
-            saveCertContent();
-        } else {
-            alert('Сначала выберите этот номер SSL и добавьте услуги!');
-        }
+        if (!n) return alert('Введите имя!');
+        if (activeCertTarget === id) saveCertContent();
+        else alert('Сначала выберите этот SSL!');
     }
 
     function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
-        const titleEl = document.getElementById('futureTitleLabel');
         if (!container || !window.crmData) return;
-        const now = new Date();
-        const todayStr = now.toLocaleDateString('ru-RU');
-        const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
-        let targetDate = clickedDate || (window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr);
+        const targetDate = clickedDate || new Date().toLocaleDateString('ru-RU');
         const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
-        container.innerHTML = ''; 
-        if (sessions.length > 0) {
-            titleEl.innerText = (targetDate === todayStr) ? "Записи на сегодня" : (targetDate === tomorrowStr ? "Записи на завтра" : `Записи на ${targetDate}`);
-            sessions.forEach(next => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'future-item';
-                itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.client}</div>`;
-                container.appendChild(itemDiv);
-            });
-            document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
-        } else {
-            titleEl.innerText = "Ближайшая запись";
-            container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
-            document.getElementById('nextSessionBox').style.borderColor = '#111';
-        }
+        container.innerHTML = sessions.length ? sessions.map(s => `<div class="future-item"><div class="future-date">${s.time}</div><div>${s.client}</div></div>`).join('') : '<div class="future-item">Нет записей</div>';
     }
 
     function toggleMobileDetails(e, index) {
@@ -1151,24 +1077,13 @@
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            if (activeCertTarget) {
-                saveCertContent();
-            } else if (document.getElementById('bookingClient')?.value) {
-                saveSession();
-            }
+            if (activeCertTarget) saveCertContent();
+            else if (document.getElementById('bookingClient')?.value) saveSession();
         }
     });
 
-    window.addEventListener('resize', () => {
-        updateTable();
-        updateCerts();
-    });
-    window.addEventListener('load', () => {
-        renderCalendar();
-        updateCerts();
-        initTooltipLogic();
-        renderCart(); 
-    });
+    window.addEventListener('resize', () => { updateTable(); updateCerts(); });
+    window.addEventListener('load', () => { renderCalendar(); updateCerts(); initTooltipLogic(); renderCart(); });
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1189,20 +1104,14 @@ const crmCollection = db.collection("sessions");
 
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
-    snapshot.forEach((doc) => {
-        window.crmData.push({ id: doc.id, ...doc.data() });
-    });
-    updateTable();
-    renderCalendar();
-    updateNextSession();
+    snapshot.forEach((doc) => { window.crmData.push({ id: doc.id, ...doc.data() }); });
+    updateTable(); renderCalendar(); updateNextSession();
 });
 
 window.saveSession = async function(event) {
     if (event) event.preventDefault();
     let cart = window.currentCart;
-    if (!cart || !cart.items || cart.items.length === 0) {
-        alert('Чек пуст!'); return;
-    }
+    if (!cart.items.length) return alert('Чек пуст!');
     const name = document.getElementById('bookingClient')?.value || 'Без имени';
     const time = document.getElementById('bookingTime')?.value || '';
     const date = selectedDate || new Date().toLocaleDateString('ru-RU');
@@ -1216,24 +1125,10 @@ window.saveSession = async function(event) {
             timestamp: Date.now()
         });
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
-        if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
+        document.getElementById('bookingClient').value = '';
+        document.getElementById('bookingTime').value = '';
         renderCart();
     } catch (error) { console.error(error); }
-};
-
-window.addPayment = function(id) {
-    const row = window.crmData.find(r => r.id === id);
-    const full = row.fullTotal || row.total;
-    const remaining = full - row.total;
-    if (remaining <= 0) return alert('Оплачено');
-    openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, "pay", function() {
-        const amount = parseInt(document.getElementById('modalInput').value);
-        if (!isNaN(amount) && amount > 0) {
-            crmCollection.doc(id).update({ total: row.total + amount });
-            closeModal();
-        }
-    }, remaining);
 };
 
 window.deleteRow = function(id) {
