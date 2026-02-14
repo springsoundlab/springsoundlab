@@ -1262,37 +1262,44 @@ const firebaseConfig = {
     messagingSenderId: "971140334464",
     appId: "1:971140334464:web:dde090a90bdcd5563cb765"
 };
+
+// Инициализация базы (только один раз!)
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-db.collection("sessions").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-    window.crmData = [];
-    snapshot.forEach((doc) => { window.crmData.push({ id: doc.id, ...doc.data() }); });
-    updateTable(); renderCalendar(); updateNextSession();
-});
-    function initDataSync() {
-        const month = String(currentCalDate.getMonth() + 1).padStart(2, '0');
-        const year = currentCalDate.getFullYear();
-        
-        // Слушаем только записи текущего месяца для скорости
-        db.collection("sessions")
-            .onSnapshot((snapshot) => {
-                window.crmData = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    // Фильтруем на стороне клиента для надежности
-                    if (data.date && data.date.includes(`.${month}.${year}`)) {
-                        window.crmData.push({ id: doc.id, ...data });
-                    }
-                });
-                updateTable();
-                renderCalendar();
-                updateNextSession();
-            });
-    }
+// Умная синхронизация данных
+window.initDataSync = function() {
+    // Определяем текущий месяц и год для фильтрации
+    const month = String(currentCalDate.getMonth() + 1).padStart(2, '0');
+    const year = currentCalDate.getFullYear();
+    const monthKey = `.${month}.${year}`;
 
-    // Запускаем при загрузке
-    initDataSync();
+    console.log("Загрузка данных для: " + monthKey);
+
+    // Слушаем изменения в базе (sessions)
+    db.collection("sessions")
+        .orderBy("timestamp", "desc")
+        .onSnapshot((snapshot) => {
+            window.crmData = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Берем только записи этого месяца
+                if (data.date && data.date.includes(monthKey)) {
+                    window.crmData.push({ id: doc.id, ...data });
+                }
+            });
+            
+            // Обновляем интерфейс
+            updateTable();
+            renderCalendar();
+            updateNextSession();
+        }, (error) => {
+            console.error("Ошибка Firebase:", error);
+        });
+};
+
+// Запуск синхронизации при первой загрузке
+initDataSync();
 </script>
 </body>
 </html>
