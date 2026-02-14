@@ -646,6 +646,7 @@
     // 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
     window.crmData = [];
     window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+    var currentCart = window.currentCart; 
     let currentCalDate = new Date();
     let selectedDate = null;
     let hoverTimer;
@@ -689,7 +690,6 @@
         const titleEl = document.getElementById('modalTitle');
         const inputEl = document.getElementById('modalInput');
         const confirmBtn = document.getElementById('modalConfirmBtn');
-        if(!modal) return;
         titleEl.innerText = title;
         inputEl.value = defaultValue;
         inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
@@ -731,6 +731,7 @@
         if(!grid || !monthName) return;
         grid.innerHTML = '';
         const now = new Date();
+        now.setHours(0,0,0,0); // Сбрасываем время для сравнения только дат
         const year = currentCalDate.getFullYear();
         const month = currentCalDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
@@ -740,15 +741,26 @@
         ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'].forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
         let startingSpace = firstDay === 0 ? 6 : firstDay - 1;
         for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
+        
         for(let d=1; d<=daysInMonth; d++) {
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
+            const [dd, mm, yyyy] = dateStr.split('.').map(Number);
+            const thisDate = new Date(yyyy, mm - 1, dd);
+            
             const hasData = window.crmData.some(row => row.date === dateStr);
             const isToday = now.toLocaleDateString('ru-RU') === dateStr;
+            const isFuture = thisDate > now && hasData; // Будущая запись
+            
             let classes = ['day'];
             if (isToday) classes.push('today');
             if (hasData) classes.push('has-data');
+            if (isFuture) classes.push('future-mark'); // Класс для голубого цвета
             if (selectedDate === dateStr) classes.push('selected-day');
-            grid.innerHTML += `<div class="${classes.join(' ')}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
+            
+            // Вставляем стили inline для будущих записей, если класс вдруг не прописан в CSS
+            let styleAttr = isFuture ? 'style="border-color: #00ccff; color: #00ccff; box-shadow: 0 0 5px rgba(0,204,255,0.4);"' : '';
+            
+            grid.innerHTML += `<div class="${classes.join(' ')}" ${styleAttr} onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
         updateMonthTotal();
     }
@@ -847,7 +859,7 @@
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             if (row.details && Array.isArray(row.details)) {
                 row.details.forEach(d => {
-                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:sans-serif; font-weight:700;">${d.price} ₽</span></div>`;
                 });
             }
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
@@ -856,7 +868,7 @@
             if (window.innerWidth <= 992) {
                 let mobileItemsHTML = '';
                 if(row.details) row.details.forEach(d => {
-                    mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur">${d.price} ₽</span></div>`;
+                    mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur" style="font-family:sans-serif; font-weight:700;">${d.price} ₽</span></div>`;
                 });
 
                 tr.ondblclick = (e) => toggleMobileDetails(e, index);
@@ -867,9 +879,9 @@
                             <div class="mobile-details-header">Детализация заказа</div>
                             <div class="mobile-details-list">${mobileItemsHTML}</div>
                             <div class="mobile-summary-section">
-                                <div class="mobile-summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur">${full} ₽</span></div>
-                                <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div>
-                                <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur" style="font-family:sans-serif; font-weight:700;">${full} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green); font-family:sans-serif; font-weight:700;">${paid} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red); font-family:sans-serif; font-weight:700;">${rest} ₽</span></div>
                             </div>
                         </div>
                         <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
@@ -884,7 +896,7 @@
                     </td>`;
             } else {
                 tr.innerHTML = `
-                    <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
+                    <td data-label="ДАТА"><div style="font-size:12px; color:#ffffff; font-weight:600;">${row.date}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
                         <div style="position:relative;">
                             <span class="artist-name" style="font-weight:600;">${row.client}</span>
@@ -893,9 +905,9 @@
                         </div>
                     </td>
                     <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
-                    <td class="price-cell privacy-blur" style="font-family:Orbitron; font-size:11px; text-align:right;">
+                    <td class="price-cell privacy-blur" style="font-family:'Inter', sans-serif; font-weight:700; font-size:14px; text-align:right; letter-spacing: 0.5px;">
                         <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
-                        ${!isComplete ? `<br><small style="color:var(--artist-red); font-size:9px;">-${rest}</small>` : ''}
+                        ${!isComplete ? `<br><small style="color:var(--artist-red); font-size:10px;">-${rest}</small>` : ''}
                     </td>
                     <td data-label="ДЕЙСТВИЯ">
                         <div class="action-icons-wrap">
@@ -971,16 +983,6 @@
         if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close')) return;
         const overlay = document.getElementById(`mobileDetails-${index}`);
         if (overlay) overlay.classList.toggle('active');
-    }
-
-    function clearFullHistory() {
-        openModal("УДАЛИТЬ ВСЮ ИСТОРИЮ?", "confirm-delete", async function() {
-            const snapshot = await crmCollection.get();
-            const batch = db.batch();
-            snapshot.docs.forEach(doc => batch.delete(doc.ref));
-            await batch.commit();
-            closeModal();
-        });
     }
 
     window.addEventListener('resize', updateTable);
