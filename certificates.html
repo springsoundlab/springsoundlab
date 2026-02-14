@@ -653,25 +653,27 @@
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
-    // УЛЬТРА-СТИЛИ ДЛЯ МОБИЛЬНОЙ СЕТКИ (ПРИНУДИТЕЛЬНЫЕ)
+    // СТИЛИ: ПРИНУДИТЕЛЬНОЕ ПЕРЕОПРЕДЕЛЕНИЕ ДЛЯ МОБИЛОК
     const style = document.createElement('style');
     style.innerHTML = `
         @media (max-width: 992px) {
-            /* Контейнер превращаем в сетку 1х2 */
+            /* Убиваем старый контейнер и создаем сетку */
             .prepaid-wrapper {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
                 gap: 10px !important;
                 width: 100% !important;
-                background: transparent !important;
+                max-width: 100% !important;
+                background: none !important;
                 border: none !important;
                 padding: 0 !important;
                 margin: 15px 0 !important;
                 height: auto !important;
+                box-shadow: none !important;
             }
 
-            /* Левая кнопка (Текст) */
-            .prepaid-wrapper .mobile-text-btn {
+            /* Левая кнопка с текстом */
+            .mobile-prepaid-btn-text {
                 background: #0a0a0a !important;
                 border: 1px solid #222 !important;
                 border-radius: 8px !important;
@@ -679,11 +681,12 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                transition: all 0.3s ease !important;
+                cursor: pointer !important;
+                transition: 0.3s !important;
             }
 
-            /* Правая кнопка (Тумблер) */
-            .prepaid-wrapper .mobile-toggle-btn {
+            /* Правая кнопка с тумблером */
+            .mobile-prepaid-btn-toggle {
                 background: #0a0a0a !important;
                 border: 1px solid #222 !important;
                 border-radius: 8px !important;
@@ -691,80 +694,85 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                transition: all 0.3s ease !important;
+                cursor: pointer !important;
+                transition: 0.3s !important;
             }
 
-            /* Текст внутри */
-            .prepaid-wrapper span {
+            /* Текст 50% */
+            .mobile-prepaid-btn-text span {
                 font-family: 'Orbitron', sans-serif !important;
                 font-size: 10px !important;
                 font-weight: 700 !important;
-                color: #666 !important;
-                margin: 0 !important;
-                text-transform: uppercase !important;
+                color: #555 !important;
                 letter-spacing: 1px !important;
+                text-transform: uppercase !important;
+                pointer-events: none !important;
             }
 
-            /* Увеличиваем тумблер внутри кнопки */
-            .prepaid-wrapper .switch {
-                width: 50px !important;
-                height: 26px !important;
+            /* Тумблер внутри кнопки */
+            .mobile-prepaid-btn-toggle .switch {
+                transform: scale(1.1) !important;
                 margin: 0 !important;
             }
-            .prepaid-wrapper .slider:before {
-                height: 18px !important;
-                width: 18px !important;
-                left: 4px !important;
-                bottom: 4px !important;
-            }
 
-            /* Эффект при включении */
-            .prepaid-wrapper.active-mode .mobile-text-btn,
-            .prepaid-wrapper.active-mode .mobile-toggle-btn {
+            /* Состояния при активации */
+            .prepaid-wrapper.active-mode .mobile-prepaid-btn-text,
+            .prepaid-wrapper.active-mode .mobile-prepaid-btn-toggle {
                 border-color: var(--neon-purple) !important;
                 background: rgba(191, 0, 255, 0.05) !important;
+                box-shadow: 0 0 10px rgba(191, 0, 255, 0.1) !important;
             }
             .prepaid-wrapper.active-mode span {
                 color: var(--neon-purple) !important;
-                text-shadow: 0 0 8px rgba(191, 0, 255, 0.4) !important;
+                text-shadow: 0 0 5px rgba(191, 0, 255, 0.5) !important;
             }
         }
     `;
     document.head.appendChild(style);
 
-    // Функция пересборки структуры для мобилок
-    function rebuildPrepaidForMobile() {
+    // Функция жесткой перестройки блока
+    function forceRebuildPrepaid() {
         if (window.innerWidth > 992) return;
         const wrapper = document.querySelector('.prepaid-wrapper');
-        if (!wrapper || wrapper.querySelector('.mobile-text-btn')) return;
+        if (!wrapper || wrapper.querySelector('.mobile-prepaid-btn-text')) return;
 
-        const originalSpan = wrapper.querySelector('span');
+        const originalCheckbox = document.getElementById('prepaidMode');
         const originalSwitch = wrapper.querySelector('.switch');
-        const checkbox = document.getElementById('prepaidMode');
-
-        // Создаем левую часть
+        
+        // Создаем новые элементы
         const leftBtn = document.createElement('div');
-        leftBtn.className = 'mobile-text-btn';
-        if (originalSpan) leftBtn.appendChild(originalSpan);
+        leftBtn.className = 'mobile-prepaid-btn-text';
+        leftBtn.innerHTML = '<span>ПРЕДОПЛАТА 50%</span>';
 
-        // Создаем правую часть
         const rightBtn = document.createElement('div');
-        rightBtn.className = 'mobile-toggle-btn';
-        if (originalSwitch) rightBtn.appendChild(originalSwitch);
+        rightBtn.className = 'mobile-prepaid-btn-toggle';
+        
+        // Переносим тумблер в правую кнопку
+        if (originalSwitch) {
+            rightBtn.appendChild(originalSwitch);
+        }
 
-        // Очищаем и вставляем новую структуру
+        // Очищаем и заменяем
         wrapper.innerHTML = '';
         wrapper.appendChild(leftBtn);
         wrapper.appendChild(rightBtn);
 
-        // Делаем всю плашку кликабельной
-        wrapper.onclick = (e) => {
-            if (e.target.tagName !== 'INPUT') {
-                checkbox.checked = !checkbox.checked;
+        // Вешаем клик на весь блок
+        const clickHandler = (e) => {
+            if (originalCheckbox) {
+                originalCheckbox.checked = !originalCheckbox.checked;
                 applyPrepaidToggle();
             }
         };
+        leftBtn.onclick = clickHandler;
+        rightBtn.onclick = clickHandler;
     }
+
+    // Следим за изменениями в DOM, чтобы никто не вернул старый вид
+    const observer = new MutationObserver(() => {
+        forceRebuildPrepaid();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
 
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     function formatTimeInput(input) {
@@ -880,7 +888,7 @@
 
     function applyPrepaidToggle() {
         const checkbox = document.getElementById('prepaidMode');
-        const wrapper = checkbox.closest('.prepaid-wrapper');
+        const wrapper = document.querySelector('.prepaid-wrapper');
         const isPrepaid = checkbox.checked;
 
         if (isPrepaid) {
@@ -1097,14 +1105,14 @@
 
     window.addEventListener('resize', () => {
         updateTable();
-        rebuildPrepaidForMobile();
+        forceRebuildPrepaid();
     });
     
     window.addEventListener('load', () => {
         renderCalendar();
         updateCerts();
         initTooltipLogic();
-        rebuildPrepaidForMobile();
+        forceRebuildPrepaid();
     });
 </script>
 
@@ -1164,7 +1172,7 @@ window.saveSession = async function(event) {
         if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
         if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
         
-        const wrapper = document.getElementById('prepaidMode').closest('.prepaid-wrapper');
+        const wrapper = document.querySelector('.prepaid-wrapper');
         if (wrapper) wrapper.classList.remove('active-mode');
         document.getElementById('prepaidMode').checked = false;
 
@@ -1196,6 +1204,7 @@ window.deleteRow = function(id) {
     });
 };
 </script>
+    
     
 </body>
 </html>
