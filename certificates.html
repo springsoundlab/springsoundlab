@@ -720,10 +720,47 @@
         .cert-row.is-active:hover { background: transparent !important; }
         .cert-row span, .cert-row div { cursor: inherit !important; }
 
-        /* Стиль для растягивания услуг в одну строку на ПК */
-        .services-cell {
-            white-space: nowrap !important;
-            overflow: visible !important;
+        /* СПЕЦИАЛЬНЫЕ ПРАВКИ ДЛЯ ПК */
+        @media (min-width: 993px) {
+            .crm-table {
+                table-layout: fixed;
+                width: 100%;
+            }
+            /* Одинаковые и четкие отступы через ширину колонок */
+            .col-date { width: 100px; }
+            .col-client { width: 180px; }
+            .col-progress { width: 230px; } /* Место под длинную шкалу + отступ */
+            .col-services { width: auto; }
+            .col-price { width: 120px; }
+            .col-actions { width: 120px; }
+
+            .services-cell {
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis;
+                padding-right: 20px;
+            }
+
+            /* Длинная шкала (в 3 раза длиннее) */
+            .progress-container-long {
+                width: 210px !important; 
+                height: 8px !important;
+                background: rgba(255,255,255,0.05);
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            
+            .crm-table th {
+                text-align: left;
+                padding: 12px 10px;
+                font-family: 'Orbitron', sans-serif;
+                font-size: 11px;
+                color: #555;
+            }
+            .crm-table td {
+                padding: 15px 10px;
+                vertical-align: middle;
+            }
         }
     </style>
 
@@ -833,24 +870,18 @@
         for(let d=1; d<=daysInMonth; d++) {
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
             const hasData = window.crmData.some(row => row.date === dateStr);
-            
             const cellDate = new Date(year, month, d);
             const isToday = now.getTime() === cellDate.getTime();
-            
             let classes = ['day'];
             if (isToday) classes.push('today');
-            
             if (hasData) {
                 if (cellDate > now || isToday) {
-                    // Сегодня или будущее
-                    if (isToday) classes.push('past-session'); // Сегодня помечаем зеленым как активное
-                    else classes.push('future-session'); // Будущее - голубым
+                    if (isToday) classes.push('past-session'); 
+                    else classes.push('future-session'); 
                 } else {
-                    // Прошлое
                     classes.push('past-session');
                 }
             }
-            
             if (selectedDate === dateStr) classes.push('selected-day');
             grid.innerHTML += `<div class="${classes.join(' ')}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
@@ -965,33 +996,29 @@
 
         if (window.innerWidth > 992 && head) {
             head.innerHTML = `
-                <th>ДАТА</th>
-                <th>КЛИЕНТ</th>
-                <th>ОПЛАТА</th>
-                <th>УСЛУГИ</th>
-                <th style="text-align:right;">СУММА</th>
-                <th>ДЕЙСТВИЯ</th>
+                <th class="col-date">ДАТА</th>
+                <th class="col-client">КЛИЕНТ</th>
+                <th class="col-progress">ПРЕДОПЛАТА</th>
+                <th class="col-services">УСЛУГИ</th>
+                <th class="col-price" style="text-align:right;">ВНЕСЕНО</th>
+                <th class="col-actions" style="text-align:center;">ДЕЙСТВИЯ</th>
             `;
         }
 
         filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total || 0;
             const paid = row.total || 0;
-            const rest = Math.max(0, full - paid);
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
             
             const tooltipHTML = `<div class="history-tooltip"><div style="color:#888; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>` + 
                 (row.details || []).map(d => `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span>${d.price} ₽</span></div>`).join('') +
-                `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
+                `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div></div>`;
 
             const tr = document.createElement('tr');
             if (window.innerWidth <= 992) {
                 tr.className = 'mobile-clickable-row';
-                tr.onclick = (e) => {
-                    if (e.target.closest('.m-action-btn')) return;
-                    showCertTooltip(e, row.client, row.details);
-                };
+                tr.onclick = (e) => { if (!e.target.closest('.m-action-btn')) showCertTooltip(e, row.client, row.details); };
                 tr.innerHTML = `<td style="position:relative; padding: 20px;">
                     <div class="mobile-row-date">${row.date}</div>
                     <div class="mobile-row-client">${row.client}</div>
@@ -1004,17 +1031,17 @@
                 </td>`;
             } else {
                 tr.innerHTML = `
-                    <td data-label="ДАТА">${row.date}</td>
-                    <td data-label="КЛИЕНТ" style="font-size: 15px; font-weight: 600;">${row.client}</td>
-                    <td data-label="ОПЛАТА">
-                        <div class="progress-container" style="width:70px; height:6px;">
+                    <td class="col-date">${row.date}</td>
+                    <td class="col-client" style="font-size: 16px; font-weight: 800; color: #fff;">${row.client}</td>
+                    <td class="col-progress">
+                        <div class="progress-container-long">
                             <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
                         </div>
                     </td>
-                    <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
-                    <td class="price-cell privacy-blur" style="text-align:right;">${paid} ₽</td>
-                    <td>
-                        <div class="action-icons-wrap">
+                    <td class="col-services services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
+                    <td class="col-price price-cell privacy-blur" style="text-align:right; font-weight:700;">${paid} ₽</td>
+                    <td class="col-actions">
+                        <div class="action-icons-wrap" style="justify-content:center;">
                             <div class="icon-btn-box" onclick="addPayment('${row.id}')"><i class="fas fa-wallet"></i></div>
                             <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><i class="fas fa-trash"></i></div>
                         </div>
@@ -1036,7 +1063,6 @@
     function showCertTooltip(e, id, items) {
         const tooltip = document.getElementById('cert-global-tooltip');
         if (!items || items.length === 0) return;
-        
         let total = items.reduce((s, i) => s + i.price, 0);
         let html = `<div class="cert-close-btn" onclick="hideCertTooltip()">×</div>`;
         html += `<div class="tooltip-title" style="color:#888; font-family:Orbitron; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom:15px;">ДЕТАЛИЗАЦИЯ ${id}:</div>`;
@@ -1049,22 +1075,17 @@
         html += `<div class="tooltip-total" style="display:flex; justify-content:space-between; border-top:1px solid #222; font-family:Orbitron;">
                     <span>ИТОГО SSL</span><span style="color:var(--neon-gold); font-weight:700;">${total} ₽</span>
                 </div>`;
-        
         tooltip.innerHTML = html;
-        
-        if (window.innerWidth <= 992) {
-            tooltip.classList.add('mobile-active');
-        } else {
+        if (window.innerWidth <= 992) tooltip.classList.add('mobile-active');
+        else {
             tooltip.style.display = 'block';
-            tooltip.style.left = (e.clientX + 15) + 'px';
-            tooltip.style.top = (e.clientY + 15) + 'px';
+            tooltip.style.left = (e.clientX + 15) + 'px'; tooltip.style.top = (e.clientY + 15) + 'px';
         }
     }
 
     function hideCertTooltip() {
         const tooltip = document.getElementById('cert-global-tooltip');
-        tooltip.style.display = 'none';
-        tooltip.classList.remove('mobile-active');
+        tooltip.style.display = 'none'; tooltip.classList.remove('mobile-active');
     }
 
     async function updateCerts() {
@@ -1075,54 +1096,41 @@
             const certsData = {};
             snapshot.forEach(doc => certsData[doc.id] = doc.data());
             list.innerHTML = '';
-            
             for (let i = 1; i <= 300; i++) {
                 const id = 'SSL-' + String(i).padStart(3, '0');
                 const d = certsData[id] || { active: false, name: '', items: [] };
                 const itemsToShow = (activeCertTarget === id) ? window.currentCart.details : (d.items || []);
                 const div = document.createElement('div');
-                
                 div.className = `cert-row ${d.active ? 'is-active' : 'not-active'}`;
-                
                 div.innerHTML = `
                     <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}</span>
                     ${d.active ? `<span class="cert-client-name" style="font-size:10px; color:#ccc;">${d.name || ''}</span>` : `<input type="text" id="in-${id}" onmousedown="stopProp(event)" onclick="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
                     ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px; font-weight:900;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
                 `;
-
                 if (window.innerWidth > 992) {
                     div.addEventListener('mousemove', (e) => showCertTooltip(e, id, itemsToShow));
                     div.addEventListener('mouseleave', hideCertTooltip);
                 } else {
-                    div.addEventListener('click', (e) => {
-                        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') showCertTooltip(e, id, itemsToShow);
-                    });
+                    div.addEventListener('click', (e) => { if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') showCertTooltip(e, id, itemsToShow); });
                 }
-
-                if(!d.active) div.addEventListener('click', (e) => {
-                    if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') startCertBinding(id);
-                });
+                if(!d.active) div.addEventListener('click', (e) => { if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') startCertBinding(id); });
                 list.appendChild(div);
             }
         } catch (e) { console.error(e); }
     }
 
     function startCertBinding(id) {
-        activeCertTarget = id;
-        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        activeCertTarget = id; window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         renderCart(); updateCerts();
     }
 
     async function saveCertContent() {
-        if (!activeCertTarget) return;
-        if (!window.currentCart.details.length) return alert("Чек пуст!");
+        if (!activeCertTarget || !window.currentCart.details.length) return;
         try {
             const name = document.getElementById('in-' + activeCertTarget)?.value || 'Без имени';
             await db.collection("certs").doc(activeCertTarget).set({
-                active: true,
-                items: JSON.parse(JSON.stringify(window.currentCart.details)),
-                name: name,
-                date: new Date().toLocaleDateString('ru-RU')
+                active: true, items: JSON.parse(JSON.stringify(window.currentCart.details)),
+                name: name, date: new Date().toLocaleDateString('ru-RU')
             }, { merge: true });
             exitCertMode(); 
         } catch (e) { console.error(e); }
@@ -1132,7 +1140,7 @@
         const n = document.getElementById('in-' + id).value;
         if (!n) return alert('Введите имя!');
         if (activeCertTarget === id) saveCertContent();
-        else alert('Сначала выберите этот SSL номер для наполнения!');
+        else alert('Сначала выберите этот SSL номер!');
     }
 
     function updateNextSession(clickedDate = null) {
@@ -1155,13 +1163,11 @@
                 date: date, client: name, time: time,
                 services: cart.items.map(i => i.name).join(', '),
                 details: JSON.parse(JSON.stringify(cart.details)),
-                total: Number(cart.total),
-                fullTotal: Number(cart.fullPriceTotal),
+                total: Number(cart.total), fullTotal: Number(cart.fullPriceTotal),
                 timestamp: Date.now()
             });
             window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-            document.getElementById('bookingClient').value = '';
-            document.getElementById('bookingTime').value = '';
+            document.getElementById('bookingClient').value = ''; document.getElementById('bookingTime').value = '';
             renderCart();
         } catch (error) { console.error(error); }
     };
