@@ -602,47 +602,39 @@
             <style>
                 /* Специфический порядок ТОЛЬКО для компьютерной версии */
                 @media (min-width: 993px) {
-                    .btn-order-1 { order: 1; }
-                    .btn-order-2 { order: 2; }
-                    .btn-order-3 { order: 3; }
-                    .btn-order-4 { order: 4; }
-                    .btn-order-6 { order: 5; }
-                    .btn-order-7 { order: 6; }
-                    .btn-order-8 { order: 7; }
-                    .btn-order-5 { order: 8; }
-
-                    table {
-                        table-layout: fixed;
-                        width: 100%;
-                        border-collapse: separate;
-                        border-spacing: 0 5px;
-                    }
-                    
-                    th, td {
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                    }
-
-                    th:nth-child(1), td:nth-child(1) { width: 110px; } 
-                    th:nth-child(2), td:nth-child(2) { width: 130px; } 
-                    th:nth-child(3), td:nth-child(3) { width: 100px; } 
-                    th:nth-child(4), td:nth-child(4) { width: 260px; } 
-                    th:nth-child(5), td:nth-child(5) { width: 110px; } 
-                    th:nth-child(6), td:nth-child(6) { width: 90px; }  
+                    .btn-order-1 { order: 1; } /* + 1 ЧАС */
+                    .btn-order-2 { order: 2; } /* START EDITION */
+                    .btn-order-3 { order: 3; } /* ARTIST EDITION */
+                    .btn-order-4 { order: 4; } /* ТЮНИНГ ВОКАЛА */
+                    .btn-order-6 { order: 5; } /* + ДОП. ДОРОЖКА */
+                    .btn-order-7 { order: 6; } /* PLATINUM EDITION */
+                    .btn-order-8 { order: 7; } /* + ПЛАТ. ДОРОЖКА */
+                    .btn-order-5 { order: 8; } /* АРАНЖИРОВКА — ТЕПЕРЬ ПОСЛЕДНЯЯ */
                 }
                 
                 @media (max-width: 992px) {
                     .btn-wrapper { order: unset !important; }
                 }
 
-                /* ФИНАНСЫ И БЛЮР (CLICK TO UNLOCK) */
+                /* СТИЛЬ ДЛЯ ФИНАНСОВЫХ БЛОКОВ */
                 #currentViewText, .price-cell, .price-cell small {
                     font-family: 'Rajdhani', sans-serif !important;
                     font-weight: 700 !important;
                     letter-spacing: 1px;
                 }
 
+                /* УВЕЛИЧЕННЫЙ РАЗМЕР ЦИФР В ТАБЛИЦЕ */
+                .price-cell {
+                    font-size: 18px !important;
+                }
+
+                .price-cell small {
+                    font-size: 13px !important;
+                    display: block;
+                    margin-top: 2px;
+                }
+
+                /* ФИНАНСОВАЯ ПРИВАТНОСТЬ (CLICK TO UNLOCK) */
                 .privacy-blur {
                     filter: blur(5px);
                     cursor: pointer;
@@ -651,63 +643,6 @@
                 }
                 .privacy-blur.unlocked {
                     filter: blur(0) !important;
-                }
-
-                .price-cell { font-size: 18px !important; }
-                .price-cell small { font-size: 13px !important; display: block; margin-top: 2px; }
-
-                /* КЛИЕНТ И ДАТА */
-                .artist-name { font-size: 16px !important; color: #fff; }
-                .full-date-cell {
-                    color: #ffffff !important;
-                    font-size: 13px !important;
-                    font-weight: 600;
-                    font-family: 'Orbitron', sans-serif;
-                }
-
-                /* СТАТУС БАР */
-                .progress-cell {
-                    vertical-align: middle;
-                    padding-left: 0 !important;
-                }
-                
-                .progress-cell .progress-container {
-                    margin: 0 0 0 2px !important;
-                    width: 90px;
-                    height: 8px !important; 
-                    background: #1a1a1a;
-                    border-radius: 2px;
-                    overflow: hidden;
-                }
-                
-                .progress-cell .progress-bar {
-                    height: 100% !important;
-                    border-radius: 2px;
-                    background: var(--neon-purple);
-                }
-                .progress-bar.complete {
-                    background: var(--status-green) !important;
-                }
-
-                /* ЦВЕТА КАЛЕНДАРЯ */
-                .cal-grid .day {
-                    transition: all 0.2s ease;
-                    border: 1px solid transparent !important;
-                    position: relative;
-                    color: #ffffff !important; /* Числа всегда белые */
-                }
-                .cal-grid .day.past-session {
-                    background: #36648B !important; /* Благородный темно-синий */
-                    font-weight: bold;
-                }
-                .cal-grid .day.future-session {
-                    background: #cc0000 !important;
-                }
-                .cal-grid .day.today-session {
-                    background: #008f39 !important;
-                }
-                .cal-grid .day.selected {
-                    border: 1px solid #00ff66 !important;
                 }
             </style>
 
@@ -719,14 +654,37 @@
                 </label>
             </div>
             
-            <div class="btn-wrapper btn-order-1"><button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button></div>
-            <div class="btn-wrapper btn-order-2"><button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button></div>
-            <div class="btn-wrapper btn-order-3"><button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button></div>
-            <div class="btn-wrapper btn-order-4"><button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button></div>
-            <div class="btn-wrapper btn-order-5"><button class="action-btn btn-blue" onclick="openPriceModal('АРАНЖИРОВКА', 'blue', 10000)">АРАНЖИРОВКА</button></div>
-            <div class="btn-wrapper btn-order-6"><button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button></div>
-            <div class="btn-wrapper btn-order-7"><button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">PLATINUM EDITION</button></div>
-            <div class="btn-wrapper btn-order-8"><button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button></div>
+            <div class="btn-wrapper btn-order-1">
+                <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
+            </div>
+            
+            <div class="btn-wrapper btn-order-2">
+                <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
+            </div>
+
+            <div class="btn-wrapper btn-order-3">
+                <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
+            </div>
+
+            <div class="btn-wrapper btn-order-4">
+                <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
+            </div>
+            
+            <div class="btn-wrapper btn-order-5">
+                <button class="action-btn btn-blue" onclick="openPriceModal('АРАНЖИРОВКА', 'blue', 10000)">АРАНЖИРОВКА</button>
+            </div>
+
+            <div class="btn-wrapper btn-order-6">
+                <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
+            </div>
+            
+            <div class="btn-wrapper btn-order-7">
+                <button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">PLATINUM EDITION</button>
+            </div>
+
+            <div class="btn-wrapper btn-order-8">
+                <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
+            </div>
         </div>
 
         <div id="currentSession" class="current-session-box">
@@ -746,16 +704,7 @@
 
         <div class="table-scroll-container">
             <table>
-                <thead>
-                    <tr>
-                        <th>ДАТА</th>
-                        <th>КЛИЕНТ</th>
-                        <th>СТАТУС</th>
-                        <th>УСЛУГИ</th>
-                        <th style="text-align:right; padding-right:12px;">ВНЕСЕНО</th>
-                        <th style="text-align:right">ДЕЙСТВИЯ</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right; padding-right:12px;">ВНЕСЕНО</th><th style="text-align:right">ДЕЙСТВИЯ</th></tr></thead>
                 <tbody id="crmTableBody"></tbody>
             </table>
         </div>
@@ -774,6 +723,55 @@
         </div>
 
         <div class="calendar-widget">
+            <style>
+                /* БАЗОВЫЙ СТИЛЬ ДНЯ - СТРОГО БЕЛЫЙ ЦВЕТ ЦИФР */
+                .cal-grid .day {
+                    transition: all 0.2s ease;
+                    border: 1px solid transparent !important;
+                    position: relative;
+                    color: #ffffff !important;
+                }
+                
+                /* Обводка ТОЛЬКО для пустых дат при наведении */
+                .cal-grid .day:not(.has-data):hover {
+                    border: 1px solid #00ff66 !important;
+                    cursor: pointer;
+                }
+
+                /* Выделенная дата */
+                .cal-grid .day.selected {
+                    background: #333 !important; 
+                    border: 1px solid #00ff66 !important;
+                    color: #ffffff !important;
+                }
+
+                /* Прошлые записи: Тёмно-голубой ненасыщенный */
+                .cal-grid .day.past-session {
+                    background: #36648B !important; 
+                    border: 1px solid transparent !important;
+                    font-weight: bold;
+                    color: #ffffff !important;
+                }
+                
+                /* Будущие сессии: Красный фон */
+                .cal-grid .day.future-session {
+                    background: #cc0000 !important;
+                    border: 1px solid transparent !important;
+                    color: #ffffff !important;
+                }
+
+                /* Текущий день: Зеленый фон */
+                .cal-grid .day.today-session {
+                    background: #008f39 !important;
+                    border: 1px solid transparent !important;
+                    color: #ffffff !important;
+                }
+
+                /* Скрываем точки-индикаторы */
+                .cal-grid .day::after {
+                    display: none !important;
+                }
+            </style>
             <div class="cal-header">
                 <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(-1)"></i>
                 <div class="month-name" id="calMonthName">ФЕВРАЛЬ 2026</div>
@@ -785,14 +783,19 @@
         <div class="session-booking-widget">
             <div class="booking-label">Добавление на будущее</div>
             <div class="booking-row">
-                <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)">
-                <input type="text" id="bookingClient" class="booking-field" placeholder="Имя клиента">
+                <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)" onkeydown="if(event.key==='Enter') saveSession()">
+                <input type="text" id="bookingClient" class="booking-field" placeholder="Имя клиента" onkeydown="if(event.key==='Enter') saveSession()">
             </div>
         </div>
 
         <div class="future-sessions-widget" id="nextSessionBox">
             <div class="future-title" id="futureTitleLabel">Ближайшая запись</div>
-            <div id="futureListContainer"></div>
+            <div id="futureListContainer">
+                <div class="future-item">
+                    <div class="future-date" id="nextSessionDate">--</div>
+                    <div class="future-client" id="nextSessionClient">Нет записей</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -800,35 +803,65 @@
 <script>
     window.crmData = [];
     window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+    var currentCart = window.currentCart; 
     let currentCalDate = new Date();
     let selectedDate = null;
+    let hoverTimer;
+    const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
-    
     function formatTimeInput(input) {
         let val = input.value.replace(/\D/g, '');
         if (val.length >= 2) val = val.slice(0, 2) + ':' + val.slice(2, 4);
         input.value = val;
     }
 
-    // CLICK TO UNLOCK ЛОГИКА
+    // ЛОГИКА СНЯТИЯ БЛЮРА ПРИ КЛИКЕ
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('privacy-blur')) {
             e.target.classList.toggle('unlocked');
         }
     });
 
+    function initTooltipLogic() {
+        const tableBody = document.getElementById('crmTableBody');
+        if(!tableBody) return;
+        tableBody.addEventListener('mousemove', (e) => {
+            const cell = e.target.closest('.services-cell');
+            if (!cell || window.innerWidth <= 992) return; 
+            const allTooltips = document.querySelectorAll('.history-tooltip');
+            clearTimeout(hoverTimer);
+            allTooltips.forEach(t => t.classList.remove('active'));
+            if (cell) {
+                const tooltip = cell.querySelector('.history-tooltip');
+                if (tooltip) {
+                    tooltip.style.left = e.clientX + 'px';
+                    tooltip.style.top = e.clientY + 'px';
+                    hoverTimer = setTimeout(() => { tooltip.classList.add('active'); }, hoverDelay);
+                }
+            }
+        });
+        tableBody.addEventListener('mouseleave', () => {
+            clearTimeout(hoverTimer);
+            document.querySelectorAll('.history-tooltip').forEach(t => t.classList.remove('active'));
+        });
+    }
+
     function openModal(title, type, confirmCallback, defaultValue = '') {
         const modal = document.getElementById('customModal');
         const overlay = document.getElementById('modalOverlay');
+        const titleEl = document.getElementById('modalTitle');
+        const inputEl = document.getElementById('modalInput');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
         if(!modal) return;
-        document.getElementById('modalTitle').innerText = title;
-        const input = document.getElementById('modalInput');
-        input.value = defaultValue;
-        input.style.display = (type === 'confirm-delete') ? 'none' : 'block';
-        document.getElementById('modalConfirmBtn').onclick = confirmCallback;
+        titleEl.innerText = title;
+        inputEl.value = defaultValue;
+        inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
+        confirmBtn.className = 'm-btn m-confirm';
+        confirmBtn.onclick = confirmCallback;
         modal.style.display = 'block'; overlay.style.display = 'block';
+        if(type !== 'confirm-delete') inputEl.focus();
     }
 
     function closeModal() {
@@ -842,7 +875,7 @@
             if(!isNaN(p) && p > 0) {
                 addToCart(name, p, color);
                 closeModal();
-            }
+            } else { alert('Введите корректную сумму'); }
         }, defaultPrice);
     }
 
@@ -850,11 +883,14 @@
         const grid = document.getElementById('calendarDays');
         if (!grid) return;
         grid.innerHTML = '';
+        
         const y = currentCalDate.getFullYear();
         const m = currentCalDate.getMonth();
-        const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
-        document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
         
+        const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", 
+                            "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+        document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
+
         const firstDay = new Date(y, m, 1).getDay();
         const lastDate = new Date(y, m + 1, 0).getDate();
         const shift = firstDay === 0 ? 6 : firstDay - 1;
@@ -862,23 +898,25 @@
         for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
 
         const today = new Date();
-        today.setHours(0,0,0,0);
+        today.setHours(0, 0, 0, 0);
         const todayStr = today.toLocaleDateString('ru-RU');
 
         for (let d = 1; d <= lastDate; d++) {
             const dateStr = `${String(d).padStart(2, '0')}.${String(m + 1).padStart(2, '0')}.${y}`;
-            const hasData = window.crmData.some(s => s.date === dateStr);
-            let classList = 'day';
+            const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
             
+            let classList = 'day';
             if (hasData) {
                 classList += ' has-data';
                 const [cellD, cellM, cellY] = dateStr.split('.').map(Number);
                 const cellDate = new Date(cellY, cellM - 1, cellD);
-                cellDate.setHours(0,0,0,0);
+                cellDate.setHours(0, 0, 0, 0);
+
                 if (dateStr === todayStr) classList += ' today-session'; 
                 else if (cellDate < today) classList += ' past-session';   
                 else classList += ' future-session'; 
             }
+            
             if (selectedDate === dateStr) classList += ' selected';
             grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
@@ -886,7 +924,8 @@
 
     function selectCalendarDate(date) {
         selectedDate = date;
-        document.getElementById('sessionDateLabel').innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
         renderCalendar(); 
         updateNextSession(date); 
     }
@@ -894,8 +933,27 @@
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
         selectedDate = null; 
-        renderCalendar(); 
-        updateTable();
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК:`;
+        updateTable(); renderCalendar(); 
+    }
+
+    function applyPrepaidToggle() {
+        const isPrepaid = document.getElementById('prepaidMode').checked;
+        window.currentCart.total = 0;
+        window.currentCart.details.forEach(item => {
+            const isForceFull = item.name.includes('ЧАС ЗАПИСИ');
+            if (isPrepaid && !isForceFull) {
+                item.price = item.basePrice / 2;
+                if (!item.name.includes('(50%)')) item.name += ' (50%)';
+            } else {
+                item.price = item.basePrice;
+                item.name = item.name.replace(' (50%)', '');
+            }
+            window.currentCart.total += item.price;
+        });
+        window.currentCart.items = window.currentCart.details.map(d => ({ name: d.name, colorClass: d.colorClass }));
+        renderCart();
     }
 
     function addToCart(name, price, colorClass, forceFull = false) {
@@ -909,16 +967,6 @@
         renderCart();
     }
 
-    function renderCart() {
-        const container = document.getElementById('cartItems');
-        const total = document.getElementById('cartTotal');
-        total.innerText = window.currentCart.total + ' ₽';
-        container.innerHTML = window.currentCart.items.length === 0 ? 'Пусто...' : '';
-        window.currentCart.items.forEach((item, i) => {
-            container.innerHTML += `<div class="cart-tag tag-${item.colorClass}">${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div></div>`;
-        });
-    }
-
     function removeFromCart(index) {
         const item = window.currentCart.details[index];
         window.currentCart.total -= item.price;
@@ -928,31 +976,60 @@
         renderCart();
     }
 
+    function renderCart() {
+        const container = document.getElementById('cartItems');
+        const total = document.getElementById('cartTotal');
+        if(!container || !total) return;
+        total.innerText = window.currentCart.total + ' ₽';
+        container.innerHTML = window.currentCart.items.length === 0 ? 'Пусто...' : '';
+        window.currentCart.items.forEach((item, i) => {
+            const tag = document.createElement('div');
+            tag.className = `cart-tag tag-${item.colorClass}`;
+            tag.innerHTML = `${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div>`;
+            container.appendChild(tag);
+        });
+    }
+
     function updateTable() {
         const body = document.getElementById('crmTableBody');
-        if(!body) return;
+        if(!body || !window.crmData) return;
         body.innerHTML = '';
+        const now = new Date();
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        const filteredData = window.crmData.filter(r => r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
+        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
-        filteredData.forEach((row) => {
+        filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total || 0;
             const paid = row.total || 0;
             const rest = Math.max(0, full - paid);
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
 
+            const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
+            let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+            if (row.details && Array.isArray(row.details)) {
+                row.details.forEach(d => {
+                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum privacy-blur" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                });
+            }
+            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum privacy-blur">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="full-date-cell">${row.date}</td>
-                <td class="artist-cell"><span class="artist-name">${row.client}</span></td>
-                <td class="progress-cell"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></td>
-                <td class="services-cell">${row.services}</td>
-                <td class="price-cell privacy-blur">
+                <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
+                <td data-label="КЛИЕНТ" class="artist-cell">
+                    <div style="position:relative;">
+                        <span class="artist-name" style="font-weight:600;">${row.client}</span>
+                        ${row.time ? `<span class="table-time-inline">${row.time}</span>` : ''}
+                        <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
+                    </div>
+                </td>
+                <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
+                <td class="price-cell privacy-blur" style="text-align:right;">
                     <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
                     ${!isComplete ? `<small style="color:var(--artist-red); opacity:0.9;">-${rest}</small>` : ''}
                 </td>
-                <td>
+                <td data-label="ДЕЙСТВИЯ">
                     <div class="action-icons-wrap">
                         <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
                         <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
@@ -965,7 +1042,7 @@
     function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
-        if (!container) return;
+        if (!container || !window.crmData) return;
         
         const now = new Date();
         const todayStr = now.toLocaleDateString('ru-RU');
@@ -977,7 +1054,10 @@
         if (sessions.length > 0) {
             titleEl.innerText = `Записи на ${targetDate}`;
             sessions.forEach(s => {
-                container.innerHTML += `<div class="future-item"><div class="future-date">${s.time}</div><div class="future-client">${s.client}</div></div>`;
+                const div = document.createElement('div');
+                div.className = 'future-item';
+                div.innerHTML = `<div class="future-date">${s.time}</div><div class="future-client">${s.client}</div>`;
+                container.appendChild(div);
             });
         } else {
             titleEl.innerText = "Ближайшая запись";
@@ -985,19 +1065,15 @@
         }
     }
 
-    function clearFullHistory() {
-        if(confirm("Удалить ВСЮ историю?")) {
-            crmCollection.get().then(qs => qs.forEach(doc => doc.ref.delete()));
-        }
-    }
-
     window.addEventListener('load', () => {
         renderCalendar();
+        initTooltipLogic();
     });
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
 const firebaseConfig = {
     apiKey: "AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",
@@ -1007,6 +1083,7 @@ const firebaseConfig = {
     messagingSenderId: "971140334464",
     appId: "1:971140334464:web:dde090a90bdcd5563cb765"
 };
+
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
@@ -1021,16 +1098,16 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
 
 window.saveSession = async function() {
     let cart = window.currentCart;
-    if (cart.items.length === 0) return;
+    if (!cart || cart.items.length === 0) return;
     const name = document.getElementById('bookingClient').value || 'Без имени';
     const time = document.getElementById('bookingTime').value || '';
     const date = selectedDate || new Date().toLocaleDateString('ru-RU');
     await crmCollection.add({
         date, client: name, time,
         services: cart.items.map(i => i.name).join(', '),
-        details: cart.details,
-        total: cart.total,
-        fullTotal: cart.fullPriceTotal,
+        details: JSON.parse(JSON.stringify(cart.details)),
+        total: Number(cart.total),
+        fullTotal: Number(cart.fullPriceTotal),
         timestamp: Date.now()
     });
     window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
@@ -1041,19 +1118,21 @@ window.saveSession = async function() {
 
 window.addPayment = function(id) {
     const row = window.crmData.find(r => r.id === id);
-    const remaining = (row.fullTotal || row.total) - row.total;
-    if (remaining <= 0) return;
-    openModal(`ДОПЛАТА: ${row.client}`, "pay", function() {
-        const val = parseInt(document.getElementById('modalInput').value);
-        if (val > 0) {
-            crmCollection.doc(id).update({ total: row.total + val });
+    const full = row.fullTotal || row.total;
+    const remaining = full - row.total;
+    if (remaining <= 0) return alert('Оплачено полностью');
+    
+    openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, "pay", function() {
+        const amount = parseInt(document.getElementById('modalInput').value);
+        if (amount > 0) {
+            crmCollection.doc(id).update({ total: row.total + amount });
             closeModal();
         }
     }, remaining);
 };
 
 window.deleteRow = function(id) {
-    if(confirm("Удалить?")) crmCollection.doc(id).delete();
+    if(confirm("Удалить запись?")) crmCollection.doc(id).delete();
 };
 </script>
 </body>
