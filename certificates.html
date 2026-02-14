@@ -611,7 +611,7 @@
                     .btn-order-8 { order: 7; } /* + ПЛАТ. ДОРОЖКА */
                     .btn-order-5 { order: 8; } /* АРАНЖИРОВКА — ТЕПЕРЬ ПОСЛЕДНЯЯ */
 
-                    /* Настройка сетки таблицы для равномерных зазоров */
+                    /* Настройка сетки таблицы для плотного расположения */
                     table {
                         table-layout: fixed;
                         width: 100%;
@@ -625,16 +625,16 @@
                         white-space: nowrap;
                     }
 
-                    /* Ширина колонок */
-                    th:nth-child(1), td:nth-child(1) { width: 60px; }  /* Дата */
-                    th:nth-child(2), td:nth-child(2) { width: 140px; } /* Клиент */
-                    th:nth-child(3), td:nth-child(3) { width: 100px; } /* Прогресс */
-                    th:nth-child(4), td:nth-child(4) { width: 220px; } /* Услуги */
+                    /* НОВАЯ ШИРИНА КОЛОНОК ДЛЯ ПЛОТНОСТИ */
+                    th:nth-child(1), td:nth-child(1) { width: 110px; } /* Дата (шире для ГГГГ) */
+                    th:nth-child(2), td:nth-child(2) { width: 150px; } /* Клиент (крупнее) */
+                    th:nth-child(3), td:nth-child(3) { width: 90px; }  /* Статус (вплотную) */
+                    th:nth-child(4), td:nth-child(4) { width: 250px; } /* Услуги (вплотную) */
                     th:nth-child(5), td:nth-child(5) { width: 110px; } /* Внесено */
-                    th:nth-child(6), td:nth-child(6) { width: 100px; } /* Действия */
+                    th:nth-child(6), td:nth-child(6) { width: 90px; }  /* Действия */
                 }
                 
-                /* На мобильных устройствах порядок будет стандартным (по коду) */
+                /* На мобильных устройствах порядок будет стандартным */
                 @media (max-width: 992px) {
                     .btn-wrapper { order: unset !important; }
                 }
@@ -657,14 +657,28 @@
                     margin-top: 2px;
                 }
 
-                /* Центрирование прогресс-бара в новой колонке */
+                /* КРУПНОЕ ИМЯ КЛИЕНТА */
+                .artist-name {
+                    font-size: 16px !important;
+                    color: #fff;
+                }
+
+                /* КРУПНАЯ БЕЛАЯ ДАТА */
+                .full-date-cell {
+                    color: #ffffff !important;
+                    font-size: 13px !important;
+                    font-weight: 600;
+                    font-family: 'Orbitron', sans-serif;
+                }
+
+                /* Центрирование прогресс-бара */
                 .progress-cell {
                     vertical-align: middle;
-                    padding-right: 15px;
+                    padding-right: 5px; /* Уменьшен зазор */
                 }
                 .progress-cell .progress-container {
                     margin-top: 0 !important;
-                    width: 100%;
+                    width: 80px; /* Фиксированная длина полоски */
                 }
             </style>
 
@@ -995,9 +1009,7 @@
         if(!body || !window.crmData) return;
         body.innerHTML = '';
         const now = new Date();
-        const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
         filteredData.forEach((row, index) => {
@@ -1044,12 +1056,12 @@
                         </div>
                     </td>`;
             } else {
-                // ПК вид (НОВАЯ СТРУКТУРА)
+                // ПК вид (ПОЛНАЯ ДАТА И ПЛОТНАЯ СТРУКТУРА)
                 tr.innerHTML = `
-                    <td><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
+                    <td class="full-date-cell">${row.date}</td>
                     <td class="artist-cell"><span class="artist-name" style="font-weight:600;">${row.client}</span></td>
                     <td class="progress-cell"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></td>
-                    <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
+                    <td class="services-cell" style="position:relative; padding-left:0;">${row.services}${tooltipHTML}</td>
                     <td class="price-cell privacy-blur" style="text-align:right;">
                         <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
                         ${!isComplete ? `<small style="color:var(--artist-red); opacity:0.9;">-${rest}</small>` : ''}
