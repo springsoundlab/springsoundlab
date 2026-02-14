@@ -642,6 +642,122 @@
     </div>
 </div>
 
+<div class="admin-grid">
+    <div class="crm-panel">
+        <div class="controls-row">
+            <div class="prepaid-toggle">
+                <span>50%</span>
+                <label class="switch">
+                    <input type="checkbox" id="prepaidMode" onchange="applyPrepaidToggle()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="btn-wrapper btn-order-1">
+                <button class="action-btn btn-white" onclick="addToCart('ЧАС ЗАПИСИ', 900, 'white', true)">+ 1 ЧАС</button>
+                <div class="btn-tooltip">900 ₽ (Всегда 100%)</div>
+            </div>
+            
+            <div class="btn-wrapper btn-order-2">
+                <button class="action-btn btn-purple" onclick="addToCart('START EDITION', 3500, 'purple')">START EDITION</button>
+                <div class="btn-tooltip">3500 ₽</div>
+            </div>
+
+            <div class="btn-wrapper btn-order-3">
+                <button class="action-btn btn-red" onclick="addToCart('ARTIST EDITION', 6000, 'red')">ARTIST EDITION</button>
+                <div class="btn-tooltip">6000 ₽</div>
+            </div>
+
+            <div class="btn-wrapper btn-order-4">
+                <button class="action-btn btn-green" onclick="addToCart('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ ВОКАЛА</button>
+                <div class="btn-tooltip">1000 ₽</div>
+            </div>
+            
+            <div class="btn-wrapper btn-order-5">
+                <button class="action-btn btn-blue" onclick="openPriceModal('АРАНЖИРОВКА', 'blue', 10000)">АРАНЖИРОВКА</button>
+                <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
+            </div>
+
+            <div class="btn-wrapper btn-order-6">
+                <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ДОП. ДОРОЖКА', 500, 'green')">+ ДОП. ДОРОЖКА</button>
+                <div class="btn-tooltip">500 ₽</div>
+            </div>
+            
+            <div class="btn-wrapper btn-order-7">
+                <button class="action-btn btn-gold" onclick="openPriceModal('PLATINUM EDITION', 'gold', 10000)">PLATINUM EDITION</button>
+                <div class="btn-tooltip">Цена по умолчанию: 10000 ₽</div>
+            </div>
+
+            <div class="btn-wrapper btn-order-8">
+                <button class="action-btn btn-gold btn-dashed-gold" onclick="addToCart('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ ПЛАТ. ДОРОЖКА</button>
+                <div class="btn-tooltip">300 ₽</div>
+            </div>
+        </div>
+
+        <div id="currentSession" class="current-session-box">
+            <div class="cart-info">
+                <div id="sessionDateLabel" style="font-size: 10px; color: #444; margin-bottom: 12px; font-family:'Orbitron'; letter-spacing: 1px;">ТЕКУЩИЙ ЧЕК:</div>
+                <div id="cartItems">Пусто...</div>
+            </div>
+            <div class="cart-actions">
+                <div class="total-display-pc" id="cartTotal">0 ₽</div>
+                <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
+            </div>
+        </div>
+
+        <div class="filter-info">
+            <span id="currentViewText">ОТЧЕТ ЗА ФЕВРАЛЬ 2026</span>
+        </div>
+
+        <div class="table-scroll-container">
+            <table>
+                <thead><tr><th>ДАТА</th><th>КЛИЕНТ</th><th>УСЛУГИ</th><th style="text-align:right; padding-right:12px;">ВНЕСЕНО</th><th style="text-align:right">ДЕЙСТВИЯ</th></tr></thead>
+                <tbody id="crmTableBody"></tbody>
+            </table>
+        </div>
+        <button onclick="clearFullHistory()" style="margin-top:20px; background:none; border:none; color:#222; font-size:8px; cursor:pointer; text-transform:uppercase; flex-shrink:0;">Удалить всю историю</button>
+    </div>
+
+    <div class="side-panel">
+        <div class="certs-dropdown" id="certsDropdown">
+            <div class="certs-header" onclick="toggleCerts()">
+                <h2>СЕРТИФИКАТЫ</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="certs-content">
+                <div class="certs-container" id="certsList"></div>
+            </div>
+        </div>
+
+        <div class="calendar-widget">
+            <div class="cal-header">
+                <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(-1)"></i>
+                <div class="month-name" id="calMonthName">ФЕВРАЛЬ 2026</div>
+                <i class="fas fa-chevron-right" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(1)"></i>
+            </div>
+            <div class="cal-grid" id="calendarDays"></div>
+        </div>
+
+        <div class="session-booking-widget">
+            <div class="booking-label">Добавление на будущее</div>
+            <div class="booking-row">
+                <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)" onkeydown="if(event.key==='Enter') saveSession()">
+                <input type="text" id="bookingClient" class="booking-field" placeholder="Имя клиента" onkeydown="if(event.key==='Enter') saveSession()">
+            </div>
+        </div>
+
+        <div class="future-sessions-widget" id="nextSessionBox">
+            <div class="future-title" id="futureTitleLabel">Ближайшая запись</div>
+            <div id="futureListContainer">
+                <div class="future-item">
+                    <div class="future-date" id="nextSessionDate">--</div>
+                    <div class="future-client" id="nextSessionClient">Нет записей</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 </div> <div id="cert-global-tooltip" class="cert-tooltip-base"></div>
 
     <style>
@@ -725,20 +841,20 @@
             .crm-table {
                 width: 100%;
                 border-collapse: collapse;
-                table-layout: auto; /* Позволяем таблице тянуться */
+                table-layout: auto; 
             }
             
             .col-date { width: 90px; }
             .col-client { width: 150px; }
             .col-progress { width: 220px; }
-            .col-services { width: auto; } /* Услуги забирают всё свободное место */
+            .col-services { width: auto; } 
             .col-price { width: 110px; white-space: nowrap; }
-            .col-actions { width: 130px; padding-right: 30px !important; } /* Отступ от скролла */
+            .col-actions { width: 130px; padding-right: 30px !important; } 
 
             .services-cell {
                 white-space: nowrap !important;
                 overflow: visible !important;
-                padding-left: 5px !important; /* Придвигаем к шкале */
+                padding-left: 5px !important; 
                 color: #fff;
             }
 
@@ -991,7 +1107,7 @@
 
     function updateTable() {
         const body = document.getElementById('crmTableBody');
-        const head = document.querySelector('.crm-table thead tr');
+        const head = document.querySelector('thead tr');
         if(!body) return;
         body.innerHTML = '';
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
@@ -1170,23 +1286,19 @@
                 timestamp: Date.now()
             });
             window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-            document.getElementById('bookingClient').value = ''; document.getElementById('bookingTime').value = '';
+            document.getElementById('bookingClient').value = '';
+            document.getElementById('bookingTime').value = '';
             renderCart();
-        } catch (error) { console.error(error); }
+        } catch (e) { console.error(e); }
     };
 
     window.addPayment = function(id) {
         const row = window.crmData.find(r => r.id === id);
-        const full = row.fullTotal || row.total;
-        const remaining = full - row.total;
-        if (remaining <= 0) return alert('Оплачено');
-        openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, "pay", function() {
+        openModal(`ДОПЛАТА: ${row.client}`, "pay", function() {
             const amount = parseInt(document.getElementById('modalInput').value);
-            if (!isNaN(amount) && amount > 0) {
-                db.collection("sessions").doc(id).update({ total: row.total + amount });
-                closeModal();
-            }
-        }, remaining);
+            if (amount > 0) db.collection("sessions").doc(id).update({ total: row.total + amount });
+            closeModal();
+        });
     };
 
     window.deleteRow = function(id) {
@@ -1195,7 +1307,16 @@
         });
     };
 
-    window.addEventListener('resize', () => { updateTable(); updateCerts(); });
+    window.clearFullHistory = function() {
+        openModal("УДАЛИТЬ ВСЮ ИСТОРИЮ?", "confirm-delete", async function() {
+            const snapshot = await db.collection("sessions").get();
+            const batch = db.batch();
+            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+            await batch.commit(); closeModal();
+        });
+    };
+
+    window.addEventListener('resize', updateTable);
     window.addEventListener('load', () => { renderCalendar(); updateCerts(); initTooltipLogic(); renderCart(); });
 </script>
 
