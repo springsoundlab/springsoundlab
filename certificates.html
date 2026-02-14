@@ -690,6 +690,11 @@
                 cursor: pointer;
                 z-index: 100;
             }
+
+            /* Подсветка при клике на мобильном для понимания кликабельности */
+            .mobile-clickable-row:active {
+                background: rgba(255,255,255,0.05);
+            }
         }
         .cert-close-btn { display: none; }
 
@@ -943,6 +948,12 @@
 
             const tr = document.createElement('tr');
             if (window.innerWidth <= 992) {
+                tr.className = 'mobile-clickable-row';
+                tr.onclick = (e) => {
+                    // Предотвращаем срабатывание при клике на кнопки
+                    if (e.target.closest('.m-action-btn')) return;
+                    showCertTooltip(e, row.client, row.details);
+                };
                 tr.innerHTML = `<td style="position:relative; padding: 20px;">
                     <div class="mobile-row-date">${row.date}</div>
                     <div class="mobile-row-client">${row.client}</div>
