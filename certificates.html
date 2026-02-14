@@ -642,117 +642,160 @@
     </div>
 </div>
 
-<div id="cert-global-tooltip" class="cert-tooltip-base"></div>
+</div> <div id="cert-global-tooltip" class="cert-tooltip-base"></div>
 
-<style>
-    /* ШРИФТ ДЛЯ ЦИФР */
-    .price-cell, .tooltip-total, .tooltip-item span, #cartTotal, #monthTotal, .future-date, .mobile-row-date {
-        font-family: 'Rajdhani', sans-serif !important;
-        font-weight: 700 !important;
-    }
-
-    .cert-tooltip-base {
-        position: fixed;
-        display: none;
-        z-index: 99999999;
-        background: rgba(0,0,0,0.98);
-        border: 1px solid var(--neon-gold);
-        box-shadow: 0 0 25px rgba(0,0,0,0.9);
-        padding: 15px;
-        border-radius: 5px;
-        color: #fff;
-        pointer-events: none;
-    }
-
-    @media (max-width: 992px) {
-        .cert-tooltip-base.mobile-active {
-            display: block !important;
-            pointer-events: auto;
-            width: 90%;
-            max-width: 340px;
-            left: 50% !important;
-            top: 20% !important;
-            transform: translateX(-50%);
-            padding: 25px;
+    <style>
+        .cert-tooltip-base {
+            position: fixed;
+            display: none;
+            z-index: 99999999;
+            background: rgba(0,0,0,0.98);
+            border: 1px solid var(--neon-gold);
+            box-shadow: 0 0 25px rgba(0,0,0,0.9);
+            padding: 15px;
+            border-radius: 5px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            pointer-events: none;
         }
-        .mobile-row-date {
-            color: #ffffff !important;
-            font-size: 20px !important;
-            margin-bottom: 8px !important;
-            display: block;
+
+        /* УВЕЛИЧЕННЫЙ ТЕКСТ ДЛЯ ТЕЛЕФОНА */
+        @media (max-width: 992px) {
+            .cert-tooltip-base.mobile-active {
+                display: block !important;
+                pointer-events: auto;
+                width: 90%;
+                max-width: 340px;
+                left: 50% !important;
+                top: 20% !important;
+                transform: translateX(-50%);
+                height: auto;
+                min-height: 200px;
+                max-height: 400px;
+                overflow-y: auto;
+                padding: 25px;
+            }
+            .cert-tooltip-base.mobile-active .tooltip-title { font-size: 16px !important; margin-bottom: 20px !important; }
+            .cert-tooltip-base.mobile-active .tooltip-item { font-size: 20px !important; margin-bottom: 12px !important; }
+            .cert-tooltip-base.mobile-active .tooltip-total { font-size: 22px !important; margin-top: 20px !important; padding-top: 10px !important; }
+            
+            .cert-close-btn {
+                display: block !important;
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                color: var(--artist-red);
+                font-size: 32px;
+                font-weight: bold;
+                cursor: pointer;
+                z-index: 100;
+            }
         }
-        .cert-close-btn {
-            display: block !important;
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            color: var(--artist-red);
-            font-size: 32px;
-            cursor: pointer;
+        .cert-close-btn { display: none; }
+
+        /* ПРАВИЛА ДЛЯ СЕРТИФИКАТОВ */
+        .cert-row {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            transition: background 0.2s ease;
         }
-    }
-
-    .pc-progress-mini {
-        width: 100%;
-        height: 3px;
-        background: rgba(255,255,255,0.05);
-        margin-top: 4px;
-        border-radius: 2px;
-        overflow: hidden;
-    }
-    .pc-progress-fill { height: 100%; background: var(--neon-purple); }
-    .pc-progress-fill.complete { background: var(--status-green); }
-
-    .password-overlay {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85);
-        z-index: 1000000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-    }
-    .password-box {
-        background: #111;
-        padding: 30px;
-        border: 2px solid var(--neon-purple);
-        box-shadow: 0 0 20px var(--neon-purple);
-        text-align: center;
-        border-radius: 10px;
-    }
-    .password-box input {
-        background: #000;
-        border: 1px solid var(--neon-purple);
-        color: #fff;
-        padding: 10px;
-        margin: 15px 0;
-        width: 100%;
-        text-align: center;
-        outline: none;
-    }
-    .cert-row { cursor: pointer; transition: 0.2s; }
-</style>
-
-<div id="pwdOverlay" class="password-overlay">
-    <div class="password-box">
-        <h3 style="color:var(--neon-purple); font-family:Orbitron;">ACCESS REQUIRED</h3>
-        <input type="password" id="adminPwd" placeholder="ENTER PASSWORD">
-        <button class="m-btn m-confirm" onclick="verifyPass()">UNLOCK</button>
-        <button class="m-btn m-del" style="margin-top:10px;" onclick="document.getElementById('pwdOverlay').style.display='none'">CANCEL</button>
-    </div>
-</div>
+        /* Неактивные: палец и подсветка */
+        .cert-row.not-active { cursor: pointer !important; }
+        .cert-row.not-active:hover { background: rgba(191, 0, 255, 0.1) !important; }
+        
+        /* Активные: стрелка и НЕТ подсветки */
+        .cert-row.is-active { cursor: default !important; }
+        .cert-row.is-active:hover { background: transparent !important; }
+        
+        /* Текст внутри тоже не должен менять курсор */
+        .cert-row span, .cert-row div { cursor: inherit !important; }
+    </style>
 
 <script>
     window.crmData = [];
     window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-    window.tempCertNames = {}; 
+    var currentCart = window.currentCart; 
     let currentCalDate = new Date();
     let selectedDate = null;
+    let hoverTimer;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
     let activeCertTarget = null; 
 
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     function stopProp(e) { e.stopPropagation(); }
+
+    function formatTimeInput(input) {
+        let val = input.value.replace(/\D/g, '');
+        if (val.length >= 2) val = val.slice(0, 2) + ':' + val.slice(2, 4);
+        input.value = val;
+    }
+
+    function initTooltipLogic() {
+        const tableBody = document.getElementById('crmTableBody');
+        if(!tableBody) return;
+        tableBody.addEventListener('mousemove', (e) => {
+            const cell = e.target.closest('.services-cell');
+            if (!cell || window.innerWidth <= 992) return; 
+            const allTooltips = document.querySelectorAll('.history-tooltip');
+            clearTimeout(hoverTimer);
+            allTooltips.forEach(t => t.classList.remove('active'));
+            if (cell) {
+                const tooltip = cell.querySelector('.history-tooltip');
+                if (tooltip) {
+                    tooltip.style.left = e.clientX + 'px';
+                    tooltip.style.top = e.clientY + 'px';
+                    hoverTimer = setTimeout(() => { tooltip.classList.add('active'); }, 300);
+                }
+            }
+        });
+        tableBody.addEventListener('mouseleave', () => {
+            clearTimeout(hoverTimer);
+            document.querySelectorAll('.history-tooltip').forEach(t => t.classList.remove('active'));
+        });
+    }
+
+    function openModal(title, type, confirmCallback, defaultValue = '') {
+        const modal = document.getElementById('customModal');
+        const overlay = document.getElementById('modalOverlay');
+        const titleEl = document.getElementById('modalTitle');
+        const inputEl = document.getElementById('modalInput');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
+        if(!modal) return;
+        titleEl.innerText = title;
+        inputEl.value = defaultValue;
+        inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
+        confirmBtn.className = 'm-btn m-confirm';
+        confirmBtn.onclick = confirmCallback;
+        modal.style.display = 'block'; overlay.style.display = 'block';
+        if(type !== 'confirm-delete') inputEl.focus();
+    }
+
+    function closeModal() {
+        document.getElementById('customModal').style.display = 'none';
+        const overlay = document.getElementById('modalOverlay');
+        if(overlay) overlay.style.display = 'none';
+    }
+
+    function openPriceModal(name, color, defaultPrice) {
+        openModal(`УКАЖИТЕ СТОИМОСТЬ: ${name}`, "price", function() {
+            const p = parseInt(document.getElementById('modalInput').value);
+            if(!isNaN(p) && p > 0) {
+                addToCart(name, p, color);
+                closeModal();
+            } else { alert('Введите корректную сумму'); }
+        }, defaultPrice);
+    }
+
+    function checkPrivacyPassword() {
+        if(document.body.classList.contains('privacy-active')) return;
+        openModal("ВВЕДИТЕ ПАРОЛЬ АДМИНИСТРАТОРА", "password", function() {
+            const pass = document.getElementById('modalInput').value;
+            if (pass === '123') {
+                document.body.classList.add('privacy-active');
+                closeModal(); updateTable(); 
+            } else { alert("Неверный пароль"); }
+        });
+    }
 
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
@@ -773,8 +816,11 @@
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
             const hasData = window.crmData.some(row => row.date === dateStr);
             const isToday = now.toLocaleDateString('ru-RU') === dateStr;
-            let cls = 'day' + (isToday ? ' today' : '') + (hasData ? ' has-data' : '') + (selectedDate === dateStr ? ' selected-day' : '');
-            grid.innerHTML += `<div class="${cls}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
+            let classes = ['day'];
+            if (isToday) classes.push('today');
+            if (hasData) classes.push('has-data');
+            if (selectedDate === dateStr) classes.push('selected-day');
+            grid.innerHTML += `<div class="${classes.join(' ')}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
         updateMonthTotal();
     }
@@ -783,29 +829,31 @@
         selectedDate = date;
         const label = document.getElementById('sessionDateLabel');
         if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
-        renderCalendar(); 
-        if(typeof updateNextSession === 'function') updateNextSession(date);
+        renderCalendar(); updateNextSession(date); 
     }
 
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
-        selectedDate = null; 
-        renderCalendar(); 
-        updateTable();
+        selectedDate = null; updateTable(); renderCalendar(); 
     }
 
-    function checkPrivacyPassword() {
-        if(document.body.classList.contains('privacy-active')) return;
-        document.getElementById('pwdOverlay').style.display = 'flex';
-        document.getElementById('adminPwd').focus();
-    }
-
-    function verifyPass() {
-        if (document.getElementById('adminPwd').value === '123') {
-            document.body.classList.add('privacy-active');
-            document.getElementById('pwdOverlay').style.display = 'none';
-            updateTable();
-        } else { alert("WRONG PASSWORD"); }
+    function applyPrepaidToggle() {
+        const isPrepaid = document.getElementById('prepaidMode').checked;
+        window.currentCart.total = 0;
+        window.currentCart.details.forEach(item => {
+            const isForceFull = item.name.includes('ЧАС ЗАПИСИ');
+            if (isPrepaid && !isForceFull) {
+                item.price = item.basePrice / 2;
+                if (!item.name.includes('(50%)')) item.name += ' (50%)';
+            } else {
+                item.price = item.basePrice;
+                item.name = item.name.replace(' (50%)', '');
+            }
+            window.currentCart.total += item.price;
+        });
+        window.currentCart.items = window.currentCart.details.map(d => ({ name: d.name, colorClass: d.colorClass }));
+        renderCart();
+        if(activeCertTarget) updateCerts();
     }
 
     function addToCart(name, price, colorClass, forceFull = false) {
@@ -820,26 +868,51 @@
         if(activeCertTarget) updateCerts();
     }
 
-    function openPriceModal(name, color, defaultPrice) {
-        const p = prompt(`УКАЖИТЕ СТОИМОСТЬ ДЛЯ ${name}:`, defaultPrice);
-        const val = parseInt(p);
-        if(!isNaN(val) && val > 0) addToCart(name, val, color);
+    function removeFromCart(index) {
+        const item = window.currentCart.details[index];
+        window.currentCart.total -= item.price;
+        window.currentCart.fullPriceTotal -= item.basePrice;
+        window.currentCart.items.splice(index, 1);
+        window.currentCart.details.splice(index, 1);
+        renderCart();
+        if(activeCertTarget) updateCerts();
+    }
+
+    function exitCertMode() {
+        activeCertTarget = null;
+        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = selectedDate ? `ТЕКУЩИЙ ЧЕК (${selectedDate}):` : 'ТЕКУЩИЙ ЧЕК:';
+        renderCart();
+        updateCerts();
     }
 
     function renderCart() {
         const container = document.getElementById('cartItems');
         const total = document.getElementById('cartTotal');
+        const cartBox = document.querySelector('.current-session-box');
         const label = document.getElementById('sessionDateLabel');
         const saveBtn = document.querySelector('.save-btn');
         if(!container || !total) return;
 
         if (activeCertTarget) {
-            label.innerHTML = `НАПОЛНЕНИЕ ${activeCertTarget} <span onclick="exitCertMode()" style="cursor:pointer; color:var(--artist-red); margin-left:10px;">×</span>`;
-            if(saveBtn) { saveBtn.innerText = `СОХРАНИТЬ В ${activeCertTarget}`; saveBtn.onclick = saveCertContent; }
+            cartBox.style.border = '2px solid var(--neon-gold)';
+            cartBox.style.boxShadow = '0 0 15px rgba(184, 150, 0, 0.4)';
+            label.innerHTML = `НАПОЛНЕНИЕ ${activeCertTarget} <span onclick="exitCertMode()" style="position:absolute; top:10px; right:15px; cursor:pointer; color:var(--artist-red); font-size:18px; font-weight:bold;">×</span>`;
+            if(saveBtn) {
+                saveBtn.innerText = `СОХРАНИТЬ В ${activeCertTarget}`;
+                saveBtn.onclick = saveCertContent;
+            }
         } else {
+            cartBox.style.border = '1px solid var(--neon-purple)';
+            cartBox.style.boxShadow = '0 0 10px rgba(191, 0, 255, 0.15)';
             if(label) label.innerText = selectedDate ? `ТЕКУЩИЙ ЧЕК (${selectedDate}):` : 'ТЕКУЩИЙ ЧЕК:';
-            if(saveBtn) { saveBtn.innerText = 'СОХРАНИТЬ'; saveBtn.onclick = saveSession; }
+            if(saveBtn) {
+                saveBtn.innerText = 'СОХРАНИТЬ';
+                saveBtn.onclick = saveSession;
+            }
         }
+
         total.innerText = window.currentCart.total + ' ₽';
         container.innerHTML = window.currentCart.items.length === 0 ? 'Пусто...' : '';
         window.currentCart.items.forEach((item, i) => {
@@ -857,35 +930,34 @@
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
-        filteredData.forEach((row) => {
+        filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total || 0;
             const paid = row.total || 0;
+            const rest = Math.max(0, full - paid);
             const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
             const isComplete = perc >= 100;
+            
+            const tooltipHTML = `<div class="history-tooltip"><div style="color:#888; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>` + 
+                (row.details || []).map(d => `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass]}; padding-left:8px;"><span style="color:${colorMap[d.colorClass]}">${d.name}</span><span>${d.price} ₽</span></div>`).join('') +
+                `<div class="summary-line"><span>ИТОГО ЧЕК</span><span>${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
+
             const tr = document.createElement('tr');
-            
-            tr.onclick = (e) => { if(window.innerWidth <= 992) showCertTooltip(e, row.client, row.details); };
-            tr.ondblclick = (e) => showCertTooltip(e, row.client, row.details);
-            
             if (window.innerWidth <= 992) {
-                tr.innerHTML = `<td style="padding: 20px;">
+                tr.innerHTML = `<td style="position:relative; padding: 20px;">
                     <div class="mobile-row-date">${row.date}</div>
                     <div class="mobile-row-client">${row.client}</div>
                     <div class="mobile-row-services">${row.services}</div>
                     <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
                     <div class="mobile-actions-grid">
-                        <div class="m-action-btn m-btn-pay" onclick="event.stopPropagation(); addPayment('${row.id}')">Доплата</div>
-                        <div class="m-action-btn m-btn-del" onclick="event.stopPropagation(); deleteRow('${row.id}')">Удалить</div>
+                        <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
+                        <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
                     </div>
                 </td>`;
             } else {
                 tr.innerHTML = `
-                    <td>${row.date}</td>
-                    <td>
-                        <div>${row.client}</div>
-                        <div class="pc-progress-mini"><div class="pc-progress-fill ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
-                    </td>
-                    <td class="services-cell">${row.services}</td>
+                    <td data-label="ДАТА">${row.date}</td>
+                    <td data-label="КЛИЕНТ">${row.client}</td>
+                    <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
                     <td class="price-cell privacy-blur">${paid} ₽</td>
                     <td>
                         <div class="action-icons-wrap">
@@ -907,6 +979,40 @@
         el.innerText = sum.toLocaleString() + ' ₽';
     }
 
+    function showCertTooltip(e, id, items) {
+        const tooltip = document.getElementById('cert-global-tooltip');
+        if (!items || items.length === 0) return;
+        
+        let total = items.reduce((s, i) => s + i.price, 0);
+        let html = `<div class="cert-close-btn" onclick="hideCertTooltip()">×</div>`;
+        html += `<div class="tooltip-title" style="color:#888; font-family:Orbitron; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom:15px;">ДЕТАЛИЗАЦИЯ ${id}:</div>`;
+        items.forEach(it => {
+            html += `<div class="tooltip-item" style="display:flex; justify-content:space-between; border-left:3px solid ${colorMap[it.colorClass] || '#555'}; padding-left:12px;">
+                        <span style="color:${colorMap[it.colorClass] || '#fff'}">${it.name}</span>
+                        <span style="font-weight:700;">${it.price} ₽</span>
+                    </div>`;
+        });
+        html += `<div class="tooltip-total" style="display:flex; justify-content:space-between; border-top:1px solid #222; font-family:Orbitron;">
+                    <span>ИТОГО SSL</span><span style="color:var(--neon-gold); font-weight:700;">${total} ₽</span>
+                </div>`;
+        
+        tooltip.innerHTML = html;
+        
+        if (window.innerWidth <= 992) {
+            tooltip.classList.add('mobile-active');
+        } else {
+            tooltip.style.display = 'block';
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY + 15) + 'px';
+        }
+    }
+
+    function hideCertTooltip() {
+        const tooltip = document.getElementById('cert-global-tooltip');
+        tooltip.style.display = 'none';
+        tooltip.classList.remove('mobile-active');
+    }
+
     async function updateCerts() {
         const list = document.getElementById('certsList');
         if(!list) return;
@@ -915,77 +1021,119 @@
             const certsData = {};
             snapshot.forEach(doc => certsData[doc.id] = doc.data());
             list.innerHTML = '';
+            
             for (let i = 1; i <= 300; i++) {
                 const id = 'SSL-' + String(i).padStart(3, '0');
                 const d = certsData[id] || { active: false, name: '', items: [] };
+                const itemsToShow = (activeCertTarget === id) ? window.currentCart.details : (d.items || []);
                 const div = document.createElement('div');
+                
                 div.className = `cert-row ${d.active ? 'is-active' : 'not-active'}`;
+                
                 div.innerHTML = `
-                    <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold);' : ''}">${id}</span>
-                    ${d.active ? `<span style="font-size:10px; color:#ccc;">${d.name}</span>` : `<input type="text" id="in-${id}" oninput="window.tempCertNames['${id}']=this.value" onmousedown="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; width:90px;" placeholder="Имя" value="${window.tempCertNames[id] || ''}">`}
-                    ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; cursor:pointer;">АКТИВ</button>`}
+                    <span class="cert-id" style="${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}</span>
+                    ${d.active ? `<span class="cert-client-name" style="font-size:10px; color:#ccc;">${d.name || ''}</span>` : `<input type="text" id="in-${id}" onmousedown="stopProp(event)" onclick="stopProp(event)" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
+                    ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px; font-weight:900;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
                 `;
-                div.onclick = (e) => {
-                    if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
-                        if (window.innerWidth <= 992) showCertTooltip(e, id, d.items || []);
-                        if (!d.active) startCertBinding(id);
-                    }
-                };
+
                 if (window.innerWidth > 992) {
-                    div.onmousemove = (e) => showCertTooltip(e, id, d.items || []);
-                    div.onmouseleave = hideCertTooltip;
+                    div.addEventListener('mousemove', (e) => showCertTooltip(e, id, itemsToShow));
+                    div.addEventListener('mouseleave', hideCertTooltip);
+                } else {
+                    div.addEventListener('click', (e) => {
+                        if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') showCertTooltip(e, id, itemsToShow);
+                    });
                 }
+
+                if(!d.active) div.addEventListener('click', (e) => {
+                    if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') startCertBinding(id);
+                });
                 list.appendChild(div);
             }
         } catch (e) { console.error(e); }
     }
 
-    function showCertTooltip(e, title, items) {
-        const t = document.getElementById('cert-global-tooltip');
-        if(!items || items.length === 0) return;
-        let total = items.reduce((s, i) => s + i.price, 0);
-        let html = `<div class="cert-close-btn" onclick="hideCertTooltip()">×</div><div style="color:var(--neon-gold); margin-bottom:10px;">${title}</div>`;
-        items.forEach(it => html += `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px;"><span>${it.name}</span><span style="margin-left:20px;">${it.price} ₽</span></div>`);
-        html += `<div style="border-top:1px solid #333; margin-top:10px; padding-top:5px; text-align:right; color:var(--neon-gold);">ИТОГО: ${total} ₽</div>`;
-        t.innerHTML = html;
-        if(window.innerWidth <= 992) t.classList.add('mobile-active');
-        else { t.style.display='block'; t.style.left=(e.clientX+15)+'px'; t.style.top=(e.clientY+15)+'px'; }
+    function startCertBinding(id) {
+        activeCertTarget = id;
+        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        renderCart(); updateCerts();
     }
 
-    function hideCertTooltip() { const t=document.getElementById('cert-global-tooltip'); t.style.display='none'; t.classList.remove('mobile-active'); }
+    async function saveCertContent() {
+        if (!activeCertTarget) return;
+        if (!window.currentCart.details.length) return alert("Чек пуст!");
+        try {
+            const name = document.getElementById('in-' + activeCertTarget)?.value || 'Без имени';
+            await db.collection("certs").doc(activeCertTarget).set({
+                active: true,
+                items: JSON.parse(JSON.stringify(window.currentCart.details)),
+                name: name,
+                date: new Date().toLocaleDateString('ru-RU')
+            }, { merge: true });
+            exitCertMode(); 
+        } catch (e) { console.error(e); }
+    }
 
-    window.saveSession = async function() {
-        const cart = window.currentCart;
-        if(!cart.items.length) return alert("Чек пуст!");
-        const name = document.getElementById('bookingClient').value || "Без имени";
+    async function activateCert(id) {
+        const n = document.getElementById('in-' + id).value;
+        if (!n) return alert('Введите имя!');
+        if (activeCertTarget === id) saveCertContent();
+        else alert('Сначала выберите этот SSL номер для наполнения!');
+    }
+
+    function updateNextSession(clickedDate = null) {
+        const container = document.getElementById('futureListContainer');
+        if (!container || !window.crmData) return;
+        const targetDate = clickedDate || new Date().toLocaleDateString('ru-RU');
+        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
+        container.innerHTML = sessions.length ? sessions.map(s => `<div class="future-item"><div class="future-date">${s.time}</div><div>${s.client}</div></div>`).join('') : '<div class="future-item">Нет записей</div>';
+    }
+
+    window.saveSession = async function(event) {
+        if (event) event.preventDefault();
+        let cart = window.currentCart;
+        if (!cart.items.length) return alert('Чек пуст!');
+        const name = document.getElementById('bookingClient')?.value || 'Без имени';
+        const time = document.getElementById('bookingTime')?.value || '';
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
-        await db.collection("sessions").add({
-            client: name, date: date, services: cart.items.map(i => i.name).join(', '),
-            details: JSON.parse(JSON.stringify(cart.details)), total: cart.total, fullTotal: cart.fullPriceTotal, timestamp: Date.now()
-        });
-        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        document.getElementById('bookingClient').value = ''; renderCart();
+        try {
+            await db.collection("sessions").add({
+                date: date, client: name, time: time,
+                services: cart.items.map(i => i.name).join(', '),
+                details: JSON.parse(JSON.stringify(cart.details)),
+                total: Number(cart.total),
+                fullTotal: Number(cart.fullPriceTotal),
+                timestamp: Date.now()
+            });
+            window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+            document.getElementById('bookingClient').value = '';
+            document.getElementById('bookingTime').value = '';
+            renderCart();
+        } catch (error) { console.error(error); }
     };
 
-    window.deleteRow = async function(id) { if(confirm("Удалить запись?")) await db.collection("sessions").doc(id).delete(); };
-
-    window.addPayment = async function(id) {
+    window.addPayment = function(id) {
         const row = window.crmData.find(r => r.id === id);
-        const amount = prompt("Сумма доплаты:", (row.fullTotal - row.total));
-        if(amount) await db.collection("sessions").doc(id).update({ total: row.total + Number(amount) });
+        const full = row.fullTotal || row.total;
+        const remaining = full - row.total;
+        if (remaining <= 0) return alert('Оплачено');
+        openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, "pay", function() {
+            const amount = parseInt(document.getElementById('modalInput').value);
+            if (!isNaN(amount) && amount > 0) {
+                db.collection("sessions").doc(id).update({ total: row.total + amount });
+                closeModal();
+            }
+        }, remaining);
     };
 
-    window.addEventListener('load', () => {
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        window.db = firebase.firestore();
-        db.collection("sessions").orderBy("timestamp", "desc").onSnapshot(snap => {
-            window.crmData = [];
-            snap.forEach(doc => window.crmData.push({ id: doc.id, ...doc.data() }));
-            updateTable(); renderCalendar();
+    window.deleteRow = function(id) {
+        openModal("УДАЛИТЬ ЗАПИСЬ?", "confirm-delete", function() {
+            db.collection("sessions").doc(id).delete(); closeModal();
         });
-        updateCerts(); renderCart(); renderCalendar();
-        document.addEventListener('click', e => { if(e.target.closest('.lock-icon')) checkPrivacyPassword(); });
-    });
+    };
+
+    window.addEventListener('resize', () => { updateTable(); updateCerts(); });
+    window.addEventListener('load', () => { renderCalendar(); updateCerts(); initTooltipLogic(); renderCart(); });
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1000,6 +1148,14 @@ const firebaseConfig = {
     messagingSenderId: "971140334464",
     appId: "1:971140334464:web:dde090a90bdcd5563cb765"
 };
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+db.collection("sessions").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+    window.crmData = [];
+    snapshot.forEach((doc) => { window.crmData.push({ id: doc.id, ...doc.data() }); });
+    updateTable(); renderCalendar(); updateNextSession();
+});
 </script>
     
 </body>
