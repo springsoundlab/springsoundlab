@@ -1094,51 +1094,53 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
 });
 
 // ЗАМЕНИ СВОЮ ФУНКЦИЮ saveSession НА ЭТУ (Облачную):
-window.saveSession = function() {
-    // 1. Пытаемся найти корзину везде, где она может быть
-    const cart = window.currentCart || (typeof currentCart !== 'undefined' ? currentCart : null);
+// ПОЛНОСТЬЮ ЗАМЕНИ СВОЮ ФУНКЦИЮ saveSession НА ЭТУ
+window.saveSession = async function() {
+    console.log("Кнопка нажата. Ищем корзину...");
+    
+    // Ищем корзину (проверяем все варианты имени переменной)
+    let cart = window.currentCart || (typeof currentCart !== 'undefined' ? currentCart : null);
 
-    // Проверка: если корзины нет или в ней пусто
     if (!cart || !cart.items || cart.items.length === 0) {
-        console.error("Корзина не найдена или пуста:", cart);
-        alert('Добавьте услуги в чек!');
+        alert('Чек пуст! Добавьте услуги.');
         return;
     }
 
-    // 2. Берем данные из полей ввода (проверяем твои ID)
+    // Собираем данные из твоих полей
     const name = document.getElementById('bookingClient')?.value || 'Без имени';
     const time = document.getElementById('bookingTime')?.value || '';
     const date = window.selectedDate || new Date().toLocaleDateString('ru-RU');
 
-    // 3. Отправка в Firebase
-    crmCollection.add({
-        date: date,
-        client: name,
-        time: time,
-        services: cart.items.map(i => i.name).join(', '),
-        total: cart.total,
-        fullTotal: cart.fullPriceTotal || cart.total,
-        timestamp: Date.now()
-    }).then(() => {
-        console.log("Успешно сохранено в облако!");
-        
-        // 4. ОЧИСТКА: после сохранения обнуляем корзину везде
+    try {
+        // Отправляем в Firebase (на серверы Google)
+        await db.collection("sessions").add({
+            date: date,
+            client: name,
+            time: time,
+            services: cart.items.map(i => i.name).join(', '),
+            total: Number(cart.total),
+            timestamp: Date.now()
+        });
+
+        // ЕСЛИ МЫ ЗДЕСЬ — ЗНАЧИТ СОХРАНИЛОСЬ
+        alert("ОТПРАВЛЕНО В ОБЛАКО!"); 
+
+        // Очищаем корзину только ПОСЛЕ успеха
         const empty = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        if (window.currentCart) window.currentCart = empty;
+        window.currentCart = empty;
         if (typeof currentCart !== 'undefined') currentCart = empty;
 
-        // Очищаем поля ввода
+        // Очищаем поля
         if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
         if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
 
-        // Обновляем визуальную часть (твои функции)
+        // Обновляем экран
         if (typeof renderCart === "function") renderCart();
-        if (typeof updateTable === "function") updateTable();
         
-    }).catch((error) => {
+    } catch (error) {
         console.error("Ошибка Firebase:", error);
-        alert("Ошибка при сохранении: " + error.message);
-    });
+        alert("ОШИБКА: Данные не ушли. Проверь интернет или базу.");
+    }
 };
 
 // ЗАМЕНИ СВОЮ ФУНКЦИЮ deleteRow НА ЭТУ:
