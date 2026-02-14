@@ -945,7 +945,10 @@
     function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
-        if (!container || !window.crmData) return;
+        if (!container || !window.crmData || window.crmData.length === 0) {
+            if(container) container.innerHTML = '<div class="future-item"><div class="future-client">Нет данных в базе</div></div>';
+            return;
+        }
 
         const now = new Date();
         now.setHours(0, 0, 0, 0); 
@@ -953,28 +956,34 @@
         let sessionsToShow = [];
         let displayTitle = "Ближайшая запись";
 
+        // Функция-помощник для превращения строки "ДД.ММ.ГГГГ" в объект даты
+        const parseDate = (str) => {
+            if (!str) return null;
+            const parts = str.split('.');
+            if (parts.length !== 3) return null;
+            return new Date(parts[2], parts[1] - 1, parts[0]);
+        };
+
         if (clickedDate) {
             sessionsToShow = window.crmData.filter(r => r.date === clickedDate && r.time);
             displayTitle = `Записи на ${clickedDate}`;
         } else {
+            // Фильтруем все записи, у которых дата сегодня или в будущем
             const futureAll = window.crmData.filter(r => {
-                if (!r.time || !r.date) return false;
-                const [d, m, y] = r.date.split('.').map(Number);
-                const sessionDate = new Date(y, m - 1, d);
-                sessionDate.setHours(0, 0, 0, 0);
-                return sessionDate >= now;
+                const sDate = parseDate(r.date);
+                return sDate && sDate >= now && r.time; // Берем только с временем
             }).sort((a, b) => {
-                const [da, ma, ya] = a.date.split('.').map(Number);
-                const [db, mb, yb] = b.date.split('.').map(Number);
-                const dateA = new Date(ya, ma - 1, da);
-                const dateB = new Date(yb, mb - 1, db);
-                return dateA - dateB || a.time.localeCompare(b.time);
+                // Сортируем: сначала по дате, потом по времени
+                const dateA = parseDate(a.date);
+                const dateB = parseDate(b.date);
+                if (dateA - dateB !== 0) return dateA - dateB;
+                return a.time.localeCompare(b.time);
             });
 
             if (futureAll.length > 0) {
                 const closestDate = futureAll[0].date;
                 sessionsToShow = futureAll.filter(r => r.date === closestDate);
-                const todayStr = new Date().toLocaleDateString('ru-RU');
+                const todayStr = now.toLocaleDateString('ru-RU');
                 displayTitle = (closestDate === todayStr) ? "Записи на сегодня" : `Записи на ${closestDate}`;
             }
         }
@@ -983,7 +992,14 @@
         container.innerHTML = ''; 
 
         if (sessionsToShow.length > 0) {
-            sessionsToShow.sort((a, b) => a.time.localeCompare(b.time)).forEach(next => {
+            // Убираем дубликаты, если они случайно просочились
+            const uniqueSessions = sessionsToShow.reduce((acc, current) => {
+                const x = acc.find(item => item.time === current.time && item.client === current.client);
+                if (!x) return acc.concat([current]);
+                else return acc;
+            }, []);
+
+            uniqueSessions.forEach(next => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'future-item';
                 itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.client}</div>`;
@@ -1008,81 +1024,6 @@
         updateCerts();
         initTooltipLogic();
     });
-</script>
-
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-<script>
-const firebaseConfig = {
-    apiKey: "AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",
-    authDomain: "crm-a9450.firebaseapp.com",
-    projectId: "crm-a9450",
-    storageBucket: "crm-a9450.firebasestorage.app",
-    messagingSenderId: "971140334464",
-    appId: "1:971140334464:web:dde090a90bdcd5563cb765"
-};
-
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const crmCollection = db.collection("sessions");
-
-crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-    window.crmData = [];
-    snapshot.forEach((doc) => {
-        window.crmData.push({ id: doc.id, ...doc.data() });
-    });
-    updateTable();
-    renderCalendar();
-    updateNextSession();
-});
-
-window.saveSession = async function(event) {
-    if (event) event.preventDefault();
-    let cart = window.currentCart;
-    if (!cart || !cart.items || cart.items.length === 0) {
-        alert('Чек пуст! Добавьте услуги.');
-        return;
-    }
-    const name = document.getElementById('bookingClient')?.value || 'Без имени';
-    const time = document.getElementById('bookingTime')?.value || '';
-    const date = selectedDate || new Date().toLocaleDateString('ru-RU');
-    try {
-        await crmCollection.add({
-            date: date, client: name, time: time,
-            services: cart.items.map(i => i.name).join(', '),
-            details: JSON.parse(JSON.stringify(cart.details)),
-            total: Number(cart.total),
-            fullTotal: Number(cart.fullPriceTotal),
-            timestamp: Date.now()
-        });
-        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        if(document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
-        if(document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
-        renderCart();
-    } catch (e) { console.error("Ошибка:", e); }
-};
-
-window.addPayment = function(id) {
-    const row = window.crmData.find(r => r.id === id);
-    const full = row.fullTotal || row.total;
-    const remaining = full - row.total;
-    if (remaining <= 0) return alert('Оплачено полностью');
-    openModal(`ДОПЛАТА: ${remaining} ₽`, "pay", function() {
-        const amount = parseInt(document.getElementById('modalInput').value);
-        if (!isNaN(amount) && amount > 0) {
-            crmCollection.doc(id).update({ total: row.total + amount });
-            closeModal();
-        }
-    }, remaining);
-};
-
-window.deleteRow = function(id) {
-    openModal("УДАЛИТЬ ЗАПИСЬ?", "confirm-delete", function() {
-        crmCollection.doc(id).delete();
-        closeModal();
-    });
-};
 </script>
     
 </body>
