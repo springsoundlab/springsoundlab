@@ -653,6 +653,44 @@
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
+    // СТИЛИ ДЛЯ УВЕЛИЧЕННОГО ТУМБЛЕРА НА МОБИЛКЕ
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @media (max-width: 992px) {
+            .prepaid-wrapper {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 10px 0 !important;
+                padding: 12px !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                background: rgba(255, 255, 255, 0.03) !important;
+                border: 1px solid #222 !important;
+                border-radius: 8px !important;
+                box-sizing: border-box !important;
+            }
+            .prepaid-wrapper span {
+                font-size: 14px !important;
+                letter-spacing: 1px !important;
+            }
+            .switch {
+                width: 60px !important;
+                height: 34px !important;
+            }
+            .slider:before {
+                height: 26px !important;
+                width: 26px !important;
+                left: 4px !important;
+                bottom: 4px !important;
+            }
+            input:checked + .slider:before {
+                transform: translateX(26px) !important;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     function formatTimeInput(input) {
         let val = input.value.replace(/\D/g, '');
@@ -826,7 +864,6 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        // СОРТИРОВКА: Самые новые по timestamp идут первыми (вверху)
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
             return b.timestamp - a.timestamp;
         });
@@ -884,7 +921,6 @@
                         </div>
                     </td>`;
             } else {
-                // УБРАН privacy-blur с ячейки клиента и прогресс-бара
                 tr.innerHTML = `
                     <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
@@ -1000,7 +1036,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
 
-// Слушаем изменения: новые сверху за счет orderBy по timestamp desc
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
     snapshot.forEach((doc) => {
