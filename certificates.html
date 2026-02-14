@@ -684,6 +684,47 @@
         </div>
 
         <div class="calendar-widget">
+            <style>
+                .cal-grid .day {
+                    transition: all 0.2s ease;
+                    border: 1px solid transparent;
+                    position: relative;
+                    color: #fff !important; /* Цифры всегда белые */
+                }
+                
+                /* Тонкая зеленая обводка при наведении */
+                .cal-grid .day:hover {
+                    border: 1px solid #00ff66 !important;
+                    cursor: pointer;
+                }
+
+                /* Выделенная дата: серый фон внутри и зеленая окантовка */
+                .cal-grid .day.selected {
+                    background: #333 !important; 
+                    border: 1px solid #00ff66 !important;
+                }
+
+                /* Прошлые записи: ПОЛНАЯ заливка желтым, цифра белая */
+                .cal-grid .day.past-session {
+                    background: #ffcc00 !important;
+                    font-weight: bold;
+                }
+                
+                /* Будущие сессии: красный фон (как Artist Edition), цифра белая */
+                .cal-grid .day.future-session {
+                    background: #cc0000 !important;
+                }
+
+                /* Текущий день: зеленый фон, цифра белая */
+                .cal-grid .day.today-session {
+                    background: #008f39 !important;
+                }
+
+                /* Убираем точки-индикаторы, так как теперь заливаем всю ячейку */
+                .cal-grid .day::after {
+                    display: none !important;
+                }
+            </style>
             <div class="cal-header">
                 <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#444;" onclick="changeMonth(-1)"></i>
                 <div class="month-name" id="calMonthName">ФЕВРАЛЬ 2026</div>
@@ -713,7 +754,6 @@
 </div>
 
 <script>
-    // 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
     window.crmData = [];
     window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     var currentCart = window.currentCart; 
@@ -796,53 +836,54 @@
     }
 
     function renderCalendar() {
-    const grid = document.getElementById('calendarDays');
-    if (!grid) return;
-    grid.innerHTML = '';
-    
-    const y = currentCalDate.getFullYear();
-    const m = currentCalDate.getMonth();
-    
-    const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", 
-                        "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
-    document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
-
-    const firstDay = new Date(y, m, 1).getDay();
-    const lastDate = new Date(y, m + 1, 0).getDate();
-    const shift = firstDay === 0 ? 6 : firstDay - 1;
-
-    for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    for (let d = 1; d <= lastDate; d++) {
-        const dayStr = String(d).padStart(2, '0');
-        const monthStr = String(m + 1).padStart(2, '0');
-        const dateStr = `${dayStr}.${monthStr}.${y}`;
+        const grid = document.getElementById('calendarDays');
+        if (!grid) return;
+        grid.innerHTML = '';
         
-        const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
+        const y = currentCalDate.getFullYear();
+        const m = currentCalDate.getMonth();
         
-        let classList = 'day';
-        if (hasData) {
-            classList += ' has-data';
-            // Разбиваем строку даты обратно в объект для сравнения
-            const [cellD, cellM, cellY] = dateStr.split('.').map(Number);
-            const cellDate = new Date(cellY, cellM - 1, cellD);
-            cellDate.setHours(0, 0, 0, 0);
+        const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", 
+                            "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+        document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
 
-            // Если дата меньше сегодняшней — помечаем как прошлое
-            if (cellDate < today) {
-                classList += ' past-session';   
-            } else {
-                classList += ' future-session'; 
+        const firstDay = new Date(y, m, 1).getDay();
+        const lastDate = new Date(y, m + 1, 0).getDate();
+        const shift = firstDay === 0 ? 6 : firstDay - 1;
+
+        for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStr = today.toLocaleDateString('ru-RU');
+
+        for (let d = 1; d <= lastDate; d++) {
+            const dayStr = String(d).padStart(2, '0');
+            const monthStr = String(m + 1).padStart(2, '0');
+            const dateStr = `${dayStr}.${monthStr}.${y}`;
+            
+            const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
+            
+            let classList = 'day';
+            if (hasData) {
+                classList += ' has-data';
+                const [cellD, cellM, cellY] = dateStr.split('.').map(Number);
+                const cellDate = new Date(cellY, cellM - 1, cellD);
+                cellDate.setHours(0, 0, 0, 0);
+
+                if (dateStr === todayStr) {
+                    classList += ' today-session'; 
+                } else if (cellDate < today) {
+                    classList += ' past-session';   
+                } else {
+                    classList += ' future-session'; 
+                }
             }
+            
+            if (selectedDate === dateStr) classList += ' selected';
+            grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
-        
-        if (selectedDate === dateStr) classList += ' selected';
-        grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
     }
-}
 
     function selectCalendarDate(date) {
         selectedDate = date;
