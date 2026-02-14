@@ -1095,23 +1095,22 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
 
 // ЗАМЕНИ СВОЮ ФУНКЦИЮ saveSession НА ЭТУ (Облачную):
 window.saveSession = function() {
-    // 1. Проверяем поля ввода
-    const clientInput = document.getElementById('bookingClient');
-    const timeInput = document.getElementById('bookingTime');
-    
-    const name = (clientInput ? clientInput.value : '') || 'Без имени';
-    const time = (timeInput ? timeInput.value : '') || '';
-    const date = window.selectedDate || new Date().toLocaleDateString('ru-RU');
+    // 1. Пытаемся найти корзину везде, где она может быть
+    const cart = window.currentCart || (typeof currentCart !== 'undefined' ? currentCart : null);
 
-    // 2. ГИБКАЯ ПРОВЕРКА КОРЗИНЫ (пробуем все варианты имен)
-    const cart = window.currentCart || currentCart;
-
+    // Проверка: если корзины нет или в ней пусто
     if (!cart || !cart.items || cart.items.length === 0) {
-        alert('Сначала добавьте услуги в чек!');
+        console.error("Корзина не найдена или пуста:", cart);
+        alert('Добавьте услуги в чек!');
         return;
     }
 
-    // 3. ОТПРАВКА В FIREBASE
+    // 2. Берем данные из полей ввода (проверяем твои ID)
+    const name = document.getElementById('bookingClient')?.value || 'Без имени';
+    const time = document.getElementById('bookingTime')?.value || '';
+    const date = window.selectedDate || new Date().toLocaleDateString('ru-RU');
+
+    // 3. Отправка в Firebase
     crmCollection.add({
         date: date,
         client: name,
@@ -1121,21 +1120,24 @@ window.saveSession = function() {
         fullTotal: cart.fullPriceTotal || cart.total,
         timestamp: Date.now()
     }).then(() => {
-        // 4. ОЧИСТКА (обнуляем оба варианта переменной для надежности)
-        const emptyCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-        if (window.currentCart) window.currentCart = emptyCart;
-        if (typeof currentCart !== 'undefined') currentCart = emptyCart;
+        console.log("Успешно сохранено в облако!");
+        
+        // 4. ОЧИСТКА: после сохранения обнуляем корзину везде
+        const empty = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        if (window.currentCart) window.currentCart = empty;
+        if (typeof currentCart !== 'undefined') currentCart = empty;
 
-        // Очищаем поля на экране
-        if (clientInput) clientInput.value = '';
-        if (timeInput) timeInput.value = '';
-        
-        // Обновляем визуальную корзину
+        // Очищаем поля ввода
+        if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
+        if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
+
+        // Обновляем визуальную часть (твои функции)
         if (typeof renderCart === "function") renderCart();
+        if (typeof updateTable === "function") updateTable();
         
-        console.log("Успешно сохранено в облако Spring Sound Lab");
     }).catch((error) => {
-        alert("Ошибка сохранения: " + error.message);
+        console.error("Ошибка Firebase:", error);
+        alert("Ошибка при сохранении: " + error.message);
     });
 };
 
