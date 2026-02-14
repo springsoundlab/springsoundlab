@@ -1068,57 +1068,62 @@
 
 <script>
   // Ваши ключи из консоли
-  const firebaseConfig = {
-    apiKey: "AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",
-    authDomain: "crm-a9450.firebaseapp.com",
-    projectId: "crm-a9450",
-    storageBucket: "crm-a9450.firebasestorage.app",
-    messagingSenderId: "971140334464",
-    appId: "1:971140334464:web:dde090a90bdcd5563cb765"
-  };
+  // Инициализация облака с твоим ключом
+const firebaseConfig = {
+  apiKey: "AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",
+  authDomain: "crm-a9450.firebaseapp.com",
+  projectId: "crm-a9450",
+  storageBucket: "crm-a9450.firebasestorage.app",
+  messagingSenderId: "971140334464",
+  appId: "1:971140334464:web:dde090a90bdcd5563cb765"
+};
 
-  // Инициализация
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const crmCollection = db.collection("sessions");
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const crmCollection = db.collection("sessions");
 
-  // 1. ПОЛУЧЕНИЕ ДАННЫХ: Обновляем таблицу при любом изменении в базе
-  crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+// СИНХРОНИЗАЦИЯ: Этот блок заставляет телефон и комп видеть друг друга
+crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
     snapshot.forEach((doc) => {
-      window.crmData.push({ id: doc.id, ...doc.data() });
+        window.crmData.push({ id: doc.id, ...doc.data() });
     });
-    // Вызываем вашу функцию отрисовки
+    // Обновляем таблицу и календарь на экране
     if (typeof updateTable === "function") updateTable();
-  });
+    if (typeof renderCalendar === "function") renderCalendar();
+});
 
-  // 2. СОХРАНЕНИЕ: Перехватываем функцию сохранения
-  const originalSave = window.saveSession;
-  window.saveSession = function() {
-    const name = document.getElementById('bookingClient')?.value || 'Без имени';
-    const time = document.getElementById('bookingTime')?.value || '';
+// ЗАМЕНИ СВОЮ ФУНКЦИЮ saveSession НА ЭТУ (Облачную):
+window.saveSession = function() {
+    const name = document.getElementById('bookingClient').value || 'Без имени';
+    const time = document.getElementById('bookingTime').value;
     const date = window.selectedDate || new Date().toLocaleDateString('ru-RU');
 
-    if (!window.currentCart || window.currentCart.items.length === 0) {
-      alert('Сначала добавьте услуги!');
-      return;
-    }
+    if (!window.currentCart || window.currentCart.items.length === 0) return alert('Добавьте услуги!');
 
-    // Отправляем в облако
     crmCollection.add({
-      date: date,
-      client: name,
-      time: time,
-      services: window.currentCart.items.map(i => i.name).join(', '),
-      total: window.currentCart.total,
-      fullTotal: window.currentCart.fullPriceTotal || window.currentCart.total,
-      timestamp: Date.now()
+        date: date,
+        client: name,
+        time: time,
+        services: window.currentCart.items.map(i => i.name).join(', '),
+        total: window.currentCart.total,
+        fullTotal: window.currentCart.fullPriceTotal || window.currentCart.total,
+        timestamp: Date.now()
     }).then(() => {
-      // После успеха в облаке — очищаем форму через вашу оригинальную логику
-      if (typeof originalSave === "function") originalSave();
-      console.log("Данные SSL CRM сохранены в облако");
+        // Очистка полей (твоя логика)
+        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        document.getElementById('bookingClient').value = '';
+        document.getElementById('bookingTime').value = '';
+        if (typeof renderCart === "function") renderCart();
     });
-  };
+};
+
+// ЗАМЕНИ СВОЮ ФУНКЦИЮ deleteRow НА ЭТУ:
+window.deleteRow = function(id) {
+    if (confirm("Удалить из облака Firebase?")) {
+        crmCollection.doc(id).delete();
+    }
+};
 
   // 3. УДАЛЕНИЕ: Перехватываем функцию удаления
   window.deleteRow = function(id) {
