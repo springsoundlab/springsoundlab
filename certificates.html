@@ -720,30 +720,30 @@
         .cert-row.is-active:hover { background: transparent !important; }
         .cert-row span, .cert-row div { cursor: inherit !important; }
 
-        /* СПЕЦИАЛЬНЫЕ ПРАВКИ ДЛЯ ПК */
+        /* ПРАВКИ ДЛЯ КОМПЬЮТЕРА (ОТЧЕТ ЗА МЕСЯЦ) */
         @media (min-width: 993px) {
             .crm-table {
-                table-layout: fixed;
                 width: 100%;
+                border-collapse: collapse;
+                table-layout: auto; /* Позволяем таблице тянуться */
             }
-            /* Одинаковые и четкие отступы через ширину колонок */
-            .col-date { width: 100px; }
-            .col-client { width: 180px; }
-            .col-progress { width: 230px; } /* Место под длинную шкалу + отступ */
-            .col-services { width: auto; }
-            .col-price { width: 120px; }
-            .col-actions { width: 120px; }
+            
+            .col-date { width: 90px; }
+            .col-client { width: 150px; }
+            .col-progress { width: 220px; }
+            .col-services { width: auto; } /* Услуги забирают всё свободное место */
+            .col-price { width: 110px; white-space: nowrap; }
+            .col-actions { width: 130px; padding-right: 30px !important; } /* Отступ от скролла */
 
             .services-cell {
                 white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis;
-                padding-right: 20px;
+                overflow: visible !important;
+                padding-left: 5px !important; /* Придвигаем к шкале */
+                color: #fff;
             }
 
-            /* Длинная шкала (в 3 раза длиннее) */
             .progress-container-long {
-                width: 210px !important; 
+                width: 200px !important; 
                 height: 8px !important;
                 background: rgba(255,255,255,0.05);
                 border-radius: 4px;
@@ -754,12 +754,15 @@
                 text-align: left;
                 padding: 12px 10px;
                 font-family: 'Orbitron', sans-serif;
-                font-size: 11px;
-                color: #555;
+                font-size: 10px;
+                color: #444;
+                text-transform: uppercase;
             }
-            .crm-table td {
-                padding: 15px 10px;
-                vertical-align: middle;
+            
+            .price-cell {
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 16px;
+                color: var(--status-green);
             }
         }
     </style>
@@ -999,7 +1002,7 @@
                 <th class="col-date">ДАТА</th>
                 <th class="col-client">КЛИЕНТ</th>
                 <th class="col-progress">ПРЕДОПЛАТА</th>
-                <th class="col-services">УСЛУГИ</th>
+                <th class="col-services">ПРЕДОСТАВЛЕННЫЕ УСЛУГИ</th>
                 <th class="col-price" style="text-align:right;">ВНЕСЕНО</th>
                 <th class="col-actions" style="text-align:center;">ДЕЙСТВИЯ</th>
             `;
@@ -1032,7 +1035,7 @@
             } else {
                 tr.innerHTML = `
                     <td class="col-date">${row.date}</td>
-                    <td class="col-client" style="font-size: 16px; font-weight: 800; color: #fff;">${row.client}</td>
+                    <td class="col-client" style="font-size: 15px; font-weight: 800; color: #fff;">${row.client}</td>
                     <td class="col-progress">
                         <div class="progress-container-long">
                             <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
@@ -1041,7 +1044,7 @@
                     <td class="col-services services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
                     <td class="col-price price-cell privacy-blur" style="text-align:right; font-weight:700;">${paid} ₽</td>
                     <td class="col-actions">
-                        <div class="action-icons-wrap" style="justify-content:center;">
+                        <div class="action-icons-wrap" style="justify-content:center; gap: 15px;">
                             <div class="icon-btn-box" onclick="addPayment('${row.id}')"><i class="fas fa-wallet"></i></div>
                             <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><i class="fas fa-trash"></i></div>
                         </div>
