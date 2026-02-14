@@ -653,7 +653,6 @@
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
     
-    // Переменные для сертификатов
     let activeCertTarget = null; 
 
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
@@ -838,7 +837,6 @@
                 saveBtn.onclick = saveCertContent;
             }
         } else {
-            // Возвращаем спокойный фиолетовый режим
             cartBox.style.border = '1px solid var(--neon-purple)';
             cartBox.style.boxShadow = '0 0 10px rgba(191, 0, 255, 0.15)';
             if(!label.innerText.includes('ТЕКУЩИЙ ЧЕК')) {
@@ -972,7 +970,6 @@
                 const id = 'SSL-' + String(i).padStart(3, '0');
                 const d = certsData[id] || { active: false, name: '', items: [] };
                 
-                // РАБОТА С ТУЛТИПОМ: Берем либо из базы, либо текущую корзину если SSL активен
                 let itemsToShow = (activeCertTarget === id) ? window.currentCart.details : (d.items || []);
                 let totalSum = itemsToShow.reduce((acc, val) => acc + val.price, 0);
 
@@ -993,9 +990,14 @@
 
                 const div = document.createElement('div');
                 div.className = 'cert-row';
+                
+                // Блокируем клик, если активен (есть OK)
+                const clickHandler = d.active ? '' : `onclick="startCertBinding('${id}')"`;
+                const cursorStyle = d.active ? 'cursor:default' : 'cursor:pointer';
+
                 div.innerHTML = `
-                    <span class="cert-id" onclick="startCertBinding('${id}')" style="cursor:pointer; position:relative; ${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}${itemsTooltip}</span>
-                    ${d.active ? `<span style="font-size:10px; color:#555">${d.name}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
+                    <span class="cert-id" ${clickHandler} style="${cursorStyle}; position:relative; ${activeCertTarget === id ? 'color:var(--neon-gold); text-shadow:0 0 5px var(--neon-gold);' : ''}">${id}${itemsTooltip}</span>
+                    ${d.active ? `<span style="font-size:10px; color:#555">${d.name || ''}</span>` : `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя">`}
                     ${d.active ? `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>` : `<button onclick="activateCert('${id}')" style="background:var(--neon-purple); border:none; color:#fff; font-size:8px; padding:4px 8px; border-radius:3px; cursor:pointer;">АКТИВ</button>`}
                 `;
                 list.appendChild(div);
@@ -1013,13 +1015,19 @@
 
     async function saveCertContent() {
         if (!activeCertTarget) return;
+        if (window.currentCart.items.length === 0) return alert("Добавьте услуги!");
+        
         try {
+            const inputName = document.getElementById('in-' + activeCertTarget)?.value || '';
             await db.collection("certs").doc(activeCertTarget).set({
-                items: JSON.parse(JSON.stringify(window.currentCart.details))
+                active: true, // Авто-активация при сохранении
+                items: JSON.parse(JSON.stringify(window.currentCart.details)),
+                name: inputName,
+                date: new Date().toLocaleDateString('ru-RU')
             }, { merge: true });
             
             exitCertMode(); 
-        } catch (e) { alert("Ошибка сохранения состава"); }
+        } catch (e) { alert("Ошибка сохранения"); }
     }
 
     async function activateCert(id) {
@@ -1063,12 +1071,23 @@
         if (overlay) overlay.classList.toggle('active');
     }
 
+    // Слушатель Enter
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            if (activeCertTarget) {
+                saveCertContent();
+            } else if (document.getElementById('bookingClient')?.value) {
+                saveSession();
+            }
+        }
+    });
+
     window.addEventListener('resize', updateTable);
     window.addEventListener('load', () => {
         renderCalendar();
         updateCerts();
         initTooltipLogic();
-        renderCart(); // Вызываем при загрузке для фиолетовой обводки
+        renderCart(); 
     });
 </script>
 
