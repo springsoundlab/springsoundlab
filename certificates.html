@@ -749,16 +749,15 @@
             
             const hasData = window.crmData.some(row => row.date === dateStr);
             const isToday = now.toLocaleDateString('ru-RU') === dateStr;
-            const isFuture = thisDate > now && hasData; // Будущая запись
+            const isFuture = thisDate > now && hasData; 
             
             let classes = ['day'];
             if (isToday) classes.push('today');
             if (hasData) classes.push('has-data');
-            if (isFuture) classes.push('future-mark'); // Класс для голубого цвета
             if (selectedDate === dateStr) classes.push('selected-day');
             
-            // Вставляем стили inline для будущих записей, если класс вдруг не прописан в CSS
-            let styleAttr = isFuture ? 'style="border-color: #00ccff; color: #00ccff; box-shadow: 0 0 5px rgba(0,204,255,0.4);"' : '';
+            // Полная заливка квадратика голубым для будущих записей
+            let styleAttr = isFuture ? 'style="background-color: #00ccff !important; color: #000 !important; border-color: #00ccff !important; font-weight: bold; box-shadow: 0 0 10px rgba(0,204,255,0.5);"' : '';
             
             grid.innerHTML += `<div class="${classes.join(' ')}" ${styleAttr} onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
