@@ -646,7 +646,6 @@
     // 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
     window.crmData = [];
     window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-    var currentCart = window.currentCart; 
     let currentCalDate = new Date();
     let selectedDate = null;
     let hoverTimer;
@@ -690,6 +689,7 @@
         const titleEl = document.getElementById('modalTitle');
         const inputEl = document.getElementById('modalInput');
         const confirmBtn = document.getElementById('modalConfirmBtn');
+        if(!modal) return;
         titleEl.innerText = title;
         inputEl.value = defaultValue;
         inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
@@ -826,7 +826,6 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        // СОРТИРОВКА: Самые новые по timestamp идут первыми (вверху)
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
             return b.timestamp - a.timestamp;
         });
@@ -884,7 +883,6 @@
                         </div>
                     </td>`;
             } else {
-                // УБРАН privacy-blur с ячейки клиента и прогресс-бара
                 tr.innerHTML = `
                     <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
@@ -975,6 +973,16 @@
         if (overlay) overlay.classList.toggle('active');
     }
 
+    function clearFullHistory() {
+        openModal("УДАЛИТЬ ВСЮ ИСТОРИЮ?", "confirm-delete", async function() {
+            const snapshot = await crmCollection.get();
+            const batch = db.batch();
+            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+            closeModal();
+        });
+    }
+
     window.addEventListener('resize', updateTable);
     window.addEventListener('load', () => {
         renderCalendar();
@@ -1000,7 +1008,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
 
-// Слушаем изменения: новые сверху за счет orderBy по timestamp desc
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
     snapshot.forEach((doc) => {
