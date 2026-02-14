@@ -653,7 +653,7 @@
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
     
-    // Новые переменные для сертификатов
+    // Переменные для сертификатов
     let activeCertTarget = null; 
 
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
@@ -704,7 +704,8 @@
 
     function closeModal() {
         document.getElementById('customModal').style.display = 'none';
-        document.getElementById('modalOverlay').style.display = 'none';
+        const overlay = document.getElementById('modalOverlay');
+        if(overlay) overlay.style.display = 'none';
     }
 
     function openPriceModal(name, color, defaultPrice) {
@@ -806,27 +807,38 @@
         renderCart();
     }
 
+    function exitCertMode() {
+        activeCertTarget = null;
+        window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = selectedDate ? `ТЕКУЩИЙ ЧЕК (${selectedDate}):` : 'ТЕКУЩИЙ ЧЕК:';
+        renderCart();
+    }
+
     function renderCart() {
         const container = document.getElementById('cartItems');
         const total = document.getElementById('cartTotal');
         const cartBox = document.querySelector('.current-session-box');
+        const label = document.getElementById('sessionDateLabel');
         if(!container || !total) return;
 
-        // Если активен режим сертификата - меняем вид чека
         if (activeCertTarget) {
             cartBox.style.border = '2px solid var(--neon-gold)';
             cartBox.style.boxShadow = '0 0 15px rgba(184, 150, 0, 0.3)';
-            document.getElementById('sessionDateLabel').innerText = `НАПОЛНЕНИЕ ${activeCertTarget}:`;
-            // Заменяем кнопку сохранить на ENTER
+            label.innerHTML = `НАПОЛНЕНИЕ ${activeCertTarget} <span onclick="exitCertMode()" style="cursor:pointer; color:var(--artist-red); margin-left:10px; font-size:14px;">[×]</span>`;
+            
             const saveBtn = document.querySelector('.save-btn');
             if(saveBtn) {
-                saveBtn.innerText = 'ПРИМЕНИТЬ К SSL';
+                saveBtn.innerText = `СОХРАНИТЬ В ${activeCertTarget}`;
                 saveBtn.style.background = 'var(--neon-gold)';
                 saveBtn.onclick = saveCertContent;
             }
         } else {
             cartBox.style.border = '1px solid #111';
             cartBox.style.boxShadow = 'none';
+            if(!label.innerText.includes('ТЕКУЩИЙ ЧЕК')) {
+                 label.innerText = selectedDate ? `ТЕКУЩИЙ ЧЕК (${selectedDate}):` : 'ТЕКУЩИЙ ЧЕК:';
+            }
             const saveBtn = document.querySelector('.save-btn');
             if(saveBtn) {
                 saveBtn.innerText = 'СОХРАНИТЬ В SSL CRM';
@@ -942,7 +954,6 @@
         el.innerText = sum.toLocaleString() + ' ₽';
     }
 
-    // ЛОГИКА СЕРТИФИКАТОВ (FIREBASE)
     async function updateCerts() {
         const list = document.getElementById('certsList');
         if(!list) return;
@@ -959,12 +970,11 @@
                 const div = document.createElement('div');
                 div.className = 'cert-row';
                 
-                // Тултип для услуг внутри сертификата
                 let itemsTooltip = "";
                 if(d.items && d.items.length > 0) {
                     itemsTooltip = `<div class="history-tooltip pos-up" style="min-width:150px; left:50%; transform:translateX(-50%);">
                         <div style="color:var(--neon-gold); font-size:9px; margin-bottom:5px;">СОСТАВ СЕРТИФИКАТА:</div>
-                        ${d.items.map(it => `<div style="font-size:10px; margin-bottom:2px; border-left:2px solid ${colorMap[it.colorClass]}; padding-left:5px;">${it.name}</div>`).join('')}
+                        ${d.items.map(it => `<div style="font-size:10px; margin-bottom:2px; border-left:2px solid ${colorMap[it.colorClass] || '#555'}; padding-left:5px;">${it.name}</div>`).join('')}
                     </div>`;
                 }
 
@@ -978,13 +988,11 @@
         } catch (e) { console.error("Ошибка сертификатов:", e); }
     }
 
-    // Режим добавления услуг в сертификат
     function startCertBinding(id) {
         activeCertTarget = id;
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         document.getElementById('certsDropdown').classList.remove('active');
         renderCart();
-        alert(`Режим настройки ${id} включен. Выбирайте услуги в прайсе.`);
     }
 
     async function saveCertContent() {
@@ -994,10 +1002,7 @@
                 items: JSON.parse(JSON.stringify(window.currentCart.details))
             }, { merge: true });
             
-            alert(`Услуги для ${activeCertTarget} сохранены!`);
-            activeCertTarget = null;
-            window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
-            renderCart();
+            exitCertMode(); 
             updateCerts();
         } catch (e) { alert("Ошибка сохранения состава"); }
     }
