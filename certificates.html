@@ -660,8 +660,8 @@
         }
 
         /* Цвета календаря */
-        .day.has-data.past-session { background: rgba(0, 143, 57, 0.4) !important; border: 1px solid #00ff66; }
-        .day.has-data.future-session { background: rgba(0, 204, 255, 0.4) !important; border: 1px solid #00ccff; }
+        .day.has-data.past-session { background: rgba(0, 143, 57, 0.6) !important; border: 1px solid #00ff66; }
+        .day.has-data.future-session { background: rgba(0, 204, 255, 0.6) !important; border: 1px solid #00ccff; }
 
         @media (max-width: 992px) {
             .cert-tooltip-base.mobile-active {
@@ -719,6 +719,12 @@
         .cert-row.is-active { cursor: default !important; }
         .cert-row.is-active:hover { background: transparent !important; }
         .cert-row span, .cert-row div { cursor: inherit !important; }
+
+        /* Стиль для растягивания услуг в одну строку на ПК */
+        .services-cell {
+            white-space: nowrap !important;
+            overflow: visible !important;
+        }
     </style>
 
 <script>
@@ -825,8 +831,7 @@
         for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
         
         for(let d=1; d<=daysInMonth; d++) {
-            const dateParts = [String(d).padStart(2,'0'), String(month+1).padStart(2,'0'), year];
-            const dateStr = dateParts.join('.');
+            const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
             const hasData = window.crmData.some(row => row.date === dateStr);
             
             const cellDate = new Date(year, month, d);
@@ -836,9 +841,12 @@
             if (isToday) classes.push('today');
             
             if (hasData) {
-                if (cellDate >= now) {
-                    classes.push('future-session');
+                if (cellDate > now || isToday) {
+                    // Сегодня или будущее
+                    if (isToday) classes.push('past-session'); // Сегодня помечаем зеленым как активное
+                    else classes.push('future-session'); // Будущее - голубым
                 } else {
+                    // Прошлое
                     classes.push('past-session');
                 }
             }
@@ -955,14 +963,13 @@
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
-        // Обновляем заголовок для ПК
         if (window.innerWidth > 992 && head) {
             head.innerHTML = `
                 <th>ДАТА</th>
                 <th>КЛИЕНТ</th>
                 <th>ОПЛАТА</th>
                 <th>УСЛУГИ</th>
-                <th>СУММА</th>
+                <th style="text-align:right;">СУММА</th>
                 <th>ДЕЙСТВИЯ</th>
             `;
         }
@@ -998,14 +1005,14 @@
             } else {
                 tr.innerHTML = `
                     <td data-label="ДАТА">${row.date}</td>
-                    <td data-label="КЛИЕНТ">${row.client}</td>
+                    <td data-label="КЛИЕНТ" style="font-size: 15px; font-weight: 600;">${row.client}</td>
                     <td data-label="ОПЛАТА">
                         <div class="progress-container" style="width:70px; height:6px;">
                             <div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div>
                         </div>
                     </td>
                     <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
-                    <td class="price-cell privacy-blur">${paid} ₽</td>
+                    <td class="price-cell privacy-blur" style="text-align:right;">${paid} ₽</td>
                     <td>
                         <div class="action-icons-wrap">
                             <div class="icon-btn-box" onclick="addPayment('${row.id}')"><i class="fas fa-wallet"></i></div>
