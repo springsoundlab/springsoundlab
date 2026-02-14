@@ -636,7 +636,7 @@
                     .btn-wrapper { order: unset !important; }
                 }
 
-                /* ФИНАНСЫ И БЛЮР */
+                /* ФИНАНСЫ И БЛЮР (CLICK TO UNLOCK) */
                 #currentViewText, .price-cell, .price-cell small {
                     font-family: 'Rajdhani', sans-serif !important;
                     font-weight: 700 !important;
@@ -650,7 +650,7 @@
                     user-select: none;
                 }
                 .privacy-blur.unlocked {
-                    filter: blur(0);
+                    filter: blur(0) !important;
                 }
 
                 .price-cell { font-size: 18px !important; }
@@ -683,10 +683,31 @@
                 .progress-cell .progress-bar {
                     height: 100% !important;
                     border-radius: 2px;
-                    background: var(--neon-purple); /* Цвет по умолчанию */
+                    background: var(--neon-purple);
                 }
                 .progress-bar.complete {
                     background: var(--status-green) !important;
+                }
+
+                /* ЦВЕТА КАЛЕНДАРЯ */
+                .cal-grid .day {
+                    transition: all 0.2s ease;
+                    border: 1px solid transparent !important;
+                    position: relative;
+                    color: #ffffff !important; /* Числа всегда белые */
+                }
+                .cal-grid .day.past-session {
+                    background: #36648B !important; /* Благородный темно-синий */
+                    font-weight: bold;
+                }
+                .cal-grid .day.future-session {
+                    background: #cc0000 !important;
+                }
+                .cal-grid .day.today-session {
+                    background: #008f39 !important;
+                }
+                .cal-grid .day.selected {
+                    border: 1px solid #00ff66 !important;
                 }
             </style>
 
@@ -735,7 +756,7 @@
                         <th style="text-align:right">ДЕЙСТВИЯ</th>
                     </tr>
                 </thead>
-                <tbody id="crmTableBody" onclick="handleTableClick(event)"></tbody>
+                <tbody id="crmTableBody"></tbody>
             </table>
         </div>
         <button onclick="clearFullHistory()" style="margin-top:20px; background:none; border:none; color:#222; font-size:8px; cursor:pointer; text-transform:uppercase; flex-shrink:0;">Удалить всю историю</button>
@@ -777,22 +798,11 @@
 </div>
 
 <script>
-    // Инициализация данных
     window.crmData = [];
     window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
     let currentCalDate = new Date();
     let selectedDate = null;
-    let hoverTimer;
-    const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
-
-    // Функция разблокировки блюра
-    function handleTableClick(e) {
-        const blurEl = e.target.closest('.privacy-blur');
-        if (blurEl) {
-            blurEl.classList.toggle('unlocked');
-        }
-    }
 
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     
@@ -802,19 +812,23 @@
         input.value = val;
     }
 
+    // CLICK TO UNLOCK ЛОГИКА
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('privacy-blur')) {
+            e.target.classList.toggle('unlocked');
+        }
+    });
+
     function openModal(title, type, confirmCallback, defaultValue = '') {
         const modal = document.getElementById('customModal');
         const overlay = document.getElementById('modalOverlay');
-        const titleEl = document.getElementById('modalTitle');
-        const inputEl = document.getElementById('modalInput');
-        const confirmBtn = document.getElementById('modalConfirmBtn');
         if(!modal) return;
-        titleEl.innerText = title;
-        inputEl.value = defaultValue;
-        inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
-        confirmBtn.onclick = confirmCallback;
+        document.getElementById('modalTitle').innerText = title;
+        const input = document.getElementById('modalInput');
+        input.value = defaultValue;
+        input.style.display = (type === 'confirm-delete') ? 'none' : 'block';
+        document.getElementById('modalConfirmBtn').onclick = confirmCallback;
         modal.style.display = 'block'; overlay.style.display = 'block';
-        if(type !== 'confirm-delete') inputEl.focus();
     }
 
     function closeModal() {
@@ -860,6 +874,7 @@
                 classList += ' has-data';
                 const [cellD, cellM, cellY] = dateStr.split('.').map(Number);
                 const cellDate = new Date(cellY, cellM - 1, cellD);
+                cellDate.setHours(0,0,0,0);
                 if (dateStr === todayStr) classList += ' today-session'; 
                 else if (cellDate < today) classList += ' past-session';   
                 else classList += ' future-session'; 
@@ -920,7 +935,7 @@
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
         const filteredData = window.crmData.filter(r => r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
-        filteredData.forEach((row, index) => {
+        filteredData.forEach((row) => {
             const full = row.fullTotal || row.total || 0;
             const paid = row.total || 0;
             const rest = Math.max(0, full - paid);
@@ -933,7 +948,7 @@
                 <td class="artist-cell"><span class="artist-name">${row.client}</span></td>
                 <td class="progress-cell"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></td>
                 <td class="services-cell">${row.services}</td>
-                <td class="price-cell privacy-blur" style="text-align:right;">
+                <td class="price-cell privacy-blur">
                     <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
                     ${!isComplete ? `<small style="color:var(--artist-red); opacity:0.9;">-${rest}</small>` : ''}
                 </td>
@@ -950,10 +965,12 @@
     function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
+        if (!container) return;
+        
         const now = new Date();
         const todayStr = now.toLocaleDateString('ru-RU');
-        
         let targetDate = clickedDate || todayStr;
+        
         const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a,b) => a.time.localeCompare(b.time));
 
         container.innerHTML = '';
@@ -969,14 +986,13 @@
     }
 
     function clearFullHistory() {
-        if(confirm("Удалить ВСЮ историю записей навсегда?")) {
+        if(confirm("Удалить ВСЮ историю?")) {
             crmCollection.get().then(qs => qs.forEach(doc => doc.ref.delete()));
         }
     }
 
     window.addEventListener('load', () => {
         renderCalendar();
-        updateNextSession();
     });
 </script>
 
