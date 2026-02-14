@@ -826,11 +826,8 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
+        // СОРТИРОВКА: Самые новые по timestamp идут первыми (вверху)
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
-            const da = a.date.split('.').reverse().join('');
-            const db = b.date.split('.').reverse().join('');
-            if (da !== db) return da.localeCompare(db);
-            if (a.time && b.time) return a.time.localeCompare(b.time);
             return b.timestamp - a.timestamp;
         });
 
@@ -887,10 +884,11 @@
                         </div>
                     </td>`;
             } else {
+                // УБРАН privacy-blur с ячейки клиента и прогресс-бара
                 tr.innerHTML = `
                     <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
-                        <div class="privacy-blur" style="position:relative;">
+                        <div style="position:relative;">
                             <span class="artist-name" style="font-weight:600;">${row.client}</span>
                             ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
                             <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
@@ -1002,6 +1000,7 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
 
+// Слушаем изменения: новые сверху за счет orderBy по timestamp desc
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
     snapshot.forEach((doc) => {
@@ -1037,7 +1036,6 @@ window.saveSession = async function(event) {
             timestamp: Date.now()
         });
 
-        // ПЛАШКА УДАЛЕНА. Очистка происходит молча.
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
         if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
