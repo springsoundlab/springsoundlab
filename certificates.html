@@ -785,7 +785,7 @@
         });
         window.currentCart.items = window.currentCart.details.map(d => ({ name: d.name, colorClass: d.colorClass }));
         renderCart();
-        if(activeCertTarget) updateCerts(); // Обновляем превью в списке
+        if(activeCertTarget) updateCerts();
     }
 
     function addToCart(name, price, colorClass, forceFull = false) {
@@ -797,7 +797,7 @@
         window.currentCart.total += finalPrice;
         window.currentCart.fullPriceTotal += price;
         renderCart();
-        if(activeCertTarget) updateCerts(); // Обновляем живой тултип
+        if(activeCertTarget) updateCerts();
     }
 
     function removeFromCart(index) {
@@ -807,7 +807,7 @@
         window.currentCart.items.splice(index, 1);
         window.currentCart.details.splice(index, 1);
         renderCart();
-        if(activeCertTarget) updateCerts(); // Обновляем живой тултип
+        if(activeCertTarget) updateCerts();
     }
 
     function exitCertMode() {
@@ -824,32 +824,29 @@
         const total = document.getElementById('cartTotal');
         const cartBox = document.querySelector('.current-session-box');
         const label = document.getElementById('sessionDateLabel');
+        const saveBtn = document.querySelector('.save-btn');
         if(!container || !total) return;
 
         if (activeCertTarget) {
             cartBox.style.border = '2px solid var(--neon-gold)';
-            cartBox.style.boxShadow = '0 0 20px rgba(184, 150, 0, 0.4)';
+            cartBox.style.boxShadow = '0 0 15px rgba(184, 150, 0, 0.4)';
             cartBox.style.position = 'relative';
             label.innerHTML = `НАПОЛНЕНИЕ ${activeCertTarget} <span onclick="exitCertMode()" style="position:absolute; top:10px; right:15px; cursor:pointer; color:var(--artist-red); font-size:18px; font-weight:bold;">×</span>`;
-            
-            const saveBtn = document.querySelector('.save-btn');
             if(saveBtn) {
                 saveBtn.innerText = `СОХРАНИТЬ В ${activeCertTarget}`;
                 saveBtn.style.background = 'var(--status-green)';
-                saveBtn.style.color = '#fff';
                 saveBtn.onclick = saveCertContent;
             }
         } else {
-            cartBox.style.border = '1px solid #111';
-            cartBox.style.boxShadow = 'none';
+            // Возвращаем спокойный фиолетовый режим
+            cartBox.style.border = '1px solid var(--neon-purple)';
+            cartBox.style.boxShadow = '0 0 10px rgba(191, 0, 255, 0.15)';
             if(!label.innerText.includes('ТЕКУЩИЙ ЧЕК')) {
                  label.innerText = selectedDate ? `ТЕКУЩИЙ ЧЕК (${selectedDate}):` : 'ТЕКУЩИЙ ЧЕК:';
             }
-            const saveBtn = document.querySelector('.save-btn');
             if(saveBtn) {
-                saveBtn.innerText = 'СОХРАНИТЬ В SSL CRM';
+                saveBtn.innerText = 'СОХРАНИТЬ';
                 saveBtn.style.background = 'var(--status-green)';
-                saveBtn.style.color = '#fff';
                 saveBtn.onclick = saveSession;
             }
         }
@@ -975,20 +972,14 @@
                 const id = 'SSL-' + String(i).padStart(3, '0');
                 const d = certsData[id] || { active: false, name: '', items: [] };
                 
-                // РАБОТА С ТУЛТИПОМ (Живой предпросмотр + База)
-                let itemsToShow = d.items || [];
+                // РАБОТА С ТУЛТИПОМ: Берем либо из базы, либо текущую корзину если SSL активен
+                let itemsToShow = (activeCertTarget === id) ? window.currentCart.details : (d.items || []);
                 let totalSum = itemsToShow.reduce((acc, val) => acc + val.price, 0);
-
-                // Если это активный сертификат - подменяем данные на текущую корзину (живое обновление)
-                if (activeCertTarget === id) {
-                    itemsToShow = window.currentCart.details;
-                    totalSum = window.currentCart.total;
-                }
 
                 let itemsTooltip = "";
                 if(itemsToShow.length > 0) {
                     itemsTooltip = `<div class="history-tooltip pos-up" style="min-width:180px; left:50%; transform:translateX(-50%);">
-                        <div style="color:var(--neon-gold); font-size:9px; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ:</div>
+                        <div style="color:var(--neon-gold); font-size:9px; margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px;">ДЕТАЛИЗАЦИЯ ${id}:</div>
                         ${itemsToShow.map(it => `
                             <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[it.colorClass] || '#555'}; padding-left:8px;">
                                 <span style="color:${colorMap[it.colorClass] || '#fff'}">${it.name}</span>
@@ -1017,7 +1008,7 @@
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         document.getElementById('certsDropdown').classList.remove('active');
         renderCart();
-        updateCerts(); // Обновляем список, чтобы подсветить активный SSL
+        updateCerts();
     }
 
     async function saveCertContent() {
@@ -1077,6 +1068,7 @@
         renderCalendar();
         updateCerts();
         initTooltipLogic();
+        renderCart(); // Вызываем при загрузке для фиолетовой обводки
     });
 </script>
 
