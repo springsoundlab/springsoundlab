@@ -653,6 +653,120 @@
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
 
+    // ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ ИДЕАЛЬНОЙ СЕТКИ НА ТЕЛЕФОНЕ
+    const style = document.createElement('style');
+    style.innerHTML = `
+        @media (max-width: 992px) {
+            /* Контейнер теперь делится на две колонки, как и кнопки услуг */
+            .prepaid-wrapper {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+                width: 100% !important;
+                background: transparent !important;
+                border: none !important;
+                margin: 10px 0 !important;
+                padding: 0 !important;
+                height: auto !important;
+            }
+
+            /* Левая часть (Текст) */
+            .prepaid-wrapper .left-part {
+                background: #0a0a0a !important;
+                border: 1px solid #222 !important;
+                border-radius: 6px !important;
+                height: 45px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                transition: all 0.3s ease !important;
+            }
+
+            /* Правая часть (Тумблер) */
+            .prepaid-wrapper .right-part {
+                background: #0a0a0a !important;
+                border: 1px solid #222 !important;
+                border-radius: 6px !important;
+                height: 45px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                transition: all 0.3s ease !important;
+            }
+
+            /* Текст "ПРЕДОПЛАТА 50%" */
+            .prepaid-wrapper span {
+                font-family: 'Orbitron', sans-serif !important;
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                letter-spacing: 1px !important;
+                color: #555 !important;
+                text-transform: uppercase !important;
+            }
+
+            /* Сам тумблер (Switch) внутри правой части */
+            .prepaid-wrapper .switch {
+                position: relative !important;
+                display: inline-block !important;
+                width: 50px !important;
+                height: 24px !important;
+                margin: 0 !important;
+            }
+            
+            .prepaid-wrapper .slider:before {
+                height: 18px !important;
+                width: 18px !important;
+                left: 3px !important;
+                bottom: 3px !important;
+            }
+
+            /* Активное состояние */
+            .prepaid-wrapper.active-mode .left-part {
+                border-color: var(--neon-purple) !important;
+                background: rgba(191, 0, 255, 0.05) !important;
+            }
+            .prepaid-wrapper.active-mode .right-part {
+                border-color: var(--neon-purple) !important;
+            }
+            .prepaid-wrapper.active-mode span {
+                color: var(--neon-purple) !important;
+                text-shadow: 0 0 5px rgba(191, 0, 255, 0.5) !important;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ВАЖНО: Оборачиваем содержимое prepaid-wrapper в две части, если это еще не сделано в HTML
+    window.addEventListener('DOMContentLoaded', () => {
+        const wrapper = document.querySelector('.prepaid-wrapper');
+        if (wrapper && !wrapper.querySelector('.left-part')) {
+            const textSpan = wrapper.querySelector('span');
+            const switchLabel = wrapper.querySelector('.switch');
+            
+            const leftDiv = document.createElement('div');
+            leftDiv.className = 'left-part';
+            if (textSpan) leftDiv.appendChild(textSpan);
+            
+            const rightDiv = document.createElement('div');
+            rightDiv.className = 'right-part';
+            if (switchLabel) rightDiv.appendChild(switchLabel);
+            
+            wrapper.innerHTML = '';
+            wrapper.appendChild(leftDiv);
+            wrapper.appendChild(rightDiv);
+            
+            // Клик по любой части активирует чекбокс
+            wrapper.onclick = (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    const cb = document.getElementById('prepaidMode');
+                    cb.checked = !cb.checked;
+                    applyPrepaidToggle();
+                }
+            };
+        }
+    });
+
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     function formatTimeInput(input) {
         let val = input.value.replace(/\D/g, '');
@@ -766,7 +880,16 @@
     }
 
     function applyPrepaidToggle() {
-        const isPrepaid = document.getElementById('prepaidMode').checked;
+        const checkbox = document.getElementById('prepaidMode');
+        const wrapper = checkbox.closest('.prepaid-wrapper');
+        const isPrepaid = checkbox.checked;
+
+        if (isPrepaid) {
+            wrapper.classList.add('active-mode');
+        } else {
+            wrapper.classList.remove('active-mode');
+        }
+
         window.currentCart.total = 0;
         window.currentCart.details.forEach(item => {
             const isForceFull = item.name.includes('ЧАС ЗАПИСИ');
@@ -826,7 +949,6 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        // СОРТИРОВКА: Самые новые по timestamp идут первыми (вверху)
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
             return b.timestamp - a.timestamp;
         });
@@ -884,7 +1006,6 @@
                         </div>
                     </td>`;
             } else {
-                // УБРАН privacy-blur с ячейки клиента и прогресс-бара
                 tr.innerHTML = `
                     <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
@@ -1000,7 +1121,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
 
-// Слушаем изменения: новые сверху за счет orderBy по timestamp desc
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
     snapshot.forEach((doc) => {
@@ -1039,6 +1159,11 @@ window.saveSession = async function(event) {
         window.currentCart = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
         if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
+        
+        const wrapper = document.getElementById('prepaidMode').closest('.prepaid-wrapper');
+        if (wrapper) wrapper.classList.remove('active-mode');
+        document.getElementById('prepaidMode').checked = false;
+
         renderCart();
     } catch (error) {
         console.error("Ошибка сохранения:", error);
