@@ -1067,53 +1067,51 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-  // Ваши ключи из консоли
-  // Инициализация облака с твоим ключом
+// 2. ИНИЦИАЛИЗАЦИЯ
 const firebaseConfig = {
-  apiKey: "AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",
-  authDomain: "crm-a9450.firebaseapp.com",
-  projectId: "crm-a9450",
-  storageBucket: "crm-a9450.firebasestorage.app",
-  messagingSenderId: "971140334464",
-  appId: "1:971140334464:web:dde090a90bdcd5563cb765"
+    apiKey: "AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",
+    authDomain: "crm-a9450.firebaseapp.com",
+    projectId: "crm-a9450",
+    storageBucket: "crm-a9450.firebasestorage.app",
+    messagingSenderId: "971140334464",
+    appId: "1:971140334464:web:dde090a90bdcd5563cb765"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.firestore();
 const crmCollection = db.collection("sessions");
 
-// СИНХРОНИЗАЦИЯ: Этот блок заставляет телефон и комп видеть друг друга
+// 3. СИНХРОНИЗАЦИЯ (слушаем облако)
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
     snapshot.forEach((doc) => {
         window.crmData.push({ id: doc.id, ...doc.data() });
     });
-    // Обновляем таблицу и календарь на экране
     if (typeof updateTable === "function") updateTable();
     if (typeof renderCalendar === "function") renderCalendar();
 });
 
-// ЗАМЕНИ СВОЮ ФУНКЦИЮ saveSession НА ЭТУ (Облачную):
-// ПОЛНОСТЬЮ ЗАМЕНИ СВОЮ ФУНКЦИЮ saveSession НА ЭТУ
-window.saveSession = async function() {
-    console.log("Кнопка нажата. Ищем корзину...");
+// 4. ГЛАВНАЯ ФУНКЦИЯ СОХРАНЕНИЯ
+window.saveSession = async function(event) {
+    if (event) event.preventDefault(); // Чтобы страница не моргала
     
-    // Ищем корзину (проверяем все варианты имени переменной)
+    console.log("Попытка отправки в Firebase...");
+    
     let cart = window.currentCart || (typeof currentCart !== 'undefined' ? currentCart : null);
 
     if (!cart || !cart.items || cart.items.length === 0) {
-        alert('Чек пуст! Добавьте услуги.');
+        alert('Чек в SSL CRM пуст! Добавьте услуги.');
         return;
     }
 
-    // Собираем данные из твоих полей
     const name = document.getElementById('bookingClient')?.value || 'Без имени';
     const time = document.getElementById('bookingTime')?.value || '';
     const date = window.selectedDate || new Date().toLocaleDateString('ru-RU');
 
     try {
-        // Отправляем в Firebase (на серверы Google)
-        await db.collection("sessions").add({
+        await crmCollection.add({
             date: date,
             client: name,
             time: time,
@@ -1122,40 +1120,32 @@ window.saveSession = async function() {
             timestamp: Date.now()
         });
 
-        // ЕСЛИ МЫ ЗДЕСЬ — ЗНАЧИТ СОХРАНИЛОСЬ
         alert("ОТПРАВЛЕНО В ОБЛАКО!"); 
 
-        // Очищаем корзину только ПОСЛЕ успеха
+        // Очистка
         const empty = { items: [], details: [], total: 0, fullPriceTotal: 0 };
         window.currentCart = empty;
         if (typeof currentCart !== 'undefined') currentCart = empty;
 
-        // Очищаем поля
         if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
         if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
 
-        // Обновляем экран
         if (typeof renderCart === "function") renderCart();
         
     } catch (error) {
         console.error("Ошибка Firebase:", error);
-        alert("ОШИБКА: Данные не ушли. Проверь интернет или базу.");
+        alert("ОШИБКА: " + error.message);
     }
 };
 
-// ЗАМЕНИ СВОЮ ФУНКЦИЮ deleteRow НА ЭТУ:
+// 5. УДАЛЕНИЕ
 window.deleteRow = function(id) {
-    if (confirm("Удалить из облака Firebase?")) {
-        crmCollection.doc(id).delete();
+    if (confirm("Удалить запись из облака Firebase?")) {
+        crmCollection.doc(id).delete().then(() => {
+            console.log("Запись удалена");
+        });
     }
 };
-
-  // 3. УДАЛЕНИЕ: Перехватываем функцию удаления
-  window.deleteRow = function(id) {
-    if (confirm("Удалить запись из облака Firebase?")) {
-      crmCollection.doc(id).delete();
-    }
-  };
 </script>
     
 </body>
