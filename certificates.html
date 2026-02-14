@@ -731,7 +731,7 @@
         if(!grid || !monthName) return;
         grid.innerHTML = '';
         const now = new Date();
-        now.setHours(0,0,0,0); // Сбрасываем время для сравнения только дат
+        now.setHours(0,0,0,0);
         const year = currentCalDate.getFullYear();
         const month = currentCalDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
@@ -742,7 +742,7 @@
         let startingSpace = firstDay === 0 ? 6 : firstDay - 1;
         for(let i=0; i<startingSpace; i++) grid.innerHTML += '<div></div>';
         
-       for(let d=1; d<=daysInMonth; d++) {
+        for(let d=1; d<=daysInMonth; d++) {
             const dateStr = `${String(d).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
             const [dd, mm, yyyy] = dateStr.split('.').map(Number);
             const thisDate = new Date(yyyy, mm - 1, dd);
@@ -756,7 +756,7 @@
             if (hasData) classes.push('has-data');
             if (selectedDate === dateStr) classes.push('selected-day');
             
-            // Красная заливка и белые цифры для записей на будущее
+            // Будущие записи: КРАСНЫЙ ФОН, БЕЛАЯ ЦИФРА
             let styleAttr = isFuture ? 'style="background-color: #cc0000 !important; color: #ffffff !important; border-color: #cc0000 !important; font-weight: bold; box-shadow: 0 0 10px rgba(204,0,0,0.5);"' : '';
             
             grid.innerHTML += `<div class="${classes.join(' ')}" ${styleAttr} onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
@@ -768,7 +768,8 @@
         selectedDate = date;
         const label = document.getElementById('sessionDateLabel');
         if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
-        renderCalendar(); updateNextSession(date); 
+        renderCalendar(); 
+        updateNextSession(date); 
     }
 
     function changeMonth(dir) { 
@@ -837,9 +838,7 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
-            return b.timestamp - a.timestamp;
-        });
+        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => b.timestamp - a.timestamp);
 
         filteredData.forEach((row, index) => {
             const full = row.fullTotal || row.total || 0;
@@ -858,7 +857,7 @@
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             if (row.details && Array.isArray(row.details)) {
                 row.details.forEach(d => {
-                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:sans-serif; font-weight:700;">${d.price} ₽</span></div>`;
+                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:'Inter', sans-serif;">${d.price} ₽</span></div>`;
                 });
             }
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
@@ -867,35 +866,26 @@
             if (window.innerWidth <= 992) {
                 let mobileItemsHTML = '';
                 if(row.details) row.details.forEach(d => {
-                    mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur" style="font-family:sans-serif; font-weight:700;">${d.price} ₽</span></div>`;
+                    mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur" style="font-family:'Inter', sans-serif; font-weight:700;">${d.price} ₽</span></div>`;
                 });
-
                 tr.ondblclick = (e) => toggleMobileDetails(e, index);
-                tr.innerHTML = `
-                    <td style="position:relative; padding-top: 20px;">
-                        <div id="mobileDetails-${index}" class="mobile-details-overlay">
-                            <div class="mobile-details-close" onclick="event.stopPropagation(); this.parentElement.classList.remove('active')">×</div>
-                            <div class="mobile-details-header">Детализация заказа</div>
-                            <div class="mobile-details-list">${mobileItemsHTML}</div>
-                            <div class="mobile-summary-section">
-                                <div class="mobile-summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur" style="font-family:sans-serif; font-weight:700;">${full} ₽</span></div>
-                                <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green); font-family:sans-serif; font-weight:700;">${paid} ₽</span></div>
-                                <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red); font-family:sans-serif; font-weight:700;">${rest} ₽</span></div>
-                            </div>
-                        </div>
-                        <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
-                        ${(row.time && showTime) ? `<div class="mobile-row-time-top" style="position:absolute; top:12px; right:15px; color:#bf00ff; font-size:20px; font-weight:900; font-family:Orbitron;">${row.time}</div>` : ''}
-                        <div class="mobile-row-client">${row.client}</div>
-                        <div class="mobile-row-services">${row.services}</div>
-                        <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
-                        <div class="mobile-actions-grid">
-                            <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
-                            <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
-                        </div>
-                    </td>`;
+                tr.innerHTML = `<td style="position:relative; padding-top: 20px;">
+                    <div id="mobileDetails-${index}" class="mobile-details-overlay">
+                        <div class="mobile-details-close" onclick="event.stopPropagation(); this.parentElement.classList.remove('active')">×</div>
+                        <div class="mobile-details-header">Детализация заказа</div>
+                        <div class="mobile-details-list">${mobileItemsHTML}</div>
+                    </div>
+                    <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
+                    <div class="mobile-row-client">${row.client}</div>
+                    <div class="mobile-row-services">${row.services}</div>
+                    <div class="mobile-actions-grid">
+                        <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
+                        <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
+                    </div>
+                </td>`;
             } else {
                 tr.innerHTML = `
-                    <td data-label="ДАТА"><div style="font-size:12px; color:#ffffff; font-weight:600;">${row.date}</div></td>
+                    <td data-label="ДАТА"><div style="font-size:12px; color:#ffffff; font-weight:600; font-family:Orbitron;">${row.date}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
                         <div style="position:relative;">
                             <span class="artist-name" style="font-weight:600;">${row.client}</span>
@@ -952,12 +942,11 @@
         updateCerts();
     }
 
-  function updateNextSession(clickedDate = null) {
+    function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
         if (!container || !window.crmData) return;
 
-        // Получаем текущую дату без времени (00:00:00)
         const now = new Date();
         now.setHours(0, 0, 0, 0);
 
@@ -965,11 +954,9 @@
         let displayTitle = "Ближайшая запись";
 
         if (clickedDate) {
-            // Если мы выбрали дату в календаре
             sessionsToShow = window.crmData.filter(r => r.date === clickedDate && r.time);
             displayTitle = `Записи на ${clickedDate}`;
         } else {
-            // Автоматический поиск: фильтруем все записи, которые сегодня или в будущем
             const futureAll = window.crmData.filter(r => {
                 if (!r.time || !r.date) return false;
                 const [d, m, y] = r.date.split('.').map(Number);
@@ -1009,25 +996,20 @@
         }
     }
 
-        container.innerHTML = ''; 
-        if (sessionsToShow.length > 0) {
-            sessionsToShow.sort((a,b) => a.time.localeCompare(b.time)).forEach(next => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'future-item';
-                itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.client}</div>`;
-                container.appendChild(itemDiv);
-            });
-            document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
-        } else {
-            container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
-            document.getElementById('nextSessionBox').style.borderColor = '#111';
-        }
-    }
-
     function toggleMobileDetails(e, index) {
         if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close')) return;
         const overlay = document.getElementById(`mobileDetails-${index}`);
         if (overlay) overlay.classList.toggle('active');
+    }
+
+    function clearFullHistory() {
+        openModal("УДАЛИТЬ ВСЮ ИСТОРИЮ?", "confirm-delete", async function() {
+            const snapshot = await crmCollection.get();
+            const batch = db.batch();
+            snapshot.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+            closeModal();
+        });
     }
 
     window.addEventListener('resize', updateTable);
@@ -1062,7 +1044,7 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     });
     updateTable();
     renderCalendar();
-    updateNextSession(); // Вот этот вызов заставляет блок обновляться при получении данных
+    updateNextSession();
 });
 
 window.saveSession = async function(event) {
