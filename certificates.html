@@ -211,7 +211,7 @@
         .certs-dropdown.active .certs-content { display: block; }
         .certs-dropdown.active .certs-header i { transform: rotate(180deg); }
 
-        /* Стили для сертификатов (ДОБАВЛЕНО) */
+        /* Стили для сертификатов */
         .cert-row {
             display: flex;
             justify-content: space-between;
@@ -235,7 +235,6 @@
             color: var(--neon-purple);
             font-size: 14px;
         }
-        /* Конец добавленных стилей */
 
         .calendar-widget { flex-shrink: 0; margin-bottom: 20px; background: #000; border-radius: 10px; padding: 15px; border: 1px solid #222; }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -322,7 +321,7 @@
         .btn-dashed-green { border: 1px dashed var(--status-green) !important; }
         .btn-dashed-gold { border: 1px dashed var(--platinum-gold) !important; }
 
-        /* Стиль для корзины при выбранном сертификате (ДОБАВЛЕНО) */
+        /* Стиль для корзины при выбранном сертификате */
         .current-session-box.session-gold {
             border-color: var(--platinum-gold) !important;
             box-shadow: 0 0 20px rgba(184,150,0,0.3);
@@ -719,7 +718,7 @@
 </div>
 
 <script>
-    // ИЗМЕНЕНО: структура currentCart (убрали items, details хранит originalColor)
+    // ==================== Глобальные переменные ====================
     window.crmData = [];
     window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
     var currentCart = window.currentCart; 
@@ -728,10 +727,9 @@
     let hoverTimer;
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
+    let selectedCertId = null; // выбранный сертификат
 
-    // ДОБАВЛЕНО: переменная для выбранного сертификата
-    let selectedCertId = null;
-
+    // ==================== Вспомогательные функции ====================
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     function formatTimeInput(input) {
         let val = input.value.replace(/\D/g, '');
@@ -887,7 +885,6 @@
         renderCart();
     }
 
-    // ИЗМЕНЕНО: addToCart теперь сохраняет originalColor
     function addToCart(name, price, colorClass, forceFull = false) {
         const isPrepaid = document.getElementById('prepaidMode').checked;
         let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
@@ -903,7 +900,6 @@
         renderCart();
     }
 
-    // ИЗМЕНЕНО: removeFromCart работает с details
     function removeFromCart(index) {
         const item = window.currentCart.details[index];
         window.currentCart.total -= item.price;
@@ -912,7 +908,6 @@
         renderCart();
     }
 
-    // ИЗМЕНЕНО: renderCart использует selectedCertId для выбора цвета
     function renderCart() {
         const container = document.getElementById('cartItems');
         const total = document.getElementById('cartTotal');
@@ -929,7 +924,7 @@
         });
     }
 
-    // ДОБАВЛЕНО: функция выбора сертификата
+    // Функция выбора сертификата
     function selectCert(certId) {
         const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
         // Если сертификат уже активен, игнорируем клик
@@ -949,7 +944,6 @@
         updateCerts();          // обновить подсветку в списке сертификатов
     }
 
-    // ИЗМЕНЕНО: полная переработка updateCerts
     function updateCerts() {
         const list = document.getElementById('certsList');
         const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
@@ -982,9 +976,8 @@
                 innerHTML += `<span style="font-size:10px; color:#555">${data.name}</span>`;
                 innerHTML += `<span style="font-size:8px; color:#00ff66; border:1px solid #00ff66; padding:2px 5px; border-radius:3px;">OK</span>`;
             } else {
-                // Неактивный: поле ввода (значение пока пустое, можно заполнить в любой момент)
+                // Неактивный: поле ввода (значение может быть уже введено ранее)
                 innerHTML += `<input type="text" id="in-${id}" style="background:#111; border:1px solid #222; color:#fff; padding:4px; font-size:10px; width:90px; outline:none;" placeholder="Имя" value="${data.name || ''}">`;
-                // Кнопка АКТИВ больше не нужна – активация происходит при сохранении чека
             }
 
             div.innerHTML = innerHTML;
@@ -992,7 +985,7 @@
         }
     }
 
-    // ИЗМЕНЕНО: saveSession теперь активирует выбранный сертификат
+    // ==================== Работа с Firebase ====================
     window.saveSession = async function(event) {
         if (event) event.preventDefault();
         let cart = window.currentCart;
@@ -1067,13 +1060,145 @@
         });
     };
 
-    // Остальные функции (updateTable, updateMonthTotal, updateNextSession, toggleMobileDetails и т.д.) остаются без изменений,
-    // но для полноты я приведу их ниже (они уже были в вашем коде). 
-    // В целях экономии места я не буду копировать их сюда, если вы не против.
-    // Однако, чтобы код был полностью рабочим, убедитесь, что все функции из оригинального скрипта присутствуют.
-    // Ниже я кратко перечислю их: updateTable, updateMonthTotal, updateCerts, activateCert (уже не нужна), updateNextSession, toggleMobileDetails и т.д.
-    // Вы можете оставить их без изменений, кроме activateCert – её можно удалить, так как мы больше не используем кнопку.
-    // Но если оставите, она не помешает.
+    // ==================== Остальные функции (без изменений) ====================
+    function updateTable() {
+        const body = document.getElementById('crmTableBody');
+        if(!body || !window.crmData) return;
+        body.innerHTML = '';
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        const todayStr = now.toLocaleDateString('ru-RU');
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+
+        const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
+            return b.timestamp - a.timestamp;
+        });
+
+        filteredData.forEach((row, index) => {
+            const full = row.fullTotal || row.total || 0;
+            const paid = row.total || 0;
+            const rest = Math.max(0, full - paid);
+            const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
+            const isComplete = perc >= 100;
+            
+            let showTime = true;
+            if (row.time && row.date === todayStr) {
+                const [h, m] = row.time.split(':').map(Number);
+                if (currentTime >= (h * 60 + m)) showTime = false;
+            }
+
+            const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
+            let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+            if (row.details && Array.isArray(row.details)) {
+                row.details.forEach(d => {
+                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.colorClass] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.colorClass] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                });
+            }
+            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
+
+            const tr = document.createElement('tr');
+            if (window.innerWidth <= 992) {
+                let mobileItemsHTML = '';
+                if(row.details) row.details.forEach(d => {
+                    mobileItemsHTML += `<div class="mobile-detail-item" style="border-left-color: ${colorMap[d.colorClass]}"><span class="mobile-detail-name" style="color:${colorMap[d.colorClass]}">${d.name}</span><span class="mobile-detail-price privacy-blur">${d.price} ₽</span></div>`;
+                });
+
+                tr.ondblclick = (e) => toggleMobileDetails(e, index);
+                tr.innerHTML = `
+                    <td style="position:relative; padding-top: 20px;">
+                        <div id="mobileDetails-${index}" class="mobile-details-overlay">
+                            <div class="mobile-details-close" onclick="event.stopPropagation(); this.parentElement.classList.remove('active')">×</div>
+                            <div class="mobile-details-header">Детализация заказа</div>
+                            <div class="mobile-details-list">${mobileItemsHTML}</div>
+                            <div class="mobile-summary-section">
+                                <div class="mobile-summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur">${full} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div>
+                            </div>
+                        </div>
+                        <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
+                        ${(row.time && showTime) ? `<div class="mobile-row-time-top" style="position:absolute; top:12px; right:15px; color:#bf00ff; font-size:20px; font-weight:900; font-family:Orbitron;">${row.time}</div>` : ''}
+                        <div class="mobile-row-client">${row.client}</div>
+                        <div class="mobile-row-services">${row.services}</div>
+                        <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
+                        <div class="mobile-actions-grid">
+                            <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
+                            <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
+                        </div>
+                    </td>`;
+            } else {
+                tr.innerHTML = `
+                    <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
+                    <td data-label="КЛИЕНТ" class="artist-cell">
+                        <div style="position:relative;">
+                            <span class="artist-name" style="font-weight:600;">${row.client}</span>
+                            ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
+                            <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
+                        </div>
+                    </td>
+                    <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
+                    <td class="price-cell privacy-blur" style="font-family:Orbitron; font-size:11px; text-align:right;">
+                        <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
+                        ${!isComplete ? `<br><small style="color:var(--artist-red); font-size:9px;">-${rest}</small>` : ''}
+                    </td>
+                    <td data-label="ДЕЙСТВИЯ">
+                        <div class="action-icons-wrap">
+                            <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
+                            <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
+                        </div>
+                    </td>`;
+            }
+            body.appendChild(tr);
+        });
+        updateMonthTotal();
+    }
+
+    function updateMonthTotal() {
+        const el = document.getElementById('monthTotal');
+        if(!el || !window.crmData) return;
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+        const sum = window.crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + Number(b.total), 0);
+        el.innerText = sum.toLocaleString() + ' ₽';
+    }
+
+    function updateNextSession(clickedDate = null) {
+        const container = document.getElementById('futureListContainer');
+        const titleEl = document.getElementById('futureTitleLabel');
+        if (!container || !window.crmData) return;
+        const now = new Date();
+        const todayStr = now.toLocaleDateString('ru-RU');
+        const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
+        let targetDate = clickedDate || (window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr);
+        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
+        container.innerHTML = ''; 
+        if (sessions.length > 0) {
+            titleEl.innerText = (targetDate === todayStr) ? "Записи на сегодня" : (targetDate === tomorrowStr ? "Записи на завтра" : `Записи на ${targetDate}`);
+            sessions.forEach(next => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'future-item';
+                itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.client}</div>`;
+                container.appendChild(itemDiv);
+            });
+            document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
+        } else {
+            titleEl.innerText = "Ближайшая запись";
+            container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
+            document.getElementById('nextSessionBox').style.borderColor = '#111';
+        }
+    }
+
+    function toggleMobileDetails(e, index) {
+        if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close')) return;
+        const overlay = document.getElementById(`mobileDetails-${index}`);
+        if (overlay) overlay.classList.toggle('active');
+    }
+
+    window.addEventListener('resize', updateTable);
+    window.addEventListener('load', () => {
+        renderCalendar();
+        updateCerts();
+        initTooltipLogic();
+    });
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1102,28 +1227,7 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     renderCalendar();
     updateNextSession();
 });
-
-// ВАЖНО: добавьте вызов updateCerts() при загрузке, чтобы отобразить сертификаты
-window.addEventListener('load', () => {
-    renderCalendar();
-    updateCerts();          // ИЗМЕНЕНО: теперь updateCerts определена выше
-    initTooltipLogic();
-});
 </script>
-</footer> 
 
-<div id="admin-overlay" onclick="closeAdmin()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; backdrop-filter: blur(8px);"></div>
-
-<div id="admin-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: #050505; border: 1px solid var(--neon-purple); padding: 30px; z-index: 10000; border-radius: 10px; box-shadow: 0 0 40px rgba(191, 0, 255, 0.3); font-family: 'Orbitron', sans-serif; text-align: center;">
-    <div style="color: var(--neon-purple); font-size: 16px; margin-bottom: 25px; letter-spacing: 3px;">ADMIN ACCESS</div>
-    
-    <input type="text" id="admin-login" placeholder="LOGIN" autocomplete="off" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 15px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
-    
-    <input type="password" id="admin-pass" placeholder="PASSWORD" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 20px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
-    
-    <button onclick="checkAdminAuth()" style="width: 100%; padding: 12px; background: var(--neon-purple); border: none; color: #fff; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.3s; letter-spacing: 1px; font-family: 'Orbitron', sans-serif;">AUTHENTICATE</button>
-    
-    <div onclick="closeAdmin()" style="margin-top: 20px; color: #333; font-size: 9px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Abort Mission</div>
-</div>
 </body>
 </html>
