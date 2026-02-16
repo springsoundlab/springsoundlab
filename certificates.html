@@ -19,7 +19,7 @@
             --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
             --azure-blue: #00ccff; --text-gray: #b0b0b0;
-            --completed-bg: rgba(184, 150, 0, 0.1); /* менее яркий */
+            --completed-bg: rgba(184, 150, 0, 0.25); /* чуть ярче */
             --completed-border: #b89600;
         }
         
@@ -41,29 +41,15 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 30px 0 20px 0; /* увеличен отступ сверху */
+            padding: 30px 0 20px 0;
             border-bottom: 1px solid #111; 
             flex-shrink: 0; 
             height: 90px;
         }
 
+        /* Скрываем левый блок на всех устройствах (по просьбе убрать дату/время) */
         .header-left {
-            width: 25%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            font-family: 'Rajdhani', sans-serif; /* изменён шрифт */
-            color: #fff;
-            line-height: 1.3;
-        }
-        .header-left .time {
-            font-size: 28px; /* крупнее */
-            font-weight: 700;
-            color: var(--neon-purple);
-        }
-        .header-left .date {
-            font-size: 18px; /* крупнее */
-            color: #aaa;
+            display: none;
         }
 
         .header-center {
@@ -86,7 +72,7 @@
 
         .total-box { 
             background: var(--neon-purple); 
-            height: 90px; /* под размер шапки */
+            height: 90px;
             width: 100%;
             max-width: 380px;
             border-radius: 10px; 
@@ -342,11 +328,20 @@
         .session-booking-widget {
             background: #000; border: 1px solid #222; border-radius: 10px; padding: 15px; margin-bottom: 20px;
         }
+        .booking-label {
+            font-family: 'Orbitron';
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 12px; /* увеличен отступ, чтобы поднять выше */
+            text-transform: uppercase; /* капслок */
+            text-align: center; /* центрирование */
+            letter-spacing: 1px;
+        }
         .booking-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .booking-field {
             background: #080808; border: 1px solid #1a1a1a; border-radius: 6px; padding: 8px; color: #fff; 
-            font-family: 'Rajdhani', sans-serif; /* изменён шрифт */
-            font-size: 16px; /* крупнее */
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
             outline: none; 
             width: 100%; 
             transition: 0.3s;
@@ -444,7 +439,7 @@
             align-items: flex-end; 
             gap: 10px; 
         }
-        .upper-row {
+        .action-row {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -460,7 +455,7 @@
             font-family: 'Inter', sans-serif;
             font-size: 14px;
             height: 42px; /* как у кнопки */
-            width: 300px; /* можно задать ширину, но лучше flex */
+            width: 300px;
             flex: 1;
             min-width: 200px;
             outline: none;
@@ -476,6 +471,8 @@
             height: 42px; 
             text-align: right; 
             line-height: 42px;
+            margin-bottom: 5px; /* небольшой отступ снизу */
+            width: 100%;
         }
         .save-btn { 
             background: var(--status-green); 
@@ -627,9 +624,6 @@
                 border-bottom: none;
                 padding: 10px 0;
             }
-            .header-left {
-                display: none; /* скрываем на мобильных */
-            }
             .header-center {
                 width: 100%;
                 font-size: 16px;
@@ -690,7 +684,7 @@
 
             .mobile-row-date { 
                 font-family: 'Inter', sans-serif;
-                font-size: 16px; /* крупнее */
+                font-size: 16px;
                 color: #fff;
                 margin-bottom: 4px; 
                 font-weight: 500;
@@ -723,7 +717,7 @@
                 padding: 12px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; 
                 text-transform: uppercase; text-align: center; cursor: pointer; border: 1px solid transparent;
             }
-            .m-btn-complete { border-color: var(--platinum-gold); color: var(--platinum-gold); } /* жёлтый */
+            .m-btn-complete { border-color: var(--platinum-gold); color: var(--platinum-gold); }
             .m-btn-pay { border-color: var(--status-green); color: var(--status-green); }
             .m-btn-del { border-color: var(--artist-red); color: var(--artist-red); }
 
@@ -732,7 +726,7 @@
                 width: 100%;
                 align-items: stretch;
             }
-            .upper-row {
+            .action-row {
                 flex-direction: column;
                 gap: 10px;
             }
@@ -743,6 +737,7 @@
             .total-display-pc { 
                 text-align: center; 
                 width: 100%;
+                margin-bottom: 5px;
             }
             .save-btn { 
                 width: 100%; 
@@ -779,13 +774,13 @@
                 margin-bottom: 12px; text-transform: uppercase;
             }
             .mobile-details-list { 
-                display: none; /* скрываем список услуг */
+                display: none;
             }
             .mobile-summary-section {
                 margin-top: 0;
                 border-top: none;
                 padding-top: 0;
-                font-size: 18px; /* крупнее */
+                font-size: 18px;
             }
             .mobile-summary-line {
                 display: flex;
@@ -860,10 +855,7 @@
 </div>
 
 <header>
-    <div class="header-left" id="liveClock">
-        <div class="time" id="currentTime">00:00</div>
-        <div class="date" id="currentDate">01.01.2026</div>
-    </div>
+    <div class="header-left" id="liveClock"><!-- скрыто --></div>
     <div class="header-center">
         SPRING SOUND LAB <span>|</span> RECORDING STUDIO
     </div>
@@ -941,11 +933,11 @@
                 <div id="cartItems">Пусто...</div>
             </div>
             <div class="cart-actions">
-                <div class="upper-row">
+                <div class="total-display-pc" id="cartTotal">0 ₽</div>
+                <div class="action-row">
                     <input type="text" id="clientSongInput" class="song-field" placeholder="Имя клиента - Название песни" value="" onkeydown="if(event.key==='Enter') saveSession()">
-                    <div class="total-display-pc" id="cartTotal">0 ₽</div>
+                    <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
                 </div>
-                <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
             </div>
         </div>
 
@@ -983,10 +975,9 @@
         </div>
 
         <div class="session-booking-widget">
-            <div class="booking-label">Добавление на будущее (время)</div>
+            <div class="booking-label">ДОБАВЛЕНИЕ НА БУДУЩЕЕ (ВРЕМЯ)</div>
             <div class="booking-row">
                 <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)" onkeydown="if(event.key==='Enter') saveSession()">
-                <!-- поле имени клиента удалено -->
             </div>
         </div>
 
@@ -1088,17 +1079,6 @@
             } else { alert("Неверный пароль"); }
         });
     }
-
-    // ---------- ЖИВЫЕ ЧАСЫ В ШАПКЕ ----------
-    function updateClock() {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-        const dateStr = now.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.');
-        document.getElementById('currentTime').textContent = timeStr;
-        document.getElementById('currentDate').textContent = dateStr;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
 
     // ---------- КАЛЕНДАРЬ ----------
     function renderCalendar() {
@@ -1391,8 +1371,8 @@
         try {
             await crmCollection.add({
                 date: date,
-                client: clientSong, // сохраняем всю строку в поле client (для совместимости)
-                song: clientSong,    // дублируем в song
+                client: clientSong,
+                song: clientSong,
                 time: time,
                 services: cart.details.map(i => i.name).join(', '),
                 details: JSON.parse(JSON.stringify(cart.details)),
@@ -1490,7 +1470,6 @@
             const clientDisplay = row.song || row.client || '';
 
             if (window.innerWidth <= 992) {
-                // Мобильная версия: упрощённая детализация
                 tr.ondblclick = (e) => toggleMobileDetails(e, index, row);
                 
                 let topActionsHTML = `<div class="mobile-top-actions">`;
