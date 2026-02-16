@@ -19,6 +19,8 @@
             --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
             --azure-blue: #00ccff; --text-gray: #b0b0b0;
+            --completed-bg: rgba(184, 150, 0, 0.15);
+            --completed-border: #b89600;
         }
         
         body { 
@@ -35,39 +37,60 @@
             padding-top: env(safe-area-inset-top);
         }
         
+        /* Обновлённая шапка */
         header { 
             display: flex; 
             justify-content: space-between; 
-            align-items: flex-start; 
+            align-items: center; 
             padding: 0 0 20px 0; 
             border-bottom: 1px solid #111; 
             flex-shrink: 0; 
+            height: 70px; /* фиксированная высота */
         }
 
-        @media (min-width: 993px) {
-            header {
-                margin-top: 30px;
-            }
-        }
-
-        .logo { 
-            font-family: 'Orbitron', sans-serif; 
-            color: var(--neon-purple); 
-            letter-spacing: 2px; 
-            font-size: 14px; 
-            padding-top: 15px;
-        }
-        
-        .header-right-zone {
-            width: 380px;
+        .header-left {
+            width: 25%;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            color: #fff;
+            line-height: 1.4;
+        }
+        .header-left .time {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--neon-purple);
+        }
+        .header-left .date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .header-center {
+            width: 50%;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            color: var(--neon-purple);
+            letter-spacing: 2px;
+        }
+        .header-center span {
+            color: #fff;
+        }
+
+        .header-right-zone {
+            width: 25%;
+            display: flex;
+            justify-content: flex-end;
         }
 
         .total-box { 
             background: var(--neon-purple); 
             height: 70px;
+            width: 100%;
+            max-width: 380px;
             border-radius: 10px; 
             text-align: center;
             display: flex;
@@ -138,6 +161,9 @@
             text-align: center;
             font-family: 'Orbitron';
             background: rgba(255,255,255,0.02);
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
         }
         .back-btn:hover { 
             color: #fff; 
@@ -313,6 +339,11 @@
         .day.has-data { background: var(--status-green) !important; color: #fff !important; }
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
         .day:hover { background: #111; }
+        /* Жёлтая обводка для дат с завершёнными сессиями */
+        .day.completed-day {
+            outline: 2px solid var(--platinum-gold);
+            outline-offset: 2px;
+        }
 
         .session-booking-widget {
             background: #000; border: 1px solid #222; border-radius: 10px; padding: 15px; margin-bottom: 20px;
@@ -446,27 +477,36 @@
         .paid-amount {
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 18px; /* крупнее */
+            font-size: 18px;
         }
         .rest-amount {
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 18px; /* такой же размер, как у paid-amount */
+            font-size: 18px;
             color: var(--artist-red);
             display: block;
         }
 
+        /* Увеличенная ширина колонки Клиент */
         th:nth-child(1), td:nth-child(1) { width: 90px; }
-        th:nth-child(2), td:nth-child(2) { width: 180px; } 
+        th:nth-child(2), td:nth-child(2) { width: 300px; } /* было 180px */
         th:nth-child(3), td:nth-child(3) { width: auto; }
         th:nth-child(4), td:nth-child(4) { width: 110px; }
-        th:nth-child(5), td:nth-child(5) { width: 120px; }
+        th:nth-child(5), td:nth-child(5) { width: 150px; } /* чуть шире для новых кнопок */
 
         .table-time-inline { 
             font-family: 'Rajdhani'; 
             font-weight: 700; 
             font-size: 16px; 
             color: var(--neon-purple); 
+        }
+
+        /* Стиль для завершённой строки */
+        tr.completed-row {
+            background-color: var(--completed-bg);
+        }
+        tr.completed-row td {
+            background-color: transparent;
         }
 
         .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
@@ -495,7 +535,7 @@
 
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
 
-        .action-icons-wrap { display: flex; align-items: center; gap: 15px; justify-content: flex-end; }
+        .action-icons-wrap { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
         .icon-btn-box { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.3s; }
         .icon-btn-box i { font-size: 12px; color: #444; }
         .icon-btn-box span { font-family: 'Orbitron'; font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -506,6 +546,12 @@
 
         .icon-edit:hover i { color: var(--azure-blue); }
         .icon-edit:hover span { color: var(--azure-blue); }
+
+        /* Новая кнопка "Готово" */
+        .icon-complete i { color: #b89600; }
+        .icon-complete span { color: #b89600; }
+        .icon-complete:hover i { color: #ffd700; }
+        .icon-complete:hover span { color: #ffd700; }
 
         .mobile-edit-icon {
             color: #fff;
@@ -527,13 +573,26 @@
                 padding-bottom: env(safe-area-inset-bottom);
             }
             header { 
-                margin-top: 0 !important;
-                flex-direction: column; gap: 15px; align-items: center; border-bottom: none; 
+                flex-direction: column;
+                height: auto;
+                gap: 10px;
+                align-items: stretch;
+                border-bottom: none;
             }
-            .header-right-zone { width: 100%; }
+            .header-left, .header-center, .header-right-zone {
+                width: 100%;
+                text-align: center;
+            }
+            .header-left {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+            }
+            .header-left .time {
+                font-size: 16px;
+            }
             .admin-grid { display: flex !important; flex-direction: column !important; height: auto !important; overflow: visible; }
             .table-scroll-container { max-height: none; overflow-y: visible; }
-            .logo { text-align: center; font-size: 16px; width: 100%; margin-bottom: 5px; }
             .side-panel { order: 1 !important; width: 100% !important; box-sizing: border-box; }
             .crm-panel { order: 2 !important; width: 100% !important; background: none; border: none; padding: 0; }
             
@@ -577,14 +636,16 @@
                 position: relative; 
                 overflow: hidden; 
             }
+            tr.completed-row {
+                background: var(--completed-bg);
+            }
             
             td { border: none !important; padding: 0 !important; text-align: left !important; min-height: auto !important; display: block !important; position: relative; }
 
-            /* Шрифт даты на мобильных */
             .mobile-row-date { 
                 font-family: 'Inter', sans-serif;
                 font-size: 14px; 
-                color: #555; 
+                color: #fff; /* было #555 */
                 margin-bottom: 4px; 
             }
             .mobile-row-client { font-family: 'Inter'; font-weight: 600; font-size: 18px; color: #fff; margin-bottom: 8px; }
@@ -610,12 +671,13 @@
                 line-height: 1;
             }
             
-            .mobile-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px; }
+            .mobile-actions-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px; }
             
             .m-action-btn { 
                 padding: 12px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; 
                 text-transform: uppercase; text-align: center; cursor: pointer; border: 1px solid transparent;
             }
+            .m-btn-complete { border-color: var(--platinum-gold); color: var(--platinum-gold); }
             .m-btn-pay { border-color: var(--status-green); color: var(--status-green); }
             .m-btn-del { border-color: var(--artist-red); color: var(--artist-red); }
 
@@ -710,6 +772,11 @@
             color: #ffffff !important;
         }
 
+        .cal-grid .day.completed-day {
+            outline: 2px solid var(--platinum-gold);
+            outline-offset: 2px;
+        }
+
         .cal-grid .day::after {
             display: none !important;
         }
@@ -728,14 +795,19 @@
 </div>
 
 <header>
-    <div class="logo">SPRING SOUND LAB | CRM & ANALYTICS</div>
+    <div class="header-left" id="liveClock">
+        <div class="time" id="currentTime">00:00:00</div>
+        <div class="date" id="currentDate">01.01.2026</div>
+    </div>
+    <div class="header-center">
+        SPRING SOUND LIVE <span>|</span> RECORDING STUDIO
+    </div>
     <div class="header-right-zone">
         <div class="total-box" onclick="checkPrivacyPassword()">
             <div class="unlock-overlay">CLICK TO UNLOCK</div>
             <span id="monthTotal" class="income-amount privacy-blur">0 ₽</span>
             <span id="totalLabel">ДОХОД ЗА МЕСЯЦ</span>
         </div>
-        <a href="index.html" class="back-btn">Выйти на сайт</a>
     </div>
 </header>
 <div class="admin-grid">
@@ -950,6 +1022,17 @@
         });
     }
 
+    // ---------- ЖИВЫЕ ЧАСЫ В ШАПКЕ ----------
+    function updateClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const dateStr = now.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.');
+        document.getElementById('currentTime').textContent = timeStr;
+        document.getElementById('currentDate').textContent = dateStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
     // ---------- КАЛЕНДАРЬ ----------
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
@@ -972,6 +1055,16 @@
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const todayStr = today.toLocaleDateString('ru-RU');
+
+        // Собираем даты, у которых есть завершённые сессии
+        const completedDates = new Set();
+        if (window.crmData) {
+            window.crmData.forEach(s => {
+                if (s.completed) {
+                    completedDates.add(s.date);
+                }
+            });
+        }
 
         for (let d = 1; d <= lastDate; d++) {
             const dayStr = String(d).padStart(2, '0');
@@ -997,6 +1090,7 @@
             }
             
             if (selectedDate === dateStr) classList += ' selected';
+            if (completedDates.has(dateStr)) classList += ' completed-day';
             grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
     }
@@ -1073,7 +1167,6 @@
     }
 
     // ---------- СЕРТИФИКАТЫ (Firestore) ----------
-    // Подписка на коллекцию certificates
     function subscribeCerts() {
         db.collection("certificates").onSnapshot((snapshot) => {
             certificates = {};
@@ -1086,7 +1179,7 @@
 
     function selectCert(certId) {
         const cert = certificates[certId];
-        if (cert && cert.active) return; // активный нельзя выбрать
+        if (cert && cert.active) return;
 
         const sessionBox = document.getElementById('currentSession');
         if (selectedCertId === certId) {
@@ -1119,7 +1212,6 @@
                     }
                 };
             } else {
-                // Для активных сертификатов добавляем тултип с детализацией
                 if (data.details && data.details.length) {
                     let tooltipHTML = '<div class="cert-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:8px;">ДЕТАЛИЗАЦИЯ:</div>';
                     data.details.forEach(d => {
@@ -1134,12 +1226,10 @@
                 div.classList.add('selected');
             }
 
-            // Левая колонка: номер
             const idSpan = document.createElement('span');
             idSpan.className = 'cert-id';
             idSpan.textContent = id;
 
-            // Центральная колонка: поле ввода или имя
             const centerCol = document.createElement('div');
             centerCol.style.textAlign = 'center';
             centerCol.style.flex = '1';
@@ -1158,7 +1248,6 @@
                 centerCol.appendChild(input);
             }
 
-            // Правая колонка: статус или пусто
             const rightCol = document.createElement('div');
             if (data.active) {
                 const status = document.createElement('span');
@@ -1174,7 +1263,6 @@
         }
     }
 
-    // Миграция старых сертификатов из localStorage в Firestore (однократно)
     async function migrateOldCerts() {
         const oldCerts = localStorage.getItem('spring_certs');
         if (!oldCerts) return;
@@ -1186,7 +1274,7 @@
                 batch.set(ref, data);
             }
             await batch.commit();
-            localStorage.removeItem('spring_certs'); // очищаем после миграции
+            localStorage.removeItem('spring_certs');
             console.log('Сертификаты перенесены в Firestore');
         } catch (e) {
             console.error('Ошибка миграции сертификатов:', e);
@@ -1203,7 +1291,6 @@
             return;
         }
 
-        // Если выбран сертификат, сохраняем данные в Firestore и НЕ отправляем в сессии
         if (selectedCertId) {
             const input = document.getElementById('in-' + selectedCertId);
             if (!input || input.value.trim() === '') {
@@ -1226,11 +1313,9 @@
             if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
             if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
             renderCart();
-            // Обновление подписки произойдёт автоматически
             return;
         }
 
-        // Обычное сохранение чека (без сертификата)
         const clientName = document.getElementById('bookingClient')?.value || 'Без имени';
         const time = document.getElementById('bookingTime')?.value || '';
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
@@ -1244,7 +1329,8 @@
                 details: JSON.parse(JSON.stringify(cart.details)),
                 total: Number(cart.total),
                 fullTotal: Number(cart.fullPriceTotal),
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                completed: false // новая сессия не завершена
             });
 
             window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
@@ -1256,7 +1342,15 @@
         }
     };
 
-    // ---------- РЕДАКТИРОВАНИЕ ЗАПИСИ (с проверкой на полную оплату) ----------
+    // ---------- ОТМЕТКА "ГОТОВО" ----------
+    window.markCompleted = function(id) {
+        const row = window.crmData.find(r => r.id === id);
+        if (!row) return;
+        // Переключаем состояние completed
+        crmCollection.doc(id).update({ completed: !row.completed });
+    };
+
+    // ---------- РЕДАКТИРОВАНИЕ ЗАПИСИ ----------
     window.editRecord = function(id) {
         const row = window.crmData.find(r => r.id === id);
         if (!row) return;
@@ -1288,6 +1382,7 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
+        // Firestore уже возвращает по убыванию timestamp, но на всякий случай сортируем
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a,b) => {
             return b.timestamp - a.timestamp;
         });
@@ -1315,6 +1410,10 @@
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
 
             const tr = document.createElement('tr');
+            if (row.completed) {
+                tr.classList.add('completed-row');
+            }
+
             if (window.innerWidth <= 992) {
                 let mobileItemsHTML = '';
                 if(row.details) row.details.forEach(d => {
@@ -1323,7 +1422,6 @@
 
                 tr.ondblclick = (e) => toggleMobileDetails(e, index);
                 
-                // Формируем верхние действия (время + редактирование)
                 let topActionsHTML = `<div class="mobile-top-actions">`;
                 if (row.time && showTime) {
                     topActionsHTML += `<div class="mobile-time">${row.time}</div>`;
@@ -1344,19 +1442,19 @@
                             </div>
                         </div>
                         ${topActionsHTML}
-                        <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
+                        <div class="mobile-row-date">${row.date}</div>
                         <div class="mobile-row-client">${row.client}</div>
                         <div class="mobile-row-services">${row.services}</div>
                         <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
                         <div class="mobile-actions-grid">
+                            <div class="m-action-btn m-btn-complete" onclick="markCompleted('${row.id}')">Готово</div>
                             <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
                             <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
                         </div>
                     </td>`;
             } else {
-                // Десктопная версия с новым расположением времени и увеличенным прогресс-баром
                 tr.innerHTML = `
-                    <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
+                    <td data-label="ДАТА"><div style="font-size:10px; color:#fff;">${row.date}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
                         <div style="position:relative;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
@@ -1373,6 +1471,7 @@
                     </td>
                     <td data-label="ДЕЙСТВИЯ">
                         <div class="action-icons-wrap">
+                            <div class="icon-btn-box icon-complete" onclick="markCompleted('${row.id}')" title="Отметить как готово"><span>готово</span><i class="fas fa-check"></i></div>
                             <div class="icon-btn-box icon-edit" onclick="editRecord('${row.id}')" title="Редактировать сумму"><span>ред.</span><i class="fas fa-pencil-alt"></i></div>
                             <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
                             <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
@@ -1382,6 +1481,7 @@
             body.appendChild(tr);
         });
         updateMonthTotal();
+        renderCalendar(); // обновить календарь после изменения completed
     }
 
     function updateMonthTotal() {
@@ -1400,7 +1500,6 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         let targetDate = clickedDate;
         if (!targetDate) {
-            // Если дата не выбрана, показываем ближайшую будущую запись (сегодня или завтра)
             const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
             targetDate = window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr;
         }
@@ -1458,7 +1557,6 @@
 
     window.clearFullHistory = function() {
         if (confirm('Удалить ВСЮ историю? Это необратимо.')) {
-            // Можно реализовать удаление всех документов, но для простоты оставим так
             alert('Функция удаления всей истории не реализована в демо-версии');
         }
     };
@@ -1493,7 +1591,6 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     updateNextSession(selectedDate);
 });
 
-// Подписка на сертификаты и миграция
 window.addEventListener('load', async () => {
     await migrateOldCerts();
     subscribeCerts();
