@@ -183,7 +183,7 @@
         .modal-title { font-family: 'Orbitron'; font-size: 11px; margin-bottom: 15px; color: #fff; letter-spacing: 1px; line-height: 1.4; }
         .modal-input {
             width: 100%; background: #000; border: 1px solid #222; color: #fff; padding: 12px;
-            margin-bottom: 20px; border-radius: 6px; font-family: 'Rajdhani'; font-size: 20px; text-align: center; outline: none; box-sizing: border-box;
+            margin-bottom: 20px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 20px; text-align: center; outline: none; box-sizing: border-box;
         }
         .modal-btns { display: flex; gap: 10px; justify-content: center; }
         .m-btn { padding: 10px 15px; border-radius: 6px; font-family: 'Orbitron'; font-size: 9px; cursor: pointer; text-transform: uppercase; border: none; flex: 1; transition: 0.2s; }
@@ -220,6 +220,7 @@
             padding: 8px 0;
             border-bottom: 1px solid #111;
             transition: background 0.2s;
+            position: relative;
         }
         .cert-row.inactive:hover {
             background: rgba(191, 0, 255, 0.1);
@@ -258,6 +259,41 @@
             padding: 2px 5px;
             border-radius: 3px;
             white-space: nowrap;
+        }
+        /* Тултип для сертификатов */
+        .cert-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            background: #0a0a0a;
+            border: 1px solid var(--neon-purple);
+            padding: 10px;
+            border-radius: 6px;
+            z-index: 10000;
+            width: 220px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            pointer-events: none;
+            transition: opacity 0.2s;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 8px;
+        }
+        .cert-row:hover .cert-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .cert-tooltip .tooltip-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 4px;
+            border-left: 2px solid;
+            padding-left: 6px;
+        }
+        .cert-tooltip .tooltip-sum {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
         }
         /* Конец стилей сертификатов */
 
@@ -397,6 +433,7 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
 
+        /* Тултип в таблице */
         .history-tooltip { 
             visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
             padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
@@ -406,7 +443,11 @@
         .history-tooltip.pos-down { transform: translate(15px, 15px); }
         .history-tooltip.pos-up { transform: translate(15px, calc(-100% - 15px)); }
         
-        .tooltip-sum { filter: blur(6px); transition: 0.3s; }
+        .tooltip-sum { 
+            filter: blur(6px); 
+            transition: 0.3s; 
+            font-family: 'Inter', sans-serif; /* новый шрифт для цифр */
+        }
         .privacy-active .tooltip-sum { filter: blur(0); }
 
         .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
@@ -419,6 +460,10 @@
         .icon-btn-box:hover span { color: var(--neon-purple); }
         .icon-delete:hover i { color: var(--artist-red); }
         .icon-delete:hover span { color: var(--artist-red); }
+
+        /* Новая иконка редактирования */
+        .icon-edit:hover i { color: var(--azure-blue); }
+        .icon-edit:hover span { color: var(--azure-blue); }
 
         @media (max-width: 992px) {
             body { 
@@ -540,7 +585,7 @@
                 border-left: 2px solid #fff; 
             }
             .mobile-detail-name { font-size: 11px; color: #fff; }
-            .mobile-detail-price { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; }
+            .mobile-detail-price { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px; }
             
             .mobile-summary-section {
                 margin-top: 10px; border-top: 1px solid #222; padding-top: 10px;
@@ -943,7 +988,6 @@
         container.innerHTML = window.currentCart.details.length === 0 ? 'Пусто...' : '';
         window.currentCart.details.forEach((item, i) => {
             const tag = document.createElement('div');
-            // Всегда используем originalColor, независимо от выбранного сертификата
             tag.className = `cart-tag tag-${item.originalColor}`;
             tag.innerHTML = `${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div>`;
             container.appendChild(tag);
@@ -986,6 +1030,16 @@
                         selectCert(id);
                     }
                 };
+            } else {
+                // Для активных сертификатов добавляем тултип с детализацией
+                if (data.details && data.details.length) {
+                    let tooltipHTML = '<div class="cert-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:8px;">ДЕТАЛИЗАЦИЯ:</div>';
+                    data.details.forEach(d => {
+                        tooltipHTML += `<div class="tooltip-item" style="border-left-color: ${colorMap[d.originalColor] || '#555'};"><span style="color:${colorMap[d.originalColor] || '#fff'}">${d.name}</span><span class="tooltip-sum">${d.price} ₽</span></div>`;
+                    });
+                    tooltipHTML += `<div class="summary-line" style="margin-top:6px;"><span>ИТОГО</span><span class="tooltip-sum">${data.fullTotal || data.total} ₽</span></div></div>`;
+                    div.innerHTML = tooltipHTML; // вставим тултип внутрь div, он будет позиционироваться относительно .cert-row
+                }
             }
 
             if (selectedCertId === id) {
@@ -1000,6 +1054,7 @@
             // Центральная колонка: поле ввода или имя
             const centerCol = document.createElement('div');
             centerCol.style.textAlign = 'center';
+            centerCol.style.flex = '1';
             if (data.active) {
                 centerCol.textContent = data.name;
                 centerCol.style.color = '#555';
@@ -1030,7 +1085,7 @@
         }
     }
 
-    // ---------- СОХРАНЕНИЕ ЧЕКА ----------
+    // ---------- СОХРАНЕНИЕ ЧЕКА (ИЗМЕНЕНО) ----------
     window.saveSession = async function(event) {
         if (event) event.preventDefault();
         let cart = window.currentCart;
@@ -1040,7 +1095,7 @@
             return;
         }
 
-        // Активация выбранного сертификата, если есть
+        // Если выбран сертификат, сохраняем данные в localStorage и НЕ отправляем в Firestore
         if (selectedCertId) {
             const input = document.getElementById('in-' + selectedCertId);
             if (!input || input.value.trim() === '') {
@@ -1049,13 +1104,25 @@
             }
             const name = input.value.trim();
             const certs = JSON.parse(localStorage.getItem('spring_certs')) || {};
-            certs[selectedCertId] = { active: true, name: name };
+            certs[selectedCertId] = {
+                active: true,
+                name: name,
+                details: cart.details,
+                total: cart.total,
+                fullTotal: cart.fullPriceTotal
+            };
             localStorage.setItem('spring_certs', JSON.stringify(certs));
             selectedCertId = null;
             document.getElementById('currentSession').classList.remove('session-gold');
+            window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
+            if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
+            if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
+            renderCart();
             updateCerts();
+            return; // Не отправляем в Firestore
         }
 
+        // Обычное сохранение чека (без сертификата)
         const clientName = document.getElementById('bookingClient')?.value || 'Без имени';
         const time = document.getElementById('bookingTime')?.value || '';
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
@@ -1079,6 +1146,21 @@
         } catch (error) {
             console.error("Ошибка сохранения:", error);
         }
+    };
+
+    // ---------- РЕДАКТИРОВАНИЕ ЗАПИСИ (новая функция) ----------
+    window.editRecord = function(id) {
+        const row = window.crmData.find(r => r.id === id);
+        if (!row) return;
+        openModal(`РЕДАКТИРОВАНИЕ: ${row.client}\nТекущая сумма: ${row.total} ₽`, "edit", function() {
+            const newTotal = parseInt(document.getElementById('modalInput').value);
+            if (!isNaN(newTotal) && newTotal >= 0) {
+                crmCollection.doc(id).update({ total: newTotal });
+                closeModal();
+            } else {
+                alert('Введите корректную сумму');
+            }
+        }, row.total);
     };
 
     // ---------- ТАБЛИЦА ----------
@@ -1112,7 +1194,7 @@
             let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
             if (row.details && Array.isArray(row.details)) {
                 row.details.forEach(d => {
-                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.originalColor] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.originalColor] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Rajdhani; font-weight:700;">${d.price} ₽</span></div>`;
+                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.originalColor] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.originalColor] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Inter, sans-serif; font-weight:600;">${d.price} ₽</span></div>`;
                 });
             }
             tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--artist-red)">${rest} ₽</span></div></div>`;
@@ -1164,6 +1246,7 @@
                     </td>
                     <td data-label="ДЕЙСТВИЯ">
                         <div class="action-icons-wrap">
+                            <div class="icon-btn-box icon-edit" onclick="editRecord('${row.id}')" title="Редактировать сумму"><span>ред.</span><i class="fas fa-pencil-alt"></i></div>
                             <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
                             <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
                         </div>
@@ -1188,12 +1271,22 @@
         if (!container || !window.crmData) return;
         const now = new Date();
         const todayStr = now.toLocaleDateString('ru-RU');
-        const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
-        let targetDate = clickedDate || (window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr);
+        let targetDate = clickedDate;
+        if (!targetDate) {
+            // Если дата не выбрана, показываем ближайшую будущую запись (сегодня или завтра)
+            const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
+            targetDate = window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr;
+        }
         const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
         container.innerHTML = ''; 
         if (sessions.length > 0) {
-            titleEl.innerText = (targetDate === todayStr) ? "Записи на сегодня" : (targetDate === tomorrowStr ? "Записи на завтра" : `Записи на ${targetDate}`);
+            if (targetDate === todayStr) {
+                titleEl.innerText = "Записи на сегодня";
+            } else if (targetDate === new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU')) {
+                titleEl.innerText = "Записи на завтра";
+            } else {
+                titleEl.innerText = `Записи на ${targetDate}`;
+            }
             sessions.forEach(next => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'future-item';
@@ -1202,7 +1295,7 @@
             });
             document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
         } else {
-            titleEl.innerText = "Ближайшая запись";
+            titleEl.innerText = "Нет записей на эту дату";
             container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
             document.getElementById('nextSessionBox').style.borderColor = '#111';
         }
@@ -1270,7 +1363,7 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     });
     updateTable();
     renderCalendar();
-    updateNextSession();
+    updateNextSession(selectedDate); // передаём выбранную дату, если есть
 });
 
 window.addEventListener('load', () => {
