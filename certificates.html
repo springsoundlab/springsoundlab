@@ -260,6 +260,12 @@
             border-radius: 3px;
             white-space: nowrap;
         }
+        /* Имя в активном сертификате */
+        .cert-name {
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+        }
         /* Тултип для сертификатов */
         .cert-tooltip {
             visibility: hidden;
@@ -429,10 +435,25 @@
         th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; position: sticky; top: 0; background: var(--card-bg); z-index: 10; }
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; word-wrap: break-word; }
         
-        .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; padding-right: 12px; }
+        .price-cell { 
+            color: #fff !important; 
+            font-weight: 700; 
+            font-size: 15px; 
+            text-align: right; 
+            padding-right: 12px;
+            line-height: 1.4;
+        }
         .paid-amount {
             font-family: 'Inter', sans-serif;
             font-weight: 600;
+            font-size: 18px; /* крупнее */
+        }
+        .rest-amount {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 18px; /* такой же размер, как у paid-amount */
+            color: var(--artist-red);
+            display: block;
         }
 
         th:nth-child(1), td:nth-child(1) { width: 90px; }
@@ -559,7 +580,13 @@
             
             td { border: none !important; padding: 0 !important; text-align: left !important; min-height: auto !important; display: block !important; position: relative; }
 
-            .mobile-row-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 14px; color: #555; margin-bottom: 4px; }
+            /* Шрифт даты на мобильных */
+            .mobile-row-date { 
+                font-family: 'Inter', sans-serif;
+                font-size: 14px; 
+                color: #555; 
+                margin-bottom: 4px; 
+            }
             .mobile-row-client { font-family: 'Inter'; font-weight: 600; font-size: 18px; color: #fff; margin-bottom: 8px; }
             .mobile-row-services { font-size: 11px; color: #888; margin-bottom: 12px; line-height: 1.4; }
             
@@ -1117,9 +1144,10 @@
             centerCol.style.textAlign = 'center';
             centerCol.style.flex = '1';
             if (data.active) {
-                centerCol.textContent = data.name;
-                centerCol.style.color = '#555';
-                centerCol.style.fontSize = '10px';
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'cert-name';
+                nameSpan.textContent = data.name;
+                centerCol.appendChild(nameSpan);
             } else {
                 const input = document.createElement('input');
                 input.type = 'text';
@@ -1228,11 +1256,18 @@
         }
     };
 
-    // ---------- РЕДАКТИРОВАНИЕ ЗАПИСИ ----------
+    // ---------- РЕДАКТИРОВАНИЕ ЗАПИСИ (с проверкой на полную оплату) ----------
     window.editRecord = function(id) {
         const row = window.crmData.find(r => r.id === id);
         if (!row) return;
-        openModal(`РЕДАКТИРОВАНИЕ: ${row.client}\nТекущая сумма: ${row.total} ₽`, "edit", function() {
+        const full = row.fullTotal || row.total || 0;
+        const paid = row.total || 0;
+        const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
+        if (perc >= 100) {
+            alert('Вся сумма уже внесена');
+            return;
+        }
+        openModal(`РЕДАКТИРОВАНИЕ: ${row.client}\nТекущая сумма: ${paid} ₽`, "edit", function() {
             const newTotal = parseInt(document.getElementById('modalInput').value);
             if (!isNaN(newTotal) && newTotal >= 0) {
                 crmCollection.doc(id).update({ total: newTotal });
@@ -1240,7 +1275,7 @@
             } else {
                 alert('Введите корректную сумму');
             }
-        }, row.total);
+        }, paid);
     };
 
     // ---------- ТАБЛИЦА ----------
@@ -1332,9 +1367,9 @@
                         </div>
                     </td>
                     <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
-                    <td class="price-cell privacy-blur" style="font-family:Orbitron; font-size:11px; text-align:right;">
+                    <td class="price-cell privacy-blur">
                         <span class="paid-amount">${paid}</span> ₽
-                        ${!isComplete ? `<br><small style="color:var(--artist-red); font-size:9px;">-${rest}</small>` : ''}
+                        ${rest > 0 ? `<span class="rest-amount">-${rest}</span>` : ''}
                     </td>
                     <td data-label="ДЕЙСТВИЯ">
                         <div class="action-icons-wrap">
