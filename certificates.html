@@ -408,8 +408,21 @@
         .total-display-pc { font-family: 'Rajdhani'; font-weight: 700; font-size: 34px; color: #fff; height: 42px; width: 155px; margin-bottom: 8px; text-align: right; }
         .save-btn { background: var(--status-green); color: #fff; border: none; height: 42px; width: 155px; border-radius: 6px; font-family: 'Orbitron'; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
 
-        .progress-container { width: 100%; height: 2px; background: #111; margin-top: 5px; border-radius: 1px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--neon-purple); transition: 0.5s; width: 0%; }
+        /* Увеличенный прогресс-бар */
+        .progress-container { 
+            width: 100%; 
+            height: 4px; /* было 2px */
+            background: #111; 
+            margin-top: 5px; 
+            border-radius: 2px; 
+            overflow: hidden; 
+        }
+        .progress-bar { 
+            height: 100%; 
+            background: var(--neon-purple); 
+            transition: 0.5s; 
+            width: 0%; 
+        }
         .progress-bar.complete { background: var(--status-green); }
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
@@ -417,7 +430,6 @@
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; word-wrap: break-word; }
         
         .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; padding-right: 12px; }
-        /* Новый класс для суммы в колонке "ВНЕСЕНО" */
         .paid-amount {
             font-family: 'Inter', sans-serif;
             font-weight: 600;
@@ -429,7 +441,13 @@
         th:nth-child(4), td:nth-child(4) { width: 110px; }
         th:nth-child(5), td:nth-child(5) { width: 120px; }
 
-        .table-time-inline { font-family: 'Rajdhani'; font-weight: 700; font-size: 16px; color: var(--neon-purple); margin-left: 10px; }
+        /* Убираем старый стиль времени, теперь оно внутри flex-контейнера */
+        .table-time-inline { 
+            font-family: 'Rajdhani'; 
+            font-weight: 700; 
+            font-size: 16px; 
+            color: var(--neon-purple); 
+        }
 
         .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
 
@@ -466,11 +484,9 @@
         .icon-delete:hover i { color: var(--artist-red); }
         .icon-delete:hover span { color: var(--artist-red); }
 
-        /* Новая иконка редактирования */
         .icon-edit:hover i { color: var(--azure-blue); }
         .icon-edit:hover span { color: var(--azure-blue); }
 
-        /* Мобильная иконка редактирования */
         .mobile-edit-icon {
             color: #fff;
             font-size: 14px;
@@ -551,7 +567,6 @@
             .mobile-progress-wrapper { margin-bottom: 15px; }
             .mobile-time-label { font-family: 'Orbitron'; font-size: 10px; color: var(--neon-purple); margin-bottom: 5px; display: block; }
             
-            /* Контейнер для верхних действий (время + редактирование) */
             .mobile-top-actions {
                 position: absolute;
                 top: 12px;
@@ -1274,12 +1289,15 @@
                         </div>
                     </td>`;
             } else {
+                // Десктопная версия с новым расположением времени и увеличенным прогресс-баром
                 tr.innerHTML = `
                     <td data-label="ДАТА"><div style="font-size:10px; color:#444;">${row.date.split('.')[0]}.${row.date.split('.')[1]}</div></td>
                     <td data-label="КЛИЕНТ" class="artist-cell">
                         <div style="position:relative;">
-                            <span class="artist-name" style="font-weight:600;">${row.client}</span>
-                            ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                <span class="artist-name" style="font-weight:600;">${row.client}</span>
+                                ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
+                            </div>
                             <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
                         </div>
                     </td>
