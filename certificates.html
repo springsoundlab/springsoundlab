@@ -417,6 +417,11 @@
         td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; word-wrap: break-word; }
         
         .price-cell { color: #fff !important; font-weight: 700; font-size: 15px; text-align: right; padding-right: 12px; }
+        /* Новый класс для суммы в колонке "ВНЕСЕНО" */
+        .paid-amount {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
 
         th:nth-child(1), td:nth-child(1) { width: 90px; }
         th:nth-child(2), td:nth-child(2) { width: 180px; } 
@@ -446,7 +451,7 @@
         .tooltip-sum { 
             filter: blur(6px); 
             transition: 0.3s; 
-            font-family: 'Inter', sans-serif; /* новый шрифт для цифр */
+            font-family: 'Inter', sans-serif;
         }
         .privacy-active .tooltip-sum { filter: blur(0); }
 
@@ -464,6 +469,18 @@
         /* Новая иконка редактирования */
         .icon-edit:hover i { color: var(--azure-blue); }
         .icon-edit:hover span { color: var(--azure-blue); }
+
+        /* Мобильная иконка редактирования */
+        .mobile-edit-icon {
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .mobile-edit-icon:hover {
+            opacity: 1;
+        }
 
         @media (max-width: 992px) {
             body { 
@@ -533,6 +550,24 @@
             
             .mobile-progress-wrapper { margin-bottom: 15px; }
             .mobile-time-label { font-family: 'Orbitron'; font-size: 10px; color: var(--neon-purple); margin-bottom: 5px; display: block; }
+            
+            /* Контейнер для верхних действий (время + редактирование) */
+            .mobile-top-actions {
+                position: absolute;
+                top: 12px;
+                right: 15px;
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                z-index: 10;
+            }
+            .mobile-time {
+                color: #bf00ff;
+                font-size: 20px;
+                font-weight: 900;
+                font-family: 'Orbitron';
+                line-height: 1;
+            }
             
             .mobile-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; border-top: 1px solid #1a1a1a; padding-top: 15px; }
             
@@ -1038,7 +1073,7 @@
                         tooltipHTML += `<div class="tooltip-item" style="border-left-color: ${colorMap[d.originalColor] || '#555'};"><span style="color:${colorMap[d.originalColor] || '#fff'}">${d.name}</span><span class="tooltip-sum">${d.price} ₽</span></div>`;
                     });
                     tooltipHTML += `<div class="summary-line" style="margin-top:6px;"><span>ИТОГО</span><span class="tooltip-sum">${data.fullTotal || data.total} ₽</span></div></div>`;
-                    div.innerHTML = tooltipHTML; // вставим тултип внутрь div, он будет позиционироваться относительно .cert-row
+                    div.innerHTML = tooltipHTML;
                 }
             }
 
@@ -1085,7 +1120,7 @@
         }
     }
 
-    // ---------- СОХРАНЕНИЕ ЧЕКА (ИЗМЕНЕНО) ----------
+    // ---------- СОХРАНЕНИЕ ЧЕКА ----------
     window.saveSession = async function(event) {
         if (event) event.preventDefault();
         let cart = window.currentCart;
@@ -1148,7 +1183,7 @@
         }
     };
 
-    // ---------- РЕДАКТИРОВАНИЕ ЗАПИСИ (новая функция) ----------
+    // ---------- РЕДАКТИРОВАНИЕ ЗАПИСИ ----------
     window.editRecord = function(id) {
         const row = window.crmData.find(r => r.id === id);
         if (!row) return;
@@ -1207,6 +1242,15 @@
                 });
 
                 tr.ondblclick = (e) => toggleMobileDetails(e, index);
+                
+                // Формируем верхние действия (время + редактирование)
+                let topActionsHTML = `<div class="mobile-top-actions">`;
+                if (row.time && showTime) {
+                    topActionsHTML += `<div class="mobile-time">${row.time}</div>`;
+                }
+                topActionsHTML += `<i class="fas fa-pencil-alt mobile-edit-icon" onclick="event.stopPropagation(); editRecord('${row.id}')"></i>`;
+                topActionsHTML += `</div>`;
+
                 tr.innerHTML = `
                     <td style="position:relative; padding-top: 20px;">
                         <div id="mobileDetails-${index}" class="mobile-details-overlay">
@@ -1219,8 +1263,8 @@
                                 <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--artist-red)">${rest} ₽</span></div>
                             </div>
                         </div>
+                        ${topActionsHTML}
                         <div class="mobile-row-date" style="color: #fff; font-size: 17px; font-weight: 800; font-family: Orbitron; margin-bottom: 5px;">${row.date}</div>
-                        ${(row.time && showTime) ? `<div class="mobile-row-time-top" style="position:absolute; top:12px; right:15px; color:#bf00ff; font-size:20px; font-weight:900; font-family:Orbitron;">${row.time}</div>` : ''}
                         <div class="mobile-row-client">${row.client}</div>
                         <div class="mobile-row-services">${row.services}</div>
                         <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
@@ -1241,7 +1285,7 @@
                     </td>
                     <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
                     <td class="price-cell privacy-blur" style="font-family:Orbitron; font-size:11px; text-align:right;">
-                        <span style="color:${isComplete ? 'var(--status-green)' : '#fff'}">${paid} ₽</span>
+                        <span class="paid-amount">${paid}</span> ₽
                         ${!isComplete ? `<br><small style="color:var(--artist-red); font-size:9px;">-${rest}</small>` : ''}
                     </td>
                     <td data-label="ДЕЙСТВИЯ">
@@ -1302,7 +1346,7 @@
     }
 
     function toggleMobileDetails(e, index) {
-        if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close')) return;
+        if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close') || e.target.closest('.mobile-edit-icon')) return;
         const overlay = document.getElementById(`mobileDetails-${index}`);
         if (overlay) overlay.classList.toggle('active');
     }
@@ -1363,7 +1407,7 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     });
     updateTable();
     renderCalendar();
-    updateNextSession(selectedDate); // передаём выбранную дату, если есть
+    updateNextSession(selectedDate);
 });
 
 window.addEventListener('load', () => {
