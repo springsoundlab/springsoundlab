@@ -411,7 +411,7 @@
         /* Увеличенный прогресс-бар */
         .progress-container { 
             width: 100%; 
-            height: 4px; /* было 2px */
+            height: 4px; 
             background: #111; 
             margin-top: 5px; 
             border-radius: 2px; 
@@ -441,7 +441,6 @@
         th:nth-child(4), td:nth-child(4) { width: 110px; }
         th:nth-child(5), td:nth-child(5) { width: 120px; }
 
-        /* Убираем старый стиль времени, теперь оно внутри flex-контейнера */
         .table-time-inline { 
             font-family: 'Rajdhani'; 
             font-weight: 700; 
@@ -847,6 +846,8 @@
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
     let selectedCertId = null;
+    // Кеш сертификатов для быстрого доступа (обновляется из Firestore)
+    let certificates = {};
 
     // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
@@ -1044,10 +1045,21 @@
         });
     }
 
-    // ---------- СЕРТИФИКАТЫ ----------
+    // ---------- СЕРТИФИКАТЫ (Firestore) ----------
+    // Подписка на коллекцию certificates
+    function subscribeCerts() {
+        db.collection("certificates").onSnapshot((snapshot) => {
+            certificates = {};
+            snapshot.forEach((doc) => {
+                certificates[doc.id] = doc.data();
+            });
+            updateCerts();
+        });
+    }
+
     function selectCert(certId) {
-        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
-        if (saved[certId] && saved[certId].active) return;
+        const cert = certificates[certId];
+        if (cert && cert.active) return; // активный нельзя выбрать
 
         const sessionBox = document.getElementById('currentSession');
         if (selectedCertId === certId) {
@@ -1063,13 +1075,12 @@
 
     function updateCerts() {
         const list = document.getElementById('certsList');
-        const saved = JSON.parse(localStorage.getItem('spring_certs')) || {};
         if (!list) return;
         list.innerHTML = '';
 
         for (let i = 1; i <= 300; i++) {
             const id = 'SSL-' + String(i).padStart(3, '0');
-            const data = saved[id] || { active: false, name: '' };
+            const data = certificates[id] || { active: false, name: '' };
             const div = document.createElement('div');
             div.className = 'cert-row';
             
@@ -1135,6 +1146,25 @@
         }
     }
 
+    // Миграция старых сертификатов из localStorage в Firestore (однократно)
+    async function migrateOldCerts() {
+        const oldCerts = localStorage.getItem('spring_certs');
+        if (!oldCerts) return;
+        try {
+            const parsed = JSON.parse(oldCerts);
+            const batch = db.batch();
+            for (const [id, data] of Object.entries(parsed)) {
+                const ref = db.collection("certificates").doc(id);
+                batch.set(ref, data);
+            }
+            await batch.commit();
+            localStorage.removeItem('spring_certs'); // очищаем после миграции
+            console.log('Сертификаты перенесены в Firestore');
+        } catch (e) {
+            console.error('Ошибка миграции сертификатов:', e);
+        }
+    }
+
     // ---------- СОХРАНЕНИЕ ЧЕКА ----------
     window.saveSession = async function(event) {
         if (event) event.preventDefault();
@@ -1145,7 +1175,7 @@
             return;
         }
 
-        // Если выбран сертификат, сохраняем данные в localStorage и НЕ отправляем в Firestore
+        // Если выбран сертификат, сохраняем данные в Firestore и НЕ отправляем в сессии
         if (selectedCertId) {
             const input = document.getElementById('in-' + selectedCertId);
             if (!input || input.value.trim() === '') {
@@ -1153,23 +1183,23 @@
                 return;
             }
             const name = input.value.trim();
-            const certs = JSON.parse(localStorage.getItem('spring_certs')) || {};
-            certs[selectedCertId] = {
+            const certData = {
                 active: true,
                 name: name,
                 details: cart.details,
                 total: cart.total,
                 fullTotal: cart.fullPriceTotal
             };
-            localStorage.setItem('spring_certs', JSON.stringify(certs));
+            await db.collection("certificates").doc(selectedCertId).set(certData);
+            
             selectedCertId = null;
             document.getElementById('currentSession').classList.remove('session-gold');
             window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
             if (document.getElementById('bookingClient')) document.getElementById('bookingClient').value = '';
             if (document.getElementById('bookingTime')) document.getElementById('bookingTime').value = '';
             renderCart();
-            updateCerts();
-            return; // Не отправляем в Firestore
+            // Обновление подписки произойдёт автоматически
+            return;
         }
 
         // Обычное сохранение чека (без сертификата)
@@ -1428,9 +1458,11 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     updateNextSession(selectedDate);
 });
 
-window.addEventListener('load', () => {
+// Подписка на сертификаты и миграция
+window.addEventListener('load', async () => {
+    await migrateOldCerts();
+    subscribeCerts();
     renderCalendar();
-    updateCerts();
     initTooltipLogic();
 });
 </script>
