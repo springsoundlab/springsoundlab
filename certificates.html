@@ -20,6 +20,7 @@
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
             --azure-blue: #00ccff; --text-gray: #b0b0b0;
             --completed-border: #b89600;
+            --completed-bg: rgba(184, 150, 0, 0.1);
         }
         
         body { 
@@ -182,7 +183,10 @@
         /* Модальное окно редактирования */
         .edit-modal {
             width: 400px;
-            max-width: 90vw;
+            max-width: 95vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
         }
         .edit-modal .modal-title {
             margin-bottom: 20px;
@@ -266,9 +270,14 @@
             transition: 0.2s;
             flex: 1 0 auto;
         }
+        .edit-add-btn.btn-white { border-color: #fff; color: #fff; }
+        .edit-add-btn.btn-purple { border-color: var(--neon-purple); color: var(--neon-purple); }
+        .edit-add-btn.btn-red { border-color: var(--artist-red); color: var(--artist-red); }
+        .edit-add-btn.btn-green { border-color: var(--status-green); color: var(--status-green); }
+        .edit-add-btn.btn-blue { border-color: var(--azure-blue); color: var(--azure-blue); }
+        .edit-add-btn.btn-gold { border-color: var(--platinum-gold); color: var(--platinum-gold); }
         .edit-add-btn:hover {
-            border-color: var(--neon-purple);
-            color: #fff;
+            background: rgba(255,255,255,0.05);
         }
         .edit-total {
             display: flex;
@@ -425,8 +434,8 @@
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
         .day:hover { background: #111; }
         .day.completed-day {
-            outline: 2px solid var(--platinum-gold);
-            outline-offset: 2px;
+            outline: 1px solid var(--platinum-gold);
+            outline-offset: 1px;
         }
 
         .session-booking-widget {
@@ -526,8 +535,8 @@
             border-radius: 10px; 
             margin-bottom: 20px; 
             display: flex; 
-            flex-direction: column; /* изменено для прижатия вниз */
-            min-height: 200px; /* немного больше для наглядности */
+            flex-direction: column;
+            min-height: 200px;
             position: relative; 
             flex-shrink: 0;
             transition: border-color 0.3s, box-shadow 0.3s;
@@ -537,7 +546,6 @@
             display: flex; 
             flex-direction: column; 
             align-items: flex-start; 
-            margin-bottom: auto; /* прижимает контент вверх, но нам нужно наоборот */
         }
         #cartItems { display: flex; flex-wrap: wrap; gap: 8px; }
         .cart-tag { font-size: 10px; font-family: 'Orbitron'; padding: 6px 30px 6px 10px; border-radius: 4px; display: inline-flex; align-items: center; position: relative; background: rgba(0,0,0,0.3); }
@@ -554,7 +562,7 @@
             flex-direction: column; 
             align-items: flex-end; 
             gap: 10px; 
-            margin-top: auto; /* прижимает к низу */
+            margin-top: auto;
         }
         .action-row {
             display: flex;
@@ -666,10 +674,14 @@
             color: var(--neon-purple); 
         }
 
-        /* Жёлтая обводка для завершённых строк */
+        /* Жёлтая обводка и фон для завершённых строк */
         tr.completed-row {
-            outline: 2px solid var(--platinum-gold);
-            outline-offset: -2px;
+            outline: 1px solid var(--platinum-gold);
+            outline-offset: -1px;
+            background-color: var(--completed-bg);
+        }
+        tr.completed-row td {
+            background-color: transparent;
         }
 
         .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
@@ -814,11 +826,12 @@
                 overflow: hidden; 
                 margin-left: auto;
                 margin-right: auto;
-                width: calc(100% - 20px) !important; /* добавляем отступы */
+                width: calc(100% - 20px) !important;
             }
             tr.completed-row {
-                outline: 2px solid var(--platinum-gold);
-                outline-offset: 2px;
+                outline: 1px solid var(--platinum-gold);
+                outline-offset: 1px;
+                background-color: var(--completed-bg);
             }
             
             td { border: none !important; padding: 0 !important; text-align: left !important; min-height: auto !important; display: block !important; position: relative; }
@@ -879,7 +892,7 @@
             .song-field {
                 width: 100%;
                 min-width: auto;
-                height: 50px; /* увеличена высота */
+                height: 50px;
                 font-size: 16px;
             }
             .total-display-pc { 
@@ -948,6 +961,7 @@
                 width: 95vw;
                 max-height: 90vh;
                 overflow-y: auto;
+                padding: 15px;
             }
         }
 
@@ -989,8 +1003,8 @@
         }
 
         .cal-grid .day.completed-day {
-            outline: 2px solid var(--platinum-gold);
-            outline-offset: 2px;
+            outline: 1px solid var(--platinum-gold);
+            outline-offset: 1px;
         }
 
         .cal-grid .day::after {
@@ -1003,24 +1017,24 @@
 <div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
 <div id="customModal" class="custom-modal">
     <div id="modalTitle" class="modal-title">ДОПЛАТА</div>
-    <input type="number" id="modalInput" class="modal-input" placeholder="0">
+    <input type="number" id="modalInput" class="modal-input" placeholder="0" onkeydown="if(event.key==='Enter') document.getElementById('modalConfirmBtn').click()">
     <div class="modal-btns">
         <button class="m-btn m-cancel" onclick="closeModal()">ОТМЕНА</button>
         <button id="modalConfirmBtn" class="m-btn m-confirm">ГОТОВО</button>
     </div>
 </div>
 
-<!-- Модальное окно редактирования записи (будет заполняться динамически) -->
+<!-- Модальное окно редактирования записи -->
 <div id="editModalOverlay" class="modal-overlay" onclick="closeEditModal()"></div>
 <div id="editModal" class="custom-modal edit-modal">
     <div id="editModalTitle" class="modal-title">РЕДАКТИРОВАНИЕ</div>
-    <input type="text" id="editClientName" class="edit-client-input" placeholder="Имя клиента">
+    <input type="text" id="editClientName" class="edit-client-input" placeholder="Имя клиента" onkeydown="if(event.key==='Enter') saveEdit()">
     <div class="edit-services-list" id="editServicesList"></div>
     <div class="edit-add-buttons" id="editAddButtons"></div>
     <div class="edit-total" id="editTotal">ИТОГО: 0 ₽</div>
     <div class="edit-actions">
         <button class="m-btn m-cancel" onclick="closeEditModal()">ОТМЕНА</button>
-        <button class="m-btn m-confirm" id="editSaveBtn">СОХРАНИТЬ</button>
+        <button class="m-btn m-confirm" id="editSaveBtn" onclick="saveEdit()">СОХРАНИТЬ</button>
     </div>
 </div>
 
@@ -1274,17 +1288,17 @@
             container.appendChild(div);
         });
 
-        // Кнопки добавления услуг (те же, что в основном чеке)
+        // Кнопки добавления услуг с цветами
         const addButtons = document.getElementById('editAddButtons');
         addButtons.innerHTML = `
-            <button class="edit-add-btn" onclick="addEditService('ЧАС ЗАПИСИ', 900, 'white', true)">+1 ЧАС</button>
-            <button class="edit-add-btn" onclick="addEditService('START EDITION', 3500, 'purple')">START</button>
-            <button class="edit-add-btn" onclick="addEditService('ARTIST EDITION', 6000, 'red')">ARTIST</button>
-            <button class="edit-add-btn" onclick="addEditService('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ</button>
-            <button class="edit-add-btn" onclick="addEditService('АРАНЖИРОВКА', 10000, 'blue')">АРАНЖ.</button>
-            <button class="edit-add-btn" onclick="addEditService('ДОП. ДОРОЖКА', 500, 'green')">+ДОП</button>
-            <button class="edit-add-btn" onclick="addEditService('PLATINUM EDITION', 10000, 'gold')">PLATINUM</button>
-            <button class="edit-add-btn" onclick="addEditService('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ПЛАТ</button>
+            <button class="edit-add-btn btn-white" onclick="addEditService('ЧАС ЗАПИСИ', 900, 'white', true)">+1 ЧАС</button>
+            <button class="edit-add-btn btn-purple" onclick="addEditService('START EDITION', 3500, 'purple')">START</button>
+            <button class="edit-add-btn btn-red" onclick="addEditService('ARTIST EDITION', 6000, 'red')">ARTIST</button>
+            <button class="edit-add-btn btn-green" onclick="addEditService('ТЮНИНГ ВОКАЛА', 1000, 'green')">ТЮНИНГ</button>
+            <button class="edit-add-btn btn-blue" onclick="addEditService('АРАНЖИРОВКА', 10000, 'blue')">АРАНЖ.</button>
+            <button class="edit-add-btn btn-green" onclick="addEditService('ДОП. ДОРОЖКА', 500, 'green')">+ДОП</button>
+            <button class="edit-add-btn btn-gold" onclick="addEditService('PLATINUM EDITION', 10000, 'gold')">PLATINUM</button>
+            <button class="edit-add-btn btn-gold" onclick="addEditService('ПЛАТ. ДОРОЖКА', 300, 'gold')">+ПЛАТ</button>
         `;
     }
 
@@ -1317,10 +1331,8 @@
         if (!currentEditId) return;
         const newClient = document.getElementById('editClientName').value.trim() || 'Без имени';
         const fullTotal = currentEditDetails.reduce((sum, item) => sum + (item.basePrice || item.price), 0);
-        const paid = currentEditDetails.reduce((sum, item) => sum + item.price, 0); // предполагаем, что total = paid (можно пересмотреть)
-        // В реальности paid может быть меньше, но для простоты будем считать paid = total
-        // Если нужно сохранять отдельно fullTotal и paid, то структура должна быть сложнее.
-        // Пока сохраняем как есть: total = paid, fullTotal = полная стоимость.
+        const paid = currentEditDetails.reduce((sum, item) => sum + item.price, 0);
+        
         crmCollection.doc(currentEditId).update({
             client: newClient,
             details: currentEditDetails,
@@ -1330,9 +1342,6 @@
             closeEditModal();
         }).catch(error => console.error("Ошибка обновления:", error));
     }
-
-    // Привязка сохранения
-    document.getElementById('editSaveBtn').onclick = saveEdit;
 
     function openPriceModal(name, color, defaultPrice) {
         openModal(`УКАЖИТЕ СТОИМОСТЬ: ${name}`, "price", function() {
@@ -1690,7 +1699,7 @@
         crmCollection.doc(id).update({ completed: !row.completed });
     };
 
-    // ---------- РЕДАКТИРОВАНИЕ ЗАПИСИ (новое) ----------
+    // ---------- РЕДАКТИРОВАНИЕ ЗАПИСИ ----------
     window.editRecord = function(id) {
         openEditModal(id);
     };
@@ -1711,7 +1720,7 @@
                 const [d, m, y] = dateStr.split('.').map(Number);
                 return new Date(y, m-1, d).getTime();
             };
-            return parseDate(b.date) - parseDate(a.date); // сначала новые
+            return parseDate(b.date) - parseDate(a.date);
         });
 
         filteredData.forEach((row, index) => {
