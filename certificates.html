@@ -19,8 +19,7 @@
             --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
             --azure-blue: #00ccff; --text-gray: #b0b0b0;
-            --completed-bg: rgba(0, 143, 57, 0.2); /* зелёный, менее яркий */
-            --completed-border: #008f39;
+            --completed-border: #b89600;
         }
         
         body { 
@@ -53,7 +52,7 @@
 
         .header-center {
             width: 50%;
-            text-align: center; /* центрирование для ПК */
+            text-align: center;
             font-family: 'Orbitron', sans-serif;
             font-size: 20px;
             color: var(--neon-purple);
@@ -236,8 +235,8 @@
             cursor: pointer;
         }
         .cert-row.selected {
-            background: rgba(0, 143, 57, 0.2);
-            border-left: 3px solid var(--status-green);
+            background: rgba(184, 150, 0, 0.2);
+            border-left: 3px solid var(--platinum-gold);
             padding-left: 5px;
         }
         .cert-id {
@@ -320,7 +319,7 @@
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
         .day:hover { background: #111; }
         .day.completed-day {
-            outline: 2px solid var(--status-green);
+            outline: 2px solid var(--platinum-gold);
             outline-offset: 2px;
         }
 
@@ -548,11 +547,10 @@
             color: var(--neon-purple); 
         }
 
+        /* Жёлтая обводка для завершённых строк */
         tr.completed-row {
-            background-color: var(--completed-bg);
-        }
-        tr.completed-row td {
-            background-color: transparent;
+            outline: 2px solid var(--platinum-gold);
+            outline-offset: -2px; /* чтобы не выходило за границы */
         }
 
         .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
@@ -593,8 +591,8 @@
 
         .icon-complete i { color: #444; }
         .icon-complete span { color: #444; }
-        .icon-complete:hover i { color: var(--status-green); }
-        .icon-complete:hover span { color: var(--status-green); }
+        .icon-complete:hover i { color: var(--platinum-gold); }
+        .icon-complete:hover span { color: var(--platinum-gold); }
 
         .mobile-edit-icon {
             color: #fff;
@@ -605,6 +603,25 @@
         }
         .mobile-edit-icon:hover {
             opacity: 1;
+        }
+
+        /* Кнопка сброса сертификатов */
+        .reset-certs-btn {
+            background: none;
+            border: 1px solid #444;
+            color: #888;
+            font-size: 8px;
+            padding: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            text-transform: uppercase;
+            font-family: 'Orbitron';
+        }
+        .reset-certs-btn:hover {
+            border-color: var(--artist-red);
+            color: var(--artist-red);
         }
 
         @media (max-width: 992px) {
@@ -680,7 +697,8 @@
                 overflow: hidden; 
             }
             tr.completed-row {
-                background: var(--completed-bg);
+                outline: 2px solid var(--platinum-gold);
+                outline-offset: 2px;
             }
             
             td { border: none !important; padding: 0 !important; text-align: left !important; min-height: auto !important; display: block !important; position: relative; }
@@ -720,7 +738,7 @@
                 padding: 12px; border-radius: 6px; font-family: 'Orbitron'; font-size: 10px; 
                 text-transform: uppercase; text-align: center; cursor: pointer; border: 1px solid transparent;
             }
-            .m-btn-complete { border-color: var(--status-green); color: var(--status-green); }
+            .m-btn-complete { border-color: var(--platinum-gold); color: var(--platinum-gold); }
             .m-btn-pay { border-color: var(--status-green); color: var(--status-green); }
             .m-btn-del { border-color: var(--artist-red); color: var(--artist-red); }
 
@@ -836,7 +854,7 @@
         }
 
         .cal-grid .day.completed-day {
-            outline: 2px solid var(--status-green);
+            outline: 2px solid var(--platinum-gold);
             outline-offset: 2px;
         }
 
@@ -965,6 +983,7 @@
             </div>
             <div class="certs-content">
                 <div class="certs-container" id="certsList"></div>
+                <button class="reset-certs-btn" onclick="resetAllCerts()">СБРОСИТЬ ВСЕ СЕРТИФИКАТЫ</button>
             </div>
         </div>
 
@@ -1215,7 +1234,7 @@
         });
     }
 
-    // ---------- СЕРТИФИКАТЫ ----------
+    // ---------- СЕРТИФИКАТЫ (Firestore) ----------
     function subscribeCerts() {
         db.collection("certificates").onSnapshot((snapshot) => {
             certificates = {};
@@ -1329,6 +1348,23 @@
             console.error('Ошибка миграции сертификатов:', e);
         }
     }
+
+    // Функция сброса всех сертификатов
+    window.resetAllCerts = async function() {
+        if (!confirm('Вы уверены, что хотите удалить ВСЕ активированные сертификаты? Это действие необратимо.')) return;
+        try {
+            const snapshot = await db.collection("certificates").get();
+            const batch = db.batch();
+            snapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            alert('Все сертификаты сброшены');
+        } catch (e) {
+            console.error('Ошибка сброса сертификатов:', e);
+            alert('Ошибка при сбросе');
+        }
+    };
 
     // ---------- СОХРАНЕНИЕ ЧЕКА ----------
     window.saveSession = async function(event) {
