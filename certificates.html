@@ -709,7 +709,7 @@
         }
         .progress-bar.complete { background: var(--status-green); }
 
-        /* Таблица с полным обрамлением */
+        /* Простая таблица без лишних линий */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -717,31 +717,22 @@
             table-layout: fixed; 
         }
         th, td {
-            border-right: 2px solid rgba(255,255,255,0.2);
             border-bottom: 1px solid #111;
-        }
-        th:first-child, td:first-child {
-            border-left: 2px solid rgba(255,255,255,0.2);
-        }
-        th:last-child, td:last-child {
-            border-right: 2px solid rgba(255,255,255,0.2); /* правая граница */
+            padding: 12px 10px;
+            text-align: left;
         }
         th { 
-            text-align: left; 
             color: #888; 
             font-family: 'Orbitron'; 
             font-size: 10px; 
-            padding: 12px 10px; 
             border-bottom: 1px solid #222; 
             position: sticky; 
             top: 0; 
             background: var(--card-bg); 
             z-index: 10; 
-            border-top: 2px solid rgba(255,255,255,0.2); /* верхняя линия */
         }
         td { 
-            padding: 12px 10px; 
-            color: #fff !important; 
+            color: #fff; 
             word-wrap: break-word; 
         }
         
@@ -752,7 +743,7 @@
         }
 
         .price-cell { 
-            color: #fff !important; 
+            color: #fff; 
             font-weight: 700; 
             font-size: 15px; 
             text-align: right; 
@@ -785,109 +776,17 @@
             color: var(--neon-purple); 
         }
 
-        /* Жёлтое выделение для ячеек клиент и услуги (десктоп) */
-        @media (min-width: 993px) {
-            tr.completed-row td:nth-child(2),
-            tr.completed-row td:nth-child(3) {
-                background-color: var(--completed-bg);
-                border-radius: 8px;
-                box-shadow: inset 0 0 0 1px var(--platinum-gold);
-            }
-            tr.completed-row td:nth-child(2) {
-                border-top-right-radius: 0;
-                border-bottom-right-radius: 0;
-            }
-            tr.completed-row td:nth-child(3) {
-                border-top-left-radius: 0;
-                border-bottom-left-radius: 0;
-            }
+        /* Стили для завершённых записей — только цвет текста */
+        tr.completed-row td:nth-child(2),
+        tr.completed-row td:nth-child(3) {
+            color: var(--platinum-gold);
+        }
+        tr.completed-row .icon-complete i,
+        tr.completed-row .icon-complete span {
+            color: var(--platinum-gold);
         }
 
-        /* На мобильных обводка остаётся на всю карточку, все границы убираем */
-        @media (max-width: 992px) {
-            tr.completed-row {
-                outline: 1px solid var(--platinum-gold);
-                outline-offset: 1px;
-                background-color: var(--completed-bg);
-            }
-            td {
-                border: none !important; /* убираем все границы */
-            }
-            th {
-                border: none !important;
-            }
-        }
-
-        .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
-
-        .filter-info { font-size: 10px; color: #888; margin: 0 0 10px 0; display: flex; justify-content: space-between; font-weight: 600; text-transform: uppercase; flex-shrink: 0; }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 10px; }
-
-        .history-tooltip { 
-            visibility: hidden; opacity: 0; position: fixed; background: #0a0a0a; border: 1px solid var(--neon-purple); 
-            padding: 15px; border-radius: 8px; z-index: 9999; width: 280px; box-shadow: 0 10px 40px rgba(0,0,0,0.9); 
-            pointer-events: none; transition: opacity 0.4s ease;
-        }
-        .history-tooltip.active { visibility: visible; opacity: 1; }
-        .history-tooltip.pos-down { transform: translate(15px, 15px); }
-        .history-tooltip.pos-up { transform: translate(15px, calc(-100% - 15px)); }
-        
-        .tooltip-sum { 
-            filter: blur(6px); 
-            transition: 0.3s; 
-            font-family: 'Inter', sans-serif;
-        }
-        .privacy-active .tooltip-sum { filter: blur(0); }
-
-        .summary-line { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; font-family: 'Rajdhani'; font-weight: 700; }
-
-        .action-icons-wrap { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
-        .icon-btn-box { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.3s; }
-        .icon-btn-box i { font-size: 12px; color: #444; }
-        .icon-btn-box span { font-family: 'Orbitron'; font-size: 7px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; }
-        .icon-btn-box:hover i { color: var(--neon-purple); }
-        .icon-btn-box:hover span { color: var(--neon-purple); }
-        .icon-delete:hover i { color: var(--artist-red); }
-        .icon-delete:hover span { color: var(--artist-red); }
-        .icon-edit:hover i { color: var(--azure-blue); }
-        .icon-edit:hover span { color: var(--azure-blue); }
-
-        .icon-complete i { color: #444; }
-        .icon-complete span { color: #444; }
-        .icon-complete:hover i { color: var(--platinum-gold); }
-        .icon-complete:hover span { color: var(--platinum-gold); }
-
-        .mobile-edit-icon {
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
-        .mobile-edit-icon:hover {
-            opacity: 1;
-        }
-
-        .reset-certs-btn {
-            background: none;
-            border: 1px solid #444;
-            color: #888;
-            font-size: 8px;
-            padding: 5px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-            width: 100%;
-            text-transform: uppercase;
-            font-family: 'Orbitron';
-        }
-        .reset-certs-btn:hover {
-            border-color: var(--artist-red);
-            color: var(--artist-red);
-        }
-
+        /* Мобильная версия */
         @media (max-width: 992px) {
             body { 
                 overflow-y: auto; 
@@ -1003,6 +902,16 @@
             .m-btn-complete { border-color: var(--platinum-gold); color: var(--platinum-gold); }
             .m-btn-pay { border-color: var(--status-green); color: var(--status-green); }
             .m-btn-del { border-color: var(--artist-red); color: var(--artist-red); }
+
+            /* Цвет текста для завершённых записей в мобильной версии */
+            tr.completed-row .mobile-row-client,
+            tr.completed-row .mobile-row-services {
+                color: var(--platinum-gold);
+            }
+            tr.completed-row .m-btn-complete {
+                border-color: var(--platinum-gold);
+                color: var(--platinum-gold);
+            }
 
             .current-session-box { 
                 flex-direction: column; 
