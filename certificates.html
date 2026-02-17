@@ -753,24 +753,21 @@
             color: var(--neon-purple); 
         }
 
-        /* Жёлтое выделение для ячеек клиент и услуги (десктоп) */
+        /* Жёлтое выделение для ячеек клиент и услуги */
         @media (min-width: 993px) {
             tr.completed-row td:nth-child(2),
             tr.completed-row td:nth-child(3) {
                 position: relative;
                 background-color: var(--completed-bg);
-                border-top: 1px solid var(--platinum-gold);
-                border-bottom: 1px solid var(--platinum-gold);
-                /* Плавное затухание по краям */
-                mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-                -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
             }
-            /* Убираем возможные артефакты границ между ячейками */
-            tr.completed-row td:nth-child(2) {
-                border-right: none;
-            }
-            tr.completed-row td:nth-child(3) {
-                border-left: none;
+            tr.completed-row td:nth-child(2)::after,
+            tr.completed-row td:nth-child(3)::after {
+                content: '';
+                position: absolute;
+                top: 2px; left: 2px; right: 2px; bottom: 2px;
+                border: 1px solid var(--platinum-gold);
+                border-radius: 8px;
+                pointer-events: none;
             }
         }
 
@@ -1299,6 +1296,7 @@
     // Переменные для редактирования
     let currentEditId = null;
     let currentEditDetails = [];
+    let originalBasePrices = []; // для хранения исходных цен при включении 50%
 
     // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
@@ -1358,7 +1356,9 @@
         const row = window.crmData.find(r => r.id === id);
         if (!row) return;
         currentEditId = id;
+        // Копируем детали и сохраняем базовые цены
         currentEditDetails = row.details ? JSON.parse(JSON.stringify(row.details)) : [];
+        originalBasePrices = currentEditDetails.map(item => item.basePrice || item.price); // сохраняем для сброса
         
         const modal = document.getElementById('editModal');
         const overlay = document.getElementById('editModalOverlay');
