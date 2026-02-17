@@ -20,7 +20,7 @@
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
             --azure-blue: #00ccff; --text-gray: #b0b0b0;
             --completed-border: #b89600;
-            --completed-bg: rgba(184, 150, 0, 0.1);
+            --completed-bg: rgba(184, 150, 0, 0.05); /* менее яркий фон */
         }
         
         body { 
@@ -892,8 +892,8 @@
             .song-field {
                 width: 100%;
                 min-width: auto;
-                height: 50px;
-                font-size: 16px;
+                height: 60px; /* увеличена высота */
+                font-size: 18px; /* крупнее текст */
             }
             .total-display-pc { 
                 text-align: center; 
@@ -902,7 +902,8 @@
             }
             .save-btn { 
                 width: 100%; 
-                height: 50px;
+                height: 60px;
+                font-size: 14px;
             }
 
             .mobile-details-overlay {
@@ -958,10 +959,11 @@
 
             /* Модальное окно редактирования на мобильных */
             .edit-modal {
-                width: 95vw;
+                width: 90vw; /* чуть уже */
                 max-height: 90vh;
                 overflow-y: auto;
                 padding: 15px;
+                margin: 0 auto;
             }
         }
 
@@ -1332,10 +1334,14 @@
         const newClient = document.getElementById('editClientName').value.trim() || 'Без имени';
         const fullTotal = currentEditDetails.reduce((sum, item) => sum + (item.basePrice || item.price), 0);
         const paid = currentEditDetails.reduce((sum, item) => sum + item.price, 0);
+        // Формируем строку услуг для отображения в таблице
+        const servicesString = currentEditDetails.map(item => item.name).join(', ');
         
         crmCollection.doc(currentEditId).update({
             client: newClient,
+            song: newClient, // для единообразия
             details: currentEditDetails,
+            services: servicesString,
             total: paid,
             fullTotal: fullTotal
         }).then(() => {
