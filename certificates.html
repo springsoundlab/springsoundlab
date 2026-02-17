@@ -20,7 +20,7 @@
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
             --azure-blue: #00ccff; --text-gray: #b0b0b0;
             --completed-border: #b89600;
-            --completed-bg: rgba(184, 150, 0, 0.2); /* немного усилил фон для наглядности */
+            --completed-bg: transparent; /* убираем фон */
         }
         
         body { 
@@ -718,7 +718,6 @@
         }
         th, td {
             border-bottom: 1px solid #111; /* только тёмные горизонтальные линии */
-            /* все белые вертикальные и верхние границы удалены */
         }
         th { 
             text-align: left; 
@@ -778,57 +777,45 @@
             color: var(--neon-purple); 
         }
 
-        /* Подсветка имени и услуг на десктопе (оставлено как было, но фон чуть усилен в :root) */
+        /* Стили для завершённых записей: только цвет текста и иконки, без фона */
+        .completed-row,
+        .completed-row td,
+        .completed-row .artist-cell,
+        .completed-row .services-cell,
+        .completed-row .mobile-row-client,
+        .completed-row .mobile-row-services,
+        .completed-row .mobile-row-date {
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+            border: none !important;
+        }
+
+        /* Десктоп: золотой текст в дате, имени клиента, услугах, времени и иконка готово */
         @media (min-width: 993px) {
-            tr.completed-row td:nth-child(2),
-            tr.completed-row td:nth-child(3) {
-                background-color: var(--completed-bg);
-                border-radius: 8px;
-                box-shadow: inset 0 0 0 1px var(--platinum-gold);
+            .completed-row td:nth-child(1),
+            .completed-row td:nth-child(2) .artist-name,
+            .completed-row td:nth-child(2) .table-time-inline,
+            .completed-row td:nth-child(3) {
+                color: var(--platinum-gold) !important;
             }
-            tr.completed-row td:nth-child(2) {
-                border-top-right-radius: 0;
-                border-bottom-right-radius: 0;
-            }
-            tr.completed-row td:nth-child(3) {
-                border-top-left-radius: 0;
-                border-bottom-left-radius: 0;
-            }
-            /* Иконка "готово" в завершённой строке становится золотой */
-            tr.completed-row .icon-complete i,
-            tr.completed-row .icon-complete span {
-                color: var(--platinum-gold);
+            .completed-row .icon-complete i,
+            .completed-row .icon-complete span {
+                color: var(--platinum-gold) !important;
             }
         }
 
-        /* Мобильные: убираем обводку всей карточки, подсвечиваем имя и услуги, кнопка готово залита */
+        /* Мобильные: золотой текст в дате, имени, услугах и золотая кнопка */
         @media (max-width: 992px) {
-            /* убираем выделение всей карточки */
-            tr.completed-row {
-                outline: none;
-                background-color: transparent;
+            .completed-row .mobile-row-date,
+            .completed-row .mobile-row-client,
+            .completed-row .mobile-row-services {
+                color: var(--platinum-gold) !important;
             }
-            /* подсвечиваем имя клиента и услуги */
-            tr.completed-row .mobile-row-client,
-            tr.completed-row .mobile-row-services {
-                background-color: var(--completed-bg);
-                border-radius: 8px;
-                padding: 4px 8px;
-                margin: -4px -8px; /* чтобы не сдвигать вёрстку */
-                box-shadow: inset 0 0 0 1px var(--platinum-gold);
-            }
-            /* кнопка "Готово" в завершённой строке — золотая */
-            tr.completed-row .m-btn-complete {
-                background: var(--platinum-gold);
-                color: #000;
-                border-color: var(--platinum-gold);
-            }
-            /* все td без границ (как и было) */
-            td {
-                border: none !important;
-            }
-            th {
-                border: none !important;
+            .completed-row .m-btn-complete {
+                background: var(--platinum-gold) !important;
+                color: #000 !important;
+                border-color: var(--platinum-gold) !important;
             }
         }
 
