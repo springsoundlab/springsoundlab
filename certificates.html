@@ -709,9 +709,37 @@
         }
         .progress-bar.complete { background: var(--status-green); }
 
-        table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
-        th { text-align: left; color: #888; font-family: 'Orbitron'; font-size: 10px; padding: 12px 10px; border-bottom: 1px solid #222; position: sticky; top: 0; background: var(--card-bg); z-index: 10; }
-        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #fff !important; word-wrap: break-word; }
+        /* Таблица с вертикальными разделителями */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 12px; 
+            table-layout: fixed; 
+        }
+        th, td {
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+        th { 
+            text-align: left; 
+            color: #888; 
+            font-family: 'Orbitron'; 
+            font-size: 10px; 
+            padding: 12px 10px; 
+            border-bottom: 1px solid #222; 
+            position: sticky; 
+            top: 0; 
+            background: var(--card-bg); 
+            z-index: 10; 
+        }
+        td { 
+            padding: 12px 10px; 
+            border-bottom: 1px solid #111; 
+            color: #fff !important; 
+            word-wrap: break-word; 
+        }
         
         td:first-child {
             font-size: 14px;
@@ -753,30 +781,36 @@
             color: var(--neon-purple); 
         }
 
-        /* Жёлтое выделение для ячеек клиент и услуги */
+        /* Жёлтое выделение для ячеек клиент и услуги (десктоп) */
         @media (min-width: 993px) {
             tr.completed-row td:nth-child(2),
             tr.completed-row td:nth-child(3) {
                 position: relative;
                 background-color: var(--completed-bg);
+                border-top: 1px solid var(--platinum-gold);
+                border-bottom: 1px solid var(--platinum-gold);
+                /* Плавное затухание по краям */
+                mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+                -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
             }
-            tr.completed-row td:nth-child(2)::after,
-            tr.completed-row td:nth-child(3)::after {
-                content: '';
-                position: absolute;
-                top: 2px; left: 2px; right: 2px; bottom: 2px;
-                border: 1px solid var(--platinum-gold);
-                border-radius: 8px;
-                pointer-events: none;
+            /* Убираем возможные артефакты границ между ячейками */
+            tr.completed-row td:nth-child(2) {
+                border-right: 1px solid rgba(255,255,255,0.2); /* сохраняем вертикальную линию */
+            }
+            tr.completed-row td:nth-child(3) {
+                border-left: none; /* убираем левую границу, если она была */
             }
         }
 
-        /* На мобильных обводка остаётся на всю карточку */
+        /* На мобильных обводка остаётся на всю карточку, вертикальные линии убираем */
         @media (max-width: 992px) {
             tr.completed-row {
                 outline: 1px solid var(--platinum-gold);
                 outline-offset: 1px;
                 background-color: var(--completed-bg);
+            }
+            td {
+                border-right: none !important; /* убираем вертикальные линии */
             }
         }
 
