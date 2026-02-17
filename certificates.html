@@ -20,7 +20,7 @@
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
             --azure-blue: #00ccff; --text-gray: #b0b0b0;
             --completed-border: #b89600;
-            --completed-bg: rgba(184, 150, 0, 0.05);
+            --completed-bg: rgba(184, 150, 0, 0.2); /* немного усилил фон для наглядности */
         }
         
         body { 
@@ -709,7 +709,7 @@
         }
         .progress-bar.complete { background: var(--status-green); }
 
-        /* Таблица с полным обрамлением */
+        /* Таблица без белых линий */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -717,14 +717,8 @@
             table-layout: fixed; 
         }
         th, td {
-            border-right: 2px solid rgba(255,255,255,0.2);
-            border-bottom: 1px solid #111;
-        }
-        th:first-child, td:first-child {
-            border-left: 2px solid rgba(255,255,255,0.2);
-        }
-        th:last-child, td:last-child {
-            border-right: 2px solid rgba(255,255,255,0.2); /* правая граница */
+            border-bottom: 1px solid #111; /* только тёмные горизонтальные линии */
+            /* все белые вертикальные и верхние границы удалены */
         }
         th { 
             text-align: left; 
@@ -737,7 +731,6 @@
             top: 0; 
             background: var(--card-bg); 
             z-index: 10; 
-            border-top: 2px solid rgba(255,255,255,0.2); /* верхняя линия */
         }
         td { 
             padding: 12px 10px; 
@@ -785,7 +778,7 @@
             color: var(--neon-purple); 
         }
 
-        /* Жёлтое выделение для ячеек клиент и услуги (десктоп) */
+        /* Подсветка имени и услуг на десктопе (оставлено как было, но фон чуть усилен в :root) */
         @media (min-width: 993px) {
             tr.completed-row td:nth-child(2),
             tr.completed-row td:nth-child(3) {
@@ -801,17 +794,38 @@
                 border-top-left-radius: 0;
                 border-bottom-left-radius: 0;
             }
+            /* Иконка "готово" в завершённой строке становится золотой */
+            tr.completed-row .icon-complete i,
+            tr.completed-row .icon-complete span {
+                color: var(--platinum-gold);
+            }
         }
 
-        /* На мобильных обводка остаётся на всю карточку, все границы убираем */
+        /* Мобильные: убираем обводку всей карточки, подсвечиваем имя и услуги, кнопка готово залита */
         @media (max-width: 992px) {
+            /* убираем выделение всей карточки */
             tr.completed-row {
-                outline: 1px solid var(--platinum-gold);
-                outline-offset: 1px;
-                background-color: var(--completed-bg);
+                outline: none;
+                background-color: transparent;
             }
+            /* подсвечиваем имя клиента и услуги */
+            tr.completed-row .mobile-row-client,
+            tr.completed-row .mobile-row-services {
+                background-color: var(--completed-bg);
+                border-radius: 8px;
+                padding: 4px 8px;
+                margin: -4px -8px; /* чтобы не сдвигать вёрстку */
+                box-shadow: inset 0 0 0 1px var(--platinum-gold);
+            }
+            /* кнопка "Готово" в завершённой строке — золотая */
+            tr.completed-row .m-btn-complete {
+                background: var(--platinum-gold);
+                color: #000;
+                border-color: var(--platinum-gold);
+            }
+            /* все td без границ (как и было) */
             td {
-                border: none !important; /* убираем все границы */
+                border: none !important;
             }
             th {
                 border: none !important;
