@@ -206,6 +206,64 @@
         .edit-client-input:focus {
             border-color: var(--neon-purple);
         }
+        
+        /* Переключатель 50% */
+        .edit-prepaid-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
+        }
+        .edit-prepaid-label {
+            font-family: 'Orbitron';
+            font-size: 11px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .edit-prepaid-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .edit-prepaid-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .edit-prepaid-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .3s;
+            border-radius: 24px;
+        }
+        .edit-prepaid-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .edit-prepaid-slider {
+            background-color: var(--neon-purple);
+        }
+        input:checked + .edit-prepaid-slider:before {
+            transform: translateX(26px);
+        }
+
         .edit-services-list {
             max-height: 200px;
             overflow-y: auto;
@@ -695,13 +753,15 @@
             color: var(--neon-purple); 
         }
 
-        /* Жёлтое выделение только для ячейки клиента на десктопе */
+        /* Жёлтое выделение для ячеек клиент и услуги */
         @media (min-width: 993px) {
-            tr.completed-row td:nth-child(2) {
+            tr.completed-row td:nth-child(2),
+            tr.completed-row td:nth-child(3) {
                 position: relative;
                 background-color: var(--completed-bg);
             }
-            tr.completed-row td:nth-child(2)::after {
+            tr.completed-row td:nth-child(2)::after,
+            tr.completed-row td:nth-child(3)::after {
                 content: '';
                 position: absolute;
                 top: 2px; left: 2px; right: 2px; bottom: 2px;
@@ -1061,6 +1121,16 @@
 <div id="editModal" class="custom-modal edit-modal">
     <div id="editModalTitle" class="modal-title">РЕДАКТИРОВАНИЕ</div>
     <input type="text" id="editClientName" class="edit-client-input" placeholder="Имя клиента" onkeydown="if(event.key==='Enter') saveEdit()">
+    
+    <!-- Переключатель 50% -->
+    <div class="edit-prepaid-row">
+        <span class="edit-prepaid-label">50% предоплата</span>
+        <label class="edit-prepaid-switch">
+            <input type="checkbox" id="editPrepaidToggle" onchange="toggleEditPrepaid()">
+            <span class="edit-prepaid-slider"></span>
+        </label>
+    </div>
+
     <div class="edit-services-list" id="editServicesList"></div>
     <div class="edit-add-buttons" id="editAddButtons"></div>
     <div class="edit-total" id="editTotal">ИТОГО: 0 ₽</div>
@@ -1226,6 +1296,7 @@
     // Переменные для редактирования
     let currentEditId = null;
     let currentEditDetails = [];
+    let originalBasePrices = []; // для хранения исходных цен при включении 50%
 
     // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
@@ -1285,11 +1356,15 @@
         const row = window.crmData.find(r => r.id === id);
         if (!row) return;
         currentEditId = id;
+        // Копируем детали и сохраняем базовые цены
         currentEditDetails = row.details ? JSON.parse(JSON.stringify(row.details)) : [];
+        originalBasePrices = currentEditDetails.map(item => item.basePrice || item.price); // сохраняем для сброса
         
         const modal = document.getElementById('editModal');
         const overlay = document.getElementById('editModalOverlay');
         document.getElementById('editClientName').value = row.client || '';
+        // Сбрасываем переключатель 50%
+        document.getElementById('editPrepaidToggle').checked = false;
         renderEditServices();
         updateEditTotal();
         
@@ -1301,6 +1376,28 @@
         document.getElementById('editModal').style.display = 'none';
         document.getElementById('editModalOverlay').style.display = 'none';
         currentEditId = null;
+    }
+
+    // Переключение 50% в редакторе
+    function toggleEditPrepaid() {
+        const isPrepaid = document.getElementById('editPrepaidToggle').checked;
+        currentEditDetails.forEach((item, index) => {
+            // ЧАС ЗАПИСИ не участвует в 50%
+            if (item.name.includes('ЧАС ЗАПИСИ')) return;
+            if (isPrepaid) {
+                // Если включаем 50%, делим цену пополам (если ещё не разделена)
+                if (item.price === item.basePrice) {
+                    item.price = Math.round(item.basePrice / 2);
+                    if (!item.name.includes('(50%)')) item.name += ' (50%)';
+                }
+            } else {
+                // Возвращаем исходную цену
+                item.price = item.basePrice;
+                item.name = item.name.replace(' (50%)', '');
+            }
+        });
+        renderEditServices();
+        updateEditTotal();
     }
 
     function renderEditServices() {
@@ -1338,15 +1435,16 @@
     }
 
     function addEditService(name, price, color, forceFull = false) {
-        const isPrepaid = document.getElementById('prepaidMode').checked;
+        const isPrepaid = document.getElementById('editPrepaidToggle').checked;
         let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
         let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
-        currentEditDetails.push({
+        const newItem = {
             name: finalName,
             price: finalPrice,
             basePrice: price,
             originalColor: color
-        });
+        };
+        currentEditDetails.push(newItem);
         renderEditServices();
         updateEditTotal();
     }
@@ -1359,12 +1457,10 @@
 
     // Функция для inline-редактирования цены
     function startInlineEdit(index, iconElement) {
-        // Находим элемент с ценой
         const priceSpan = document.querySelector(`.edit-service-price[data-index="${index}"]`);
         if (!priceSpan) return;
         
         const currentPrice = currentEditDetails[index].price;
-        // Создаём input
         const input = document.createElement('input');
         input.type = 'number';
         input.value = currentPrice;
@@ -1372,18 +1468,15 @@
         input.style.width = '80px';
         input.style.marginLeft = '10px';
         
-        // Заменяем span на input
         const parent = priceSpan.parentNode;
         parent.replaceChild(input, priceSpan);
         
-        // Функция завершения редактирования
         const finishEdit = () => {
             const newValue = parseInt(input.value);
             if (!isNaN(newValue) && newValue > 0) {
                 currentEditDetails[index].price = newValue;
-                currentEditDetails[index].basePrice = newValue; // обновляем basePrice для корректного fullTotal
+                currentEditDetails[index].basePrice = newValue; // обновляем базовую цену
             }
-            // Перерисовываем список
             renderEditServices();
             updateEditTotal();
         };
@@ -1408,7 +1501,6 @@
         const newClient = document.getElementById('editClientName').value.trim() || 'Без имени';
         const fullTotal = currentEditDetails.reduce((sum, item) => sum + (item.basePrice || item.price), 0);
         const paid = currentEditDetails.reduce((sum, item) => sum + item.price, 0);
-        // Формируем строку услуг для отображения в таблице
         const servicesString = currentEditDetails.map(item => item.name).join(', ');
         
         crmCollection.doc(currentEditId).update({
