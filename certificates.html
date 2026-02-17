@@ -20,7 +20,7 @@
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
             --azure-blue: #00ccff; --text-gray: #b0b0b0;
             --completed-border: #b89600;
-            --completed-bg: rgba(184, 150, 0, 0.05); /* менее яркий фон */
+            --completed-bg: rgba(184, 150, 0, 0.05);
         }
         
         body { 
@@ -228,6 +228,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-grow: 1;
         }
         .edit-service-color {
             width: 12px;
@@ -243,11 +244,19 @@
             font-size: 14px;
             margin-left: 10px;
         }
-        .edit-service-remove {
+        .edit-service-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .edit-service-edit, .edit-service-remove {
             color: #666;
             cursor: pointer;
-            font-size: 16px;
-            padding: 0 5px;
+            font-size: 14px;
+            padding: 0 2px;
+        }
+        .edit-service-edit:hover {
+            color: var(--azure-blue);
         }
         .edit-service-remove:hover {
             color: var(--artist-red);
@@ -674,14 +683,28 @@
             color: var(--neon-purple); 
         }
 
-        /* Жёлтая обводка и фон для завершённых строк */
-        tr.completed-row {
-            outline: 1px solid var(--platinum-gold);
-            outline-offset: -1px;
-            background-color: var(--completed-bg);
+        /* Жёлтая обводка и фон для завершённых строк - только для даты и клиента на десктопе */
+        @media (min-width: 993px) {
+            tr.completed-row td:first-child,
+            tr.completed-row td:nth-child(2) {
+                outline: 1px solid var(--platinum-gold);
+                outline-offset: -1px;
+                background-color: var(--completed-bg);
+            }
+            /* Убираем обводку с остальных ячеек */
+            tr.completed-row td:not(:first-child):not(:nth-child(2)) {
+                outline: none;
+                background-color: transparent;
+            }
         }
-        tr.completed-row td {
-            background-color: transparent;
+
+        /* На мобильных обводка остаётся на всю карточку */
+        @media (max-width: 992px) {
+            tr.completed-row {
+                outline: 1px solid var(--platinum-gold);
+                outline-offset: 1px;
+                background-color: var(--completed-bg);
+            }
         }
 
         .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
@@ -828,11 +851,6 @@
                 margin-right: auto;
                 width: calc(100% - 20px) !important;
             }
-            tr.completed-row {
-                outline: 1px solid var(--platinum-gold);
-                outline-offset: 1px;
-                background-color: var(--completed-bg);
-            }
             
             td { border: none !important; padding: 0 !important; text-align: left !important; min-height: auto !important; display: block !important; position: relative; }
 
@@ -892,8 +910,8 @@
             .song-field {
                 width: 100%;
                 min-width: auto;
-                height: 60px; /* увеличена высота */
-                font-size: 18px; /* крупнее текст */
+                height: 60px;
+                font-size: 18px;
             }
             .total-display-pc { 
                 text-align: center; 
@@ -957,9 +975,8 @@
                 font-family: 'Inter', sans-serif;
             }
 
-            /* Модальное окно редактирования на мобильных */
             .edit-modal {
-                width: 90vw; /* чуть уже */
+                width: 90vw;
                 max-height: 90vh;
                 overflow-y: auto;
                 padding: 15px;
@@ -1285,7 +1302,10 @@
                     <span class="edit-service-name">${item.name}</span>
                     <span class="edit-service-price">${item.price} ₽</span>
                 </div>
-                <div class="edit-service-remove" onclick="removeEditService(${index})">×</div>
+                <div class="edit-service-actions">
+                    <i class="fas fa-pencil-alt edit-service-edit" onclick="editServicePrice(${index})"></i>
+                    <i class="fas fa-times edit-service-remove" onclick="removeEditService(${index})"></i>
+                </div>
             `;
             container.appendChild(div);
         });
@@ -1324,6 +1344,24 @@
         updateEditTotal();
     }
 
+    // Новая функция для редактирования цены услуги
+    function editServicePrice(index) {
+        const item = currentEditDetails[index];
+        const newPrice = prompt('Введите новую цену (в рублях):', item.price);
+        if (newPrice !== null) {
+            const parsed = parseInt(newPrice);
+            if (!isNaN(parsed) && parsed > 0) {
+                // Обновляем и price, и basePrice, чтобы fullTotal пересчитался правильно
+                item.price = parsed;
+                item.basePrice = parsed; // упрощаем: считаем, что это окончательная цена
+                renderEditServices();
+                updateEditTotal();
+            } else {
+                alert('Некорректная цена');
+            }
+        }
+    }
+
     function updateEditTotal() {
         const total = currentEditDetails.reduce((sum, item) => sum + item.price, 0);
         document.getElementById('editTotal').innerText = `ИТОГО: ${total} ₽`;
@@ -1339,7 +1377,7 @@
         
         crmCollection.doc(currentEditId).update({
             client: newClient,
-            song: newClient, // для единообразия
+            song: newClient,
             details: currentEditDetails,
             services: servicesString,
             total: paid,
