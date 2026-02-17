@@ -244,6 +244,18 @@
             font-size: 14px;
             margin-left: 10px;
         }
+        .edit-service-price-input {
+            width: 80px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 4px;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            text-align: right;
+            margin-left: 10px;
+        }
         .edit-service-actions {
             display: flex;
             gap: 8px;
@@ -683,18 +695,19 @@
             color: var(--neon-purple); 
         }
 
-        /* Жёлтая обводка и фон для завершённых строк - только для даты и клиента на десктопе */
+        /* Жёлтое выделение только для ячейки клиента на десктопе */
         @media (min-width: 993px) {
-            tr.completed-row td:first-child,
             tr.completed-row td:nth-child(2) {
-                outline: 1px solid var(--platinum-gold);
-                outline-offset: -1px;
+                position: relative;
                 background-color: var(--completed-bg);
             }
-            /* Убираем обводку с остальных ячеек */
-            tr.completed-row td:not(:first-child):not(:nth-child(2)) {
-                outline: none;
-                background-color: transparent;
+            tr.completed-row td:nth-child(2)::after {
+                content: '';
+                position: absolute;
+                top: 2px; left: 2px; right: 2px; bottom: 2px;
+                border: 1px solid var(--platinum-gold);
+                border-radius: 8px;
+                pointer-events: none;
             }
         }
 
@@ -1300,10 +1313,10 @@
                 <div class="edit-service-info">
                     <div class="edit-service-color" style="background:${colorMap[item.originalColor]}"></div>
                     <span class="edit-service-name">${item.name}</span>
-                    <span class="edit-service-price">${item.price} ₽</span>
+                    <span class="edit-service-price" data-index="${index}">${item.price} ₽</span>
                 </div>
                 <div class="edit-service-actions">
-                    <i class="fas fa-pencil-alt edit-service-edit" onclick="editServicePrice(${index})"></i>
+                    <i class="fas fa-pencil-alt edit-service-edit" data-index="${index}" onclick="startInlineEdit(${index}, this)"></i>
                     <i class="fas fa-times edit-service-remove" onclick="removeEditService(${index})"></i>
                 </div>
             `;
@@ -1344,22 +1357,45 @@
         updateEditTotal();
     }
 
-    // Новая функция для редактирования цены услуги
-    function editServicePrice(index) {
-        const item = currentEditDetails[index];
-        const newPrice = prompt('Введите новую цену (в рублях):', item.price);
-        if (newPrice !== null) {
-            const parsed = parseInt(newPrice);
-            if (!isNaN(parsed) && parsed > 0) {
-                // Обновляем и price, и basePrice, чтобы fullTotal пересчитался правильно
-                item.price = parsed;
-                item.basePrice = parsed; // упрощаем: считаем, что это окончательная цена
-                renderEditServices();
-                updateEditTotal();
-            } else {
-                alert('Некорректная цена');
+    // Функция для inline-редактирования цены
+    function startInlineEdit(index, iconElement) {
+        // Находим элемент с ценой
+        const priceSpan = document.querySelector(`.edit-service-price[data-index="${index}"]`);
+        if (!priceSpan) return;
+        
+        const currentPrice = currentEditDetails[index].price;
+        // Создаём input
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.value = currentPrice;
+        input.className = 'edit-service-price-input';
+        input.style.width = '80px';
+        input.style.marginLeft = '10px';
+        
+        // Заменяем span на input
+        const parent = priceSpan.parentNode;
+        parent.replaceChild(input, priceSpan);
+        
+        // Функция завершения редактирования
+        const finishEdit = () => {
+            const newValue = parseInt(input.value);
+            if (!isNaN(newValue) && newValue > 0) {
+                currentEditDetails[index].price = newValue;
+                currentEditDetails[index].basePrice = newValue; // обновляем basePrice для корректного fullTotal
             }
-        }
+            // Перерисовываем список
+            renderEditServices();
+            updateEditTotal();
+        };
+        
+        input.addEventListener('blur', finishEdit);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finishEdit();
+            }
+        });
+        input.focus();
     }
 
     function updateEditTotal() {
