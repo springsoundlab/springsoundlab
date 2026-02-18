@@ -20,7 +20,7 @@
             --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
             --azure-blue: #00ccff; --text-gray: #b0b0b0;
             --completed-border: #b89600;
-            --completed-bg: transparent; /* убираем фон */
+            --completed-bg: transparent;
         }
         
         body { 
@@ -37,6 +37,23 @@
             padding-top: env(safe-area-inset-top);
         }
         
+        #offlineIndicator {
+            display: none;
+            background: #cc0000;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 1px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        
         header { 
             display: flex; 
             justify-content: space-between; 
@@ -45,6 +62,7 @@
             border-bottom: 1px solid #111; 
             flex-shrink: 0; 
             height: 90px;
+            margin-top: env(safe-area-inset-top);
         }
 
         .header-left {
@@ -717,7 +735,7 @@
             table-layout: fixed; 
         }
         th, td {
-            border-bottom: 1px solid #111; /* только тёмные горизонтальные линии */
+            border-bottom: 1px solid #111;
         }
         th { 
             text-align: left; 
@@ -1145,6 +1163,8 @@
 </head>
 <body>
 
+<div id="offlineIndicator" class="offline-indicator">📡 ОФЛАЙН-РЕЖИМ — данные сохраняются локально</div>
+
 <div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
 <div id="customModal" class="custom-modal">
     <div id="modalTitle" class="modal-title">ДОПЛАТА</div>
@@ -1335,7 +1355,7 @@
     // Переменные для редактирования
     let currentEditId = null;
     let currentEditDetails = [];
-    let originalBasePrices = []; // для хранения исходных цен при включении 50%
+    let originalBasePrices = [];
 
     // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
@@ -1395,14 +1415,12 @@
         const row = window.crmData.find(r => r.id === id);
         if (!row) return;
         currentEditId = id;
-        // Копируем детали и сохраняем базовые цены
         currentEditDetails = row.details ? JSON.parse(JSON.stringify(row.details)) : [];
-        originalBasePrices = currentEditDetails.map(item => item.basePrice || item.price); // сохраняем для сброса
+        originalBasePrices = currentEditDetails.map(item => item.basePrice || item.price);
         
         const modal = document.getElementById('editModal');
         const overlay = document.getElementById('editModalOverlay');
         document.getElementById('editClientName').value = row.client || '';
-        // Сбрасываем переключатель 50%
         document.getElementById('editPrepaidToggle').checked = false;
         renderEditServices();
         updateEditTotal();
@@ -1417,20 +1435,16 @@
         currentEditId = null;
     }
 
-    // Переключение 50% в редакторе
     function toggleEditPrepaid() {
         const isPrepaid = document.getElementById('editPrepaidToggle').checked;
         currentEditDetails.forEach((item, index) => {
-            // ЧАС ЗАПИСИ не участвует в 50%
             if (item.name.includes('ЧАС ЗАПИСИ')) return;
             if (isPrepaid) {
-                // Если включаем 50%, делим цену пополам (если ещё не разделена)
                 if (item.price === item.basePrice) {
                     item.price = Math.round(item.basePrice / 2);
                     if (!item.name.includes('(50%)')) item.name += ' (50%)';
                 }
             } else {
-                // Возвращаем исходную цену
                 item.price = item.basePrice;
                 item.name = item.name.replace(' (50%)', '');
             }
@@ -1459,7 +1473,6 @@
             container.appendChild(div);
         });
 
-        // Кнопки добавления услуг с цветами
         const addButtons = document.getElementById('editAddButtons');
         addButtons.innerHTML = `
             <button class="edit-add-btn btn-white" onclick="addEditService('ЧАС ЗАПИСИ', 900, 'white', true)">+1 ЧАС</button>
@@ -1494,7 +1507,6 @@
         updateEditTotal();
     }
 
-    // Функция для inline-редактирования цены
     function startInlineEdit(index, iconElement) {
         const priceSpan = document.querySelector(`.edit-service-price[data-index="${index}"]`);
         if (!priceSpan) return;
@@ -1514,7 +1526,7 @@
             const newValue = parseInt(input.value);
             if (!isNaN(newValue) && newValue > 0) {
                 currentEditDetails[index].price = newValue;
-                currentEditDetails[index].basePrice = newValue; // обновляем базовую цену
+                currentEditDetails[index].basePrice = newValue;
             }
             renderEditServices();
             updateEditTotal();
@@ -1822,7 +1834,6 @@
         }
     }
 
-    // Функция сброса всех сертификатов
     window.resetAllCerts = async function() {
         if (!confirm('Вы уверены, что хотите удалить ВСЕ активированные сертификаты? Это действие необратимо.')) return;
         try {
@@ -1881,6 +1892,9 @@
 
         // Обычное сохранение чека (без сертификата)
         try {
+            // Определяем, есть ли интернет
+            const isOnline = navigator.onLine;
+            
             await crmCollection.add({
                 date: date,
                 client: clientSong,
@@ -1894,12 +1908,18 @@
                 completed: false
             });
 
+            if (!isOnline) {
+                // Показываем уведомление, что запись сохранена локально
+                alert('📡 Запись сохранена локально. Она будет отправлена при подключении к интернету.');
+            }
+
             window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
             document.getElementById('bookingTime').value = '';
             document.getElementById('clientSongInput').value = '';
             renderCart();
         } catch (error) {
             console.error("Ошибка сохранения:", error);
+            alert('Ошибка при сохранении. Возможно, нет соединения с Firebase.');
         }
     };
 
@@ -1925,7 +1945,6 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        // Сортировка по дате (от новых к старым)
         const filteredData = window.crmData.filter(r => r.date && r.date.includes(mKey)).sort((a, b) => {
             const parseDate = (dateStr) => {
                 const [d, m, y] = dateStr.split('.').map(Number);
@@ -2112,6 +2131,20 @@
     };
 
     window.addEventListener('resize', updateTable);
+
+    // ---------- OFFLINE / ONLINE ИНДИКАТОР ----------
+    function updateOnlineStatus() {
+        const indicator = document.getElementById('offlineIndicator');
+        if (navigator.onLine) {
+            indicator.style.display = 'none';
+        } else {
+            indicator.style.display = 'block';
+        }
+    }
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus(); // проверяем сразу
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -2129,6 +2162,17 @@ const firebaseConfig = {
 
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// Включаем офлайн-персистентность
+db.enablePersistence()
+  .catch((err) => {
+    if (err.code == 'failed-precondition') {
+      console.log('Persistence failed: multiple tabs open');
+    } else if (err.code == 'unimplemented') {
+      console.log('Persistence not supported');
+    }
+  });
+
 const crmCollection = db.collection("sessions");
 
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
@@ -2147,6 +2191,13 @@ window.addEventListener('load', async () => {
     renderCalendar();
     initTooltipLogic();
 });
+
+// Регистрация Service Worker для PWA (офлайн-доступ к приложению)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed', err));
+  });
+}
 </script>
 </body>
 </html>
