@@ -47,12 +47,17 @@
         }
 
         /* ==========================================
-           КАРУСЕЛЬ SERVICES — УЛУЧШЕННАЯ ВЕРСИЯ
+           КАРУСЕЛЬ SERVICES — ИСПРАВЛЕННАЯ ВЕРСИЯ
            ========================================== */
+        .services-carousel-wrapper {
+            position: relative;
+            margin-left: -20px;   /* компенсируем padding .container */
+            margin-right: -20px;
+            overflow: visible;
+        }
+
         .services-swiper {
             width: 100%;
-            padding: 0 100px; /* Отступы для размещения больших стрелок */
-            position: relative;
             overflow: visible;
         }
 
@@ -67,43 +72,48 @@
             margin: 0;
         }
 
-        /* СТРЕЛКИ: огромные, белые, с неоновым ховером */
-        .swiper-button-prev,
-        .swiper-button-next {
-            color: #ffffff !important;
-            background: rgba(0, 0, 0, 0.7);
-            width: 80px;
-            height: 320px;           /* Высота почти как у карточек */
-            border-radius: 0 !important;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all var(--transition-speed);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-            /* Центрирование по вертикали */
+        /* СТРЕЛКИ: огромные, белые, с неоновым ховером — позиционированы относительно wrapper'а */
+        .services-carousel-wrapper .swiper-button-prev,
+        .services-carousel-wrapper .swiper-button-next {
+            position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            margin-top: 0;            /* Убираем стандартный margin */
-            /* Располагаем в пределах отступов padding */
-            left: 20px;               /* Отступ от края контейнера */
+            width: 80px;
+            height: 320px;           /* высота почти как у карточек */
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff !important;
+            border-radius: 0 !important;
+            transition: all var(--transition-speed);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            z-index: 20;
+            margin: 0;
+            left: 20px;               /* отступ от края экрана */
             right: auto;
         }
 
-        .swiper-button-next {
+        .services-carousel-wrapper .swiper-button-next {
             left: auto;
             right: 20px;
         }
 
-        .swiper-button-prev:hover,
-        .swiper-button-next:hover {
+        .services-carousel-wrapper .swiper-button-prev:hover,
+        .services-carousel-wrapper .swiper-button-next:hover {
             color: var(--neon-blue) !important;
             border-color: var(--neon-blue);
             background: rgba(0, 0, 0, 0.9);
             box-shadow: 0 0 30px var(--soft-glow), 0 0 60px rgba(0, 242, 255, 0.4);
         }
 
-        .swiper-button-prev::after,
-        .swiper-button-next::after {
-            font-size: 48px;          /* Увеличенная иконка */
+        .services-carousel-wrapper .swiper-button-prev::after,
+        .services-carousel-wrapper .swiper-button-next::after {
+            font-size: 48px;
             font-weight: bold;
+        }
+
+        /* Убираем стандартные позиционирования стрелок Swiper */
+        .swiper-button-prev, .swiper-button-next {
+            position: static; /* сбрасываем, чтобы работали наши правила */
         }
 
         /* Убираем полосу прокрутки */
@@ -117,42 +127,37 @@
 
         /* Адаптация для планшетов */
         @media (max-width: 1200px) {
-            .services-swiper {
-                padding: 0 80px;
-            }
-            .swiper-button-prev,
-            .swiper-button-next {
+            .services-carousel-wrapper .swiper-button-prev,
+            .services-carousel-wrapper .swiper-button-next {
                 width: 60px;
                 height: 250px;
             }
-            .swiper-button-prev::after,
-            .swiper-button-next::after {
+            .services-carousel-wrapper .swiper-button-prev::after,
+            .services-carousel-wrapper .swiper-button-next::after {
                 font-size: 36px;
             }
         }
 
         @media (max-width: 1024px) {
-            .services-swiper {
-                padding: 0 60px;
-            }
-            .swiper-button-prev,
-            .swiper-button-next {
+            .services-carousel-wrapper .swiper-button-prev,
+            .services-carousel-wrapper .swiper-button-next {
                 width: 50px;
                 height: 200px;
             }
-            .swiper-button-prev::after,
-            .swiper-button-next::after {
+            .services-carousel-wrapper .swiper-button-prev::after,
+            .services-carousel-wrapper .swiper-button-next::after {
                 font-size: 30px;
             }
         }
 
         @media (max-width: 768px) {
-            .services-swiper {
-                padding: 0 20px;       /* Уменьшаем отступы для мобильных */
+            .services-carousel-wrapper .swiper-button-prev,
+            .services-carousel-wrapper .swiper-button-next {
+                display: none;   /* на мобильных скрываем, оставляем свайп */
             }
-            .swiper-button-prev,
-            .swiper-button-next {
-                display: none;         /* На мобильных скрываем, оставляем свайп */
+            .services-carousel-wrapper {
+                margin-left: 0;   /* на мобильных убираем отрицательные отступы */
+                margin-right: 0;
             }
         }
 
@@ -553,222 +558,224 @@
 <div class="container">
     <section id="services">
         <h2>SERVICES</h2>
-        <!-- Swiper карусель -->
-        <div class="swiper services-swiper">
-            <div class="swiper-wrapper">
-                <!-- Существующие карточки -->
-                <div class="swiper-slide">
-                    <div class="module rec js-scroll-glow" data-package="rec">
-                        <h3>ЗАПИСЬ</h3>
-                        <div class="price">900 <span>₽/час</span></div>
-                        <div class="module-description">
-                            80% успеха трека — это правильное исполнение. Моя задача — выжать максимум из твоего таланта.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: #ffffff;">ВОКАЛЬНЫЙ КОУЧИНГ</span>
-                                • Помогу с подачей и интонацией, подберу крутые фишки для твоего голоса. <br>
-                                • Исправляю ошибки на лету: если не попал в такт или ноту, перепишем и добьёмся идеала. <br>
-                                • Работаем над эмоциями и динамикой, чтобы слушатель верил каждому твоему слову.
+        <!-- Обёртка для карусели на всю ширину -->
+        <div class="services-carousel-wrapper">
+            <div class="swiper services-swiper">
+                <div class="swiper-wrapper">
+                    <!-- Существующие карточки -->
+                    <div class="swiper-slide">
+                        <div class="module rec js-scroll-glow" data-package="rec">
+                            <h3>ЗАПИСЬ</h3>
+                            <div class="price">900 <span>₽/час</span></div>
+                            <div class="module-description">
+                                80% успеха трека — это правильное исполнение. Моя задача — выжать максимум из твоего таланта.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: #ffffff;">ВОКАЛЬНЫЙ КОУЧИНГ</span>
+                                    • Помогу с подачей и интонацией, подберу крутые фишки для твоего голоса. <br>
+                                    • Исправляю ошибки на лету: если не попал в такт или ноту, перепишем и добьёмся идеала. <br>
+                                    • Работаем над эмоциями и динамикой, чтобы слушатель верил каждому твоему слову.
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>РАБОТАЕМ <span>ПО ПРЕДВАРИТЕЛЬНОЙ ЗАПИСИ</span></li>
+                                <li>БРОНИРОВАНИЕ ВРЕМЕНИ <span>500 ₽ (ВХОДИТ В СТОИМОСТЬ СЕССИИ)</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>РАБОТАЕМ <span>ПО ПРЕДВАРИТЕЛЬНОЙ ЗАПИСИ</span></li>
-                            <li>БРОНИРОВАНИЕ ВРЕМЕНИ <span>500 ₽ (ВХОДИТ В СТОИМОСТЬ СЕССИИ)</span></li>
-                        </ul>
                     </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="module start js-scroll-glow" data-package="start">
-                        <h3>START EDITION</h3>
-                        <div class="price">3 900 <span>₽</span></div>
-                        <div class="module-description">
-                            Идеальное решение для песен в подарок или корпоративных гимнов. Подойдет тем, кому нужен качественный, но быстрый результат без лишних сложностей.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-purple);">БАЗОВЫЙ ПРОДАКШН</span>
-                                • 1 Час записи: Помогу с подачей и выберу лучшие дубли. <br>
-                                • Подготовка: Очистка дорожек от шумов, вздохов и щелчков. <br>
-                                • Атмосфера: Добавлю глубину, объем и эффекты (ревер, дилэй). <br>
-                                • Сведение: Сделаю голос плотным и «вклею» его в твой минус. <br>
-                                • Мастеринг: Подтяну громкость под стандарты стримингов.
+                    <div class="swiper-slide">
+                        <div class="module start js-scroll-glow" data-package="start">
+                            <h3>START EDITION</h3>
+                            <div class="price">3 900 <span>₽</span></div>
+                            <div class="module-description">
+                                Идеальное решение для песен в подарок или корпоративных гимнов. Подойдет тем, кому нужен качественный, но быстрый результат без лишних сложностей.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: var(--neon-purple);">БАЗОВЫЙ ПРОДАКШН</span>
+                                    • 1 Час записи: Помогу с подачей и выберу лучшие дубли. <br>
+                                    • Подготовка: Очистка дорожек от шумов, вздохов и щелчков. <br>
+                                    • Атмосфера: Добавлю глубину, объем и эффекты (ревер, дилэй). <br>
+                                    • Сведение: Сделаю голос плотным и «вклею» его в твой минус. <br>
+                                    • Мастеринг: Подтяну громкость под стандарты стримингов.
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>ВКЛЮЧЕНО <span>1 ЧАС ЗАПИСИ, СВЕДЕНИЕ: МИНУСОВКА + 1 ДОРОЖКА ВОКАЛА</span></li>
+                                <li>ТЮНИНГ ВОКАЛА <span>+ 1 000 ₽ / ДОРОЖКА</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>ВКЛЮЧЕНО <span>1 ЧАС ЗАПИСИ, СВЕДЕНИЕ: МИНУСОВКА + 1 ДОРОЖКА ВОКАЛА</span></li>
-                            <li>ТЮНИНГ ВОКАЛА <span>+ 1 000 ₽ / ДОРОЖКА</span></li>
-                        </ul>
                     </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="module artist js-scroll-glow js-artist-trigger" data-package="artist">
-                        <h3>ARTIST EDITION</h3>
-                        <div class="price">6 000 <span>₽</span></div>
-                        <div class="module-description">
-                            Продукт для топ-чартов и стриминговых площадок. Полная проработка коммерческого звучания, которое будет конкурировать с лучшими релизами индустрии.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-red);">ПРОФЕССИОНАЛЬНЫЙ ПОДХОД</span>
-                                • Ручная коррекция основного вокала: каждый слог встанет на свое место по нотам. <br>
-                                • Современный объем и эффекты: используем передовые плагины для создания пространства. <br>
-                                • Работа со вторыми голосами: создадим мощную панораму и плотность.
+                    <div class="swiper-slide">
+                        <div class="module artist js-scroll-glow js-artist-trigger" data-package="artist">
+                            <h3>ARTIST EDITION</h3>
+                            <div class="price">6 000 <span>₽</span></div>
+                            <div class="module-description">
+                                Продукт для топ-чартов и стриминговых площадок. Полная проработка коммерческого звучания, которое будет конкурировать с лучшими релизами индустрии.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: var(--neon-red);">ПРОФЕССИОНАЛЬНЫЙ ПОДХОД</span>
+                                    • Ручная коррекция основного вокала: каждый слог встанет на свое место по нотам. <br>
+                                    • Современный объем и эффекты: используем передовые плагины для создания пространства. <br>
+                                    • Работа со вторыми голосами: создадим мощную панораму и плотность.
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>ВКЛЮЧЕНО <span>ОБРАБОТКА 2-Х ДОП. ДОРОЖЕК</span></li>
+                                <li>ТЮНИНГ ДОП. ДОРОЖКИ <span>+ 500 ₽</span></li>
+                                <li>ОБРАБОТКА ДОП. ДОРОЖКИ <span>+ 300 ₽</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>ВКЛЮЧЕНО <span>ОБРАБОТКА 2-Х ДОП. ДОРОЖЕК</span></li>
-                            <li>ТЮНИНГ ДОП. ДОРОЖКИ <span>+ 500 ₽</span></li>
-                            <li>ОБРАБОТКА ДОП. ДОРОЖКИ <span>+ 300 ₽</span></li>
-                        </ul>
                     </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="module platinum js-scroll-glow" data-package="platinum">
-                        <h3>PLATINUM EDITION</h3>
-                        <div class="price">ОТ 10 000 <span>₽</span></div>
-                        <div class="module-description">
-                            Масштабный продакшн для монолитного звука. Когда в треке много партий, инструментов и нюансов, требующих ювелирной точности.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-gold);">МУЛЬТИТРЕК</span>
-                                • Сведение до 20 дорожек включительно: детальная работа с каждой частотой. <br>
-                                • Ручной тюнинг основного вокала включен: идеальный питч без механического звука. <br>
-                                • Творческая работа: создание уникального саунд-дизайна под твой запрос.
+                    <div class="swiper-slide">
+                        <div class="module platinum js-scroll-glow" data-package="platinum">
+                            <h3>PLATINUM EDITION</h3>
+                            <div class="price">ОТ 10 000 <span>₽</span></div>
+                            <div class="module-description">
+                                Масштабный продакшн для монолитного звука. Когда в треке много партий, инструментов и нюансов, требующих ювелирной точности.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: var(--neon-gold);">МУЛЬТИТРЕК</span>
+                                    • Сведение до 20 дорожек включительно: детальная работа с каждой частотой. <br>
+                                    • Ручной тюнинг основного вокала включен: идеальный питч без механического звука. <br>
+                                    • Творческая работа: создание уникального саунд-дизайна под твой запрос.
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>ДОП. ДОРОЖКА <span>+ 300 ₽</span></li>
+                                <li>ТЮНИНГ БЭКОВ <span>ОТДЕЛЬНО</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>ДОП. ДОРОЖКА <span>+ 300 ₽</span></li>
-                            <li>ТЮНИНГ БЭКОВ <span>ОТДЕЛЬНО</span></li>
-                        </ul>
                     </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="module arrangement js-scroll-glow" data-package="arrangement">
-                        <h3>АРАНЖИРОВКА</h3>
-                        <div class="price">ОТ 8 000 <span>₽</span></div>
-                        <div class="module-description">
-                            Создание уникальной музыкальной основы под ваш трек. Полный цикл аранжировки в любом стиле — от поп и рэп до рока и электроники.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-blue);">ИНДИВИДУАЛЬНЫЙ ПОДХОД</span>
-                                • Написание инструментальной партитуры под ваш вкус. <br>
-                                • Живые и виртуальные инструменты, современные звуки. <br>
-                                • Адаптация аранжировки под ваш вокал: структура, динамика, грув. <br>
-                                • Готовый минус в высоком качестве, пригодный для записи и сведения.
+                    <div class="swiper-slide">
+                        <div class="module arrangement js-scroll-glow" data-package="arrangement">
+                            <h3>АРАНЖИРОВКА</h3>
+                            <div class="price">ОТ 8 000 <span>₽</span></div>
+                            <div class="module-description">
+                                Создание уникальной музыкальной основы под ваш трек. Полный цикл аранжировки в любом стиле — от поп и рэп до рока и электроники.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: var(--neon-blue);">ИНДИВИДУАЛЬНЫЙ ПОДХОД</span>
+                                    • Написание инструментальной партитуры под ваш вкус. <br>
+                                    • Живые и виртуальные инструменты, современные звуки. <br>
+                                    • Адаптация аранжировки под ваш вокал: структура, динамика, грув. <br>
+                                    • Готовый минус в высоком качестве, пригодный для записи и сведения.
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>СТИЛИ <span>POP, RAP, ROCK, ELECTRO, LO-FI</span></li>
+                                <li>СРОКИ <span>ОТ 3 ДНЕЙ (ЗАВИСИТ ОТ СЛОЖНОСТИ)</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>СТИЛИ <span>POP, RAP, ROCK, ELECTRO, LO-FI</span></li>
-                            <li>СРОКИ <span>ОТ 3 ДНЕЙ (ЗАВИСИТ ОТ СЛОЖНОСТИ)</span></li>
-                        </ul>
                     </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="module gift js-scroll-glow" data-package="gift">
-                        <h3>ПОДАРОЧНЫЙ СЕРТИФИКАТ</h3>
-                        <div class="price">ОТ 3 000 <span>₽</span></div>
-                        <div class="module-description">
-                            Идеальный подарок для музыканта. Дайте возможность записать трек или воспользоваться любой услугой студии.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-pink);">ВАРИАНТЫ НОМИНАЛА</span>
-                                • На 1 час записи (включая консультацию). <br>
-                                • На START EDITION (запись + сведение). <br>
-                                • На ARTIST EDITION (полный продакшн). <br>
-                                • На АРАНЖИРОВКУ (инструментал под ключ).
+                    <div class="swiper-slide">
+                        <div class="module gift js-scroll-glow" data-package="gift">
+                            <h3>ПОДАРОЧНЫЙ СЕРТИФИКАТ</h3>
+                            <div class="price">ОТ 3 000 <span>₽</span></div>
+                            <div class="module-description">
+                                Идеальный подарок для музыканта. Дайте возможность записать трек или воспользоваться любой услугой студии.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: var(--neon-pink);">ВАРИАНТЫ НОМИНАЛА</span>
+                                    • На 1 час записи (включая консультацию). <br>
+                                    • На START EDITION (запись + сведение). <br>
+                                    • На ARTIST EDITION (полный продакшн). <br>
+                                    • На АРАНЖИРОВКУ (инструментал под ключ).
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>СРОК ДЕЙСТВИЯ <span>6 МЕСЯЦЕВ</span></li>
+                                <li>ИМЕННОЙ / АНОНИМНЫЙ <span>ПО ЖЕЛАНИЮ</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>СРОК ДЕЙСТВИЯ <span>6 МЕСЯЦЕВ</span></li>
-                            <li>ИМЕННОЙ / АНОНИМНЫЙ <span>ПО ЖЕЛАНИЮ</span></li>
-                        </ul>
                     </div>
-                </div>
-                <div class="swiper-slide">
-                    <div class="module lesson js-scroll-glow" data-package="lesson">
-                        <h3>УРОКИ ЗВУКОРЕЖИССУРЫ</h3>
-                        <div class="price">1 500 <span>₽/час</span></div>
-                        <div class="module-description">
-                            Индивидуальные занятия по звукорежиссуре для начинающих и продвинутых. Освойте сведение, мастеринг и работу в DAW.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-green);">ПРОГРАММА КУРСА</span>
-                                • Основы DAW (Ableton, Logic, Cubase — на выбор). <br>
-                                • Теория звука: частоты, динамика, эквализация. <br>
-                                • Практика сведения реальных проектов. <br>
-                                • Мастеринг и подготовка треков к релизу. <br>
-                                • Индивидуальный план под ваш уровень.
+                    <div class="swiper-slide">
+                        <div class="module lesson js-scroll-glow" data-package="lesson">
+                            <h3>УРОКИ ЗВУКОРЕЖИССУРЫ</h3>
+                            <div class="price">1 500 <span>₽/час</span></div>
+                            <div class="module-description">
+                                Индивидуальные занятия по звукорежиссуре для начинающих и продвинутых. Освойте сведение, мастеринг и работу в DAW.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: var(--neon-green);">ПРОГРАММА КУРСА</span>
+                                    • Основы DAW (Ableton, Logic, Cubase — на выбор). <br>
+                                    • Теория звука: частоты, динамика, эквализация. <br>
+                                    • Практика сведения реальных проектов. <br>
+                                    • Мастеринг и подготовка треков к релизу. <br>
+                                    • Индивидуальный план под ваш уровень.
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
+                                <li>ФОРМАТ <span>ОЧНО / ONLINE</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
-                            <li>ФОРМАТ <span>ОЧНО / ONLINE</span></li>
-                        </ul>
                     </div>
-                </div>
 
-                <!-- НОВЫЕ КАРТОЧКИ: Уроки вокала -->
-                <div class="swiper-slide">
-                    <div class="module vocal js-scroll-glow" data-package="vocal">
-                        <h3>УРОКИ ВОКАЛА</h3>
-                        <div class="price">1 800 <span>₽/час</span></div>
-                        <div class="module-description">
-                            Индивидуальные занятия с профессиональным педагогом. Постановка голоса, расширение диапазона, снятие зажимов.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-vocal);">ЧТО ВЫ ПОЛУЧИТЕ</span>
-                                • Дыхательные техники и опора. <br>
-                                • Развитие слуха и чувства ритма. <br>
-                                • Работа над дикцией и артикуляцией. <br>
-                                • Подбор репертуара под ваш тембр. <br>
-                                • Подготовка к записи в студии.
+                    <!-- НОВЫЕ КАРТОЧКИ: Уроки вокала -->
+                    <div class="swiper-slide">
+                        <div class="module vocal js-scroll-glow" data-package="vocal">
+                            <h3>УРОКИ ВОКАЛА</h3>
+                            <div class="price">1 800 <span>₽/час</span></div>
+                            <div class="module-description">
+                                Индивидуальные занятия с профессиональным педагогом. Постановка голоса, расширение диапазона, снятие зажимов.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: var(--neon-vocal);">ЧТО ВЫ ПОЛУЧИТЕ</span>
+                                    • Дыхательные техники и опора. <br>
+                                    • Развитие слуха и чувства ритма. <br>
+                                    • Работа над дикцией и артикуляцией. <br>
+                                    • Подбор репертуара под ваш тембр. <br>
+                                    • Подготовка к записи в студии.
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>ДЛИТЕЛЬНОСТЬ <span>60 / 90 МИНУТ</span></li>
+                                <li>ФОРМАТ <span>ОЧНО / ONLINE</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>ДЛИТЕЛЬНОСТЬ <span>60 / 90 МИНУТ</span></li>
-                            <li>ФОРМАТ <span>ОЧНО / ONLINE</span></li>
-                        </ul>
                     </div>
-                </div>
 
-                <!-- Уроки фортепиано -->
-                <div class="swiper-slide">
-                    <div class="module piano js-scroll-glow" data-package="piano">
-                        <h3>УРОКИ ФОРТЕПИАНО</h3>
-                        <div class="price">1 800 <span>₽/час</span></div>
-                        <div class="module-description">
-                            Обучение игре на фортепиано с нуля или для продолжающих. Теория музыки, аккомпанемент, чтение с листа.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-piano);">ПРОГРАММА</span>
-                                • Постановка рук, основы нотной грамоты. <br>
-                                • Изучение аккордов и гармонии. <br>
-                                • Разбор ваших любимых произведений. <br>
-                                • Импровизация и создание аранжировок. <br>
-                                • Подготовка к выступлениям.
+                    <!-- Уроки фортепиано -->
+                    <div class="swiper-slide">
+                        <div class="module piano js-scroll-glow" data-package="piano">
+                            <h3>УРОКИ ФОРТЕПИАНО</h3>
+                            <div class="price">1 800 <span>₽/час</span></div>
+                            <div class="module-description">
+                                Обучение игре на фортепиано с нуля или для продолжающих. Теория музыки, аккомпанемент, чтение с листа.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: var(--neon-piano);">ПРОГРАММА</span>
+                                    • Постановка рук, основы нотной грамоты. <br>
+                                    • Изучение аккордов и гармонии. <br>
+                                    • Разбор ваших любимых произведений. <br>
+                                    • Импровизация и создание аранжировок. <br>
+                                    • Подготовка к выступлениям.
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
+                                <li>УРОВЕНЬ <span>ЛЮБОЙ</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
-                            <li>УРОВЕНЬ <span>ЛЮБОЙ</span></li>
-                        </ul>
                     </div>
-                </div>
 
-                <!-- Уроки гитары -->
-                <div class="swiper-slide">
-                    <div class="module guitar js-scroll-glow" data-package="guitar">
-                        <h3>УРОКИ ГИТАРЫ</h3>
-                        <div class="price">1 800 <span>₽/час</span></div>
-                        <div class="module-description">
-                            Индивидуальные занятия на акустической или электрогитаре. Аккорды, бой, перебор, соло и теория музыки.
-                            <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-guitar);">НАПРАВЛЕНИЯ</span>
-                                • Акустическая гитара: аккомпанемент, пение под гитару. <br>
-                                • Электрогитара: риффы, соло, импровизация, звукоизвлечение. <br>
-                                • Основы гармонии и построения партий. <br>
-                                • Разбор песен в любом стиле (рок, поп, блюз).
+                    <!-- Уроки гитары -->
+                    <div class="swiper-slide">
+                        <div class="module guitar js-scroll-glow" data-package="guitar">
+                            <h3>УРОКИ ГИТАРЫ</h3>
+                            <div class="price">1 800 <span>₽/час</span></div>
+                            <div class="module-description">
+                                Индивидуальные занятия на акустической или электрогитаре. Аккорды, бой, перебор, соло и теория музыки.
+                                <div class="sub-package">
+                                    <span class="sub-package-title" style="color: var(--neon-guitar);">НАПРАВЛЕНИЯ</span>
+                                    • Акустическая гитара: аккомпанемент, пение под гитару. <br>
+                                    • Электрогитара: риффы, соло, импровизация, звукоизвлечение. <br>
+                                    • Основы гармонии и построения партий. <br>
+                                    • Разбор песен в любом стиле (рок, поп, блюз).
+                                </div>
                             </div>
+                            <ul class="specs">
+                                <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
+                                <li>ИНСТРУМЕНТ <span>ВАШ ИЛИ СТУДИЙНЫЙ</span></li>
+                            </ul>
                         </div>
-                        <ul class="specs">
-                            <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
-                            <li>ИНСТРУМЕНТ <span>ВАШ ИЛИ СТУДИЙНЫЙ</span></li>
-                        </ul>
                     </div>
                 </div>
+                <!-- Навигационные стрелки (огромные, внутри wrapper'а) -->
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
             </div>
-            <!-- Навигационные стрелки (огромные) -->
-            <div class="swiper-button-prev"></div>
-            <div class="swiper-button-next"></div>
         </div>
     </section>
 
