@@ -6,9 +6,11 @@
     <title>SPRING SOUND LAB | WEYTON</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;500;700;800&family=Montserrat:wght@100;200;300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         /* ==========================================
-           1. ПЕРЕМЕННЫЕ И ОСНОВНЫЕ СТИЛИ
+           1. ПЕРЕМЕННЫЕ И ОСНОВНЫЕ СТИЛИ (CSS VARIABLES)
            ========================================== */
         :root {
             --neon-blue: #00f2ff;
@@ -17,7 +19,9 @@
             --neon-gold: #ffcc00;
             --neon-pink: #ff44aa;
             --neon-green: #00ff88;
-            --neon-orange: #ff9900;
+            --neon-vocal: #ff66aa;      /* цвет для уроков вокала */
+            --neon-piano: #ffaa00;       /* цвет для уроков фортепиано */
+            --neon-guitar: #aa66ff;      /* цвет для уроков гитары */
             --youtube-red: #ff0000;
             --bg-dark: #020205;
             --transition-speed: 0.4s;
@@ -43,7 +47,76 @@
             width: 100%;
         }
 
-        /* Кастомный плеер (был в исходном коде) */
+        /* Стили для Swiper карусели */
+        .services-swiper {
+            width: 100%;
+            padding: 20px 60px; /* место для стрелок */
+            position: relative;
+            overflow: visible;
+        }
+
+        .swiper-slide {
+            height: auto;
+            display: flex;
+        }
+
+        .swiper-slide .module {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .swiper-button-prev,
+        .swiper-button-next {
+            color: var(--neon-blue);
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 0 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all var(--transition-speed);
+        }
+
+        .swiper-button-prev:hover,
+        .swiper-button-next:hover {
+            background: rgba(0, 242, 255, 0.2);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px var(--soft-glow);
+        }
+
+        .swiper-button-prev::after,
+        .swiper-button-next::after {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Убираем полосу прокрутки, если она появляется */
+        .services-swiper .swiper-wrapper {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .services-swiper .swiper-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Адаптация для мобильных */
+        @media (max-width: 1024px) {
+            .services-swiper {
+                padding: 20px 40px;
+            }
+            .swiper-button-prev,
+            .swiper-button-next {
+                display: none; /* на мобильных лучше скрыть стрелки, оставить свайп */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .services-swiper {
+                padding: 20px 20px;
+            }
+        }
+
+        /* Остальные стили без изменений (сохранены из исходного кода) */
         .custom-audio-player {
             background: #000 !important;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -58,9 +131,6 @@
         .progress-bar { height: 100%; background: #00f2ff; width: 0%; }
         .time-display { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: #fff; min-width: 40px; }
 
-        /* ==========================================
-           2. ФОН И АНИМАЦИЯ
-           ========================================== */
         .studio-background {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -75,19 +145,16 @@
             100% { transform: scale(1.15); } 
         }
 
-        /* ==========================================
-           3. ШАПКА
-           ========================================== */
         header { 
             height: 100vh; min-height: 600px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; 
-            padding: 20px; position: relative; width: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            text-align: center; padding: 20px; position: relative; width: 100%;
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
 
         .flicker-header {
-            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.4rem; letter-spacing: 22px;
-            color: #ffffff; text-transform: uppercase; margin-bottom: 25px;
+            font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.4rem; 
+            letter-spacing: 22px; color: #ffffff; text-transform: uppercase; margin-bottom: 25px;
             opacity: 0; transform: translateY(15px);
             animation: ultraSmoothFade 1.5s 0.8s forwards;
         }
@@ -102,9 +169,12 @@
             font-size: clamp(2.5rem, 8vw, 7.5rem); 
             background-image: linear-gradient(90deg, #ffffff, var(--neon-blue), var(--neon-purple), #ffffff);
             background-size: 300% auto; 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
             animation: flow 15s linear infinite; 
-            text-transform: uppercase; letter-spacing: 15px; font-weight: 900;
+            text-transform: uppercase; 
+            letter-spacing: 15px; 
+            font-weight: 900;
             width: 100%;
         }
 
@@ -122,9 +192,6 @@
             animation: ultraSmoothFade 1.5s 1.8s forwards;
         }
 
-        /* ==========================================
-           4. СОЦИАЛЬНЫЕ СЕТИ
-           ========================================== */
         .header-socials {
             display: flex; gap: 50px; margin-top: 70px;
             opacity: 0; transform: translateY(20px);
@@ -146,14 +213,12 @@
             .social-btn:hover { transform: scale(1.1); }
         }
 
-        /* ==========================================
-           5. ТЕЛЕФОН
-           ========================================== */
         .phone-box-container {
             margin-top: 40px; padding: 20px 40px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             background-color: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: inline-flex; flex-direction: column; align-items: center;
             text-decoration: none; transition: all var(--transition-speed) var(--transition-timing);
             opacity: 0; transform: translateY(20px);
@@ -178,12 +243,12 @@
             background-color: rgba(255, 255, 255, 0.08);
         }
 
-        .phone-box-container:hover .header-phone { color: var(--neon-blue); text-shadow: 0 0 5px var(--soft-glow); }
+        .phone-box-container:hover .header-phone {
+            color: var(--neon-blue); text-shadow: 0 0 5px var(--soft-glow);
+        }
+
         .phone-box-container:hover .phone-hint { color: #ffffff; }
 
-        /* ==========================================
-           6. ОСНОВНОЙ КОНТЕНТ
-           ========================================== */
         .container { 
             padding: 50px 20px; max-width: 1600px; margin: 0 auto;
             position: relative; z-index: 5; width: 100%;
@@ -194,288 +259,123 @@
         }
 
         h2 { 
-            font-family: 'Orbitron', sans-serif; font-weight: 700; text-align: center;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; text-align: center; 
             letter-spacing: 15px; margin-bottom: 80px; font-size: 2.8rem; text-transform: uppercase; 
         }
 
-        /* ==========================================
-           7. КАРУСЕЛЬ СЕРВИСОВ
-           ========================================== */
-        .services-carousel {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .carousel-wrapper {
-            overflow: hidden;
-            flex: 1;
-        }
-
-        .carousel-track {
-            display: flex;
-            gap: 20px;
-            transition: transform 0.4s ease;
-            will-change: transform;
-        }
-
-        /* Стили карточек (объединены с .module для сохранения всех свойств) */
-        .module, .service-card {
-            flex: 0 0 auto;
-            width: 320px; /* фиксированная ширина, как в оригинале */
-            background-color: rgba(255, 255, 255, 0.02);
+        /* Модули (карточки) */
+        .module { 
+            background-color: rgba(255, 255, 255, 0.02); 
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 50px 25px;
             transition: all var(--transition-speed) var(--transition-timing);
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            position: relative;
-            height: 100%;
+            display: flex; flex-direction: column; align-items: flex-start; text-align: left; 
+            backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+            position: relative; height: 100%; 
         }
 
-        .module:hover, .service-card:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+        .module:hover {
+            background-color: rgba(255, 255, 255, 0.05); 
             transform: translateY(-8px);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
         }
 
-        /* Индивидуальные цвета подсветки */
-        .module.rec:hover, .service-card.rec:hover,
-        .module.rec.active-scroll, .service-card.rec.active-scroll { 
-            border-color: #ffffff; 
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); 
-        }
-        
-        .module.start:hover, .service-card.start:hover,
-        .module.start.active-scroll, .service-card.start.active-scroll { 
-            border-color: var(--neon-purple); 
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.1); 
-        }
-        
-        .module.artist:hover, .service-card.artist:hover,
-        .module.artist.active-scroll, .service-card.artist.active-scroll { 
-            border-color: var(--neon-red); 
-            box-shadow: 0 0 15px rgba(255, 0, 60, 0.1); 
-        }
-        
-        .module.platinum:hover, .service-card.platinum:hover,
-        .module.platinum.active-scroll, .service-card.platinum.active-scroll { 
-            border-color: var(--neon-gold) !important; 
-            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2) !important; 
+        .module.rec:hover, .module.rec.active-scroll { border-color: #ffffff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); }
+        .module.start:hover, .module.start.active-scroll { border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(188, 19, 254, 0.1); }
+        .module.artist:hover, .module.artist.active-scroll { border-color: var(--neon-red); box-shadow: 0 0 15px rgba(255, 0, 60, 0.1); }
+        .module.platinum:hover, .module.platinum.active-scroll { border-color: var(--neon-gold); box-shadow: 0 0 15px rgba(255, 204, 0, 0.2); }
+        .module.arrangement:hover, .module.arrangement.active-scroll { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--soft-glow); }
+        .module.gift:hover, .module.gift.active-scroll { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 68, 170, 0.3); }
+        .module.lesson:hover, .module.lesson.active-scroll { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
+        /* Новые карточки */
+        .module.vocal:hover, .module.vocal.active-scroll { border-color: var(--neon-vocal); box-shadow: 0 0 15px rgba(255, 102, 170, 0.4); }
+        .module.piano:hover, .module.piano.active-scroll { border-color: var(--neon-piano); box-shadow: 0 0 15px rgba(255, 170, 0, 0.4); }
+        .module.guitar:hover, .module.guitar.active-scroll { border-color: var(--neon-guitar); box-shadow: 0 0 15px rgba(170, 102, 255, 0.4); }
+
+        .module h3 { 
+            font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: 3px; 
+            margin-bottom: 20px; font-size: 0.9rem; text-transform: uppercase; color: #ffffff;
         }
 
-        .module.arrangement:hover, .service-card.arrangement:hover,
-        .module.arrangement.active-scroll, .service-card.arrangement.active-scroll { 
-            border-color: var(--neon-blue); 
-            box-shadow: 0 0 15px var(--soft-glow); 
+        .price { 
+            font-size: 2.2rem; font-weight: 900; font-family: 'Orbitron', sans-serif; 
+            margin-bottom: 10px; color: #ffffff;
         }
 
-        .module.gift:hover, .service-card.gift:hover,
-        .module.gift.active-scroll, .service-card.gift.active-scroll { 
-            border-color: var(--neon-pink); 
-            box-shadow: 0 0 15px rgba(255, 68, 170, 0.3); 
-        }
+        .price span { font-size: 0.8rem; color: #aaaaaa; font-family: 'Montserrat', sans-serif; }
 
-        .module.lesson:hover, .service-card.lesson:hover,
-        .module.lesson.active-scroll, .service-card.lesson.active-scroll { 
-            border-color: var(--neon-green); 
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); 
-        }
-
-        /* Новые карточки уроков (вокал, фортепиано, гитара) */
-        .service-card.vocal:hover { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 68, 170, 0.3); }
-        .service-card.piano:hover { border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(188, 19, 254, 0.1); }
-        .service-card.guitar:hover { border-color: var(--neon-red); box-shadow: 0 0 15px rgba(255, 0, 60, 0.1); }
-
-        /* Общие стили для заголовков, цен и т.д. */
-        .module h3, .service-card h3 { 
-            font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: 3px; margin-bottom: 20px;
-            font-size: 0.9rem; text-transform: uppercase; color: #ffffff;
-        }
-
-        .module .price, .service-card .price { 
-            font-size: 2.2rem; font-weight: 900; font-family: 'Orbitron', sans-serif; margin-bottom: 10px; color: #ffffff;
-        }
-
-        .module .price span, .service-card .price span { 
-            font-size: 0.8rem; color: #aaaaaa; font-family: 'Montserrat', sans-serif; 
-        }
-
-        .module .module-description, .service-card .module-description {
+        .module-description {
             font-family: 'Montserrat', sans-serif; font-size: 0.7rem; line-height: 1.6;
             color: rgba(255, 255, 255, 0.8); margin-bottom: 25px;
             text-transform: uppercase; letter-spacing: 1px; flex-grow: 1; 
         }
 
-        .module .sub-package, .service-card .sub-package {
+        .sub-package {
             border-top: 1px solid rgba(255, 255, 255, 0.2); margin-top: 15px; padding-top: 15px; width: 100%;
         }
 
-        .module .sub-package-title, .service-card .sub-package-title {
+        .sub-package-title {
             font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.8rem;
             margin-bottom: 8px; display: block; text-transform: uppercase;
         }
 
-        .module .specs, .service-card .specs { 
-            list-style-type: none; margin-top: 30px; width: 100%; 
-        }
+        .specs { list-style-type: none; margin-top: 30px; width: 100%; }
 
-        .module .specs li, .service-card .specs li { 
+        .specs li { 
             padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center;
             text-transform: uppercase; letter-spacing: 1px; color: #ffffff;
         }
 
-        .module .specs li span, .service-card .specs li span { 
-            color: var(--neon-blue); font-weight: 700; text-align: right; margin-left: 10px; 
-        }
+        .specs li span { color: var(--neon-blue); font-weight: 700; text-align: right; margin-left: 10px; }
 
-        /* Стрелки карусели */
-        .carousel-arrow {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            font-size: 1.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            z-index: 10;
-            flex-shrink: 0;
-        }
-
-        .carousel-arrow:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: white;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
-        }
-
-        .carousel-arrow:active { transform: scale(0.95); }
-
-        @media (max-width: 768px) {
-            .module, .service-card { width: 280px; padding: 30px 20px; }
-            .carousel-arrow { width: 40px; height: 40px; font-size: 1.4rem; }
-        }
-
-        /* ==========================================
-           8. PORTFOLIO (без изменений)
-           ========================================== */
+        /* Portfolio */
         .portfolio-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            width: 100%;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; width: 100%;
         }
 
         .audio-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            transition: all var(--transition-speed) var(--transition-timing);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            backdrop-filter: blur(5px);
-            position: relative;
-            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px; transition: all var(--transition-speed) var(--transition-timing);
+            display: flex; flex-direction: column; gap: 15px; backdrop-filter: blur(5px);
         }
 
         .audio-card:hover, .audio-card.active-scroll {
-            border-color: var(--neon-blue);
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .audio-card::after {
-            content: "";
-            position: absolute;
-            top: -150%;
-            left: -150%;
-            width: 40%;
-            height: 400%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.03) 70%, rgba(255,255,255,0) 100%);
-            transform: rotate(35deg);
-            pointer-events: none;
-            z-index: 10;
-            opacity: 0;
-        }
-
-        .audio-card:hover::after {
-            opacity: 1;
-            left: 150%;
-            top: 50%;
-            transition: left 0.7s ease-in-out, top 0.7s ease-in-out;
+            border-color: var(--neon-blue); background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1); transform: translateY(-5px);
         }
 
         .audio-cover {
-            width: 100%;
-            aspect-ratio: 1/1;
-            background-size: cover;
-            background-position: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 10px;
+            width: 100%; aspect-ratio: 1/1; background-size: cover; background-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 10px;
         }
 
-        .audio-info { 
-            padding: 15px 20px; height: 95px;
-            display: flex; flex-direction: column; justify-content: center; overflow: hidden;
-        }
+        .audio-info { padding: 15px 20px; height: 95px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
 
         .audio-title { 
-            font-family: 'Orbitron', sans-serif; font-weight: 700;
-            font-size: clamp(0.7rem, 2.5vw, 0.9rem); line-height: 1.2; letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; 
+            font-size: clamp(0.7rem, 2.5vw, 0.9rem); line-height: 1.2; letter-spacing: 1px; 
             margin-bottom: 6px; text-transform: uppercase;
         }
 
-        .neon-accent {
-            color: var(--neon-blue);
-            text-shadow: none !important;
-            font-weight: 600;
-        } 
-
         .audio-subtitle {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.65rem !important;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            line-height: 1;
+            font-family: 'Montserrat', sans-serif; font-size: 0.65rem !important;
+            color: #888; text-transform: uppercase; letter-spacing: 1px; line-height: 1;
             flex-shrink: 0;
         }
 
-        audio {
-            width: 100%; height: 40px;
-            filter: invert(100%) hue-rotate(180deg) brightness(1.2);
-            outline: none; opacity: 0.8; transition: opacity 0.3s;
-        }
-
+        audio { width: 100%; height: 40px; filter: invert(100%) hue-rotate(180deg) brightness(1.2); outline: none; opacity: 0.8; transition: opacity 0.3s; }
         audio:hover { opacity: 1; }
 
-        /* ==========================================
-           9. КОНТАКТЫ
-           ========================================== */
+        /* Booking */
         .booking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
 
         .contact-card {
-            background-color: rgba(255, 255, 255, 0.02);
-            padding: 80px 40px; text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-decoration: none; color: #ffffff;
-            transition: all var(--transition-speed) var(--transition-timing);
-            backdrop-filter: blur(8px); display: block;
+            background-color: rgba(255, 255, 255, 0.02); padding: 80px 40px; text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1); text-decoration: none; color: #ffffff;
+            transition: all var(--transition-speed) var(--transition-timing); backdrop-filter: blur(8px);
+            display: block;
         }
 
         .contact-label {
@@ -484,7 +384,7 @@
         }
 
         .contact-main-text { 
-            color: #ffffff; font-size: clamp(1.2rem, 2.5vw, 2.2rem);
+            color: #ffffff; font-size: clamp(1.2rem, 2.5vw, 2.2rem); 
             font-family: 'Orbitron', sans-serif; font-weight: 900; margin-bottom: 10px;
             transition: all var(--transition-speed); text-transform: uppercase;
         }
@@ -494,13 +394,9 @@
             transform: translateY(-5px); background-color: rgba(255, 255, 255, 0.05);
         }
 
-        .contact-card:hover .contact-main-text { color: var(--neon-blue); text-shadow: 0 0 6px var(--soft-glow); }
-
-        .contact-card.active-scroll {
-            border-color: var(--neon-blue); box-shadow: 0 0 15px var(--soft-glow);
-            background-color: rgba(255, 255, 255, 0.05);
+        .contact-card:hover .contact-main-text {
+            color: var(--neon-blue); text-shadow: 0 0 6px var(--soft-glow);
         }
-        .contact-card.active-scroll .contact-main-text { color: var(--neon-blue); text-shadow: 0 0 6px var(--soft-glow); }
 
         .work-time {
             font-family: 'Orbitron', sans-serif; font-size: 0.9rem; letter-spacing: 2px;
@@ -512,20 +408,15 @@
             color: rgba(255, 255, 255, 0.7); text-transform: uppercase;
         }
 
-        /* ==========================================
-           10. ПОДВАЛ
-           ========================================== */
         footer { 
-            padding: 60px 20px; text-align: center; 
-            font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: #555555;
-            letter-spacing: 5px; border-top: 1px solid #111111; text-transform: uppercase;
+            padding: 60px 20px; text-align: center; font-family: 'Orbitron', sans-serif; 
+            font-size: 0.7rem; color: #555555; letter-spacing: 5px; 
+            border-top: 1px solid #111111; text-transform: uppercase;
         }
 
         .header-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-        /* ==========================================
-           11. ABOUT ME (полностью сохранён)
-           ========================================== */
+        /* About Me */
         #about-me { padding: 80px 0; display: flex; justify-content: center; align-items: center; overflow: hidden; width: 100%; }
         .about-container { display: flex; align-items: stretch; justify-content: flex-start; max-width: 1200px; width: 100%; margin: 0 auto; padding: 0 20px; }
         .fader-track { width: 12px; height: 380px; background: #000; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1); position: relative; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.8); display: flex; justify-content: center; flex-shrink: 0; z-index: 30; }
@@ -536,12 +427,12 @@
         .about-content-blur { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 20px 60px; opacity: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; transform: translateX(-100%); transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s, opacity 0.8s ease 0.6s; text-align: center; position: relative; box-sizing: border-box; }
         .about-content-blur::after { content: ""; position: absolute; right: 0; top: 0; width: 2px; height: 100%; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
         .about-title { font-family: 'Orbitron', sans-serif; font-size: 2.8rem; letter-spacing: 8px; color: #ffffff; margin-bottom: 20px; text-transform: uppercase; }
+        .neon-accent { color: var(--neon-blue); }
         .about-text { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; line-height: 1.6; color: rgba(255, 255, 255, 0.9); margin: 0 auto; max-width: 900px; }
         #about-me.is-revealed .fader-handle { bottom: 280px; }
         #about-me.is-revealed .fader-led-scale { height: 320px; opacity: 1; }
         #about-me.is-revealed .about-content-blur { opacity: 1; transform: translateX(0); }
 
-        /* Медиа-запросы */
         @media (max-width: 1024px) { 
             header { height: auto; min-height: 100vh; padding: 60px 20px; }
             .flicker-header { font-size: 0.8rem; letter-spacing: 10px; margin-bottom: 15px; opacity: 1; transform: none; animation: none; }
@@ -556,19 +447,19 @@
             .booking-grid { grid-template-columns: 1fr; } 
             .contact-card { padding: 50px 20px; }
             .contact-main-text { font-size: 1.4rem; }
-            .module:hover, .service-card:hover, .social-btn:hover, .phone-box-container:hover, .contact-card:hover, .audio-card:hover { transform: none; }
-            .module.active-scroll, .service-card.active-scroll, .audio-card.active-scroll { background-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+            .module:hover, .social-btn:hover, .phone-box-container:hover, .contact-card:hover, .audio-card:hover { transform: none; }
+            .module.active-scroll, .audio-card.active-scroll { background-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
         }
 
         @media (max-width: 768px) {
-            #about-me { padding: 10px 0 !important; }
-            .about-container { flex-direction: row !important; padding: 0 15px !important; }
+            #about-me .about-container { flex-direction: row !important; }
             .fader-track { width: 10px !important; height: 250px !important; }
             .fader-handle { width: 35px !important; height: 60px !important; }
             #about-me.is-revealed .fader-handle { bottom: 180px !important; }
-            #about-me.is-revealed .fader-led-scale { height: 210px !important; }
+            #about-me.is-revealed .fader-led-scale { height: 210px !important; opacity: 1 !important; }
             .about-content-wrapper { height: 250px !important; }
-            .about-content-blur { padding: 15px 25px !important; }
+            .about-content-blur { padding: 15px 25px !important; transform: translateX(-100%) !important; }
+            #about-me.is-revealed .about-content-blur { transform: translateX(0) !important; }
             .about-title { font-size: 1.2rem !important; letter-spacing: 3px !important; margin-bottom: 10px !important; }
             .about-text { font-size: 0.8rem !important; line-height: 1.4 !important; }
         }
@@ -577,18 +468,6 @@
             h1 { font-size: 2.2rem; }
             .flicker-header { letter-spacing: 5px; }
         }
-
-        /* Цвета для мобильной активации (добавляем новые карточки) */
-        .module.active-package.rec, .service-card.active-package.rec { border-color: #ffffff !important; box-shadow: 0 0 25px rgba(255, 255, 255, 0.5) !important; }
-        .module.active-package.start, .service-card.active-package.start { border-color: var(--neon-purple) !important; box-shadow: 0 0 25px rgba(191, 0, 255, 0.5) !important; }
-        .module.active-package.artist, .service-card.active-package.artist { border-color: var(--neon-red) !important; box-shadow: 0 0 25px rgba(255, 0, 60, 0.5) !important; }
-        .module.active-package.platinum, .service-card.active-package.platinum { border-color: var(--neon-gold) !important; box-shadow: 0 0 25px rgba(255, 215, 0, 0.5) !important; }
-        .module.active-package.arrangement, .service-card.active-package.arrangement { border-color: var(--neon-blue) !important; box-shadow: 0 0 25px var(--soft-glow) !important; }
-        .module.active-package.gift, .service-card.active-package.gift { border-color: var(--neon-pink) !important; box-shadow: 0 0 25px rgba(255, 68, 170, 0.5) !important; }
-        .module.active-package.lesson, .service-card.active-package.lesson { border-color: var(--neon-green) !important; box-shadow: 0 0 25px rgba(0, 255, 136, 0.5) !important; }
-        .service-card.active-package.vocal { border-color: var(--neon-pink) !important; box-shadow: 0 0 25px rgba(255, 68, 170, 0.5) !important; }
-        .service-card.active-package.piano { border-color: var(--neon-purple) !important; box-shadow: 0 0 25px rgba(191, 0, 255, 0.5) !important; }
-        .service-card.active-package.guitar { border-color: var(--neon-red) !important; box-shadow: 0 0 25px rgba(255, 0, 60, 0.5) !important; }
     </style>
 </head>
 <body>
@@ -625,8 +504,7 @@
             <div class="about-content-blur">
                 <h2 class="about-title">ABOUT <span class="neon-accent">ME</span></h2>
                 <p class="about-text">
-                    Привет! Меня зовут АЛЕКСАНДР. Я — основатель студии и твой звукорежиссёр.
-                    Мой путь в музыке начался в 2010 году. За это время я прошёл всё: от записи первых демок в домашних условиях до создания собственной профессиональной лаборатории звука. Я не просто человек, который «нажимает на кнопки» — я сам артист, поэтому вижу твой проект с двух сторон: как технический специалист и как музыкант.
+                    Привет! Меня зовут АЛЕКСАНДР. Я — основатель студии и твой звукорежиссёр. Мой путь в музыке начался в 2010 году. За это время я прошёл всё: от записи первых демок в домашних условиях до создания собственной профессиональной лаборатории звука. Я не просто человек, который «нажимает на кнопки» — я сам артист, поэтому вижу твой проект с двух сторон: как технический специалист и как музыкант.
                 </p>
             </div>
         </div>
@@ -636,62 +514,61 @@
 <div class="container">
     <section id="services">
         <h2>SERVICES</h2>
-        
-        <!-- Карусель со всеми услугами -->
-        <div class="services-carousel">
-            <div class="carousel-arrow left" id="carousel-left"><i class="fas fa-chevron-left"></i></div>
-            <div class="carousel-wrapper" id="carousel-wrapper">
-                <div class="carousel-track" id="carousel-track">
-                    <!-- Запись -->
-                    <div class="service-card rec" data-package="rec">
+        <!-- Swiper карусель -->
+        <div class="swiper services-swiper">
+            <div class="swiper-wrapper">
+                <!-- Существующие карточки -->
+                <div class="swiper-slide">
+                    <div class="module rec js-scroll-glow" data-package="rec">
                         <h3>ЗАПИСЬ</h3>
                         <div class="price">900 <span>₽/час</span></div>
                         <div class="module-description">
-                            80% успеха трека — это правильное исполнение.
+                            80% успеха трека — это правильное исполнение. Моя задача — выжать максимум из твоего таланта.
                             <div class="sub-package">
                                 <span class="sub-package-title" style="color: #ffffff;">ВОКАЛЬНЫЙ КОУЧИНГ</span>
-                                • Помогу с подачей и интонацией. <br>
-                                • Исправляю ошибки на лету. <br>
-                                • Работаем над эмоциями.
+                                • Помогу с подачей и интонацией, подберу крутые фишки для твоего голоса. <br>
+                                • Исправляю ошибки на лету: если не попал в такт или ноту, перепишем и добьёмся идеала. <br>
+                                • Работаем над эмоциями и динамикой, чтобы слушатель верил каждому твоему слову.
                             </div>
                         </div>
                         <ul class="specs">
                             <li>РАБОТАЕМ <span>ПО ПРЕДВАРИТЕЛЬНОЙ ЗАПИСИ</span></li>
-                            <li>БРОНИРОВАНИЕ ВРЕМЕНИ <span>500 ₽</span></li>
+                            <li>БРОНИРОВАНИЕ ВРЕМЕНИ <span>500 ₽ (ВХОДИТ В СТОИМОСТЬ СЕССИИ)</span></li>
                         </ul>
                     </div>
-
-                    <!-- START EDITION -->
-                    <div class="service-card start" data-package="start">
+                </div>
+                <div class="swiper-slide">
+                    <div class="module start js-scroll-glow" data-package="start">
                         <h3>START EDITION</h3>
                         <div class="price">3 900 <span>₽</span></div>
                         <div class="module-description">
-                            Для песен в подарок или корпоративных гимнов.
+                            Идеальное решение для песен в подарок или корпоративных гимнов. Подойдет тем, кому нужен качественный, но быстрый результат без лишних сложностей.
                             <div class="sub-package">
                                 <span class="sub-package-title" style="color: var(--neon-purple);">БАЗОВЫЙ ПРОДАКШН</span>
-                                • 1 час записи. <br>
-                                • Очистка от шумов. <br>
-                                • Эффекты (ревер, дилэй). <br>
-                                • Сведение + мастеринг.
+                                • 1 Час записи: Помогу с подачей и выберу лучшие дубли. <br>
+                                • Подготовка: Очистка дорожек от шумов, вздохов и щелчков. <br>
+                                • Атмосфера: Добавлю глубину, объем и эффекты (ревер, дилэй). <br>
+                                • Сведение: Сделаю голос плотным и «вклею» его в твой минус. <br>
+                                • Мастеринг: Подтяну громкость под стандарты стримингов.
                             </div>
                         </div>
                         <ul class="specs">
-                            <li>ВКЛЮЧЕНО <span>1 ЧАС ЗАПИСИ, СВЕДЕНИЕ: МИНУСОВКА + 1 ДОРОЖКА</span></li>
-                            <li>ТЮНИНГ ВОКАЛА <span>+ 1 000 ₽</span></li>
+                            <li>ВКЛЮЧЕНО <span>1 ЧАС ЗАПИСИ, СВЕДЕНИЕ: МИНУСОВКА + 1 ДОРОЖКА ВОКАЛА</span></li>
+                            <li>ТЮНИНГ ВОКАЛА <span>+ 1 000 ₽ / ДОРОЖКА</span></li>
                         </ul>
                     </div>
-
-                    <!-- ARTIST EDITION -->
-                    <div class="service-card artist" data-package="artist">
+                </div>
+                <div class="swiper-slide">
+                    <div class="module artist js-scroll-glow js-artist-trigger" data-package="artist">
                         <h3>ARTIST EDITION</h3>
                         <div class="price">6 000 <span>₽</span></div>
                         <div class="module-description">
-                            Для топ-чартов и стримингов.
+                            Продукт для топ-чартов и стриминговых площадок. Полная проработка коммерческого звучания, которое будет конкурировать с лучшими релизами индустрии.
                             <div class="sub-package">
                                 <span class="sub-package-title" style="color: var(--neon-red);">ПРОФЕССИОНАЛЬНЫЙ ПОДХОД</span>
-                                • Ручная коррекция вокала. <br>
-                                • Современные эффекты. <br>
-                                • Работа со вторыми голосами.
+                                • Ручная коррекция основного вокала: каждый слог встанет на свое место по нотам. <br>
+                                • Современный объем и эффекты: используем передовые плагины для создания пространства. <br>
+                                • Работа со вторыми голосами: создадим мощную панораму и плотность.
                             </div>
                         </div>
                         <ul class="specs">
@@ -700,18 +577,18 @@
                             <li>ОБРАБОТКА ДОП. ДОРОЖКИ <span>+ 300 ₽</span></li>
                         </ul>
                     </div>
-
-                    <!-- PLATINUM EDITION -->
-                    <div class="service-card platinum" data-package="platinum">
+                </div>
+                <div class="swiper-slide">
+                    <div class="module platinum js-scroll-glow" data-package="platinum">
                         <h3>PLATINUM EDITION</h3>
                         <div class="price">ОТ 10 000 <span>₽</span></div>
                         <div class="module-description">
-                            Масштабный продакшн.
+                            Масштабный продакшн для монолитного звука. Когда в треке много партий, инструментов и нюансов, требующих ювелирной точности.
                             <div class="sub-package">
                                 <span class="sub-package-title" style="color: var(--neon-gold);">МУЛЬТИТРЕК</span>
-                                • Сведение до 20 дорожек. <br>
-                                • Ручной тюнинг основного вокала. <br>
-                                • Саунд-дизайн.
+                                • Сведение до 20 дорожек включительно: детальная работа с каждой частотой. <br>
+                                • Ручной тюнинг основного вокала включен: идеальный питч без механического звука. <br>
+                                • Творческая работа: создание уникального саунд-дизайна под твой запрос.
                             </div>
                         </div>
                         <ul class="specs">
@@ -719,39 +596,39 @@
                             <li>ТЮНИНГ БЭКОВ <span>ОТДЕЛЬНО</span></li>
                         </ul>
                     </div>
-
-                    <!-- Аранжировка -->
-                    <div class="service-card arrangement" data-package="arrangement">
+                </div>
+                <div class="swiper-slide">
+                    <div class="module arrangement js-scroll-glow" data-package="arrangement">
                         <h3>АРАНЖИРОВКА</h3>
                         <div class="price">ОТ 8 000 <span>₽</span></div>
                         <div class="module-description">
-                            Создание музыкальной основы.
+                            Создание уникальной музыкальной основы под ваш трек. Полный цикл аранжировки в любом стиле — от поп и рэп до рока и электроники.
                             <div class="sub-package">
                                 <span class="sub-package-title" style="color: var(--neon-blue);">ИНДИВИДУАЛЬНЫЙ ПОДХОД</span>
-                                • Написание партитуры. <br>
-                                • Живые и виртуальные инструменты. <br>
-                                • Адаптация под вокал. <br>
-                                • Готовый минус.
+                                • Написание инструментальной партитуры под ваш вкус. <br>
+                                • Живые и виртуальные инструменты, современные звуки. <br>
+                                • Адаптация аранжировки под ваш вокал: структура, динамика, грув. <br>
+                                • Готовый минус в высоком качестве, пригодный для записи и сведения.
                             </div>
                         </div>
                         <ul class="specs">
-                            <li>СТИЛИ <span>POP, RAP, ROCK, ELECTRO</span></li>
-                            <li>СРОКИ <span>ОТ 3 ДНЕЙ</span></li>
+                            <li>СТИЛИ <span>POP, RAP, ROCK, ELECTRO, LO-FI</span></li>
+                            <li>СРОКИ <span>ОТ 3 ДНЕЙ (ЗАВИСИТ ОТ СЛОЖНОСТИ)</span></li>
                         </ul>
                     </div>
-
-                    <!-- Подарочный сертификат -->
-                    <div class="service-card gift" data-package="gift">
+                </div>
+                <div class="swiper-slide">
+                    <div class="module gift js-scroll-glow" data-package="gift">
                         <h3>ПОДАРОЧНЫЙ СЕРТИФИКАТ</h3>
                         <div class="price">ОТ 3 000 <span>₽</span></div>
                         <div class="module-description">
-                            Идеальный подарок.
+                            Идеальный подарок для музыканта. Дайте возможность записать трек или воспользоваться любой услугой студии.
                             <div class="sub-package">
                                 <span class="sub-package-title" style="color: var(--neon-pink);">ВАРИАНТЫ НОМИНАЛА</span>
-                                • На 1 час записи. <br>
-                                • На START EDITION. <br>
-                                • На ARTIST EDITION. <br>
-                                • На АРАНЖИРОВКУ.
+                                • На 1 час записи (включая консультацию). <br>
+                                • На START EDITION (запись + сведение). <br>
+                                • На ARTIST EDITION (полный продакшн). <br>
+                                • На АРАНЖИРОВКУ (инструментал под ключ).
                             </div>
                         </div>
                         <ul class="specs">
@@ -759,18 +636,20 @@
                             <li>ИМЕННОЙ / АНОНИМНЫЙ <span>ПО ЖЕЛАНИЮ</span></li>
                         </ul>
                     </div>
-
-                    <!-- Уроки звукорежиссуры -->
-                    <div class="service-card lesson" data-package="lesson">
+                </div>
+                <div class="swiper-slide">
+                    <div class="module lesson js-scroll-glow" data-package="lesson">
                         <h3>УРОКИ ЗВУКОРЕЖИССУРЫ</h3>
                         <div class="price">1 500 <span>₽/час</span></div>
                         <div class="module-description">
-                            Индивидуальные занятия.
+                            Индивидуальные занятия по звукорежиссуре для начинающих и продвинутых. Освойте сведение, мастеринг и работу в DAW.
                             <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-green);">ПРОГРАММА</span>
-                                • Основы DAW. <br>
-                                • Теория звука. <br>
-                                • Сведение и мастеринг.
+                                <span class="sub-package-title" style="color: var(--neon-green);">ПРОГРАММА КУРСА</span>
+                                • Основы DAW (Ableton, Logic, Cubase — на выбор). <br>
+                                • Теория звука: частоты, динамика, эквализация. <br>
+                                • Практика сведения реальных проектов. <br>
+                                • Мастеринг и подготовка треков к релизу. <br>
+                                • Индивидуальный план под ваш уровень.
                             </div>
                         </div>
                         <ul class="specs">
@@ -778,72 +657,79 @@
                             <li>ФОРМАТ <span>ОЧНО / ONLINE</span></li>
                         </ul>
                     </div>
+                </div>
 
-                    <!-- Уроки вокала (новая) -->
-                    <div class="service-card vocal" data-package="vocal">
+                <!-- НОВЫЕ КАРТОЧКИ: Уроки вокала -->
+                <div class="swiper-slide">
+                    <div class="module vocal js-scroll-glow" data-package="vocal">
                         <h3>УРОКИ ВОКАЛА</h3>
-                        <div class="price">1 500 <span>₽/час</span></div>
+                        <div class="price">1 800 <span>₽/час</span></div>
                         <div class="module-description">
-                            Индивидуальные занятия по вокалу.
+                            Индивидуальные занятия с профессиональным педагогом. Постановка голоса, расширение диапазона, снятие зажимов.
                             <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-pink);">ПРОГРАММА</span>
-                                • Постановка голоса, дыхание. <br>
-                                • Расширение диапазона. <br>
-                                • Работа над интонацией. <br>
-                                • Подбор репертуара.
+                                <span class="sub-package-title" style="color: var(--neon-vocal);">ЧТО ВЫ ПОЛУЧИТЕ</span>
+                                • Дыхательные техники и опора. <br>
+                                • Развитие слуха и чувства ритма. <br>
+                                • Работа над дикцией и артикуляцией. <br>
+                                • Подбор репертуара под ваш тембр. <br>
+                                • Подготовка к записи в студии.
                             </div>
                         </div>
                         <ul class="specs">
-                            <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
+                            <li>ДЛИТЕЛЬНОСТЬ <span>60 / 90 МИНУТ</span></li>
                             <li>ФОРМАТ <span>ОЧНО / ONLINE</span></li>
-                            <li>ПРОБНОЕ ЗАНЯТИЕ <span>500 ₽</span></li>
                         </ul>
                     </div>
+                </div>
 
-                    <!-- Уроки фортепиано (новая) -->
-                    <div class="service-card piano" data-package="piano">
+                <!-- Уроки фортепиано -->
+                <div class="swiper-slide">
+                    <div class="module piano js-scroll-glow" data-package="piano">
                         <h3>УРОКИ ФОРТЕПИАНО</h3>
-                        <div class="price">1 500 <span>₽/час</span></div>
+                        <div class="price">1 800 <span>₽/час</span></div>
                         <div class="module-description">
-                            Индивидуальные занятия по фортепиано.
+                            Обучение игре на фортепиано с нуля или для продолжающих. Теория музыки, аккомпанемент, чтение с листа.
                             <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-purple);">ПРОГРАММА</span>
-                                • Основы игры, аккомпанемент. <br>
-                                • Теория музыки. <br>
-                                • Разбор произведений. <br>
-                                • Развитие слуха.
+                                <span class="sub-package-title" style="color: var(--neon-piano);">ПРОГРАММА</span>
+                                • Постановка рук, основы нотной грамоты. <br>
+                                • Изучение аккордов и гармонии. <br>
+                                • Разбор ваших любимых произведений. <br>
+                                • Импровизация и создание аранжировок. <br>
+                                • Подготовка к выступлениям.
                             </div>
                         </div>
                         <ul class="specs">
                             <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
-                            <li>ФОРМАТ <span>ОЧНО / ONLINE</span></li>
-                            <li>ПРОБНОЕ ЗАНЯТИЕ <span>500 ₽</span></li>
+                            <li>УРОВЕНЬ <span>ЛЮБОЙ</span></li>
                         </ul>
                     </div>
+                </div>
 
-                    <!-- Уроки гитары (новая) -->
-                    <div class="service-card guitar" data-package="guitar">
+                <!-- Уроки гитары -->
+                <div class="swiper-slide">
+                    <div class="module guitar js-scroll-glow" data-package="guitar">
                         <h3>УРОКИ ГИТАРЫ</h3>
-                        <div class="price">1 500 <span>₽/час</span></div>
+                        <div class="price">1 800 <span>₽/час</span></div>
                         <div class="module-description">
-                            Индивидуальные занятия по гитаре.
+                            Индивидуальные занятия на акустической или электрогитаре. Аккорды, бой, перебор, соло и теория музыки.
                             <div class="sub-package">
-                                <span class="sub-package-title" style="color: var(--neon-red);">ПРОГРАММА</span>
-                                • Акустика / электро. <br>
-                                • Аккорды, бой, перебор. <br>
-                                • Табулатуры, импровизация. <br>
-                                • Игра в ансамбле.
+                                <span class="sub-package-title" style="color: var(--neon-guitar);">НАПРАВЛЕНИЯ</span>
+                                • Акустическая гитара: аккомпанемент, пение под гитару. <br>
+                                • Электрогитара: риффы, соло, импровизация, звукоизвлечение. <br>
+                                • Основы гармонии и построения партий. <br>
+                                • Разбор песен в любом стиле (рок, поп, блюз).
                             </div>
                         </div>
                         <ul class="specs">
                             <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
-                            <li>ФОРМАТ <span>ОЧНО / ONLINE</span></li>
-                            <li>ПРОБНОЕ ЗАНЯТИЕ <span>500 ₽</span></li>
+                            <li>ИНСТРУМЕНТ <span>ВАШ ИЛИ СТУДИЙНЫЙ</span></li>
                         </ul>
                     </div>
                 </div>
             </div>
-            <div class="carousel-arrow right" id="carousel-right"><i class="fas fa-chevron-right"></i></div>
+            <!-- Навигационные стрелки -->
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
         </div>
     </section>
 
@@ -919,10 +805,10 @@
             LOG IN
         </div>
     </div>
-</footer>
+</footer> 
 
-<!-- Админ-панель (без изменений) -->
 <div id="admin-overlay" onclick="closeAdmin()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; backdrop-filter: blur(8px);"></div>
+
 <div id="admin-panel" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: #050505; border: 1px solid var(--neon-purple); padding: 30px; z-index: 10000; border-radius: 10px; box-shadow: 0 0 40px rgba(191, 0, 255, 0.3); font-family: 'Orbitron', sans-serif; text-align: center;">
     <div style="color: var(--neon-purple); font-size: 16px; margin-bottom: 25px; letter-spacing: 3px;">ADMIN ACCESS</div>
     <input type="text" id="admin-login" placeholder="LOGIN" autocomplete="off" style="width: 100%; padding: 12px; background: #111; border: 1px solid #222; color: #fff; margin-bottom: 15px; border-radius: 4px; outline: none; font-size: 12px; font-family: sans-serif; text-align: center; box-sizing: border-box;">
@@ -931,8 +817,38 @@
     <div onclick="closeAdmin()" style="margin-top: 20px; color: #333; font-size: 9px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">Abort Mission</div>
 </div>
 
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
 <script>
-    // Логика аудио-плееров (без изменений)
+    // Инициализация Swiper
+    document.addEventListener('DOMContentLoaded', function() {
+        new Swiper('.services-swiper', {
+            slidesPerView: 4,
+            spaceBetween: 20,
+            loop: true,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                320: {
+                    slidesPerView: 1,
+                    spaceBetween: 10
+                },
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 15
+                },
+                1024: {
+                    slidesPerView: 4,
+                    spaceBetween: 20
+                }
+            }
+        });
+    });
+
+    // 1. Логика аудио-плееров (как в исходном)
     document.addEventListener('play', function(e) {
         const allAudios = document.querySelectorAll('audio');
         allAudios.forEach(audio => {
@@ -982,68 +898,8 @@
         });
     });
 
+    // About Me observer
     document.addEventListener('DOMContentLoaded', () => {
-        // Бесконечная карусель
-        const track = document.getElementById('carousel-track');
-        const leftBtn = document.getElementById('carousel-left');
-        const rightBtn = document.getElementById('carousel-right');
-
-        if (track && leftBtn && rightBtn) {
-            const cards = Array.from(track.children);
-            if (cards.length === 0) return;
-
-            // Клонируем первую и последнюю карточку
-            const firstClone = cards[0].cloneNode(true);
-            const lastClone = cards[cards.length - 1].cloneNode(true);
-            
-            track.insertBefore(lastClone, cards[0]);
-            track.appendChild(firstClone);
-
-            const allCards = Array.from(track.children);
-            const totalCards = allCards.length;
-            let currentIndex = 1; // начинаем с первой оригинальной
-
-            const getCardWidth = () => {
-                const card = allCards[0];
-                if (!card) return 0;
-                const cardWidth = card.offsetWidth;
-                const gap = parseInt(window.getComputedStyle(track).gap) || 20;
-                return cardWidth + gap;
-            };
-
-            const setPosition = (index, animate = true) => {
-                track.style.transition = animate ? 'transform 0.4s ease' : 'none';
-                const cardWidth = getCardWidth();
-                track.style.transform = `translateX(-${index * cardWidth}px)`;
-                currentIndex = index;
-            };
-
-            setPosition(currentIndex, false);
-
-            rightBtn.addEventListener('click', () => {
-                currentIndex++;
-                setPosition(currentIndex, true);
-
-                if (currentIndex === totalCards - 1) {
-                    setTimeout(() => setPosition(1, false), 400);
-                }
-            });
-
-            leftBtn.addEventListener('click', () => {
-                currentIndex--;
-                setPosition(currentIndex, true);
-
-                if (currentIndex === 0) {
-                    setTimeout(() => setPosition(totalCards - 2, false), 400);
-                }
-            });
-
-            window.addEventListener('resize', () => {
-                setPosition(currentIndex, false);
-            });
-        }
-
-        // About Me observer
         const aboutSection = document.querySelector('#about-me');
         if (aboutSection) {
             const aboutObserver = new IntersectionObserver((entries) => {
@@ -1056,36 +912,25 @@
             aboutObserver.observe(aboutSection);
         }
 
-        // Мобильная подсветка
+        // Mobile glow (как в исходном)
         const handleMobileGlow = () => {
             if (window.innerWidth > 768) return;
-            const cards = document.querySelectorAll('.service-card');
+            const modules = document.querySelectorAll('.module');
             const triggerLine = window.innerHeight / 2;
-            cards.forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const cardCenter = rect.top + (rect.height / 2);
-                if (Math.abs(cardCenter - triggerLine) < 150) {
-                    cards.forEach(c => c.classList.remove('active-package'));
-                    card.classList.add('active-package');
+            modules.forEach(mod => {
+                const rect = mod.getBoundingClientRect();
+                const moduleCenter = rect.top + (rect.height / 2);
+                if (Math.abs(moduleCenter - triggerLine) < 150) {
+                    modules.forEach(m => m.classList.remove('active-package'));
+                    mod.classList.add('active-package');
                 }
             });
         };
         window.addEventListener('scroll', handleMobileGlow, { passive: true });
         handleMobileGlow();
-
-        // Админка
-        const adminBtn = document.getElementById('admin-trigger');
-        if (adminBtn) {
-            adminBtn.onclick = function() {
-                document.getElementById('admin-panel').style.display = 'block';
-                document.getElementById('admin-overlay').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('admin-login').focus();
-                }, 100);
-            };
-        }
     });
 
+    // Admin functions (как в исходном)
     function closeAdmin() {
         document.getElementById('admin-panel').style.display = 'none';
         document.getElementById('admin-overlay').style.display = 'none';
@@ -1098,13 +943,17 @@
 
         if (userLogin === 'admin ssl' && userPass === '080808') {
             btn.innerHTML = 'ACCESS GRANTED...';
-            btn.style.background = '#006400';
-            setTimeout(() => window.location.href = 'certificates.html', 600);
+            btn.style.background = '#006400'; 
+            btn.style.boxShadow = 'none';
+            setTimeout(() => {
+                window.location.href = 'certificates.html'; 
+            }, 600);
         } else {
+            const originalColor = btn.style.background;
             btn.style.background = '#8B0000';
             btn.innerHTML = 'DENIED';
             setTimeout(() => {
-                btn.style.background = 'var(--neon-purple)';
+                btn.style.background = originalColor;
                 btn.innerHTML = 'AUTHENTICATE';
                 document.getElementById('admin-pass').value = '';
             }, 1000);
@@ -1116,7 +965,14 @@
             checkAdminAuth();
         }
     });
-</script>
 
+    document.getElementById('admin-trigger').onclick = function() {
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('admin-overlay').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('admin-login').focus();
+        }, 100);
+    };
+</script>
 </body>
 </html>
