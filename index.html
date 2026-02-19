@@ -19,13 +19,12 @@
             --neon-gold: #ffcc00;
             --neon-pink: #ff44aa;
             --neon-green: #00ff88;
-            --neon-vocal: #ff66aa;      /* цвет для уроков вокала */
-            --neon-piano: #ffaa00;       /* цвет для уроков фортепиано */
-            --neon-guitar: #aa66ff;      /* цвет для уроков гитары */
+            --neon-vocal: #ff66aa;
+            --neon-piano: #ffaa00;
+            --neon-guitar: #aa66ff;
             --youtube-red: #ff0000;
             --bg-dark: #020205;
             --transition-speed: 0.4s;
-            --transition-speed-mobile: 0.6s;
             --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
             --soft-glow: rgba(0, 242, 255, 0.25);
         }
@@ -47,10 +46,12 @@
             width: 100%;
         }
 
-        /* Стили для Swiper карусели */
+        /* ==========================================
+           КАРУСЕЛЬ SERVICES (УЛУЧШЕННАЯ)
+           ========================================== */
         .services-swiper {
             width: 100%;
-            padding: 20px 60px; /* место для стрелок */
+            padding: 20px 120px; /* увеличенные отступы для больших стрелок */
             position: relative;
             overflow: visible;
         }
@@ -66,31 +67,44 @@
             margin: 0;
         }
 
+        /* СТРЕЛКИ: большие, белые, с неоновым ховером */
         .swiper-button-prev,
         .swiper-button-next {
-            color: var(--neon-blue);
-            background: rgba(0, 0, 0, 0.5);
-            width: 50px;
-            height: 50px;
+            color: #ffffff !important; /* белый цвет по умолчанию */
+            background: rgba(0, 0, 0, 0.6);
+            width: 80px;          /* увеличенный размер */
+            height: 80px;
             border-radius: 0 !important;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all var(--transition-speed);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            /* Отодвигаем стрелки от карточек */
+            margin-top: -40px;     /* половина высоты для вертикального центрирования */
+        }
+
+        .swiper-button-prev {
+            left: 20px;            /* отступ от края контейнера */
+        }
+
+        .swiper-button-next {
+            right: 20px;
         }
 
         .swiper-button-prev:hover,
         .swiper-button-next:hover {
-            background: rgba(0, 242, 255, 0.2);
+            color: var(--neon-blue) !important;   /* неоновый цвет при наведении */
             border-color: var(--neon-blue);
-            box-shadow: 0 0 15px var(--soft-glow);
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 25px var(--soft-glow), 0 0 40px rgba(0, 242, 255, 0.3);
         }
 
         .swiper-button-prev::after,
         .swiper-button-next::after {
-            font-size: 24px;
+            font-size: 36px;       /* увеличенный размер иконки */
             font-weight: bold;
         }
 
-        /* Убираем полосу прокрутки, если она появляется */
+        /* Убираем полосу прокрутки */
         .services-swiper .swiper-wrapper {
             -ms-overflow-style: none;
             scrollbar-width: none;
@@ -102,21 +116,30 @@
         /* Адаптация для мобильных */
         @media (max-width: 1024px) {
             .services-swiper {
-                padding: 20px 40px;
+                padding: 20px 60px;
             }
             .swiper-button-prev,
             .swiper-button-next {
-                display: none; /* на мобильных лучше скрыть стрелки, оставить свайп */
+                width: 60px;
+                height: 60px;
+            }
+            .swiper-button-prev::after,
+            .swiper-button-next::after {
+                font-size: 28px;
             }
         }
 
         @media (max-width: 768px) {
             .services-swiper {
-                padding: 20px 20px;
+                padding: 20px 40px;
+            }
+            .swiper-button-prev,
+            .swiper-button-next {
+                display: none; /* на мобильных скрываем стрелки, оставляем свайп */
             }
         }
 
-        /* Остальные стили без изменений (сохранены из исходного кода) */
+        /* Остальные стили (без изменений, сохранены из исходного кода) */
         .custom-audio-player {
             background: #000 !important;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -288,7 +311,6 @@
         .module.arrangement:hover, .module.arrangement.active-scroll { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--soft-glow); }
         .module.gift:hover, .module.gift.active-scroll { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 68, 170, 0.3); }
         .module.lesson:hover, .module.lesson.active-scroll { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
-        /* Новые карточки */
         .module.vocal:hover, .module.vocal.active-scroll { border-color: var(--neon-vocal); box-shadow: 0 0 15px rgba(255, 102, 170, 0.4); }
         .module.piano:hover, .module.piano.active-scroll { border-color: var(--neon-piano); box-shadow: 0 0 15px rgba(255, 170, 0, 0.4); }
         .module.guitar:hover, .module.guitar.active-scroll { border-color: var(--neon-guitar); box-shadow: 0 0 15px rgba(170, 102, 255, 0.4); }
@@ -727,7 +749,7 @@
                     </div>
                 </div>
             </div>
-            <!-- Навигационные стрелки -->
+            <!-- Навигационные стрелки (улучшенные) -->
             <div class="swiper-button-prev"></div>
             <div class="swiper-button-next"></div>
         </div>
@@ -848,7 +870,7 @@
         });
     });
 
-    // 1. Логика аудио-плееров (как в исходном)
+    // Логика аудио-плееров
     document.addEventListener('play', function(e) {
         const allAudios = document.querySelectorAll('audio');
         allAudios.forEach(audio => {
@@ -912,7 +934,7 @@
             aboutObserver.observe(aboutSection);
         }
 
-        // Mobile glow (как в исходном)
+        // Mobile glow
         const handleMobileGlow = () => {
             if (window.innerWidth > 768) return;
             const modules = document.querySelectorAll('.module');
@@ -930,7 +952,7 @@
         handleMobileGlow();
     });
 
-    // Admin functions (как в исходном)
+    // Admin functions
     function closeAdmin() {
         document.getElementById('admin-panel').style.display = 'none';
         document.getElementById('admin-overlay').style.display = 'none';
