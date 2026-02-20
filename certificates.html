@@ -1789,6 +1789,11 @@
     let currentEditDetails = [];
     let originalBasePrices = [];
 
+    // Уведомления
+    let notificationsEnabled = false;
+    let notifInterval = null;
+    let notifiedSessions = new Set();
+
     function toggleCerts() { document.getElementById('certsDropdown').classList.toggle('active'); }
     
     function formatTimeInput(input) {
@@ -2582,10 +2587,33 @@
 
     window.addEventListener('resize', updateTable);
 
-    // ========== УВЕДОМЛЕНИЯ ==========
-    let notificationsEnabled = false;
-    let notifInterval = null;
-    let notifiedSessions = new Set();
+    // ========== УВЕДОМЛЕНИЯ (с сохранением состояния) ==========
+    function updateNotifButtonUI() {
+        const btn = document.getElementById('mobileNotifBtn');
+        if (!btn) return;
+        if (notificationsEnabled) {
+            btn.style.color = 'var(--status-green)';
+            btn.style.borderColor = 'var(--status-green)';
+            btn.innerHTML = '🔔 Уведомления вкл.';
+        } else {
+            btn.style.color = '#444';
+            btn.style.borderColor = '#222';
+            btn.innerHTML = '🔔 Уведомления';
+        }
+    }
+
+    function stopNotifications() {
+        if (notifInterval) {
+            clearInterval(notifInterval);
+            notifInterval = null;
+        }
+    }
+
+    function startNotifications() {
+        if (notifInterval) clearInterval(notifInterval);
+        notifInterval = setInterval(checkUpcomingSessions, 60000);
+        checkUpcomingSessions(); // сразу проверить
+    }
 
     // Ручное включение уведомлений (вызывается кнопкой внизу на мобиле)
     window.enableNotifications = async function() {
@@ -2600,14 +2628,9 @@
         const perm = await Notification.requestPermission();
         if (perm === 'granted') {
             notificationsEnabled = true;
-            const btn = document.getElementById('mobileNotifBtn');
-            if (btn) {
-                btn.style.color = 'var(--status-green)';
-                btn.style.borderColor = 'var(--status-green)';
-                btn.innerHTML = '🔔 Уведомления вкл.';
-            }
-            notifInterval = setInterval(checkUpcomingSessions, 60000);
-            checkUpcomingSessions();
+            localStorage.setItem('notificationsEnabled', 'true');
+            startNotifications();
+            updateNotifButtonUI();
             new Notification('SPRING SOUND LAB', {
                 body: '✅ Уведомления включены! За час до сессии придёт напоминание.',
                 icon: '/favicon.ico'
@@ -2617,7 +2640,24 @@
         }
     };
 
-    function initNotifications() { /* не используется */ }
+    // Восстановление состояния при загрузке
+    function restoreNotifications() {
+        if (!('Notification' in window)) return;
+        const saved = localStorage.getItem('notificationsEnabled');
+        if (saved === 'true' && Notification.permission === 'granted') {
+            notificationsEnabled = true;
+            startNotifications();
+        } else {
+            // если разрешение было дано, но в localStorage нет, всё равно можно включить автоматически?
+            // можно предложить включить, но оставим ручное включение.
+            // Если разрешение уже есть, но флага нет – значит пользователь не включал через кнопку.
+        }
+        updateNotifButtonUI();
+    }
+
+    function initNotifications() {
+        restoreNotifications();
+    }
 
     function checkUpcomingSessions() {
         if (!window.crmData || !notificationsEnabled) return;
@@ -2785,7 +2825,7 @@ window.addEventListener('load', async () => {
     subscribeCerts();
     renderCalendar();
     initTooltipLogic();
-    initNotifications();
+    initNotifications(); // восстановление состояния уведомлений
 });
 
 if ('serviceWorker' in navigator) {
