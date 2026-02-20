@@ -259,13 +259,32 @@
             text-transform: uppercase; 
         }
 
-        .module-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
-            gap: 20px; 
-            align-items: stretch; 
+        /* ===== КАРУСЕЛЬ ДЛЯ УСЛУГ ===== */
+        .services-carousel {
+            position: relative;
+            width: 100%;
         }
 
+        .services-carousel-container {
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+            padding-bottom: 10px; /* для пространства */
+        }
+
+        .services-carousel-container::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .services-carousel-container .module-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(320px, 1fr)); /* 7 карточек */
+            gap: 20px;
+            width: max-content; /* чтобы контейнер растягивался по содержимому */
+        }
+
+        /* Сами карточки без изменений */
         .module { 
             background-color: rgba(255, 255, 255, 0.02); 
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -605,12 +624,17 @@
             .phone-box-container { padding: 15px 25px; margin-top: 30px; width: 90%; max-width: 320px; opacity: 1; transform: none; animation: none; }
             section { padding: 60px 0; }
             h2 { font-size: 2rem; letter-spacing: 8px; margin-bottom: 40px; }
-            .module-grid { grid-template-columns: 1fr; }
             .booking-grid { grid-template-columns: 1fr; } 
             .contact-card { padding: 50px 20px; }
             .contact-main-text { font-size: 1.4rem; }
             .module:hover, .social-btn:hover, .phone-box-container:hover, .contact-card:hover, .audio-card:hover { transform: none; }
             .module.active-scroll, .audio-card.active-scroll { background-color: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
+        }
+
+        @media (max-width: 768px) {
+            .services-carousel-container .module-grid {
+                grid-template-columns: repeat(7, minmax(280px, 1fr)); /* чуть меньше на мобильных, но сохраняем пропорции */
+            }
         }
 
         @media (max-width: 350px) {
@@ -953,32 +977,7 @@
 }
 }
         
-        /* ========== ДОПОЛНЕНИЯ ДЛЯ КАРУСЕЛИ ========== */
-        .services-carousel-wrapper {
-            position: relative;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        .services-carousel-container {
-            overflow: hidden;
-            width: 100%;
-        }
-
-        .services-carousel-container .module-grid {
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 20px;
-            transition: transform 0.4s ease;
-            will-change: transform;
-        }
-
-        .services-carousel-container .module {
-            flex: 0 0 auto;
-            width: calc((100% - 60px) / 4); /* 4 карточки, 3 промежутка по 20px */
-            box-sizing: border-box;
-        }
-
+        /* ========== СТРЕЛКИ КАРУСЕЛИ ========== */
         .carousel-arrow {
             position: absolute;
             top: 50%;
@@ -1026,24 +1025,6 @@
             }
             .carousel-arrow-right {
                 right: -15px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .services-carousel-container .module {
-                width: calc((100% - 20px) / 2); /* на мобильных показываем 2 карточки */
-            }
-            .carousel-arrow-left {
-                left: -5px;
-            }
-            .carousel-arrow-right {
-                right: -5px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .services-carousel-container .module {
-                width: 100%; /* на очень узких экранах по 1 карточке */
             }
         }
     </style>
@@ -1094,11 +1075,12 @@
 <div class="container">
     <section id="services">
         <h2>SERVICES</h2>
-        <!-- Обёртка для карусели -->
-        <div class="services-carousel-wrapper">
+        <!-- Карусель с сохранением исходных размеров карточек -->
+        <div class="services-carousel">
             <button class="carousel-arrow carousel-arrow-left"><i class="fas fa-chevron-left"></i></button>
-            <div class="services-carousel-container">
+            <div class="services-carousel-container" id="servicesCarousel">
                 <div class="module-grid">
+                    <!-- Все 7 карточек без изменений -->
                     <div class="module rec js-scroll-glow" data-package="rec">
                         <h3>ЗАПИСЬ</h3>
                         <div class="price">900 <span>₽/час</span></div>
@@ -1385,90 +1367,49 @@
         handleMobileGlow();
     });
 
-    // ========== КАРУСЕЛЬ ==========
+    // ========== КАРУСЕЛЬ СО СТРЕЛКАМИ (ЦИКЛИЧНАЯ) ==========
     document.addEventListener('DOMContentLoaded', function() {
-        const wrapper = document.querySelector('.services-carousel-wrapper');
-        if (!wrapper) return;
+        const carousel = document.getElementById('servicesCarousel');
+        if (!carousel) return;
 
-        const container = wrapper.querySelector('.services-carousel-container');
-        const grid = container.querySelector('.module-grid');
-        const modules = grid.querySelectorAll('.module');
-        const leftArrow = wrapper.querySelector('.carousel-arrow-left');
-        const rightArrow = wrapper.querySelector('.carousel-arrow-right');
+        const leftArrow = document.querySelector('.carousel-arrow-left');
+        const rightArrow = document.querySelector('.carousel-arrow-right');
+        const grid = carousel.querySelector('.module-grid');
+        const cards = grid.querySelectorAll('.module');
+        if (cards.length === 0) return;
 
-        const total = modules.length;
-        let visible = 4; // число видимых карточек (будет меняться в зависимости от ширины)
-        let currentIndex = 0;
-
-        // Функция для определения числа видимых карточек
-        function getVisibleCount() {
-            if (window.innerWidth <= 480) return 1;
-            if (window.innerWidth <= 768) return 2;
-            return 4;
+        // Функция для получения ширины одной карточки с учётом gap
+        function getScrollAmount() {
+            const card = cards[0];
+            const style = window.getComputedStyle(card);
+            const cardWidth = card.offsetWidth;
+            const gap = parseInt(window.getComputedStyle(grid).gap) || 20;
+            return cardWidth + gap;
         }
 
-        // Функция для обновления ширины карточек
-        function updateCardWidth() {
-            visible = getVisibleCount();
-            const gap = 20; // из CSS
-            const containerWidth = container.offsetWidth;
-            const cardWidth = (containerWidth - (gap * (visible - 1))) / visible;
-            modules.forEach(card => {
-                card.style.width = cardWidth + 'px';
-            });
-            // После изменения ширины обновляем transform
-            updateTransform();
-        }
-
-        // Функция для обновления transform
-        function updateTransform() {
-            if (!grid || modules.length === 0) return;
-            const gap = 20;
-            const cardWidth = modules[0].offsetWidth;
-            const shift = currentIndex * (cardWidth + gap);
-            grid.style.transform = `translateX(-${shift}px)`;
-        }
-
-        // Обработчики стрелок
-        leftArrow.addEventListener('click', () => {
-            visible = getVisibleCount();
-            const maxIndex = total - visible;
-            if (currentIndex > 0) {
-                currentIndex--;
+        // Прокрутка влево с циклическим переходом
+        leftArrow.addEventListener('click', function() {
+            const scrollAmount = getScrollAmount();
+            const maxScroll = grid.scrollWidth - carousel.clientWidth;
+            if (carousel.scrollLeft <= 0) {
+                // Если мы в начале, переходим в конец
+                carousel.scrollLeft = maxScroll;
             } else {
-                currentIndex = maxIndex; // циклически на последний
+                carousel.scrollLeft -= scrollAmount;
             }
-            updateTransform();
         });
 
-        rightArrow.addEventListener('click', () => {
-            visible = getVisibleCount();
-            const maxIndex = total - visible;
-            if (currentIndex < maxIndex) {
-                currentIndex++;
+        // Прокрутка вправо с циклическим переходом
+        rightArrow.addEventListener('click', function() {
+            const scrollAmount = getScrollAmount();
+            const maxScroll = grid.scrollWidth - carousel.clientWidth;
+            if (carousel.scrollLeft >= maxScroll - 5) {
+                // Если мы в конце, переходим в начало
+                carousel.scrollLeft = 0;
             } else {
-                currentIndex = 0; // циклически на первый
+                carousel.scrollLeft += scrollAmount;
             }
-            updateTransform();
         });
-
-        // Обновление при изменении размера окна
-        window.addEventListener('resize', () => {
-            updateCardWidth();
-            // Корректировка индекса, если текущий индекс стал больше допустимого
-            visible = getVisibleCount();
-            const maxIndex = total - visible;
-            if (currentIndex > maxIndex) {
-                currentIndex = maxIndex;
-            }
-            updateTransform();
-        });
-
-        // Инициализация
-        updateCardWidth();
-
-        // На всякий случай обновляем при загрузке, если картинки влияют на ширину
-        window.addEventListener('load', updateCardWidth);
     });
 </script>
 
