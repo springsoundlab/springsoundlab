@@ -16,11 +16,17 @@
     
     <style>
         :root { 
-            --neon-purple: #bf00ff; --bg-dark: #050505; --card-bg: #0a0a0a; 
-            --status-green: #008f39; --artist-red: #cc0000; --platinum-gold: #b89600;
-            --azure-blue: #00ccff; --text-gray: #b0b0b0;
+            --neon-purple: #bf00ff; 
+            --bg-dark: #050505; 
+            --card-bg: #0a0a0a; 
+            --status-green: #008f39; 
+            --artist-red: #cc0000; 
+            --platinum-gold: #b89600;
+            --azure-blue: #00ccff; 
+            --text-gray: #b0b0b0;
             --completed-border: #b89600;
             --completed-bg: transparent;
+            --vocal-pastel: #d9c9e3;  /* новый цвет для занятий преподавателя */
         }
         
         body { 
@@ -89,7 +95,6 @@
             gap: 12px;
         }
 
-        /* Блок статистики готово/не готово */
         .stats-box {
             background: var(--card-bg);
             height: 90px;
@@ -584,15 +589,38 @@
         .month-name { font-family: 'Orbitron'; color: #fff; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .day-name { font-size: 9px; color: #666; font-weight: bold; padding-bottom: 5px; }
-        .day { font-size: 12px; padding: 8px 0; cursor: pointer; border-radius: 4px; transition: 0.2s; border: 1px solid transparent; color: #fff; font-family: 'Rajdhani', sans-serif; font-weight: 600; }
+        .day { 
+            font-size: 12px; 
+            padding: 8px 0; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            transition: 0.2s; 
+            border: 1px solid transparent; 
+            color: #fff; 
+            font-family: 'Rajdhani', sans-serif; 
+            font-weight: 600; 
+            position: relative;
+            overflow: hidden;
+        }
         .day.today { border: 1px solid var(--neon-purple); }
-        .day.has-data { background: var(--status-green) !important; color: #fff !important; }
+        .day.has-data { /* базовый класс, переопределяется конкретными */ }
+        .day.sound-only { } /* будет переопределено статусом */
+        .day.vocal-only { background: var(--vocal-pastel) !important; color: #000 !important; }
+        .day.double-session {
+            background: linear-gradient(to right, currentColor 50%, var(--vocal-pastel) 50%);
+            color: #fff;
+            text-shadow: 0 0 2px rgba(0,0,0,0.5);
+        }
         .day.selected-day { border: 1px solid #fff; background: rgba(255,255,255,0.1); }
         .day:hover { background: #111; }
         .day.completed-day {
             outline: 1px solid var(--platinum-gold);
             outline-offset: 1px;
         }
+        /* Классы для статусов звукорежиссёра (будут добавлены в renderCalendar) */
+        .day.past-session { background: var(--azure-blue) !important; }      /* прошлые - синий */
+        .day.future-session { background: var(--artist-red) !important; }    /* будущие - красный */
+        .day.today-session { background: var(--status-green) !important; }   /* сегодня - зелёный */
 
         .session-booking-widget {
             background: #000; border: 1px solid #222; border-radius: 10px; padding: 15px; margin-bottom: 20px;
@@ -625,13 +653,38 @@
         .future-title { font-family: 'Orbitron'; font-size: 9px; color: #444; letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
         
         .future-item { 
-            display: flex; align-items: center; gap: 12px; padding: 8px 0; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 12px;
         }
         .future-item:last-child { border-bottom: none; }
-        
-        .future-date { font-family: 'Rajdhani'; font-weight: 700; font-size: 18px; color: var(--neon-purple); min-width: 55px; }
-        .future-client { font-family: 'Inter'; font-weight: 600; font-size: 13px; color: #fff; }
+        .future-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .future-time {
+            font-family: 'Rajdhani';
+            font-weight: 700;
+            color: var(--neon-purple);
+            min-width: 45px;
+        }
+        .future-client {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .future-source {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: #111;
+            color: #aaa;
+        }
 
         .prepaid-toggle { display: flex; align-items: center; gap: 10px; margin-right: 15px; padding: 5px 12px; border-right: 1px solid #222; }
         .prepaid-toggle span { font-family: 'Orbitron'; font-size: 9px; color: var(--neon-purple); }
@@ -897,6 +950,7 @@
                 color: #000 !important;
                 border-color: var(--platinum-gold) !important;
             }
+            /* остальные мобильные стили (оставляем как в оригинале) */
         }
 
         .certs-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
@@ -1726,7 +1780,7 @@
         </div>
 
         <div class="filter-info">
-            <span id="currentViewText">ОТЧЕТ ЗА ФЕВРАЛЬ 2026</span>
+            <span id="currentViewText">ОТЧЕТ ЗА МЕСЯЦ</span>
         </div>
 
         <div class="table-scroll-container">
@@ -1781,7 +1835,8 @@
 </div>
 
 <script>
-    window.crmData = [];
+    window.crmData = [];          // ваши записи (sessions)
+    window.vocalData = [];        // записи преподавателя (vocal_sessions)
     window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
     var currentCart = window.currentCart; 
     let currentCalDate = new Date();
@@ -2031,7 +2086,7 @@
         });
     }
 
-    // ---------- КАЛЕНДАРЬ ----------
+    // ---------- КАЛЕНДАРЬ (с учётом обеих коллекций) ----------
     function renderCalendar() {
         const grid = document.getElementById('calendarDays');
         if (!grid) return;
@@ -2054,40 +2109,54 @@
         today.setHours(0, 0, 0, 0);
         const todayStr = today.toLocaleDateString('ru-RU');
 
-        const completedDates = new Set();
-        if (window.crmData) {
-            window.crmData.forEach(s => {
-                if (s.completed) {
-                    completedDates.add(s.date);
-                }
-            });
-        }
+        // Собираем множества дат для каждого источника
+        const soundDates = new Set(window.crmData.map(s => s.date));
+        const vocalDates = new Set(window.vocalData.map(s => s.date));
 
         for (let d = 1; d <= lastDate; d++) {
             const dayStr = String(d).padStart(2, '0');
             const monthStr = String(m + 1).padStart(2, '0');
             const dateStr = `${dayStr}.${monthStr}.${y}`;
             
-            const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
+            const soundSessions = window.crmData.filter(s => s.date === dateStr);
+            const vocalSessions = window.vocalData.filter(s => s.date === dateStr);
             
             let classList = 'day';
-            if (hasData) {
-                classList += ' has-data';
-                const [cellD, cellM, cellY] = dateStr.split('.').map(Number);
-                const cellDate = new Date(cellY, cellM - 1, cellD);
-                cellDate.setHours(0, 0, 0, 0);
-
+            
+            // Определяем статус для звукорежиссёра (если есть его занятия)
+            let soundStatus = null;
+            if (soundSessions.length > 0) {
+                const [d, m, y] = dateStr.split('.').map(Number);
+                const cellDate = new Date(y, m-1, d);
+                cellDate.setHours(0,0,0,0);
                 if (dateStr === todayStr) {
-                    classList += ' today-session'; 
+                    soundStatus = 'today-session';
                 } else if (cellDate < today) {
-                    classList += ' past-session';   
+                    soundStatus = 'past-session';
                 } else {
-                    classList += ' future-session'; 
+                    soundStatus = 'future-session';
                 }
+            }
+
+            // Если есть и звук, и вокал
+            if (soundSessions.length > 0 && vocalSessions.length > 0) {
+                classList += ' double-session';
+                if (soundStatus) {
+                    classList += ' ' + soundStatus;
+                }
+            } else if (soundSessions.length > 0) {
+                // Только звук
+                if (soundStatus) {
+                    classList += ' ' + soundStatus;
+                }
+            } else if (vocalSessions.length > 0) {
+                // Только вокал
+                classList += ' vocal-only';
             }
             
             if (selectedDate === dateStr) classList += ' selected';
-            if (completedDates.has(dateStr)) classList += ' completed-day';
+            if (dateStr === todayStr) classList += ' today';
+            
             grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
     }
@@ -2376,9 +2445,7 @@
     // ---------- СТАТИСТИКА РАБОТ ----------
     function updateWorkStats() {
         if (!window.crmData) return;
-        // Готовые — отмечены галочкой (completed: true), считаем все за всё время
         const completed = window.crmData.filter(r => r.completed === true).length;
-        // В работе — НЕ отмечены, переходят через месяцы (все время)
         const pending = window.crmData.filter(r => !r.completed).length;
         const elDone = document.getElementById('statsCompleted');
         const elPending = document.getElementById('statsPending');
@@ -2386,7 +2453,7 @@
         if (elPending) elPending.textContent = pending;
     }
 
-    // ---------- ТАБЛИЦА ----------
+    // ---------- ТАБЛИЦА (только ваши записи) ----------
     function updateTable() {
         const body = document.getElementById('crmTableBody');
         if(!body || !window.crmData) return;
@@ -2396,10 +2463,9 @@
         const todayStr = now.toLocaleDateString('ru-RU');
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        // Показываем записи текущего месяца + незакрытые (pending) из прошлых месяцев
         const filteredData = window.crmData.filter(r => {
-            if (r.date && r.date.includes(mKey)) return true;  // текущий месяц
-            if (!r.completed) return true;                      // незакрытые из любого месяца
+            if (r.date && r.date.includes(mKey)) return true;
+            if (!r.completed) return true;
             return false;
         }).sort((a, b) => {
             const parseDate = (dateStr) => {
@@ -2444,7 +2510,6 @@
 
             const clientDisplay = row.song || row.client || '';
 
-            // Метка "перенесено" если запись из другого месяца
             const isCarriedOver = !row.date.includes(mKey);
             const carriedLabel = isCarriedOver ? ` <span style="font-size:8px; color:#666; font-family:'Orbitron'; letter-spacing:0.5px;">[${row.date.slice(3)}]</span>` : '';
 
@@ -2522,38 +2587,48 @@
         el.innerText = sum.toLocaleString() + ' ₽';
     }
 
+    // ---------- БЛИЖАЙШИЕ ЗАНЯТИЯ (обе коллекции) ----------
     function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
         const titleEl = document.getElementById('futureTitleLabel');
-        if (!container || !window.crmData) return;
-        const now = new Date();
-        const todayStr = now.toLocaleDateString('ru-RU');
-        let targetDate = clickedDate;
+        if (!container) return;
+        
+        const allSessions = [
+            ...window.crmData.map(s => ({ ...s, source: 'sound' })),
+            ...window.vocalData.map(s => ({ ...s, source: 'vocal' }))
+        ];
+
+        let targetDate = clickedDate || selectedDate;
         if (!targetDate) {
+            const now = new Date();
+            const todayStr = now.toLocaleDateString('ru-RU');
             const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
-            targetDate = window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr;
+            targetDate = allSessions.some(s => s.date === todayStr && s.time) ? todayStr : tomorrowStr;
         }
-        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
+
+        const sessions = allSessions.filter(s => s.date === targetDate && s.time).sort((a, b) => a.time.localeCompare(b.time));
         container.innerHTML = ''; 
+
         if (sessions.length > 0) {
-            if (targetDate === todayStr) {
-                titleEl.innerText = "Записи на сегодня";
-            } else if (targetDate === new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU')) {
-                titleEl.innerText = "Записи на завтра";
-            } else {
-                titleEl.innerText = `Записи на ${targetDate}`;
-            }
-            sessions.forEach(next => {
-                const clientDisplay = next.song || next.client || '';
+            titleEl.innerText = `Записи на ${targetDate}`;
+            sessions.forEach(s => {
+                const clientDisplay = s.song || s.client || '';
+                const icon = s.source === 'sound' ? '🎧' : '🎤';
+                const sourceLabel = s.source === 'sound' ? 'sound' : 'vocal';
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'future-item';
-                itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${clientDisplay}</div>`;
+                itemDiv.innerHTML = `
+                    <span class="future-icon">${icon}</span>
+                    <span class="future-time">${s.time}</span>
+                    <span class="future-client">${clientDisplay}</span>
+                    <span class="future-source">${sourceLabel}</span>
+                `;
                 container.appendChild(itemDiv);
             });
             document.getElementById('nextSessionBox').style.borderColor = 'var(--neon-purple)';
         } else {
             titleEl.innerText = "Нет записей на эту дату";
-            container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
+            container.innerHTML = `<div class="future-item">—</div>`;
             document.getElementById('nextSessionBox').style.borderColor = '#111';
         }
     }
@@ -2816,6 +2891,7 @@ db.enablePersistence()
   });
 
 const crmCollection = db.collection("sessions");
+const vocalCollection = db.collection("vocal_sessions");
 
 crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
@@ -2823,6 +2899,15 @@ crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
         window.crmData.push({ id: doc.id, ...doc.data() });
     });
     updateTable();
+    renderCalendar();
+    updateNextSession(selectedDate);
+});
+
+vocalCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+    window.vocalData = [];
+    snapshot.forEach((doc) => {
+        window.vocalData.push({ id: doc.id, ...doc.data() });
+    });
     renderCalendar();
     updateNextSession(selectedDate);
 });
