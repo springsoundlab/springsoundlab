@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         /* ==========================================
-           1. ПЕРЕМЕННЫЕ И ОСНОВНЫЕ СТИЛИ
+           1. ПЕРЕМЕННЫЕ И ОСНОВНЫЕ СТИЛИ (CSS VARIABLES)
            ========================================== */
         :root {
             --neon-blue: #00f2ff;
@@ -47,11 +47,11 @@
         }
 
         /* ==========================================
-           КАРУСЕЛЬ SERVICES — 4 КАРТОЧКИ, СТРЕЛКИ ВСЕГДА НЕОНОВЫЕ
+           КАРУСЕЛЬ SERVICES — УЛУЧШЕННАЯ ВЕРСИЯ
            ========================================== */
         .services-carousel-wrapper {
             position: relative;
-            margin-left: -20px;
+            margin-left: -20px;   /* компенсация padding .container */
             margin-right: -20px;
             overflow: visible;
         }
@@ -72,48 +72,48 @@
             margin: 0;
         }
 
-        /* СТРЕЛКИ: широкие, всегда светятся неоном */
+        /* СТРЕЛКИ: огромные, всегда неоновые, с усилением при наведении */
         .services-carousel-wrapper .swiper-button-prev,
         .services-carousel-wrapper .swiper-button-next {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 100px;                /* шире обычного */
-            height: 300px;                /* почти как карточки */
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px solid var(--neon-blue);   /* неоновая рамка всегда */
-            color: var(--neon-blue) !important;   /* неоновый цвет всегда */
+            width: 120px;               /* ширина увеличена */
+            height: 350px;              /* высота почти как у карточек */
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--neon-blue);        /* всегда неоновая рамка */
+            color: var(--neon-blue) !important;        /* всегда неоновый цвет */
             border-radius: 0 !important;
             transition: all var(--transition-speed);
             box-shadow: 0 0 20px var(--neon-blue), 0 0 40px rgba(0, 242, 255, 0.3); /* постоянное свечение */
             z-index: 20;
             margin: 0;
-            left: 30px;                  /* отодвинуты от карточек */
+            left: 10px;                 /* отступ от края экрана */
             right: auto;
         }
 
         .services-carousel-wrapper .swiper-button-next {
             left: auto;
-            right: 30px;
+            right: 10px;
         }
 
         .services-carousel-wrapper .swiper-button-prev:hover,
         .services-carousel-wrapper .swiper-button-next:hover {
-            color: #ffffff !important;
-            border-color: #ffffff;
-            background: rgba(0, 242, 255, 0.2);
-            box-shadow: 0 0 30px var(--neon-blue), 0 0 60px var(--neon-blue), 0 0 90px var(--neon-blue);
+            color: var(--neon-blue) !important;
+            border-color: var(--neon-blue);
+            background: rgba(0, 0, 0, 0.95);
+            box-shadow: 0 0 40px var(--neon-blue), 0 0 80px rgba(0, 242, 255, 0.6); /* усиление при наведении */
         }
 
         .services-carousel-wrapper .swiper-button-prev::after,
         .services-carousel-wrapper .swiper-button-next::after {
-            font-size: 48px;
+            font-size: 60px;            /* ещё больше иконка */
             font-weight: bold;
         }
 
-        /* Убираем стандартные позиционирования */
+        /* Убираем стандартные позиционирования стрелок Swiper */
         .swiper-button-prev, .swiper-button-next {
-            position: static;
+            position: static; /* сбрасываем, чтобы работали наши правила */
         }
 
         /* Убираем полосу прокрутки */
@@ -125,12 +125,24 @@
             display: none;
         }
 
-        /* Адаптация */
+        /* Адаптация для планшетов */
         @media (max-width: 1200px) {
             .services-carousel-wrapper .swiper-button-prev,
             .services-carousel-wrapper .swiper-button-next {
+                width: 90px;
+                height: 280px;
+            }
+            .services-carousel-wrapper .swiper-button-prev::after,
+            .services-carousel-wrapper .swiper-button-next::after {
+                font-size: 48px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .services-carousel-wrapper .swiper-button-prev,
+            .services-carousel-wrapper .swiper-button-next {
                 width: 70px;
-                height: 250px;
+                height: 220px;
             }
             .services-carousel-wrapper .swiper-button-prev::after,
             .services-carousel-wrapper .swiper-button-next::after {
@@ -138,24 +150,10 @@
             }
         }
 
-        @media (max-width: 1024px) {
-            .services-carousel-wrapper .swiper-button-prev,
-            .services-carousel-wrapper .swiper-button-next {
-                width: 60px;
-                height: 200px;
-                left: 20px;
-                right: 20px;
-            }
-            .services-carousel-wrapper .swiper-button-prev::after,
-            .services-carousel-wrapper .swiper-button-next::after {
-                font-size: 30px;
-            }
-        }
-
         @media (max-width: 768px) {
             .services-carousel-wrapper .swiper-button-prev,
             .services-carousel-wrapper .swiper-button-next {
-                display: none;
+                display: none;   /* на мобильных скрываем, оставляем свайп */
             }
             .services-carousel-wrapper {
                 margin-left: 0;
@@ -163,9 +161,7 @@
             }
         }
 
-        /* ==========================================
-           ОСТАЛЬНЫЕ СТИЛИ (без изменений, сохранены из исходного кода)
-           ========================================== */
+        /* Остальные стили (без изменений, сохранены из исходного кода) */
         .custom-audio-player {
             background: #000 !important;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -875,7 +871,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         new Swiper('.services-swiper', {
             slidesPerView: 4,
-            slidesPerGroup: 1,
             spaceBetween: 20,
             loop: true,
             navigation: {
