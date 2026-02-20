@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VOCAL TEACHER CRM | SPRING SOUND LAB</title>
     
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Vocal CRM">
+    
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIlZvY2FsIENSTSB8IFNQUklORyBTT1VORCBMQUIiLAogICJzaG9ydF9uYW1lIjogIlZvY2FsIENSTSwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmYWY0ZjUiLAogICJ0aGVtZV9jb2xvciI6ICIjZDljOWUzIgp9">
+
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -36,6 +42,7 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            padding-top: env(safe-area-inset-top);
         }
         
         #offlineIndicator {
@@ -52,6 +59,7 @@
             left: 0;
             right: 0;
             z-index: 1000000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
         
         header { 
@@ -62,6 +70,11 @@
             border-bottom: 1px solid var(--border-light); 
             flex-shrink: 0; 
             height: 90px;
+            margin-top: env(safe-area-inset-top);
+        }
+
+        .header-left {
+            display: none;
         }
 
         .header-center {
@@ -426,7 +439,7 @@
         }
         .edit-add-btn.btn-white { border-color: var(--text-dark); color: var(--text-dark); }
         .edit-add-btn.btn-purple { border-color: var(--pastel-lavender); color: var(--pastel-lavender); }
-        .edit-add-btn.btn-red { border-color: #f7d6b4; color: #f7d6b4; }
+        .edit-add-btn.btn-red { border-color: var(--pastel-peach); color: var(--pastel-peach); }
         .edit-add-btn.btn-green { border-color: var(--pastel-mint); color: var(--pastel-mint); }
         .edit-add-btn.btn-blue { border-color: var(--pastel-blue); color: var(--pastel-blue); }
         .edit-add-btn.btn-gold { border-color: var(--pastel-yellow); color: var(--pastel-yellow); }
@@ -466,7 +479,115 @@
         .m-btn { padding: 10px 15px; border-radius: 6px; font-family: 'Orbitron'; font-size: 9px; cursor: pointer; text-transform: uppercase; border: none; flex: 1; transition: 0.2s; }
         .m-confirm { background: var(--pastel-mint); color: var(--text-dark); }
         .m-cancel { background: #eee; color: #888; }
-        .m-delete { background: #f7d6b4; color: var(--text-dark); }
+        .m-delete { background: var(--pastel-peach); color: var(--text-dark); }
+
+        .packages-dropdown {
+            margin-bottom: 20px; border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden;
+            flex-shrink: 0; background: var(--card-bg);
+        }
+        .packages-header {
+            background: var(--card-bg); padding: 12px 15px; display: flex; justify-content: space-between;
+            align-items: center; cursor: pointer; transition: 0.3s;
+        }
+        .packages-header h2 {
+            font-family: 'Orbitron'; font-size: 11px; margin: 0; color: var(--pastel-lavender);
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+        .packages-header i { color: var(--pastel-lavender); font-size: 10px; transition: 0.3s; }
+        .packages-content {
+            display: none; max-height: 350px; overflow-y: auto; padding: 0 15px 15px 15px;
+            border-top: 1px solid var(--border-light);
+        }
+        .packages-dropdown.active .packages-content { display: block; }
+        .packages-dropdown.active .packages-header i { transform: rotate(180deg); }
+
+        .package-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: background 0.2s;
+            position: relative;
+        }
+        .package-row.inactive:hover {
+            background: rgba(217, 201, 227, 0.1);
+            cursor: pointer;
+        }
+        .package-row.selected {
+            background: rgba(184, 150, 0, 0.2);
+            border-left: 3px solid var(--pastel-yellow);
+            padding-left: 5px;
+        }
+        .package-id {
+            font-family: 'Rajdhani';
+            font-weight: 700;
+            color: var(--pastel-lavender);
+            font-size: 14px;
+        }
+        .package-input {
+            background: #f0e8f0;
+            border: 1px solid var(--border-light);
+            color: var(--text-dark);
+            padding: 4px;
+            font-size: 10px;
+            width: 100%;
+            outline: none;
+            text-align: center;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+        .package-input:focus {
+            border-color: var(--pastel-lavender);
+        }
+        .package-status {
+            font-size: 8px;
+            color: #00ff66;
+            border: 1px solid #00ff66;
+            padding: 2px 5px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+        .package-name {
+            color: var(--text-dark);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .package-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            background: var(--card-bg);
+            border: 1px solid var(--pastel-lavender);
+            padding: 10px;
+            border-radius: 6px;
+            z-index: 10000;
+            width: 220px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            pointer-events: none;
+            transition: opacity 0.2s;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 8px;
+        }
+        .package-row:hover .package-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .package-tooltip .tooltip-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 4px;
+            border-left: 2px solid;
+            padding-left: 6px;
+        }
+        .package-tooltip .tooltip-sum {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
 
         .calendar-widget { flex-shrink: 0; margin-bottom: 20px; background: var(--card-bg); border-radius: 10px; padding: 15px; border: 1px solid var(--border-light); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -526,7 +647,7 @@
         .prepaid-toggle span { font-family: 'Orbitron'; font-size: 9px; color: var(--pastel-lavender); }
         .switch { position: relative; display: inline-block; width: 34px; height: 18px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; border: 1px solid var(--border-light); }
         .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--pastel-lavender); }
         input:checked + .slider:before { transform: translateX(16px); }
@@ -551,6 +672,8 @@
             cursor: pointer; font-size: 9px; font-family: 'Orbitron', sans-serif; 
             transition: 0.3s; position: relative; white-space: nowrap;
             border: 1px solid;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .btn-tooltip { 
@@ -563,7 +686,7 @@
 
         .btn-white { border-color: var(--text-dark); color: var(--text-dark); }
         .btn-purple { border-color: var(--pastel-lavender); color: var(--pastel-lavender); }
-        .btn-red { border-color: #f7d6b4; color: #f7d6b4; }
+        .btn-red { border-color: var(--pastel-peach); color: var(--pastel-peach); }
         .btn-green { border-color: var(--pastel-mint); color: var(--pastel-mint); }
         .btn-blue { border-color: var(--pastel-blue); color: var(--pastel-blue); }
         .btn-gold { border-color: var(--pastel-yellow); color: var(--pastel-yellow); }
@@ -597,7 +720,7 @@
         .cart-tag { font-size: 10px; font-family: 'Orbitron'; padding: 6px 30px 6px 10px; border-radius: 4px; display: inline-flex; align-items: center; position: relative; background: rgba(255,255,255,0.3); }
         .tag-white { border: 1px solid var(--text-dark); color: var(--text-dark); }
         .tag-purple { border: 1px solid var(--pastel-lavender); color: var(--pastel-lavender); }
-        .tag-red { border: 1px solid #f7d6b4; color: #f7d6b4; }
+        .tag-red { border: 1px solid var(--pastel-peach); color: var(--pastel-peach); }
         .tag-green { border: 1px solid var(--pastel-mint); color: var(--pastel-mint); }
         .tag-blue { border: 1px solid var(--pastel-blue); color: var(--pastel-blue); }
         .tag-gold { border: 1px solid var(--pastel-yellow); color: var(--pastel-yellow); }
@@ -726,7 +849,7 @@
             font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 18px;
-            color: #f7d6b4;
+            color: var(--pastel-peach);
             display: block;
         }
 
@@ -743,9 +866,50 @@
             color: var(--pastel-lavender); 
         }
 
-        .completed-row td {
-            color: #aaa !important;
+        .completed-row,
+        .completed-row td,
+        .completed-row .artist-cell,
+        .completed-row .services-cell,
+        .completed-row .mobile-row-client,
+        .completed-row .mobile-row-services,
+        .completed-row .mobile-row-date {
+            background: transparent !important;
+            box-shadow: none !important;
+            outline: none !important;
+            border: none !important;
         }
+
+        @media (min-width: 993px) {
+            .completed-row td:nth-child(1),
+            .completed-row td:nth-child(2) .artist-name,
+            .completed-row td:nth-child(2) .table-time-inline,
+            .completed-row td:nth-child(3) {
+                color: var(--pastel-yellow) !important;
+            }
+            .completed-row .icon-complete i,
+            .completed-row .icon-complete span {
+                color: var(--pastel-yellow) !important;
+            }
+            .controls-row .btn-wrapper {
+                flex: 1 1 100px;
+                min-width: 90px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .completed-row .mobile-row-date,
+            .completed-row .mobile-row-client,
+            .completed-row .mobile-row-services {
+                color: var(--pastel-yellow) !important;
+            }
+            .completed-row .m-btn-complete {
+                background: var(--pastel-yellow) !important;
+                color: var(--text-dark) !important;
+                border-color: var(--pastel-yellow) !important;
+            }
+        }
+
+        .packages-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; }
 
         .filter-info { font-size: 10px; color: #aaa; margin: 0 0 10px 0; display: flex; justify-content: space-between; font-weight: 600; text-transform: uppercase; flex-shrink: 0; }
 
@@ -758,6 +922,9 @@
             pointer-events: none; transition: opacity 0.4s ease;
         }
         .history-tooltip.active { visibility: visible; opacity: 1; }
+        .history-tooltip.pos-down { transform: translate(15px, 15px); }
+        .history-tooltip.pos-up { transform: translate(15px, calc(-100% - 15px)); }
+        
         .tooltip-sum { 
             filter: blur(6px); 
             transition: 0.3s; 
@@ -773,8 +940,8 @@
         .icon-btn-box span { font-family: 'Orbitron'; font-size: 7px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; }
         .icon-btn-box:hover i { color: var(--pastel-lavender); }
         .icon-btn-box:hover span { color: var(--pastel-lavender); }
-        .icon-delete:hover i { color: #f7d6b4; }
-        .icon-delete:hover span { color: #f7d6b4; }
+        .icon-delete:hover i { color: var(--pastel-peach); }
+        .icon-delete:hover span { color: var(--pastel-peach); }
         .icon-edit:hover i { color: var(--pastel-blue); }
         .icon-edit:hover span { color: var(--pastel-blue); }
 
@@ -783,11 +950,39 @@
         .icon-complete:hover i { color: var(--pastel-yellow); }
         .icon-complete:hover span { color: var(--pastel-yellow); }
 
-        /* ===== МОБИЛЬНЫЕ СТИЛИ (адаптированы из исходной CRM) ===== */
+        .mobile-edit-icon {
+            color: var(--text-dark);
+            font-size: 14px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .mobile-edit-icon:hover {
+            opacity: 1;
+        }
+
+        .reset-packages-btn {
+            background: none;
+            border: 1px solid var(--border-light);
+            color: #888;
+            font-size: 8px;
+            padding: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            text-transform: uppercase;
+            font-family: 'Orbitron';
+        }
+        .reset-packages-btn:hover {
+            border-color: var(--pastel-peach);
+            color: var(--pastel-peach);
+        }
+
         @media (max-width: 992px) {
             body { 
                 overflow-y: auto; 
-                height: auto; 
+                height: 100vh; 
                 padding: 10px; 
                 padding-top: max(10px, env(safe-area-inset-top)); 
                 padding-bottom: env(safe-area-inset-bottom);
@@ -843,7 +1038,15 @@
                 margin-bottom: 5px;
             }
 
-            .btn-wrapper { width: 100%; }
+            .btn-order-1 { order: 1; } 
+            .btn-order-2 { order: 2; } 
+            .btn-order-3 { order: 3; } 
+            .btn-order-4 { order: 4; } 
+            .btn-order-5 { order: 5; } 
+            .btn-order-6 { order: 6; } 
+            .btn-order-7 { order: 7; grid-column: span 2; } 
+            .btn-order-8 { order: 8; grid-column: span 2; } 
+            
             .action-btn { width: 100%; }
 
             table, thead, tbody, th, td, tr { display: block; width: 100% !important; box-sizing: border-box; }
@@ -901,7 +1104,7 @@
             }
             .m-btn-complete { border-color: var(--pastel-yellow); color: var(--pastel-yellow); }
             .m-btn-pay { border-color: var(--pastel-mint); color: var(--pastel-mint); }
-            .m-btn-del { border-color: #f7d6b4; color: #f7d6b4; }
+            .m-btn-del { border-color: var(--pastel-peach); color: var(--pastel-peach); }
 
             .current-session-box { 
                 flex-direction: column; 
@@ -993,30 +1196,340 @@
                 margin: 0 auto;
             }
 
-            /* Центрирование текста в карточках */
+            /* Улучшение отображения блока "Топ услуг" на мобильных */
+            .svc-row {
+                gap: 6px;
+            }
+            .svc-name {
+                min-width: auto;
+                font-size: 10px;
+                max-width: 120px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .svc-count {
+                font-size: 14px;
+                min-width: auto;
+            }
+            .analytics-card {
+                padding: 15px;
+                text-align: left;
+            }
             .analytics-card .stat-big,
             .analytics-card .stat-sub {
                 text-align: center;
             }
         }
 
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--pastel-lavender);
-            color: var(--text-dark);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 10px;
-            cursor: pointer;
-            text-transform: uppercase;
-            z-index: 100;
+        .cal-grid .day {
+            transition: all 0.2s ease;
+            border: 1px solid transparent !important;
+            position: relative;
+            color: var(--text-dark) !important;
         }
-        .logout-btn:hover {
-            background: #c5b0d4;
+        
+        .cal-grid .day:not(.has-data):hover {
+            border: 1px solid var(--pastel-mint) !important;
+            cursor: pointer;
+        }
+
+        .cal-grid .day.selected {
+            background: #f0e8f0 !important; 
+            border: 1px solid var(--pastel-mint) !important;
+            color: var(--text-dark) !important;
+        }
+
+        .cal-grid .day.past-session {
+            background: var(--pastel-blue) !important; 
+            border: 1px solid transparent !important;
+            font-weight: bold;
+            color: var(--text-dark) !important;
+        }
+        
+        .cal-grid .day.future-session {
+            background: var(--pastel-peach) !important;
+            border: 1px solid transparent !important;
+            color: var(--text-dark) !important;
+        }
+
+        .cal-grid .day.today-session {
+            background: var(--pastel-mint) !important;
+            border: 1px solid transparent !important;
+            color: var(--text-dark) !important;
+        }
+
+        .cal-grid .day.completed-day {
+            outline: 1px solid var(--pastel-yellow);
+            outline-offset: 1px;
+        }
+
+        .cal-grid .day::after {
+            display: none !important;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .header-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 0 20px;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: var(--card-bg);
+            position: relative;
+            height: 90px;
+            min-width: 80px;
+        }
+        .header-action-btn i { font-size: 20px; color: #aaa; transition: 0.3s; }
+        .header-action-btn span {
+            font-family: 'Orbitron';
+            font-size: 7px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .header-action-btn:hover { border-color: var(--pastel-lavender); background: rgba(217,201,227,0.03); }
+        .header-action-btn:hover i,
+        .header-action-btn:hover span { color: var(--pastel-lavender); }
+        .header-action-btn.notif-on { border-color: var(--pastel-mint); }
+        .header-action-btn.notif-on i,
+        .header-action-btn.notif-on span { color: var(--pastel-mint); }
+        .notif-badge {
+            position: absolute;
+            top: 14px; right: 14px;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--pastel-peach);
+            display: none;
+            animation: pulse 1.5s infinite;
+        }
+        .notif-badge.show { display: block; }
+        @keyframes pulse {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        @media (max-width: 992px) { .header-actions { display: none; } }
+
+        .desktop-analytics-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 0 20px;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: var(--card-bg);
+            height: 90px;
+            min-width: 80px;
+            flex-shrink: 0;
+        }
+        .desktop-analytics-btn i { font-size: 20px; color: #aaa; transition: 0.3s; }
+        .desktop-analytics-btn span {
+            font-family: 'Orbitron'; font-size: 7px;
+            color: #aaa; text-transform: uppercase;
+            letter-spacing: 1px; transition: 0.3s;
+        }
+        .desktop-analytics-btn:hover { border-color: var(--pastel-lavender); background: rgba(217,201,227,0.03); }
+        .desktop-analytics-btn:hover i,
+        .desktop-analytics-btn:hover span { color: var(--pastel-lavender); }
+        @media (max-width: 992px) { .desktop-analytics-btn { display: none; } }
+
+        .mobile-analytics-btn { display: none; }
+        @media (max-width: 992px) {
+            .mobile-analytics-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                order: 3;
+                width: 100%;
+                height: 48px;
+                background: var(--card-bg);
+                border: 1px solid var(--border-light);
+                border-radius: 10px;
+                cursor: pointer;
+                font-family: 'Orbitron';
+                font-size: 11px;
+                color: var(--pastel-lavender);
+                letter-spacing: 2px;
+                transition: 0.3s;
+            }
+            .mobile-analytics-btn:hover {
+                border-color: var(--pastel-lavender);
+                background: rgba(217,201,227,0.05);
+            }
+            .mobile-analytics-btn i { font-size: 14px; }
+        }
+
+        .analytics-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 99998; backdrop-filter: blur(8px);
+        }
+        .analytics-modal {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg); border: 1px solid var(--pastel-lavender);
+            border-radius: 16px; z-index: 99999;
+            width: 920px; max-width: 96vw; max-height: 88vh;
+            overflow-y: auto; padding: 30px;
+            box-shadow: 0 0 80px rgba(217,201,227,0.15);
+        }
+        .analytics-modal .privacy-blur {
+            filter: none !important;
+            opacity: 1 !important;
+        }
+        @media (max-width: 992px) {
+            .analytics-modal {
+                top: 0; left: 0;
+                transform: none;
+                width: 100%; max-width: 100%;
+                height: 100%; max-height: 100%;
+                border-radius: 0;
+                padding: 20px 16px;
+                border: none;
+                border-top: 3px solid var(--pastel-lavender);
+                overflow-y: auto;
+            }
+            .analytics-modal .analytics-close {
+                position: fixed;
+                top: 16px;
+                right: auto;
+                left: calc(100vw - 70px);
+            }
+            .analytics-modal > div[style*="grid-template-columns:1fr 1fr 1fr"],
+            .analytics-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .analytics-card.wide,
+            .analytics-modal > div[style*="grid-template-columns:1fr 1fr 1fr"] .analytics-card {
+                grid-column: span 1 !important;
+            }
+            .stat-big { font-size: 38px; }
+            .chart-wrap { height: 110px; }
+            .chart-bar-val { font-size: 8px; }
+            .chart-bar-lbl { font-size: 6px; }
+        }
+        .analytics-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 28px; border-bottom: 1px solid var(--border-light); padding-bottom: 20px;
+        }
+        .analytics-title {
+            font-family: 'Orbitron'; font-size: 14px;
+            color: var(--pastel-lavender); letter-spacing: 4px;
+        }
+        .analytics-close {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #f0e8f0; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #888; font-size: 16px; transition: 0.2s;
+        }
+        .analytics-close:hover { background: var(--pastel-peach); color: #fff; }
+        .analytics-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 16px; margin-bottom: 16px;
+        }
+        .analytics-card {
+            background: var(--card-bg); border: 1px solid var(--border-light);
+            border-radius: 12px; padding: 20px;
+        }
+        .analytics-card.wide { grid-column: span 2; }
+        .analytics-card-title {
+            font-family: 'Orbitron'; font-size: 8px;
+            color: var(--text-dark); letter-spacing: 2px;
+            text-transform: uppercase; margin-bottom: 16px;
+        }
+        .stat-big {
+            font-family: 'Rajdhani'; font-weight: 700;
+            font-size: 52px; color: var(--text-dark); line-height: 1;
+        }
+        .stat-sub {
+            font-family: 'Orbitron'; font-size: 8px;
+            color: var(--text-dark); margin-top: 6px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .chart-wrap {
+            display: flex; align-items: flex-end;
+            gap: 6px; height: 150px; padding-top: 10px;
+        }
+        .chart-col {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-end; height: 100%; gap: 4px;
+        }
+        .chart-bar-val {
+            font-family: 'Rajdhani'; font-weight: 700;
+            font-size: 9px; color: var(--text-dark);
+        }
+        .chart-bar {
+            width: 100%; border-radius: 3px 3px 0 0;
+            background: #f0e8f0; transition: height 0.6s ease;
+            min-height: 2px; position: relative; overflow: hidden;
+        }
+        .chart-bar.has-data { background: var(--pastel-lavender); }
+        .chart-bar.is-current { background: var(--pastel-mint); }
+        .chart-bar-lbl {
+            font-family: 'Orbitron'; font-size: 7px;
+            color: var(--text-dark); text-transform: uppercase;
+        }
+        .svc-row {
+            display: flex; align-items: center;
+            gap: 10px; margin-bottom: 12px;
+        }
+        .svc-row:last-child { margin-bottom: 0; }
+        .svc-name {
+            font-size: 11px; color: var(--text-dark);
+            min-width: 150px; font-family: 'Inter';
+            white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .svc-track {
+            flex: 1; height: 6px; background: #f0e8f0;
+            border-radius: 3px; overflow: hidden;
+        }
+        .svc-fill {
+            height: 100%; border-radius: 3px; transition: width 0.6s;
+        }
+        .svc-count {
+            font-family: 'Rajdhani'; font-weight: 700;
+            font-size: 16px; color: var(--text-dark); min-width: 28px;
+            text-align: right;
+        }
+
+        .edit-comment-label {
+            font-family: 'Orbitron'; font-size: 8px;
+            color: #aaa; letter-spacing: 1px;
+            text-transform: uppercase; margin-bottom: 6px;
+        }
+        .edit-comment-textarea {
+            width: 100%; background: #f0e8f0;
+            border: 1px solid var(--border-light); color: var(--text-dark);
+            padding: 10px; border-radius: 6px;
+            margin-bottom: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px; outline: none;
+            resize: vertical; min-height: 70px;
+            box-sizing: border-box; line-height: 1.6;
+            transition: 0.2s;
+        }
+        .edit-comment-textarea:focus { border-color: var(--pastel-lavender); color: var(--text-dark); }
+        .row-comment {
+            font-size: 11px; color: #aaa;
+            font-style: italic; margin-top: 3px;
+            font-family: 'Inter';
+            white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis; max-width: 260px;
+            display: block;
         }
     </style>
 </head>
@@ -1024,132 +1537,42 @@
 
 <div id="offlineIndicator" class="offline-indicator">📡 ОФЛАЙН-РЕЖИМ — данные сохраняются локально</div>
 
-<button class="logout-btn" onclick="logout()">Выйти</button>
-
-<header>
-    <div class="header-center">
-        VOCAL TEACHER <span>|</span> CRM
+<!-- Analytics overlay & modal -->
+<div id="analyticsOverlay" class="analytics-overlay" onclick="closeAnalyticsModal()"></div>
+<div id="analyticsModal" class="analytics-modal">
+    <div class="analytics-header">
+        <div class="analytics-title">АНАЛИТИКА</div>
+        <div class="analytics-close" onclick="closeAnalyticsModal()">×</div>
     </div>
-    <div class="header-right-zone">
-        <div class="stats-box">
-            <div class="stats-title">ЗАНЯТИЯ</div>
-            <div class="stats-halves">
-                <div class="stats-half">
-                    <div class="stats-count done" id="statsCompleted">0</div>
-                    <div class="stats-label">Проведено</div>
-                </div>
-                <div class="stats-half">
-                    <div class="stats-count pending" id="statsPending">0</div>
-                    <div class="stats-label">В работе</div>
-                </div>
-            </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
+        <div class="analytics-card">
+            <div class="analytics-card-title">Средний чек</div>
+            <div class="stat-big privacy-blur" id="aAvg">0 ₽</div>
+            <div class="stat-sub" id="aAvgSub">за все время</div>
         </div>
-        <div class="total-box" onclick="checkPrivacyPassword()">
-            <div class="unlock-overlay">CLICK TO UNLOCK</div>
-            <span id="monthTotal" class="income-amount privacy-blur">0 ₽</span>
-            <span id="totalLabel">ДОХОД ЗА МЕСЯЦ</span>
+        <div class="analytics-card">
+            <div class="analytics-card-title">Всего записей</div>
+            <div class="stat-big" id="aTotal">0</div>
+            <div class="stat-sub">в базе</div>
+        </div>
+        <div class="analytics-card">
+            <div class="analytics-card-title">Доход за год</div>
+            <div class="stat-big privacy-blur" id="aYear">0 ₽</div>
+            <div class="stat-sub" id="aYearLbl">текущий год</div>
         </div>
     </div>
-</header>
-
-<div class="admin-grid">
-    <div class="crm-panel">
-        <div class="controls-row">
-            <div class="prepaid-toggle">
-                <span>50%</span>
-                <label class="switch">
-                    <input type="checkbox" id="prepaidMode" onchange="applyPrepaidToggle()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            
-            <div class="btn-wrapper">
-                <button class="action-btn btn-white" onclick="addToCart('УРОК ВОКАЛА (60 мин)', 1500, 'white', true)">+ УРОК</button>
-                <div class="btn-tooltip">1500 ₽</div>
-            </div>
-            
-            <div class="btn-wrapper">
-                <button class="action-btn btn-purple" onclick="addToCart('АБОНЕМЕНТ 4 УРОКА', 5500, 'purple')">АБОНЕМЕНТ 4</button>
-                <div class="btn-tooltip">5500 ₽</div>
-            </div>
-
-            <div class="btn-wrapper">
-                <button class="action-btn btn-red" onclick="addToCart('АБОНЕМЕНТ 8 УРОКОВ', 10000, 'red')">АБОНЕМЕНТ 8</button>
-                <div class="btn-tooltip">10000 ₽</div>
-            </div>
-
-            <div class="btn-wrapper">
-                <button class="action-btn btn-green" onclick="addToCart('РАСПЕВКА', 500, 'green')">РАСПЕВКА</button>
-                <div class="btn-tooltip">500 ₽</div>
-            </div>
-            
-            <div class="btn-wrapper">
-                <button class="action-btn btn-blue" onclick="addToCart('ПОСТАНОВКА ГОЛОСА', 2000, 'blue')">ПОСТАНОВКА</button>
-                <div class="btn-tooltip">2000 ₽</div>
-            </div>
-
-            <div class="btn-wrapper">
-                <button class="action-btn btn-gold" onclick="addToCart('ЗАПИСЬ ДЕМО', 3000, 'gold')">ЗАПИСЬ ДЕМО</button>
-                <div class="btn-tooltip">3000 ₽</div>
-            </div>
-        </div>
-
-        <div id="currentSession" class="current-session-box">
-            <div class="cart-info">
-                <div id="sessionDateLabel" style="font-size: 10px; color: #aaa; margin-bottom: 12px; font-family:'Orbitron'; letter-spacing: 1px;">ТЕКУЩИЙ ЧЕК:</div>
-                <div id="cartItems">Пусто...</div>
-            </div>
-            <div class="cart-actions">
-                <div class="total-display-pc" id="cartTotal">0 ₽</div>
-                <div class="action-row">
-                    <input type="text" id="clientSongInput" class="song-field" placeholder="Имя ученика - Название песни" value="" onkeydown="if(event.key==='Enter') saveSession()">
-                    <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-info">
-            <span id="currentViewText">ОТЧЕТ ЗА МЕСЯЦ</span>
-        </div>
-
-        <div class="table-scroll-container">
-            <table>
-                <thead><tr><th>ДАТА</th><th>УЧЕНИК</th><th>УСЛУГИ</th><th style="text-align:right; padding-right:12px;">ВНЕСЕНО</th><th style="text-align:right">ДЕЙСТВИЯ</th></tr></thead>
-                <tbody id="crmTableBody"></tbody>
-            </table>
-        </div>
+    <div class="analytics-card wide" style="margin-bottom:16px;">
+        <div class="analytics-card-title">ДОХОД ПО МЕСЯЦАМ — <span id="aChartYear">2026</span></div>
+        <div class="chart-wrap" id="aChartBars"></div>
     </div>
-
-    <div class="side-panel">
-        <div class="calendar-widget">
-            <div class="cal-header">
-                <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#aaa;" onclick="changeMonth(-1)"></i>
-                <div class="month-name" id="calMonthName"></div>
-                <i class="fas fa-chevron-right" style="cursor:pointer; font-size:12px; color:#aaa;" onclick="changeMonth(1)"></i>
-            </div>
-            <div class="cal-grid" id="calendarDays"></div>
-        </div>
-
-        <div class="session-booking-widget">
-            <div class="booking-label">ВРЕМЯ ЗАНЯТИЯ</div>
-            <div class="booking-row">
-                <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)" onkeydown="if(event.key==='Enter') saveSession()">
-            </div>
-        </div>
-
-        <div class="future-sessions-widget" id="nextSessionBox">
-            <div class="future-title" id="futureTitleLabel">Ближайшее занятие</div>
-            <div id="futureListContainer">
-                <div class="future-item">
-                    <div class="future-date" id="nextSessionDate">--</div>
-                    <div class="future-client" id="nextSessionClient">Нет записей</div>
-                </div>
-            </div>
+    <div class="analytics-grid">
+        <div class="analytics-card" style="grid-column: span 2;">
+            <div class="analytics-card-title">ТОП УСЛУГ</div>
+            <div id="aTopServices"></div>
         </div>
     </div>
 </div>
 
-<!-- Модальные окна -->
 <div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
 <div id="customModal" class="custom-modal">
     <div id="modalTitle" class="modal-title">ДОПЛАТА</div>
@@ -1184,12 +1607,1155 @@
     </div>
 </div>
 
-<!-- Firebase SDK -->
+<header>
+    <div class="header-left" id="liveClock"><!-- скрыто --></div>
+    <div class="header-center">
+        VOCAL TEACHER <span>|</span> CRM
+    </div>
+    <div class="header-actions" style="display:none;"></div>
+    <div class="header-right-zone">
+        <div class="stats-box">
+            <div class="stats-title">ЗАНЯТИЯ</div>
+            <div class="stats-halves">
+                <div class="stats-half">
+                    <div class="stats-count done" id="statsCompleted">0</div>
+                    <div class="stats-label">Проведено</div>
+                </div>
+                <div class="stats-half">
+                    <div class="stats-count pending" id="statsPending">0</div>
+                    <div class="stats-label">В работе</div>
+                </div>
+            </div>
+        </div>
+        <div class="desktop-analytics-btn" onclick="openAnalyticsModal()">
+            <i class="fas fa-chart-bar"></i>
+            <span>Аналитика</span>
+        </div>
+        <div class="mobile-analytics-btn" onclick="openAnalyticsModal()">
+            <i class="fas fa-chart-bar"></i>
+            <span>АНАЛИТИКА</span>
+        </div>
+        <div class="total-box" onclick="checkPrivacyPassword()">
+            <div class="unlock-overlay">CLICK TO UNLOCK</div>
+            <span id="monthTotal" class="income-amount privacy-blur">0 ₽</span>
+            <span id="totalLabel">ДОХОД ЗА МЕСЯЦ</span>
+        </div>
+    </div>
+</header>
+<div class="admin-grid">
+    <div class="crm-panel">
+        <div class="controls-row">
+            <style>
+                @media (min-width: 993px) {
+                    .btn-order-1 { order: 1; }
+                    .btn-order-2 { order: 2; }
+                    .btn-order-3 { order: 3; }
+                    .btn-order-4 { order: 4; }
+                    .btn-order-6 { order: 5; }
+                    .btn-order-7 { order: 6; }
+                    .btn-order-8 { order: 7; }
+                    .btn-order-5 { order: 8; }
+                }
+                @media (max-width: 992px) {
+                    .btn-wrapper { order: unset !important; }
+                }
+            </style>
+
+            <div class="prepaid-toggle">
+                <span>50%</span>
+                <label class="switch">
+                    <input type="checkbox" id="prepaidMode" onchange="applyPrepaidToggle()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="btn-wrapper btn-order-1">
+                <button class="action-btn btn-white" onclick="addToCart('УРОК ВОКАЛА (60 мин)', 1500, 'white', true)">+ УРОК</button>
+            </div>
+            
+            <div class="btn-wrapper btn-order-2">
+                <button class="action-btn btn-purple" onclick="addToCart('АБОНЕМЕНТ 4 УРОКА', 5500, 'purple')">АБОНЕМЕНТ 4</button>
+            </div>
+
+            <div class="btn-wrapper btn-order-3">
+                <button class="action-btn btn-red" onclick="addToCart('АБОНЕМЕНТ 8 УРОКОВ', 10000, 'red')">АБОНЕМЕНТ 8</button>
+            </div>
+
+            <div class="btn-wrapper btn-order-4">
+                <button class="action-btn btn-green" onclick="addToCart('РАСПЕВКА', 500, 'green')">РАСПЕВКА</button>
+            </div>
+            
+            <div class="btn-wrapper btn-order-5">
+                <button class="action-btn btn-blue" onclick="openPriceModal('ПОСТАНОВКА ГОЛОСА', 'blue', 2000)">ПОСТАНОВКА</button>
+            </div>
+
+            <div class="btn-wrapper btn-order-6">
+                <button class="action-btn btn-green btn-dashed-green" onclick="addToCart('ЗАПИСЬ ДЕМО', 3000, 'gold')">ЗАПИСЬ ДЕМО</button>
+            </div>
+            
+            <div class="btn-wrapper btn-order-7">
+                <button class="action-btn btn-gold" onclick="addToCart('ДОП. ЗАНЯТИЕ', 1200, 'gold')">+ ДОП. ЗАНЯТИЕ</button>
+            </div>
+
+            <div class="btn-wrapper btn-order-8">
+                <button class="action-btn btn-blue btn-dashed-green" onclick="openPriceModal('СПЕЦ. УСЛУГА', 'blue', 0)">СВОЯ ЦЕНА</button>
+            </div>
+        </div>
+
+        <div id="currentSession" class="current-session-box">
+            <div class="cart-info">
+                <div id="sessionDateLabel" style="font-size: 10px; color: #aaa; margin-bottom: 12px; font-family:'Orbitron'; letter-spacing: 1px;">ТЕКУЩИЙ ЧЕК:</div>
+                <div id="cartItems">Пусто...</div>
+            </div>
+            <div class="cart-actions">
+                <div class="total-display-pc" id="cartTotal">0 ₽</div>
+                <div class="action-row">
+                    <input type="text" id="clientSongInput" class="song-field" placeholder="Имя ученика - Название песни" value="" onkeydown="if(event.key==='Enter') saveSession()">
+                    <button class="save-btn" onclick="saveSession()">СОХРАНИТЬ</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-info">
+            <span id="currentViewText">ОТЧЕТ ЗА МЕСЯЦ</span>
+        </div>
+
+        <div class="table-scroll-container">
+            <table>
+                <thead><tr><th>ДАТА</th><th>УЧЕНИК</th><th>УСЛУГИ</th><th style="text-align:right; padding-right:12px;">ВНЕСЕНО</th><th style="text-align:right">ДЕЙСТВИЯ</th></tr></thead>
+                <tbody id="crmTableBody"></tbody>
+            </table>
+        </div>
+        <button onclick="clearFullHistory()" style="margin-top:20px; background:none; border:none; color:#aaa; font-size:8px; cursor:pointer; text-transform:uppercase; flex-shrink:0;">Удалить всю историю</button>
+        <button id="mobileNotifBtn" onclick="enableNotifications()" style="display:none; margin-top:20px; margin-left:auto; background:none; border:1px solid var(--border-light); color:#aaa; font-size:8px; padding:6px 12px; border-radius:6px; cursor:pointer; text-transform:uppercase; font-family:'Orbitron'; flex-shrink:0; transition:0.3s;">🔔 Уведомления</button>
+        <style>@media(max-width:992px){#mobileNotifBtn{display:block!important;}}</style>
+    </div>
+
+    <div class="side-panel">
+        <div class="packages-dropdown" id="packagesDropdown">
+            <div class="packages-header" onclick="togglePackages()">
+                <h2>ПАКЕТЫ УРОКОВ</h2>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="packages-content">
+                <div class="packages-container" id="packagesList"></div>
+                <button class="reset-packages-btn" onclick="resetAllPackages()">СБРОСИТЬ ВСЕ ПАКЕТЫ</button>
+            </div>
+        </div>
+
+        <div class="calendar-widget">
+            <div class="cal-header">
+                <i class="fas fa-chevron-left" style="cursor:pointer; font-size:12px; color:#aaa;" onclick="changeMonth(-1)"></i>
+                <div class="month-name" id="calMonthName"></div>
+                <i class="fas fa-chevron-right" style="cursor:pointer; font-size:12px; color:#aaa;" onclick="changeMonth(1)"></i>
+            </div>
+            <div class="cal-grid" id="calendarDays"></div>
+        </div>
+
+        <div class="session-booking-widget">
+            <div class="booking-label">ВРЕМЯ ЗАНЯТИЯ</div>
+            <div class="booking-row">
+                <input type="text" id="bookingTime" class="booking-field" placeholder="00:00" maxlength="5" oninput="formatTimeInput(this)" onkeydown="if(event.key==='Enter') saveSession()">
+            </div>
+        </div>
+
+        <div class="future-sessions-widget" id="nextSessionBox">
+            <div class="future-title" id="futureTitleLabel">Ближайшее занятие</div>
+            <div id="futureListContainer">
+                <div class="future-item">
+                    <div class="future-date" id="nextSessionDate">--</div>
+                    <div class="future-client" id="nextSessionClient">Нет записей</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.crmData = [];
+    window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
+    var currentCart = window.currentCart; 
+    let currentCalDate = new Date();
+    let selectedDate = null;
+    let hoverTimer;
+    const hoverDelay = 700;
+    const colorMap = { white: '#5e4b6e', purple: '#d9c9e3', red: '#f7d6b4', green: '#b8e0d4', gold: '#f9e7b3', blue: '#a9d6e5' };
+    let selectedPackageId = null;
+    let packages = {};
+
+    let currentEditId = null;
+    let currentEditDetails = [];
+    let originalBasePrices = [];
+
+    let notificationsEnabled = false;
+    let notifInterval = null;
+    let notifiedSessions = new Set();
+
+    function togglePackages() { document.getElementById('packagesDropdown').classList.toggle('active'); }
+    
+    function formatTimeInput(input) {
+        let val = input.value.replace(/\D/g, '');
+        if (val.length >= 2) val = val.slice(0, 2) + ':' + val.slice(2, 4);
+        input.value = val;
+    }
+
+    function initTooltipLogic() {
+        const tableBody = document.getElementById('crmTableBody');
+        if(!tableBody) return;
+        tableBody.addEventListener('mousemove', (e) => {
+            const cell = e.target.closest('.services-cell');
+            if (!cell || window.innerWidth <= 992) return; 
+            const allTooltips = document.querySelectorAll('.history-tooltip');
+            clearTimeout(hoverTimer);
+            allTooltips.forEach(t => t.classList.remove('active'));
+            if (cell) {
+                const tooltip = cell.querySelector('.history-tooltip');
+                if (tooltip) {
+                    tooltip.style.left = e.clientX + 'px';
+                    tooltip.style.top = e.clientY + 'px';
+                    hoverTimer = setTimeout(() => { tooltip.classList.add('active'); }, hoverDelay);
+                }
+            }
+        });
+        tableBody.addEventListener('mouseleave', () => {
+            clearTimeout(hoverTimer);
+            document.querySelectorAll('.history-tooltip').forEach(t => t.classList.remove('active'));
+        });
+    }
+
+    function openModal(title, type, confirmCallback, defaultValue = '') {
+        const modal = document.getElementById('customModal');
+        const overlay = document.getElementById('modalOverlay');
+        const titleEl = document.getElementById('modalTitle');
+        const inputEl = document.getElementById('modalInput');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
+        titleEl.innerText = title;
+        inputEl.value = defaultValue;
+        inputEl.style.display = (type === 'confirm-delete') ? 'none' : 'block';
+        confirmBtn.className = 'm-btn m-confirm';
+        confirmBtn.onclick = confirmCallback;
+        modal.style.display = 'block'; overlay.style.display = 'block';
+        if(type !== 'confirm-delete') inputEl.focus();
+    }
+
+    function closeModal() {
+        document.getElementById('customModal').style.display = 'none';
+        document.getElementById('modalOverlay').style.display = 'none';
+    }
+
+    function openEditModal(id) {
+        const row = window.crmData.find(r => r.id === id);
+        if (!row) return;
+        currentEditId = id;
+        currentEditDetails = row.details ? JSON.parse(JSON.stringify(row.details)) : [];
+        originalBasePrices = currentEditDetails.map(item => item.basePrice || item.price);
+        
+        const modal = document.getElementById('editModal');
+        const overlay = document.getElementById('editModalOverlay');
+        document.getElementById('editClientName').value = row.client || '';
+        document.getElementById('editPrepaidToggle').checked = false;
+        document.getElementById('editComment').value = row.comment || '';
+        renderEditServices();
+        updateEditTotal();
+        
+        modal.style.display = 'block';
+        overlay.style.display = 'block';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+        document.getElementById('editModalOverlay').style.display = 'none';
+        currentEditId = null;
+    }
+
+    function toggleEditPrepaid() {
+        const isPrepaid = document.getElementById('editPrepaidToggle').checked;
+        currentEditDetails.forEach((item, index) => {
+            if (item.name.includes('УРОК ВОКАЛА')) return;
+            if (isPrepaid) {
+                if (item.price === item.basePrice) {
+                    item.price = Math.round(item.basePrice / 2);
+                    if (!item.name.includes('(50%)')) item.name += ' (50%)';
+                }
+            } else {
+                item.price = item.basePrice;
+                item.name = item.name.replace(' (50%)', '');
+            }
+        });
+        renderEditServices();
+        updateEditTotal();
+    }
+
+    function renderEditServices() {
+        const container = document.getElementById('editServicesList');
+        container.innerHTML = '';
+        currentEditDetails.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'edit-service-item';
+            div.innerHTML = `
+                <div class="edit-service-info">
+                    <div class="edit-service-color" style="background:${colorMap[item.originalColor]}"></div>
+                    <span class="edit-service-name">${item.name}</span>
+                    <span class="edit-service-price" data-index="${index}">${item.price} ₽</span>
+                </div>
+                <div class="edit-service-actions">
+                    <i class="fas fa-pencil-alt edit-service-edit" data-index="${index}" onclick="startInlineEdit(${index}, this)"></i>
+                    <i class="fas fa-times edit-service-remove" onclick="removeEditService(${index})"></i>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+
+        const addButtons = document.getElementById('editAddButtons');
+        addButtons.innerHTML = `
+            <button class="edit-add-btn btn-white" onclick="addEditService('УРОК ВОКАЛА (60 мин)', 1500, 'white', true)">+УРОК</button>
+            <button class="edit-add-btn btn-purple" onclick="addEditService('АБОНЕМЕНТ 4', 5500, 'purple')">АБ4</button>
+            <button class="edit-add-btn btn-red" onclick="addEditService('АБОНЕМЕНТ 8', 10000, 'red')">АБ8</button>
+            <button class="edit-add-btn btn-green" onclick="addEditService('РАСПЕВКА', 500, 'green')">РАСП</button>
+            <button class="edit-add-btn btn-blue" onclick="addEditService('ПОСТАНОВКА', 2000, 'blue')">ПОСТ</button>
+            <button class="edit-add-btn btn-gold" onclick="addEditService('ЗАПИСЬ ДЕМО', 3000, 'gold')">ДЕМО</button>
+            <button class="edit-add-btn btn-blue" onclick="addEditService('ДОП. ЗАНЯТИЕ', 1200, 'blue')">+ДОП</button>
+        `;
+    }
+
+    function addEditService(name, price, color, forceFull = false) {
+        const isPrepaid = document.getElementById('editPrepaidToggle').checked;
+        let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
+        let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
+        const newItem = {
+            name: finalName,
+            price: finalPrice,
+            basePrice: price,
+            originalColor: color
+        };
+        currentEditDetails.push(newItem);
+        renderEditServices();
+        updateEditTotal();
+    }
+
+    function removeEditService(index) {
+        currentEditDetails.splice(index, 1);
+        renderEditServices();
+        updateEditTotal();
+    }
+
+    function startInlineEdit(index, iconElement) {
+        const priceSpan = document.querySelector(`.edit-service-price[data-index="${index}"]`);
+        if (!priceSpan) return;
+        
+        const currentPrice = currentEditDetails[index].price;
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.value = currentPrice;
+        input.className = 'edit-service-price-input';
+        input.style.width = '80px';
+        input.style.marginLeft = '10px';
+        
+        const parent = priceSpan.parentNode;
+        parent.replaceChild(input, priceSpan);
+        
+        const finishEdit = () => {
+            const newValue = parseInt(input.value);
+            if (!isNaN(newValue) && newValue > 0) {
+                currentEditDetails[index].price = newValue;
+                currentEditDetails[index].basePrice = newValue;
+            }
+            renderEditServices();
+            updateEditTotal();
+        };
+        
+        input.addEventListener('blur', finishEdit);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finishEdit();
+            }
+        });
+        input.focus();
+    }
+
+    function updateEditTotal() {
+        const total = currentEditDetails.reduce((sum, item) => sum + item.price, 0);
+        document.getElementById('editTotal').innerText = `ИТОГО: ${total} ₽`;
+    }
+
+    function saveEdit() {
+        if (!currentEditId) return;
+        const newClient = document.getElementById('editClientName').value.trim() || 'Без имени';
+        const fullTotal = currentEditDetails.reduce((sum, item) => sum + (item.basePrice || item.price), 0);
+        const paid = currentEditDetails.reduce((sum, item) => sum + item.price, 0);
+        const servicesString = currentEditDetails.map(item => item.name).join(', ');
+        
+        vocalCollection.doc(currentEditId).update({
+            client: newClient,
+            song: newClient,
+            details: currentEditDetails,
+            services: servicesString,
+            total: paid,
+            fullTotal: fullTotal,
+            comment: document.getElementById('editComment').value.trim()
+        }).then(() => {
+            closeEditModal();
+        }).catch(error => console.error("Ошибка обновления:", error));
+    }
+
+    function openPriceModal(name, color, defaultPrice) {
+        openModal(`УКАЖИТЕ СТОИМОСТЬ: ${name}`, "price", function() {
+            const p = parseInt(document.getElementById('modalInput').value);
+            if(!isNaN(p) && p > 0) {
+                addToCart(name, p, color);
+                closeModal();
+            } else { alert('Введите корректную сумму'); }
+        }, defaultPrice);
+    }
+
+    function checkPrivacyPassword() {
+        if(document.body.classList.contains('privacy-active')) return;
+        openModal("ВВЕДИТЕ ПАРОЛЬ", "password", function() {
+            const pass = document.getElementById('modalInput').value;
+            if (pass === '123') {
+                document.body.classList.add('privacy-active');
+                closeModal(); updateTable(); 
+            } else { alert("Неверный пароль"); }
+        });
+    }
+
+    // ---------- КАЛЕНДАРЬ ----------
+    function renderCalendar() {
+        const grid = document.getElementById('calendarDays');
+        if (!grid) return;
+        grid.innerHTML = '';
+        
+        const y = currentCalDate.getFullYear();
+        const m = currentCalDate.getMonth();
+        
+        const monthNames = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", 
+                            "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+        document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
+
+        const firstDay = new Date(y, m, 1).getDay();
+        const lastDate = new Date(y, m + 1, 0).getDate();
+        const shift = firstDay === 0 ? 6 : firstDay - 1;
+
+        for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStr = today.toLocaleDateString('ru-RU');
+
+        const completedDates = new Set();
+        if (window.crmData) {
+            window.crmData.forEach(s => {
+                if (s.completed) {
+                    completedDates.add(s.date);
+                }
+            });
+        }
+
+        for (let d = 1; d <= lastDate; d++) {
+            const dayStr = String(d).padStart(2, '0');
+            const monthStr = String(m + 1).padStart(2, '0');
+            const dateStr = `${dayStr}.${monthStr}.${y}`;
+            
+            const hasData = window.crmData && window.crmData.some(s => s.date === dateStr);
+            
+            let classList = 'day';
+            if (hasData) {
+                classList += ' has-data';
+                const [cellD, cellM, cellY] = dateStr.split('.').map(Number);
+                const cellDate = new Date(cellY, cellM - 1, cellD);
+                cellDate.setHours(0, 0, 0, 0);
+
+                if (dateStr === todayStr) {
+                    classList += ' today-session'; 
+                } else if (cellDate < today) {
+                    classList += ' past-session';   
+                } else {
+                    classList += ' future-session'; 
+                }
+            }
+            
+            if (selectedDate === dateStr) classList += ' selected';
+            if (completedDates.has(dateStr)) classList += ' completed-day';
+            grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
+        }
+    }
+
+    function selectCalendarDate(date) {
+        selectedDate = date;
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
+        renderCalendar(); 
+        updateNextSession(date); 
+    }
+
+    function changeMonth(dir) { 
+        currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
+        selectedDate = null; 
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК:`;
+        updateTable(); renderCalendar(); 
+    }
+
+    // ---------- КОРЗИНА ----------
+    function applyPrepaidToggle() {
+        const isPrepaid = document.getElementById('prepaidMode').checked;
+        window.currentCart.total = 0;
+        window.currentCart.details.forEach(item => {
+            const isForceFull = item.name.includes('УРОК ВОКАЛА');
+            if (isPrepaid && !isForceFull) {
+                item.price = item.basePrice / 2;
+                if (!item.name.includes('(50%)')) item.name += ' (50%)';
+            } else {
+                item.price = item.basePrice;
+                item.name = item.name.replace(' (50%)', '');
+            }
+            window.currentCart.total += item.price;
+        });
+        renderCart();
+    }
+
+    function addToCart(name, price, colorClass, forceFull = false) {
+        const isPrepaid = document.getElementById('prepaidMode').checked;
+        let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
+        let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
+        window.currentCart.details.push({ 
+            name: finalName, 
+            price: finalPrice, 
+            basePrice: price, 
+            originalColor: colorClass
+        });
+        window.currentCart.total += finalPrice;
+        window.currentCart.fullPriceTotal += price;
+        renderCart();
+    }
+
+    function removeFromCart(index) {
+        const item = window.currentCart.details[index];
+        window.currentCart.total -= item.price;
+        window.currentCart.fullPriceTotal -= item.basePrice;
+        window.currentCart.details.splice(index, 1);
+        renderCart();
+    }
+
+    function renderCart() {
+        const container = document.getElementById('cartItems');
+        const total = document.getElementById('cartTotal');
+        if (!container || !total) return;
+        total.innerText = window.currentCart.total + ' ₽';
+        container.innerHTML = window.currentCart.details.length === 0 ? 'Пусто...' : '';
+        window.currentCart.details.forEach((item, i) => {
+            const tag = document.createElement('div');
+            tag.className = `cart-tag tag-${item.originalColor}`;
+            tag.innerHTML = `${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div>`;
+            container.appendChild(tag);
+        });
+    }
+
+    // ---------- ПАКЕТЫ УРОКОВ (аналог сертификатов) ----------
+    function subscribePackages() {
+        db.collection("vocal_packages").onSnapshot((snapshot) => {
+            packages = {};
+            snapshot.forEach((doc) => {
+                packages[doc.id] = doc.data();
+            });
+            updatePackages();
+        });
+    }
+
+    function selectPackage(packageId) {
+        const pkg = packages[packageId];
+        if (pkg && pkg.active) return;
+
+        const sessionBox = document.getElementById('currentSession');
+        if (selectedPackageId === packageId) {
+            selectedPackageId = null;
+            sessionBox.classList.remove('session-gold');
+        } else {
+            selectedPackageId = packageId;
+            sessionBox.classList.add('session-gold');
+        }
+        renderCart();
+        updatePackages();
+    }
+
+    function updatePackages() {
+        const list = document.getElementById('packagesList');
+        if (!list) return;
+        list.innerHTML = '';
+
+        for (let i = 1; i <= 50; i++) {
+            const id = 'PACK-' + String(i).padStart(3, '0');
+            const data = packages[id] || { active: false, name: '' };
+            const div = document.createElement('div');
+            div.className = 'package-row';
+            
+            if (!data.active) {
+                div.classList.add('inactive');
+                div.onclick = (e) => {
+                    if (e.target.tagName !== 'INPUT') {
+                        selectPackage(id);
+                    }
+                };
+            } else {
+                if (data.details && data.details.length) {
+                    let tooltipHTML = '<div class="package-tooltip"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:8px;">ДЕТАЛИЗАЦИЯ:</div>';
+                    data.details.forEach(d => {
+                        tooltipHTML += `<div class="tooltip-item" style="border-left-color: ${colorMap[d.originalColor] || '#555'};"><span style="color:${colorMap[d.originalColor] || '#fff'}">${d.name}</span><span class="tooltip-sum">${d.price} ₽</span></div>`;
+                    });
+                    tooltipHTML += `<div class="summary-line" style="margin-top:6px;"><span>ИТОГО</span><span class="tooltip-sum">${data.fullTotal || data.total} ₽</span></div></div>`;
+                    div.innerHTML = tooltipHTML;
+                }
+            }
+
+            if (selectedPackageId === id) {
+                div.classList.add('selected');
+            }
+
+            const idSpan = document.createElement('span');
+            idSpan.className = 'package-id';
+            idSpan.textContent = id;
+
+            const centerCol = document.createElement('div');
+            centerCol.style.textAlign = 'center';
+            centerCol.style.flex = '1';
+            if (data.active) {
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'package-name';
+                nameSpan.textContent = data.name;
+                centerCol.appendChild(nameSpan);
+            } else {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'in-' + id;
+                input.className = 'package-input';
+                input.placeholder = 'Имя';
+                input.value = data.name || '';
+                centerCol.appendChild(input);
+            }
+
+            const rightCol = document.createElement('div');
+            if (data.active) {
+                const status = document.createElement('span');
+                status.className = 'package-status';
+                status.textContent = 'OK';
+                rightCol.appendChild(status);
+            }
+
+            div.appendChild(idSpan);
+            div.appendChild(centerCol);
+            div.appendChild(rightCol);
+            list.appendChild(div);
+        }
+    }
+
+    async function migrateOldPackages() {
+        // Если были старые данные в localStorage, можно перенести
+    }
+
+    window.resetAllPackages = async function() {
+        if (!confirm('Вы уверены, что хотите удалить ВСЕ активированные пакеты? Это действие необратимо.')) return;
+        try {
+            const snapshot = await db.collection("vocal_packages").get();
+            const batch = db.batch();
+            snapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            alert('Все пакеты сброшены');
+        } catch (e) {
+            console.error('Ошибка сброса пакетов:', e);
+            alert('Ошибка при сбросе');
+        }
+    };
+
+    // ---------- СОХРАНЕНИЕ ЧЕКА ----------
+    window.saveSession = async function(event) {
+        if (event) event.preventDefault();
+        let cart = window.currentCart;
+
+        if (!cart || !cart.details || cart.details.length === 0) {
+            alert('Чек пуст! Добавьте услуги.');
+            return;
+        }
+
+        const clientSong = document.getElementById('clientSongInput')?.value || 'Без имени';
+        const time = document.getElementById('bookingTime')?.value || '';
+        const date = selectedDate || new Date().toLocaleDateString('ru-RU');
+
+        if (selectedPackageId) {
+            const input = document.getElementById('in-' + selectedPackageId);
+            if (!input || input.value.trim() === '') {
+                alert('Введите имя для пакета');
+                return;
+            }
+            const packageName = input.value.trim();
+            const packageData = {
+                active: true,
+                name: packageName,
+                details: cart.details,
+                total: cart.total,
+                fullTotal: cart.fullPriceTotal
+            };
+            await db.collection("vocal_packages").doc(selectedPackageId).set(packageData);
+            
+            selectedPackageId = null;
+            document.getElementById('currentSession').classList.remove('session-gold');
+            window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
+            document.getElementById('bookingTime').value = '';
+            document.getElementById('clientSongInput').value = '';
+            renderCart();
+            return;
+        }
+
+        try {
+            const isOnline = navigator.onLine;
+            
+            await vocalCollection.add({
+                date: date,
+                client: clientSong,
+                song: clientSong,
+                time: time,
+                services: cart.details.map(i => i.name).join(', '),
+                details: JSON.parse(JSON.stringify(cart.details)),
+                total: Number(cart.total),
+                fullTotal: Number(cart.fullPriceTotal),
+                timestamp: Date.now(),
+                completed: false
+            });
+
+            if (!isOnline) {
+                alert('📡 Запись сохранена локально. Она будет отправлена при подключении к интернету.');
+            }
+
+            window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
+            document.getElementById('bookingTime').value = '';
+            document.getElementById('clientSongInput').value = '';
+            renderCart();
+        } catch (error) {
+            console.error("Ошибка сохранения:", error);
+            alert('Ошибка при сохранении. Возможно, нет соединения с Firebase.');
+        }
+    };
+
+    window.markCompleted = function(id) {
+        const row = window.crmData.find(r => r.id === id);
+        if (!row) return;
+        vocalCollection.doc(id).update({ completed: !row.completed });
+    };
+
+    window.editRecord = function(id) {
+        openEditModal(id);
+    };
+
+    // ---------- СТАТИСТИКА РАБОТ ----------
+    function updateWorkStats() {
+        if (!window.crmData) return;
+        const completed = window.crmData.filter(r => r.completed === true).length;
+        const pending = window.crmData.filter(r => !r.completed).length;
+        const elDone = document.getElementById('statsCompleted');
+        const elPending = document.getElementById('statsPending');
+        if (elDone) elDone.textContent = completed;
+        if (elPending) elPending.textContent = pending;
+    }
+
+    // ---------- ТАБЛИЦА ----------
+    function updateTable() {
+        const body = document.getElementById('crmTableBody');
+        if(!body || !window.crmData) return;
+        body.innerHTML = '';
+        const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
+        const todayStr = now.toLocaleDateString('ru-RU');
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+
+        const filteredData = window.crmData.filter(r => {
+            if (r.date && r.date.includes(mKey)) return true;
+            if (!r.completed) return true;
+            return false;
+        }).sort((a, b) => {
+            const parseDate = (dateStr) => {
+                const [d, m, y] = dateStr.split('.').map(Number);
+                return new Date(y, m-1, d).getTime();
+            };
+            return parseDate(b.date) - parseDate(a.date);
+        });
+
+        filteredData.forEach((row, index) => {
+            const full = row.fullTotal || row.total || 0;
+            const paid = row.total || 0;
+            const rest = Math.max(0, full - paid);
+            const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
+            const isComplete = perc >= 100;
+            
+            let showTime = true;
+            if (row.time && row.date === todayStr) {
+                const [h, m] = row.time.split(':').map(Number);
+                if (currentTime >= (h * 60 + m)) showTime = false;
+            } else if (row.date !== todayStr) {
+                const [d, mo, y] = row.date.split('.').map(Number);
+                const rowDate = new Date(y, mo-1, d);
+                if (rowDate < new Date().setHours(0,0,0,0)) {
+                    showTime = false;
+                }
+            }
+
+            const tooltipClass = (index < 4) ? 'pos-down' : 'pos-up';
+            let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+            if (row.details && Array.isArray(row.details)) {
+                row.details.forEach(d => {
+                    tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.originalColor] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.originalColor] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Inter, sans-serif; font-weight:600;">${d.price} ₽</span></div>`;
+                });
+            }
+            tooltipHTML += `<div class="summary-line"><span>ИТОГО ЧЕК</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--status-gold)">${rest} ₽</span></div></div>`;
+
+            const tr = document.createElement('tr');
+            if (row.completed) {
+                tr.classList.add('completed-row');
+            }
+
+            const clientDisplay = row.song || row.client || '';
+
+            const isCarriedOver = !row.date.includes(mKey);
+            const carriedLabel = isCarriedOver ? ` <span style="font-size:8px; color:#666; font-family:'Orbitron'; letter-spacing:0.5px;">[${row.date.slice(3)}]</span>` : '';
+
+            if (window.innerWidth <= 992) {
+                tr.ondblclick = (e) => toggleMobileDetails(e, index, row);
+                
+                let topActionsHTML = `<div class="mobile-top-actions">`;
+                if (row.time && showTime) {
+                    topActionsHTML += `<div class="mobile-time">${row.time}</div>`;
+                }
+                topActionsHTML += `<i class="fas fa-pencil-alt mobile-edit-icon" onclick="event.stopPropagation(); editRecord('${row.id}')"></i>`;
+                topActionsHTML += `</div>`;
+
+                tr.innerHTML = `
+                    <td style="position:relative; padding-top: 20px;">
+                        <div id="mobileDetails-${index}" class="mobile-details-overlay">
+                            <div class="mobile-details-close" onclick="event.stopPropagation(); this.parentElement.classList.remove('active')">×</div>
+                            <div class="mobile-details-header">Детализация заказа</div>
+                            <div class="mobile-summary-section">
+                                <div class="mobile-summary-line"><span>ИТОГО ЧЕК</span><span class="privacy-blur">${full} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div>
+                                <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--status-gold)">${rest} ₽</span></div>
+                            </div>
+                        </div>
+                        ${topActionsHTML}
+                        <div class="mobile-row-date">${row.date}${isCarriedOver ? ' <span style="font-size:9px;color:#555;">[перенос]</span>' : ''}</div>
+                        <div class="mobile-row-client">${clientDisplay}</div>
+                        <div class="mobile-row-services">${row.services}</div>
+                        <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
+                        <div class="mobile-actions-grid">
+                            <div class="m-action-btn m-btn-complete" onclick="markCompleted('${row.id}')">Готово</div>
+                            <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
+                            <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
+                        </div>
+                    </td>`;
+            } else {
+                tr.innerHTML = `
+                    <td data-label="ДАТА">${row.date}${carriedLabel}</td>
+                    <td data-label="УЧЕНИК" class="artist-cell">
+                        <div style="position:relative;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                <span class="artist-name" style="font-weight:600; font-size:16px;">${clientDisplay}</span>
+                                ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
+                            </div>
+                            ${row.comment ? `<span class="row-comment">💬 ${row.comment}</span>` : ''}
+                            <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
+                        </div>
+                    </td>
+                    <td class="services-cell" style="position:relative;" data-label="УСЛУГИ">${row.services}${tooltipHTML}</td>
+                    <td class="price-cell privacy-blur">
+                        <span class="paid-amount">${paid}</span> ₽
+                        ${rest > 0 ? `<span class="rest-amount">-${rest}</span>` : ''}
+                    </td>
+                    <td data-label="ДЕЙСТВИЯ">
+                        <div class="action-icons-wrap">
+                            <div class="icon-btn-box icon-complete" onclick="markCompleted('${row.id}')" title="Отметить как готово"><span>готово</span><i class="fas fa-check"></i></div>
+                            <div class="icon-btn-box icon-edit" onclick="editRecord('${row.id}')" title="Редактировать"><span>ред.</span><i class="fas fa-pencil-alt"></i></div>
+                            <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
+                            <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
+                        </div>
+                    </td>`;
+            }
+            body.appendChild(tr);
+        });
+        updateMonthTotal();
+        updateWorkStats();
+        renderCalendar();
+    }
+
+    function updateMonthTotal() {
+        const el = document.getElementById('monthTotal');
+        if(!el || !window.crmData) return;
+        const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+        const sum = window.crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + Number(b.total), 0);
+        el.innerText = sum.toLocaleString() + ' ₽';
+    }
+
+    function updateNextSession(clickedDate = null) {
+        const container = document.getElementById('futureListContainer');
+        const titleEl = document.getElementById('futureTitleLabel');
+        if (!container || !window.crmData) return;
+        const now = new Date();
+        const todayStr = now.toLocaleDateString('ru-RU');
+        let targetDate = clickedDate;
+        if (!targetDate) {
+            const tomorrowStr = new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU');
+            targetDate = window.crmData.some(r => r.date === todayStr && r.time) ? todayStr : tomorrowStr;
+        }
+        const sessions = window.crmData.filter(r => r.date === targetDate && r.time).sort((a, b) => a.time.localeCompare(b.time));
+        container.innerHTML = ''; 
+        if (sessions.length > 0) {
+            if (targetDate === todayStr) {
+                titleEl.innerText = "Записи на сегодня";
+            } else if (targetDate === new Date(now.getTime() + 86400000).toLocaleDateString('ru-RU')) {
+                titleEl.innerText = "Записи на завтра";
+            } else {
+                titleEl.innerText = `Записи на ${targetDate}`;
+            }
+            sessions.forEach(next => {
+                const clientDisplay = next.song || next.client || '';
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'future-item';
+                itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${clientDisplay}</div>`;
+                container.appendChild(itemDiv);
+            });
+            document.getElementById('nextSessionBox').style.borderColor = 'var(--pastel-lavender)';
+        } else {
+            titleEl.innerText = "Нет записей на эту дату";
+            container.innerHTML = `<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>`;
+            document.getElementById('nextSessionBox').style.borderColor = '#111';
+        }
+    }
+
+    function toggleMobileDetails(e, index, row) {
+        if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close') || e.target.closest('.mobile-edit-icon')) return;
+        const overlay = document.getElementById(`mobileDetails-${index}`);
+        if (overlay) overlay.classList.toggle('active');
+    }
+
+    window.addPayment = function(id) {
+        const row = window.crmData.find(r => r.id === id);
+        const full = row.fullTotal || row.total;
+        const remaining = full - row.total;
+        if (remaining <= 0) return alert('Заказ уже полностью оплачен');
+        
+        openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, "pay", function() {
+            const amount = parseInt(document.getElementById('modalInput').value);
+            if (!isNaN(amount) && amount > 0) {
+                vocalCollection.doc(id).update({ total: row.total + amount });
+                closeModal();
+            }
+        }, remaining);
+    };
+
+    window.deleteRow = function(id) {
+        openModal("УДАЛИТЬ ЗАПИСЬ?", "confirm-delete", function() {
+            vocalCollection.doc(id).delete();
+            closeModal();
+        });
+    };
+
+    window.clearFullHistory = function() {
+        if (confirm('Удалить ВСЮ историю? Это необратимо.')) {
+            alert('Функция удаления всей истории не реализована в демо-версии');
+        }
+    };
+
+    window.addEventListener('resize', updateTable);
+
+    // ========== УВЕДОМЛЕНИЯ (с сохранением состояния) ==========
+    function updateNotifButtonUI() {
+        const btn = document.getElementById('mobileNotifBtn');
+        if (!btn) return;
+        if (notificationsEnabled) {
+            btn.style.color = 'var(--status-green)';
+            btn.style.borderColor = 'var(--status-green)';
+            btn.innerHTML = '🔔 Уведомления вкл.';
+        } else {
+            btn.style.color = '#aaa';
+            btn.style.borderColor = '#aaa';
+            btn.innerHTML = '🔔 Уведомления';
+        }
+    }
+
+    function stopNotifications() {
+        if (notifInterval) {
+            clearInterval(notifInterval);
+            notifInterval = null;
+        }
+    }
+
+    function startNotifications() {
+        if (notifInterval) clearInterval(notifInterval);
+        notifInterval = setInterval(checkUpcomingSessions, 60000);
+        checkUpcomingSessions();
+    }
+
+    window.enableNotifications = async function() {
+        if (!('Notification' in window)) {
+            alert('Ваш браузер не поддерживает уведомления');
+            return;
+        }
+        if (notificationsEnabled) {
+            alert('Уведомления уже включены ✅');
+            return;
+        }
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+            notificationsEnabled = true;
+            localStorage.setItem('notificationsEnabled', 'true');
+            startNotifications();
+            updateNotifButtonUI();
+            new Notification('VOCAL CRM', {
+                body: '✅ Уведомления включены! За час до занятия придёт напоминание.',
+                icon: '/favicon.ico'
+            });
+        } else {
+            alert('Разрешите уведомления в настройках браузера, затем нажмите снова.');
+        }
+    };
+
+    function restoreNotifications() {
+        if (!('Notification' in window)) return;
+        const saved = localStorage.getItem('notificationsEnabled');
+        if (saved === 'true' && Notification.permission === 'granted') {
+            notificationsEnabled = true;
+            startNotifications();
+        }
+        updateNotifButtonUI();
+    }
+
+    function initNotifications() {
+        restoreNotifications();
+    }
+
+    function checkUpcomingSessions() {
+        if (!window.crmData || !notificationsEnabled) return;
+        const now = new Date();
+        const todayStr = now.toLocaleDateString('ru-RU');
+        window.crmData.forEach(row => {
+            if (!row.time || row.date !== todayStr) return;
+            const [h, m] = row.time.split(':').map(Number);
+            const sessionTime = new Date();
+            sessionTime.setHours(h, m, 0, 0);
+            const diff = sessionTime - now;
+            if (diff > 55 * 60 * 1000 && diff < 65 * 60 * 1000 && !notifiedSessions.has(row.id)) {
+                notifiedSessions.add(row.id);
+                document.getElementById('notifBadge').classList.add('show');
+                new Notification('⏰ Занятие через час!', {
+                    body: `${row.time} — ${row.song || row.client}`,
+                    icon: '/favicon.ico'
+                });
+                setTimeout(() => {
+                    document.getElementById('notifBadge').classList.remove('show');
+                }, 10000);
+            }
+        });
+    }
+
+    // ========== АНАЛИТИКА ==========
+    window.openAnalyticsModal = function() {
+        document.getElementById('analyticsOverlay').style.display = 'block';
+        document.getElementById('analyticsModal').style.display = 'block';
+        renderAnalytics();
+    };
+
+    window.closeAnalyticsModal = function() {
+        document.getElementById('analyticsOverlay').style.display = 'none';
+        document.getElementById('analyticsModal').style.display = 'none';
+    };
+
+    function renderAnalytics() {
+        if (!window.crmData) return;
+        const now = new Date();
+        const year = now.getFullYear();
+
+        const allPaid = window.crmData.map(r => Number(r.total) || 0).filter(v => v > 0);
+        const avg = allPaid.length ? Math.round(allPaid.reduce((a,b)=>a+b,0) / allPaid.length) : 0;
+        document.getElementById('aAvg').innerText = avg.toLocaleString() + ' ₽';
+        document.getElementById('aAvgSub').innerText = `за ${allPaid.length} записей`;
+
+        document.getElementById('aTotal').innerText = window.crmData.length;
+
+        const yearIncome = window.crmData
+            .filter(r => r.date && r.date.endsWith('.' + year))
+            .reduce((a,b) => a + (Number(b.total)||0), 0);
+        document.getElementById('aYear').innerText = yearIncome.toLocaleString() + ' ₽';
+        document.getElementById('aYearLbl').innerText = year + ' год';
+        document.getElementById('aChartYear').innerText = year;
+
+        const monthNames = ['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
+        const monthlyTotals = Array(12).fill(0);
+        window.crmData.forEach(r => {
+            if (!r.date || !r.date.endsWith('.' + year)) return;
+            const mo = parseInt(r.date.split('.')[1]) - 1;
+            if (mo >= 0 && mo < 12) monthlyTotals[mo] += Number(r.total) || 0;
+        });
+        const maxVal = Math.max(...monthlyTotals, 1);
+        const chartEl = document.getElementById('aChartBars');
+        chartEl.innerHTML = '';
+        monthlyTotals.forEach((val, i) => {
+            const pct = Math.round((val / maxVal) * 140);
+            const isCurrent = i === now.getMonth();
+            const col = document.createElement('div');
+            col.className = 'chart-col';
+            col.innerHTML = `
+                <div class="chart-bar-val">${val > 0 ? (val >= 1000 ? Math.round(val/1000)+'к' : val) : ''}</div>
+                <div class="chart-bar ${val > 0 ? 'has-data' : ''} ${isCurrent ? 'is-current' : ''}" style="height:${pct}px"></div>
+                <div class="chart-bar-lbl">${monthNames[i]}</div>`;
+            chartEl.appendChild(col);
+        });
+
+        const svcCount = {};
+        window.crmData.forEach(r => {
+            if (!r.details) return;
+            r.details.forEach(d => {
+                const key = d.name.replace(' (50%)','').trim();
+                svcCount[key] = (svcCount[key] || 0) + 1;
+            });
+        });
+        const sorted = Object.entries(svcCount).sort((a,b) => b[1]-a[1]).slice(0, 8);
+        const maxCount = sorted[0] ? sorted[0][1] : 1;
+        const svcColors = ['#d9c9e3','#b8e0d4','#f7d6b4','#a9d6e5','#f0b6d6','#f9e7b3','#d9c9e3','#b8e0d4'];
+        const topEl = document.getElementById('aTopServices');
+        topEl.innerHTML = '';
+        sorted.forEach(([name, count], i) => {
+            const pct = Math.round((count / maxCount) * 100);
+            const row = document.createElement('div');
+            row.className = 'svc-row';
+            row.innerHTML = `
+                <span class="svc-name">${name}</span>
+                <div class="svc-track"><div class="svc-fill" style="width:${pct}%; background:${svcColors[i%svcColors.length]}"></div></div>
+                <span class="svc-count">${count}</span>`;
+            topEl.appendChild(row);
+        });
+        if (!sorted.length) topEl.innerHTML = '<div style="color:#aaa; font-size:12px; font-family:Inter;">Нет данных</div>';
+    }
+
+    function updateOnlineStatus() {
+        const indicator = document.getElementById('offlineIndicator');
+        if (navigator.onLine) {
+            indicator.style.display = 'none';
+        } else {
+            indicator.style.display = 'block';
+        }
+    }
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+
+    function logout() {
+        window.location.href = 'index.html';
+    }
+</script>
+
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// ================== КОНФИГУРАЦИЯ FIREBASE ==================
 const firebaseConfig = {
     apiKey: "AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",
     authDomain: "crm-a9450.firebaseapp.com",
@@ -1201,491 +2767,47 @@ const firebaseConfig = {
 
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+db.enablePersistence()
+  .catch((err) => {
+    if (err.code == 'failed-precondition') {
+      console.log('Persistence failed: multiple tabs open');
+    } else if (err.code == 'unimplemented') {
+      console.log('Persistence not supported');
+    }
+  });
+
 const vocalCollection = db.collection("vocal_sessions");
 
-// Включение офлайн-персистентности
-db.enablePersistence().catch(err => console.log('Persistence error:', err));
-
-// ================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==================
-let currentCart = { details: [], total: 0, fullPriceTotal: 0 };
-let currentCalDate = new Date();
-let selectedDate = null;
-let currentEditId = null;
-let currentEditDetails = [];
-let originalBasePrices = [];
-
-const colorMap = { white: '#5e4b6e', purple: '#d9c9e3', red: '#f7d6b4', green: '#b8e0d4', gold: '#f9e7b3', blue: '#a9d6e5' };
-
-// ================== ФУНКЦИИ КОРЗИНЫ ==================
-function addToCart(name, price, colorClass, forceFull = false) {
-    const isPrepaid = document.getElementById('prepaidMode').checked;
-    let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
-    let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
-    currentCart.details.push({ name: finalName, price: finalPrice, basePrice: price, originalColor: colorClass });
-    currentCart.total += finalPrice;
-    currentCart.fullPriceTotal += price;
-    renderCart();
-}
-
-function removeFromCart(index) {
-    const item = currentCart.details[index];
-    currentCart.total -= item.price;
-    currentCart.fullPriceTotal -= item.basePrice;
-    currentCart.details.splice(index, 1);
-    renderCart();
-}
-
-function renderCart() {
-    const container = document.getElementById('cartItems');
-    const totalEl = document.getElementById('cartTotal');
-    if (!container || !totalEl) return;
-    totalEl.innerText = currentCart.total + ' ₽';
-    container.innerHTML = currentCart.details.length === 0 ? 'Пусто...' : '';
-    currentCart.details.forEach((item, i) => {
-        const tag = document.createElement('div');
-        tag.className = `cart-tag tag-${item.originalColor}`;
-        tag.innerHTML = `${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div>`;
-        container.appendChild(tag);
-    });
-}
-
-function applyPrepaidToggle() {
-    const isPrepaid = document.getElementById('prepaidMode').checked;
-    currentCart.total = 0;
-    currentCart.details.forEach(item => {
-        const forceFull = item.name.includes('УРОК');
-        if (isPrepaid && !forceFull) {
-            item.price = item.basePrice / 2;
-            if (!item.name.includes('(50%)')) item.name += ' (50%)';
-        } else {
-            item.price = item.basePrice;
-            item.name = item.name.replace(' (50%)', '');
-        }
-        currentCart.total += item.price;
-    });
-    renderCart();
-}
-
-// ================== МОДАЛЬНЫЕ ОКНА ==================
-function openModal(title, type, confirmCallback, defaultValue = '') {
-    const modal = document.getElementById('customModal');
-    const overlay = document.getElementById('modalOverlay');
-    document.getElementById('modalTitle').innerText = title;
-    document.getElementById('modalInput').value = defaultValue;
-    document.getElementById('modalInput').style.display = (type === 'confirm-delete') ? 'none' : 'block';
-    document.getElementById('modalConfirmBtn').onclick = confirmCallback;
-    modal.style.display = 'block';
-    overlay.style.display = 'block';
-    if (type !== 'confirm-delete') document.getElementById('modalInput').focus();
-}
-
-function closeModal() {
-    document.getElementById('customModal').style.display = 'none';
-    document.getElementById('modalOverlay').style.display = 'none';
-}
-
-// ================== СОХРАНЕНИЕ СЕССИИ ==================
-async function saveSession() {
-    if (!currentCart.details.length) { alert('Чек пуст'); return; }
-    const clientSong = document.getElementById('clientSongInput').value || 'Без имени';
-    const time = document.getElementById('bookingTime').value || '';
-    const date = selectedDate || new Date().toLocaleDateString('ru-RU');
-    try {
-        await vocalCollection.add({
-            date, client: clientSong, song: clientSong, time,
-            services: currentCart.details.map(i => i.name).join(', '),
-            details: JSON.parse(JSON.stringify(currentCart.details)),
-            total: currentCart.total,
-            fullTotal: currentCart.fullPriceTotal,
-            timestamp: Date.now(),
-            completed: false
-        });
-        currentCart = { details: [], total: 0, fullPriceTotal: 0 };
-        document.getElementById('bookingTime').value = '';
-        document.getElementById('clientSongInput').value = '';
-        renderCart();
-    } catch (e) { console.error(e); alert('Ошибка сохранения'); }
-}
-
-// ================== ОБНОВЛЕНИЕ ТАБЛИЦЫ ==================
-function updateTable() {
-    const body = document.getElementById('crmTableBody');
-    if (!body || !window.crmData) return;
-    body.innerHTML = '';
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-    const todayStr = now.toLocaleDateString('ru-RU');
-    const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-
-    const filtered = window.crmData.filter(r => {
-        if (r.date && r.date.includes(mKey)) return true;
-        if (!r.completed) return true;
-        return false;
-    }).sort((a,b) => {
-        const parse = s => new Date(s.split('.').reverse().join('-')).getTime();
-        return parse(b.date) - parse(a.date);
-    });
-
-    filtered.forEach((row, idx) => {
-        const full = row.fullTotal || row.total || 0;
-        const paid = row.total || 0;
-        const rest = Math.max(0, full - paid);
-        const perc = full > 0 ? (paid / full) * 100 : 0;
-        const isComplete = perc >= 100;
-        let showTime = true;
-        if (row.time && row.date === todayStr) {
-            const [h,m] = row.time.split(':').map(Number);
-            if (currentTime >= h*60+m) showTime = false;
-        } else if (row.date !== todayStr) {
-            const [d,mo,y] = row.date.split('.').map(Number);
-            if (new Date(y, mo-1, d) < new Date().setHours(0,0,0,0)) showTime = false;
-        }
-
-        const tooltipClass = (idx < 4) ? 'pos-down' : 'pos-up';
-        let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
-        if (row.details && Array.isArray(row.details)) {
-            row.details.forEach(d => {
-                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.originalColor] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.originalColor] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Inter; font-weight:600;">${d.price} ₽</span></div>`;
-            });
-        }
-        tooltipHTML += `<div class="summary-line"><span>ИТОГО</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--status-gold)">${rest} ₽</span></div></div>`;
-
-        const tr = document.createElement('tr');
-        if (row.completed) tr.classList.add('completed-row');
-        const clientDisplay = row.song || row.client || '';
-        const isCarriedOver = !row.date.includes(mKey);
-        const carriedLabel = isCarriedOver ? ` <span style="font-size:8px; color:#666; font-family:'Orbitron';">[${row.date.slice(3)}]</span>` : '';
-
-        if (window.innerWidth <= 992) {
-            tr.ondblclick = (e) => toggleMobileDetails(e, idx, row);
-            let topActions = `<div class="mobile-top-actions">`;
-            if (row.time && showTime) topActions += `<div class="mobile-time">${row.time}</div>`;
-            topActions += `<i class="fas fa-pencil-alt mobile-edit-icon" onclick="event.stopPropagation(); editRecord('${row.id}')"></i></div>`;
-            tr.innerHTML = `
-                <td style="position:relative; padding-top:20px;">
-                    <div id="mobileDetails-${idx}" class="mobile-details-overlay">
-                        <div class="mobile-details-close" onclick="event.stopPropagation(); this.parentElement.classList.remove('active')">×</div>
-                        <div class="mobile-details-header">Детализация</div>
-                        <div class="mobile-summary-section">
-                            <div class="mobile-summary-line"><span>ИТОГО</span><span class="privacy-blur">${full} ₽</span></div>
-                            <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div>
-                            <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--status-gold)">${rest} ₽</span></div>
-                        </div>
-                    </div>
-                    ${topActions}
-                    <div class="mobile-row-date">${row.date}${isCarriedOver ? ' <span style="font-size:9px;color:#555;">[перенос]</span>' : ''}</div>
-                    <div class="mobile-row-client">${clientDisplay}</div>
-                    <div class="mobile-row-services">${row.services}</div>
-                    <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
-                    <div class="mobile-actions-grid">
-                        <div class="m-action-btn m-btn-complete" onclick="markCompleted('${row.id}')">Готово</div>
-                        <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
-                        <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
-                    </div>
-                </td>`;
-        } else {
-            tr.innerHTML = `
-                <td data-label="ДАТА">${row.date}${carriedLabel}</td>
-                <td data-label="УЧЕНИК" class="artist-cell">
-                    <div style="position:relative;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                            <span class="artist-name" style="font-weight:600; font-size:16px;">${clientDisplay}</span>
-                            ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
-                        </div>
-                        ${row.comment ? `<span class="row-comment">💬 ${row.comment}</span>` : ''}
-                        <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
-                    </div>
-                </td>
-                <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
-                <td class="price-cell privacy-blur">
-                    <span class="paid-amount">${paid}</span> ₽
-                    ${rest > 0 ? `<span class="rest-amount">-${rest}</span>` : ''}
-                </td>
-                <td>
-                    <div class="action-icons-wrap">
-                        <div class="icon-btn-box icon-complete" onclick="markCompleted('${row.id}')" title="Отметить готово"><span>готово</span><i class="fas fa-check"></i></div>
-                        <div class="icon-btn-box icon-edit" onclick="editRecord('${row.id}')" title="Редактировать"><span>ред.</span><i class="fas fa-pencil-alt"></i></div>
-                        <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
-                        <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
-                    </div>
-                </td>`;
-        }
-        body.appendChild(tr);
-    });
-    updateMonthTotal();
-    updateWorkStats();
-    renderCalendar();
-}
-
-// ================== КАЛЕНДАРЬ ==================
-function renderCalendar() {
-    const grid = document.getElementById('calendarDays');
-    if (!grid) return;
-    grid.innerHTML = '';
-    const y = currentCalDate.getFullYear(), m = currentCalDate.getMonth();
-    const monthNames = ["ЯНВАРЬ","ФЕВРАЛЬ","МАРТ","АПРЕЛЬ","МАЙ","ИЮНЬ","ИЮЛЬ","АВГУСТ","СЕНТЯБРЬ","ОКТЯБРЬ","НОЯБРЬ","ДЕКАБРЬ"];
-    document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
-    const firstDay = new Date(y, m, 1).getDay();
-    const lastDate = new Date(y, m+1, 0).getDate();
-    const shift = firstDay === 0 ? 6 : firstDay - 1;
-    for (let i=0; i<shift; i++) grid.innerHTML += '<div></div>';
-    const today = new Date(); today.setHours(0,0,0,0);
-    const todayStr = today.toLocaleDateString('ru-RU');
-    const completed = new Set(window.crmData?.filter(s=>s.completed).map(s=>s.date) || []);
-    for (let d=1; d<=lastDate; d++) {
-        const dayStr = String(d).padStart(2,'0'), monthStr = String(m+1).padStart(2,'0');
-        const dateStr = `${dayStr}.${monthStr}.${y}`;
-        let classList = 'day';
-        if (window.crmData?.some(s=>s.date===dateStr)) {
-            classList += ' has-data';
-            const cellDate = new Date(y, m, d);
-            if (dateStr === todayStr) classList += ' today-session';
-            else if (cellDate < today) classList += ' past-session';
-            else classList += ' future-session';
-        }
-        if (selectedDate === dateStr) classList += ' selected';
-        if (completed.has(dateStr)) classList += ' completed-day';
-        grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
-    }
-}
-
-function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth()+dir); selectedDate=null; updateTable(); renderCalendar(); }
-
-function selectCalendarDate(date) {
-    selectedDate = date;
-    document.getElementById('sessionDateLabel').innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
-    renderCalendar();
-    updateNextSession(date);
-}
-
-function formatTimeInput(i) { let v = i.value.replace(/\D/g,''); if(v.length>=2) v=v.slice(0,2)+':'+v.slice(2,4); i.value=v; }
-
-// ================== ДЕЙСТВИЯ С ЗАПИСЯМИ ==================
-function markCompleted(id) {
-    const row = window.crmData.find(r=>r.id===id);
-    if (row) vocalCollection.doc(id).update({ completed: !row.completed });
-}
-
-function addPayment(id) {
-    const row = window.crmData.find(r=>r.id===id);
-    const full = row.fullTotal || row.total;
-    const remaining = full - row.total;
-    if (remaining<=0) { alert('Уже полностью оплачено'); return; }
-    openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, 'pay', function() {
-        const amount = parseInt(document.getElementById('modalInput').value);
-        if (!isNaN(amount) && amount>0) vocalCollection.doc(id).update({ total: row.total + amount });
-        closeModal();
-    }, remaining);
-}
-
-function deleteRow(id) {
-    openModal("УДАЛИТЬ ЗАПИСЬ?", "confirm-delete", function() { vocalCollection.doc(id).delete(); closeModal(); });
-}
-
-// ================== РЕДАКТИРОВАНИЕ ==================
-function openEditModal(id) {
-    const row = window.crmData.find(r=>r.id===id);
-    if (!row) return;
-    currentEditId = id;
-    currentEditDetails = row.details ? JSON.parse(JSON.stringify(row.details)) : [];
-    originalBasePrices = currentEditDetails.map(item=>item.basePrice||item.price);
-    document.getElementById('editClientName').value = row.client || '';
-    document.getElementById('editPrepaidToggle').checked = false;
-    document.getElementById('editComment').value = row.comment || '';
-    renderEditServices();
-    updateEditTotal();
-    document.getElementById('editModal').style.display = 'block';
-    document.getElementById('editModalOverlay').style.display = 'block';
-}
-
-function closeEditModal() {
-    document.getElementById('editModal').style.display = 'none';
-    document.getElementById('editModalOverlay').style.display = 'none';
-    currentEditId = null;
-}
-
-function toggleEditPrepaid() {
-    const isPrepaid = document.getElementById('editPrepaidToggle').checked;
-    currentEditDetails.forEach((item, index) => {
-        if (item.name.includes('УРОК')) return;
-        if (isPrepaid) {
-            if (item.price === item.basePrice) {
-                item.price = Math.round(item.basePrice / 2);
-                if (!item.name.includes('(50%)')) item.name += ' (50%)';
-            }
-        } else {
-            item.price = item.basePrice;
-            item.name = item.name.replace(' (50%)', '');
-        }
-    });
-    renderEditServices();
-    updateEditTotal();
-}
-
-function renderEditServices() {
-    const container = document.getElementById('editServicesList');
-    container.innerHTML = '';
-    currentEditDetails.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'edit-service-item';
-        div.innerHTML = `
-            <div class="edit-service-info">
-                <div class="edit-service-color" style="background:${colorMap[item.originalColor]}"></div>
-                <span class="edit-service-name">${item.name}</span>
-                <span class="edit-service-price" data-index="${index}">${item.price} ₽</span>
-            </div>
-            <div class="edit-service-actions">
-                <i class="fas fa-pencil-alt edit-service-edit" data-index="${index}" onclick="startInlineEdit(${index}, this)"></i>
-                <i class="fas fa-times edit-service-remove" onclick="removeEditService(${index})"></i>
-            </div>
-        `;
-        container.appendChild(div);
-    });
-    document.getElementById('editAddButtons').innerHTML = `
-        <button class="edit-add-btn btn-white" onclick="addEditService('УРОК ВОКАЛА (60 мин)',1500,'white',true)">+УРОК</button>
-        <button class="edit-add-btn btn-purple" onclick="addEditService('АБОНЕМЕНТ 4',5500,'purple')">АБ4</button>
-        <button class="edit-add-btn btn-red" onclick="addEditService('АБОНЕМЕНТ 8',10000,'red')">АБ8</button>
-        <button class="edit-add-btn btn-green" onclick="addEditService('РАСПЕВКА',500,'green')">РАСП</button>
-        <button class="edit-add-btn btn-blue" onclick="addEditService('ПОСТАНОВКА',2000,'blue')">ПОСТ</button>
-        <button class="edit-add-btn btn-gold" onclick="addEditService('ЗАПИСЬ ДЕМО',3000,'gold')">ДЕМО</button>
-    `;
-}
-
-function addEditService(name, price, color, forceFull=false) {
-    const isPrepaid = document.getElementById('editPrepaidToggle').checked;
-    let finalPrice = (isPrepaid && !forceFull) ? price/2 : price;
-    let finalName = (isPrepaid && !forceFull) ? name+' (50%)' : name;
-    currentEditDetails.push({ name:finalName, price:finalPrice, basePrice:price, originalColor:color });
-    renderEditServices();
-    updateEditTotal();
-}
-
-function removeEditService(index) { currentEditDetails.splice(index,1); renderEditServices(); updateEditTotal(); }
-
-function startInlineEdit(index, iconEl) {
-    const priceSpan = document.querySelector(`.edit-service-price[data-index="${index}"]`);
-    if (!priceSpan) return;
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.value = currentEditDetails[index].price;
-    input.className = 'edit-service-price-input';
-    input.style.width = '80px';
-    priceSpan.parentNode.replaceChild(input, priceSpan);
-    input.focus();
-    input.addEventListener('blur', () => {
-        const newVal = parseInt(input.value);
-        if (!isNaN(newVal) && newVal>0) {
-            currentEditDetails[index].price = newVal;
-            currentEditDetails[index].basePrice = newVal;
-        }
-        renderEditServices();
-        updateEditTotal();
-    });
-    input.addEventListener('keydown', e => { if(e.key==='Enter') input.blur(); });
-}
-
-function updateEditTotal() {
-    const total = currentEditDetails.reduce((s,item)=>s+item.price,0);
-    document.getElementById('editTotal').innerText = `ИТОГО: ${total} ₽`;
-}
-
-function saveEdit() {
-    if (!currentEditId) return;
-    const newClient = document.getElementById('editClientName').value.trim() || 'Без имени';
-    const fullTotal = currentEditDetails.reduce((s,item)=>s+(item.basePrice||item.price),0);
-    const paid = currentEditDetails.reduce((s,item)=>s+item.price,0);
-    const servicesString = currentEditDetails.map(i=>i.name).join(', ');
-    vocalCollection.doc(currentEditId).update({
-        client: newClient,
-        song: newClient,
-        details: currentEditDetails,
-        services: servicesString,
-        total: paid,
-        fullTotal: fullTotal,
-        comment: document.getElementById('editComment').value.trim()
-    }).then(closeEditModal).catch(e=>console.error(e));
-}
-
-// ================== СТАТИСТИКА ==================
-function updateWorkStats() {
-    if (!window.crmData) return;
-    const completed = window.crmData.filter(r=>r.completed).length;
-    const pending = window.crmData.filter(r=>!r.completed).length;
-    document.getElementById('statsCompleted').textContent = completed;
-    document.getElementById('statsPending').textContent = pending;
-}
-
-function updateMonthTotal() {
-    const el = document.getElementById('monthTotal');
-    if (!el || !window.crmData) return;
-    const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-    const sum = window.crmData.filter(r=>r.date.includes(mKey)).reduce((a,b)=>a+Number(b.total),0);
-    el.innerText = sum.toLocaleString() + ' ₽';
-}
-
-function updateNextSession(clickedDate = null) {
-    const container = document.getElementById('futureListContainer');
-    const titleEl = document.getElementById('futureTitleLabel');
-    if (!container || !window.crmData) return;
-    const now = new Date();
-    const todayStr = now.toLocaleDateString('ru-RU');
-    let targetDate = clickedDate;
-    if (!targetDate) {
-        const tomorrowStr = new Date(now.getTime()+86400000).toLocaleDateString('ru-RU');
-        targetDate = window.crmData.some(r=>r.date===todayStr && r.time) ? todayStr : tomorrowStr;
-    }
-    const sessions = window.crmData.filter(r=>r.date===targetDate && r.time).sort((a,b)=>a.time.localeCompare(b.time));
-    container.innerHTML = '';
-    if (sessions.length) {
-        titleEl.innerText = targetDate===todayStr ? "Записи на сегодня" : (targetDate===tomorrowStr?"Записи на завтра":`Записи на ${targetDate}`);
-        sessions.forEach(next => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'future-item';
-            itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.song || next.client}</div>`;
-            container.appendChild(itemDiv);
-        });
-        document.getElementById('nextSessionBox').style.borderColor = 'var(--pastel-lavender)';
-    } else {
-        titleEl.innerText = "Нет записей на эту дату";
-        container.innerHTML = '<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>';
-        document.getElementById('nextSessionBox').style.borderColor = '#aaa';
-    }
-}
-
-function checkPrivacyPassword() {
-    if (document.body.classList.contains('privacy-active')) return;
-    openModal("ВВЕДИТЕ ПАРОЛЬ", "password", function() {
-        if (document.getElementById('modalInput').value === '123') {
-            document.body.classList.add('privacy-active');
-            closeModal();
-            updateTable();
-        } else alert("Неверный пароль");
-    });
-}
-
-function logout() { window.location.href = 'index.html'; }
-
-function toggleMobileDetails(e, idx, row) {
-    if (e.target.closest('.m-action-btn') || e.target.closest('.mobile-details-close') || e.target.closest('.mobile-edit-icon')) return;
-    const overlay = document.getElementById(`mobileDetails-${idx}`);
-    if (overlay) overlay.classList.toggle('active');
-}
-
-// ================== ПОДПИСКА НА ДАННЫЕ ==================
-vocalCollection.orderBy("timestamp", "desc").onSnapshot(snapshot => {
+vocalCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     window.crmData = [];
-    snapshot.forEach(doc => window.crmData.push({ id: doc.id, ...doc.data() }));
+    snapshot.forEach((doc) => {
+        window.crmData.push({ id: doc.id, ...doc.data() });
+    });
     updateTable();
     renderCalendar();
     updateNextSession(selectedDate);
 });
 
-// ================== ИНИЦИАЛИЗАЦИЯ ==================
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+    await migrateOldPackages();
+    subscribePackages();
     renderCalendar();
-    updateTable();
+    initTooltipLogic();
+    initNotifications();
 });
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed', err));
+  });
+}
 </script>
+
+<!-- Кнопка выхода (logout) добавлена в верхний правый угол -->
+<div style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+    <button onclick="logout()" style="background: var(--pastel-lavender); border: none; color: var(--text-dark); padding: 8px 16px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 10px; cursor: pointer; text-transform: uppercase;">Выйти</button>
+</div>
 
 </body>
 </html>
