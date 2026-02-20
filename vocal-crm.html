@@ -254,7 +254,6 @@
             padding-right: 5px;
         }
 
-        /* стили модальных окон (можно оставить как в оригинале, только цвета подправить) */
         .edit-modal {
             width: 400px;
             max-width: 95vw;
@@ -469,7 +468,6 @@
         .m-cancel { background: #eee; color: #888; }
         .m-delete { background: #f7d6b4; color: var(--text-dark); }
 
-        /* calendar */
         .calendar-widget { flex-shrink: 0; margin-bottom: 20px; background: var(--card-bg); border-radius: 10px; padding: 15px; border: 1px solid var(--border-light); }
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .month-name { font-family: 'Orbitron'; color: var(--text-dark); cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
@@ -794,10 +792,8 @@
             .total-box { width: 100%; min-width: 0; }
             .stats-box { width: 100%; }
             .header-right-zone { flex-direction: column; align-items: stretch; }
-            /* остальные мобильные стили аналогично оригиналу, но с заменой цветов */
         }
 
-        /* Стили для кнопки выхода */
         .logout-btn {
             position: absolute;
             top: 20px;
@@ -947,7 +943,6 @@
     </div>
 </div>
 
-<!-- Модальные окна (копируем из оригинальной CRM, но с адаптированными цветами) -->
 <div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
 <div id="customModal" class="custom-modal">
     <div id="modalTitle" class="modal-title">ДОПЛАТА</div>
@@ -958,7 +953,6 @@
     </div>
 </div>
 
-<!-- Модальное окно редактирования -->
 <div id="editModalOverlay" class="modal-overlay" onclick="closeEditModal()"></div>
 <div id="editModal" class="custom-modal edit-modal">
     <div id="editModalTitle" class="modal-title">РЕДАКТИРОВАНИЕ</div>
@@ -983,12 +977,10 @@
     </div>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-// Firebase конфигурация (та же, что и в вашей CRM)
 const firebaseConfig = {
     apiKey: "AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",
     authDomain: "crm-a9450.firebaseapp.com",
@@ -1000,65 +992,481 @@ const firebaseConfig = {
 
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
-// Используем отдельную коллекцию для уроков вокала
 const vocalCollection = db.collection("vocal_sessions");
 
-// Данные CRM
-window.crmData = [];
-window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
+db.enablePersistence().catch(err => console.log('Persistence error:', err));
+
+let currentCart = { details: [], total: 0, fullPriceTotal: 0 };
 let currentCalDate = new Date();
 let selectedDate = null;
 let currentEditId = null;
 let currentEditDetails = [];
+let originalBasePrices = [];
 
-// Цвета для тегов (пастельные)
-const colorMap = { 
-    white: '#5e4b6e', 
-    purple: '#d9c9e3', 
-    red: '#f7d6b4', 
-    green: '#b8e0d4', 
-    gold: '#f9e7b3', 
-    blue: '#a9d6e5' 
-};
+const colorMap = { white: '#5e4b6e', purple: '#d9c9e3', red: '#f7d6b4', green: '#b8e0d4', gold: '#f9e7b3', blue: '#a9d6e5' };
 
-// ---------- Функции (аналогичные оригинальной CRM, но с vocalCollection) ----------
-
-// Здесь нужно скопировать все функции из оригинальной CRM:
-// openModal, closeModal, addToCart, removeFromCart, renderCart, saveSession, 
-// updateTable, renderCalendar, changeMonth, selectCalendarDate, formatTimeInput,
-// applyPrepaidToggle, openEditModal, closeEditModal, toggleEditPrepaid, renderEditServices,
-// addEditService, removeEditService, saveEdit, markCompleted, addPayment, deleteRow,
-// updateWorkStats, updateMonthTotal, updateNextSession, checkPrivacyPassword, logout и т.д.
-// Так как объём кода велик, я предоставлю ключевые функции, но для полноценной работы
-// вам нужно скопировать весь JavaScript из вашей CRM и заменить:
-// - crmCollection на vocalCollection
-// - цвета и названия услуг в соответствующих местах
-
-// В целях экономии места я не буду вставлять все функции повторно.
-// Вы можете скопировать скрипт из вашей CRM (файл index.html, секцию <script>)
-// и заменить:
-// 1. const crmCollection = db.collection("sessions"); → const vocalCollection = db.collection("vocal_sessions");
-// 2. Все обращения к crmCollection заменить на vocalCollection.
-// 3. При необходимости скорректировать цвета и названия услуг в addToCart и других местах.
-
-// Также добавьте функцию logout для возврата на главную:
-function logout() {
-    window.location.href = 'index.html';
+// --- Функции работы с корзиной ---
+function addToCart(name, price, colorClass, forceFull = false) {
+    const isPrepaid = document.getElementById('prepaidMode').checked;
+    let finalPrice = (isPrepaid && !forceFull) ? price / 2 : price;
+    let finalName = (isPrepaid && !forceFull) ? name + ' (50%)' : name;
+    currentCart.details.push({ name: finalName, price: finalPrice, basePrice: price, originalColor: colorClass });
+    currentCart.total += finalPrice;
+    currentCart.fullPriceTotal += price;
+    renderCart();
 }
 
-// Подписка на данные
-vocalCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-    window.crmData = [];
-    snapshot.forEach((doc) => {
-        window.crmData.push({ id: doc.id, ...doc.data() });
+function removeFromCart(index) {
+    const item = currentCart.details[index];
+    currentCart.total -= item.price;
+    currentCart.fullPriceTotal -= item.basePrice;
+    currentCart.details.splice(index, 1);
+    renderCart();
+}
+
+function renderCart() {
+    const container = document.getElementById('cartItems');
+    const totalEl = document.getElementById('cartTotal');
+    if (!container || !totalEl) return;
+    totalEl.innerText = currentCart.total + ' ₽';
+    container.innerHTML = currentCart.details.length === 0 ? 'Пусто...' : '';
+    currentCart.details.forEach((item, i) => {
+        const tag = document.createElement('div');
+        tag.className = `cart-tag tag-${item.originalColor}`;
+        tag.innerHTML = `${item.name}<div class="tag-remove" onclick="removeFromCart(${i})">×</div>`;
+        container.appendChild(tag);
     });
+}
+
+function applyPrepaidToggle() {
+    const isPrepaid = document.getElementById('prepaidMode').checked;
+    currentCart.total = 0;
+    currentCart.details.forEach(item => {
+        const forceFull = item.name.includes('УРОК');
+        if (isPrepaid && !forceFull) {
+            item.price = item.basePrice / 2;
+            if (!item.name.includes('(50%)')) item.name += ' (50%)';
+        } else {
+            item.price = item.basePrice;
+            item.name = item.name.replace(' (50%)', '');
+        }
+        currentCart.total += item.price;
+    });
+    renderCart();
+}
+
+// --- Модальные окна ---
+function openModal(title, type, confirmCallback, defaultValue = '') {
+    const modal = document.getElementById('customModal');
+    const overlay = document.getElementById('modalOverlay');
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalInput').value = defaultValue;
+    document.getElementById('modalInput').style.display = (type === 'confirm-delete') ? 'none' : 'block';
+    document.getElementById('modalConfirmBtn').onclick = confirmCallback;
+    modal.style.display = 'block';
+    overlay.style.display = 'block';
+    if (type !== 'confirm-delete') document.getElementById('modalInput').focus();
+}
+
+function closeModal() {
+    document.getElementById('customModal').style.display = 'none';
+    document.getElementById('modalOverlay').style.display = 'none';
+}
+
+// --- Сохранение сессии ---
+async function saveSession() {
+    if (!currentCart.details.length) { alert('Чек пуст'); return; }
+    const clientSong = document.getElementById('clientSongInput').value || 'Без имени';
+    const time = document.getElementById('bookingTime').value || '';
+    const date = selectedDate || new Date().toLocaleDateString('ru-RU');
+    try {
+        await vocalCollection.add({
+            date, client: clientSong, song: clientSong, time,
+            services: currentCart.details.map(i => i.name).join(', '),
+            details: JSON.parse(JSON.stringify(currentCart.details)),
+            total: currentCart.total,
+            fullTotal: currentCart.fullPriceTotal,
+            timestamp: Date.now(),
+            completed: false
+        });
+        currentCart = { details: [], total: 0, fullPriceTotal: 0 };
+        document.getElementById('bookingTime').value = '';
+        document.getElementById('clientSongInput').value = '';
+        renderCart();
+    } catch (e) { console.error(e); alert('Ошибка сохранения'); }
+}
+
+// --- Обновление таблицы ---
+function updateTable() {
+    const body = document.getElementById('crmTableBody');
+    if (!body || !window.crmData) return;
+    body.innerHTML = '';
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    const todayStr = now.toLocaleDateString('ru-RU');
+    const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+
+    const filtered = window.crmData.filter(r => {
+        if (r.date && r.date.includes(mKey)) return true;
+        if (!r.completed) return true;
+        return false;
+    }).sort((a,b) => {
+        const parse = s => new Date(s.split('.').reverse().join('-')).getTime();
+        return parse(b.date) - parse(a.date);
+    });
+
+    filtered.forEach((row, idx) => {
+        const full = row.fullTotal || row.total || 0;
+        const paid = row.total || 0;
+        const rest = Math.max(0, full - paid);
+        const perc = full > 0 ? (paid / full) * 100 : 0;
+        const isComplete = perc >= 100;
+        let showTime = true;
+        if (row.time && row.date === todayStr) {
+            const [h,m] = row.time.split(':').map(Number);
+            if (currentTime >= h*60+m) showTime = false;
+        } else if (row.date !== todayStr) {
+            const [d,mo,y] = row.date.split('.').map(Number);
+            if (new Date(y, mo-1, d) < new Date().setHours(0,0,0,0)) showTime = false;
+        }
+
+        const tooltipClass = (idx < 4) ? 'pos-down' : 'pos-up';
+        let tooltipHTML = `<div class="history-tooltip ${tooltipClass}"><div style="color:#888; font-family:Orbitron; font-size:9px; border-bottom:1px solid #222; padding-bottom:5px; margin-bottom:10px;">ДЕТАЛИЗАЦИЯ:</div>`;
+        if (row.details && Array.isArray(row.details)) {
+            row.details.forEach(d => {
+                tooltipHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11px; border-left:2px solid ${colorMap[d.originalColor] || '#555'}; padding-left:8px;"><span style="color:${colorMap[d.originalColor] || '#fff'}">${d.name}</span><span class="tooltip-sum" style="font-family:Inter; font-weight:600;">${d.price} ₽</span></div>`;
+            });
+        }
+        tooltipHTML += `<div class="summary-line"><span>ИТОГО</span><span class="tooltip-sum">${full} ₽</span></div><div class="summary-line"><span>ВНЕСЕНО</span><span class="tooltip-sum" style="color:var(--status-green)">${paid} ₽</span></div><div class="summary-line"><span>ОСТАТОК</span><span class="tooltip-sum" style="color:var(--status-gold)">${rest} ₽</span></div></div>`;
+
+        const tr = document.createElement('tr');
+        if (row.completed) tr.classList.add('completed-row');
+        const clientDisplay = row.song || row.client || '';
+        const isCarriedOver = !row.date.includes(mKey);
+        const carriedLabel = isCarriedOver ? ` <span style="font-size:8px; color:#666; font-family:'Orbitron';">[${row.date.slice(3)}]</span>` : '';
+
+        if (window.innerWidth <= 992) {
+            tr.ondblclick = (e) => toggleMobileDetails(e, idx, row);
+            let topActions = `<div class="mobile-top-actions">`;
+            if (row.time && showTime) topActions += `<div class="mobile-time">${row.time}</div>`;
+            topActions += `<i class="fas fa-pencil-alt mobile-edit-icon" onclick="event.stopPropagation(); editRecord('${row.id}')"></i></div>`;
+            tr.innerHTML = `
+                <td style="position:relative; padding-top:20px;">
+                    <div id="mobileDetails-${idx}" class="mobile-details-overlay">
+                        <div class="mobile-details-close" onclick="event.stopPropagation(); this.parentElement.classList.remove('active')">×</div>
+                        <div class="mobile-details-header">Детализация</div>
+                        <div class="mobile-summary-section">
+                            <div class="mobile-summary-line"><span>ИТОГО</span><span class="privacy-blur">${full} ₽</span></div>
+                            <div class="mobile-summary-line"><span>ВНЕСЕНО</span><span class="privacy-blur" style="color:var(--status-green)">${paid} ₽</span></div>
+                            <div class="mobile-summary-line"><span>ОСТАТОК</span><span class="privacy-blur" style="color:var(--status-gold)">${rest} ₽</span></div>
+                        </div>
+                    </div>
+                    ${topActions}
+                    <div class="mobile-row-date">${row.date}${isCarriedOver ? ' <span style="font-size:9px;color:#555;">[перенос]</span>' : ''}</div>
+                    <div class="mobile-row-client">${clientDisplay}</div>
+                    <div class="mobile-row-services">${row.services}</div>
+                    <div class="mobile-progress-wrapper"><div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div></div>
+                    <div class="mobile-actions-grid">
+                        <div class="m-action-btn m-btn-complete" onclick="markCompleted('${row.id}')">Готово</div>
+                        <div class="m-action-btn m-btn-pay" onclick="addPayment('${row.id}')">Доплата</div>
+                        <div class="m-action-btn m-btn-del" onclick="deleteRow('${row.id}')">Удалить</div>
+                    </div>
+                </td>`;
+        } else {
+            tr.innerHTML = `
+                <td data-label="ДАТА">${row.date}${carriedLabel}</td>
+                <td data-label="УЧЕНИК" class="artist-cell">
+                    <div style="position:relative;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <span class="artist-name" style="font-weight:600; font-size:16px;">${clientDisplay}</span>
+                            ${(row.time && showTime) ? `<span class="table-time-inline">${row.time}</span>` : ''}
+                        </div>
+                        ${row.comment ? `<span class="row-comment">💬 ${row.comment}</span>` : ''}
+                        <div class="progress-container"><div class="progress-bar ${isComplete ? 'complete' : ''}" style="width:${perc}%"></div></div>
+                    </div>
+                </td>
+                <td class="services-cell" style="position:relative;">${row.services}${tooltipHTML}</td>
+                <td class="price-cell privacy-blur">
+                    <span class="paid-amount">${paid}</span> ₽
+                    ${rest > 0 ? `<span class="rest-amount">-${rest}</span>` : ''}
+                </td>
+                <td>
+                    <div class="action-icons-wrap">
+                        <div class="icon-btn-box icon-complete" onclick="markCompleted('${row.id}')" title="Отметить готово"><span>готово</span><i class="fas fa-check"></i></div>
+                        <div class="icon-btn-box icon-edit" onclick="editRecord('${row.id}')" title="Редактировать"><span>ред.</span><i class="fas fa-pencil-alt"></i></div>
+                        <div class="icon-btn-box" onclick="addPayment('${row.id}')"><span>доплата</span><i class="fas fa-wallet"></i></div>
+                        <div class="icon-btn-box icon-delete" onclick="deleteRow('${row.id}')"><span>удалить</span><i class="fas fa-trash"></i></div>
+                    </div>
+                </td>`;
+        }
+        body.appendChild(tr);
+    });
+    updateMonthTotal();
+    updateWorkStats();
+    renderCalendar();
+}
+
+// --- Календарь ---
+function renderCalendar() {
+    const grid = document.getElementById('calendarDays');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const y = currentCalDate.getFullYear(), m = currentCalDate.getMonth();
+    const monthNames = ["ЯНВАРЬ","ФЕВРАЛЬ","МАРТ","АПРЕЛЬ","МАЙ","ИЮНЬ","ИЮЛЬ","АВГУСТ","СЕНТЯБРЬ","ОКТЯБРЬ","НОЯБРЬ","ДЕКАБРЬ"];
+    document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
+    const firstDay = new Date(y, m, 1).getDay();
+    const lastDate = new Date(y, m+1, 0).getDate();
+    const shift = firstDay === 0 ? 6 : firstDay - 1;
+    for (let i=0; i<shift; i++) grid.innerHTML += '<div></div>';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayStr = today.toLocaleDateString('ru-RU');
+    const completed = new Set(window.crmData?.filter(s=>s.completed).map(s=>s.date) || []);
+    for (let d=1; d<=lastDate; d++) {
+        const dayStr = String(d).padStart(2,'0'), monthStr = String(m+1).padStart(2,'0');
+        const dateStr = `${dayStr}.${monthStr}.${y}`;
+        let classList = 'day';
+        if (window.crmData?.some(s=>s.date===dateStr)) {
+            classList += ' has-data';
+            const cellDate = new Date(y, m, d);
+            if (dateStr === todayStr) classList += ' today-session';
+            else if (cellDate < today) classList += ' past-session';
+            else classList += ' future-session';
+        }
+        if (selectedDate === dateStr) classList += ' selected';
+        if (completed.has(dateStr)) classList += ' completed-day';
+        grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
+    }
+}
+
+function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth()+dir); selectedDate=null; updateTable(); renderCalendar(); }
+
+function selectCalendarDate(date) {
+    selectedDate = date;
+    document.getElementById('sessionDateLabel').innerText = `ТЕКУЩИЙ ЧЕК (${date}):`;
+    renderCalendar();
+    updateNextSession(date);
+}
+
+function formatTimeInput(i) { let v = i.value.replace(/\D/g,''); if(v.length>=2) v=v.slice(0,2)+':'+v.slice(2,4); i.value=v; }
+
+// --- Действия с записями ---
+function markCompleted(id) {
+    const row = window.crmData.find(r=>r.id===id);
+    if (row) vocalCollection.doc(id).update({ completed: !row.completed });
+}
+
+function addPayment(id) {
+    const row = window.crmData.find(r=>r.id===id);
+    const full = row.fullTotal || row.total;
+    const remaining = full - row.total;
+    if (remaining<=0) { alert('Уже полностью оплачено'); return; }
+    openModal(`ДОПЛАТА: ${row.client}\nОСТАТОК: ${remaining} ₽`, 'pay', function() {
+        const amount = parseInt(document.getElementById('modalInput').value);
+        if (!isNaN(amount) && amount>0) vocalCollection.doc(id).update({ total: row.total + amount });
+        closeModal();
+    }, remaining);
+}
+
+function deleteRow(id) {
+    openModal("УДАЛИТЬ ЗАПИСЬ?", "confirm-delete", function() { vocalCollection.doc(id).delete(); closeModal(); });
+}
+
+// --- Редактирование ---
+function openEditModal(id) {
+    const row = window.crmData.find(r=>r.id===id);
+    if (!row) return;
+    currentEditId = id;
+    currentEditDetails = row.details ? JSON.parse(JSON.stringify(row.details)) : [];
+    originalBasePrices = currentEditDetails.map(item=>item.basePrice||item.price);
+    document.getElementById('editClientName').value = row.client || '';
+    document.getElementById('editPrepaidToggle').checked = false;
+    document.getElementById('editComment').value = row.comment || '';
+    renderEditServices();
+    updateEditTotal();
+    document.getElementById('editModal').style.display = 'block';
+    document.getElementById('editModalOverlay').style.display = 'block';
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+    document.getElementById('editModalOverlay').style.display = 'none';
+    currentEditId = null;
+}
+
+function toggleEditPrepaid() {
+    const isPrepaid = document.getElementById('editPrepaidToggle').checked;
+    currentEditDetails.forEach((item, index) => {
+        if (item.name.includes('УРОК')) return;
+        if (isPrepaid) {
+            if (item.price === item.basePrice) {
+                item.price = Math.round(item.basePrice / 2);
+                if (!item.name.includes('(50%)')) item.name += ' (50%)';
+            }
+        } else {
+            item.price = item.basePrice;
+            item.name = item.name.replace(' (50%)', '');
+        }
+    });
+    renderEditServices();
+    updateEditTotal();
+}
+
+function renderEditServices() {
+    const container = document.getElementById('editServicesList');
+    container.innerHTML = '';
+    currentEditDetails.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'edit-service-item';
+        div.innerHTML = `
+            <div class="edit-service-info">
+                <div class="edit-service-color" style="background:${colorMap[item.originalColor]}"></div>
+                <span class="edit-service-name">${item.name}</span>
+                <span class="edit-service-price" data-index="${index}">${item.price} ₽</span>
+            </div>
+            <div class="edit-service-actions">
+                <i class="fas fa-pencil-alt edit-service-edit" data-index="${index}" onclick="startInlineEdit(${index}, this)"></i>
+                <i class="fas fa-times edit-service-remove" onclick="removeEditService(${index})"></i>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    document.getElementById('editAddButtons').innerHTML = `
+        <button class="edit-add-btn btn-white" onclick="addEditService('УРОК ВОКАЛА (60 мин)',1500,'white',true)">+УРОК</button>
+        <button class="edit-add-btn btn-purple" onclick="addEditService('АБОНЕМЕНТ 4',5500,'purple')">АБ4</button>
+        <button class="edit-add-btn btn-red" onclick="addEditService('АБОНЕМЕНТ 8',10000,'red')">АБ8</button>
+        <button class="edit-add-btn btn-green" onclick="addEditService('РАСПЕВКА',500,'green')">РАСП</button>
+        <button class="edit-add-btn btn-blue" onclick="addEditService('ПОСТАНОВКА',2000,'blue')">ПОСТ</button>
+        <button class="edit-add-btn btn-gold" onclick="addEditService('ЗАПИСЬ ДЕМО',3000,'gold')">ДЕМО</button>
+    `;
+}
+
+function addEditService(name, price, color, forceFull=false) {
+    const isPrepaid = document.getElementById('editPrepaidToggle').checked;
+    let finalPrice = (isPrepaid && !forceFull) ? price/2 : price;
+    let finalName = (isPrepaid && !forceFull) ? name+' (50%)' : name;
+    currentEditDetails.push({ name:finalName, price:finalPrice, basePrice:price, originalColor:color });
+    renderEditServices();
+    updateEditTotal();
+}
+
+function removeEditService(index) { currentEditDetails.splice(index,1); renderEditServices(); updateEditTotal(); }
+
+function startInlineEdit(index, iconEl) {
+    const priceSpan = document.querySelector(`.edit-service-price[data-index="${index}"]`);
+    if (!priceSpan) return;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = currentEditDetails[index].price;
+    input.className = 'edit-service-price-input';
+    input.style.width = '80px';
+    priceSpan.parentNode.replaceChild(input, priceSpan);
+    input.focus();
+    input.addEventListener('blur', () => {
+        const newVal = parseInt(input.value);
+        if (!isNaN(newVal) && newVal>0) {
+            currentEditDetails[index].price = newVal;
+            currentEditDetails[index].basePrice = newVal;
+        }
+        renderEditServices();
+        updateEditTotal();
+    });
+    input.addEventListener('keydown', e => { if(e.key==='Enter') input.blur(); });
+}
+
+function updateEditTotal() {
+    const total = currentEditDetails.reduce((s,item)=>s+item.price,0);
+    document.getElementById('editTotal').innerText = `ИТОГО: ${total} ₽`;
+}
+
+function saveEdit() {
+    if (!currentEditId) return;
+    const newClient = document.getElementById('editClientName').value.trim() || 'Без имени';
+    const fullTotal = currentEditDetails.reduce((s,item)=>s+(item.basePrice||item.price),0);
+    const paid = currentEditDetails.reduce((s,item)=>s+item.price,0);
+    const servicesString = currentEditDetails.map(i=>i.name).join(', ');
+    vocalCollection.doc(currentEditId).update({
+        client: newClient,
+        song: newClient,
+        details: currentEditDetails,
+        services: servicesString,
+        total: paid,
+        fullTotal: fullTotal,
+        comment: document.getElementById('editComment').value.trim()
+    }).then(closeEditModal).catch(e=>console.error(e));
+}
+
+// --- Статистика и доход ---
+function updateWorkStats() {
+    if (!window.crmData) return;
+    const completed = window.crmData.filter(r=>r.completed).length;
+    const pending = window.crmData.filter(r=>!r.completed).length;
+    document.getElementById('statsCompleted').textContent = completed;
+    document.getElementById('statsPending').textContent = pending;
+}
+
+function updateMonthTotal() {
+    const el = document.getElementById('monthTotal');
+    if (!el || !window.crmData) return;
+    const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
+    const sum = window.crmData.filter(r=>r.date.includes(mKey)).reduce((a,b)=>a+Number(b.total),0);
+    el.innerText = sum.toLocaleString() + ' ₽';
+}
+
+function updateNextSession(clickedDate = null) {
+    const container = document.getElementById('futureListContainer');
+    const titleEl = document.getElementById('futureTitleLabel');
+    if (!container || !window.crmData) return;
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('ru-RU');
+    let targetDate = clickedDate;
+    if (!targetDate) {
+        const tomorrowStr = new Date(now.getTime()+86400000).toLocaleDateString('ru-RU');
+        targetDate = window.crmData.some(r=>r.date===todayStr && r.time) ? todayStr : tomorrowStr;
+    }
+    const sessions = window.crmData.filter(r=>r.date===targetDate && r.time).sort((a,b)=>a.time.localeCompare(b.time));
+    container.innerHTML = '';
+    if (sessions.length) {
+        titleEl.innerText = targetDate===todayStr ? "Записи на сегодня" : (targetDate===tomorrowStr?"Записи на завтра":`Записи на ${targetDate}`);
+        sessions.forEach(next => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'future-item';
+            itemDiv.innerHTML = `<div class="future-date">${next.time}</div><div class="future-client">${next.song || next.client}</div>`;
+            container.appendChild(itemDiv);
+        });
+        document.getElementById('nextSessionBox').style.borderColor = 'var(--pastel-lavender)';
+    } else {
+        titleEl.innerText = "Нет записей на эту дату";
+        container.innerHTML = '<div class="future-item"><div class="future-date">--</div><div class="future-client">Нет записей</div></div>';
+        document.getElementById('nextSessionBox').style.borderColor = '#aaa';
+    }
+}
+
+function checkPrivacyPassword() {
+    if (document.body.classList.contains('privacy-active')) return;
+    openModal("ВВЕДИТЕ ПАРОЛЬ", "password", function() {
+        if (document.getElementById('modalInput').value === '123') {
+            document.body.classList.add('privacy-active');
+            closeModal();
+            updateTable();
+        } else alert("Неверный пароль");
+    });
+}
+
+function logout() { window.location.href = 'index.html'; }
+
+// Подписка на данные
+vocalCollection.orderBy("timestamp", "desc").onSnapshot(snapshot => {
+    window.crmData = [];
+    snapshot.forEach(doc => window.crmData.push({ id: doc.id, ...doc.data() }));
     updateTable();
     renderCalendar();
     updateNextSession(selectedDate);
 });
 
-// Остальные функции скопируйте из вашей CRM (они полностью рабочие)
+window.addEventListener('load', () => {
+    renderCalendar();
+    updateTable();
+});
 </script>
 
 </body>
