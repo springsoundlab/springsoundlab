@@ -1,26 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoundBetter клон</title>
-    <!-- Font Awesome 6 (free) для иконок -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPRING SOUND LAB | на SoundBetter</title>
+    <!-- Шрифты и иконки как в SSL, но сохранён стиль SoundBetter -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;500;700;800&family=Montserrat:wght@100;200;300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Open Sans', sans-serif;
-        }
-
-        body {
-            background-color: #ffffff;
-            color: #1e1e1e;
-            line-height: 1.5;
-        }
-
-        /* цвета как на soundbetter */
+        /* ----- ОСНОВНЫЕ ПЕРЕМЕННЫЕ (SoundBetter + SSL акценты) ----- */
         :root {
             --primary-green: #1ed760;
             --dark-bg: #181818;
@@ -29,21 +17,62 @@
             --text-dark: #222;
             --text-gray: #6a6a6a;
             --accent-blue: #3b78e7;
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --neon-red: #ff003c;
+            --neon-gold: #ffcc00;
+            --neon-pink: #ff44aa;
+            --neon-green: #00ff88;
+            --youtube-red: #ff0000;
+            --soft-glow: rgba(0, 242, 255, 0.25);
+            --bg-dark: #020205;
+            --transition-speed: 0.4s;
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* ----- ФОН как в SoundBetter (тёмный) ----- */
+        .studio-background {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background-image: linear-gradient(rgba(2, 2, 5, 0.85), rgba(2, 2, 5, 0.98)), url('https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2070&auto=format&fit=crop'); /* заглушка */
+            background-size: cover;
+            background-position: center;
+            animation: backgroundSubtleScale 80s infinite alternate ease-in-out;
+        }
+
+        @keyframes backgroundSubtleScale {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
+        }
+
+        /* ----- СЕТКА И КОНТЕЙНЕР (как в SoundBetter) ----- */
         .container {
             max-width: 1280px;
             margin: 0 auto;
             padding: 0 24px;
         }
 
-        /* ---- шапка (header) как на скрине ---- */
+        /* ----- ШАПКА (микс SoundBetter + SSL) ----- */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px 0;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             flex-wrap: wrap;
         }
 
@@ -51,7 +80,7 @@
             font-size: 1.8rem;
             font-weight: 700;
             letter-spacing: -0.5px;
-            color: #000;
+            color: #fff;
         }
 
         .nav-links {
@@ -60,7 +89,7 @@
             align-items: center;
             font-weight: 500;
             font-size: 0.95rem;
-            color: #2c2c2c;
+            color: #ddd;
         }
 
         .nav-links a {
@@ -75,19 +104,20 @@
 
         .signin-btn {
             background: transparent;
-            border: 1px solid #ccc;
+            border: 1px solid #444;
             padding: 8px 18px;
             border-radius: 40px;
             font-weight: 600;
             transition: all 0.2s;
+            color: white;
         }
 
         .signin-btn:hover {
-            background: #f2f2f2;
-            border-color: #999;
+            background: #333;
+            border-color: #888;
         }
 
-        /* ---- hero section (Finish Your Song) ---- */
+        /* ----- HERO (Finish Your Song → адаптация под SSL) ----- */
         .hero {
             padding: 60px 0 40px;
             text-align: center;
@@ -99,13 +129,17 @@
             letter-spacing: -2px;
             line-height: 1.1;
             margin-bottom: 24px;
+            background: linear-gradient(90deg, #fff, var(--neon-blue), var(--neon-purple), #fff);
+            background-size: 300% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .hero p {
             font-size: 1.3rem;
             max-width: 800px;
             margin: 0 auto 36px;
-            color: var(--text-gray);
+            color: rgba(255,255,255,0.7);
         }
 
         .hero-buttons {
@@ -122,7 +156,7 @@
             font-size: 1rem;
             border: none;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
             text-decoration: none;
             display: inline-block;
         }
@@ -140,27 +174,14 @@
         }
 
         .btn-secondary {
-            background-color: var(--accent-blue);
+            background-color: var(--neon-purple);
             color: white;
         }
 
         .btn-secondary:hover {
-            background-color: #2f68d6;
+            background-color: #a315d2;
             transform: scale(1.02);
-            box-shadow: 0 6px 14px rgba(59,120,231,0.25);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #222;
-            color: #222;
-            padding: 12px 34px;
-        }
-
-        .btn-outline:hover {
-            background: #222;
-            color: white;
-            transform: scale(1.02);
+            box-shadow: 0 6px 14px rgba(188,19,254,0.3);
         }
 
         .watch-video {
@@ -168,7 +189,7 @@
             align-items: center;
             gap: 8px;
             font-weight: 600;
-            color: #222;
+            color: white;
             text-decoration: none;
             padding: 0 10px;
         }
@@ -178,448 +199,817 @@
             color: var(--primary-green);
         }
 
-        /* ---- категории (producers, singers, mixing engineers) первый ряд ---- */
+        /* ----- СОЦИАЛЬНЫЕ КНОПКИ (из SSL) ----- */
+        .header-socials {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .social-btn {
+            color: #fff;
+            font-size: 2.5rem;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .social-btn.vk:hover { color: #0077ff; }
+        .social-btn.tg:hover { color: #24A1DE; }
+        .social-btn.yt:hover { color: var(--youtube-red); }
+        .social-btn.ig:hover { color: #f09433; }
+
+        /* ----- ТЕЛЕФОННЫЙ БЛОК (из SSL) ----- */
+        .phone-box-container {
+            margin: 30px auto 0;
+            padding: 20px 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background-color: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.4s;
+        }
+
+        .phone-box-container:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px var(--soft-glow);
+        }
+
+        .header-phone {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            color: #fff;
+            letter-spacing: 5px;
+        }
+
+        .phone-hint {
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+        }
+
+        /* ----- ЗАГОЛОВКИ СЕКЦИЙ (как в SoundBetter) ----- */
         .section-title {
             font-size: 2rem;
             font-weight: 700;
-            margin: 40px 0 24px;
+            margin: 60px 0 24px;
             letter-spacing: -1px;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
         }
 
-        .category-cards {
+        /* ----- КАРТОЧКИ УСЛУГ (микс дизайна SoundBetter и SSL) ----- */
+        .module-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
 
-        .category-card {
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 28px 16px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1.2rem;
-            transition: all 0.2s ease;
-            cursor: default;
-            border: 1px solid transparent;
-        }
-
-        .category-card i {
-            font-size: 2.2rem;
-            margin-bottom: 12px;
-            color: #3a3a3a;
-        }
-
-        .category-card:hover {
-            background-color: #ececec;
-            border-color: #ccc;
-            transform: translateY(-4px);
-            box-shadow: 0 12px 22px -10px rgba(0,0,0,0.1);
-        }
-
-        /* ---- вторая строка категорий и спецблок "Taylor Swift's Drummer" ---- */
-        .categories-row-two {
+        .module {
+            background-color: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 30px 25px;
+            transition: all var(--transition-speed);
+            backdrop-filter: blur(2px);
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin: 20px 0 40px;
-        }
-
-        .cat-small {
-            background: var(--card-bg);
-            border-radius: 40px;
-            padding: 12px 28px;
-            font-weight: 500;
-            transition: 0.15s;
-            white-space: nowrap;
-        }
-
-        .cat-small:hover {
-            background: #e0e0e0;
-            transform: scale(1.02);
-        }
-
-        .drummer-block {
-            background: #191919;
-            color: white;
-            border-radius: 100px;
-            padding: 12px 32px;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            margin-left: auto;
-        }
-
-        .drummer-block i {
-            color: var(--primary-green);
-            font-size: 1.4rem;
-        }
-
-        /* ---- How SoundBetter works (из реального сайта) ---- */
-        .how-it-works {
-            background: #fafafa;
-            padding: 60px 0;
-            margin: 40px 0;
-            border-radius: 48px;
-        }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .step-item {
-            background: white;
-            border-radius: 32px;
-            padding: 32px 24px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.02);
-            border: 1px solid var(--border-light);
-        }
-
-        .step-number {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: #ddd;
-            line-height: 1;
-            margin-bottom: 12px;
-        }
-
-        .step-item h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        /* ---- отзывы (из реального сайта) ---- */
-        .reviews {
-            padding: 40px 0;
-        }
-
-        .reviews-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-top: 32px;
-        }
-
-        .review-card {
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 24px;
-            font-style: italic;
-            border: 1px solid var(--border-light);
-        }
-
-        .review-card p {
-            margin-bottom: 16px;
-            color: #2e2e2e;
-        }
-
-        .review-author {
-            font-weight: 700;
-            color: #000;
-            font-style: normal;
-        }
-
-        /* ---- browse block (как на третьем скрине) ---- */
-        .browse-section {
-            background: #f2f2f2;
-            border-radius: 48px;
-            padding: 40px 32px;
-            margin: 40px 0;
-        }
-
-        .browse-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px 24px;
-            align-items: center;
-            margin: 20px 0 20px;
-        }
-
-        .browse-tag {
-            font-size: 1.2rem;
-            font-weight: 500;
-            padding: 8px 0;
-            border-bottom: 2px solid transparent;
-            transition: 0.15s;
-            cursor: default;
-        }
-
-        .browse-tag:hover {
-            border-bottom-color: var(--primary-green);
-        }
-
-        .post-job-btn {
-            background: #000;
-            color: white;
-            padding: 14px 36px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            border: none;
-            margin-left: auto;
-            transition: 0.2s;
-        }
-
-        .post-job-btn:hover {
-            background: #2d2d2d;
-            transform: scale(1.02);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-        }
-
-        /* ---- преимущества (пять пунктов) ---- */
-        .trust-section {
-            padding: 40px 0 60px;
-        }
-
-        .trust-header {
-            font-size: 2.4rem;
-            font-weight: 800;
-            max-width: 600px;
-            line-height: 1.2;
-            margin-bottom: 48px;
-        }
-
-        .trust-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 40px 60px;
-        }
-
-        .trust-item {
-            display: flex;
-            gap: 16px;
+            flex-direction: column;
             align-items: flex-start;
+            height: 100%;
         }
 
-        .trust-item i {
-            color: var(--primary-green);
-            font-size: 1.8rem;
-            flex-shrink: 0;
+        .module:hover {
+            background-color: rgba(255,255,255,0.05);
+            transform: translateY(-8px);
+            backdrop-filter: blur(15px);
         }
 
-        .trust-item h4 {
-            font-size: 1.4rem;
+        /* подсветка пакетов (из SSL) */
+        .module.rec:hover { border-color: #ffffff; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+        .module.start:hover { border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(188,19,254,0.2); }
+        .module.artist:hover { border-color: var(--neon-red); box-shadow: 0 0 15px rgba(255,0,60,0.2); }
+        .module.platinum:hover { border-color: var(--neon-gold); box-shadow: 0 0 15px rgba(255,204,0,0.2); }
+        .module.arrangement:hover { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--soft-glow); }
+        .module.gift:hover { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255,68,170,0.3); }
+        .module.lesson:hover { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0,255,136,0.3); }
+
+        .module h3 {
+            font-family: 'Orbitron', sans-serif;
             font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .trust-item p {
-            color: var(--text-gray);
-        }
-
-        /* мелкие детали с третьего скрина */
-        .small-note {
-            display: flex;
-            gap: 12px;
-            color: #444;
-            margin-top: 24px;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
             font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #fff;
         }
 
-        /* footer минимальный */
-        .footer {
-            border-top: 1px solid var(--border-light);
-            padding: 40px 0;
-            margin-top: 40px;
+        .price {
+            font-size: 2.2rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .price span {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .module-description {
+            font-size: 0.7rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex-grow: 1;
+        }
+
+        .sub-package {
+            border-top: 1px solid rgba(255,255,255,0.2);
+            margin-top: 15px;
+            padding-top: 15px;
+            width: 100%;
+        }
+
+        .sub-package-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .specs {
+            list-style: none;
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .specs li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.75rem;
             display: flex;
             justify-content: space-between;
-            color: var(--text-gray);
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .specs li span {
+            color: var(--neon-blue);
+            font-weight: 700;
+        }
+
+        /* ----- PORTFOLIO (из SSL) ----- */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .audio-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            transition: 0.4s;
+            backdrop-filter: blur(5px);
+        }
+
+        .audio-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px var(--soft-glow);
+            transform: translateY(-5px);
+        }
+
+        .audio-cover {
+            width: 100%;
+            aspect-ratio: 1/1;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 15px;
+        }
+
+        .audio-info {
+            padding: 10px 0;
+        }
+
+        .audio-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .audio-subtitle {
+            font-size: 0.65rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        audio {
+            width: 100%;
+            height: 40px;
+            filter: invert(100%) hue-rotate(180deg) brightness(1.2);
+            outline: none;
+            opacity: 0.8;
+        }
+
+        /* ----- ABOUT ME с фейдером (из SSL, адаптирован) ----- */
+        #about-me {
+            padding: 80px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .about-container {
+            display: flex;
+            align-items: stretch;
+            justify-content: flex-start;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .fader-track {
+            width: 12px;
+            height: 380px;
+            background: #000;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            flex-shrink: 0;
+            z-index: 30;
+        }
+
+        .fader-led-scale {
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            height: 0%;
+            background: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            transition: height 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+            opacity: 0;
+        }
+
+        .fader-handle {
+            width: 50px;
+            height: 80px;
+            background: linear-gradient(145deg, #222, #444, #111);
+            border: 1px solid #555;
+            position: absolute;
+            bottom: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 35;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.6);
+            transition: bottom 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+
+        .fader-handle::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .about-content-wrapper {
+            flex-grow: 1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            height: 380px;
+        }
+
+        .about-content-blur {
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px 60px;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transform: translateX(-100%);
+            transition: transform 1.2s cubic-bezier(0.16,1,0.3,1) 0.6s, opacity 0.8s ease 0.6s;
+            text-align: center;
+            position: relative;
+        }
+
+        .about-content-blur::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        .about-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            letter-spacing: 8px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .neon-accent {
+            color: var(--neon-blue);
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.9);
+            max-width: 900px;
+        }
+
+        #about-me.is-revealed .fader-handle { bottom: 280px; }
+        #about-me.is-revealed .fader-led-scale { height: 320px; opacity: 1; }
+        #about-me.is-revealed .about-content-blur { opacity: 1; transform: translateX(0); }
+
+        /* ----- КОНТАКТЫ (booking) ----- */
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .contact-card {
+            background-color: rgba(255,255,255,0.02);
+            padding: 80px 40px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.4s;
+            backdrop-filter: blur(8px);
+        }
+
+        .contact-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px var(--soft-glow);
+            transform: translateY(-5px);
+        }
+
+        .contact-main-text {
+            font-size: clamp(1.2rem, 2.5vw, 2.2rem);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .action-hint {
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+        }
+
+        /* ----- ПОДВАЛ (из SSL) ----- */
+        footer {
+            background: #000;
+            border-top: 1px solid #111;
+            padding: 20px;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            color: #555;
+        }
+
+        #admin-trigger, #vocal-trigger {
+            color: #555;
+            font-size: 9px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border: 1px solid #222;
+            padding: 2px 8px;
+            transition: 0.3s;
+            text-transform: uppercase;
+            display: inline-block;
+            margin: 0 5px;
+        }
+
+        /* модальные окна (из SSL) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-panel {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background: #050505;
+            border: 1px solid var(--neon-purple);
+            padding: 30px;
+            z-index: 10000;
+            box-shadow: 0 0 40px rgba(191,0,255,0.3);
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+        }
+
+        .modal-panel input {
+            width: 100%;
+            padding: 12px;
+            background: #111;
+            border: 1px solid #222;
+            color: #fff;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-panel button {
+            width: 100%;
+            padding: 12px;
+            background: var(--neon-purple);
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
         }
 
         /* адаптация */
-        @media (max-width: 800px) {
-            .navbar { flex-direction: column; gap: 16px; }
-            .hero h1 { font-size: 3rem; }
-            .steps-grid, .reviews-grid, .trust-grid { grid-template-columns: 1fr; }
-            .drummer-block { margin-left: 0; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.8rem; }
+            .booking-grid { grid-template-columns: 1fr; }
+            .about-container { flex-direction: row; } 
+            .about-content-blur { padding: 15px; }
+            .about-title { font-size: 1.8rem; }
+            .about-text { font-size: 0.9rem; }
+            .fader-track { height: 250px; }
+            .fader-handle { width: 35px; height: 60px; }
+            #about-me.is-revealed .fader-handle { bottom: 180px; }
+            #about-me.is-revealed .fader-led-scale { height: 210px; }
         }
     </style>
 </head>
 <body>
+    <div class="studio-background"></div>
+
+    <!-- ШАПКА в стиле SoundBetter, но с элементами SSL -->
     <div class="container">
-        <!-- ШАПКА как на первом скрине -->
-        <header>
-            <div class="navbar">
-                <div class="logo">SoundBetter</div>
-                <div class="nav-links">
-                    <a href="#">Explore</a>
-                    <a href="#">Recent jobs</a>
-                    <a href="#">Tracks</a>
-                    <a href="#">New Tracks</a>
-                    <a href="#">SoundCheck</a>
-                    <a href="#">Plugins</a>
-                    <a href="#" class="signin-btn">Sign in</a>
-                </div>
-            </div>
-        </header>
-
-        <!-- HERO: Finish Your Song (первый скрин) -->
-        <section class="hero">
-            <h1>Finish Your Song</h1>
-            <p>The world's best mixing & mastering engineers, singers, songwriters, producers and studio musicians for hire</p>
-            <div class="hero-buttons">
-                <button class="btn btn-primary">FIND A PRO</button>
-                <button class="btn btn-secondary">CREATE A PROJECT</button>
-                <a href="#" class="watch-video"><i class="fas fa-play-circle"></i> Watch Video</a>
-            </div>
-        </section>
-
-        <!-- Discover Top Music Production Pros (первые три категории + второй скрин) -->
-        <div class="section-title">Discover Top Music Production Pros</div>
-        <div class="category-cards">
-            <div class="category-card"><i class="fas fa-sliders-h"></i> Producers</div>
-            <div class="category-card"><i class="fas fa-microphone-alt"></i> Singers</div>
-            <div class="category-card"><i class="fas fa-mixer"></i> Mixing Engineers</div>
-        </div>
-
-        <!-- расширенный список категорий (как на втором скрине) + блок "Taylor Swift's Drummer" -->
-        <div class="categories-row-two">
-            <span class="cat-small">Songwriters</span>
-            <span class="cat-small">Mastering Engineers</span>
-            <span class="cat-small">Session Musicians</span>
-            <span class="cat-small">More categories</span>
-            <div class="drummer-block">
-                <i class="fas fa-drum"></i> Want to work with Taylor Swift's Drummer?
+        <div class="navbar">
+            <div class="logo">SPRING SOUND LAB</div>
+            <div class="nav-links">
+                <a href="#">Explore</a>
+                <a href="#">Услуги</a>
+                <a href="#">Портфолио</a>
+                <a href="#">О студии</a>
+                <a href="#">Контакты</a>
+                <a href="#" class="signin-btn">Войти</a>
             </div>
         </div>
+    </div>
 
-        <!-- How SoundBetter works (добавлено из реального сайта для полноты) -->
-        <div class="how-it-works">
-            <div style="text-align: center; font-size: 2.2rem; font-weight: 700;">How SoundBetter works:</div>
-            <div class="steps-grid">
-                <div class="step-item">
-                    <div class="step-number">1</div>
-                    <h3>Describe your project</h3>
-                    <p>in seconds</p>
-                </div>
-                <div class="step-item">
-                    <div class="step-number">2</div>
-                    <h3>Get free proposals</h3>
-                    <p>from top professionals</p>
-                </div>
-                <div class="step-item">
-                    <div class="step-number">3</div>
-                    <h3>Hire a pro & get</h3>
-                    <p>awesome sounding tracks</p>
-                </div>
-            </div>
-            <!-- миниатюра сообщений как на оригинале (упрощенно) -->
-            <div style="margin-top: 40px; background: white; border-radius: 50px; padding: 16px 24px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; border: 1px solid #ddd;">
-                <span><strong>Martin Merenyi</strong> Mixing & Mastering Engineer $300</span>
-                <span style="color: var(--primary-green);">Ready For Review</span>
-            </div>
+    <!-- HERO секция (Finish Your Song переделана под SSL) -->
+    <section class="hero">
+        <h1>SPRING SOUND LAB</h1>
+        <p>Профессиональная архитектура звука. Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.</p>
+        <div class="hero-buttons">
+            <button class="btn btn-primary">ЗАПИСАТЬСЯ</button>
+            <button class="btn btn-secondary">УСЛУГИ</button>
+            <a href="#" class="watch-video"><i class="fas fa-play-circle"></i> Смотреть видео</a>
         </div>
 
-        <!-- Endless 5-Star Reviews (блок с отзывами, как на реальном сайте) -->
-        <section class="reviews">
-            <div class="section-title">Endless 5-Star Reviews</div>
-            <div class="reviews-grid">
-                <div class="review-card">
-                    <p>“This is how engineers are found now”</p>
-                    <div class="review-author">Ed Cherney</div>
+        <!-- соцсети из SSL -->
+        <div class="header-socials">
+            <a href="#" class="social-btn vk" target="_blank"><i class="fab fa-vk"></i></a>
+            <a href="https://t.me/springsound_lab" class="social-btn tg" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.youtube.com/@SpringSoundLab" class="social-btn yt" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="#" class="social-btn ig" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+
+        <!-- телефон -->
+        <a href="tel:+79178382017" class="phone-box-container">
+            <span class="header-phone">+7 917 838 20 17</span>
+            <span class="phone-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</span>
+        </a>
+    </section>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <div class="container">
+
+        <!-- ABOUT ME с фейдером (из SSL) -->
+        <section id="about-me">
+            <div class="about-container">
+                <div class="fader-track">
+                    <div class="fader-handle"></div>
+                    <div class="fader-led-scale"></div>
                 </div>
-                <div class="review-card">
-                    <p>“@SoundBetterNow has really been a come up for me.”</p>
-                    <div class="review-author">Brian McKnight Jr</div>
-                </div>
-                <div class="review-card">
-                    <p>“I was able to hand over a song and get back magic. That's unbelievable in my book”</p>
-                    <div class="review-author">RJ</div>
-                </div>
-                <div class="review-card">
-                    <p>“I almost fell out of my chair as I listened to the remix I got. So good!”</p>
-                    <div class="review-author">Morsy</div>
-                </div>
-                <div class="review-card">
-                    <p>“Years ago I would’ve had to go through many gatekeepers…”</p>
-                    <div class="review-author">Jeff I.</div>
-                </div>
-                <div class="review-card">
-                    <p>“I received a mix from Helik and it is crazyyyyyyy good.”</p>
-                    <div class="review-author">Geeva</div>
+                <div class="about-content-wrapper">
+                    <div class="about-content-blur">
+                        <h2 class="about-title">ABOUT <span class="neon-accent">ME</span></h2>
+                        <p class="about-text">
+                            Привет! Меня зовут АЛЕКСАНДР. Я — основатель студии и твой звукорежиссёр.<br>
+                            Мой путь в музыке начался в 2010 году. За это время я прошёл всё: от записи первых демок в домашних условиях до создания собственной профессиональной лаборатории звука. Я не просто человек, который «нажимает на кнопки» — я сам артист, поэтому вижу твой проект с двух сторон: как технический специалист и как музыкант.
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- BROWSE блок (третий скрин: категории + POST A JOB) -->
-        <div class="browse-section">
-            <div style="font-size: 2rem; font-weight: 700;">Browse:</div>
-            <div class="browse-tags">
-                <span class="browse-tag">Producers</span>
-                <span class="browse-tag">Female Singers</span>
-                <span class="browse-tag">Mixing Engineers</span>
-                <span class="browse-tag">Mastering Engineers</span>
-                <span class="browse-tag">Male Singers</span>
-                <span class="browse-tag">Songwriters</span>
-                <span class="browse-tag">Beat Makers</span>
-                <button class="post-job-btn">POST A JOB</button>
+        <!-- УСЛУГИ (SERVICES) в сетке SoundBetter, но карточки из SSL -->
+        <div class="section-title">SERVICES</div>
+        <div class="module-grid">
+            <!-- ЗАПИСЬ -->
+            <div class="module rec">
+                <h3>ЗАПИСЬ</h3>
+                <div class="price">900 <span>₽/час</span></div>
+                <div class="module-description">
+                    80% успеха трека — это правильное исполнение. Моя задача — выжать максимум из твоего таланта.
+                    <div class="sub-package">
+                        <span class="sub-package-title" style="color: #fff;">ВОКАЛЬНЫЙ КОУЧИНГ</span>
+                        • Помогу с подачей и интонацией, подберу крутые фишки для твоего голоса.<br>
+                        • Исправляю ошибки на лету.
+                    </div>
+                </div>
+                <ul class="specs">
+                    <li>РАБОТАЕМ <span>ПО ПРЕДВАРИТЕЛЬНОЙ ЗАПИСИ</span></li>
+                    <li>БРОНИРОВАНИЕ ВРЕМЕНИ <span>500 ₽ (ВХОДИТ В СТОИМОСТЬ)</span></li>
+                </ul>
+            </div>
+
+            <!-- START EDITION -->
+            <div class="module start">
+                <h3>START EDITION</h3>
+                <div class="price">3 900 <span>₽</span></div>
+                <div class="module-description">
+                    Идеальное решение для песен в подарок.
+                    <div class="sub-package">
+                        <span class="sub-package-title" style="color: var(--neon-purple);">БАЗОВЫЙ ПРОДАКШН</span>
+                        • 1 Час записи + сведение + мастеринг.
+                    </div>
+                </div>
+                <ul class="specs">
+                    <li>ВКЛЮЧЕНО <span>1 ЧАС ЗАПИСИ, СВЕДЕНИЕ</span></li>
+                    <li>ТЮНИНГ ВОКАЛА <span>+ 1 000 ₽</span></li>
+                </ul>
+            </div>
+
+            <!-- ARTIST EDITION -->
+            <div class="module artist">
+                <h3>ARTIST EDITION</h3>
+                <div class="price">6 000 <span>₽</span></div>
+                <div class="module-description">
+                    Продукт для топ-чартов.
+                    <div class="sub-package">
+                        <span class="sub-package-title" style="color: var(--neon-red);">ПРОФЕССИОНАЛЬНЫЙ ПОДХОД</span>
+                        • Ручная коррекция, современный объем.
+                    </div>
+                </div>
+                <ul class="specs">
+                    <li>ВКЛЮЧЕНО <span>ОБРАБОТКА 2-Х ДОП. ДОРОЖЕК</span></li>
+                    <li>ТЮНИНГ ДОП. ДОРОЖКИ <span>+ 500 ₽</span></li>
+                </ul>
+            </div>
+
+            <!-- PLATINUM EDITION -->
+            <div class="module platinum">
+                <h3>PLATINUM EDITION</h3>
+                <div class="price">ОТ 10 000 <span>₽</span></div>
+                <div class="module-description">
+                    Масштабный продакшн.
+                    <div class="sub-package">
+                        <span class="sub-package-title" style="color: var(--neon-gold);">МУЛЬТИТРЕК</span>
+                        • Сведение до 20 дорожек.
+                    </div>
+                </div>
+                <ul class="specs">
+                    <li>ДОП. ДОРОЖКА <span>+ 300 ₽</span></li>
+                </ul>
+            </div>
+
+            <!-- АРАНЖИРОВКА -->
+            <div class="module arrangement">
+                <h3>АРАНЖИРОВКА</h3>
+                <div class="price">ОТ 8 000 <span>₽</span></div>
+                <div class="module-description">
+                    Уникальная музыкальная основа.
+                    <div class="sub-package">
+                        <span class="sub-package-title" style="color: var(--neon-blue);">ИНДИВИДУАЛЬНЫЙ ПОДХОД</span>
+                        • Написание партитуры, живые инструменты.
+                    </div>
+                </div>
+                <ul class="specs">
+                    <li>СТИЛИ <span>POP, RAP, ROCK</span></li>
+                    <li>СРОКИ <span>ОТ 3 ДНЕЙ</span></li>
+                </ul>
+            </div>
+
+            <!-- ПОДАРОЧНЫЙ СЕРТИФИКАТ -->
+            <div class="module gift">
+                <h3>ПОДАРОЧНЫЙ СЕРТИФИКАТ</h3>
+                <div class="price">ОТ 3 000 <span>₽</span></div>
+                <div class="module-description">
+                    Идеальный подарок для музыканта.
+                    <div class="sub-package">
+                        <span class="sub-package-title" style="color: var(--neon-pink);">ВАРИАНТЫ НОМИНАЛА</span>
+                        • На запись, START, ARTIST, аранжировку.
+                    </div>
+                </div>
+                <ul class="specs">
+                    <li>СРОК ДЕЙСТВИЯ <span>6 МЕСЯЦЕВ</span></li>
+                </ul>
+            </div>
+
+            <!-- УРОКИ ЗВУКОРЕЖИССУРЫ -->
+            <div class="module lesson">
+                <h3>УРОКИ ЗВУКОРЕЖИССУРЫ</h3>
+                <div class="price">1 500 <span>₽/час</span></div>
+                <div class="module-description">
+                    Индивидуальные занятия.
+                    <div class="sub-package">
+                        <span class="sub-package-title" style="color: var(--neon-green);">ПРОГРАММА КУРСА</span>
+                        • Основы DAW, теория звука, сведение.
+                    </div>
+                </div>
+                <ul class="specs">
+                    <li>ДЛИТЕЛЬНОСТЬ <span>60 МИНУТ</span></li>
+                    <li>ФОРМАТ <span>ОЧНО / ONLINE</span></li>
+                </ul>
             </div>
         </div>
 
-        <!-- БЛОК преимуществ (третий скрин полностью) -->
-        <section class="trust-section">
-            <div class="trust-header">Over 400,000 musicians have used and trust SoundBetter</div>
-            <div class="trust-grid">
-                <div class="trust-item">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <h4>Safe and secure</h4>
-                        <p>Fund a project to get started and release payment once it's completed</p>
-                    </div>
+        <!-- PORTFOLIO (из SSL) -->
+        <div class="section-title">PORTFOLIO</div>
+        <div class="portfolio-grid">
+            <div class="audio-card">
+                <div class="audio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif');"></div>
+                <div class="audio-info">
+                    <div class="audio-title">LUANHO - ЛЕТИ СО МНОЙ</div>
+                    <div class="audio-subtitle">Mixed by WEYTON</div>
                 </div>
-                <div class="trust-item">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <h4>Protect your copyright</h4>
-                        <p>Our software provides a record of exchanges and files for future reference</p>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <h4>Human support</h4>
-                        <p>Email, phone and chat to help you with your projects</p>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <h4>Simply the best talent</h4>
-                        <p>SoundBetter pros work for their reviews and will give you their best</p>
-                    </div>
-                </div>
-                <div class="trust-item">
-                    <i class="fas fa-check-circle"></i>
-                    <div>
-                        <h4>Level up</h4>
-                        <p>Better sounding content gets more plays, bookings and placement</p>
-                    </div>
-                </div>
+                <audio controls src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3"></audio>
             </div>
-            <!-- дополнительные строчки с третьего скрина (про software, email и т.д) уже вписаны выше, но для точности дублируем текст -->
-            <div class="small-note">
-                <span><i class="fas fa-lock"></i> Safe and secure: Fund a project…</span>
-                <span><i class="fas fa-copyright"></i> Protect your copyright</span>
+            <div class="audio-card">
+                <div class="audio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/blob/main/etot_gorod/oblojka.jpg?raw=true');"></div>
+                <div class="audio-info">
+                    <div class="audio-title">WEYTON - Этот город</div>
+                    <div class="audio-subtitle">Mixed by WEYTON</div>
+                </div>
+                <audio controls src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3"></audio>
             </div>
-        </section>
+            <div class="audio-card">
+                <div class="audio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/oblojka.jfif');"></div>
+                <div class="audio-info">
+                    <div class="audio-title">Оксана Шемановская - Необычайно</div>
+                    <div class="audio-subtitle">Mixed by WEYTON</div>
+                </div>
+                <audio controls src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3"></audio>
+            </div>
+        </div>
 
-        <!-- легкий футер (не на скринах, но для завершенности) -->
-        <footer class="footer">
-            <span>SoundBetter</span>
-            <span>© 2025 SoundBetter (копия для демо)</span>
-        </footer>
+        <!-- КОНТАКТЫ (booking) -->
+        <div class="section-title">КОНТАКТЫ</div>
+        <div class="booking-grid">
+            <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="contact-card">
+                <div class="contact-main-text">ВОЛГОГРАД, ТУЛАКА 9</div>
+                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОСМОТРЕТЬ</div>
+            </a>
+            <a href="tel:+79178382017" class="contact-card">
+                <div class="contact-main-text">+7 917 838 20 17</div>
+                <div class="action-hint">НАЖМИ, ЧТОБЫ ПОЗВОНИТЬ</div>
+            </a>
+        </div>
+    </div>
 
-    </div> <!-- конец container -->
+    <!-- ПОДВАЛ с модальными триггерами (из SSL) -->
+    <footer>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 25px; flex-wrap: wrap;">
+            <span>© 2026 <span style="color: var(--neon-purple);">SPRING SOUND LAB</span></span>
+            <span id="admin-trigger">LOG IN</span>
+            <span id="vocal-trigger">VOCAL LOGIN</span>
+        </div>
+    </footer>
 
-    <!-- маленький скрипт для анимаций при наведении (дополнительно) -->
+    <!-- МОДАЛКИ ADMIN и VOCAL -->
+    <div id="admin-overlay" class="modal-overlay" onclick="closeModal('admin')"></div>
+    <div id="admin-panel" class="modal-panel" style="border-color: var(--neon-purple);">
+        <div style="color: var(--neon-purple); margin-bottom: 25px;">ADMIN ACCESS</div>
+        <input type="text" id="admin-login" placeholder="LOGIN">
+        <input type="password" id="admin-pass" placeholder="PASSWORD">
+        <button onclick="checkAdminAuth()">AUTHENTICATE</button>
+        <div onclick="closeModal('admin')" style="margin-top:20px; color:#333; font-size:9px; cursor:pointer;">Abort Mission</div>
+    </div>
+
+    <div id="vocal-overlay" class="modal-overlay" onclick="closeModal('vocal')"></div>
+    <div id="vocal-panel" class="modal-panel" style="border-color: #d9c9e3;">
+        <div style="color:#5e4b6e; margin-bottom:25px;">VOCAL ACCESS</div>
+        <input type="text" id="vocal-login" placeholder="LOGIN">
+        <input type="password" id="vocal-pass" placeholder="PASSWORD">
+        <button onclick="checkVocalAuth()">AUTHENTICATE</button>
+        <div onclick="closeModal('vocal')" style="margin-top:20px; color:#aaa; font-size:9px; cursor:pointer;">Abort Mission</div>
+    </div>
+
     <script>
-        // просто для примера — можно добавить интерактив
-        console.log('клон SoundBetter загружен');
+        // Скрипты для about me, модалок, плееров
+        document.addEventListener('DOMContentLoaded', function() {
+            // about me observer
+            const aboutSection = document.getElementById('about-me');
+            if (aboutSection) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            aboutSection.classList.add('is-revealed');
+                        }
+                    });
+                }, { threshold: 0.5 });
+                observer.observe(aboutSection);
+            }
+
+            // модалки
+            document.getElementById('admin-trigger').onclick = function() {
+                document.getElementById('admin-overlay').style.display = 'block';
+                document.getElementById('admin-panel').style.display = 'block';
+            };
+            document.getElementById('vocal-trigger').onclick = function() {
+                document.getElementById('vocal-overlay').style.display = 'block';
+                document.getElementById('vocal-panel').style.display = 'block';
+            };
+        });
+
+        function closeModal(type) {
+            document.getElementById(type + '-overlay').style.display = 'none';
+            document.getElementById(type + '-panel').style.display = 'none';
+        }
+
+        function checkAdminAuth() {
+            const login = document.getElementById('admin-login').value;
+            const pass = document.getElementById('admin-pass').value;
+            const btn = document.querySelector('#admin-panel button');
+            if (login === 'admin ssl' && pass === '080808') {
+                btn.innerHTML = 'ACCESS GRANTED...';
+                btn.style.background = '#006400';
+                setTimeout(() => { window.location.href = 'certificates.html'; }, 600);
+            } else {
+                btn.style.background = '#8B0000';
+                btn.innerHTML = 'DENIED';
+                setTimeout(() => {
+                    btn.style.background = 'var(--neon-purple)';
+                    btn.innerHTML = 'AUTHENTICATE';
+                    document.getElementById('admin-pass').value = '';
+                }, 1000);
+            }
+        }
+
+        function checkVocalAuth() {
+            const login = document.getElementById('vocal-login').value;
+            const pass = document.getElementById('vocal-pass').value;
+            const btn = document.querySelector('#vocal-panel button');
+            if (login === 'vocal' && pass === '1310') {
+                btn.innerHTML = 'ACCESS GRANTED...';
+                btn.style.background = '#5e4b6e';
+                setTimeout(() => { window.location.href = 'vocal-crm.html'; }, 600);
+            } else {
+                btn.style.background = '#8B0000';
+                btn.innerHTML = 'DENIED';
+                setTimeout(() => {
+                    btn.style.background = '#d9c9e3';
+                    btn.innerHTML = 'AUTHENTICATE';
+                    document.getElementById('vocal-pass').value = '';
+                }, 1000);
+            }
+        }
+
+        // останавливать другие аудио при старте (встроено в браузер, но добавим)
+        document.querySelectorAll('audio').forEach(a => {
+            a.addEventListener('play', function() {
+                document.querySelectorAll('audio').forEach(other => { if(other !== this) other.pause(); });
+            });
+        });
     </script>
 </body>
 </html>
