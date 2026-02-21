@@ -60,7 +60,7 @@
         }
 
         .address {
-            font-size: 0.95rem; /* чуть увеличен для соответствия логотипу */
+            font-size: 0.95rem;
             color: #aaa;
             letter-spacing: 0.5px;
             white-space: nowrap;
@@ -193,7 +193,7 @@
         .hero {
             margin: 80px 0 100px 0;
             display: flex;
-            align-items: stretch; /* чтобы левый и правый блоки были одной высоты */
+            align-items: stretch;
             gap: 40px;
         }
 
@@ -201,7 +201,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* распределяет контент по вертикали */
+            justify-content: space-between;
         }
 
         .hero-pre {
@@ -227,9 +227,10 @@
         }
 
         .hero-desc {
-            font-size: 1.5rem; /* увеличен для соответствия логотипу (логотип 1.5rem) */
+            font-size: 2rem;        /* увеличен с 1.5rem до 2rem */
+            line-height: 1.4;
             color: #ccc;
-            max-width: 600px;
+            max-width: 600px;        /* ограничение ширины для соответствия заголовку */
             margin-bottom: 20px;
         }
 
@@ -246,7 +247,7 @@
             border: 2px solid #fff;
             transition: all 0.2s;
             cursor: pointer;
-            align-self: flex-start; /* чтобы кнопка не растягивалась на всю ширину */
+            align-self: flex-start;
         }
 
         .hero-btn:hover {
@@ -642,6 +643,10 @@
                 max-width: 100%;
                 width: 100%;
             }
+            .hero-desc {
+                font-size: 1.8rem; /* чуть меньше на планшетах */
+                max-width: 100%;
+            }
             .artist-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -675,6 +680,9 @@
             }
             .hero-title {
                 font-size: 3rem;
+            }
+            .hero-desc {
+                font-size: 1.5rem;
             }
             .artist-grid {
                 grid-template-columns: 1fr;
@@ -941,14 +949,11 @@
         };
 
         function showPage(pageId) {
-            // Скрываем все страницы
             Object.values(pages).forEach(page => {
                 if (page) page.classList.remove('active-page');
             });
-            // Показываем нужную
             if (pages[pageId]) pages[pageId].classList.add('active-page');
 
-            // Подсветка активной ссылки
             document.querySelectorAll('[data-page]').forEach(el => {
                 el.classList.remove('active-link');
                 if (el.dataset.page === pageId) {
@@ -956,19 +961,16 @@
                 }
             });
 
-            // Если выбрана about, сбрасываем скролл наверх
             if (pageId === 'about') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-        // Обработчики кликов по элементам с data-page
         document.querySelectorAll('[data-page]').forEach(el => {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
                 const page = el.dataset.page;
                 if (page === 'portfolio') {
-                    // Показываем главную и скроллим к портфолио
                     showPage('home');
                     setTimeout(() => {
                         document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
@@ -979,7 +981,6 @@
             });
         });
 
-        // По умолчанию показываем главную
         showPage('home');
 
         // ===== ЛОГИН =====
@@ -1025,7 +1026,6 @@
             }
         });
 
-        // Остановка других аудио при старте
         document.addEventListener('play', function(e) {
             const allAudios = document.querySelectorAll('audio');
             allAudios.forEach(audio => {
