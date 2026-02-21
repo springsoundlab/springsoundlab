@@ -46,7 +46,7 @@
         .navbar-left {
             display: flex;
             align-items: center;
-            gap: 80px; /* увеличен отступ, чтобы адрес был правее */
+            gap: 80px;
             flex-wrap: wrap;
         }
 
@@ -61,7 +61,7 @@
 
         .address {
             font-size: 0.95rem;
-            color: #ffffff; /* белый цвет */
+            color: #ffffff;
             letter-spacing: 0.5px;
             white-space: nowrap;
         }
@@ -75,7 +75,7 @@
             justify-content: flex-end;
         }
 
-        .nav-links a {
+        .nav-links > a, .nav-links > .dropdown > a {
             color: #fff;
             text-decoration: none;
             font-weight: 500;
@@ -86,108 +86,71 @@
             cursor: pointer;
         }
 
-        .nav-links a:hover {
+        .nav-links > a:hover, .nav-links > .dropdown > a:hover {
             color: #aaa;
         }
 
         .nav-links .active-link {
-            color: #3a8cff; /* тёмно-голубой без свечения */
+            color: #3a8cff;
             border-bottom: 2px solid #3a8cff;
         }
 
-        /* Основной выпадающий список для "О нас" */
-        .dropdown-about {
+        /* Общий стиль для всех выпадающих меню */
+        .dropdown {
             position: relative;
             display: inline-block;
         }
 
-        .dropdown-about-content {
+        .dropdown-content {
             opacity: 0;
             visibility: hidden;
             position: absolute;
-            top: 30px;
+            top: 100%;
             left: 0;
+            margin-top: 5px;
             background-color: #1a1a1a;
-            min-width: 220px;
+            width: max-content;
+            min-width: 140px;
             border: 1px solid rgba(255,255,255,0.1);
-            padding: 15px;
+            padding: 8px 0;
             z-index: 100;
             backdrop-filter: blur(10px);
-            transition: opacity 0.2s ease, visibility 0.2s ease;
-            transition-delay: 0.2s;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            transition: opacity 0.15s ease, visibility 0.15s ease;
+            transition-delay: 0.2s; /* задержка при скрытии */
         }
 
-        .dropdown-about:hover .dropdown-about-content {
+        .dropdown:hover .dropdown-content {
             opacity: 1;
             visibility: visible;
-            transition-delay: 0s;
+            transition-delay: 0s; /* без задержки при появлении */
         }
 
-        .dropdown-about-content a {
+        .dropdown-content a, .dropdown-content .phone-number {
             display: block;
             color: #fff;
-            padding: 8px 10px;
+            padding: 8px 16px;
             text-decoration: none;
             font-size: 0.9rem;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             transition: background 0.2s;
+            white-space: nowrap;
         }
 
-        .dropdown-about-content a:hover {
+        .dropdown-content a:hover {
             background-color: rgba(255,255,255,0.1);
         }
 
-        .dropdown-about-content a:last-child {
-            border-bottom: none;
-        }
-
-        /* Выпадающий список для контактов */
-        .dropdown-contacts {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-contacts-content {
-            opacity: 0;
-            visibility: hidden;
-            position: absolute;
-            top: 30px;
-            left: 0;
-            background-color: #1a1a1a;
-            min-width: 220px;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 15px;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            transition: opacity 0.2s ease, visibility 0.2s ease;
-            transition-delay: 0.2s;
-        }
-
-        .dropdown-contacts:hover .dropdown-contacts-content {
-            opacity: 1;
-            visibility: visible;
-            transition-delay: 0s;
-        }
-
-        .dropdown-contacts-content a, .dropdown-contacts-content .phone-number {
-            display: block;
-            color: #fff;
-            padding: 8px 10px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: background 0.2s;
-        }
-
-        .dropdown-contacts-content a:hover {
-            background-color: rgba(255,255,255,0.1);
-        }
-
-        .dropdown-contacts-content .phone-number {
+        .dropdown-content .phone-number {
             font-family: 'Inter', monospace;
             letter-spacing: 1px;
             cursor: pointer;
-            color: #fff; /* белый номер */
+            color: #fff;
+        }
+
+        .dropdown-content a:last-child, .dropdown-content .phone-number:last-child {
+            border-bottom: none;
         }
 
         .btn-outline {
@@ -460,7 +423,7 @@
         }
 
         .about-title span {
-            color: #3a8cff; /* тёмно-голубой */
+            color: #3a8cff;
         }
 
         .about-grid {
@@ -687,7 +650,7 @@
         .price-value {
             font-size: 3rem;
             font-weight: 700;
-            color: #ffffff; /* белые цифры */
+            color: #ffffff;
             margin-bottom: 20px;
         }
 
@@ -973,19 +936,20 @@
                 <a data-page="portfolio">Портфолио</a>
                 <a data-page="prices">Цены</a>
 
-                <!-- Выпадающий список "О нас" -->
-                <div class="dropdown-about">
+                <!-- Выпадающий список "О нас" (единый класс dropdown) -->
+                <div class="dropdown">
                     <a>О нас</a>
-                    <div class="dropdown-about-content">
+                    <div class="dropdown-content">
                         <a data-page="about">О нас</a>
                         <a data-page="studio">Студия</a>
                         <a data-page="equipment">Оборудование</a>
                     </div>
                 </div>
 
-                <div class="dropdown-contacts">
+                <!-- Выпадающий список "Контакты" -->
+                <div class="dropdown">
                     <a href="#">Контакты</a>
-                    <div class="dropdown-contacts-content">
+                    <div class="dropdown-content">
                         <a href="#"><i class="fab fa-vk"></i> ВКонтакте</a>
                         <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i> Telegram</a>
                         <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i> YouTube</a>
@@ -993,6 +957,7 @@
                         <div class="phone-number"><i class="fas fa-phone"></i> +7 917 838 20 17</div>
                     </div>
                 </div>
+
                 <button class="btn-outline" id="loginBtn">Login</button>
                 <a href="tel:+79178382017" class="header-phone"><i class="fas fa-phone"></i> +7 917 838 20 17</a>
             </div>
