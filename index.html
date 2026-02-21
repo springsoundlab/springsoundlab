@@ -46,7 +46,7 @@
         .navbar-left {
             display: flex;
             align-items: center;
-            gap: 60px; /* увеличен отступ, чтобы адрес был между логотипом и меню */
+            gap: 60px;
             flex-wrap: wrap;
         }
 
@@ -61,9 +61,10 @@
 
         .address {
             font-size: 0.95rem;
-            color: #aaa;
+            color: #ffffff; /* белый цвет */
             letter-spacing: 0.5px;
             white-space: nowrap;
+            margin-left: 40px; /* дополнительный сдвиг вправо */
         }
 
         .nav-links {
@@ -91,8 +92,8 @@
         }
 
         .nav-links .active-link {
-            color: #00f2ff;
-            border-bottom: 2px solid #00f2ff;
+            color: #0088cc; /* более тёмный голубой, без свечения */
+            border-bottom: 2px solid #0088cc;
         }
 
         .dropdown {
@@ -177,7 +178,7 @@
         }
 
         .header-phone:hover {
-            color: #00f2ff;
+            color: #0088cc;
         }
 
         /* ===== СТРАНИЦЫ (SPA) ===== */
@@ -412,7 +413,7 @@
         }
 
         .about-title span {
-            color: #00f2ff;
+            color: #0088cc;
         }
 
         .about-grid {
@@ -442,7 +443,7 @@
 
         .about-image:hover {
             transform: scale(1.02);
-            border-color: #00f2ff;
+            border-color: #0088cc;
         }
 
         .about-text-block {
@@ -457,7 +458,7 @@
         }
 
         .about-text-block strong {
-            color: #00f2ff;
+            color: #0088cc;
             font-weight: 600;
         }
 
@@ -476,7 +477,7 @@
         }
 
         .prices-title span {
-            color: #00f2ff;
+            color: #0088cc;
         }
 
         .price-grid {
@@ -495,9 +496,9 @@
         }
 
         .price-card:hover {
-            border-color: #00f2ff;
+            border-color: #0088cc;
             transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(0,242,255,0.1);
+            box-shadow: 0 0 20px rgba(0,136,204,0.1);
         }
 
         .price-name {
@@ -511,7 +512,7 @@
         .price-value {
             font-size: 3rem;
             font-weight: 700;
-            color: #00f2ff;
+            color: #ffffff; /* белый цвет для цифр */
             margin-bottom: 20px;
         }
 
@@ -709,6 +710,9 @@
             .navbar-left {
                 justify-content: space-between;
                 gap: 30px;
+            }
+            .address {
+                margin-left: 0; /* на мобильных убираем дополнительный сдвиг */
             }
             .nav-links {
                 justify-content: center;
@@ -1068,14 +1072,11 @@
         };
 
         function showPage(pageId) {
-            // Скрываем все страницы
             Object.values(pages).forEach(page => {
                 if (page) page.classList.remove('active-page');
             });
-            // Показываем нужную
             if (pages[pageId]) pages[pageId].classList.add('active-page');
 
-            // Подсветка активной ссылки
             document.querySelectorAll('[data-page]').forEach(el => {
                 el.classList.remove('active-link');
                 if (el.dataset.page === pageId) {
@@ -1083,19 +1084,16 @@
                 }
             });
 
-            // Если выбрана about или prices, сбрасываем скролл наверх
             if (pageId === 'about' || pageId === 'prices') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-        // Обработчики кликов по элементам с data-page
         document.querySelectorAll('[data-page]').forEach(el => {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
                 const page = el.dataset.page;
                 if (page === 'portfolio') {
-                    // Показываем главную и скроллим к портфолио
                     showPage('home');
                     setTimeout(() => {
                         document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
@@ -1106,7 +1104,6 @@
             });
         });
 
-        // По умолчанию показываем главную
         showPage('home');
 
         // ===== ЛОГИН =====
@@ -1152,7 +1149,6 @@
             }
         });
 
-        // Остановка других аудио при старте
         document.addEventListener('play', function(e) {
             const allAudios = document.querySelectorAll('audio');
             allAudios.forEach(audio => {
