@@ -106,7 +106,8 @@
             visibility: hidden;
             position: absolute;
             top: 100%;
-            left: 0;
+            left: 50%;
+            transform: translateX(-50%);
             margin-top: 5px;
             background-color: #1a1a1a;
             width: max-content;
@@ -117,7 +118,6 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             transition: opacity 0.15s ease, visibility 0.15s ease;
-            /* border полностью убран */
             border: none;
         }
 
@@ -135,7 +135,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
             transition: background 0.2s;
             white-space: nowrap;
-            text-align: center; /* текст по центру */
+            text-align: center;
         }
 
         .dropdown-content a:hover {
@@ -1267,14 +1267,11 @@
         };
 
         function showPage(pageId) {
-            // Скрываем все страницы
             Object.values(pages).forEach(page => {
                 if (page) page.classList.remove('active-page');
             });
-            // Показываем нужную
             if (pages[pageId]) pages[pageId].classList.add('active-page');
 
-            // Подсветка активной ссылки (только для прямых пунктов меню)
             document.querySelectorAll('[data-page]').forEach(el => {
                 el.classList.remove('active-link');
                 if (el.dataset.page === pageId) {
@@ -1282,19 +1279,16 @@
                 }
             });
 
-            // Если выбрана about, studio, equipment или prices, сбрасываем скролл наверх
             if (pageId === 'about' || pageId === 'prices' || pageId === 'studio' || pageId === 'equipment') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
-        // Обработчики кликов по элементам с data-page
         document.querySelectorAll('[data-page]').forEach(el => {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
                 const page = el.dataset.page;
                 if (page === 'portfolio') {
-                    // Показываем главную и скроллим к портфолио
                     showPage('home');
                     setTimeout(() => {
                         document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
@@ -1305,7 +1299,6 @@
             });
         });
 
-        // По умолчанию показываем главную
         showPage('home');
 
         // ===== ЛОГИН =====
@@ -1351,7 +1344,6 @@
             }
         });
 
-        // Остановка других аудио при старте
         document.addEventListener('play', function(e) {
             const allAudios = document.querySelectorAll('audio');
             allAudios.forEach(audio => {
