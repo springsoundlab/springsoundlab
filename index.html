@@ -29,8 +29,12 @@
             padding: 0 40px;
         }
 
-        /* навигация */
+        /* Фиксированная навигация */
         .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: #0a0a0a; /* фон, чтобы не просвечивало */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -81,7 +85,8 @@
         }
 
         .dropdown-content {
-            display: none;
+            opacity: 0;
+            visibility: hidden;
             position: absolute;
             top: 30px;
             left: 0;
@@ -91,10 +96,14 @@
             padding: 15px;
             z-index: 100;
             backdrop-filter: blur(10px);
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            transition-delay: 0.2s; /* задержка при скрытии */
         }
 
         .dropdown:hover .dropdown-content {
-            display: block;
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0s; /* мгновенное появление */
         }
 
         .dropdown-content a, .dropdown-content .phone-number {
@@ -171,16 +180,16 @@
             line-height: 1.1;
             letter-spacing: -0.03em;
             text-transform: uppercase;
-            margin-bottom: 20px; /* добавлен отступ снизу, но описание теперь ближе */
+            margin-bottom: 20px;
         }
 
         .hero-title .hero-title-secondary {
-            color: #888; /* светло-серый для LAB */
+            color: #888;
             font-weight: 700;
         }
 
         .hero-desc {
-            margin-top: 20px; /* уменьшено с 40px до 20px */
+            margin-top: 20px;
             font-size: 1.2rem;
             color: #ccc;
             max-width: 600px;
@@ -492,62 +501,6 @@
             padding-top: 30px;
         }
 
-        /* ===== КУКИ ===== */
-        .cookie-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #1a1a1a;
-            color: #ccc;
-            padding: 16px 40px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid #333;
-            z-index: 1000;
-            font-size: 0.9rem;
-        }
-
-        .cookie-text {
-            max-width: 70%;
-        }
-
-        .cookie-text strong {
-            color: #fff;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .cookie-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        .cookie-btn {
-            background: transparent;
-            border: 1px solid #555;
-            color: #fff;
-            padding: 8px 24px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .cookie-btn.accept {
-            background-color: #fff;
-            border-color: #fff;
-            color: #0a0a0a;
-        }
-
-        .cookie-btn:hover {
-            background-color: #fff;
-            border-color: #fff;
-            color: #0a0a0a;
-        }
-
         /* ===== МОДАЛКА ЛОГИНА ===== */
         .modal-overlay {
             display: none;
@@ -646,14 +599,6 @@
                 justify-content: center;
                 gap: 25px;
             }
-            .cookie-bar {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            .cookie-text {
-                max-width: 100%;
-            }
             .event-item {
                 flex-direction: column;
                 align-items: flex-start;
@@ -689,18 +634,6 @@
     </style>
 </head>
 <body>
-    <!-- Куки бар -->
-    <div class="cookie-bar">
-        <div class="cookie-text">
-            <strong>Этот сайт использует куки-файлы</strong>
-            Мы используем куки для персонализации контента и рекламы, предоставления функций соцсетей и анализа трафика. Мы также делимся информацией о том, как вы используете наш сайт, с нашими партнёрами по соцсетям, рекламе и аналитике, которые могут объединять её с другой информацией, которую вы им предоставили или которую они собрали в результате использования вами их сервисов.
-        </div>
-        <div class="cookie-buttons">
-            <button class="cookie-btn">Подробнее</button>
-            <button class="cookie-btn accept">Принять</button>
-        </div>
-    </div>
-
     <div class="container">
         <!-- Навигация -->
         <nav class="navbar">
@@ -911,7 +844,7 @@
                 </div>
             </div>
             <div class="copyright">
-                © 2026 SPRING SOUND LAB. Все права защищены. Сайт использует куки – вы уже видели уведомление.
+                © 2026 SPRING SOUND LAB. Все права защищены.
             </div>
         </div>
     </footer>
@@ -986,17 +919,6 @@
 
         // По умолчанию показываем главную
         showPage('home');
-
-        // ===== КУКИ =====
-        document.querySelectorAll('.cookie-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (this.classList.contains('accept')) {
-                    document.querySelector('.cookie-bar').style.display = 'none';
-                } else {
-                    alert('Здесь откроются подробности о куки — как на оригинальном сайте.');
-                }
-            });
-        });
 
         // ===== ЛОГИН =====
         const loginBtn = document.getElementById('loginBtn');
