@@ -29,6 +29,7 @@
             padding: 0 40px;
         }
 
+        /* навигация */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -128,13 +129,16 @@
             color: #0a0a0a;
         }
 
-        /* Hero с заголовками как в оригинале Metropolis */
+        /* Hero с заголовками и слайдером */
         .hero {
             margin: 80px 0 100px 0;
+            display: flex;
+            align-items: center;
+            gap: 40px;
         }
 
         .hero-content {
-            max-width: 1000px;
+            flex: 1;
         }
 
         .hero-pre {
@@ -190,6 +194,33 @@
             color: #fff;
         }
 
+        /* Слайдер в шапке */
+        .hero-slider {
+            flex: 1;
+            max-width: 500px;
+            aspect-ratio: 1 / 1;
+            background-color: #222;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slider-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .slider-image.active {
+            opacity: 1;
+        }
+
+        /* общие стили секций */
         .section-title {
             font-size: 2rem;
             font-weight: 600;
@@ -307,6 +338,72 @@
             color: #0a0a0a;
         }
 
+        /* Шахматный блок О нас (вставлен с about.html) */
+        .about-section {
+            padding: 80px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .about-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-align: center;
+        }
+
+        .about-title span {
+            color: #00f2ff;
+        }
+
+        .about-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 80px;
+        }
+
+        .about-row {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .about-row.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .about-image {
+            flex: 1;
+            aspect-ratio: 1 / 1;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s;
+        }
+
+        .about-image:hover {
+            transform: scale(1.02);
+            border-color: #00f2ff;
+        }
+
+        .about-text-block {
+            flex: 1;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #ccc;
+        }
+
+        .about-text-block p {
+            margin-bottom: 20px;
+        }
+
+        .about-text-block strong {
+            color: #00f2ff;
+            font-weight: 600;
+        }
+
+        /* подвал */
         .footer {
             border-top: 1px solid rgba(255,255,255,0.1);
             padding: 60px 0 40px;
@@ -508,8 +605,14 @@
         }
 
         @media (max-width: 900px) {
+            .hero {
+                flex-direction: column;
+            }
             .hero-title, .hero-title-secondary {
                 font-size: 4rem;
+            }
+            .hero-slider {
+                max-width: 100%;
             }
             .artist-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -546,6 +649,13 @@
                 width: 100%;
                 margin-right: 0;
             }
+            .about-row, .about-row.reverse {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .about-image {
+                width: 100%;
+            }
         }
 
         @media (max-width: 600px) {
@@ -578,7 +688,7 @@
             <div class="logo">SPRING SOUND LAB</div>
             <div class="nav-links">
                 <a href="#portfolio">Портфолио</a>
-                <a href="about.html">О нас</a>
+                <a href="#about">О нас</a> <!-- якорь на раздел -->
                 <div class="dropdown">
                     <a href="#">Контакты</a>
                     <div class="dropdown-content">
@@ -593,7 +703,7 @@
             </div>
         </nav>
 
-        <!-- Герой с заголовками -->
+        <!-- Герой с заголовками и слайдером -->
         <section class="hero">
             <div class="hero-content">
                 <div class="hero-pre">СТУДИЯ ЗВУКОЗАПИСИ</div>
@@ -602,7 +712,13 @@
                 <p class="hero-desc">
                     Профессиональная архитектура звука. Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
                 </p>
-                <a href="about.html" class="hero-btn">Записаться</a>
+                <a href="#about" class="hero-btn">Записаться</a>
+            </div>
+            <div class="hero-slider">
+                <img class="slider-image active" src="https://via.placeholder.com/500x500/2a2a2a/ffffff?text=Studio+1" alt="Студия 1">
+                <img class="slider-image" src="https://via.placeholder.com/500x500/1f2a3a/ffffff?text=Studio+2" alt="Студия 2">
+                <img class="slider-image" src="https://via.placeholder.com/500x500/3a2a2a/ffffff?text=Studio+3" alt="Студия 3">
+                <img class="slider-image" src="https://via.placeholder.com/500x500/2a3a2a/ffffff?text=Studio+4" alt="Студия 4">
             </div>
         </section>
 
@@ -699,6 +815,45 @@
                 </div>
             </div>
         </section>
+
+        <!-- Раздел О нас (шахматный дизайн) -->
+        <section id="about" class="about-section">
+            <h2 class="about-title">О <span>нас</span></h2>
+            <div class="about-grid">
+                <!-- Блок 1: фото слева, текст справа -->
+                <div class="about-row">
+                    <div class="about-image" style="background-image: linear-gradient(145deg, #2a2a2a, #3c3c3c);"></div>
+                    <div class="about-text-block">
+                        <p><strong>Привет! Меня зовут АЛЕКСАНДР.</strong> Я — основатель студии и твой звукорежиссёр.</p>
+                        <p>Мой путь в музыке начался в 2010 году. За это время я прошёл всё: от записи первых демок в домашних условиях до создания собственной профессиональной лаборатории звука.</p>
+                    </div>
+                </div>
+                <!-- Блок 2: фото справа, текст слева -->
+                <div class="about-row reverse">
+                    <div class="about-image" style="background-image: linear-gradient(145deg, #1f2a3a, #2c3e50);"></div>
+                    <div class="about-text-block">
+                        <p>Я не просто человек, который «нажимает на кнопки» — <strong>я сам артист</strong>, поэтому вижу твой проект с двух сторон: как технический специалист и как музыкант.</p>
+                        <p>Здесь ты найдёшь не просто студию, а пространство для творчества, где каждая деталь настроена на то, чтобы твой звук зазвучал именно так, как ты задумал.</p>
+                    </div>
+                </div>
+                <!-- Блок 3: фото слева, текст справа -->
+                <div class="about-row">
+                    <div class="about-image" style="background-image: linear-gradient(145deg, #3a2a2a, #5a3a3a);"></div>
+                    <div class="about-text-block">
+                        <p><strong>Мы работаем в любых жанрах:</strong> поп, рэп, рок, электроника, инди. Для нас нет ограничений — есть только твоё видение и наша задача воплотить его в жизнь.</p>
+                        <p>В студии установлено современное оборудование, акустическая обработка и лучшие микрофоны для вокала и инструментов.</p>
+                    </div>
+                </div>
+                <!-- Блок 4: фото справа, текст слева -->
+                <div class="about-row reverse">
+                    <div class="about-image" style="background-image: linear-gradient(145deg, #2a3a2a, #3a5a3a);"></div>
+                    <div class="about-text-block">
+                        <p><strong>Приходи записываться, сводить, учиться или просто за советом.</strong></p>
+                        <p>Мы открыты каждый день с 10:00 до 22:00. Волгоград, Тулака 9. Ждём тебя!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <footer class="footer">
@@ -711,12 +866,12 @@
                 <div class="footer-links">
                     <h4>Исследовать</h4>
                     <a href="#portfolio">Портфолио</a>
-                    <a href="about.html">О нас</a>
+                    <a href="#about">О нас</a>
                     <a href="#">Архив</a>
                 </div>
                 <div class="footer-links">
                     <h4>Информация</h4>
-                    <a href="about.html">О нас</a>
+                    <a href="#about">О нас</a>
                     <a href="#">Контакты</a>
                     <a href="#">Выходные данные</a>
                 </div>
@@ -746,6 +901,19 @@
     </div>
 
     <script>
+        // Слайдер
+        const slides = document.querySelectorAll('.slider-image');
+        let currentSlide = 0;
+
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        setInterval(nextSlide, 5000); // меняем каждые 5 секунд
+
+        // Куки-бар
         document.querySelectorAll('.cookie-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 if (this.classList.contains('accept')) {
@@ -756,6 +924,7 @@
             });
         });
 
+        // Логин модалка
         const loginBtn = document.getElementById('loginBtn');
         const adminPanel = document.getElementById('admin-panel');
         const adminOverlay = document.getElementById('admin-overlay');
