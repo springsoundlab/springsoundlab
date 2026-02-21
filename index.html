@@ -4,19 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SPRING SOUND LAB | студия</title>
-    <!-- шрифты и иконки как в SSL -->
+    <!-- шрифты и иконки -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;500;700;800&family=Montserrat:wght@100;200;300;400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ----- ОСНОВНЫЕ ПЕРЕМЕННЫЕ (SoundBetter + SSL акценты) ----- */
+        /* ----- ПЕРЕМЕННЫЕ ----- */
         :root {
             --primary-green: #1ed760;
             --dark-bg: #181818;
-            --card-bg: #f7f7f7;
-            --border-light: #eaeaea;
-            --text-dark: #222;
-            --text-gray: #6a6a6a;
-            --accent-blue: #3b78e7;
             --neon-blue: #00f2ff;
             --neon-purple: #bc13fe;
             --neon-red: #ff003c;
@@ -25,7 +20,6 @@
             --neon-green: #00ff88;
             --youtube-red: #ff0000;
             --soft-glow: rgba(0, 242, 255, 0.25);
-            --bg-dark: #020205;
             --transition-speed: 0.4s;
         }
 
@@ -43,7 +37,7 @@
             overflow-x: hidden;
         }
 
-        /* ----- ФОН (как в SoundBetter) ----- */
+        /* ----- ФОН ----- */
         .studio-background {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -59,14 +53,14 @@
             100% { transform: scale(1.15); }
         }
 
-        /* ----- СЕТКА И КОНТЕЙНЕР ----- */
+        /* ----- КОНТЕЙНЕР ----- */
         .container {
             max-width: 1280px;
             margin: 0 auto;
             padding: 0 24px;
         }
 
-        /* ----- ШАПКА (навигация) ----- */
+        /* ----- ШАПКА (НАВИГАЦИЯ) ----- */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -117,7 +111,7 @@
             border-color: #888;
         }
 
-        /* ----- HERO секция (точная копия скриншота) ----- */
+        /* ----- HERO С ДИАГОНАЛЬНЫМ РАЗДЕЛЕНИЕМ ----- */
         .hero {
             padding: 60px 0 20px;
         }
@@ -125,32 +119,37 @@
         .hero-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 40px;
-            align-items: center;
+            align-items: stretch;
+            gap: 0; /* убираем зазор, чтобы диагональ смотрелась цельной */
         }
 
         .hero-left {
             flex: 1 1 400px;
             min-width: 300px;
+            padding: 40px 40px 40px 0;
+            background: transparent; /* фон задаёт общий фон hero */
+            z-index: 2;
         }
 
         .hero-right {
             flex: 1 1 400px;
             min-width: 300px;
-            background: rgba(255,255,255,0.02);
-            border: 2px dashed rgba(255,255,255,0.2);
-            border-radius: 20px;
-            height: 400px;
+            background: rgba(30, 215, 96, 0.1); /* легкий фон для области фото */
+            backdrop-filter: blur(10px);
+            border: 2px dashed rgba(255,255,255,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #888;
+            color: #ccc;
             font-family: 'Orbitron', sans-serif;
             font-size: 1.2rem;
             text-transform: uppercase;
-            backdrop-filter: blur(5px);
+            /* диагональное разделение: скошенный левый край */
+            clip-path: polygon(10% 0, 100% 0, 100% 100%, 0 100%);
+            transition: clip-path 0.3s ease;
         }
 
+        /* текст внутри hero */
         .hero h1 {
             font-size: 3.8rem;
             font-weight: 800;
@@ -235,7 +234,7 @@
             letter-spacing: 1px;
         }
 
-        /* ----- БЛОК СОЦСЕТЕЙ И ТЕЛЕФОНА (вынесен из hero) ----- */
+        /* ----- БЛОК СОЦСЕТЕЙ И ТЕЛЕФОНА (после hero) ----- */
         .social-phone-block {
             padding: 30px 0 20px;
             border-top: 1px solid rgba(255,255,255,0.1);
@@ -704,14 +703,18 @@
             font-weight: bold;
         }
 
-        /* адаптация */
+        /* ----- АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ: УБИРАЕМ ДИАГОНАЛЬНОЕ ОБРЕЗАНИЕ ----- */
         @media (max-width: 768px) {
             .hero-container {
                 flex-direction: column;
             }
             .hero-right {
-                height: 250px;
+                clip-path: none; /* убираем скошенный край на мобильных */
                 width: 100%;
+                height: 250px;
+            }
+            .hero-left {
+                padding-right: 0;
             }
             .hero h1 { font-size: 2.8rem; }
             .booking-grid { grid-template-columns: 1fr; }
@@ -729,7 +732,7 @@
 <body>
     <div class="studio-background"></div>
 
-    <!-- НАВИГАЦИЯ (как в SoundBetter) -->
+    <!-- НАВИГАЦИЯ -->
     <div class="container">
         <div class="navbar">
             <div class="logo">SPRING SOUND LAB</div>
@@ -744,10 +747,10 @@
         </div>
     </div>
 
-    <!-- HERO СЕКЦИЯ (точное соответствие скриншоту) -->
+    <!-- HERO С ДИАГОНАЛЬНЫМ РАЗДЕЛЕНИЕМ (ЛЕВО - ТЕКСТ, ПРАВО - ФОТО) -->
     <section class="hero">
         <div class="container hero-container">
-            <!-- Левая колонка: текст и кнопки -->
+            <!-- Левая колонка: текст и кнопки (прямоугольная) -->
             <div class="hero-left">
                 <h1>Завершите свою песню</h1>
                 <p>Лучшие в мире звукорежиссеры, авторы песен, продюсеры и студийные музыканты, которых можно нанять для сведения и мастеринга</p>
@@ -758,14 +761,15 @@
                 </div>
                 <div class="hero-sub">Откройте для себя Лучших профессионалов в области создания музыки</div>
             </div>
-            <!-- Правая колонка: место для ваших фотографий -->
+            <!-- Правая колонка: место для ваших фотографий (со скошенным левым краем) -->
             <div class="hero-right">
                 <span>Ваши фото</span>
+                <!-- Сюда вы сможете вставить изображение: <img src="your-photo.jpg" alt="студия"> -->
             </div>
         </div>
     </section>
 
-    <!-- ВЫНЕСЕННЫЙ БЛОК СОЦСЕТЕЙ И ТЕЛЕФОНА (был в hero, теперь отдельно) -->
+    <!-- ВЫНЕСЕННЫЙ БЛОК СОЦСЕТЕЙ И ТЕЛЕФОНА -->
     <div class="container social-phone-block">
         <div class="header-socials">
             <a href="#" class="social-btn vk" target="_blank"><i class="fab fa-vk"></i></a>
@@ -779,7 +783,7 @@
         </a>
     </div>
 
-    <!-- ОСНОВНОЙ КОНТЕНТ (дальше всё как в SSL) -->
+    <!-- ОСНОВНОЙ КОНТЕНТ (УСЛУГИ, ПОРТФОЛИО, ABOUT ME, КОНТАКТЫ) -->
     <div class="container">
 
         <!-- ABOUT ME с фейдером -->
@@ -960,7 +964,7 @@
         </div>
     </div>
 
-    <!-- ПОДВАЛ с модальными триггерами -->
+    <!-- ПОДВАЛ -->
     <footer>
         <div style="display: flex; justify-content: center; align-items: center; gap: 25px; flex-wrap: wrap;">
             <span>© 2026 <span style="color: var(--neon-purple);">SPRING SOUND LAB</span></span>
