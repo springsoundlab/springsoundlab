@@ -401,6 +401,7 @@
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
+            display: inline-block;
         }
 
         .event-ticket:hover {
@@ -686,6 +687,86 @@
             color: #0a0a0a;
         }
 
+        /* ===== МОДАЛЬНОЕ ОКНО ДЛЯ АРАНЖИРОВОК ===== */
+        .arrangement-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arrangement-modal {
+            background-color: #111;
+            border: 1px solid #3a8cff;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(58,140,255,0.3);
+        }
+
+        .arrangement-modal h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .arrangement-modal p {
+            margin-bottom: 15px;
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .arrangement-modal p strong {
+            color: #3a8cff;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #aaa;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .modal-close-btn:hover {
+            color: #fff;
+        }
+
+        .modal-buy-btn {
+            display: block;
+            background: #fff;
+            color: #0a0a0a;
+            text-align: center;
+            padding: 15px;
+            border-radius: 40px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            margin-top: 25px;
+            border: 2px solid #fff;
+            transition: all 0.2s;
+        }
+
+        .modal-buy-btn:hover {
+            background: transparent;
+            color: #fff;
+        }
+
         /* ===== ПОДВАЛ ===== */
         .footer {
             border-top: 1px solid rgba(255,255,255,0.1);
@@ -763,7 +844,7 @@
             padding-top: 30px;
         }
 
-        /* ===== МОДАЛКА ЛОГИНА ===== */
+        /* ===== МОДАЛКА ЛОГИНА (админ) ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -1034,7 +1115,7 @@
                 </div>
             </section>
 
-            <!-- Аранжировки -->
+            <!-- Аранжировки в наличии -->
             <section>
                 <h2 class="section-title">Аранжировки в наличии</h2>
                 <div class="events-list">
@@ -1046,7 +1127,12 @@
                             <div class="event-title">Аранжировка "Поп-баллада"</div>
                             <div class="event-location">3 500 ₽</div>
                         </div>
-                        <a href="#" class="event-ticket">Купить</a>
+                        <a href="#" class="event-ticket buy-arrangement" 
+                           data-title="Аранжировка Поп-баллада"
+                           data-price="3 500 ₽"
+                           data-genre="Поп"
+                           data-bpm="72"
+                           data-description="Нежная баллада с живыми струнными. Идеально для лирических песен.">Купить</a>
                     </div>
                     <div class="event-item">
                         <audio controls>
@@ -1056,7 +1142,12 @@
                             <div class="event-title">Аранжировка "Хип-хоп"</div>
                             <div class="event-location">4 000 ₽</div>
                         </div>
-                        <a href="#" class="event-ticket">Купить</a>
+                        <a href="#" class="event-ticket buy-arrangement"
+                           data-title="Аранжировка Хип-хоп"
+                           data-price="4 000 ₽"
+                           data-genre="Хип-хоп / Трэп"
+                           data-bpm="140"
+                           data-description="Мощный бит, глубокий бас, современные синтезаторы. Готов к записывай свой куплет.">Купить</a>
                     </div>
                     <div class="event-item">
                         <audio controls>
@@ -1066,7 +1157,12 @@
                             <div class="event-title">Аранжировка "Электроника"</div>
                             <div class="event-location">4 500 ₽</div>
                         </div>
-                        <a href="#" class="event-ticket">Купить</a>
+                        <a href="#" class="event-ticket buy-arrangement"
+                           data-title="Аранжировка Электроника"
+                           data-price="4 500 ₽"
+                           data-genre="Electro / Synthwave"
+                           data-bpm="126"
+                           data-description="Атмосферный синтезаторный грув, идеально для танцевальных треков.">Купить</a>
                     </div>
                     <div class="event-item">
                         <audio controls>
@@ -1076,7 +1172,12 @@
                             <div class="event-title">Аранжировка "Рок"</div>
                             <div class="event-location">5 000 ₽</div>
                         </div>
-                        <a href="#" class="event-ticket">Купить</a>
+                        <a href="#" class="event-ticket buy-arrangement"
+                           data-title="Аранжировка Рок"
+                           data-price="5 000 ₽"
+                           data-genre="Альтернативный рок"
+                           data-bpm="95"
+                           data-description="Живые гитары, мощные барабаны, динамичная структура.">Купить</a>
                     </div>
                 </div>
             </section>
@@ -1234,6 +1335,19 @@
         </div>
     </footer>
 
+    <!-- Модальное окно для аранжировок -->
+    <div id="arrangement-modal-overlay" class="arrangement-modal-overlay" onclick="closeArrangementModal(event)">
+        <div class="arrangement-modal" id="arrangement-modal-content">
+            <span class="modal-close-btn" onclick="closeArrangementModal(event)">&times;</span>
+            <h3 id="modal-title">Название</h3>
+            <p><strong>Цена:</strong> <span id="modal-price"></span></p>
+            <p><strong>Жанр:</strong> <span id="modal-genre"></span></p>
+            <p><strong>BPM:</strong> <span id="modal-bpm"></span></p>
+            <p><strong>Описание:</strong> <span id="modal-description"></span></p>
+            <a href="#" class="modal-buy-btn" id="modal-buy-link">Приобрести</a>
+        </div>
+    </div>
+
     <!-- Модалка логина -->
     <div id="admin-overlay" class="modal-overlay" onclick="closeAdmin()"></div>
     <div id="admin-panel" class="modal-panel">
@@ -1301,6 +1415,43 @@
 
         showPage('home');
 
+        // ===== МОДАЛЬНОЕ ОКНО ДЛЯ АРАНЖИРОВОК =====
+        const modalOverlay = document.getElementById('arrangement-modal-overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalPrice = document.getElementById('modal-price');
+        const modalGenre = document.getElementById('modal-genre');
+        const modalBpm = document.getElementById('modal-bpm');
+        const modalDescription = document.getElementById('modal-description');
+        const modalBuyLink = document.getElementById('modal-buy-link');
+
+        document.querySelectorAll('.buy-arrangement').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const title = btn.dataset.title;
+                const price = btn.dataset.price;
+                const genre = btn.dataset.genre;
+                const bpm = btn.dataset.bpm;
+                const description = btn.dataset.description;
+
+                modalTitle.textContent = title;
+                modalPrice.textContent = price;
+                modalGenre.textContent = genre;
+                modalBpm.textContent = bpm;
+                modalDescription.textContent = description;
+                // Можно задать ссылку для покупки, если нужно
+                // modalBuyLink.href = "https://example.com/buy/" + encodeURIComponent(title);
+
+                modalOverlay.style.display = 'flex';
+            });
+        });
+
+        function closeArrangementModal(event) {
+            // Если клик по оверлею или по крестику
+            if (event.target === modalOverlay || event.target.classList.contains('modal-close-btn')) {
+                modalOverlay.style.display = 'none';
+            }
+        }
+
         // ===== ЛОГИН =====
         const loginBtn = document.getElementById('loginBtn');
         const adminPanel = document.getElementById('admin-panel');
@@ -1344,6 +1495,7 @@
             }
         });
 
+        // Остановка других аудио при старте
         document.addEventListener('play', function(e) {
             const allAudios = document.querySelectorAll('audio');
             allAudios.forEach(audio => {
