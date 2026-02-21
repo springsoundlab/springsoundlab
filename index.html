@@ -45,6 +45,7 @@
             letter-spacing: -0.02em;
             text-transform: uppercase;
             color: #fff;
+            cursor: pointer;
         }
 
         .nav-links {
@@ -62,10 +63,16 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             transition: color 0.2s;
+            cursor: pointer;
         }
 
         .nav-links a:hover {
             color: #aaa;
+        }
+
+        .nav-links .active-link {
+            color: #00f2ff;
+            border-bottom: 2px solid #00f2ff;
         }
 
         .dropdown {
@@ -129,7 +136,16 @@
             color: #0a0a0a;
         }
 
-        /* Hero с заголовками и слайдером */
+        /* ===== СТРАНИЦЫ (SPA) ===== */
+        .page {
+            display: none;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        /* ===== ГЛАВНАЯ ===== */
         .hero {
             margin: 80px 0 100px 0;
             display: flex;
@@ -187,6 +203,7 @@
             letter-spacing: 1px;
             border: 2px solid #fff;
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .hero-btn:hover {
@@ -194,7 +211,7 @@
             color: #fff;
         }
 
-        /* Слайдер в шапке */
+        /* Слайдер */
         .hero-slider {
             flex: 1;
             max-width: 500px;
@@ -220,7 +237,6 @@
             opacity: 1;
         }
 
-        /* общие стили секций */
         .section-title {
             font-size: 2rem;
             font-weight: 600;
@@ -338,10 +354,9 @@
             color: #0a0a0a;
         }
 
-        /* Шахматный блок О нас (вставлен с about.html) */
-        .about-section {
-            padding: 80px 0;
-            border-top: 1px solid rgba(255,255,255,0.05);
+        /* ===== СТРАНИЦА "О НАС" (шахматка) ===== */
+        .about-page {
+            padding: 40px 0 80px;
         }
 
         .about-title {
@@ -403,7 +418,7 @@
             font-weight: 600;
         }
 
-        /* подвал */
+        /* ===== ПОДВАЛ ===== */
         .footer {
             border-top: 1px solid rgba(255,255,255,0.1);
             padding: 60px 0 40px;
@@ -446,6 +461,7 @@
             margin-bottom: 12px;
             font-size: 0.95rem;
             transition: color 0.2s;
+            cursor: pointer;
         }
 
         .footer-links a:hover {
@@ -478,6 +494,7 @@
             padding-top: 30px;
         }
 
+        /* ===== КУКИ ===== */
         .cookie-bar {
             position: fixed;
             bottom: 0;
@@ -533,6 +550,7 @@
             color: #0a0a0a;
         }
 
+        /* ===== МОДАЛКА ЛОГИНА ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -604,6 +622,7 @@
             letter-spacing: 1px;
         }
 
+        /* ===== АДАПТИВНОСТЬ ===== */
         @media (max-width: 900px) {
             .hero {
                 flex-direction: column;
@@ -672,6 +691,7 @@
     </style>
 </head>
 <body>
+    <!-- Куки бар -->
     <div class="cookie-bar">
         <div class="cookie-text">
             <strong>Этот сайт использует куки-файлы</strong>
@@ -684,11 +704,13 @@
     </div>
 
     <div class="container">
+        <!-- Навигация -->
         <nav class="navbar">
-            <div class="logo">SPRING SOUND LAB</div>
+            <div class="logo" data-page="home">SPRING SOUND LAB</div>
             <div class="nav-links">
-                <a href="#portfolio">Портфолио</a>
-                <a href="#about">О нас</a> <!-- якорь на раздел -->
+                <a data-page="home">Главная</a>
+                <a data-page="portfolio">Портфолио</a>
+                <a data-page="about">О нас</a>
                 <div class="dropdown">
                     <a href="#">Контакты</a>
                     <div class="dropdown-content">
@@ -703,122 +725,125 @@
             </div>
         </nav>
 
-        <!-- Герой с заголовками и слайдером -->
-        <section class="hero">
-            <div class="hero-content">
-                <div class="hero-pre">СТУДИЯ ЗВУКОЗАПИСИ</div>
-                <h1 class="hero-title">SPRING SOUND</h1>
-                <h1 class="hero-title-secondary">LAB</h1>
-                <p class="hero-desc">
-                    Профессиональная архитектура звука. Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
-                </p>
-                <a href="#about" class="hero-btn">Записаться</a>
-            </div>
-            <div class="hero-slider">
-                <img class="slider-image active" src="https://via.placeholder.com/500x500/2a2a2a/ffffff?text=Studio+1" alt="Студия 1">
-                <img class="slider-image" src="https://via.placeholder.com/500x500/1f2a3a/ffffff?text=Studio+2" alt="Студия 2">
-                <img class="slider-image" src="https://via.placeholder.com/500x500/3a2a2a/ffffff?text=Studio+3" alt="Студия 3">
-                <img class="slider-image" src="https://via.placeholder.com/500x500/2a3a2a/ffffff?text=Studio+4" alt="Студия 4">
-            </div>
-        </section>
+        <!-- Главная страница -->
+        <div id="home-page" class="page active-page">
+            <!-- Герой -->
+            <section class="hero">
+                <div class="hero-content">
+                    <div class="hero-pre">СТУДИЯ ЗВУКОЗАПИСИ</div>
+                    <h1 class="hero-title">SPRING SOUND</h1>
+                    <h1 class="hero-title-secondary">LAB</h1>
+                    <p class="hero-desc">
+                        Профессиональная архитектура звука. Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
+                    </p>
+                    <a class="hero-btn" data-page="about">Записаться</a>
+                </div>
+                <div class="hero-slider">
+                    <img class="slider-image active" src="https://via.placeholder.com/500x500/2a2a2a/ffffff?text=Studio+1" alt="Студия 1">
+                    <img class="slider-image" src="https://via.placeholder.com/500x500/1f2a3a/ffffff?text=Studio+2" alt="Студия 2">
+                    <img class="slider-image" src="https://via.placeholder.com/500x500/3a2a2a/ffffff?text=Studio+3" alt="Студия 3">
+                    <img class="slider-image" src="https://via.placeholder.com/500x500/2a3a2a/ffffff?text=Studio+4" alt="Студия 4">
+                </div>
+            </section>
 
-        <!-- Портфолио -->
-        <section id="portfolio">
-            <h2 class="section-title">Портфолио</h2>
-            <div class="artist-grid">
-                <div class="artist-card">
-                    <div class="artist-image one"></div>
-                    <div class="artist-info">
-                        <div class="artist-name">LUANHO - ЛЕТИ СО МНОЙ</div>
-                        <div class="artist-role">Mixed by WEYTON</div>
-                        <audio controls>
-                            <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg">
-                        </audio>
+            <!-- Портфолио -->
+            <section id="portfolio">
+                <h2 class="section-title">Портфолио</h2>
+                <div class="artist-grid">
+                    <div class="artist-card">
+                        <div class="artist-image one"></div>
+                        <div class="artist-info">
+                            <div class="artist-name">LUANHO - ЛЕТИ СО МНОЙ</div>
+                            <div class="artist-role">Mixed by WEYTON</div>
+                            <audio controls>
+                                <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
+                    </div>
+                    <div class="artist-card">
+                        <div class="artist-image two"></div>
+                        <div class="artist-info">
+                            <div class="artist-name">WEYTON - Этот город</div>
+                            <div class="artist-role">Mixed by WEYTON</div>
+                            <audio controls>
+                                <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
+                    </div>
+                    <div class="artist-card">
+                        <div class="artist-image three"></div>
+                        <div class="artist-info">
+                            <div class="artist-name">Оксана Шемановская - Необычайно</div>
+                            <div class="artist-role">Mixed by WEYTON</div>
+                            <audio controls>
+                                <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
+                    </div>
+                    <div class="artist-card">
+                        <div class="artist-image four"></div>
+                        <div class="artist-info">
+                            <div class="artist-name">TRACK 04 // PLATINUM</div>
+                            <div class="artist-role">Full Production</div>
+                            <audio controls>
+                                <source src="track4.mp3" type="audio/mpeg">
+                            </audio>
+                        </div>
                     </div>
                 </div>
-                <div class="artist-card">
-                    <div class="artist-image two"></div>
-                    <div class="artist-info">
-                        <div class="artist-name">WEYTON - Этот город</div>
-                        <div class="artist-role">Mixed by WEYTON</div>
-                        <audio controls>
-                            <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg">
-                        </audio>
-                    </div>
-                </div>
-                <div class="artist-card">
-                    <div class="artist-image three"></div>
-                    <div class="artist-info">
-                        <div class="artist-name">Оксана Шемановская - Необычайно</div>
-                        <div class="artist-role">Mixed by WEYTON</div>
-                        <audio controls>
-                            <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3" type="audio/mpeg">
-                        </audio>
-                    </div>
-                </div>
-                <div class="artist-card">
-                    <div class="artist-image four"></div>
-                    <div class="artist-info">
-                        <div class="artist-name">TRACK 04 // PLATINUM</div>
-                        <div class="artist-role">Full Production</div>
-                        <audio controls>
-                            <source src="track4.mp3" type="audio/mpeg">
-                        </audio>
-                    </div>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Аранжировки в наличии -->
-        <section>
-            <h2 class="section-title">Аранжировки в наличии</h2>
-            <div class="events-list">
-                <div class="event-item">
-                    <audio controls>
-                        <source src="arr1.mp3" type="audio/mpeg">
-                    </audio>
-                    <div class="event-details">
-                        <div class="event-title">Аранжировка "Поп-баллада"</div>
-                        <div class="event-location">3 500 ₽</div>
+            <!-- Аранжировки -->
+            <section>
+                <h2 class="section-title">Аранжировки в наличии</h2>
+                <div class="events-list">
+                    <div class="event-item">
+                        <audio controls>
+                            <source src="arr1.mp3" type="audio/mpeg">
+                        </audio>
+                        <div class="event-details">
+                            <div class="event-title">Аранжировка "Поп-баллада"</div>
+                            <div class="event-location">3 500 ₽</div>
+                        </div>
+                        <a href="#" class="event-ticket">Купить</a>
                     </div>
-                    <a href="#" class="event-ticket">Купить</a>
-                </div>
-                <div class="event-item">
-                    <audio controls>
-                        <source src="arr2.mp3" type="audio/mpeg">
-                    </audio>
-                    <div class="event-details">
-                        <div class="event-title">Аранжировка "Хип-хоп"</div>
-                        <div class="event-location">4 000 ₽</div>
+                    <div class="event-item">
+                        <audio controls>
+                            <source src="arr2.mp3" type="audio/mpeg">
+                        </audio>
+                        <div class="event-details">
+                            <div class="event-title">Аранжировка "Хип-хоп"</div>
+                            <div class="event-location">4 000 ₽</div>
+                        </div>
+                        <a href="#" class="event-ticket">Купить</a>
                     </div>
-                    <a href="#" class="event-ticket">Купить</a>
-                </div>
-                <div class="event-item">
-                    <audio controls>
-                        <source src="arr3.mp3" type="audio/mpeg">
-                    </audio>
-                    <div class="event-details">
-                        <div class="event-title">Аранжировка "Электроника"</div>
-                        <div class="event-location">4 500 ₽</div>
+                    <div class="event-item">
+                        <audio controls>
+                            <source src="arr3.mp3" type="audio/mpeg">
+                        </audio>
+                        <div class="event-details">
+                            <div class="event-title">Аранжировка "Электроника"</div>
+                            <div class="event-location">4 500 ₽</div>
+                        </div>
+                        <a href="#" class="event-ticket">Купить</a>
                     </div>
-                    <a href="#" class="event-ticket">Купить</a>
-                </div>
-                <div class="event-item">
-                    <audio controls>
-                        <source src="arr4.mp3" type="audio/mpeg">
-                    </audio>
-                    <div class="event-details">
-                        <div class="event-title">Аранжировка "Рок"</div>
-                        <div class="event-location">5 000 ₽</div>
+                    <div class="event-item">
+                        <audio controls>
+                            <source src="arr4.mp3" type="audio/mpeg">
+                        </audio>
+                        <div class="event-details">
+                            <div class="event-title">Аранжировка "Рок"</div>
+                            <div class="event-location">5 000 ₽</div>
+                        </div>
+                        <a href="#" class="event-ticket">Купить</a>
                     </div>
-                    <a href="#" class="event-ticket">Купить</a>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
 
-        <!-- Раздел О нас (шахматный дизайн) -->
-        <section id="about" class="about-section">
-            <h2 class="about-title">О <span>нас</span></h2>
+        <!-- Страница "О нас" -->
+        <div id="about-page" class="page about-page">
+            <h1 class="about-title">О <span>нас</span></h1>
             <div class="about-grid">
                 <!-- Блок 1: фото слева, текст справа -->
                 <div class="about-row">
@@ -853,25 +878,26 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
     </div>
 
+    <!-- Подвал -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div>
-                    <div class="footer-logo">SPRING SOUND LAB</div>
+                    <div class="footer-logo" data-page="home">SPRING SOUND LAB</div>
                     <p class="footer-about">Артист прежде всего. Всегда.<br>Дом для новаторского звука и визуального искусства.</p>
                 </div>
                 <div class="footer-links">
                     <h4>Исследовать</h4>
-                    <a href="#portfolio">Портфолио</a>
-                    <a href="#about">О нас</a>
-                    <a href="#">Архив</a>
+                    <a data-page="home">Главная</a>
+                    <a data-page="portfolio">Портфолио</a>
+                    <a data-page="about">О нас</a>
                 </div>
                 <div class="footer-links">
                     <h4>Информация</h4>
-                    <a href="#about">О нас</a>
+                    <a data-page="about">О нас</a>
                     <a href="#">Контакты</a>
                     <a href="#">Выходные данные</a>
                 </div>
@@ -891,6 +917,7 @@
         </div>
     </footer>
 
+    <!-- Модалка логина -->
     <div id="admin-overlay" class="modal-overlay" onclick="closeAdmin()"></div>
     <div id="admin-panel" class="modal-panel">
         <div class="modal-title">ADMIN ACCESS</div>
@@ -901,19 +928,67 @@
     </div>
 
     <script>
-        // Слайдер
+        // ===== СЛАЙДЕР =====
         const slides = document.querySelectorAll('.slider-image');
-        let currentSlide = 0;
-
-        function nextSlide() {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
+        if (slides.length) {
+            let currentSlide = 0;
+            function nextSlide() {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+            setInterval(nextSlide, 5000);
         }
 
-        setInterval(nextSlide, 5000); // меняем каждые 5 секунд
+        // ===== ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ (SPA) =====
+        const pages = {
+            home: document.getElementById('home-page'),
+            about: document.getElementById('about-page')
+        };
 
-        // Куки-бар
+        function showPage(pageId) {
+            // Скрываем все страницы
+            Object.values(pages).forEach(page => {
+                if (page) page.classList.remove('active-page');
+            });
+            // Показываем нужную
+            if (pages[pageId]) pages[pageId].classList.add('active-page');
+
+            // Подсветка активной ссылки
+            document.querySelectorAll('[data-page]').forEach(el => {
+                el.classList.remove('active-link');
+                if (el.dataset.page === pageId) {
+                    el.classList.add('active-link');
+                }
+            });
+
+            // Если выбрана about, сбрасываем скролл наверх
+            if (pageId === 'about') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Обработчики кликов по элементам с data-page
+        document.querySelectorAll('[data-page]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = el.dataset.page;
+                if (page === 'portfolio') {
+                    // Показываем главную и скроллим к портфолио
+                    showPage('home');
+                    setTimeout(() => {
+                        document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                } else if (page === 'home' || page === 'about') {
+                    showPage(page);
+                }
+            });
+        });
+
+        // По умолчанию показываем главную
+        showPage('home');
+
+        // ===== КУКИ =====
         document.querySelectorAll('.cookie-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 if (this.classList.contains('accept')) {
@@ -924,7 +999,7 @@
             });
         });
 
-        // Логин модалка
+        // ===== ЛОГИН =====
         const loginBtn = document.getElementById('loginBtn');
         const adminPanel = document.getElementById('admin-panel');
         const adminOverlay = document.getElementById('admin-overlay');
@@ -967,6 +1042,7 @@
             }
         });
 
+        // Остановка других аудио при старте
         document.addEventListener('play', function(e) {
             const allAudios = document.querySelectorAll('audio');
             allAudios.forEach(audio => {
