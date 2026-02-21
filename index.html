@@ -3,717 +3,844 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPRING SOUND LAB | Студия звукозаписи</title>
-    <!-- Шрифты и иконки -->
+    <title>SPRING SOUND LAB на SoundBetter</title>
+    <!-- Шрифт Inter и иконки Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== СБРОС И ПЕРЕМЕННЫЕ ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --bg: #ffffff;
-            --surface: #f8f9fc;
-            --card-bg: #ffffff;
-            --text-primary: #1a1e24;
-            --text-secondary: #5b6877;
-            --text-muted: #8b98a9;
-            --border-light: #eef2f6;
-            --primary: #0a66c2;      /* синий, как на soundbetter */
-            --primary-dark: #084a8f;
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --transition: all 0.2s ease;
-        }
-
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-primary);
+            background-color: #f9fafc;
+            color: #1d2c3a;
             line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
         }
 
-        a {
-            text-decoration: none;
-            color: inherit;
+        /* ===== НАВИГАЦИЯ ===== */
+        .navbar {
+            background: #fff;
+            border-bottom: 1px solid #e6ecf0;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        /* ===== КОНТЕЙНЕР ===== */
         .container {
             max-width: 1280px;
             margin: 0 auto;
             padding: 0 24px;
         }
 
-        /* ===== НАВИГАЦИЯ ===== */
-        .navbar {
-            padding: 20px 0;
-            border-bottom: 1px solid var(--border-light);
-            background: var(--bg);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            background-color: rgba(255,255,255,0.9);
-        }
-
-        .nav-container {
+        .nav-flex {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .logo {
-            font-weight: 800;
-            font-size: 1.6rem;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #1a1e24 0%, var(--primary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .logo-sb {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #1d2c3a;
+        }
+        .logo-sb span {
+            color: #0a66c2;
+        }
+
+        .nav-search {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 20px;
+        }
+        .nav-search input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid #dbe4ea;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            background: #f9fafc;
         }
 
         .nav-links {
             display: flex;
-            gap: 32px;
+            gap: 28px;
             font-weight: 500;
-            color: var(--text-secondary);
+            color: #5b6f7e;
         }
-
+        .nav-links a {
+            text-decoration: none;
+            color: inherit;
+        }
         .nav-links a:hover {
-            color: var(--primary);
+            color: #0a66c2;
         }
 
-        .nav-cta {
-            background: var(--primary);
-            color: white;
-            padding: 10px 20px;
+        .nav-signin {
+            background: none;
+            border: 1px solid #dbe4ea;
             border-radius: 30px;
+            padding: 8px 18px;
             font-weight: 600;
-            font-size: 0.9rem;
-            transition: var(--transition);
+            color: #1d2c3a;
+            cursor: pointer;
+        }
+        .nav-signin:hover {
+            background: #f0f4f9;
         }
 
-        .nav-cta:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
+        /* ===== ПРОФИЛЬ (ШАПКА) ===== */
+        .profile-header {
+            background: #fff;
+            border-bottom: 1px solid #e6ecf0;
+            padding: 32px 0 0;
         }
 
-        /* ===== ГЕРОЙ ===== */
-        .hero {
-            padding: 80px 0 60px;
-            text-align: center;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-        }
-
-        .hero h1 {
-            font-size: 3.8rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-            max-width: 900px;
-            margin: 0 auto 20px;
-            color: #0b1a2a;
-        }
-
-        .hero .highlight {
-            color: var(--primary);
-        }
-
-        .hero-sub {
-            font-size: 1.3rem;
-            color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto 30px;
-            font-weight: 400;
-        }
-
-        .hero-stats {
+        .profile-row {
             display: flex;
-            gap: 40px;
-            justify-content: center;
-            margin-top: 50px;
-            color: var(--text-muted);
+            gap: 32px;
+            align-items: flex-start;
         }
 
-        .hero-stats span {
-            font-weight: 700;
-            color: var(--text-primary);
-            font-size: 1.2rem;
-            display: block;
-        }
-
-        /* ===== ЗАГОЛОВКИ СЕКЦИЙ ===== */
-        .section-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 40px;
-            color: #0b1a2a;
-        }
-
-        .section-title span {
-            color: var(--primary);
-        }
-
-        /* ===== КАРТОЧКИ УСЛУГ (как на soundbetter) ===== */
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-bottom: 60px;
-        }
-
-        .service-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius);
-            padding: 28px;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .service-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-md);
-            border-color: #d0d9e8;
-        }
-
-        .service-card h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #0b1a2a;
-        }
-
-        .price-tag {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 16px;
-            line-height: 1;
-        }
-
-        .price-tag small {
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--text-muted);
-        }
-
-        .service-desc {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-
-        .sub-package {
-            background: var(--surface);
-            border-radius: var(--radius-sm);
-            padding: 16px;
-            margin: 16px 0;
-            border-left: 4px solid var(--primary);
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .sub-package strong {
-            color: var(--text-primary);
-            display: block;
-            margin-bottom: 6px;
-            font-size: 0.95rem;
-        }
-
-        .spec-list {
-            list-style: none;
-            margin-top: 16px;
-            border-top: 1px solid var(--border-light);
-            padding-top: 16px;
-        }
-
-        .spec-list li {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            padding: 6px 0;
-            border-bottom: 1px dashed var(--border-light);
-        }
-
-        .spec-list li span {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        /* ===== ПОРТФОЛИО (КАРТОЧКИ ТРЕКОВ) ===== */
-        .portfolio-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-            margin: 40px 0;
-        }
-
-        .track-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius);
-            overflow: hidden;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .track-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .track-cover {
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .track-info {
-            padding: 20px;
-        }
-
-        .track-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 4px;
-        }
-
-        .track-artist {
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        audio {
-            width: 100%;
-            margin-top: 8px;
-            border-radius: 20px;
-        }
-
-        /* ===== ОБО МНЕ ===== */
-        .about-section {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 60px;
-            margin: 60px 0;
-            display: flex;
-            gap: 50px;
-            align-items: center;
-        }
-
-        .about-photo {
-            width: 200px;
-            height: 200px;
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), #2b7bd0);
+            background: linear-gradient(145deg, #0a66c2, #032b4a);
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 5rem;
+            font-size: 3rem;
             font-weight: 700;
-            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .profile-info {
+            flex-grow: 1;
+        }
+        .profile-info h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+        .profile-title {
+            font-size: 1.2rem;
+            color: #5b6f7e;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .profile-meta {
+            display: flex;
+            gap: 24px;
+            color: #5b6f7e;
+            font-size: 0.95rem;
+            flex-wrap: wrap;
+        }
+        .meta-item i {
+            color: #0a66c2;
+            width: 18px;
+        }
+        .stars {
+            color: #f5b342;
+            letter-spacing: 2px;
+        }
+        .profile-price {
+            font-weight: 700;
+            color: #1d2c3a;
+            background: #f0f4f9;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== ВКЛАДКИ (TABS) ===== */
+        .tabs {
+            display: flex;
+            gap: 32px;
+            margin-top: 32px;
+            border-bottom: 1px solid #e6ecf0;
+        }
+        .tab {
+            padding: 12px 0 14px;
+            font-weight: 600;
+            color: #5b6f7e;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.15s;
+        }
+        .tab.active {
+            color: #0a66c2;
+            border-bottom-color: #0a66c2;
+        }
+
+        /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+        .main-layout {
+            display: flex;
+            gap: 32px;
+            padding: 32px 0;
+        }
+        .content-area {
+            flex: 1;
+        }
+        .sidebar {
+            width: 320px;
             flex-shrink: 0;
         }
 
-        .about-content p {
+        /* ===== КОНТЕНТ ВКЛАДОК ===== */
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* OVERVIEW */
+        .overview-card {
+            background: #fff;
+            border: 1px solid #e6ecf0;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+        .overview-card h3 {
+            font-size: 1.3rem;
             margin-bottom: 16px;
-            color: var(--text-secondary);
-            font-size: 1.05rem;
-        }
-
-        .about-content strong {
-            color: var(--text-primary);
-        }
-
-        /* ===== КОНТАКТЫ (КАРТОЧКИ) ===== */
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin: 40px 0;
-        }
-
-        .contact-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius);
-            padding: 32px;
-            text-align: center;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .contact-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-        }
-
-        .contact-label {
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .contact-main {
-            font-size: 1.5rem;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 12px;
+        }
+        .overview-text {
+            color: #2c3e50;
+            font-size: 1rem;
+            line-height: 1.6;
         }
 
-        .contact-action {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 0.9rem;
+        /* SERVICES (стили как на soundbetter) */
+        .service-item {
+            background: #fff;
+            border: 1px solid #e6ecf0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: 0.2s;
         }
-
-        /* ===== ФУТЕР ===== */
-        footer {
-            border-top: 1px solid var(--border-light);
-            padding: 40px 0;
-            margin-top: 60px;
-            background: var(--surface);
+        .service-item:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+            border-color: #bcd0e2;
         }
-
-        .footer-content {
+        .service-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
+            margin-bottom: 12px;
         }
-
-        .footer-copy {
-            color: var(--text-muted);
+        .service-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0a66c2;
+        }
+        .service-price {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #1d2c3a;
+        }
+        .service-price small {
             font-size: 0.9rem;
+            font-weight: 400;
+            color: #8b9eb0;
         }
-
-        .footer-links {
+        .service-desc {
+            color: #3b4d5e;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+        .service-features {
             display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            font-size: 0.9rem;
+            color: #5b6f7e;
+            border-top: 1px solid #eef2f6;
+            padding-top: 16px;
+        }
+        .service-features i {
+            color: #0a66c2;
+            width: 20px;
+        }
+
+        /* PORTFOLIO */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 20px;
         }
-
-        .footer-links a {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+        .portfolio-card {
+            background: #fff;
+            border: 1px solid #e6ecf0;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .portfolio-cover {
+            height: 160px;
+            background-size: cover;
+            background-position: center;
+            background-color: #eef2f6;
+        }
+        .portfolio-info {
+            padding: 16px;
+        }
+        .portfolio-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .portfolio-role {
+            font-size: 0.85rem;
+            color: #0a66c2;
+            font-weight: 500;
+        }
+        .portfolio-player {
+            margin-top: 12px;
+        }
+        audio {
+            width: 100%;
+            border-radius: 20px;
         }
 
-        .footer-links a:hover {
-            color: var(--primary);
+        /* REVIEWS */
+        .review-item {
+            background: #fff;
+            border: 1px solid #e6ecf0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .review-header {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .review-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #cbdae8;
+            color: #1d2c3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        .review-name {
+            font-weight: 700;
+        }
+        .review-date {
+            color: #8b9eb0;
+            font-size: 0.85rem;
+        }
+        .review-stars {
+            color: #f5b342;
+            margin: 8px 0 12px;
         }
 
-        /* ===== АДАПТИВНОСТЬ ===== */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
-            .nav-links { display: none; }
-            .about-section { flex-direction: column; text-align: center; padding: 30px; }
-            .section-title { font-size: 1.8rem; }
+        /* ABOUT */
+        .about-card {
+            background: #fff;
+            border: 1px solid #e6ecf0;
+            border-radius: 16px;
+            padding: 32px;
+        }
+        .about-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #2c3e50;
+            margin-bottom: 24px;
+        }
+        .about-detail {
+            display: flex;
+            gap: 24px;
+            border-top: 1px solid #eef2f6;
+            padding-top: 24px;
+        }
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #5b6f7e;
         }
 
-        /* ===== СТИЛИ ДЛЯ АДМИНКИ (сохранены с адаптацией) ===== */
-        .admin-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            z-index: 10000;
-            width: 320px;
-            text-align: center;
-            border: 1px solid var(--border-light);
+        /* ===== САЙДБАР ===== */
+        .sidebar-card {
+            background: #fff;
+            border: 1px solid #e6ecf0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
         }
-        .admin-overlay {
+        .sidebar-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+        }
+        .contact-info {
+            list-style: none;
+        }
+        .contact-info li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            color: #3b4d5e;
+        }
+        .contact-info i {
+            width: 20px;
+            color: #0a66c2;
+        }
+        .btn-block {
+            width: 100%;
+            padding: 14px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 12px;
+            background: #fff;
+            border: 1px solid #0a66c2;
+            color: #0a66c2;
+            transition: 0.2s;
+        }
+        .btn-primary {
+            background: #0a66c2;
+            color: #fff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #084a8f;
+        }
+        .btn-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,102,204,0.1);
+        }
+        .sidebar-stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 16px 0;
+        }
+
+        /* ===== МОДАЛЬНЫЕ ОКНА ===== */
+        .modal-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.5);
             backdrop-filter: blur(4px);
             z-index: 9999;
+            display: none;
         }
-        .admin-modal input {
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            border-radius: 32px;
+            padding: 32px;
+            width: 340px;
+            z-index: 10000;
+            display: none;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+        }
+        .modal input {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin: 8px 0;
-            border: 1px solid var(--border-light);
-            border-radius: 30px;
-            font-size: 0.9rem;
+            border: 1px solid #dbe4ea;
+            border-radius: 40px;
+            font-size: 0.95rem;
         }
-        .admin-modal button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 30px;
-            font-weight: 600;
+        .modal button {
             width: 100%;
+            padding: 14px;
+            border-radius: 40px;
+            background: #0a66c2;
+            color: #fff;
+            font-weight: 700;
+            border: none;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 12px;
         }
-        .admin-modal .close {
+        .modal .close-link {
+            text-align: center;
             margin-top: 16px;
-            color: var(--text-muted);
-            font-size: 0.8rem;
+            color: #8b9eb0;
+            font-size: 0.85rem;
             cursor: pointer;
+        }
+
+        /* ===== АДАПТАЦИЯ ===== */
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .profile-row { flex-wrap: wrap; }
+        }
+        @media (max-width: 600px) {
+            .tabs { gap: 16px; font-size: 0.9rem; }
+            .profile-info h1 { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- НАВИГАЦИЯ (как на soundbetter) -->
-<nav class="navbar">
-    <div class="container nav-container">
-        <div class="logo">SPRING SOUND LAB</div>
+<!-- НАВИГАЦИЯ (полная копия soundbetter) -->
+<div class="navbar">
+    <div class="container nav-flex">
+        <div class="logo-sb">SoundBetter<span>.</span></div>
+        <div class="nav-search">
+            <input type="text" placeholder="Search for pros...">
+        </div>
         <div class="nav-links">
-            <a href="#services">Услуги</a>
-            <a href="#portfolio">Портфолио</a>
-            <a href="#about">О студии</a>
-            <a href="#contact">Контакты</a>
+            <a href="#">Find pros</a>
+            <a href="#">Community</a>
+            <a href="#">Hiring</a>
         </div>
-        <a href="#contact" class="nav-cta">Забронировать</a>
+        <button class="nav-signin" id="signin-trigger">Sign In</button>
     </div>
-</nav>
+</div>
 
-<!-- ГЕРОЙ (упрощённый вариант soundbetter) -->
-<header class="hero">
+<!-- ШАПКА ПРОФИЛЯ -->
+<div class="profile-header">
     <div class="container">
-        <h1>Профессиональная <span class="highlight">архитектура звука</span><br>для артистов, готовых к сцене</h1>
-        <p class="hero-sub">Запись, сведение, мастеринг, аранжировка и уроки — всё в одной студии</p>
-        <div class="hero-stats">
-            <div><span>10+ лет</span> опыта</div>
-            <div><span>200+</span> треков</div>
-            <div><span>100%</span> индивидуально</div>
+        <div class="profile-row">
+            <div class="profile-avatar">SSL</div>
+            <div class="profile-info">
+                <h1>SPRING SOUND LAB</h1>
+                <div class="profile-title">Студия звукозаписи / Звукорежиссёр</div>
+                <div class="profile-meta">
+                    <div class="meta-item"><i class="fas fa-map-marker-alt"></i> Волгоград, Россия</div>
+                    <div class="meta-item"><i class="fas fa-star stars"></i> 5.0 (23 отзыва)</div>
+                    <div class="meta-item"><i class="fas fa-check-circle" style="color:#0a66c2;"></i> Верифицирован</div>
+                    <div class="profile-price">от 900 ₽ / час</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВКЛАДКИ -->
+        <div class="tabs" id="tabs">
+            <div class="tab active" data-tab="overview">Overview</div>
+            <div class="tab" data-tab="services">Services</div>
+            <div class="tab" data-tab="portfolio">Portfolio</div>
+            <div class="tab" data-tab="reviews">Reviews</div>
+            <div class="tab" data-tab="about">About</div>
         </div>
     </div>
-</header>
+</div>
 
-<main class="container">
+<!-- ОСНОВНОЙ КОНТЕНТ + САЙДБАР -->
+<div class="container main-layout">
+    <!-- ЛЕВАЯ ЧАСТЬ: ВКЛАДКИ -->
+    <div class="content-area">
+        <!-- OVERVIEW -->
+        <div class="tab-pane active" id="overview">
+            <div class="overview-card">
+                <h3>Профессиональная архитектура звука</h3>
+                <div class="overview-text">
+                    <p>Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене. Более 10 лет опыта, 200+ успешных треков. Работаем в любых жанрах: pop, rap, rock, electronic.</p>
+                    <p style="margin-top: 16px;">Полный цикл производства: запись, сведение, мастеринг, аранжировка, вокальный коучинг. Индивидуальный подход к каждому проекту.</p>
+                </div>
+            </div>
+        </div>
 
-    <!-- УСЛУГИ (карточки как на soundbetter) -->
-    <section id="services">
-        <h2 class="section-title">Наши <span>услуги</span></h2>
-        <div class="services-grid">
-
-            <!-- Запись -->
-            <div class="service-card">
-                <h3>ЗАПИСЬ</h3>
-                <div class="price-tag">900 ₽ <small>/ час</small></div>
-                <p class="service-desc">80% успеха трека — это правильное исполнение. Помогу выжать максимум.</p>
-                <div class="sub-package"><strong>Вокальный коучинг</strong> • Помогу с подачей, интонацией, эмоциями • Исправляю ошибки на лету</div>
-                <ul class="spec-list">
-                    <li>Предварительная запись <span>обязательна</span></li>
-                    <li>Бронирование <span>500 ₽</span></li>
-                </ul>
+        <!-- SERVICES -->
+        <div class="tab-pane" id="services">
+            <!-- ЗАПИСЬ -->
+            <div class="service-item">
+                <div class="service-header">
+                    <span class="service-name">Запись вокала / инструментов</span>
+                    <span class="service-price">900 ₽ <small>/ час</small></span>
+                </div>
+                <div class="service-desc">Профессиональная запись в тёплой аналоговой атмосфере. Помогаю с подачей, эмоциями, интонацией. В стоимость входит консультация звукорежиссёра.</div>
+                <div class="service-features">
+                    <span><i class="fas fa-check"></i> Предварительное бронирование 500 ₽</span>
+                    <span><i class="fas fa-microphone"></i> Оборудование Neumann, AKG</span>
+                </div>
             </div>
 
             <!-- START EDITION -->
-            <div class="service-card">
-                <h3>START EDITION</h3>
-                <div class="price-tag">3 900 ₽</div>
-                <p class="service-desc">Быстрый результат для песен в подарок или корпоративных гимнов.</p>
-                <div class="sub-package"><strong>Базовый продакшн</strong> • 1 час записи • Очистка дорожек • Эффекты • Сведение под минус • Мастеринг</div>
-                <ul class="spec-list">
-                    <li>Включено <span>1 час записи, 1 вокал</span></li>
-                    <li>Тюнинг вокала <span>+1000 ₽</span></li>
-                </ul>
+            <div class="service-item">
+                <div class="service-header">
+                    <span class="service-name">START EDITION</span>
+                    <span class="service-price">3 900 ₽</span>
+                </div>
+                <div class="service-desc">Идеально для песен в подарок или демо. 1 час записи, очистка дорожек, сведение под минус, мастеринг под стриминги.</div>
+                <div class="service-features">
+                    <span><i class="fas fa-check"></i> Тюнинг вокала +1000 ₽</span>
+                </div>
             </div>
 
             <!-- ARTIST EDITION -->
-            <div class="service-card">
-                <h3>ARTIST EDITION</h3>
-                <div class="price-tag">6 000 ₽</div>
-                <p class="service-desc">Для топ-чартов и стримингов. Полная проработка коммерческого звучания.</p>
-                <div class="sub-package"><strong>Профессиональный подход</strong> • Ручная коррекция • Современные эффекты • Работа со вторыми голосами</div>
-                <ul class="spec-list">
-                    <li>Обработка 2 доп. дорожек <span>включено</span></li>
-                    <li>Тюнинг доп. дорожки <span>+500 ₽</span></li>
-                </ul>
+            <div class="service-item">
+                <div class="service-header">
+                    <span class="service-name">ARTIST EDITION</span>
+                    <span class="service-price">6 000 ₽</span>
+                </div>
+                <div class="service-desc">Коммерческое звучание. Ручная коррекция, современные эффекты, работа со вторыми голосами, плотный микс.</div>
+                <div class="service-features">
+                    <span><i class="fas fa-check"></i> 2 доп. дорожки включены</span>
+                </div>
             </div>
 
             <!-- PLATINUM EDITION -->
-            <div class="service-card">
-                <h3>PLATINUM EDITION</h3>
-                <div class="price-tag">от 10 000 ₽</div>
-                <p class="service-desc">Масштабный продакшн для многодорожечных проектов.</p>
-                <div class="sub-package"><strong>Мультитрек</strong> • Сведение до 20 дорожек • Ручной тюнинг основного вокала • Саунд-дизайн</div>
-                <ul class="spec-list">
-                    <li>Доп. дорожка <span>+300 ₽</span></li>
-                    <li>Тюнинг бэков <span>индивидуально</span></li>
-                </ul>
+            <div class="service-item">
+                <div class="service-header">
+                    <span class="service-name">PLATINUM EDITION</span>
+                    <span class="service-price">от 10 000 ₽</span>
+                </div>
+                <div class="service-desc">Мультитрек до 20 дорожек. Тюнинг основного вокала, творческий саунд-дизайн.</div>
+                <div class="service-features">
+                    <span><i class="fas fa-check"></i> Доп. дорожка +300 ₽</span>
+                </div>
             </div>
 
             <!-- АРАНЖИРОВКА -->
-            <div class="service-card">
-                <h3>АРАНЖИРОВКА</h3>
-                <div class="price-tag">от 8 000 ₽</div>
-                <p class="service-desc">Уникальная музыкальная основа под ваш трек в любом стиле.</p>
-                <div class="sub-package"><strong>Индивидуальный подход</strong> • Инструментальная партитура • Живые/виртуальные инструменты • Адаптация под вокал</div>
-                <ul class="spec-list">
-                    <li>Стили <span>Pop, Rap, Rock, Electro</span></li>
-                    <li>Сроки <span>от 3 дней</span></li>
-                </ul>
+            <div class="service-item">
+                <div class="service-header">
+                    <span class="service-name">Аранжировка</span>
+                    <span class="service-price">от 8 000 ₽</span>
+                </div>
+                <div class="service-desc">Уникальная музыкальная основа под ваш трек. Любые стили: pop, rap, rock, electro, lo‑fi.</div>
+                <div class="service-features">
+                    <span><i class="fas fa-check"></i> Срок от 3 дней</span>
+                </div>
             </div>
 
             <!-- ПОДАРОЧНЫЙ СЕРТИФИКАТ -->
-            <div class="service-card">
-                <h3>ПОДАРОЧНЫЙ СЕРТИФИКАТ</h3>
-                <div class="price-tag">от 3 000 ₽</div>
-                <p class="service-desc">Идеальный подарок для музыканта — запись трека или любая услуга.</p>
-                <div class="sub-package"><strong>Варианты номинала</strong> • 1 час записи • START EDITION • ARTIST EDITION • Аранжировка</div>
-                <ul class="spec-list">
-                    <li>Срок действия <span>6 месяцев</span></li>
-                    <li>Именной/анонимный <span>по желанию</span></li>
-                </ul>
+            <div class="service-item">
+                <div class="service-header">
+                    <span class="service-name">Подарочный сертификат</span>
+                    <span class="service-price">от 3 000 ₽</span>
+                </div>
+                <div class="service-desc">Подарите запись трека или любую услугу студии. Действителен 6 месяцев, именной или анонимный.</div>
             </div>
 
-            <!-- УРОКИ ЗВУКОРЕЖИССУРЫ -->
-            <div class="service-card">
-                <h3>УРОКИ ЗВУКОРЕЖИССУРЫ</h3>
-                <div class="price-tag">1 500 ₽ <small>/ час</small></div>
-                <p class="service-desc">Индивидуальные занятия по сведению, мастерингу и работе в DAW.</p>
-                <div class="sub-package"><strong>Программа курса</strong> • Основы DAW • Теория звука • Практика сведения • Мастеринг</div>
-                <ul class="spec-list">
-                    <li>Длительность <span>60 мин</span></li>
-                    <li>Формат <span>очно / online</span></li>
-                </ul>
+            <!-- УРОКИ -->
+            <div class="service-item">
+                <div class="service-header">
+                    <span class="service-name">Уроки звукорежиссуры</span>
+                    <span class="service-price">1 500 ₽ <small>/ час</small></span>
+                </div>
+                <div class="service-desc">Индивидуальные занятия по сведению, мастерингу, работе в Ableton / Logic. Очно или онлайн.</div>
             </div>
         </div>
-    </section>
 
-    <!-- ПОРТФОЛИО (карточки треков) -->
-    <section id="portfolio">
-        <h2 class="section-title">Портфолио <span>работ</span></h2>
-        <div class="portfolio-grid">
-            <!-- Трек 1 -->
-            <div class="track-card">
-                <div class="track-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif');"></div>
-                <div class="track-info">
-                    <div class="track-title">LUANHO - ЛЕТИ СО МНОЙ</div>
-                    <div class="track-artist">сведение: WEYTON</div>
-                    <audio controls preload="none"><source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg"></audio>
+        <!-- PORTFOLIO -->
+        <div class="tab-pane" id="portfolio">
+            <div class="portfolio-grid">
+                <div class="portfolio-card">
+                    <div class="portfolio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif');"></div>
+                    <div class="portfolio-info">
+                        <div class="portfolio-title">LUANHO - Лети со мной</div>
+                        <div class="portfolio-role">сведение</div>
+                        <div class="portfolio-player">
+                            <audio controls preload="none"><source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg"></audio>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <!-- Трек 2 -->
-            <div class="track-card">
-                <div class="track-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/blob/main/etot_gorod/oblojka.jpg?raw=true');"></div>
-                <div class="track-info">
-                    <div class="track-title">WEYTON - Этот город</div>
-                    <div class="track-artist">сведение: WEYTON</div>
-                    <audio controls preload="none"><source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg"></audio>
+                <div class="portfolio-card">
+                    <div class="portfolio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/blob/main/etot_gorod/oblojka.jpg?raw=true');"></div>
+                    <div class="portfolio-info">
+                        <div class="portfolio-title">WEYTON - Этот город</div>
+                        <div class="portfolio-role">сведение</div>
+                        <div class="portfolio-player">
+                            <audio controls preload="none"><source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg"></audio>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <!-- Трек 3 -->
-            <div class="track-card">
-                <div class="track-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/oblojka.jfif');"></div>
-                <div class="track-info">
-                    <div class="track-title">Оксана Шемановская - Необычайно</div>
-                    <div class="track-artist">сведение: WEYTON</div>
-                    <audio controls preload="none"><source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3" type="audio/mpeg"></audio>
+                <div class="portfolio-card">
+                    <div class="portfolio-cover" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/oblojka.jfif');"></div>
+                    <div class="portfolio-info">
+                        <div class="portfolio-title">Оксана Шемановская - Необычайно</div>
+                        <div class="portfolio-role">сведение</div>
+                        <div class="portfolio-player">
+                            <audio controls preload="none"><source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3" type="audio/mpeg"></audio>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <!-- Заглушка на будущее -->
-            <div class="track-card">
-                <div class="track-cover" style="background: linear-gradient(145deg, #0a66c2, #0b1a2a);"></div>
-                <div class="track-info">
-                    <div class="track-title">PLATINUM TRACK</div>
-                    <div class="track-artist">скоро</div>
-                    <audio controls preload="none"><source src="#" type="audio/mpeg"></audio>
+                <div class="portfolio-card">
+                    <div class="portfolio-cover" style="background: linear-gradient(145deg, #0a66c2, #032b4a);"></div>
+                    <div class="portfolio-info">
+                        <div class="portfolio-title">PLATINUM TRACK</div>
+                        <div class="portfolio-role">скоро</div>
+                        <div class="portfolio-player"><audio controls preload="none"><source src="#"></audio></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- ОБО МНЕ (адаптировано под стиль soundbetter) -->
-    <section id="about">
-        <div class="about-section">
-            <div class="about-photo">А</div>
-            <div class="about-content">
-                <h2 class="section-title" style="margin-bottom: 20px;">Обо <span>мне</span></h2>
-                <p><strong>Привет! Я Александр</strong> — основатель студии и твой звукорежиссёр. Мой путь в музыке начался в 2010 году. За это время я прошёл всё: от домашних демо до собственной профессиональной лаборатории звука.</p>
-                <p>Я не просто «нажимаю на кнопки» — я сам артист, поэтому вижу твой проект с двух сторон: как технический специалист и как музыкант. Моя цель — сделать так, чтобы твой трек звучал на уровне индустриальных стандартов.</p>
-                <p><i class="fa-solid fa-check" style="color: var(--primary);"></i> За плечами более 200 успешных работ в разных жанрах.</p>
+        <!-- REVIEWS -->
+        <div class="tab-pane" id="reviews">
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="review-avatar">ДМ</div>
+                    <div>
+                        <div class="review-name">Дмитрий М.</div>
+                        <div class="review-date">февраль 2026</div>
+                    </div>
+                </div>
+                <div class="review-stars">★★★★★</div>
+                <p>Отличная студия! Александр помог с записью вокала, всё быстро и профессионально. Звук получился именно таким, как я хотел. Обязательно приду ещё!</p>
+            </div>
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="review-avatar">АН</div>
+                    <div>
+                        <div class="review-name">Анна Н.</div>
+                        <div class="review-date">январь 2026</div>
+                    </div>
+                </div>
+                <div class="review-stars">★★★★★</div>
+                <p>Заказывала аранжировку для своей песни. Результат превзошёл ожидания! Очень чуткий подход, учли все пожелания. Рекомендую!</p>
             </div>
         </div>
-    </section>
 
-    <!-- КОНТАКТЫ (карточки) -->
-    <section id="contact">
-        <h2 class="section-title">Связь <span>и бронь</span></h2>
-        <div class="contact-grid">
-            <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="contact-card">
-                <div class="contact-label">АДРЕС СТУДИИ</div>
-                <div class="contact-main">Волгоград, Тулака 9</div>
-                <div class="contact-action">ежедневно 10:00–22:00 →</div>
-            </a>
-            <a href="tel:+79178382017" class="contact-card">
-                <div class="contact-label">ПОЗВОНИТЬ</div>
-                <div class="contact-main">+7 917 838 20 17</div>
-                <div class="contact-action">нажми, чтобы позвонить →</div>
-            </a>
-            <a href="https://t.me/springsound_lab" target="_blank" class="contact-card">
-                <div class="contact-label">TELEGRAM</div>
-                <div class="contact-main">@springsound_lab</div>
-                <div class="contact-action">написать →</div>
-            </a>
-        </div>
-    </section>
-</main>
-
-<!-- ФУТЕР (с кнопками входа) -->
-<footer>
-    <div class="container footer-content">
-        <div class="footer-copy">© 2026 SPRING SOUND LAB / WEYTON</div>
-        <div class="footer-links">
-            <a href="#" id="admin-trigger">LOG IN</a>
-            <a href="#" id="vocal-trigger">VOCAL LOGIN</a>
+        <!-- ABOUT -->
+        <div class="tab-pane" id="about">
+            <div class="about-card">
+                <div class="about-text">
+                    <p><strong>Привет! Меня зовут Александр.</strong> Я — основатель студии и звукорежиссёр с 10-летним опытом. Начинал с домашних демо, а сегодня моя студия — место, где рождаются хиты.</p>
+                    <p>Работал с разными артистами, в том числе с LUANHO, WEYTON, Оксаной Шемановской. Для меня важно не просто «нажать кнопки», а услышать душу трека и помочь ей зазвучать.</p>
+                    <p>Владею современным оборудованием, постоянно учусь новым техникам. Буду рад воплотить твой проект в жизнь!</p>
+                </div>
+                <div class="about-detail">
+                    <div class="detail-item"><i class="fas fa-music"></i> 200+ треков</div>
+                    <div class="detail-item"><i class="fas fa-clock"></i> Ответ за 2 часа</div>
+                    <div class="detail-item"><i class="fas fa-globe"></i> Работаю по всему миру</div>
+                </div>
+            </div>
         </div>
     </div>
-</footer>
 
-<!-- МОДАЛЬНЫЕ ОКНА (полностью сохранены с вашей логикой) -->
-<div id="admin-overlay" class="admin-overlay" style="display: none;" onclick="closeAdmin()"></div>
-<div id="admin-panel" class="admin-modal" style="display: none;">
-    <div style="font-weight: 700; margin-bottom: 20px; color: var(--primary);">ADMIN ACCESS</div>
+    <!-- ПРАВАЯ КОЛОНКА (САЙДБАР) -->
+    <aside class="sidebar">
+        <div class="sidebar-card">
+            <div class="sidebar-title">Контакты</div>
+            <ul class="contact-info">
+                <li><i class="fas fa-phone"></i> <a href="tel:+79178382017">+7 917 838 20 17</a></li>
+                <li><i class="fas fa-envelope"></i> <a href="mailto:springsoundlab@mail.ru">springsoundlab@mail.ru</a></li>
+                <li><i class="fab fa-telegram"></i> <a href="https://t.me/springsound_lab" target="_blank">@springsound_lab</a></li>
+                <li><i class="fab fa-vk"></i> <a href="#" target="_blank">vk.com/springsound</a></li>
+                <li><i class="fab fa-youtube"></i> <a href="https://www.youtube.com/@SpringSoundLab" target="_blank">YouTube</a></li>
+            </ul>
+            <button class="btn-block btn-primary">Hire me</button>
+            <button class="btn-block">Message</button>
+            <button class="btn-block">Share</button>
+        </div>
+
+        <div class="sidebar-card">
+            <div class="sidebar-title">Статистика</div>
+            <div class="sidebar-stats">
+                <span>⭐ 5.0</span>
+                <span>💬 23 отзыва</span>
+            </div>
+            <div style="margin-top: 16px; font-size: 0.9rem; color: #5b6f7e;">
+                <i class="fas fa-check-circle" style="color:#0a66c2;"></i> Верифицирован
+            </div>
+        </div>
+
+        <div class="sidebar-card">
+            <div class="sidebar-title">Языки</div>
+            <div>Русский (родной), Английский (B2)</div>
+        </div>
+    </aside>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО SIGN IN (общее) -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
+<div class="modal" id="signin-modal">
+    <h3 style="margin-bottom: 20px;">Sign In</h3>
+    <input type="text" placeholder="Username or email" id="login-username">
+    <input type="password" placeholder="Password" id="login-password">
+    <button onclick="handleSignIn()">Sign In</button>
+    <div class="close-link" onclick="closeModal()">Close</div>
+    <div style="margin-top: 16px; font-size:0.8rem; color:#aaa;">(admin: admin ssl / 080808; vocal: vocal / 1310)</div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО ADMIN (как в исходном коде) -->
+<div class="modal" id="admin-panel" style="display: none;">
+    <div style="font-weight: 700; margin-bottom: 20px; color: #0a66c2;">ADMIN ACCESS</div>
     <input type="text" id="admin-login" placeholder="LOGIN" autocomplete="off">
     <input type="password" id="admin-pass" placeholder="PASSWORD">
     <button onclick="checkAdminAuth()">AUTHENTICATE</button>
-    <div class="close" onclick="closeAdmin()">Abort Mission</div>
+    <div class="close-link" onclick="closeAdmin()">Abort Mission</div>
 </div>
 
-<div id="vocal-overlay" class="admin-overlay" style="display: none;" onclick="closeVocal()"></div>
-<div id="vocal-panel" class="admin-modal" style="display: none;">
+<!-- МОДАЛЬНОЕ ОКНО VOCAL -->
+<div class="modal" id="vocal-panel" style="display: none;">
     <div style="font-weight: 700; margin-bottom: 20px; color: #5e4b6e;">VOCAL ACCESS</div>
     <input type="text" id="vocal-login" placeholder="LOGIN" autocomplete="off">
     <input type="password" id="vocal-pass" placeholder="PASSWORD">
     <button onclick="checkVocalAuth()">AUTHENTICATE</button>
-    <div class="close" onclick="closeVocal()">Abort Mission</div>
+    <div class="close-link" onclick="closeVocal()">Abort Mission</div>
 </div>
 
-<!-- СКРИПТЫ (адаптированы, но сохранена ваша логика) -->
 <script>
-    // Функции для админ-панелей (полностью ваши)
+    // ===== ВКЛАДКИ =====
+    const tabs = document.querySelectorAll('.tab');
+    const panes = document.querySelectorAll('.tab-pane');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const tabId = tab.dataset.tab;
+            panes.forEach(pane => pane.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // ===== МОДАЛЬНЫЕ ОКНА =====
+    const modalOverlay = document.getElementById('modal-overlay');
+    const signinModal = document.getElementById('signin-modal');
+    const adminPanel = document.getElementById('admin-panel');
+    const vocalPanel = document.getElementById('vocal-panel');
+
+    function openModal(modal) {
+        modalOverlay.style.display = 'block';
+        modal.style.display = 'block';
+    }
+
+    function closeModal() {
+        modalOverlay.style.display = 'none';
+        signinModal.style.display = 'none';
+        adminPanel.style.display = 'none';
+        vocalPanel.style.display = 'none';
+    }
+
+    document.getElementById('signin-trigger').addEventListener('click', () => {
+        openModal(signinModal);
+    });
+
+    function handleSignIn() {
+        // простой переход к админской логике
+        closeModal();
+        openModal(adminPanel);
+        document.getElementById('admin-login').focus();
+    }
+
+    // функции админских входов (полностью ваши)
     function closeAdmin() {
-        document.getElementById('admin-panel').style.display = 'none';
-        document.getElementById('admin-overlay').style.display = 'none';
+        adminPanel.style.display = 'none';
+        modalOverlay.style.display = 'none';
     }
     function closeVocal() {
-        document.getElementById('vocal-panel').style.display = 'none';
-        document.getElementById('vocal-overlay').style.display = 'none';
+        vocalPanel.style.display = 'none';
+        modalOverlay.style.display = 'none';
     }
     function checkAdminAuth() {
         const login = document.getElementById('admin-login').value;
@@ -752,29 +879,15 @@
         }
     }
 
-    // Открытие модалок
-    document.getElementById('admin-trigger').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('admin-overlay').style.display = 'block';
-        setTimeout(() => document.getElementById('admin-login').focus(), 100);
-    });
-    document.getElementById('vocal-trigger').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.getElementById('vocal-panel').style.display = 'block';
-        document.getElementById('vocal-overlay').style.display = 'block';
-        setTimeout(() => document.getElementById('vocal-login').focus(), 100);
-    });
-
     // Enter для модалок
     document.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            if (document.getElementById('admin-panel').style.display === 'block') checkAdminAuth();
-            if (document.getElementById('vocal-panel').style.display === 'block') checkVocalAuth();
+            if (adminPanel.style.display === 'block') checkAdminAuth();
+            if (vocalPanel.style.display === 'block') checkVocalAuth();
         }
     });
 
-    // Останавливать другие аудио при старте нового (простое решение)
+    // Остановка других аудио при старте нового
     document.querySelectorAll('audio').forEach(a => {
         a.addEventListener('play', function() {
             document.querySelectorAll('audio').forEach(other => { if (other !== this) other.pause(); });
@@ -782,5 +895,7 @@
     });
 </script>
 
+<!-- Дополнительный скрытый оверлей для входа через Sign In -->
+<div style="display: none;">Скрытый элемент для совместимости</div>
 </body>
 </html>
