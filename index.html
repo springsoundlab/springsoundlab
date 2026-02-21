@@ -303,6 +303,11 @@
             letter-spacing: -0.02em;
         }
 
+        /* Увеличиваем отступ перед секцией портфолио, чтобы заголовок был чуть ниже */
+        #portfolio {
+            margin-top: 150px;
+        }
+
         .artist-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -314,10 +319,15 @@
             background-color: #111;
             border-radius: 12px;
             overflow: hidden;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
             height: 100%;
+        }
+
+        .artist-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
         .artist-image {
@@ -363,6 +373,11 @@
             filter: invert(100%) hue-rotate(180deg) brightness(1.2);
             outline: none;
             opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .artist-card audio:hover {
+            opacity: 1;
         }
 
         .events-list {
@@ -1066,6 +1081,9 @@
             .studio-image, .equipment-image {
                 width: 100%;
             }
+            #portfolio {
+                margin-top: 80px; /* на планшетах отступ поменьше */
+            }
         }
 
         @media (max-width: 600px) {
@@ -1092,6 +1110,9 @@
                 width: 90%;
                 padding: 20px;
             }
+            #portfolio {
+                margin-top: 40px;
+            }
         }
     </style>
 </head>
@@ -1106,7 +1127,16 @@
             <div class="nav-links">
                 <a data-page="home">Главная</a>
                 <a data-page="portfolio-page">Портфолио</a>
-                <a data-page="prices">Цены</a>
+
+                <!-- Выпадающий список "Цены" -->
+                <div class="dropdown">
+                    <a>Цены</a>
+                    <div class="dropdown-content">
+                        <a data-page="prices">Запись</a>
+                        <a data-page="prices">Сведение</a>
+                        <a data-page="prices">Аранжировка</a>
+                    </div>
+                </div>
 
                 <!-- Выпадающий список "О нас" (только студия и оборудование) -->
                 <div class="dropdown">
