@@ -236,6 +236,7 @@
             margin-bottom: 20px;
         }
 
+        /* --- НОВАЯ АНИМАЦИЯ ГОЛУБОГО БЛИКА --- */
         .hero-title {
             font-size: 5rem;
             font-weight: 700;
@@ -243,15 +244,47 @@
             letter-spacing: -0.03em;
             text-transform: uppercase;
             margin-bottom: 20px;
-            color: #fff;
+            color: #fff;  /* SPRING SOUND всегда белый */
             position: relative;
             display: inline-block;
         }
 
-        .hero-title .hero-title-secondary {
-            color: #3a8cff;
-            font-weight: 700;
+        /* Голубой блик */
+        .hero-title::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -20%;
+            width: 60%;
+            height: 100%;
+            background: rgba(58, 140, 255, 0.7);
+            filter: blur(20px);
+            mix-blend-mode: screen;
+            animation: blink 2s linear forwards;
+            pointer-events: none;
+            z-index: 2;
         }
+
+        @keyframes blink {
+            0% { left: -20%; opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { left: 120%; opacity: 0; }
+        }
+
+        /* Второе слово изначально белое, к концу анимации становится синим */
+        .hero-title .hero-title-secondary {
+            color: #fff;
+            font-weight: 700;
+            animation: colorShift 2s linear forwards;
+        }
+
+        @keyframes colorShift {
+            0% { color: #fff; }
+            70% { color: #fff; }
+            100% { color: #3a8cff; }
+        }
+        /* ---------------------------------------- */
 
         .hero-desc {
             font-size: 2rem;
@@ -1070,7 +1103,6 @@
             resize: vertical;
         }
 
-        /* Исправлено: кнопка без дерганья при наведении */
         .vocal-modal-submit {
             background: #fff;
             color: #0a0a0a;
@@ -1693,7 +1725,6 @@
                             Акустическая, электрогитара, бас. Обучение с нуля и для продвинутых. Техника, теория, импровизация. Индивидуальный подход.
                         </p>
                     </div>
-                    <!-- Теперь такая же кнопка, как на вокале, с классом open-vocal-modal -->
                     <a class="hero-btn open-vocal-modal">Записаться на пробное занятие</a>
                 </div>
                 <div class="hero-slider">
