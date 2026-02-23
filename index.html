@@ -11,7 +11,7 @@
     <!-- Скрипт виджета отзывов -->
     <script src="https://res.smartwidgets.ru/app.js" async></script>
     <style>
-        /* === ВАШИ СТИЛИ (ПОЛНОСТЬЮ СОХРАНЕНЫ, ИСПРАВЛЕНА АНИМАЦИЯ БЛИКА) === */
+        /* === ВАШИ СТИЛИ (ПОЛНОСТЬЮ СОХРАНЕНЫ) === */
         * {
             margin: 0;
             padding: 0;
@@ -62,11 +62,24 @@
             cursor: pointer;
         }
 
-        .address {
-            font-size: 0.95rem;
+        /* Адрес теперь кликабельный с иконкой */
+        .header-address {
+            display: flex;
+            align-items: center;
+            gap: 5px;
             color: #ffffff;
+            text-decoration: none;
+            font-size: 0.95rem;
             letter-spacing: 0.5px;
             white-space: nowrap;
+            transition: color 0.2s;
+        }
+        .header-address i {
+            color: #3a8cff;
+            font-size: 1rem;
+        }
+        .header-address:hover {
+            color: #aaa;
         }
 
         .nav-links {
@@ -93,9 +106,10 @@
             color: #aaa;
         }
 
+        /* Активная ссылка – синий текст и подчёркивание */
         .nav-links .active-link {
-            color: #3a8cff;
-            border-bottom: 2px solid #3a8cff;
+            color: #3a8cff !important;
+            border-bottom: 2px solid #3a8cff !important;
         }
 
         .nav-links a, .dropdown-content a, .dropdown-content .phone-number, .header-phone, .footer-links a, .footer-dropdown-title {
@@ -226,7 +240,7 @@
             margin-bottom: 20px;
         }
 
-        /* --- НОВАЯ АНИМАЦИЯ БЛИКА --- */
+        /* --- ИСПРАВЛЕННЫЙ БЛИК --- */
         .hero-title {
             font-size: 5rem;
             font-weight: 700;
@@ -234,49 +248,62 @@
             letter-spacing: -0.03em;
             text-transform: uppercase;
             margin-bottom: 20px;
-            /* Весь заголовок изначально серый, чтобы блик был виден */
-            color: #888;
+            color: #fff;  /* SPRING SOUND всегда белый */
             position: relative;
-            display: inline-block; /* чтобы псевдоэлемент ограничивался шириной текста */
+            display: inline-block;
+            /* убираем старый псевдоэлемент */
         }
 
-        /* Псевдоэлемент для блика */
-        .hero-title::before {
+        /* Второе слово (LAB/VOCAL/GUITAR) изначально серое */
+        .hero-title .hero-title-secondary {
+            color: #888;
+            font-weight: 700;
+            transition: color 0.2s ease 1.5s; /* плавное появление синего после блика */
+        }
+
+        /* Сам блик – круглое пятно с размытием */
+        .hero-title::after {
             content: '';
             position: absolute;
             top: 0;
-            left: -20%; /* начинаем за левым краем */
-            width: 30%;  /* ширина блика */
+            left: -20%;
+            width: 30%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            filter: blur(8px); /* лёгкое размытие по краям, но основной блик чёткий */
-            mix-blend-mode: overlay; /* осветляет текст под собой */
-            animation: blinkSlide 1.5s ease forwards;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 70%);
+            filter: blur(10px);
+            mix-blend-mode: overlay;
             pointer-events: none;
+            animation: blinkMove 1.6s cubic-bezier(0.25, 0.1, 0.15, 1) forwards;
             z-index: 2;
         }
 
-        @keyframes blinkSlide {
+        @keyframes blinkMove {
             0% {
-                left: -30%;
+                left: -20%;
+                opacity: 0;
+            }
+            5% {
+                opacity: 1;
+            }
+            80% {
+                left: 75%; /* останавливается на последней букве второго слова */
+                opacity: 1;
             }
             100% {
-                left: 100%;
+                left: 110%;
+                opacity: 0;
             }
         }
 
+        /* После окончания анимации второе слово становится синим */
         .hero-title .hero-title-secondary {
-            color: inherit; /* наследует серый цвет от родителя */
-            font-weight: 700;
-            animation: colorChange 0s 1.5s forwards; /* изменение цвета после блика */
+            animation: secondaryColor 0s 1.5s forwards;
         }
 
-        @keyframes colorChange {
-            to {
-                color: #3a8cff;
-            }
+        @keyframes secondaryColor {
+            to { color: #3a8cff; }
         }
-        /* --------------------------------- */
+        /* ------------------------- */
 
         .hero-desc {
             font-size: 2rem;
@@ -1384,23 +1411,25 @@
             letter-spacing: 1px;
         }
 
-        /* ===== ПОДВАЛ (обновлённый) ===== */
+        /* ===== ПОДВАЛ (УЗКИЙ, ВЫПАДАНИЕ ВВЕРХ) ===== */
         .footer {
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 60px 0 40px;
+            padding: 20px 0 20px; /* значительно уменьшил отступы */
             margin-top: 80px;
+            font-size: 0.9rem;
         }
 
         .footer-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1.5fr;
             gap: 40px;
+            align-items: start; /* чтобы колонки не растягивались */
         }
 
         .footer-logo {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             letter-spacing: -0.02em;
             text-transform: uppercase;
             cursor: pointer;
@@ -1408,31 +1437,31 @@
 
         .footer-about {
             color: #aaa;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            max-width: 300px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            max-width: 250px;
         }
 
-        /* Новые стили для выпадающих заголовков */
+        /* Выпадающие списки в футере открываются вверх */
         .footer-dropdown {
-            margin-bottom: 15px;
+            position: relative;
+            margin-bottom: 0; /* убрал лишний отступ */
         }
 
         .footer-dropdown-title {
-            font-size: 1rem;
-            margin-bottom: 10px;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #fff;
             cursor: pointer;
             display: inline-block;
-            position: relative;
         }
 
         .footer-dropdown-title::after {
             content: "▼";
-            font-size: 0.7rem;
-            margin-left: 8px;
+            font-size: 0.6rem;
+            margin-left: 5px;
             transition: transform 0.2s;
         }
 
@@ -1442,9 +1471,17 @@
 
         .footer-dropdown-content {
             display: none;
-            list-style: none;
-            padding: 0;
-            margin: 5px 0 0 0;
+            position: absolute;
+            bottom: 100%; /* открывается вверх */
+            left: 0;
+            background-color: rgba(26,26,26,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 8px 0;
+            min-width: 150px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.4);
+            z-index: 10;
+            margin-bottom: 5px;
         }
 
         .footer-dropdown.open .footer-dropdown-content {
@@ -1455,26 +1492,27 @@
             display: block;
             color: #aaa;
             text-decoration: none;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
+            padding: 6px 16px;
+            font-size: 0.85rem;
             transition: color 0.2s;
+            white-space: nowrap;
         }
 
         .footer-dropdown-content a:hover {
             color: #fff;
+            background-color: rgba(255,255,255,0.05);
         }
 
-        /* Контактная информация в футере */
         .footer-contact {
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .footer-contact a {
             display: block;
             color: #aaa;
             text-decoration: none;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
             transition: color 0.2s;
         }
 
@@ -1483,19 +1521,20 @@
         }
 
         .footer-contact i {
-            margin-right: 8px;
+            margin-right: 6px;
             color: #3a8cff;
+            width: 16px;
         }
 
         .social-icons {
             display: flex;
-            gap: 20px;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 10px;
         }
 
         .social-icons a {
             color: #fff;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             opacity: 0.7;
             transition: opacity 0.2s;
         }
@@ -1505,12 +1544,12 @@
         }
 
         .copyright {
-            margin-top: 60px;
+            margin-top: 20px;
             color: #666;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-align: center;
             border-top: 1px solid rgba(255,255,255,0.05);
-            padding-top: 30px;
+            padding-top: 15px;
         }
 
         /* ===== АДАПТАЦИЯ ===== */
@@ -1556,6 +1595,7 @@
             }
             .footer-grid {
                 grid-template-columns: 1fr 1fr;
+                gap: 20px;
             }
             .event-item {
                 flex-direction: column;
@@ -1600,7 +1640,7 @@
                 gap: 10px;
                 justify-content: center;
             }
-            .address {
+            .header-address {
                 white-space: normal;
                 text-align: center;
             }
@@ -1646,9 +1686,11 @@
         <!-- Навигация -->
         <nav class="navbar">
             <div class="navbar-left">
-                <!-- Логотип – простой текст, как в старом коде -->
                 <div class="logo" data-page="home">SPRING SOUND LAB</div>
-                <div class="address">г. Волгоград, ул. Тулака 9</div>
+                <!-- Адрес теперь кликабельный с иконкой -->
+                <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="header-address">
+                    <i class="fas fa-map-marker-alt"></i> г. Волгоград, ул. Тулака 9
+                </a>
             </div>
             <div class="nav-links">
                 <a data-page="home">Главная</a>
@@ -1703,7 +1745,6 @@
 
         <!-- Главная страница -->
         <div id="home-page" class="page active-page">
-            <!-- Герой -->
             <section class="hero">
                 <div class="hero-content">
                     <div>
@@ -1725,7 +1766,6 @@
                 </div>
             </section>
 
-            <!-- Примеры работ -->
             <section id="portfolio">
                 <h2 class="section-title">Примеры работ</h2>
                 <div class="artist-grid">
@@ -1772,7 +1812,6 @@
                 </div>
             </section>
 
-            <!-- Аранжировки в наличии -->
             <section id="arrangements">
                 <h2 class="section-title">Аранжировки в наличии</h2>
                 <div class="events-list">
@@ -2115,7 +2154,7 @@
         <div class="arrangement-modal-close" onclick="closeArrangementModal()">Закрыть</div>
     </div>
 
-    <!-- Подвал (обновлённый) -->
+    <!-- Подвал (узкий, выпадающие списки вверх) -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
@@ -2157,7 +2196,7 @@
 
                 <!-- Колонка "Мы в соцсетях" (без изменений) -->
                 <div class="footer-links">
-                    <h4>Мы в соцсетях</h4>
+                    <h4 style="font-size:0.95rem; margin-bottom:5px;">Мы в соцсетях</h4>
                     <div class="social-icons">
                         <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
                         <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
