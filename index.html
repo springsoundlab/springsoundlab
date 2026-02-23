@@ -11,7 +11,7 @@
     <!-- Скрипт виджета отзывов -->
     <script src="https://res.smartwidgets.ru/app.js" async></script>
     <style>
-        /* === ВАШИ СТИЛИ (ПОЛНОСТЬЮ СОХРАНЕНЫ, ИСПРАВЛЕНЫ ЛОГОТИП И АНИМАЦИЯ) === */
+        /* === ВАШИ СТИЛИ (ПОЛНОСТЬЮ СОХРАНЕНЫ, ИСПРАВЛЕНА АНИМАЦИЯ БЛИКА) === */
         * {
             margin: 0;
             padding: 0;
@@ -32,7 +32,7 @@
             padding: 0 40px;
         }
 
-        /* Фиксированная навигация (исходный вид) */
+        /* Фиксированная навигация */
         .navbar {
             position: sticky;
             top: 0;
@@ -53,7 +53,6 @@
             flex-wrap: wrap;
         }
 
-        /* Логотип – простой текст, как в старом коде */
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
@@ -99,7 +98,6 @@
             border-bottom: 2px solid #3a8cff;
         }
 
-        /* Курсор-палец для кликабельных элементов */
         .nav-links a, .dropdown-content a, .dropdown-content .phone-number, .header-phone, .footer-links a, .footer-dropdown-title {
             cursor: pointer;
         }
@@ -228,6 +226,7 @@
             margin-bottom: 20px;
         }
 
+        /* --- НОВАЯ АНИМАЦИЯ БЛИКА --- */
         .hero-title {
             font-size: 5rem;
             font-weight: 700;
@@ -235,26 +234,41 @@
             letter-spacing: -0.03em;
             text-transform: uppercase;
             margin-bottom: 20px;
-            animation: shine 2s ease forwards;
+            /* Весь заголовок изначально серый, чтобы блик был виден */
+            color: #888;
+            position: relative;
+            display: inline-block; /* чтобы псевдоэлемент ограничивался шириной текста */
+        }
+
+        /* Псевдоэлемент для блика */
+        .hero-title::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -20%; /* начинаем за левым краем */
+            width: 30%;  /* ширина блика */
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            filter: blur(8px); /* лёгкое размытие по краям, но основной блик чёткий */
+            mix-blend-mode: overlay; /* осветляет текст под собой */
+            animation: blinkSlide 1.5s ease forwards;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes blinkSlide {
+            0% {
+                left: -30%;
+            }
+            100% {
+                left: 100%;
+            }
         }
 
         .hero-title .hero-title-secondary {
-            color: #888;
+            color: inherit; /* наследует серый цвет от родителя */
             font-weight: 700;
-            animation: colorChange 0s 1.5s forwards;
-        }
-
-        /* Анимация блика */
-        @keyframes shine {
-            0% {
-                text-shadow: -20px 0 10px rgba(255,255,255,0.2);
-            }
-            40% {
-                text-shadow: 20px 0 20px rgba(255,255,255,0.5);
-            }
-            100% {
-                text-shadow: none;
-            }
+            animation: colorChange 0s 1.5s forwards; /* изменение цвета после блика */
         }
 
         @keyframes colorChange {
@@ -262,6 +276,7 @@
                 color: #3a8cff;
             }
         }
+        /* --------------------------------- */
 
         .hero-desc {
             font-size: 2rem;
@@ -271,11 +286,10 @@
             margin-bottom: 20px;
         }
 
-        /* Кнопка "Записаться" теперь менее яркая */
         .hero-btn {
             margin-top: 50px;
             display: inline-block;
-            background-color: transparent;  /* прозрачный фон */
+            background-color: transparent;
             color: #fff;
             text-decoration: none;
             padding: 16px 48px;
@@ -295,7 +309,6 @@
             color: #0a0a0a;
         }
 
-        /* Слайдер: видимая область, скруглённые углы */
         .hero-slider {
             flex: 1;
             max-width: 600px;
@@ -331,13 +344,11 @@
             color: #fff;
         }
 
-        /* Заголовки секций на главной странице делаем серыми, как hero-pre */
         #portfolio .section-title,
         #arrangements .section-title {
             color: #aaa;
         }
 
-        /* Отступ для секции Примеры работ */
         #portfolio {
             margin-top: 270px;
         }
@@ -649,7 +660,7 @@
             color: #0a0a0a;
         }
 
-        /* Страница цен на уроки гитары (аналогично вокалу) */
+        /* Страница цен на уроки гитары */
         .guitar-prices-page {
             padding: 40px 0 80px;
         }
@@ -1691,7 +1702,7 @@
         </nav>
 
         <!-- Главная страница -->
-        <div id="home-page" class="page">
+        <div id="home-page" class="page active-page">
             <!-- Герой -->
             <section class="hero">
                 <div class="hero-content">
