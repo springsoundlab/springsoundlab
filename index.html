@@ -32,7 +32,6 @@
             padding: 0 40px;
         }
 
-        /* Навигация */
         .navbar {
             position: sticky;
             top: 0;
@@ -238,7 +237,7 @@
             margin-bottom: 20px;
         }
 
-        /* --- НОВАЯ КРАСИВАЯ АНИМАЦИЯ --- */
+        /* --- НОВАЯ «ДОРОГАЯ» АНИМАЦИЯ --- */
         .hero-title {
             font-size: 5rem;
             font-weight: 700;
@@ -249,9 +248,33 @@
             color: #fff;  /* SPRING SOUND всегда белый */
             position: relative;
             display: inline-block;
+            /* Фоновое свечение (боке) */
+            &::before {
+                content: '';
+                position: absolute;
+                top: -20%;
+                left: -10%;
+                width: 120%;
+                height: 140%;
+                background: radial-gradient(circle at 30% 50%, rgba(58,140,255,0.4) 0%, rgba(255,255,255,0.1) 40%, transparent 70%);
+                filter: blur(40px);
+                opacity: 0;
+                animation: glowPulse 2.4s ease-out forwards;
+                pointer-events: none;
+                z-index: 0;
+            }
         }
 
-        /* Световая волна */
+        /* Пульсация фонового свечения */
+        @keyframes glowPulse {
+            0% { opacity: 0; transform: scale(0.8); }
+            20% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 0.5; }
+            80% { opacity: 0.3; }
+            100% { opacity: 0; }
+        }
+
+        /* Блик-отражение (скользящая полоса) */
         .hero-title::after {
             content: '';
             position: absolute;
@@ -259,16 +282,16 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), rgba(255,255,255,0.5), rgba(255,255,255,0.3), transparent);
             transform: translateX(-100%);
-            animation: sweep 2s ease-in-out forwards;
+            animation: shine 2.4s cubic-bezier(0.25, 0.1, 0.15, 1) forwards;
             pointer-events: none;
             z-index: 2;
         }
 
-        @keyframes sweep {
+        @keyframes shine {
             0% { transform: translateX(-100%); }
-            50% { transform: translateX(0); }
+            40% { transform: translateX(0); }
             100% { transform: translateX(100%); }
         }
 
@@ -276,25 +299,37 @@
             color: #888; /* стартовый серый */
             font-weight: 700;
             display: inline-block;
-            animation: neonGlow 2s ease-in-out forwards;
+            position: relative;
+            z-index: 1;
+            /* Анимация перелива + финальный синий */
+            animation: premiumGlow 2.4s ease-in-out forwards;
         }
 
-        @keyframes neonGlow {
+        @keyframes premiumGlow {
             0% {
                 color: #888;
                 text-shadow: none;
+                background: none;
             }
-            30% {
-                color: #aaddff;  /* светло-голубой */
-                text-shadow: 0 0 5px #3a8cff, 0 0 15px #3a8cff80;
+            15% {
+                color: #ccd;
+                text-shadow: 0 0 5px #fff, 0 0 15px #3a8cff;
+            }
+            35% {
+                color: #eef;
+                text-shadow: 0 0 8px #fff, 0 0 25px #3a8cff, 0 0 40px #ffd966;
             }
             60% {
-                color: #3a8cff;  /* синий */
-                text-shadow: 0 0 10px #3a8cff, 0 0 30px #3a8cff;
+                color: #3a8cff;
+                text-shadow: 0 0 12px #3a8cff, 0 0 30px #ffd966, 0 0 60px #fff8;
+            }
+            85% {
+                color: #3a8cff;
+                text-shadow: 0 0 8px #3a8cff, 0 0 20px #ffd966;
             }
             100% {
                 color: #3a8cff;
-                text-shadow: none;  /* финальное слово без свечения */
+                text-shadow: none; /* финал – чистый синий */
             }
         }
         /* ------------------------------ */
