@@ -11,7 +11,7 @@
     <!-- Скрипт виджета отзывов -->
     <script src="https://res.smartwidgets.ru/app.js" async></script>
     <style>
-        /* === ВАШИ СТИЛИ (ПОЛНОСТЬЮ СОХРАНЕНЫ) === */
+        /* === БАЗОВЫЕ СТИЛИ === */
         * {
             margin: 0;
             padding: 0;
@@ -32,7 +32,7 @@
             padding: 0 40px;
         }
 
-        /* Фиксированная навигация */
+        /* Навигация */
         .navbar {
             position: sticky;
             top: 0;
@@ -62,7 +62,6 @@
             cursor: pointer;
         }
 
-        /* Адрес теперь кликабельный с иконкой */
         .header-address {
             display: flex;
             align-items: center;
@@ -106,7 +105,6 @@
             color: #aaa;
         }
 
-        /* Активная ссылка – синий текст и подчёркивание */
         .nav-links .active-link {
             color: #3a8cff !important;
             border-bottom: 2px solid #3a8cff !important;
@@ -240,7 +238,7 @@
             margin-bottom: 20px;
         }
 
-        /* --- ИСПРАВЛЕННЫЙ БЛИК --- */
+        /* --- НОВАЯ КРАСИВАЯ АНИМАЦИЯ --- */
         .hero-title {
             font-size: 5rem;
             font-weight: 700;
@@ -251,59 +249,55 @@
             color: #fff;  /* SPRING SOUND всегда белый */
             position: relative;
             display: inline-block;
-            /* убираем старый псевдоэлемент */
         }
 
-        /* Второе слово (LAB/VOCAL/GUITAR) изначально серое */
-        .hero-title .hero-title-secondary {
-            color: #888;
-            font-weight: 700;
-            transition: color 0.2s ease 1.5s; /* плавное появление синего после блика */
-        }
-
-        /* Сам блик – круглое пятно с размытием */
+        /* Световая волна */
         .hero-title::after {
             content: '';
             position: absolute;
             top: 0;
-            left: -20%;
-            width: 30%;
+            left: 0;
+            width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 70%);
-            filter: blur(10px);
-            mix-blend-mode: overlay;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: translateX(-100%);
+            animation: sweep 2s ease-in-out forwards;
             pointer-events: none;
-            animation: blinkMove 1.6s cubic-bezier(0.25, 0.1, 0.15, 1) forwards;
             z-index: 2;
         }
 
-        @keyframes blinkMove {
+        @keyframes sweep {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(0); }
+            100% { transform: translateX(100%); }
+        }
+
+        .hero-title .hero-title-secondary {
+            color: #888; /* стартовый серый */
+            font-weight: 700;
+            display: inline-block;
+            animation: neonGlow 2s ease-in-out forwards;
+        }
+
+        @keyframes neonGlow {
             0% {
-                left: -20%;
-                opacity: 0;
+                color: #888;
+                text-shadow: none;
             }
-            5% {
-                opacity: 1;
+            30% {
+                color: #aaddff;  /* светло-голубой */
+                text-shadow: 0 0 5px #3a8cff, 0 0 15px #3a8cff80;
             }
-            80% {
-                left: 75%; /* останавливается на последней букве второго слова */
-                opacity: 1;
+            60% {
+                color: #3a8cff;  /* синий */
+                text-shadow: 0 0 10px #3a8cff, 0 0 30px #3a8cff;
             }
             100% {
-                left: 110%;
-                opacity: 0;
+                color: #3a8cff;
+                text-shadow: none;  /* финальное слово без свечения */
             }
         }
-
-        /* После окончания анимации второе слово становится синим */
-        .hero-title .hero-title-secondary {
-            animation: secondaryColor 0s 1.5s forwards;
-        }
-
-        @keyframes secondaryColor {
-            to { color: #3a8cff; }
-        }
-        /* ------------------------- */
+        /* ------------------------------ */
 
         .hero-desc {
             font-size: 2rem;
@@ -933,7 +927,7 @@
             font-weight: 600;
         }
 
-        /* Новые стили для страниц уроков */
+        /* Страницы уроков */
         .lesson-description,
         .lesson-teacher {
             padding: 80px 0;
@@ -1032,7 +1026,7 @@
             }
         }
 
-        /* Модальное окно записи на вокал */
+        /* Модальные окна */
         .vocal-modal-overlay {
             display: none;
             position: fixed;
@@ -1158,7 +1152,6 @@
             color: #fff;
         }
 
-        /* Модальное окно записи (общее) */
         .book-modal-overlay {
             display: none;
             position: fixed;
@@ -1247,7 +1240,6 @@
             color: #fff;
         }
 
-        /* Модальное окно для покупки аранжировки */
         .arrangement-modal-overlay {
             display: none;
             position: fixed;
@@ -1339,7 +1331,6 @@
             color: #fff;
         }
 
-        /* Модалка логина */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -1414,7 +1405,7 @@
         /* ===== ПОДВАЛ (УЗКИЙ, ВЫПАДАНИЕ ВВЕРХ) ===== */
         .footer {
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 20px 0 20px; /* значительно уменьшил отступы */
+            padding: 20px 0 20px;
             margin-top: 80px;
             font-size: 0.9rem;
         }
@@ -1423,7 +1414,7 @@
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1.5fr;
             gap: 40px;
-            align-items: start; /* чтобы колонки не растягивались */
+            align-items: start;
         }
 
         .footer-logo {
@@ -1435,17 +1426,32 @@
             cursor: pointer;
         }
 
-        .footer-about {
-            color: #aaa;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            max-width: 250px;
+        .footer-contact {
+            margin-top: 10px;
         }
 
-        /* Выпадающие списки в футере открываются вверх */
+        .footer-contact a {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .footer-contact a:hover {
+            color: #fff;
+        }
+
+        .footer-contact i {
+            margin-right: 6px;
+            color: #3a8cff;
+            width: 16px;
+        }
+
         .footer-dropdown {
             position: relative;
-            margin-bottom: 0; /* убрал лишний отступ */
+            margin-bottom: 0;
         }
 
         .footer-dropdown-title {
@@ -1472,7 +1478,7 @@
         .footer-dropdown-content {
             display: none;
             position: absolute;
-            bottom: 100%; /* открывается вверх */
+            bottom: 100%;
             left: 0;
             background-color: rgba(26,26,26,0.95);
             backdrop-filter: blur(10px);
@@ -1503,27 +1509,10 @@
             background-color: rgba(255,255,255,0.05);
         }
 
-        .footer-contact {
-            margin-top: 10px;
-        }
-
-        .footer-contact a {
-            display: block;
-            color: #aaa;
-            text-decoration: none;
-            margin-bottom: 5px;
-            font-size: 0.85rem;
-            transition: color 0.2s;
-        }
-
-        .footer-contact a:hover {
-            color: #fff;
-        }
-
-        .footer-contact i {
-            margin-right: 6px;
-            color: #3a8cff;
-            width: 16px;
+        .footer-links h4 {
+            font-size:0.95rem; 
+            margin-bottom:5px;
+            color:#fff;
         }
 
         .social-icons {
@@ -1554,130 +1543,45 @@
 
         /* ===== АДАПТАЦИЯ ===== */
         @media (max-width: 900px) {
-            .container {
-                padding: 0 30px;
-            }
-            .navbar {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-            .navbar-left {
-                justify-content: space-between;
-                gap: 30px;
-                width: 100%;
-            }
-            .nav-links {
-                justify-content: center;
-                gap: 25px;
-            }
-            .hero {
-                flex-direction: column;
-                align-items: center;
-                margin: 40px 0 60px;
-            }
-            .hero-content {
-                width: 100%;
-            }
-            .hero-title {
-                font-size: 4rem;
-            }
-            .hero-slider {
-                max-width: 100%;
-                width: 100%;
-            }
-            .hero-desc {
-                max-width: 100%;
-                font-size: 1.8rem;
-            }
-            .artist-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-            }
-            .event-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            .event-details {
-                padding-left: 0;
-            }
-            .event-item audio {
-                width: 100%;
-                margin-right: 0;
-            }
-            .studio-row, .studio-row.reverse,
-            .equipment-row, .equipment-row.reverse {
-                flex-direction: column;
-                gap: 20px;
-            }
-            .studio-image, .equipment-image {
-                width: 100%;
-            }
-            #portfolio {
-                margin-top: 80px;
-            }
+            .container { padding: 0 30px; }
+            .navbar { flex-direction: column; align-items: stretch; gap: 15px; }
+            .navbar-left { justify-content: space-between; gap: 30px; width: 100%; }
+            .nav-links { justify-content: center; gap: 25px; }
+            .hero { flex-direction: column; align-items: center; margin: 40px 0 60px; }
+            .hero-content { width: 100%; }
+            .hero-title { font-size: 4rem; }
+            .hero-slider { max-width: 100%; width: 100%; }
+            .hero-desc { max-width: 100%; font-size: 1.8rem; }
+            .artist-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+            .event-item { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .event-details { padding-left: 0; }
+            .event-item audio { width: 100%; margin-right: 0; }
+            .studio-row, .studio-row.reverse, .equipment-row, .equipment-row.reverse { flex-direction: column; gap: 20px; }
+            .studio-image, .equipment-image { width: 100%; }
+            #portfolio { margin-top: 80px; }
         }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 0 20px;
-            }
-            .hero-title {
-                font-size: 3rem;
-            }
-            .hero-desc {
-                font-size: 1.5rem;
-            }
-            .artist-grid {
-                grid-template-columns: 1fr;
-            }
-            .navbar-left {
-                flex-wrap: wrap;
-                gap: 10px;
-                justify-content: center;
-            }
-            .header-address {
-                white-space: normal;
-                text-align: center;
-            }
-            .nav-links {
-                gap: 15px;
-            }
-            .nav-links > a, .nav-links > .dropdown > a {
-                font-size: 0.85rem;
-            }
-            .header-phone {
-                font-size: 0.85rem;
-            }
-            .book-modal-panel, .arrangement-modal-panel, .vocal-modal-panel {
-                width: 90%;
-                padding: 20px;
-            }
-            #portfolio {
-                margin-top: 60px;
-            }
-            .logo {
-                font-size: 1.2rem;
-            }
+            .container { padding: 0 20px; }
+            .hero-title { font-size: 3rem; }
+            .hero-desc { font-size: 1.5rem; }
+            .artist-grid { grid-template-columns: 1fr; }
+            .navbar-left { flex-wrap: wrap; gap: 10px; justify-content: center; }
+            .header-address { white-space: normal; text-align: center; }
+            .nav-links { gap: 15px; }
+            .nav-links > a, .nav-links > .dropdown > a { font-size: 0.85rem; }
+            .header-phone { font-size: 0.85rem; }
+            .book-modal-panel, .arrangement-modal-panel, .vocal-modal-panel { width: 90%; padding: 20px; }
+            #portfolio { margin-top: 60px; }
+            .logo { font-size: 1.2rem; }
         }
 
         @media (max-width: 480px) {
-            .nav-links {
-                gap: 10px;
-            }
-            .nav-links > a, .nav-links > .dropdown > a {
-                font-size: 0.75rem;
-            }
-            .header-phone {
-                font-size: 0.75rem;
-            }
-            .logo {
-                font-size: 1rem;
-            }
+            .nav-links { gap: 10px; }
+            .nav-links > a, .nav-links > .dropdown > a { font-size: 0.75rem; }
+            .header-phone { font-size: 0.75rem; }
+            .logo { font-size: 1rem; }
         }
     </style>
 </head>
@@ -1687,7 +1591,6 @@
         <nav class="navbar">
             <div class="navbar-left">
                 <div class="logo" data-page="home">SPRING SOUND LAB</div>
-                <!-- Адрес теперь кликабельный с иконкой -->
                 <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="header-address">
                     <i class="fas fa-map-marker-alt"></i> г. Волгоград, ул. Тулака 9
                 </a>
@@ -1745,6 +1648,7 @@
 
         <!-- Главная страница -->
         <div id="home-page" class="page active-page">
+            <!-- Герой -->
             <section class="hero">
                 <div class="hero-content">
                     <div>
@@ -1766,6 +1670,7 @@
                 </div>
             </section>
 
+            <!-- Примеры работ -->
             <section id="portfolio">
                 <h2 class="section-title">Примеры работ</h2>
                 <div class="artist-grid">
@@ -1812,6 +1717,7 @@
                 </div>
             </section>
 
+            <!-- Аранжировки в наличии -->
             <section id="arrangements">
                 <h2 class="section-title">Аранжировки в наличии</h2>
                 <div class="events-list">
@@ -2196,7 +2102,7 @@
 
                 <!-- Колонка "Мы в соцсетях" (без изменений) -->
                 <div class="footer-links">
-                    <h4 style="font-size:0.95rem; margin-bottom:5px;">Мы в соцсетях</h4>
+                    <h4>Мы в соцсетях</h4>
                     <div class="social-icons">
                         <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
                         <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
