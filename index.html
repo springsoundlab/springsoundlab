@@ -53,11 +53,11 @@
             flex-wrap: wrap;
         }
 
-        /* Новые стили для логотипа */
+        /* Стили для логотипа */
         .logo-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;          /* расстояние между картинкой и текстом */
+            gap: 10px;
             cursor: pointer;
         }
 
@@ -112,7 +112,7 @@
         }
 
         /* Курсор-палец для кликабельных элементов */
-        .nav-links a, .dropdown-content a, .dropdown-content .phone-number, .header-phone, .footer-links a {
+        .nav-links a, .dropdown-content a, .dropdown-content .phone-number, .header-phone, .footer-links a, .footer-dropdown-title {
             cursor: pointer;
         }
 
@@ -241,17 +241,45 @@
         }
 
         .hero-title {
-            font-size: 5rem; /* уменьшили заголовок */
+            font-size: 5rem;
             font-weight: 700;
             line-height: 1.1;
             letter-spacing: -0.03em;
             text-transform: uppercase;
             margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            animation: shine 2s ease forwards;
         }
 
         .hero-title .hero-title-secondary {
             color: #888;
             font-weight: 700;
+            transition: color 0.5s ease 1.5s; /* задержка, чтобы после блика изменился цвет */
+        }
+
+        /* Анимация блика */
+        @keyframes shine {
+            0% {
+                text-shadow: -20px 0 10px rgba(255,255,255,0.2);
+            }
+            40% {
+                text-shadow: 20px 0 20px rgba(255,255,255,0.5);
+            }
+            100% {
+                text-shadow: none;
+            }
+        }
+
+        /* Цвет для второго слова меняется после анимации */
+        .hero-title .hero-title-secondary {
+            animation: colorChange 0s 1.5s forwards;
+        }
+
+        @keyframes colorChange {
+            to {
+                color: #3a8cff;
+            }
         }
 
         .hero-desc {
@@ -262,11 +290,12 @@
             margin-bottom: 20px;
         }
 
+        /* Кнопка "Записаться" теперь менее яркая */
         .hero-btn {
             margin-top: 50px;
             display: inline-block;
-            background-color: #fff;
-            color: #0a0a0a;
+            background-color: transparent;  /* прозрачный фон */
+            color: #fff;
             text-decoration: none;
             padding: 16px 48px;
             border-radius: 40px;
@@ -281,8 +310,8 @@
         }
 
         .hero-btn:hover {
-            background-color: transparent;
-            color: #fff;
+            background-color: #fff;
+            color: #0a0a0a;
         }
 
         /* Слайдер: видимая область, скруглённые углы */
@@ -294,7 +323,7 @@
             position: relative;
             background-color: #222;
             border: 1px solid #444;
-            border-radius: 20px; /* скругление углов */
+            border-radius: 20px;
         }
 
         .slider-image {
@@ -893,7 +922,7 @@
         }
 
         .lesson-description:first-of-type {
-            border-top: none; /* первый блок не имеет верхней границы */
+            border-top: none;
         }
 
         .lesson-description h2,
@@ -903,7 +932,7 @@
             margin-bottom: 40px;
             text-transform: uppercase;
             letter-spacing: -0.02em;
-            color: #aaa; /* серый, как hero-pre */
+            color: #aaa;
         }
 
         .lesson-description p,
@@ -1093,7 +1122,7 @@
             background: transparent;
             color: #fff;
             border: 2px solid #fff;
-            padding: 12px; /* компенсация */
+            padding: 12px;
         }
 
         .vocal-modal-close {
@@ -1363,6 +1392,7 @@
             letter-spacing: 1px;
         }
 
+        /* ===== ПОДВАЛ (обновлённый) ===== */
         .footer {
             border-top: 1px solid rgba(255,255,255,0.1);
             padding: 60px 0 40px;
@@ -1391,26 +1421,78 @@
             max-width: 300px;
         }
 
-        .footer-links h4 {
+        /* Новые стили для выпадающих заголовков */
+        .footer-dropdown {
+            margin-bottom: 15px;
+        }
+
+        .footer-dropdown-title {
             font-size: 1rem;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #fff;
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
         }
 
-        .footer-links a {
+        .footer-dropdown-title::after {
+            content: "▼";
+            font-size: 0.7rem;
+            margin-left: 8px;
+            transition: transform 0.2s;
+        }
+
+        .footer-dropdown.open .footer-dropdown-title::after {
+            transform: rotate(180deg);
+        }
+
+        .footer-dropdown-content {
+            display: none;
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 0 0;
+        }
+
+        .footer-dropdown.open .footer-dropdown-content {
+            display: block;
+        }
+
+        .footer-dropdown-content a {
             display: block;
             color: #aaa;
             text-decoration: none;
-            margin-bottom: 12px;
-            font-size: 0.95rem;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
             transition: color 0.2s;
-            cursor: pointer;
         }
 
-        .footer-links a:hover {
+        .footer-dropdown-content a:hover {
             color: #fff;
+        }
+
+        /* Контактная информация в футере */
+        .footer-contact {
+            margin-top: 20px;
+        }
+
+        .footer-contact a {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .footer-contact a:hover {
+            color: #fff;
+        }
+
+        .footer-contact i {
+            margin-right: 8px;
+            color: #3a8cff;
         }
 
         .social-icons {
@@ -1507,7 +1589,7 @@
                 margin-top: 80px;
             }
             .site-logo {
-                height: 35px; /* чуть меньше на планшетах */
+                height: 35px;
             }
             .logo-text {
                 font-size: 1.3rem;
@@ -1558,6 +1640,9 @@
             .logo-text {
                 font-size: 1.2rem;
             }
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1586,7 +1671,7 @@
             <div class="navbar-left">
                 <!-- Логотип: картинка и название. Замените ССЫЛКА_НА_ВАШ_ЛОГОТИП на свою прямую ссылку -->
                 <div class="logo-wrapper" data-page="home">
-                    <img src="https://github.com/springsoundlab/portfolio/raw/main/logotip.png" alt="Spring Sound Lab" class="site-logo">
+                    <img src="ССЫЛКА_НА_ВАШ_ЛОГОТИП" alt="Spring Sound Lab" class="site-logo">
                     <span class="logo-text">SPRING SOUND LAB</span>
                 </div>
                 <div class="address">г. Волгоград, ул. Тулака 9</div>
@@ -1779,7 +1864,6 @@
 
         <!-- Страница "Уроки вокала" -->
         <div id="vocal-lessons-page" class="page">
-            <!-- Герой для уроков вокала -->
             <section class="hero">
                 <div class="hero-content">
                     <div>
@@ -1800,15 +1884,11 @@
                     <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Vocal+4" alt="Вокал 4">
                 </div>
             </section>
-
-            <!-- Подробное описание и методика -->
             <section class="lesson-description">
                 <h2>Подробное описание и методика</h2>
                 <p>Наши уроки вокала построены на индивидуальном подходе. Мы используем современные методики постановки голоса, работаем над дыханием, артикуляцией и расширением диапазона. Вы сможете петь любые песни — от классики до современного попа, с комфортом и без зажимов.</p>
                 <p>Формат занятий: 60 минут. Возможны разовые уроки или абонементы. Занятия проходят в звукоизолированном классе с профессиональным оборудованием.</p>
             </section>
-
-            <!-- О преподавателе -->
             <section class="lesson-teacher">
                 <h2>О преподавателе</h2>
                 <div class="teacher-card">
@@ -1826,7 +1906,6 @@
 
         <!-- Страница "Уроки гитары" -->
         <div id="guitar-lessons-page" class="page">
-            <!-- Герой для уроков гитары -->
             <section class="hero">
                 <div class="hero-content">
                     <div>
@@ -1847,15 +1926,11 @@
                     <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Guitar+4" alt="Гитара 4">
                 </div>
             </section>
-
-            <!-- Подробное описание и методика -->
             <section class="lesson-description">
                 <h2>Подробное описание и методика</h2>
                 <p>Уроки гитары для любого уровня — от первых аккордов до сольных партий. Мы обучаем игре на акустической, электрогитаре и бас-гитаре. В программе: постановка рук, изучение аккордов, гамм, теория музыки, импровизация, работа в ансамбле.</p>
                 <p>Занятия проходят индивидуально, 60 минут. Вы можете выбрать удобное время и формат — разовые уроки или абонемент.</p>
             </section>
-
-            <!-- О преподавателе -->
             <section class="lesson-teacher">
                 <h2>О преподавателе</h2>
                 <div class="teacher-card">
@@ -2066,33 +2141,47 @@
         <div class="arrangement-modal-close" onclick="closeArrangementModal()">Закрыть</div>
     </div>
 
-    <!-- Подвал -->
+    <!-- Подвал (обновлённый) -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
+                <!-- Левая колонка с логотипом и контактами -->
                 <div>
                     <div class="footer-logo" data-page="home">SPRING SOUND LAB</div>
-                    <p class="footer-about">Артист прежде всего. Всегда.<br>Дом для новаторского звука и визуального искусства.</p>
+                    <div class="footer-contact">
+                        <a href="tel:+79178382017"><i class="fas fa-phone"></i> +7 917 838 20 17</a>
+                        <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank"><i class="fas fa-map-marker-alt"></i> г. Волгоград, ул. Тулака 9</a>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <h4>Исследовать</h4>
-                    <a data-page="home">Главная</a>
-                    <a data-page="vocal-lessons">Уроки вокала</a>
-                    <a data-page="guitar-lessons">Уроки гитары</a>
-                    <a data-page="studio-prices">Цены (студия)</a>
-                    <a data-page="vocal-prices">Цены (вокал)</a>
-                    <a data-page="guitar-prices">Цены (гитара)</a>
-                    <a data-page="reviews">Отзывы</a>
-                    <a data-page="studio">Студия</a>
-                    <a data-page="equipment">Оборудование</a>
+
+                <!-- Колонка "Исследовать" с выпадающим списком -->
+                <div class="footer-dropdown" id="explore-dropdown">
+                    <div class="footer-dropdown-title">Исследовать</div>
+                    <div class="footer-dropdown-content">
+                        <a data-page="home">Главная</a>
+                        <a data-page="vocal-lessons">Уроки вокала</a>
+                        <a data-page="guitar-lessons">Уроки гитары</a>
+                        <a data-page="studio-prices">Цены (студия)</a>
+                        <a data-page="vocal-prices">Цены (вокал)</a>
+                        <a data-page="guitar-prices">Цены (гитара)</a>
+                        <a data-page="reviews">Отзывы</a>
+                        <a data-page="studio">Студия</a>
+                        <a data-page="equipment">Оборудование</a>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <h4>Информация</h4>
-                    <a data-page="studio">Студия</a>
-                    <a href="#">Контакты</a>
-                    <a href="#">Выходные данные</a>
-                    <a id="loginFooterBtn">Login</a>
+
+                <!-- Колонка "Информация" с выпадающим списком -->
+                <div class="footer-dropdown" id="info-dropdown">
+                    <div class="footer-dropdown-title">Информация</div>
+                    <div class="footer-dropdown-content">
+                        <a data-page="studio">Студия</a>
+                        <a href="#">Контакты</a>
+                        <a href="#">Выходные данные</a>
+                        <a id="loginFooterBtn">Login</a>
+                    </div>
                 </div>
+
+                <!-- Колонка "Мы в соцсетях" (без изменений) -->
                 <div class="footer-links">
                     <h4>Мы в соцсетях</h4>
                     <div class="social-icons">
@@ -2292,6 +2381,14 @@
             } else {
                 showPage('home');
             }
+
+            // Инициализация выпадающих списков в футере
+            document.querySelectorAll('.footer-dropdown-title').forEach(title => {
+                title.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    parent.classList.toggle('open');
+                });
+            });
         });
 
         document.querySelectorAll('[data-page]').forEach(el => {
