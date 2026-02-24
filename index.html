@@ -1301,7 +1301,7 @@
             }
         }
 
-        /* ===== МОДАЛЬНОЕ ОКНО (КВАДРАТНОЕ, ОБНОВЛЁННОЕ) ===== */
+        /* ===== МОДАЛЬНОЕ ОКНО (КВАДРАТНОЕ, С +7 ПО УМОЛЧАНИЮ) ===== */
         .vocal-modal-overlay {
             display: none;
             position: fixed;
@@ -1320,7 +1320,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 440px; /* квадратная форма */
+            width: 440px;
+            aspect-ratio: 1 / 1; /* квадрат */
             max-width: 95%;
             background: #111;
             border: 1px solid #3a8cff;
@@ -1329,6 +1330,7 @@
             z-index: 10001;
             box-shadow: 0 0 40px rgba(58,140,255,0.3);
             font-family: 'Inter', sans-serif;
+            overflow-y: auto; /* скролл, если контент не влезает */
         }
 
         .vocal-modal-title {
@@ -1649,7 +1651,7 @@
             .nav-links { gap: 15px; }
             .nav-links > a, .nav-links > .dropdown > a { font-size: 0.85rem; }
             .header-phone { font-size: 0.85rem; }
-            .vocal-modal-panel { width: 95%; padding: 20px; }
+            .vocal-modal-panel { width: 95%; aspect-ratio: 1 / 1; padding: 20px; }
             #portfolio { margin-top: 60px; }
             .logo { font-size: 1.2rem; }
             .logo-image { height: 30px; }
@@ -1841,21 +1843,18 @@
             <section class="services-overview">
                 <h2 class="section-title">Наши услуги</h2>
                 <div class="services-grid">
-                    <!-- Уроки вокала -->
                     <div class="service-card" data-page="vocal-lessons">
                         <div class="service-icon"><i class="fas fa-microphone-alt"></i></div>
                         <h3>Уроки вокала</h3>
                         <p>Постановка голоса, дыхание, расширение диапазона. Индивидуальный подход.</p>
                         <a href="#" class="service-link">Подробнее</a>
                     </div>
-                    <!-- Уроки гитары -->
                     <div class="service-card" data-page="guitar-lessons">
                         <div class="service-icon"><i class="fas fa-guitar"></i></div>
                         <h3>Уроки гитары</h3>
                         <p>Акустика, электро, бас. С нуля до профи. Техника и теория.</p>
                         <a href="#" class="service-link">Подробнее</a>
                     </div>
-                    <!-- Уроки звукорежиссуры -->
                     <div class="service-card" data-page="production-lessons">
                         <div class="service-icon"><i class="fas fa-sliders-h"></i></div>
                         <h3>Звукорежиссура</h3>
@@ -2433,12 +2432,15 @@
         const vocalForm = document.getElementById('vocalForm');
         const privacyCheck = document.getElementById('privacy-check');
         const vocalModalTitle = document.getElementById('vocalModalTitle');
+        const phoneInput = document.getElementById('vocal-phone');
 
         function resetVocalForm() {
             vocalForm.reset();
             vocalSubmitBtn.classList.remove('submitted');
             vocalSubmitBtn.textContent = 'Отправить';
             if (privacyCheck) privacyCheck.checked = false;
+            // Устанавливаем +7 по умолчанию
+            phoneInput.value = '+7';
         }
 
         function openVocalModal() {
@@ -2521,6 +2523,8 @@
                 // Очищаем форму и снимаем галочку
                 vocalForm.reset();
                 if (privacyCheck) privacyCheck.checked = false;
+                // После очистки снова ставим +7
+                phoneInput.value = '+7';
 
                 // Закрываем окно через 1 секунду
                 setTimeout(closeVocalModal, 1000);
