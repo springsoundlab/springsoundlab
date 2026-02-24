@@ -2233,7 +2233,7 @@
     <!-- Модальное окно для бронирования / записи -->
     <div id="vocal-modal-overlay" class="vocal-modal-overlay" onclick="closeVocalModal()"></div>
     <div id="vocal-modal-panel" class="vocal-modal-panel">
-        <div class="vocal-modal-title">Забронировать студию</div>
+        <div class="vocal-modal-title" id="vocalModalTitle">Заголовок</div> <!-- Заголовок будет меняться через JS -->
         <a href="tel:+79178382017" class="vocal-modal-phone"><i class="fas fa-phone"></i> +7 917 838 20 17</a>
         <form class="vocal-modal-form" id="vocalForm" onsubmit="submitVocalForm(event)">
             <label for="vocal-name">Ваше имя</label>
@@ -2414,6 +2414,7 @@
         const vocalSubmitBtn = document.getElementById('vocalSubmitBtn');
         const vocalForm = document.getElementById('vocalForm');
         const privacyCheck = document.getElementById('privacy-check');
+        const vocalModalTitle = document.getElementById('vocalModalTitle');
 
         function resetVocalForm() {
             vocalForm.reset();
@@ -2424,6 +2425,13 @@
 
         function openVocalModal() {
             resetVocalForm();
+            // Определяем текущую страницу и устанавливаем заголовок
+            const currentPage = sessionStorage.getItem('currentPage') || 'home';
+            if (currentPage === 'home') {
+                vocalModalTitle.textContent = 'Забронировать студию';
+            } else {
+                vocalModalTitle.textContent = 'Записаться на пробное занятие';
+            }
             vocalModal.style.display = 'block';
             vocalOverlay.style.display = 'block';
         }
