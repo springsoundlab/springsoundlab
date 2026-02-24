@@ -51,7 +51,7 @@
             flex-wrap: wrap;
         }
 
-        /* Логотип: картинка + текст */
+        /* Логотип с картинкой (сохранён) */
         .logo {
             display: flex;
             align-items: center;
@@ -65,7 +65,7 @@
         }
 
         .logo-image {
-            height: 40px;        /* подберите нужный размер */
+            height: 40px;
             width: auto;
             display: block;
         }
@@ -256,7 +256,6 @@
             color: #fff;
         }
 
-        /* Второе слово всегда синее */
         .hero-title .hero-title-secondary {
             color: #3a8cff;
             font-weight: 700;
@@ -1365,40 +1364,94 @@
             letter-spacing: 1px;
         }
 
-        /* ===== ПОДВАЛ (ТОЛЬКО ЛОГОТИП+КОНТАКТЫ И СОЦСЕТИ) ===== */
+        /* ===== ПОДВАЛ (ПОЛНАЯ ВЕРСИЯ, КАК БЫЛО) ===== */
         .footer {
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 20px 0 20px;
+            padding: 60px 0 40px;
             margin-top: 80px;
-            font-size: 0.9rem;
         }
 
         .footer-grid {
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
             gap: 40px;
-            align-items: center;
         }
 
         .footer-logo {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 20px;
             letter-spacing: -0.02em;
             text-transform: uppercase;
             cursor: pointer;
         }
 
+        .footer-about {
+            color: #aaa;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-width: 300px;
+        }
+
+        .footer-dropdown {
+            margin-bottom: 15px;
+        }
+
+        .footer-dropdown-title {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .footer-dropdown-title::after {
+            content: "▼";
+            font-size: 0.7rem;
+            margin-left: 8px;
+            transition: transform 0.2s;
+        }
+
+        .footer-dropdown.open .footer-dropdown-title::after {
+            transform: rotate(180deg);
+        }
+
+        .footer-dropdown-content {
+            display: none;
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 0 0;
+        }
+
+        .footer-dropdown.open .footer-dropdown-content {
+            display: block;
+        }
+
+        .footer-dropdown-content a {
+            display: block;
+            color: #aaa;
+            text-decoration: none;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-dropdown-content a:hover {
+            color: #fff;
+        }
+
         .footer-contact {
-            margin-top: 5px;
+            margin-top: 20px;
         }
 
         .footer-contact a {
-            display: inline-block;
+            display: block;
             color: #aaa;
             text-decoration: none;
-            margin-right: 20px;
-            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
             transition: color 0.2s;
         }
 
@@ -1407,18 +1460,19 @@
         }
 
         .footer-contact i {
-            margin-right: 6px;
+            margin-right: 8px;
             color: #3a8cff;
         }
 
         .social-icons {
             display: flex;
-            gap: 15px;
+            gap: 20px;
+            margin-top: 20px;
         }
 
         .social-icons a {
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             opacity: 0.7;
             transition: opacity 0.2s;
         }
@@ -1428,12 +1482,12 @@
         }
 
         .copyright {
-            margin-top: 20px;
+            margin-top: 60px;
             color: #666;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             text-align: center;
             border-top: 1px solid rgba(255,255,255,0.05);
-            padding-top: 15px;
+            padding-top: 30px;
         }
 
         /* ===== АДАПТАЦИЯ ===== */
@@ -1448,15 +1502,14 @@
             .hero-slider { max-width: 100%; width: 100%; }
             .hero-desc { max-width: 100%; font-size: 1.8rem; }
             .artist-grid { grid-template-columns: repeat(2, 1fr); }
-            .footer-grid { grid-template-columns: 1fr; text-align: center; gap: 20px; }
-            .footer-contact a { display: block; margin: 5px 0; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
             .event-item { flex-direction: column; align-items: flex-start; gap: 15px; }
             .event-details { padding-left: 0; }
             .event-item audio { width: 100%; margin-right: 0; }
             .studio-row, .studio-row.reverse, .equipment-row, .equipment-row.reverse { flex-direction: column; gap: 20px; }
             .studio-image, .equipment-image { width: 100%; }
             #portfolio { margin-top: 80px; }
-            .logo-image { height: 35px; } /* чуть уменьшаем логотип на планшетах */
+            .logo-image { height: 35px; }
         }
 
         @media (max-width: 600px) {
@@ -1473,6 +1526,7 @@
             #portfolio { margin-top: 60px; }
             .logo { font-size: 1.2rem; }
             .logo-image { height: 30px; }
+            .footer-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
@@ -1489,9 +1543,9 @@
         <!-- Навигация -->
         <nav class="navbar">
             <div class="navbar-left">
-                <!-- Логотип: картинка + текст (ССЫЛКУ НА КАРТИНКУ ВСТАВЬТЕ В src) -->
+                <!-- Логотип с картинкой (вставьте ссылку в src) -->
                 <div class="logo" data-page="home">
-                    <img src="https://github.com/springsoundlab/portfolio/raw/main/logotip.png" alt="Spring Sound Lab" class="logo-image">
+                    <img src="" alt="Spring Sound Lab" class="logo-image">
                     <span>SPRING SOUND LAB</span>
                 </div>
                 <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="header-address">
@@ -1500,8 +1554,6 @@
             </div>
             <div class="nav-links">
                 <a data-page="home">Главная</a>
-                
-                <!-- Выпадающий список "Наши услуги" (добавлен пункт звукорежиссуры) -->
                 <div class="dropdown" id="services-dropdown">
                     <a>Наши услуги</a>
                     <div class="dropdown-content">
@@ -1510,8 +1562,6 @@
                         <a data-page="production-lessons">Уроки звукорежиссуры</a>
                     </div>
                 </div>
-
-                <!-- Выпадающий список "Цены" -->
                 <div class="dropdown" id="prices-dropdown">
                     <a>Цены</a>
                     <div class="dropdown-content">
@@ -1520,8 +1570,6 @@
                         <a data-page="guitar-prices">Уроки гитары</a>
                     </div>
                 </div>
-
-                <!-- Выпадающий список "О нас" -->
                 <div class="dropdown" id="about-dropdown">
                     <a>О нас</a>
                     <div class="dropdown-content">
@@ -1529,8 +1577,6 @@
                         <a data-page="equipment">Оборудование</a>
                     </div>
                 </div>
-
-                <!-- Выпадающий список "Контакты" -->
                 <div class="dropdown">
                     <a href="#">Контакты</a>
                     <div class="dropdown-content">
@@ -1541,11 +1587,7 @@
                         <div class="phone-number"><i class="fas fa-phone"></i> +7 917 838 20 17</div>
                     </div>
                 </div>
-
-                <!-- Кнопка "Отзывы" -->
                 <a data-page="reviews">Отзывы</a>
-
-                <!-- Номер телефона -->
                 <a href="tel:+79178382017" class="header-phone"><i class="fas fa-phone"></i> +7 917 838 20 17</a>
             </div>
         </nav>
@@ -1750,7 +1792,7 @@
             </section>
         </div>
 
-        <!-- Новая страница "Уроки звукорежиссуры" -->
+        <!-- Страница "Уроки звукорежиссуры" -->
         <div id="production-lessons-page" class="page">
             <section class="hero">
                 <div class="hero-content">
@@ -1942,7 +1984,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно для записи на вокал (общее) -->
+    <!-- Модальные окна (без изменений) -->
     <div id="vocal-modal-overlay" class="vocal-modal-overlay" onclick="closeVocalModal()"></div>
     <div id="vocal-modal-panel" class="vocal-modal-panel">
         <div class="vocal-modal-title">Запись на пробное занятие</div>
@@ -1959,7 +2001,6 @@
         <div class="vocal-modal-close" onclick="closeVocalModal()">Закрыть</div>
     </div>
 
-    <!-- Модальное окно для записи (общее) -->
     <div id="book-modal-overlay" class="book-modal-overlay" onclick="closeBookModal()"></div>
     <div id="book-modal-panel" class="book-modal-panel">
         <div class="book-modal-title">Записаться</div>
@@ -1973,7 +2014,6 @@
         <div class="book-modal-close" onclick="closeBookModal()">Закрыть</div>
     </div>
 
-    <!-- Модальное окно для покупки аранжировки -->
     <div id="arrangement-modal-overlay" class="arrangement-modal-overlay" onclick="closeArrangementModal()"></div>
     <div id="arrangement-modal-panel" class="arrangement-modal-panel">
         <div class="arrangement-modal-title" id="arrangement-modal-title">Название</div>
@@ -1984,22 +2024,57 @@
         <div class="arrangement-modal-close" onclick="closeArrangementModal()">Закрыть</div>
     </div>
 
-    <!-- Подвал (только логотип, контакты и соцсети) -->
+    <!-- Подвал (восстановлен полностью) -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
+                <!-- Левая колонка -->
                 <div>
                     <div class="footer-logo" data-page="home">SPRING SOUND LAB</div>
+                    <div class="footer-about">Артист прежде всего. Всегда.<br>Дом для новаторского звука и визуального искусства.</div>
                     <div class="footer-contact">
                         <a href="tel:+79178382017"><i class="fas fa-phone"></i> +7 917 838 20 17</a>
                         <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank"><i class="fas fa-map-marker-alt"></i> г. Волгоград, ул. Тулака 9</a>
                     </div>
                 </div>
-                <div class="social-icons">
-                    <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
-                    <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
-                    <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+
+                <!-- Колонка "Исследовать" (выпадающая) -->
+                <div class="footer-dropdown" id="explore-dropdown">
+                    <div class="footer-dropdown-title">Исследовать</div>
+                    <div class="footer-dropdown-content">
+                        <a data-page="home">Главная</a>
+                        <a data-page="vocal-lessons">Уроки вокала</a>
+                        <a data-page="guitar-lessons">Уроки гитары</a>
+                        <a data-page="production-lessons">Уроки звукорежиссуры</a>
+                        <a data-page="studio-prices">Цены (студия)</a>
+                        <a data-page="vocal-prices">Цены (вокал)</a>
+                        <a data-page="guitar-prices">Цены (гитара)</a>
+                        <a data-page="reviews">Отзывы</a>
+                        <a data-page="studio">Студия</a>
+                        <a data-page="equipment">Оборудование</a>
+                    </div>
+                </div>
+
+                <!-- Колонка "Информация" (выпадающая) -->
+                <div class="footer-dropdown" id="info-dropdown">
+                    <div class="footer-dropdown-title">Информация</div>
+                    <div class="footer-dropdown-content">
+                        <a data-page="studio">Студия</a>
+                        <a href="#">Контакты</a>
+                        <a href="#">Выходные данные</a>
+                        <a id="loginFooterBtn">Login</a>
+                    </div>
+                </div>
+
+                <!-- Колонка "Мы в соцсетях" -->
+                <div class="footer-links">
+                    <h4>Мы в соцсетях</h4>
+                    <div class="social-icons">
+                        <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
+                        <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
+                        <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i></a>
+                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
             </div>
             <div class="copyright">
@@ -2065,6 +2140,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             const saved = sessionStorage.getItem('currentPage');
             showPage(saved && pages[saved] ? saved : 'home');
+
+            // Инициализация выпадающих списков в футере
+            document.querySelectorAll('.footer-dropdown-title').forEach(title => {
+                title.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    parent.classList.toggle('open');
+                });
+            });
         });
 
         document.querySelectorAll('[data-page]').forEach(el => {
@@ -2075,7 +2158,7 @@
             });
         });
 
-        // --- Слайдер (интервал 5 сек) ---
+        // --- Слайдер ---
         const slides = document.querySelectorAll('.slider-image');
         if (slides.length) {
             let currentSlide = 0;
