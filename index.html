@@ -498,7 +498,7 @@
             background-color: #111;
             border-radius: 12px;
             padding: 30px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
             text-align: center;
             cursor: pointer;
         }
@@ -509,6 +509,13 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             border-color: #3a8cff;
+        }
+
+        .service-card:hover .service-link,
+        .price-card:hover .price-link,
+        .about-card:hover .about-link {
+            background-color: #fff;
+            color: #0a0a0a;
         }
 
         .service-icon {
@@ -668,32 +675,34 @@
             background-color: #111;
             border: 1px solid #3a8cff;
             border-radius: 12px;
-            padding: 10px 0;
-            min-width: 180px;
+            padding: 10px;
             display: none;
             flex-direction: column;
+            gap: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
         .social-float-menu a {
             color: #fff;
             text-decoration: none;
-            padding: 10px 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #222;
             transition: background 0.2s;
+        }
+
+        .social-float-menu a i {
+            font-size: 24px;
+            color: #3a8cff;
         }
 
         .social-float-menu a:hover {
             background-color: #3a8cff;
         }
-
-        .social-float-menu a i {
-            width: 20px;
-            color: #3a8cff;
-        }
-
         .social-float-menu a:hover i {
             color: #fff;
         }
@@ -2015,19 +2024,19 @@
             <section class="prices-overview">
                 <h2 class="section-title">Цены</h2>
                 <div class="prices-grid">
-                    <div class="price-card">
+                    <div class="price-card" data-page="studio-prices">
                         <h3>Студия</h3>
                         <div class="price-value">от 900₽/час</div>
                         <p>Запись, сведение, мастеринг, аранжировка.</p>
                         <a href="#" class="price-link" data-page="studio-prices">Все цены</a>
                     </div>
-                    <div class="price-card">
+                    <div class="price-card" data-page="vocal-prices">
                         <h3>Уроки вокала</h3>
                         <div class="price-value">от 1 000₽</div>
                         <p>Пробное, разовое, абонементы.</p>
                         <a href="#" class="price-link" data-page="vocal-prices">Все цены</a>
                     </div>
-                    <div class="price-card">
+                    <div class="price-card" data-page="guitar-prices">
                         <h3>Уроки гитары</h3>
                         <div class="price-value">от 1 000₽</div>
                         <p>Пробное, разовое, абонементы.</p>
@@ -2450,16 +2459,16 @@
         <div class="modal-close" onclick="closeAdmin()">Abort Mission</div>
     </div>
 
-    <!-- Плавающая кнопка соцсетей -->
+    <!-- Плавающая кнопка соцсетей (только иконки) -->
     <div class="social-float" id="socialFloat">
         <div class="social-float-button" id="socialFloatBtn">
             <i class="fas fa-share-alt"></i>
         </div>
         <div class="social-float-menu" id="socialFloatMenu">
-            <a href="#" target="_blank"><i class="fab fa-vk"></i> ВКонтакте</a>
-            <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i> Telegram</a>
-            <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i> YouTube</a>
-            <a href="#" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+            <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
+            <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
+            <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
         </div>
     </div>
 
@@ -2540,8 +2549,8 @@
             });
         });
 
-        // Добавляем обработчики для новых карточек на главной
-        document.querySelectorAll('.service-card[data-page], .price-link[data-page], .about-card[data-page], .reviews-link[data-page]').forEach(el => {
+        // Добавляем обработчики для карточек на главной (услуги, цены, о нас, отзывы)
+        document.querySelectorAll('.service-card[data-page], .price-card[data-page], .price-link[data-page], .about-card[data-page], .reviews-link[data-page]').forEach(el => {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
                 const page = el.dataset.page;
