@@ -569,20 +569,51 @@
             margin-bottom: 20px;
         }
 
-        .reviews-preview {
-            background-color: #111;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            max-width: 800px;
+        /* Виджет отзывов на главной */
+        .reviews-overview .sw-app {
+            max-width: 1200px;
             margin: 0 auto;
+            min-height: 300px;
         }
 
-        .reviews-preview p {
-            font-size: 1.2rem;
-            color: #ccc;
-            margin-bottom: 20px;
-            font-style: italic;
+        /* ===== ПЛАШКА COOKIE ===== */
+        .cookie-consent {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #111;
+            border: 1px solid #3a8cff;
+            border-radius: 50px;
+            padding: 12px 24px;
+            color: #fff;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .cookie-consent p {
+            margin: 0;
+        }
+
+        .cookie-consent button {
+            background-color: #3a8cff;
+            border: none;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .cookie-consent button:hover {
+            background-color: #1e5bbf;
         }
 
         /* ===== СТРАНИЦА ЦЕН НА СТУДИЮ ===== */
@@ -1944,14 +1975,10 @@
                 </div>
             </section>
 
-            <!-- ===== ОТЗЫВЫ (КРАТКО) ===== -->
+            <!-- ===== ОТЗЫВЫ (ПОЛНОЦЕННЫЙ ВИДЖЕТ) ===== -->
             <section class="reviews-overview">
                 <h2 class="section-title">Отзывы</h2>
-                <div class="reviews-preview">
-                    <p>“Отличная студия, профессиональный подход. Записываюсь только здесь!” — Иван</p>
-                    <p>“Очень помогли со сведением, трек зазвучал по-новому!” — Анна</p>
-                    <a href="#" class="reviews-link" data-page="reviews">Читать все отзывы</a>
-                </div>
+                <div class="sw-app" data-app="e8dd4642baab0f03640c288b8528925e"></div>
             </section>
         </div>
 
@@ -2337,6 +2364,25 @@
         <div class="modal-close" onclick="closeAdmin()">Abort Mission</div>
     </div>
 
+    <!-- Плашка cookie-согласия -->
+    <div id="cookie-consent" class="cookie-consent" style="display: none;">
+        <p>Мы используем Яндекс.Метрику для анализа посещаемости. Продолжая пользоваться сайтом, вы соглашаетесь на обработку данных.</p>
+        <button id="cookie-accept">Принять</button>
+    </div>
+
+    <!-- Яндекс.Метрика -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=106978089', 'ym');
+
+        ym(106978089, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/106978089" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
     <script>
         // --- Переключение страниц ---
         const pages = {
@@ -2487,6 +2533,19 @@
         document.addEventListener('play', function(e) {
             document.querySelectorAll('audio').forEach(audio => { if (audio !== e.target) { audio.pause(); audio.currentTime = 0; } });
         }, true);
+
+        // --- Логика плашки cookie ---
+        (function() {
+            const cookieConsent = document.getElementById('cookie-consent');
+            const acceptBtn = document.getElementById('cookie-accept');
+            if (!localStorage.getItem('cookieAccepted')) {
+                cookieConsent.style.display = 'flex';
+            }
+            acceptBtn.addEventListener('click', function() {
+                localStorage.setItem('cookieAccepted', 'true');
+                cookieConsent.style.display = 'none';
+            });
+        })();
     </script>
 </body>
 </html>
