@@ -1414,6 +1414,14 @@
             color: #fff;
         }
 
+        .vocal-modal-submit.submitted {
+            background: #0a0a0a;
+            color: #3a8cff;
+            border-color: #3a8cff;
+            cursor: default;
+            pointer-events: none;
+        }
+
         .vocal-modal-close {
             margin-top: 20px;
             color: #666;
@@ -2392,7 +2400,7 @@
             <input type="tel" id="vocal-phone" name="phone" required placeholder="+7 900 123-45-67">
             <label for="vocal-comment">Комментарий</label>
             <textarea id="vocal-comment" name="comment" placeholder="Ваши пожелания..."></textarea>
-            <button type="submit" class="vocal-modal-submit">Отправить</button>
+            <button type="submit" class="vocal-modal-submit" id="vocalSubmitBtn">Отправить</button>
         </form>
         <div class="vocal-modal-close" onclick="closeVocalModal()">Закрыть</div>
     </div>
@@ -2580,8 +2588,24 @@
 
         const vocalModal = document.getElementById('vocal-modal-panel');
         const vocalOverlay = document.getElementById('vocal-modal-overlay');
-        function openVocalModal() { vocalModal.style.display = 'block'; vocalOverlay.style.display = 'block'; }
-        function closeVocalModal() { vocalModal.style.display = 'none'; vocalOverlay.style.display = 'none'; }
+        const vocalSubmitBtn = document.getElementById('vocalSubmitBtn');
+        const vocalForm = document.getElementById('vocalForm');
+
+        function resetVocalForm() {
+            vocalForm.reset();
+            vocalSubmitBtn.classList.remove('submitted');
+            vocalSubmitBtn.textContent = 'Отправить';
+        }
+
+        function openVocalModal() {
+            resetVocalForm();
+            vocalModal.style.display = 'block';
+            vocalOverlay.style.display = 'block';
+        }
+        function closeVocalModal() {
+            vocalModal.style.display = 'none';
+            vocalOverlay.style.display = 'none';
+        }
 
         document.querySelectorAll('.open-vocal-modal').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -2590,11 +2614,46 @@
             });
         });
 
-        function submitVocalForm(event) {
+        // Функция отправки формы в Telegram
+        async function submitVocalForm(event) {
             event.preventDefault();
-            alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
-            closeVocalModal();
-            document.getElementById('vocalForm').reset();
+
+            // Если кнопка уже в состоянии отправлено, ничего не делаем
+            if (vocalSubmitBtn.classList.contains('submitted')) return;
+
+            const name = document.getElementById('vocal-name').value;
+            const phone = document.getElementById('vocal-phone').value;
+            const comment = document.getElementById('vocal-comment').value;
+
+            const token = '8743026282:AAGvt8mSj-3L251CZMYoN46LC2XFDyTZeZY';
+            const chatId = '8246220926';
+            const text = `🔔 Новая заявка на пробное занятие!\n\nИмя: ${name}\nТелефон: ${phone}\nКомментарий: ${comment || '—'}`;
+
+            // Отключаем кнопку и меняем текст
+            vocalSubmitBtn.classList.add('submitted');
+            vocalSubmitBtn.textContent = 'Заявка успешно отправлена';
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: text })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка отправки');
+                }
+
+                // Очищаем форму
+                vocalForm.reset();
+
+            } catch (error) {
+                console.error(error);
+                alert('Не удалось отправить заявку. Попробуйте позже или позвоните по телефону.');
+                // Возвращаем кнопку в исходное состояние
+                vocalSubmitBtn.classList.remove('submitted');
+                vocalSubmitBtn.textContent = 'Отправить';
+            }
         }
 
         const arrangementModal = document.getElementById('arrangement-modal-panel');
