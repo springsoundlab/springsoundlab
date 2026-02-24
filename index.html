@@ -2665,19 +2665,27 @@
             const phone = document.getElementById('vocal-phone').value;
             const comment = document.getElementById('vocal-comment').value;
 
-            // --- НАСТРОЙКИ БОТОВ (ЗАМЕНИТЕ НА СВОИ) ---
+            // --- НАСТРОЙКИ БОТОВ (ЗАМЕНИТЕ ПЛЕЙСХОЛДЕРЫ НА РЕАЛЬНЫЕ) ---
             const bots = {
                 'vocal-lessons': { token: 'ТОКЕН_БОТА_ВОКАЛА', chatId: 'ID_ЧАТА_ВОКАЛА' },
                 'guitar-lessons': { token: 'ТОКЕН_БОТА_ГИТАРЫ', chatId: 'ID_ЧАТА_ГИТАРЫ' },
-                'production-lessons': { token: '8743026282:AAGvt8mSj-3L25iCZMyoN46LC2XFDyTZeZY', chatId: '8246220926' }
+                'production-lessons': { token: '8743026282:AAGvt8mSj-3L251CZMYoN46LC2XFDyTZeZY', chatId: '8246220926' }
             };
             // Бот по умолчанию (если страница не определена) – ваш общий
-            const defaultBot = { token: '8743026282:AAGvt8mSj-3L25iCZMyoN46LC2XFDyTZeZY', chatId: '8246220926' };
+            const defaultBot = { token: '8743026282:AAGvt8mSj-3L251CZMYoN46LC2XFDyTZeZY', chatId: '8246220926' };
 
             const currentPage = sessionStorage.getItem('currentPage') || 'home';
             const bot = bots[currentPage] || defaultBot;
 
-            const text = `🔔 Новая заявка на пробное занятие!\n\nИмя: ${name}\nТелефон: ${phone}\nКомментарий: ${comment || '—'}`;
+            // Определяем заголовок в зависимости от страницы
+            let messageTitle = '';
+            if (currentPage === 'home') {
+                messageTitle = '🔔 Новая заявка на БРОНИРОВАНИЕ СТУДИИ!';
+            } else {
+                messageTitle = '🔔 Новая заявка на пробное занятие!';
+            }
+
+            const text = `${messageTitle}\n\nИмя: ${name}\nТелефон: ${phone}\nКомментарий: ${comment || '—'}`;
 
             vocalSubmitBtn.classList.add('submitted');
             vocalSubmitBtn.textContent = 'Заявка успешно отправлена';
