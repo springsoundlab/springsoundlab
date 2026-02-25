@@ -1,7 +1,23 @@
-<!-- ЛИЦЕНЗИОННЫЙ ДОГОВОР (СОХРАНЕНИЕ АВТОРСТВА) -->
+<!-- ЛИЦЕНЗИОННЫЙ ДОГОВОР (СОХРАНЕНИЕ АВТОРСТВА) с кнопкой скачивания -->
 <style>
   @media print {
     .license-body { color: black; background: white; }
+    .download-btn { display: none; }
+  }
+  .download-btn {
+    display: block;
+    margin: 30px auto;
+    padding: 12px 24px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .download-btn:hover {
+    background-color: #45a049;
   }
 </style>
 <div class="license-body" style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
@@ -150,4 +166,22 @@
   <h3>ПОДПИСИ СТОРОН</h3>
   <p><strong>Лицензиар</strong> ____________________ / _________________________</p>
   <p><strong>Лицензиат</strong> ____________________ / _________________________</p>
+
+  <!-- Кнопка скачивания -->
+  <button class="download-btn" onclick="downloadContract()">📥 Скачать договор</button>
+
+  <script>
+    function downloadContract() {
+      var content = document.documentElement.outerHTML;
+      var blob = new Blob([content], { type: 'text/html' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'dogovor_license.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
 </div>
