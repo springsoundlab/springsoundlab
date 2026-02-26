@@ -1,285 +1,697 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Лицензионный договор (с сохранением авторства)</title>
-    <style>
-        /* Стили для сайта (как на странице политики) */
-        .contract-body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
-            color: #333;
-        }
-        .contract-body h1 {
-            font-size: 2em;
-            margin-bottom: 0.5em;
-            text-align: center;
-            font-weight: 600;
-        }
-        .contract-body h2 {
-            font-size: 1.5em;
-            margin-top: 1.5em;
-            margin-bottom: 1em;
-            font-weight: 500;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 0.3em;
-        }
-        .contract-body h3 {
-            font-size: 1.2em;
-            margin-top: 1.2em;
-            margin-bottom: 0.8em;
-            font-weight: 500;
-        }
-        .contract-body p {
-            margin: 0.8em 0;
-        }
-        .contract-body ul, .contract-body ol {
-            margin: 0.5em 0 1em 1.5em;
-        }
-        .contract-body li {
-            margin: 0.3em 0;
-        }
-        .contract-body .option-group {
-            margin: 1em 0;
-            padding: 0.5em 1em;
-            background: #f9f9f9;
-            border-left: 4px solid #bf00ff;
-        }
-        .contract-body .option-item {
-            margin: 0.5em 0;
-        }
-        .contract-body input[type="checkbox"], .contract-body input[type="radio"] {
-            margin-right: 0.5em;
-        }
-        .contract-body .note {
-            font-size: 0.9em;
-            color: #666;
-            font-style: italic;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Лицензионный договор — Генератор</title>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --ink-soft: #3d3d5c;
+    --accent: #c8a96e;
+    --accent-light: #f0e6d0;
+    --bg: #f7f5f0;
+    --bg-card: #ffffff;
+    --border: #e2ddd4;
+    --success: #2d7a5f;
+    --field-bg: #fafaf8;
+    --radius: 10px;
+  }
 
-        /* Стили для печати (чёрно-белые) */
-        @media print {
-            .contract-body {
-                color: black;
-                background: white;
-                font-family: 'Times New Roman', serif;
-            }
-            .contract-body h2 {
-                border-bottom: 1px solid black;
-            }
-            .download-btn { display: none; }
-        }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* Кнопка скачивания */
-        .download-btn {
-            display: block;
-            margin: 40px auto 20px;
-            padding: 12px 30px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .download-btn:hover {
-            background-color: #45a049;
-        }
-    </style>
+  body {
+    font-family: 'Geologica', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ─── LAYOUT ─── */
+  .app { display: grid; grid-template-columns: 420px 1fr; min-height: 100vh; }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    background: var(--ink);
+    color: #fff;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+    padding: 32px 28px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .sidebar-header .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-header p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tabs {
+    display: flex;
+    padding: 16px 28px 0;
+    gap: 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .tab {
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab:hover { color: rgba(255,255,255,0.75); }
+
+  .tab-content { display: none; padding: 20px 28px; flex: 1; overflow-y: auto; }
+  .tab-content.active { display: block; }
+
+  .section-title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin: 20px 0 10px;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  input[type="text"], input[type="number"], input[type="date"], textarea, select {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: #fff;
+    font-family: 'Geologica', sans-serif;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 12px;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(200,169,110,0.08);
+  }
+
+  select option { background: #1a1a2e; color: #fff; }
+
+  textarea { resize: vertical; min-height: 60px; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row2 input { margin-bottom: 0; }
+
+  .radio-group { display: flex; gap: 8px; margin-bottom: 12px; }
+  .radio-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+  .radio-option:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(200,169,110,0.12);
+    color: var(--accent);
+  }
+  .radio-option input { display: none; }
+
+  .calc-box {
+    background: rgba(200,169,110,0.1);
+    border: 1px solid rgba(200,169,110,0.3);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .calc-box .calc-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 2px; }
+  .calc-box .calc-value { font-size: 20px; font-weight: 600; color: var(--accent); font-family: 'Playfair Display', serif; }
+
+  .btn-print {
+    margin: 0 28px 28px;
+    width: calc(100% - 56px);
+    padding: 14px;
+    background: var(--accent);
+    color: var(--ink);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Geologica', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-print:hover { background: #d4b87a; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(200,169,110,0.3); }
+
+  /* ─── PREVIEW ─── */
+  .preview-area {
+    padding: 40px;
+    overflow-y: auto;
+    background: var(--bg);
+  }
+
+  .preview-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .preview-toolbar h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--ink);
+  }
+
+  .badge {
+    background: var(--accent-light);
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── CONTRACT PAPER ─── */
+  .contract-paper {
+    background: #fff;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 70px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    border-radius: 4px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #000;
+  }
+
+  .contract-paper .c-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  .contract-paper .c-header-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+
+  .contract-paper .c-section {
+    font-weight: bold;
+    text-align: center;
+    margin: 18px 0 8px;
+    font-size: 13px;
+  }
+
+  .contract-paper p {
+    margin-bottom: 6px;
+    text-indent: 0;
+  }
+
+  .contract-paper .indent { padding-left: 20px; }
+
+  .f { color: #1a1a9e; font-style: italic; }
+  .f:empty::before { content: '___________'; color: #aaa; font-style: normal; }
+
+  .c-sign-block { margin-top: 30px; }
+  .c-sign-row { display: flex; justify-content: space-between; margin-bottom: 20px; }
+  .c-sign-row > div { width: 45%; }
+  .c-sign-row .sign-label { font-weight: bold; font-size: 12px; margin-bottom: 4px; }
+  .c-sign-row .sign-line { border-bottom: 1px solid #000; margin-bottom: 2px; min-height: 22px; }
+  .c-sign-row .sign-sub { font-size: 10px; color: #555; }
+
+  hr.c-hr { border: none; border-top: 1px solid #ccc; margin: 16px 0; }
+
+  .checkbox-mark { display: inline-block; width: 12px; height: 12px; border: 1px solid #000; margin-right: 6px; text-align: center; line-height: 12px; font-size: 10px; vertical-align: middle; }
+
+  /* ─── PRINT ─── */
+  @media print {
+    body { background: white; }
+    .sidebar, .preview-toolbar, .preview-area > :not(.contract-paper) { display: none !important; }
+    .app { display: block; }
+    .preview-area { padding: 0; background: white; }
+    .contract-paper {
+      box-shadow: none;
+      padding: 20mm 25mm;
+      max-width: 100%;
+      border-radius: 0;
+      font-size: 12pt;
+      line-height: 1.6;
+    }
+    .f { color: #000; font-style: normal; }
+    @page { size: A4; margin: 0; }
+  }
+</style>
 </head>
 <body>
-<div class="contract-body">
-    <h1>ДОГОВОР №__</h1>
-    <h2>предоставления права использования музыкального произведения (лицензионный договор)</h2>
-    <p style="text-align: right;"><strong>г. Волгоград</strong> «___» __________ 2026 г.</p>
+<div class="app">
 
-    <p><strong>Лицензиар:</strong> ___________________________________________________________________,<br>
-    (ФИО полностью)<br>
-    паспорт: серия _______ номер ____________, выдан _______________________________________________________<br>
-    ________________________________________________________________________<br>
-    ________________________________________________________________________,<br>
-    (наименование органа, выдавшего паспорт)<br>
-    зарегистрирован по адресу: ________________________________________________________,<br>
-    применяющий специальный налоговый режим «Налог на профессиональный доход» (самозанятый),<br>
-    ИНН _______________________, телефон: _______________________, email: _______________________,<br>
-    именуемый в дальнейшем <strong>«Лицензиар»</strong>,</p>
-
-    <p><strong>Лицензиат:</strong> ___________________________________________________________________,<br>
-    (ФИО полностью / Наименование организации)<br>
-    паспорт: серия _______ номер ____________, выдан _____________________________ / ИНН _________________, ОГРН _________________,<br>
-    зарегистрированный по адресу: _____________________________________________________,<br>
-    телефон: _______________________, email: _______________________,<br>
-    именуемый в дальнейшем <strong>«Лицензиат»</strong>,</p>
-
-    <p>вместе именуемые <strong>«Стороны»</strong>, заключили настоящий Договор о нижеследующем:</p>
-
-    <h3>1. ПРЕДМЕТ ДОГОВОРА</h3>
-    <p>1.1. Лицензиар обязуется создать оригинальное музыкальное произведение (аранжировку) в соответствии с Техническим заданием (Приложение № 1) и предоставить Лицензиату право использования этого произведения на условиях, указанных в настоящем Договоре.</p>
-    <p>1.2. Лицензиат обязуется принять созданное произведение и выплатить Лицензиару вознаграждение в порядке и размере, установленных настоящим Договором.</p>
-    <p>1.3. Лицензиат гарантирует, что любые материалы (мелодия, текст, референсы), предоставленные им для создания произведения, не нарушают исключительных прав третьих лиц. В случае предъявления претензий к Лицензиару в связи с использованием таких материалов, Лицензиат обязуется урегулировать их самостоятельно и возместить Лицензиару все убытки.</p>
-
-    <h3>2. ИСКЛЮЧИТЕЛЬНЫЕ ПРАВА И ЛИЦЕНЗИЯ</h3>
-    <p>2.1. Исключительное право на созданное произведение (аранжировку) полностью сохраняется за Лицензиаром. Лицензиат не приобретает исключительное право, а получает право использования произведения в объёме, предусмотренном настоящим Договором.</p>
-    <p>2.2. <strong>Тип лицензии (нужное отметить):</strong></p>
-    <div class="option-group">
-        <div class="option-item">
-            ☐ <strong>простая (неисключительная) лицензия</strong> – Лицензиар вправе сам использовать произведение и выдавать лицензии на его использование другим лицам. Лицензиат не может запрещать использование произведения другим лицам.
-        </div>
-        <div class="option-item">
-            ☐ <strong>исключительная лицензия</strong> – Лицензиату предоставляется право использования произведения в пределах, установленных п. 2.3, <strong>без сохранения за Лицензиаром права выдачи лицензий другим лицам</strong>. При этом Лицензиар сохраняет право самостоятельно использовать произведение способами, не противоречащими условиям настоящего Договора, если иное не предусмотрено письменным соглашением Сторон.
-        </div>
+  <!-- ═══ SIDEBAR FORM ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">♩ АранжДоговор</div>
+      <p>Генератор лицензионного договора</p>
     </div>
 
-    <p>2.3. <strong>Способы использования произведения:</strong></p>
-    <ul>
-        <li>запись вокала и/или инструментов поверх аранжировки (создание фонограммы);</li>
-        <li>распространение фонограммы (включая цифровую дистрибуцию, продажу на физических носителях);</li>
-        <li>публичное исполнение (концерты);</li>
-        <li>доведение до всеобщего сведения (размещение в сети «Интернет» на стриминговых платформах, в социальных сетях, видеохостингах);</li>
-        <li>использование в рекламе, кино, играх (синхронизация) – только с письменного согласия Лицензиара.</li>
-    </ul>
-
-    <p>2.4. <strong>Территория использования:</strong> весь мир.</p>
-
-    <p>2.5. <strong>Срок действия лицензии (нужное отметить):</strong></p>
-    <div class="option-group">
-        <div class="option-item">
-            ☐ <strong>1 (один) год</strong> с даты подписания Акта приёма-передачи произведения. По истечении срока лицензия прекращается. Лицензиат имеет право на продление лицензии на тех же условиях путём направления письменного уведомления Лицензиару не позднее чем за 30 дней до окончания срока. Продление осуществляется на возмездной основе, если иное не согласовано Сторонами.
-        </div>
-        <div class="option-item">
-            ☐ <strong>Бессрочно (на весь срок действия исключительного права)</strong>. Лицензия действует до истечения срока охраны произведения в соответствии с ГК РФ. Лицензиар не вправе в одностороннем порядке отказаться от договора, за исключением случаев существенного нарушения Лицензиатом своих обязательств.
-        </div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('t1',this)">Стороны</button>
+      <button class="tab" onclick="showTab('t2',this)">Условия</button>
+      <button class="tab" onclick="showTab('t3',this)">Оплата</button>
+      <button class="tab" onclick="showTab('t4',this)">ТЗ</button>
     </div>
 
-    <p>2.6. <strong>Лицензиат не вправе:</strong></p>
-    <ul>
-        <li>вносить изменения в мелодию, гармонию, структуру и темп произведения без письменного согласия Лицензиара (допускается стандартная эквализация и мастеринг при сведении);</li>
-        <li>перерабатывать произведение (создавать переработки, ремиксы) без согласия Лицензиара;</li>
-        <li>передавать права, полученные по настоящему Договору, третьим лицам (сублицензирование) без письменного согласия Лицензиара;</li>
-        <li>использовать произведение способами, не предусмотренными п. 2.3.</li>
-    </ul>
+    <!-- TAB 1: Стороны -->
+    <div class="tab-content active" id="t1">
+      <div class="section-title">Договор</div>
+      <label>Номер договора</label>
+      <input type="text" id="docNum" placeholder="01" oninput="render()">
+      <label>Дата договора</label>
+      <input type="date" id="docDate" oninput="render()">
 
-    <p>2.7. <strong>Обязанность указывать имя автора:</strong> При любом использовании произведения (в аудио- и видеоматериалах, в описаниях, буклетах, титрах, на стриминговых платформах, в социальных сетях и т.п.) Лицензиат обязан указывать имя Лицензиара как автора аранжировки. Допустимая форма: <em>«Аранжировка: [Имя или псевдоним Лицензиара]»</em>. Неисполнение данной обязанности является существенным нарушением договора.</p>
+      <div class="section-title">Лицензиар (Аранжировщик)</div>
+      <label>ФИО полностью</label>
+      <input type="text" id="lrName" placeholder="Иванов Иван Иванович" oninput="render()">
+      <label>Псевдоним (для указания в релизе)</label>
+      <input type="text" id="lrPseudo" placeholder="Ivan Beats" oninput="render()">
+      <div class="row2">
+        <div>
+          <label>Серия паспорта</label>
+          <input type="text" id="lrPassSer" placeholder="1234" oninput="render()">
+        </div>
+        <div>
+          <label>Номер паспорта</label>
+          <input type="text" id="lrPassNum" placeholder="567890" oninput="render()">
+        </div>
+      </div>
+      <label>Кем выдан</label>
+      <input type="text" id="lrPassBy" placeholder="УМВД России по г. Волгограду" oninput="render()">
+      <label>Адрес регистрации</label>
+      <input type="text" id="lrAddr" placeholder="г. Волгоград, ул. Ленина, д. 1, кв. 1" oninput="render()">
+      <label>ИНН самозанятого</label>
+      <input type="text" id="lrInn" placeholder="340112345678" oninput="render()">
+      <label>Телефон</label>
+      <input type="text" id="lrPhone" placeholder="+7 900 000-00-00" oninput="render()">
+      <label>Email</label>
+      <input type="text" id="lrEmail" placeholder="ivan@example.com" oninput="render()">
 
-    <h3>3. АВТОРСКОЕ ВОЗНАГРАЖДЕНИЕ И ПОРЯДОК РАСЧЁТОВ</h3>
-    <p>3.1. За создание произведения и предоставление прав использования Лицензиат выплачивает Лицензиару вознаграждение, состоящее из следующих частей:</p>
-    <p>3.1.1. <strong>Единовременный платёж (аванс)</strong> – ________ (______________________) рублей. Сумма выплачивается в течение 3 (трёх) рабочих дней с даты подписания настоящего Договора.</p>
-    <p>3.1.2. <strong>Процентные отчисления (роялти)</strong> начисляются отдельно по каждому виду использования:</p>
-    <ul>
-        <li>от использования фонограммы в цифровых магазинах и стриминговых сервисах – <strong>40%</strong> от сумм, фактически полученных Лицензиатом от дистрибьюторов/агрегаторов (после вычета всех комиссий дистрибьюторов, но до вычета налогов, уплачиваемых Лицензиатом);</li>
-        <li>от использования произведения в рекламе, кино, играх (синхронизация) – <strong>50%</strong> от вознаграждения, полученного Лицензиатом по соответствующему договору;</li>
-        <li>от публичного исполнения (концерты) – <strong>фиксированная сумма 5 000 (Пять тысяч) рублей</strong> за каждое публичное исполнение произведения на концерте.</li>
-    </ul>
-    <p>3.2. Аванс является невозвратным, за исключением случаев, когда произведение не соответствует Техническому заданию, что подтверждено мотивированным отказом, заявленным в порядке п. 4.3.</p>
-    <p>3.3. <strong>Отчётность и выплаты:</strong></p>
-    <p>3.3.1. Лицензиат обязан ежеквартально, не позднее 30 дней после окончания квартала, предоставлять Лицензиару письменный отчёт о доходах с приложением копий подтверждающих документов.</p>
-    <p>3.3.2. Одновременно с отчётом Лицензиат выплачивает причитающуюся сумму роялти.</p>
-    <p>3.4. <strong>Контроль:</strong> Лицензиат обязуется предоставить Лицензиару доступ на чтение к статистике использования произведения в личном кабинете дистрибьютора либо направлять заверенные скриншоты.</p>
-    <p>3.5. <strong>Право на аудит:</strong> Лицензиар вправе проверять достоверность отчётов. При выявлении занижения сумм более чем на 5% расходы на аудит возмещаются Лицензиатом.</p>
-    <p>3.6. <strong>Налоговый статус Лицензиара:</strong> Лицензиар применяет режим «Налог на профессиональный доход». При получении оплаты Лицензиар формирует чек в приложении «Мой налог» и направляет его Лицензиату.</p>
+      <div class="section-title">Банковские реквизиты</div>
+      <label>Получатель</label>
+      <input type="text" id="lrBankName" placeholder="Иванов Иван Иванович" oninput="render()">
+      <label>Банк</label>
+      <input type="text" id="lrBank" placeholder='ПАО "Сбербанк"' oninput="render()">
+      <label>БИК</label>
+      <input type="text" id="lrBik" placeholder="042015607" oninput="render()">
+      <label>Счёт</label>
+      <input type="text" id="lrAcc" placeholder="40817810000000000000" oninput="render()">
+      <label>Карта (если нужно)</label>
+      <input type="text" id="lrCard" placeholder="2202 0000 0000 0000" oninput="render()">
 
-    <h3>4. ПРАВА И ОБЯЗАННОСТИ СТОРОН</h3>
-    <p>4.1. <strong>Лицензиар обязан:</strong></p>
-    <ul>
-        <li>создать произведение в соответствии с Техническим заданием (Приложение № 1) и передать его Лицензиату по Акту приёма-передачи (Приложение № 2) в срок, указанный в ТЗ;</li>
-        <li>предоставить Лицензиату права использования согласно п. 2.</li>
-    </ul>
-    <p>4.2. <strong>Лицензиат обязан:</strong></p>
-    <ul>
-        <li>выплачивать вознаграждение;</li>
-        <li>при любом использовании произведения указывать имя Лицензиара как автора аранжировки;</li>
-        <li>соблюдать ограничения п. 2.6;</li>
-        <li>в течение 5 (пяти) рабочих дней с момента получения готового произведения подписать Акт либо предоставить мотивированный отказ. При непредоставлении ответа работа считается принятой.</li>
-    </ul>
-    <p>4.3. <strong>Правки:</strong> Лицензиар обязуется внести до 2 (двух) раундов правок бесплатно. Правки, выходящие за пределы ТЗ, оплачиваются дополнительно.</p>
+      <div class="section-title">Лицензиат (Заказчик)</div>
+      <label>ФИО / Наименование организации</label>
+      <input type="text" id="ltName" placeholder="Петров Пётр Петрович / ООО «Музыка»" oninput="render()">
+      <label>Серия и номер паспорта (для физлица)</label>
+      <input type="text" id="ltPass" placeholder="5678 901234, выдан УМВД..." oninput="render()">
+      <label>ИНН / ОГРН (для юрлица)</label>
+      <input type="text" id="ltInn" placeholder="340298765432 / 1234567890123" oninput="render()">
+      <label>Адрес</label>
+      <input type="text" id="ltAddr" placeholder="г. Москва, ул. Тверская, д. 1" oninput="render()">
+      <label>Телефон</label>
+      <input type="text" id="ltPhone" placeholder="+7 900 000-00-00" oninput="render()">
+      <label>Email</label>
+      <input type="text" id="ltEmail" placeholder="client@example.com" oninput="render()">
+    </div>
 
-    <h3>5. ОТВЕТСТВЕННОСТЬ СТОРОН</h3>
-    <p>5.1. За нарушение сроков выплаты вознаграждения – пеня 0,1% от суммы задолженности за каждый день просрочки, но не более 50%.</p>
-    <p>5.2. За неисполнение обязанности по указанию имени автора – штраф <strong>20 000 рублей</strong> за каждый факт нарушения.</p>
-    <p>5.3. За передачу прав третьим лицам (сублицензирование) без согласия – штраф <strong>500%</strong> от суммы аванса.</p>
-    <p>5.4. В случае существенного нарушения условий Договора Лицензиар вправе расторгнуть Договор в одностороннем порядке с уведомлением за 10 дней, аванс возврату не подлежит.</p>
+    <!-- TAB 2: Условия -->
+    <div class="tab-content" id="t2">
+      <div class="section-title">Тип лицензии</div>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="licType" value="simple" checked onchange="render()"> Простая
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="licType" value="exclusive" onchange="render()"> Исключительная
+        </label>
+      </div>
 
-    <h3>6. ПОРЯДОК РАССМОТРЕНИЯ СПОРОВ</h3>
-    <p>6.1. Споры разрешаются путём переговоров. При недостижении согласия – в суде по месту нахождения Лицензиара (г. Волгоград).</p>
+      <div class="section-title">Срок лицензии</div>
+      <div class="radio-group">
+        <label class="radio-option">
+          <input type="radio" name="licTerm" value="1year" checked onchange="render()"> 1 год
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="licTerm" value="perpetual" onchange="render()"> Бессрочно
+        </label>
+      </div>
+    </div>
 
-    <h3>7. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</h3>
-    <p>7.1. Договор вступает в силу с даты подписания и действует до полного исполнения обязательств.</p>
-    <p>7.2. Договор составлен в двух экземплярах, имеющих равную юридическую силу.</p>
-    <p>7.3. Изменения и дополнения – только в письменной форме.</p>
+    <!-- TAB 3: Оплата -->
+    <div class="tab-content" id="t3">
+      <div class="section-title">Стоимость</div>
+      <label>Общая стоимость аранжировки (₽)</label>
+      <input type="number" id="totalPrice" placeholder="10000" oninput="calcPayments(); render()">
+      <label>Аванс (₽)</label>
+      <input type="number" id="advance" placeholder="5000" oninput="calcPayments(); render()">
 
-    <h3>8. ПРИЛОЖЕНИЯ</h3>
-    <h4>Приложение № 1 – Техническое задание</h4>
-    <p>(Заполняется Лицензиатом до подписания договора)</p>
-    <ul>
-        <li>Жанр / стиль: ________________________________</li>
-        <li>Темп (BPM): _________________________________</li>
-        <li>Тональность: ________________________________</li>
-        <li>Настроение / атмосфера: _______________________</li>
-        <li>Основные инструменты: ________________________</li>
-        <li>Структура (куплет, припев, бридж и т.д.): __________________________________</li>
-        <li>Ссылки на референсы (обязательно): ______________</li>
-        <li>Особые требования: ___________________________</li>
-        <li>Срок выполнения работы: ______________________</li>
-        <li>Количество бесплатных правок: 2 (два) раунда.</li>
-    </ul>
+      <div class="calc-box">
+        <div class="calc-label">Остаток к оплате</div>
+        <div class="calc-value" id="remainder">— ₽</div>
+      </div>
+      <div class="calc-box">
+        <div class="calc-label">Аванс составляет</div>
+        <div class="calc-value" id="advPct">— %</div>
+      </div>
+    </div>
 
-    <h4>Приложение № 2 – Акт приёма-передачи</h4>
-    <p>«___» __________ 2026 г.</p>
-    <p>Мы, нижеподписавшиеся, подтверждаем, что произведение создано, соответствует ТЗ и передано Лицензиату в формате ________.</p>
-    <p><strong>Лицензиар:</strong> ____________________ / _________________________<br>
-    (подпись) (расшифровка)</p>
-    <p><strong>Лицензиат:</strong> ____________________ / _________________________<br>
-    (подпись) (расшифровка)</p>
+    <!-- TAB 4: ТЗ -->
+    <div class="tab-content" id="t4">
+      <div class="section-title">Техническое задание</div>
+      <label>Жанр / стиль</label>
+      <input type="text" id="tzGenre" placeholder="Pop, R&B, Hip-hop..." oninput="render()">
+      <label>Темп (BPM)</label>
+      <input type="text" id="tzBpm" placeholder="120" oninput="render()">
+      <label>Тональность</label>
+      <input type="text" id="tzKey" placeholder="Am, C major..." oninput="render()">
+      <label>Настроение / атмосфера</label>
+      <input type="text" id="tzMood" placeholder="Лирическое, энергичное..." oninput="render()">
+      <label>Основные инструменты</label>
+      <input type="text" id="tzInstr" placeholder="Пианино, скрипки, ударные..." oninput="render()">
+      <label>Структура</label>
+      <input type="text" id="tzStruct" placeholder="Интро → Куплет → Припев → Бридж → Аутро" oninput="render()">
+      <label>Ссылки на референсы</label>
+      <textarea id="tzRef" placeholder="https://..." oninput="render()"></textarea>
+      <label>Особые требования</label>
+      <textarea id="tzSpecial" placeholder="Доп. пожелания..." oninput="render()"></textarea>
+      <label>Срок выполнения</label>
+      <input type="text" id="tzDeadline" placeholder="7 рабочих дней с даты подписания" oninput="render()">
+    </div>
 
-    <h3>9. АДРЕСА И РЕКВИЗИТЫ СТОРОН</h3>
-    <p><strong>Лицензиар:</strong><br>
-    ФИО: _____________________________________________________________________<br>
-    Паспорт: серия _______ номер ____________, выдан _____________________________<br>
-    Адрес регистрации: ________________________________________________________<br>
-    ИНН (для самозанятого): ___________________________________________________<br>
-    Телефон: _________________________________________________________________<br>
-    Email: ___________________________________________________________________<br>
-    Банковские реквизиты (для перевода):<br>
-    Получатель: ______________________________________________________________<br>
-    Банк: ____________________________________________________________________<br>
-    БИК: _____________________________________________________________________<br>
-    Счёт: ____________________________________________________________________<br>
-    Карта (при необходимости): ________________________________________________</p>
+    <button class="btn-print" onclick="window.print()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Распечатать / Скачать PDF
+    </button>
+  </aside>
 
-    <p><strong>Лицензиат:</strong><br>
-    ФИО / Наименование организации: __________________________________________<br>
-    Паспорт (для физлица): серия _______ номер ____________, выдан _______________<br>
-    ИНН / ОГРН (для юрлица): _________________________________________________<br>
-    Адрес регистрации / юридический адрес: _____________________________________<br>
-    Телефон: _________________________________________________________________<br>
-    Email: ___________________________________________________________________</p>
+  <!-- ═══ PREVIEW ═══ -->
+  <main class="preview-area">
+    <div class="preview-toolbar">
+      <h2>Предпросмотр договора</h2>
+      <span class="badge">Для печати / PDF</span>
+    </div>
+    <div class="contract-paper" id="contractPreview"></div>
+  </main>
 
-    <h3>ПОДПИСИ СТОРОН</h3>
-    <p><strong>Лицензиар</strong> ____________________ / _________________________</p>
-    <p><strong>Лицензиат</strong> ____________________ / _________________________</p>
-
-    <!-- Кнопка скачивания -->
-    <button class="download-btn" onclick="downloadContract()">📥 Скачать договор</button>
 </div>
 
 <script>
-    function downloadContract() {
-        var content = document.documentElement.outerHTML;
-        var blob = new Blob([content], { type: 'text/html' });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'dogovor_license.html';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function g(id) { return (document.getElementById(id)?.value || '').trim(); }
+function radio(name) { return document.querySelector(`input[name="${name}"]:checked`)?.value; }
+
+function f(val, fallback='') {
+  if (!val) return `<span class="f">${fallback}</span>`;
+  return `<span class="f">${val}</span>`;
+}
+
+function numWord(n) {
+  // Simple number to Russian words for common amounts
+  const ones = ['','один','два','три','четыре','пять','шесть','семь','восемь','девять','десять',
+    'одиннадцать','двенадцать','тринадцать','четырнадцать','пятнадцать','шестнадцать',
+    'семнадцать','восемнадцать','девятнадцать'];
+  const tens = ['','','двадцать','тридцать','сорок','пятьдесят','шестьдесят','семьдесят','восемьдесят','девяносто'];
+  const hundreds = ['','сто','двести','триста','четыреста','пятьсот','шестьсот','семьсот','восемьсот','девятьсот'];
+  const thousands = ['','одна тысяча','две тысячи','три тысячи','четыре тысячи','пять тысяч',
+    'шесть тысяч','семь тысяч','восемь тысяч','девять тысяч','десять тысяч',
+    'одиннадцать тысяч','двенадцать тысяч','тринадцать тысяч','четырнадцать тысяч',
+    'пятнадцать тысяч','шестнадцать тысяч','семнадцать тысяч','восемнадцать тысяч',
+    'девятнадцать тысяч'];
+
+  if (!n || isNaN(n)) return '';
+  n = parseInt(n);
+  if (n === 0) return 'ноль';
+  if (n >= 1000 && n < 20000 && n % 1000 === 0) {
+    return thousands[n/1000].charAt(0).toUpperCase() + thousands[n/1000].slice(1);
+  }
+  // For simplicity, just capitalize first letter if exists
+  let result = '';
+  if (n >= 1000) {
+    const th = Math.floor(n / 1000);
+    const rem = n % 1000;
+    result += (th <= 19 ? thousands[th] : tens[Math.floor(th/10)] + (th%10 ? ' ' + ones[th%10] : '') + ' тысяч');
+    if (rem > 0) result += ' ' + buildSmall(rem);
+  } else {
+    result = buildSmall(n);
+  }
+  return result.charAt(0).toUpperCase() + result.slice(1);
+
+  function buildSmall(n) {
+    let s = '';
+    if (n >= 100) { s += hundreds[Math.floor(n/100)] + ' '; n %= 100; }
+    if (n >= 20) { s += tens[Math.floor(n/10)] + ' '; n %= 10; }
+    if (n > 0) s += ones[n];
+    return s.trim();
+  }
+}
+
+function calcPayments() {
+  const total = parseFloat(g('totalPrice')) || 0;
+  const adv = parseFloat(g('advance')) || 0;
+  const rem = total - adv;
+  const pct = total > 0 ? Math.round(adv / total * 100) : 0;
+  document.getElementById('remainder').textContent = rem > 0 ? rem.toLocaleString('ru-RU') + ' ₽' : '— ₽';
+  document.getElementById('advPct').textContent = total > 0 ? pct + ' %' : '— %';
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '___';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function render() {
+  const licType = radio('licType');
+  const licTerm = radio('licTerm');
+  const total = parseFloat(g('totalPrice')) || 0;
+  const adv = parseFloat(g('advance')) || 0;
+  const rem = total - adv;
+  const pct = total > 0 ? Math.round(adv / total * 100) : 0;
+  const pseudo = g('lrPseudo') || g('lrName') || '___';
+  const docDate = g('docDate') ? formatDate(g('docDate')) : '«___» __________ 2026 г.';
+
+  const ckS = licType === 'simple' ? '☑' : '☐';
+  const ckE = licType === 'exclusive' ? '☑' : '☐';
+  const ck1 = licTerm === '1year' ? '☑' : '☐';
+  const ckP = licTerm === 'perpetual' ? '☑' : '☐';
+
+  const html = `
+<p class="c-title">ДОГОВОР № ${f(g('docNum'),'__')}</p>
+<p class="c-title">предоставления права использования музыкального произведения</p>
+<p class="c-title">(лицензионный договор)</p>
+<br>
+<div class="c-header-line">
+  <span>г. Волгоград</span>
+  <span>${docDate}</span>
+</div>
+
+<p><b>Лицензиар:</b> ${f(g('lrName'))}, паспорт: серия ${f(g('lrPassSer'),'_______')} номер ${f(g('lrPassNum'),'____________')}, выдан ${f(g('lrPassBy'))}, зарегистрирован по адресу: ${f(g('lrAddr'))}, применяющий специальный налоговый режим «Налог на профессиональный доход» (самозанятый), ИНН ${f(g('lrInn'))}, телефон: ${f(g('lrPhone'))}, email: ${f(g('lrEmail'))}, именуемый в дальнейшем <b>«Лицензиар»</b>,</p>
+<br>
+<p><b>Лицензиат:</b> ${f(g('ltName'))}, ${g('ltPass') ? 'паспорт: ' + f(g('ltPass')) + ',' : ''} ${g('ltInn') ? 'ИНН/ОГРН: ' + f(g('ltInn')) + ',' : ''} зарегистрированный по адресу: ${f(g('ltAddr'))}, телефон: ${f(g('ltPhone'))}, email: ${f(g('ltEmail'))}, именуемый в дальнейшем <b>«Лицензиат»</b>,</p>
+<br>
+<p>вместе именуемые <b>«Стороны»</b>, заключили настоящий Договор о нижеследующем:</p>
+
+<p class="c-section">1. ПРЕДМЕТ ДОГОВОРА</p>
+<p>1.1. Лицензиар обязуется создать оригинальное музыкальное произведение (аранжировку) в соответствии с Техническим заданием (Приложение № 1) и предоставить Лицензиату право использования этого произведения на условиях настоящего Договора.</p>
+<p>1.2. Лицензиат обязуется принять созданное произведение и выплатить Лицензиару вознаграждение в порядке и размере, установленных настоящим Договором.</p>
+<p>1.3. Лицензиат гарантирует, что любые материалы (мелодия, текст, референсы), предоставленные им для создания произведения, не нарушают исключительных прав третьих лиц. В случае предъявления претензий к Лицензиару, Лицензиат обязуется урегулировать их самостоятельно и возместить Лицензиару все убытки.</p>
+
+<p class="c-section">2. ИСКЛЮЧИТЕЛЬНЫЕ ПРАВА И ЛИЦЕНЗИЯ</p>
+<p>2.1. Исключительное право на созданное произведение полностью сохраняется за Лицензиаром. Лицензиат получает право использования произведения в объёме, предусмотренном настоящим Договором.</p>
+<p>2.2. Тип лицензии:</p>
+<p class="indent"><span class="checkbox-mark">${ckS}</span> <b>простая (неисключительная) лицензия</b> – Лицензиар вправе сам использовать произведение и выдавать лицензии другим лицам.</p>
+<p class="indent"><span class="checkbox-mark">${ckE}</span> <b>исключительная лицензия</b> – в пределах п. 2.3 без права Лицензиара выдавать лицензии другим лицам на те же способы использования (ст. 1236 ГК РФ).</p>
+<p>2.3. Способы использования: запись вокала/инструментов поверх аранжировки; распространение фонограммы (цифровая дистрибуция, физические носители); публичное исполнение (концерты); доведение до всеобщего сведения (стриминг, соцсети, видеохостинги); синхронизация (реклама, кино, игры) — только с письменного согласия Лицензиара.</p>
+<p>2.4. Территория: весь мир.</p>
+<p>2.5. Срок лицензии:</p>
+<p class="indent"><span class="checkbox-mark">${ck1}</span> <b>1 (один) год</b> с даты подписания Акта приёма-передачи. Продление — письменное уведомление не позднее чем за 30 дней до окончания срока, на возмездной основе.</p>
+<p class="indent"><span class="checkbox-mark">${ckP}</span> <b>Бессрочно</b> (на весь срок охраны произведения по ГК РФ). Лицензиар не вправе в одностороннем порядке отказаться от Договора, кроме случаев существенного нарушения.</p>
+<p>2.6. Лицензиат не вправе: вносить изменения в мелодию, гармонию, структуру и темп без письменного согласия (допускается стандартная эквализация и мастеринг); создавать переработки и ремиксы без согласия; сублицензировать права без письменного согласия; использовать произведение способами, не предусмотренными п. 2.3.</p>
+<p>2.7. При любом использовании произведения Лицензиат обязан указывать: <b>«Аранжировка: ${pseudo}»</b>. Неисполнение — существенное нарушение договора.</p>
+
+<p class="c-section">3. ВОЗНАГРАЖДЕНИЕ И ПОРЯДОК РАСЧЁТОВ</p>
+<p>3.1.0. Общая стоимость создания произведения составляет <b>${total > 0 ? total.toLocaleString('ru-RU') : f('','_______')} (${numWord(total) || f('','___________________')}) рублей</b>.</p>
+<p>3.1.1. Аванс — <b>${adv > 0 ? adv.toLocaleString('ru-RU') : f('','_______')} (${numWord(adv) || f('','___________________')}) рублей</b> (${pct > 0 ? pct+'%' : f('','___')} от общей стоимости). Выплачивается в течение 3 рабочих дней с даты подписания Договора.</p>
+<p>3.1.2. Остаток — <b>${rem > 0 ? rem.toLocaleString('ru-RU') : f('','_______')} (${numWord(rem) || f('','___________________')}) рублей</b>. Выплачивается в течение 3 рабочих дней с даты подписания Акта приёма-передачи. До полной оплаты остатка Лицензиат не вправе использовать произведение.</p>
+<p>3.1.3. Роялти начисляются отдельно:</p>
+<p class="indent">— стриминг и цифровые магазины: <b>15%</b> от фактически полученных Лицензиатом сумм от дистрибьюторов (после вычета комиссий дистрибьютора);</p>
+<p class="indent">— синхронизация (реклама, кино, игры): <b>50%</b> от вознаграждения по соответствующему договору;</p>
+<p class="indent">— публичное исполнение (концерты): <b>2% от кассовых сборов мероприятия</b>, но не менее <b>5 000 рублей</b> за каждое исполнение.</p>
+<p>3.2. Аванс является невозвратным, кроме случаев: а) несоответствие произведения ТЗ с мотивированным отказом по п. 4.2; б) расторжение Договора по вине Лицензиара.</p>
+<p>3.3. Лицензиат предоставляет ежеквартальный отчёт о доходах не позднее 30 дней после окончания квартала с подтверждающими документами и одновременно выплачивает роялти.</p>
+<p>3.4. Лицензиат обязан предоставить доступ к статистике в кабинете дистрибьютора либо направлять заверенные скриншоты.</p>
+<p>3.5. При выявлении занижения сумм более чем на 5% расходы на аудит возмещаются Лицензиатом.</p>
+<p>3.6. Лицензиар применяет режим «Налог на профессиональный доход» и при получении оплаты формирует чек в приложении «Мой налог».</p>
+
+<p class="c-section">4. ПРАВА И ОБЯЗАННОСТИ СТОРОН</p>
+<p>4.1. Лицензиар обязан: создать произведение согласно ТЗ и передать по Акту в установленный срок; предоставить права согласно разделу 2.</p>
+<p>4.2. Лицензиат обязан: выплачивать вознаграждение; указывать имя автора; соблюдать ограничения п. 2.6; в течение 5 рабочих дней с получения произведения подписать Акт или направить мотивированный отказ. При непредоставлении ответа — произведение считается принятым.</p>
+<p>4.3. Правки: до 2 (двух) раундов бесплатно. Один раунд — единый консолидированный список замечаний в одном сообщении. Правки за пределами ТЗ — дополнительная оплата.</p>
+
+<p class="c-section">5. ОТВЕТСТВЕННОСТЬ</p>
+<p>5.1. За нарушение сроков выплаты — пеня 0,1% от суммы задолженности за каждый день просрочки, но не более 50%.</p>
+<p>5.2. За неисполнение обязанности указывать имя автора — штраф 20 000 рублей за каждый факт.</p>
+<p>5.3. За сублицензирование без согласия — штраф 500% от суммы аванса.</p>
+<p>5.4. При существенном нарушении Лицензиатом — Лицензиар вправе расторгнуть Договор с уведомлением за 10 дней; аванс не возвращается. При вине Лицензиара — аванс возвращается в полном объёме.</p>
+
+<p class="c-section">6. КОНФИДЕНЦИАЛЬНОСТЬ</p>
+<p>6.1. Стороны обязуются не разглашать условия Договора и информацию о сотрудничестве без письменного согласия другой Стороны.</p>
+<p>6.2. До релиза Лицензиар не публикует фрагменты произведения и сведения о проекте без согласия Лицензиата. После релиза — вправе указывать работу в портфолио.</p>
+<p>6.3. Обязательства по конфиденциальности сохраняются 3 года после прекращения Договора.</p>
+
+<p class="c-section">7. ФОРС-МАЖОР</p>
+<p>7.1. Стороны освобождаются от ответственности при обстоятельствах непреодолимой силы, которые невозможно было предвидеть или предотвратить.</p>
+<p>7.2. Сторона, столкнувшаяся с форс-мажором, уведомляет другую в течение 5 рабочих дней. При непредоставлении уведомления — лишается права ссылаться на форс-мажор.</p>
+<p>7.3. При длительности форс-мажора свыше 30 дней каждая Сторона вправе расторгнуть Договор; Лицензиар передаёт выполненную часть, Лицензиат оплачивает пропорционально.</p>
+
+<p class="c-section">8. СПОРЫ</p>
+<p>8.1. Споры разрешаются путём переговоров. При недостижении согласия в течение 30 дней — в суде по месту нахождения Лицензиара (г. Волгоград).</p>
+
+<p class="c-section">9. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</p>
+<p>9.1. Договор вступает в силу с даты подписания и действует до полного исполнения обязательств.</p>
+<p>9.2. Договор составлен в двух экземплярах, имеющих равную юридическую силу.</p>
+<p>9.3. Изменения и дополнения — только в письменной форме, подписанной обеими Сторонами.</p>
+<p>9.4. В не урегулированном настоящим Договором — руководствоваться ГК РФ (часть IV).</p>
+
+<hr class="c-hr">
+<p class="c-section">ПРИЛОЖЕНИЕ № 1 — ТЕХНИЧЕСКОЕ ЗАДАНИЕ</p>
+<p><b>Жанр / стиль:</b> ${f(g('tzGenre'))}</p>
+<p><b>Темп (BPM):</b> ${f(g('tzBpm'))}</p>
+<p><b>Тональность:</b> ${f(g('tzKey'))}</p>
+<p><b>Настроение / атмосфера:</b> ${f(g('tzMood'))}</p>
+<p><b>Основные инструменты:</b> ${f(g('tzInstr'))}</p>
+<p><b>Структура:</b> ${f(g('tzStruct'))}</p>
+<p><b>Референсы:</b> ${f(g('tzRef'))}</p>
+<p><b>Особые требования:</b> ${f(g('tzSpecial'))}</p>
+<p><b>Срок выполнения:</b> ${f(g('tzDeadline'))}</p>
+<p><b>Формат файлов:</b> WAV 24 бит / 48 кГц; стемы по инструментам; MIDI при необходимости.</p>
+<p><b>Бесплатных раундов правок:</b> 2 (два).</p>
+<div class="c-sign-block">
+  <div class="c-sign-row">
+    <div><div class="sign-label">Лицензиар</div><div class="sign-line"></div><div class="sign-sub">(подпись / расшифровка)</div></div>
+    <div><div class="sign-label">Лицензиат</div><div class="sign-line"></div><div class="sign-sub">(подпись / расшифровка)</div></div>
+  </div>
+</div>
+
+<hr class="c-hr">
+<p class="c-section">ПРИЛОЖЕНИЕ № 2 — АКТ ПРИЁМА-ПЕРЕДАЧИ</p>
+<p>${docDate}</p>
+<br>
+<p>Мы, нижеподписавшиеся, подтверждаем, что произведение создано в полном объёме, соответствует Техническому заданию и передано Лицензиату в формате: WAV 24/48 кГц □, стемы □, MIDI □, иное: _______________</p>
+<p>Претензий к качеству и составу переданных материалов не имеется.</p>
+<div class="c-sign-block">
+  <div class="c-sign-row">
+    <div><div class="sign-label">Лицензиар</div><div class="sign-line"></div><div class="sign-sub">(подпись / расшифровка)</div></div>
+    <div><div class="sign-label">Лицензиат</div><div class="sign-line"></div><div class="sign-sub">(подпись / расшифровка)</div></div>
+  </div>
+</div>
+
+<hr class="c-hr">
+<p class="c-section">РЕКВИЗИТЫ И ПОДПИСИ СТОРОН</p>
+<div class="c-sign-row">
+  <div>
+    <div class="sign-label">ЛИЦЕНЗИАР</div>
+    <p>${f(g('lrName'))}</p>
+    <p>ИНН: ${f(g('lrInn'))}</p>
+    <p>Адрес: ${f(g('lrAddr'))}</p>
+    <p>Тел.: ${f(g('lrPhone'))}</p>
+    <p>Email: ${f(g('lrEmail'))}</p>
+    <p>Банк: ${f(g('lrBank'))}</p>
+    <p>БИК: ${f(g('lrBik'))}</p>
+    <p>Счёт: ${f(g('lrAcc'))}</p>
+    ${g('lrCard') ? '<p>Карта: ' + f(g('lrCard')) + '</p>' : ''}
+    <br>
+    <div class="sign-line" style="margin-top:30px"></div>
+    <div class="sign-sub">подпись / расшифровка</div>
+  </div>
+  <div>
+    <div class="sign-label">ЛИЦЕНЗИАТ</div>
+    <p>${f(g('ltName'))}</p>
+    ${g('ltInn') ? '<p>ИНН/ОГРН: ' + f(g('ltInn')) + '</p>' : ''}
+    <p>Адрес: ${f(g('ltAddr'))}</p>
+    <p>Тел.: ${f(g('ltPhone'))}</p>
+    <p>Email: ${f(g('ltEmail'))}</p>
+    <br><br><br><br><br>
+    <div class="sign-line" style="margin-top:30px"></div>
+    <div class="sign-sub">подпись / расшифровка</div>
+  </div>
+</div>
+`;
+
+  document.getElementById('contractPreview').innerHTML = html;
+}
+
+// Init
+render();
 </script>
 </body>
 </html>
