@@ -1,222 +1,915 @@
-<!-- ДОГОВОР ОТЧУЖДЕНИЯ ИСКЛЮЧИТЕЛЬНОГО ПРАВА (стилизованный, полная версия) -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Договор отчуждения — Генератор</title>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  /* Стили для сайта (как на странице политики) */
-  .contract-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  :root {
+    --ink: #1a1a2e;
+    --ink-soft: #3d3d5c;
+    --accent: #c8a96e;
+    --accent-light: #f0e6d0;
+    --bg: #f7f5f0;
+    --bg-card: #ffffff;
+    --border: #e2ddd4;
+    --success: #2d7a5f;
+    --field-bg: #fafaf8;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Geologica', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .app { display: grid; grid-template-columns: 420px 1fr; min-height: 100vh; }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    background: var(--ink);
+    color: #fff;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+    padding: 32px 28px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+
+  .sidebar-header .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-header p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tabs {
+    display: flex;
+    padding: 16px 28px 0;
+    gap: 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab:hover { color: rgba(255,255,255,0.75); }
+
+  .tab-content { display: none; padding: 20px 28px; flex: 1; overflow-y: auto; }
+  .tab-content.active { display: block; }
+
+  .section-title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin: 20px 0 10px;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  input[type="text"], input[type="number"], input[type="date"], textarea, select {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: #fff;
+    font-family: 'Geologica', sans-serif;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 12px;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(200,169,110,0.08);
+  }
+
+  select option { background: #1a1a2e; color: #fff; }
+  textarea { resize: vertical; min-height: 60px; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row2 > div input { margin-bottom: 0; }
+
+  .calc-box {
+    background: rgba(200,169,110,0.1);
+    border: 1px solid rgba(200,169,110,0.3);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .calc-box .calc-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 2px; }
+  .calc-box .calc-value { font-size: 20px; font-weight: 600; color: var(--accent); font-family: 'Playfair Display', serif; }
+
+  .info-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.6;
+  }
+  .info-box span { color: var(--accent); font-weight: 600; }
+
+  .btn-print {
+    margin: 0 28px 28px;
+    width: calc(100% - 56px);
+    padding: 14px;
+    background: var(--accent);
+    color: var(--ink);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Geologica', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn-print:hover { background: #d4b87a; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(200,169,110,0.3); }
+
+  .btn-row { display: flex; gap: 8px; padding: 0 28px 8px; flex-shrink: 0; }
+
+  .btn-save {
+    flex: 1;
+    padding: 10px 14px;
+    background: rgba(200,169,110,0.15);
+    border: 1px solid rgba(200,169,110,0.4);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Geologica', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .btn-save:hover { background: rgba(200,169,110,0.25); }
+
+  .btn-clear-save {
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.35);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .btn-clear-save:hover { background: rgba(220,80,80,0.15); border-color: rgba(220,80,80,0.4); color: #e07070; }
+
+  .save-status {
+    margin: 0 28px 10px;
+    font-size: 11px;
+    padding: 7px 12px;
+    border-radius: 6px;
+    display: none;
+    flex-shrink: 0;
+  }
+  .save-status.ok { background: rgba(45,122,95,0.2); color: #5dcfa0; display: block; }
+  .save-status.del { background: rgba(220,80,80,0.15); color: #e07070; display: block; }
+
+  .tz-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 12px; }
+  .tz-row input, .tz-row textarea { margin-bottom: 0; flex: 1; }
+
+  .btn-auto {
+    white-space: nowrap;
+    padding: 9px 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.45);
+    font-size: 10px;
+    font-family: 'Geologica', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .btn-auto:hover { background: rgba(200,169,110,0.15); border-color: rgba(200,169,110,0.4); color: var(--accent); }
+
+  .ref-buttons { display: flex; gap: 6px; margin-bottom: 6px; }
+  .btn-ref {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    font-family: 'Geologica', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-ref:hover { background: rgba(200,169,110,0.15); border-color: rgba(200,169,110,0.4); color: var(--accent); }
+
+  /* ─── PREVIEW ─── */
+  .preview-area {
+    padding: 40px;
+    overflow-y: auto;
+    background: var(--bg);
+  }
+
+  .preview-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .preview-toolbar h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--ink);
+  }
+
+  .badge-wrap { display: flex; gap: 8px; align-items: center; }
+
+  .badge {
+    background: var(--accent-light);
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-type {
+    background: #1a1a2e;
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── CONTRACT PAPER ─── */
+  .contract-paper {
+    background: #fff;
     max-width: 800px;
     margin: 0 auto;
-    line-height: 1.6;
-    color: #333;
+    padding: 60px 70px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    border-radius: 4px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #000;
   }
-  .contract-body h1 {
-    font-size: 2em;
-    margin-bottom: 0.5em;
+
+  .contract-paper .c-title {
     text-align: center;
-    font-weight: 600;
-  }
-  .contract-body h2 {
-    font-size: 1.5em;
-    margin-top: 1.5em;
-    margin-bottom: 1em;
-    font-weight: 500;
-    border-bottom: 2px solid #f0f0f0;
-    padding-bottom: 0.3em;
-  }
-  .contract-body h3 {
-    font-size: 1.2em;
-    margin-top: 1.2em;
-    margin-bottom: 0.8em;
-    font-weight: 500;
-  }
-  .contract-body p {
-    margin: 0.8em 0;
-  }
-  .contract-body ul, .contract-body ol {
-    margin: 0.5em 0 1em 1.5em;
-  }
-  .contract-body li {
-    margin: 0.3em 0;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 4px;
   }
 
-  /* Стили для печати (чёрно-белые) */
+  .contract-paper .c-header-line {
+    display: flex;
+    justify-content: space-between;
+    margin: 16px 0 20px;
+    font-size: 13px;
+  }
+
+  .contract-paper .c-section {
+    font-weight: bold;
+    text-align: center;
+    margin: 18px 0 8px;
+    font-size: 13px;
+  }
+
+  .contract-paper p { margin-bottom: 6px; }
+  .contract-paper .indent { padding-left: 20px; }
+
+  .f { color: #1a1a9e; font-style: italic; }
+  .f:empty::before { content: '___________'; color: #aaa; font-style: normal; }
+
+  .c-sign-block { margin-top: 24px; }
+  .c-sign-row { display: flex; justify-content: space-between; margin-bottom: 20px; }
+  .c-sign-row > div { width: 45%; }
+  .c-sign-row .sign-label { font-weight: bold; font-size: 12px; margin-bottom: 4px; }
+  .c-sign-row .sign-line { border-bottom: 1px solid #000; margin-bottom: 2px; min-height: 24px; }
+  .c-sign-row .sign-sub { font-size: 10px; color: #555; }
+
+  hr.c-hr { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
+
+  /* ─── PRINT ─── */
   @media print {
-    .contract-body {
-      color: black;
-      background: white;
-      font-family: 'Times New Roman', serif;
+    body { background: white; }
+    .sidebar, .preview-toolbar, .preview-area > :not(.contract-paper) { display: none !important; }
+    .app { display: block; }
+    .preview-area { padding: 0; background: white; }
+    .contract-paper {
+      box-shadow: none;
+      padding: 20mm 25mm;
+      max-width: 100%;
+      border-radius: 0;
+      font-size: 12pt;
+      line-height: 1.6;
     }
-    .contract-body h2 {
-      border-bottom: 1px solid black;
-    }
-    .download-btn { display: none; }
-  }
-
-  /* Кнопка скачивания */
-  .download-btn {
-    display: block;
-    margin: 40px auto 20px;
-    padding: 12px 30px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  .download-btn:hover {
-    background-color: #45a049;
+    .f { color: #000; font-style: normal; }
+    @page { size: A4; margin: 0; }
   }
 </style>
+</head>
+<body>
+<div class="app">
 
-<div class="contract-body">
-  <h1>ДОГОВОР №__</h1>
-  <h2>отчуждения исключительного права на музыкальное произведение</h2>
-  <p style="text-align: right;"><strong>г. Волгоград</strong> «___» __________ 2026 г.</p>
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">♩ АранжДоговор</div>
+      <p>Отчуждение исключительного права</p>
+    </div>
 
-  <p><strong>Автор:</strong> ___________________________________________________________________,<br>
-  (ФИО полностью)<br>
-  паспорт: серия _______ номер ____________, выдан _____________________________,<br>
-  зарегистрирован по адресу: ________________________________________________________,<br>
-  применяющий специальный налоговый режим «Налог на профессиональный доход» (самозанятый),<br>
-  ИНН _______________________, телефон: _______________________, email: _______________________,<br>
-  именуемый в дальнейшем <strong>«Автор»</strong>,</p>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('t1',this)">Стороны</button>
+      <button class="tab" onclick="showTab('t2',this)">Оплата</button>
+      <button class="tab" onclick="showTab('t3',this)">ТЗ</button>
+      <button class="tab" onclick="showTab('t4',this)">Доп.</button>
+    </div>
 
-  <p><strong>Приобретатель:</strong> ___________________________________________________________________,<br>
-  (ФИО полностью / Наименование организации)<br>
-  паспорт: серия _______ номер ____________, выдан _____________________________ / ИНН _________________, ОГРН _________________,<br>
-  зарегистрированный по адресу: _____________________________________________________,<br>
-  телефон: _______________________, email: _______________________,<br>
-  именуемый в дальнейшем <strong>«Приобретатель»</strong>,</p>
+    <!-- TAB 1: Стороны -->
+    <div class="tab-content active" id="t1">
+      <div class="section-title">Договор</div>
+      <label>Номер договора</label>
+      <input type="text" id="docNum" placeholder="01" oninput="render()">
+      <label>Дата договора</label>
+      <input type="date" id="docDate" oninput="render()">
 
-  <p>вместе именуемые <strong>«Стороны»</strong>, заключили настоящий Договор о нижеследующем:</p>
+      <div class="section-title">Автор (Правообладатель)</div>
+      <label>ФИО полностью</label>
+      <input type="text" id="authName" placeholder="Иванов Иван Иванович" oninput="render()">
+      <label>Псевдоним (для указания при использовании)</label>
+      <input type="text" id="authPseudo" placeholder="Ivan Beats" oninput="render()">
+      <div class="row2">
+        <div>
+          <label>Серия паспорта</label>
+          <input type="text" id="authPassSer" placeholder="1234" oninput="render()">
+        </div>
+        <div>
+          <label>Номер паспорта</label>
+          <input type="text" id="authPassNum" placeholder="567890" oninput="render()">
+        </div>
+      </div>
+      <label>Кем выдан</label>
+      <input type="text" id="authPassBy" placeholder="УМВД России по г. Волгограду" oninput="render()">
+      <label>Адрес регистрации</label>
+      <input type="text" id="authAddr" placeholder="г. Волгоград, ул. Ленина, д. 1, кв. 1" oninput="render()">
+      <label>ИНН самозанятого</label>
+      <input type="text" id="authInn" placeholder="340112345678" oninput="render()">
+      <label>Телефон</label>
+      <input type="text" id="authPhone" placeholder="+7 900 000-00-00" oninput="render()">
+      <label>Email</label>
+      <input type="text" id="authEmail" placeholder="ivan@example.com" oninput="render()">
 
-  <h3>1. ПРЕДМЕТ ДОГОВОРА</h3>
-  <p>1.1. Автор обязуется создать оригинальное музыкальное произведение (аранжировку) в соответствии с Техническим заданием (Приложение № 1) и передать Приобретателю <strong>в полном объеме исключительное право</strong> на это произведение.</p>
-  <p>1.2. Приобретатель обязуется принять созданное произведение и уплатить Автору единовременное вознаграждение, предусмотренное настоящим Договором.</p>
-  <p>1.3. После подписания Сторонами Акта приёма-передачи (Приложение № 2) исключительное право на произведение переходит от Автора к Приобретателю. С этого момента Приобретатель становится единственным правообладателем и вправе использовать произведение любыми способами по своему усмотрению, а также разрешать или запрещать его использование другим лицам.</p>
-  <p>1.4. Личные неимущественные права (право авторства и право на имя) сохраняются за Автором. Приобретатель обязуется при любом использовании произведения указывать имя Автора (или псевдоним) в следующей форме: ___________________________________.</p>
+      <div class="section-title">Банк Автора</div>
+      <label>Получатель</label>
+      <input type="text" id="authBankName" placeholder="Иванов Иван Иванович" oninput="render()">
+      <label>Банк</label>
+      <input type="text" id="authBank" placeholder='ПАО "Сбербанк"' oninput="render()">
+      <label>БИК</label>
+      <input type="text" id="authBik" placeholder="042015607" oninput="render()">
+      <label>Счёт</label>
+      <input type="text" id="authAcc" placeholder="40817810000000000000" oninput="render()">
+      <label>Карта (если нужно)</label>
+      <input type="text" id="authCard" placeholder="2202 0000 0000 0000" oninput="render()">
 
-  <h3>2. ВОЗНАГРАЖДЕНИЕ АВТОРА</h3>
-  <p>2.1. За передачу исключительного права Приобретатель выплачивает Автору единовременное вознаграждение в размере ________ (______________________) рублей.</p>
-  <p>2.2. Вознаграждение выплачивается в следующем порядке:</p>
-  <ul>
-    <li>предоплата в размере ________% (не менее 50%) от суммы п. 2.1 – в течение 3 (трёх) рабочих дней с даты подписания настоящего Договора;</li>
-    <li>окончательный расчёт – в течение 3 (трёх) рабочих дней с даты подписания Сторонами Акта приёма-передачи произведения (Приложение № 2).</li>
-  </ul>
-  <p>2.3. Предоплата является невозвратной, за исключением случаев, когда произведение не соответствует Техническому заданию, что подтверждено мотивированным отказом, заявленным в порядке п. 4.3.</p>
-  <p>2.4. Автор применяет специальный налоговый режим «Налог на профессиональный доход». При получении оплаты Автор формирует чек в приложении «Мой налог» и направляет его Приобретателю. Налог уплачивается Автором самостоятельно.</p>
+      <div class="section-title">Приобретатель (Заказчик)</div>
+      <label>ФИО / Наименование организации</label>
+      <input type="text" id="acqName" placeholder="Петров Пётр Петрович / ООО «Музыка»" oninput="render()">
+      <label>Серия и номер паспорта (для физлица)</label>
+      <input type="text" id="acqPass" placeholder="5678 901234, выдан УМВД..." oninput="render()">
+      <label>ИНН / ОГРН (для юрлица)</label>
+      <input type="text" id="acqInn" placeholder="340298765432 / 1234567890123" oninput="render()">
+      <label>Адрес регистрации / юридический адрес</label>
+      <input type="text" id="acqAddr" placeholder="г. Москва, ул. Тверская, д. 1" oninput="render()">
+      <label>Телефон</label>
+      <input type="text" id="acqPhone" placeholder="+7 900 000-00-00" oninput="render()">
+      <label>Email</label>
+      <input type="text" id="acqEmail" placeholder="client@example.com" oninput="render()">
 
-  <h3>3. ГАРАНТИИ АВТОРА</h3>
-  <p>3.1. Автор гарантирует, что:</p>
-  <ul>
-    <li>он является единственным автором произведения;</li>
-    <li>произведение создано его творческим трудом и не нарушает авторских и смежных прав третьих лиц;</li>
-    <li>на момент подписания настоящего Договора исключительное право на произведение никому не отчуждено, не заложено, под запретом (арестом) не состоит, споров о праве на него не имеется;</li>
-    <li>в произведении не использованы результаты чужого интеллектуального труда без согласия правообладателей.</li>
-  </ul>
+      <div class="section-title">Банк Приобретателя (для возврата)</div>
+      <label>Получатель</label>
+      <input type="text" id="acqBankName" placeholder="Петров Пётр Петрович" oninput="render()">
+      <label>Банк</label>
+      <input type="text" id="acqBank" placeholder='ПАО "Тинькофф"' oninput="render()">
+      <label>БИК</label>
+      <input type="text" id="acqBik" placeholder="044525974" oninput="render()">
+      <label>Счёт</label>
+      <input type="text" id="acqAcc" placeholder="40817810000000000000" oninput="render()">
+    </div>
 
-  <h3>4. ПРАВА И ОБЯЗАННОСТИ СТОРОН</h3>
-  <p>4.1. <strong>Автор обязан:</strong></p>
-  <ul>
-    <li>создать произведение в соответствии с Техническим заданием (Приложение № 1) и передать его Приобретателю по Акту приёма-передачи (Приложение № 2) в срок, указанный в ТЗ;</li>
-    <li>подписать Акт приёма-передачи и тем самым подтвердить передачу исключительного права.</li>
-  </ul>
-  <p>4.2. <strong>Приобретатель обязан:</strong></p>
-  <ul>
-    <li>принять работу и подписать Акт в течение 5 (пяти) рабочих дней с момента получения файлов, либо направить мотивированный отказ с указанием конкретных несоответствий ТЗ. При непредоставлении ответа в указанный срок работа считается принятой, а Акт – подписанным;</li>
-    <li>выплатить вознаграждение в полном объеме и в установленные сроки;</li>
-    <li>указывать имя Автора при использовании произведения.</li>
-  </ul>
-  <p>4.3. <strong>Правки:</strong> Автор обязуется внести до 2 (двух) раундов правок бесплатно. Правки, выходящие за пределы изначального ТЗ, оплачиваются дополнительно по соглашению Сторон.</p>
+    <!-- TAB 2: Оплата -->
+    <div class="tab-content" id="t2">
+      <div class="info-box">
+        <span>Договор отчуждения</span> — Приобретатель получает <span>полное исключительное право</span> навсегда. Единовременное вознаграждение, без роялти.
+      </div>
 
-  <h3>5. ОТВЕТСТВЕННОСТЬ СТОРОН</h3>
-  <p>5.1. За нарушение сроков выплаты вознаграждения Приобретатель уплачивает пеню в размере 0,1% от суммы задолженности за каждый день просрочки, но не более 50% от суммы долга.</p>
-  <p>5.2. За нарушение обязанности по указанию имени Автора Приобретатель уплачивает штраф в размере <strong>20 000 (Двадцать тысяч) рублей</strong> за каждый выявленный факт нарушения.</p>
-  <p>5.3. В случае существенного нарушения условий Договора (в том числе неоднократной просрочки оплаты) Автор вправе требовать расторжения Договора в судебном порядке и возмещения убытков.</p>
+      <div class="section-title">Вознаграждение</div>
+      <label>Общее вознаграждение (₽)</label>
+      <input type="number" id="totalPrice" placeholder="15000" oninput="calcPayments(); render()">
 
-  <h3>6. ПОРЯДОК РАССМОТРЕНИЯ СПОРОВ</h3>
-  <p>6.1. Все споры и разногласия разрешаются путём переговоров. При недостижении согласия спор передаётся на рассмотрение в суд по месту нахождения Автора (г. Волгоград) в соответствии с действующим законодательством РФ.</p>
+      <label>Предоплата (не менее 50%)</label>
+      <input type="number" id="advance" placeholder="7500" oninput="calcPayments(); render()">
 
-  <h3>7. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</h3>
-  <p>7.1. Настоящий Договор вступает в силу с даты его подписания обеими Сторонами и действует до полного исполнения Сторонами своих обязательств.</p>
-  <p>7.2. Договор составлен в двух экземплярах, имеющих равную юридическую силу, по одному для каждой Стороны.</p>
-  <p>7.3. Изменения и дополнения к Договору действительны только в письменной форме и подписываются обеими Сторонами.</p>
+      <div class="calc-box">
+        <div class="calc-label">Остаток (доплата после Акта)</div>
+        <div class="calc-value" id="remainder">— ₽</div>
+      </div>
+      <div class="calc-box">
+        <div class="calc-label">Предоплата составляет</div>
+        <div class="calc-value" id="advPct">— %</div>
+      </div>
 
-  <h3>8. ПРИЛОЖЕНИЯ</h3>
-  <h4>Приложение № 1 – Техническое задание</h4>
-  <p>(Заполняется Приобретателем до подписания договора)</p>
-  <ul>
-    <li>Жанр / стиль: ________________________________</li>
-    <li>Темп (BPM): _________________________________</li>
-    <li>Тональность: ________________________________</li>
-    <li>Настроение / атмосфера: _______________________</li>
-    <li>Основные инструменты: ________________________</li>
-    <li>Структура (куплет, припев, бридж и т.д.): __________________________________</li>
-    <li>Ссылки на референсы (обязательно): ______________</li>
-    <li>Особые требования: ___________________________</li>
-    <li>Срок выполнения работы: ______________________</li>
-    <li>Количество бесплатных правок: 2 (два) раунда.</li>
-  </ul>
+      <div class="info-box" style="margin-top:4px;">
+        Предоплата невозвратна, если Автор <span>приступил к работе</span>. При обоснованном отказе и неустранимых несоответствиях ТЗ — возвращается полностью.
+      </div>
+    </div>
 
-  <h4>Приложение № 2 – Акт приёма-передачи</h4>
-  <p>«___» __________ 2026 г.</p>
-  <p>Мы, нижеподписавшиеся, подтверждаем:</p>
-  <ol>
-    <li>Автор создал и передал, а Приобретатель принял музыкальное произведение (аранжировку), созданное по Техническому заданию в рамках Договора №___ от «___» __________ 2026 г.</li>
-    <li>Произведение соответствует Техническому заданию, качество и объём работы удовлетворяют Приобретателя.</li>
-    <li>С момента подписания настоящего Акта исключительное право на произведение переходит к Приобретателю.</li>
-  </ol>
-  <p>Произведение передано в формате: _________________________.</p>
-  <p><strong>Автор:</strong> ____________________ / _________________________<br>
-  (подпись) (расшифровка)</p>
-  <p><strong>Приобретатель:</strong> ____________________ / _________________________<br>
-  (подпись) (расшифровка)</p>
+    <!-- TAB 3: ТЗ -->
+    <div class="tab-content" id="t3">
+      <div class="section-title">Техническое задание</div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:14px;line-height:1.5;">Нажмите <span style="color:var(--accent);font-weight:600;">«на усмотрение»</span> — автоматически вписывается «по усмотрению Автора»</p>
 
-  <h3>9. АДРЕСА И РЕКВИЗИТЫ СТОРОН</h3>
-  <p><strong>Автор:</strong><br>
-  ФИО: _____________________________________________________________________<br>
-  Паспорт: серия _______ номер ____________, выдан _____________________________<br>
-  Адрес регистрации: ________________________________________________________<br>
-  ИНН (для самозанятого): ___________________________________________________<br>
-  Телефон: _________________________________________________________________<br>
-  Email: ___________________________________________________________________<br>
-  Банковские реквизиты (для перевода):<br>
-  Получатель: ______________________________________________________________<br>
-  Банк: ____________________________________________________________________<br>
-  БИК: _____________________________________________________________________<br>
-  Счёт: ____________________________________________________________________<br>
-  Карта (при необходимости): ________________________________________________</p>
+      <label>Жанр / стиль</label>
+      <div class="tz-row">
+        <input type="text" id="tzGenre" placeholder="Pop, R&B, Hip-hop..." oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzGenre')">на усмотрение</button>
+      </div>
 
-  <p><strong>Приобретатель:</strong><br>
-  ФИО / Наименование организации: __________________________________________<br>
-  Паспорт (для физлица): серия _______ номер ____________, выдан _______________<br>
-  ИНН / ОГРН (для юрлица): _________________________________________________<br>
-  Адрес регистрации / юридический адрес: _____________________________________<br>
-  Телефон: _________________________________________________________________<br>
-  Email: ___________________________________________________________________</p>
+      <label>Темп (BPM)</label>
+      <div class="tz-row">
+        <input type="text" id="tzBpm" placeholder="120" oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzBpm')">на усмотрение</button>
+      </div>
 
-  <h3>ПОДПИСИ СТОРОН</h3>
-  <p><strong>Автор</strong> ____________________ / _________________________</p>
-  <p><strong>Приобретатель</strong> ____________________ / _________________________</p>
+      <label>Тональность</label>
+      <div class="tz-row">
+        <input type="text" id="tzKey" placeholder="Am, C major..." oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzKey')">на усмотрение</button>
+      </div>
 
-  <!-- Кнопка скачивания -->
-  <button class="download-btn" onclick="downloadContract()">📥 Скачать договор</button>
+      <label>Настроение / атмосфера</label>
+      <div class="tz-row">
+        <input type="text" id="tzMood" placeholder="Лирическое, энергичное..." oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzMood')">на усмотрение</button>
+      </div>
 
-  <script>
-    function downloadContract() {
-      var content = document.documentElement.outerHTML;
-      var blob = new Blob([content], { type: 'text/html' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'dogovor_otchuzhdenie.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-  </script>
+      <label>Основные инструменты</label>
+      <div class="tz-row">
+        <input type="text" id="tzInstr" placeholder="Пианино, скрипки, ударные..." oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzInstr')">на усмотрение</button>
+      </div>
+
+      <label>Структура</label>
+      <div class="tz-row">
+        <input type="text" id="tzStruct" placeholder="Интро → Куплет → Припев → Аутро" oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzStruct')">на усмотрение</button>
+      </div>
+
+      <label>Референсы</label>
+      <div class="ref-buttons">
+        <button class="btn-ref" onclick="setRef('noref')">Без референсов</button>
+        <button class="btn-ref" onclick="clearField('tzRef')">Очистить</button>
+      </div>
+      <textarea id="tzRef" placeholder="Ссылка или «Исполнитель — Название»" oninput="render()" rows="3"></textarea>
+
+      <label>Особые требования</label>
+      <div class="tz-row">
+        <textarea id="tzSpecial" placeholder="Доп. пожелания..." oninput="render()" rows="2" style="margin-bottom:0;"></textarea>
+        <button class="btn-auto" onclick="setAuto('tzSpecial')" style="align-self:flex-start;margin-top:2px;">на усмотрение</button>
+      </div>
+
+      <label style="margin-top:10px;display:block;">Срок выполнения</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <input type="number" id="tzDeadline" placeholder="7" min="1" oninput="render()" style="width:80px;flex:none;margin-bottom:0;">
+        <span style="font-size:12px;color:rgba(255,255,255,0.55);white-space:nowrap;">рабочих дней с даты подписания</span>
+      </div>
+    </div>
+
+    <!-- TAB 4: Дополнительно -->
+    <div class="tab-content" id="t4">
+      <div class="section-title">Конфиденциальность</div>
+      <div class="info-box">После подписания Акта Автор вправе упоминать произведение в портфолио, если ниже не указано иное.</div>
+      <label>Запрет упоминания в портфолио?</label>
+      <select id="portfolioRestrict" onchange="render()">
+        <option value="no">Нет — Автор вправе указать в портфолио</option>
+        <option value="yes">Да — Автор не вправе раскрывать факт создания</option>
+      </select>
+
+      <div class="section-title">Правки</div>
+      <label>Количество бесплатных раундов правок</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <input type="number" id="freeRevisions" value="2" min="0" max="10" oninput="render()" style="width:70px;flex:none;margin-bottom:0;">
+        <span style="font-size:12px;color:rgba(255,255,255,0.55);">раунда(ов)</span>
+      </div>
+
+      <div class="section-title">Форма имени в кредитах</div>
+      <label>Как указывать имя Автора при использовании</label>
+      <input type="text" id="creditForm" placeholder="Аранжировка: Ivan Beats" oninput="render()">
+
+      <div class="section-title">Неустойки</div>
+      <div class="info-box">
+        Стандарт: пеня <span>0,1%/день</span> (макс. 50%), штраф за не указание имени <span>20 000 ₽</span> за факт. Можно изменить ниже.
+      </div>
+      <label>Размер пени за просрочку (% в день)</label>
+      <input type="number" id="penaltyPct" value="0.1" step="0.05" min="0.05" max="1" oninput="render()">
+      <label>Штраф за нарушение права на имя (₽)</label>
+      <input type="number" id="penaltyName" value="20000" step="1000" oninput="render()">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-save" onclick="saveMyData()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Сохранить мои данные
+      </button>
+      <button class="btn-clear-save" onclick="clearMyData()" title="Сбросить поля Автора">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      </button>
+    </div>
+    <div class="save-status" id="saveStatus"></div>
+
+    <button class="btn-print" onclick="window.print()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Распечатать / Скачать PDF
+    </button>
+  </aside>
+
+  <!-- ═══ PREVIEW ═══ -->
+  <main class="preview-area">
+    <div class="preview-toolbar">
+      <h2>Предпросмотр договора</h2>
+      <div class="badge-wrap">
+        <span class="badge-type">Отчуждение</span>
+        <span class="badge">Для печати / PDF</span>
+      </div>
+    </div>
+    <div class="contract-paper" id="contractPreview"></div>
+  </main>
+
 </div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function g(id) { return (document.getElementById(id)?.value || '').trim(); }
+function gn(id, def) { const v = parseFloat(document.getElementById(id)?.value); return isNaN(v) ? def : v; }
+
+function f(val, fallback) {
+  if (!val) return `<span class="f">${fallback !== undefined ? fallback : ''}</span>`;
+  return `<span class="f">${escHtml(val)}</span>`;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function numWord(n) {
+  const ones = ['','один','два','три','четыре','пять','шесть','семь','восемь','девять','десять',
+    'одиннадцать','двенадцать','тринадцать','четырнадцать','пятнадцать','шестнадцать',
+    'семнадцать','восемнадцать','девятнадцать'];
+  const tens = ['','','двадцать','тридцать','сорок','пятьдесят','шестьдесят','семьдесят','восемьдесят','девяносто'];
+  const hundreds = ['','сто','двести','триста','четыреста','пятьсот','шестьсот','семьсот','восемьсот','девятьсот'];
+  const thousands = ['','одна тысяча','две тысячи','три тысячи','четыре тысячи','пять тысяч',
+    'шесть тысяч','семь тысяч','восемь тысяч','девять тысяч','десять тысяч',
+    'одиннадцать тысяч','двенадцать тысяч','тринадцать тысяч','четырнадцать тысяч',
+    'пятнадцать тысяч','шестнадцать тысяч','семнадцать тысяч','восемнадцать тысяч',
+    'девятнадцать тысяч'];
+  if (!n || isNaN(n) || n <= 0) return '';
+  n = parseInt(n);
+  if (n >= 1000 && n < 20000 && n % 1000 === 0) {
+    return cap(thousands[n/1000]);
+  }
+  let result = '';
+  if (n >= 1000) {
+    const th = Math.floor(n / 1000);
+    const rem = n % 1000;
+    result += (th < 20 ? thousands[th] : buildSmall(th, true) + ' тысяч');
+    if (rem > 0) result += ' ' + buildSmall(rem, false);
+  } else {
+    result = buildSmall(n, false);
+  }
+  return cap(result.trim());
+
+  function buildSmall(n, fem) {
+    let s = '';
+    if (n >= 100) { s += hundreds[Math.floor(n/100)] + ' '; n %= 100; }
+    if (n >= 20) { s += tens[Math.floor(n/10)] + ' '; n %= 10; }
+    if (n > 0) {
+      if (fem && n === 1) s += 'одна';
+      else if (fem && n === 2) s += 'две';
+      else s += ones[n];
+    }
+    return s.trim();
+  }
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+}
+
+function calcPayments() {
+  const total = gn('totalPrice', 0);
+  const adv = gn('advance', 0);
+  const rem = total - adv;
+  const pct = total > 0 ? Math.round(adv / total * 100) : 0;
+  document.getElementById('remainder').textContent = rem > 0 ? rem.toLocaleString('ru-RU') + ' ₽' : (total > 0 && rem === 0 ? '0 ₽ (полная предоплата)' : '— ₽');
+  document.getElementById('advPct').textContent = total > 0 ? pct + ' %' : '— %';
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '«___» __________ 2026 г.';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function render() {
+  const total = gn('totalPrice', 0);
+  const adv = gn('advance', 0);
+  const rem = total - adv;
+  const pct = total > 0 ? Math.round(adv / total * 100) : 0;
+  const pseudo = g('authPseudo') || g('authName') || '___';
+  const creditForm = g('creditForm') || ('Аранжировка: ' + pseudo);
+  const docDate = formatDate(g('docDate'));
+  const penaltyPct = gn('penaltyPct', 0.1);
+  const penaltyName = gn('penaltyName', 20000);
+  const freeRev = gn('freeRevisions', 2);
+  const portfolioOk = g('portfolioRestrict') !== 'yes';
+  const tzDeadline = g('tzDeadline');
+
+  const html = `
+<p class="c-title">ДОГОВОР № ${f(g('docNum'),'__')}</p>
+<p class="c-title">отчуждения исключительного права на музыкальное произведение</p>
+<div class="c-header-line">
+  <span>г. Волгоград</span>
+  <span>${docDate}</span>
+</div>
+
+<p><b>Автор:</b> ${f(g('authName'))}, паспорт: серия ${f(g('authPassSer'),'_______')} номер ${f(g('authPassNum'),'____________')}, выдан ${f(g('authPassBy'))}, зарегистрирован по адресу: ${f(g('authAddr'))}, применяющий специальный налоговый режим «Налог на профессиональный доход» (самозанятый), ИНН ${f(g('authInn'))}, телефон: ${f(g('authPhone'))}, email: ${f(g('authEmail'))}, именуемый в дальнейшем <b>«Автор»</b>,</p>
+<br>
+<p><b>Приобретатель:</b> ${f(g('acqName'))}${g('acqPass') ? ', паспорт: ' + f(g('acqPass')) : ''}${g('acqInn') ? ', ИНН/ОГРН: ' + f(g('acqInn')) : ''}, зарегистрированный по адресу: ${f(g('acqAddr'))}, телефон: ${f(g('acqPhone'))}, email: ${f(g('acqEmail'))}, именуемый в дальнейшем <b>«Приобретатель»</b>,</p>
+<br>
+<p>вместе именуемые <b>«Стороны»</b>, заключили настоящий Договор о нижеследующем:</p>
+
+<p class="c-section">1. ПРЕДМЕТ ДОГОВОРА</p>
+<p>1.1. Автор обязуется создать оригинальное музыкальное произведение (аранжировку) в соответствии с Техническим заданием (Приложение № 1) и передать Приобретателю в полном объёме исключительное право на это произведение.</p>
+<p>1.2. Приобретатель обязуется принять созданное произведение и уплатить Автору единовременное вознаграждение, предусмотренное настоящим Договором.</p>
+<p>1.3. После подписания Сторонами Акта приёма-передачи (Приложение № 2) исключительное право на произведение в полном объёме переходит от Автора к Приобретателю. С этого момента Приобретатель становится единственным правообладателем и вправе использовать произведение любыми способами по своему усмотрению, а также разрешать или запрещать его использование другим лицам. Автор утрачивает право использовать произведение в любой форме, передавать его третьим лицам и иным образом распоряжаться исключительным правом на него.</p>
+<p>1.4. Личные неимущественные права (право авторства и право на имя) сохраняются за Автором. Приобретатель обязуется при любом использовании произведения указывать имя Автора в следующей форме: <b>${f(creditForm)}</b>.</p>
+
+<p class="c-section">2. ВОЗНАГРАЖДЕНИЕ АВТОРА</p>
+<p>2.1. За передачу исключительного права Приобретатель выплачивает Автору единовременное вознаграждение в размере <b>${total > 0 ? total.toLocaleString('ru-RU') : f('','_______')} (${numWord(total) || f('','___________________')}) рублей</b>.</p>
+<p>2.2. Вознаграждение выплачивается в следующем порядке:</p>
+<p class="indent">— предоплата в размере <b>${adv > 0 ? adv.toLocaleString('ru-RU') : f('','_______')} (${numWord(adv) || f('','___________________')}) рублей</b> (${pct > 0 ? pct + '%' : f('','___')} от суммы п. 2.1) — в течение 3 (трёх) рабочих дней с даты подписания настоящего Договора;</p>
+<p class="indent">— окончательный расчёт в размере <b>${total > 0 && rem === 0 ? '0 (Ноль) рублей — полная оплата произведена авансом' : rem > 0 ? rem.toLocaleString('ru-RU') + ' (' + (numWord(rem) || '___') + ') рублей' : f('','_______') + ' (' + f('','___________________') + ') рублей'}</b> — в течение 3 (трёх) рабочих дней с даты подписания Сторонами Акта приёма-передачи (Приложение № 2).</p>
+<p>2.3. Предоплата является невозвратной при условии, что Автор приступил к выполнению работы (что подтверждается направлением Приобретателю любого промежуточного материала, переписки по существу произведения или уведомления о начале работы). Предоплата подлежит возврату в полном объёме, если Автор не приступал к работе, а также в случае обоснованного мотивированного отказа Приобретателя, заявленного в порядке п. 4.3, при невозможности устранения несоответствий Техническому заданию.</p>
+<p>2.4. Автор применяет специальный налоговый режим «Налог на профессиональный доход». При получении каждого платежа Автор формирует чек в приложении «Мой налог» и незамедлительно направляет его Приобретателю. Налог уплачивается Автором самостоятельно.</p>
+
+<p class="c-section">3. ГАРАНТИИ АВТОРА</p>
+<p>3.1. Автор гарантирует, что:</p>
+<p class="indent">— он является единственным автором произведения;</p>
+<p class="indent">— произведение создано его творческим трудом и не нарушает авторских и смежных прав третьих лиц;</p>
+<p class="indent">— на момент подписания настоящего Договора исключительное право на произведение никому не отчуждено, не заложено, под запретом (арестом) не состоит, споров о праве на него не имеется;</p>
+<p class="indent">— в произведении не использованы результаты чужого интеллектуального труда без согласия правообладателей.</p>
+
+<p class="c-section">4. ПРАВА И ОБЯЗАННОСТИ СТОРОН</p>
+<p>4.1. Автор обязан:</p>
+<p class="indent">— создать произведение в соответствии с Техническим заданием (Приложение № 1) и передать его Приобретателю по Акту приёма-передачи в срок, указанный в ТЗ;</p>
+<p class="indent">— подписать Акт приёма-передачи и тем самым подтвердить передачу исключительного права.</p>
+<p>4.2. Приобретатель обязан:</p>
+<p class="indent">— принять работу и подписать Акт в течение 5 (пяти) рабочих дней с момента получения файлов, либо направить мотивированный отказ с указанием конкретных несоответствий ТЗ. При непредоставлении ответа в указанный срок работа считается принятой, а Акт — подписанным;</p>
+<p class="indent">— выплатить вознаграждение в полном объёме и в установленные сроки;</p>
+<p class="indent">— указывать имя Автора при использовании произведения в форме, указанной в п. 1.4.</p>
+<p>4.3. Правки: Автор обязуется внести до <b>${freeRev}</b> (${numRevWord(freeRev)}) раунда(ов) правок бесплатно в рамках изначального Технического задания. Под одним раундом понимается единый консолидированный список замечаний, направленный в одном сообщении. Правки, выходящие за пределы изначального ТЗ или превышающие указанное число раундов, оплачиваются дополнительно. Стоимость и объём таких правок согласовываются Сторонами в письменной форме (в том числе по электронной почте или в мессенджере) до начала их выполнения. Без письменного согласования Автор вправе не приступать к дополнительным правкам.</p>
+
+<p class="c-section">5. КОНФИДЕНЦИАЛЬНОСТЬ</p>
+<p>5.1. Стороны обязуются сохранять конфиденциальность условий настоящего Договора, а также любых сведений, полученных в ходе его исполнения, и не раскрывать их третьим лицам без письменного согласия другой Стороны.</p>
+<p>5.2. Автор обязуется не публиковать, не демонстрировать и не передавать произведение или его фрагменты третьим лицам до момента подписания Акта приёма-передачи (Приложение № 2), если иное не согласовано Сторонами письменно.</p>
+<p>5.3. ${portfolioOk
+  ? 'После подписания Акта приёма-передачи Автор вправе упоминать факт создания произведения в своём портфолио, если иное не оговорено Сторонами дополнительно в письменной форме.'
+  : 'Автор не вправе раскрывать факт создания произведения в рамках настоящего Договора, упоминать произведение в портфолио или иным образом публично идентифицировать его как свою работу без письменного согласия Приобретателя.'
+}</p>
+
+<p class="c-section">6. ОТВЕТСТВЕННОСТЬ СТОРОН</p>
+<p>6.1. За нарушение сроков выплаты вознаграждения Приобретатель уплачивает пеню в размере <b>${penaltyPct}%</b> от суммы задолженности за каждый день просрочки, но не более 50% от суммы долга.</p>
+<p>6.2. За нарушение обязанности по указанию имени Автора (п. 1.4) Приобретатель уплачивает штраф в размере <b>${penaltyName.toLocaleString('ru-RU')} (${numWord(penaltyName) || '___________________'}) рублей</b> за каждый выявленный факт нарушения.</p>
+<p>6.3. В случае существенного нарушения условий Договора (в том числе неоднократной просрочки оплаты, нарушения п. 1.4, использования произведения до полной оплаты) Автор вправе требовать расторжения Договора в судебном порядке и возмещения убытков.</p>
+
+<p class="c-section">7. ПОРЯДОК РАССМОТРЕНИЯ СПОРОВ</p>
+<p>7.1. Все споры и разногласия разрешаются путём переговоров. При недостижении согласия в течение 30 (тридцати) календарных дней спор передаётся на рассмотрение в суд по месту нахождения Автора (г. Волгоград) в соответствии с действующим законодательством РФ.</p>
+
+<p class="c-section">8. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ</p>
+<p>8.1. Настоящий Договор вступает в силу с даты его подписания обеими Сторонами и действует до полного исполнения Сторонами своих обязательств.</p>
+<p>8.2. Договор составлен в двух экземплярах, имеющих равную юридическую силу, по одному для каждой Стороны.</p>
+<p>8.3. Изменения и дополнения к Договору действительны только в письменной форме и подписываются обеими Сторонами.</p>
+<p>8.4. В части, не урегулированной настоящим Договором, Стороны руководствуются Гражданским кодексом Российской Федерации (часть IV).</p>
+
+<hr class="c-hr">
+<p class="c-section">ПРИЛОЖЕНИЕ № 1 — ТЕХНИЧЕСКОЕ ЗАДАНИЕ</p>
+<p><i>(Заполняется Приобретателем до подписания Договора)</i></p>
+<br>
+<p><b>Жанр / стиль:</b> ${f(g('tzGenre'))}</p>
+<p><b>Темп (BPM):</b> ${f(g('tzBpm'))}</p>
+<p><b>Тональность:</b> ${f(g('tzKey'))}</p>
+<p><b>Настроение / атмосфера:</b> ${f(g('tzMood'))}</p>
+<p><b>Основные инструменты:</b> ${f(g('tzInstr'))}</p>
+<p><b>Структура:</b> ${f(g('tzStruct'))}</p>
+<p><b>Референсы:</b> ${f(g('tzRef'))}</p>
+<p><b>Особые требования:</b> ${f(g('tzSpecial'))}</p>
+<p><b>Срок выполнения:</b> ${f(tzDeadline ? tzDeadline + ' рабочих дней с даты подписания Договора' : '')}</p>
+<p><b>Формат передачи:</b> WAV 24 бит / 48 кГц; стемы по инструментам; MIDI по согласованию.</p>
+<p><b>Бесплатных раундов правок:</b> ${freeRev} (${numRevWord(freeRev)}).</p>
+<div class="c-sign-block">
+  <div class="c-sign-row">
+    <div><div class="sign-label">Автор</div><div class="sign-line"></div><div class="sign-sub">(подпись / расшифровка)</div></div>
+    <div><div class="sign-label">Приобретатель</div><div class="sign-line"></div><div class="sign-sub">(подпись / расшифровка)</div></div>
+  </div>
+</div>
+
+<hr class="c-hr">
+<p class="c-section">ПРИЛОЖЕНИЕ № 2 — АКТ ПРИЁМА-ПЕРЕДАЧИ</p>
+<p>${docDate}</p>
+<br>
+<p>Мы, нижеподписавшиеся, подтверждаем:</p>
+<p class="indent">1. Автор создал и передал, а Приобретатель принял музыкальное произведение (аранжировку), созданное по Техническому заданию в рамках Договора № ${f(g('docNum'),'__')} от ${docDate}.</p>
+<p class="indent">2. Произведение соответствует Техническому заданию, качество и объём работы удовлетворяют Приобретателя.</p>
+<p class="indent">3. С момента подписания настоящего Акта исключительное право на произведение переходит к Приобретателю в полном объёме. Автор подтверждает утрату права использовать произведение и распоряжаться исключительным правом на него.</p>
+<p class="indent">4. Произведение передано в формате: WAV 24/48 кГц ☐, стемы ☐, MIDI ☐, иное: _______________</p>
+<p>Претензий к качеству и составу переданных материалов не имеется.</p>
+<div class="c-sign-block">
+  <div class="c-sign-row">
+    <div><div class="sign-label">Автор</div><div class="sign-line"></div><div class="sign-sub">(подпись / расшифровка)</div></div>
+    <div><div class="sign-label">Приобретатель</div><div class="sign-line"></div><div class="sign-sub">(подпись / расшифровка)</div></div>
+  </div>
+</div>
+
+<hr class="c-hr">
+<p class="c-section">АДРЕСА И РЕКВИЗИТЫ СТОРОН</p>
+<div class="c-sign-row">
+  <div>
+    <div class="sign-label">АВТОР</div>
+    <p>${f(g('authName'))}</p>
+    <p>ИНН: ${f(g('authInn'))}</p>
+    <p>Адрес: ${f(g('authAddr'))}</p>
+    <p>Тел.: ${f(g('authPhone'))}</p>
+    <p>Email: ${f(g('authEmail'))}</p>
+    <p>Банк: ${f(g('authBank'))}</p>
+    <p>БИК: ${f(g('authBik'))}</p>
+    <p>Счёт: ${f(g('authAcc'))}</p>
+    ${g('authCard') ? '<p>Карта: ' + f(g('authCard')) + '</p>' : ''}
+    <br>
+    <div class="sign-line" style="margin-top:28px"></div>
+    <div class="sign-sub">подпись / расшифровка</div>
+  </div>
+  <div>
+    <div class="sign-label">ПРИОБРЕТАТЕЛЬ</div>
+    <p>${f(g('acqName'))}</p>
+    ${g('acqInn') ? '<p>ИНН/ОГРН: ' + f(g('acqInn')) + '</p>' : ''}
+    <p>Адрес: ${f(g('acqAddr'))}</p>
+    <p>Тел.: ${f(g('acqPhone'))}</p>
+    <p>Email: ${f(g('acqEmail'))}</p>
+    ${g('acqBank') ? '<p>Банк: ' + f(g('acqBank')) + '</p>' : ''}
+    ${g('acqBik') ? '<p>БИК: ' + f(g('acqBik')) + '</p>' : ''}
+    ${g('acqAcc') ? '<p>Счёт: ' + f(g('acqAcc')) + '</p>' : ''}
+    <br>
+    <div class="sign-line" style="margin-top:28px"></div>
+    <div class="sign-sub">подпись / расшифровка</div>
+  </div>
+</div>
+`;
+
+  document.getElementById('contractPreview').innerHTML = html;
+}
+
+function numRevWord(n) {
+  const w = ['ноль','один','два','три','четыре','пять','шесть','семь','восемь','девять','десять'];
+  return w[n] || String(n);
+}
+
+// ─── SAVE ───
+const MY_FIELDS = ['authName','authPseudo','authPassSer','authPassNum','authPassBy','authAddr',
+  'authInn','authPhone','authEmail','authBankName','authBank','authBik','authAcc','authCard',
+  'penaltyPct','penaltyName','freeRevisions'];
+
+const DEFAULT_DATA = {
+  authName: '', authPseudo: '', authPassSer: '', authPassNum: '', authPassBy: '',
+  authAddr: '', authInn: '', authPhone: '', authEmail: '',
+  authBankName: '', authBank: '', authBik: '', authAcc: '', authCard: '',
+  penaltyPct: '0.1', penaltyName: '20000', freeRevisions: '2'
+};
+
+function saveMyData() {
+  const data = {};
+  MY_FIELDS.forEach(id => { data[id] = document.getElementById(id)?.value || ''; });
+  let html = document.documentElement.outerHTML;
+  const newDefaults = 'const DEFAULT_DATA = ' + JSON.stringify(data, null, 2) + ';';
+  html = html.replace(/const DEFAULT_DATA = \{[\s\S]*?\};/, newDefaults);
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'dogovor_otchuzhdenia_generator.html'; a.click();
+  URL.revokeObjectURL(url);
+  showStatus('✓ Файл скачан с вашими данными — замените старый файл новым', 'ok');
+}
+
+function clearMyData() {
+  if (!confirm('Очистить поля Автора?')) return;
+  MY_FIELDS.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  render(); showStatus('Поля очищены', 'del');
+}
+
+function loadMyData() {
+  MY_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && DEFAULT_DATA[id]) el.value = DEFAULT_DATA[id];
+  });
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('saveStatus');
+  el.textContent = msg; el.className = 'save-status ' + type;
+  setTimeout(() => { el.className = 'save-status'; }, 4000);
+}
+
+function setAuto(id) {
+  const el = document.getElementById(id);
+  if (el) { el.value = 'по усмотрению Автора'; render(); }
+}
+
+function setRef(type) {
+  const el = document.getElementById('tzRef');
+  if (!el) return;
+  if (type === 'noref') el.value = 'без референсов, стиль на усмотрение Автора';
+  render();
+}
+
+function clearField(id) {
+  const el = document.getElementById(id);
+  if (el) { el.value = ''; render(); }
+}
+
+loadMyData();
+calcPayments();
+render();
+</script>
+</body>
+</html>
