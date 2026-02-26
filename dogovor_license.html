@@ -192,6 +192,79 @@
 
   .btn-print:hover { background: #d4b87a; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(200,169,110,0.3); }
 
+  .btn-row { display: flex; gap: 8px; padding: 0 28px 8px; }
+
+  .btn-save {
+    flex: 1;
+    padding: 10px 14px;
+    background: rgba(200,169,110,0.15);
+    border: 1px solid rgba(200,169,110,0.4);
+    border-radius: 8px;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Geologica', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .btn-save:hover { background: rgba(200,169,110,0.25); }
+
+  .btn-clear-save {
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.35);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .btn-clear-save:hover { background: rgba(220,80,80,0.15); border-color: rgba(220,80,80,0.4); color: #e07070; }
+
+  .save-status {
+    margin: 0 28px 10px;
+    font-size: 11px;
+    padding: 7px 12px;
+    border-radius: 6px;
+    display: none;
+  }
+  .save-status.ok { background: rgba(45,122,95,0.2); color: #5dcfa0; display: block; }
+  .save-status.del { background: rgba(220,80,80,0.15); color: #e07070; display: block; }
+
+  .tz-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .tz-row input, .tz-row textarea { margin-bottom: 0; flex: 1; }
+
+  .btn-auto {
+    white-space: nowrap;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.45);
+    font-size: 10px;
+    font-family: 'Geologica', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .btn-auto:hover { background: rgba(200,169,110,0.15); border-color: rgba(200,169,110,0.4); color: var(--accent); }
+
+  .ref-buttons { display: flex; gap: 6px; margin-bottom: 6px; }
+  .btn-ref {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    font-family: 'Geologica', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-ref:hover { background: rgba(200,169,110,0.15); border-color: rgba(200,169,110,0.4); color: var(--accent); }
+
   /* ─── PREVIEW ─── */
   .preview-area {
     padding: 40px;
@@ -421,25 +494,75 @@
     <!-- TAB 4: ТЗ -->
     <div class="tab-content" id="t4">
       <div class="section-title">Техническое задание</div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:14px;line-height:1.5;">Нажмите <span style="color:var(--accent);font-weight:600;">«на усмотрение»</span> чтобы автоматически вписать «по усмотрению Лицензиара»</p>
+
       <label>Жанр / стиль</label>
-      <input type="text" id="tzGenre" placeholder="Pop, R&B, Hip-hop..." oninput="render()">
+      <div class="tz-row">
+        <input type="text" id="tzGenre" placeholder="Pop, R&B, Hip-hop..." oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzGenre')" title="По усмотрению Лицензиара">на усмотрение</button>
+      </div>
+
       <label>Темп (BPM)</label>
-      <input type="text" id="tzBpm" placeholder="120" oninput="render()">
+      <div class="tz-row">
+        <input type="text" id="tzBpm" placeholder="120" oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzBpm')" title="По усмотрению Лицензиара">на усмотрение</button>
+      </div>
+
       <label>Тональность</label>
-      <input type="text" id="tzKey" placeholder="Am, C major..." oninput="render()">
+      <div class="tz-row">
+        <input type="text" id="tzKey" placeholder="Am, C major..." oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzKey')" title="По усмотрению Лицензиара">на усмотрение</button>
+      </div>
+
       <label>Настроение / атмосфера</label>
-      <input type="text" id="tzMood" placeholder="Лирическое, энергичное..." oninput="render()">
+      <div class="tz-row">
+        <input type="text" id="tzMood" placeholder="Лирическое, энергичное..." oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzMood')" title="По усмотрению Лицензиара">на усмотрение</button>
+      </div>
+
       <label>Основные инструменты</label>
-      <input type="text" id="tzInstr" placeholder="Пианино, скрипки, ударные..." oninput="render()">
+      <div class="tz-row">
+        <input type="text" id="tzInstr" placeholder="Пианино, скрипки, ударные..." oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzInstr')" title="По усмотрению Лицензиара">на усмотрение</button>
+      </div>
+
       <label>Структура</label>
-      <input type="text" id="tzStruct" placeholder="Интро → Куплет → Припев → Бридж → Аутро" oninput="render()">
-      <label>Ссылки на референсы</label>
-      <textarea id="tzRef" placeholder="https://..." oninput="render()"></textarea>
+      <div class="tz-row">
+        <input type="text" id="tzStruct" placeholder="Интро → Куплет → Припев → Аутро" oninput="render()">
+        <button class="btn-auto" onclick="setAuto('tzStruct')" title="По усмотрению Лицензиара">на усмотрение</button>
+      </div>
+
+      <label>Референсы</label>
+      <div class="ref-buttons">
+        <button class="btn-ref" onclick="setRef('noref')">Без референсов</button>
+        <button class="btn-ref" onclick="clearField('tzRef')">Очистить</button>
+      </div>
+      <textarea id="tzRef" placeholder="Ссылка (https://...) или название песни и исполнитель, например: Billie Eilish — Happier Than Ever" oninput="render()" rows="3"></textarea>
+      <p style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:-8px;margin-bottom:12px;">Можно вписать ссылку, название песни с исполнителем, или нажать «Без референсов»</p>
+
       <label>Особые требования</label>
-      <textarea id="tzSpecial" placeholder="Доп. пожелания..." oninput="render()"></textarea>
-      <label>Срок выполнения</label>
-      <input type="text" id="tzDeadline" placeholder="7 рабочих дней с даты подписания" oninput="render()">
+      <div class="tz-row">
+        <textarea id="tzSpecial" placeholder="Доп. пожелания..." oninput="render()" rows="2" style="margin-bottom:0;"></textarea>
+        <button class="btn-auto" onclick="setAuto('tzSpecial')" title="По усмотрению Лицензиара" style="align-self:flex-start;margin-top:2px;">на усмотрение</button>
+      </div>
+
+      <label style="margin-top:10px;display:block;">Срок выполнения</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <input type="number" id="tzDeadline" placeholder="7" min="1" oninput="render()" style="width:80px;flex:none;margin-bottom:0;">
+        <span style="font-size:12px;color:rgba(255,255,255,0.55);white-space:nowrap;">рабочих дней с даты подписания</span>
+      </div>
     </div>
+
+    <div class="btn-row">
+      <button class="btn-save" onclick="saveMyData()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Сохранить мои данные
+      </button>
+      <button class="btn-clear-save" onclick="clearMyData()" title="Сбросить сохранённые данные">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+      </button>
+    </div>
+    <div class="save-status" id="saveStatus"></div>
 
     <button class="btn-print" onclick="window.print()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -581,11 +704,21 @@ function render() {
 <p class="c-section">3. ВОЗНАГРАЖДЕНИЕ И ПОРЯДОК РАСЧЁТОВ</p>
 <p>3.1.0. Общая стоимость создания произведения составляет <b>${total > 0 ? total.toLocaleString('ru-RU') : f('','_______')} (${numWord(total) || f('','___________________')}) рублей</b>.</p>
 <p>3.1.1. Аванс — <b>${adv > 0 ? adv.toLocaleString('ru-RU') : f('','_______')} (${numWord(adv) || f('','___________________')}) рублей</b> (${pct > 0 ? pct+'%' : f('','___')} от общей стоимости). Выплачивается в течение 3 рабочих дней с даты подписания Договора.</p>
-<p>3.1.2. Остаток — <b>${rem > 0 ? rem.toLocaleString('ru-RU') : f('','_______')} (${numWord(rem) || f('','___________________')}) рублей</b>. Выплачивается в течение 3 рабочих дней с даты подписания Акта приёма-передачи. До полной оплаты остатка Лицензиат не вправе использовать произведение.</p>
+<p>3.1.2. Остаток — <b>${
+  (total > 0 && rem === 0)
+    ? '0 (Ноль) рублей 00 копеек'
+    : rem > 0
+      ? rem.toLocaleString('ru-RU') + ' (' + (numWord(rem) || '___') + ') рублей'
+      : f('','_______') + ' (' + f('','___________________') + ') рублей'
+}</b>. ${
+  (total > 0 && rem === 0)
+    ? '<b>Полная оплата произведена при подписании Договора. Дополнительных платежей не требуется.</b>'
+    : 'Выплачивается в течение 3 рабочих дней с даты подписания Акта приёма-передачи. До полной оплаты остатка Лицензиат не вправе использовать произведение.'
+}</p>
 <p>3.1.3. Роялти начисляются отдельно:</p>
 <p class="indent">— стриминг и цифровые магазины: <b>15%</b> от фактически полученных Лицензиатом сумм от дистрибьюторов (после вычета комиссий дистрибьютора);</p>
 <p class="indent">— синхронизация (реклама, кино, игры): <b>50%</b> от вознаграждения по соответствующему договору;</p>
-<p class="indent">— публичное исполнение (концерты): <b>2% от кассовых сборов мероприятия</b>, но не менее <b>5 000 рублей</b> за каждое исполнение.</p>
+<p class="indent">— публичное исполнение (концерты): <b>2% от кассовых сборов мероприятия</b>, но не менее <b>3 000 рублей</b> за каждое исполнение.</p>
 <p>3.2. Аванс является невозвратным, кроме случаев: а) несоответствие произведения ТЗ с мотивированным отказом по п. 4.2; б) расторжение Договора по вине Лицензиара.</p>
 <p>3.3. Лицензиат предоставляет ежеквартальный отчёт о доходах не позднее 30 дней после окончания квартала с подтверждающими документами и одновременно выплачивает роялти.</p>
 <p>3.4. Лицензиат обязан предоставить доступ к статистике в кабинете дистрибьютора либо направлять заверенные скриншоты.</p>
@@ -632,7 +765,7 @@ function render() {
 <p><b>Структура:</b> ${f(g('tzStruct'))}</p>
 <p><b>Референсы:</b> ${f(g('tzRef'))}</p>
 <p><b>Особые требования:</b> ${f(g('tzSpecial'))}</p>
-<p><b>Срок выполнения:</b> ${f(g('tzDeadline'))}</p>
+<p><b>Срок выполнения:</b> ${f((g('tzDeadline') ? g('tzDeadline') + ' рабочих дней с даты подписания' : ''))}</p>
 <p><b>Формат файлов:</b> WAV 24 бит / 48 кГц; стемы по инструментам; MIDI при необходимости.</p>
 <p><b>Бесплатных раундов правок:</b> 2 (два).</p>
 <div class="c-sign-block">
@@ -690,7 +823,93 @@ function render() {
   document.getElementById('contractPreview').innerHTML = html;
 }
 
+// ─── SAVE INTO FILE ───
+const MY_FIELDS = ['lrName','lrPseudo','lrPassSer','lrPassNum','lrPassBy','lrAddr',
+  'lrInn','lrPhone','lrEmail','lrBankName','lrBank','lrBik','lrAcc','lrCard'];
+
+// DEFAULT DATA — filled automatically by "Save" button
+const DEFAULT_DATA = {
+  lrName: '',
+  lrPseudo: '',
+  lrPassSer: '',
+  lrPassNum: '',
+  lrPassBy: '',
+  lrAddr: '',
+  lrInn: '',
+  lrPhone: '',
+  lrEmail: '',
+  lrBankName: '',
+  lrBank: '',
+  lrBik: '',
+  lrAcc: '',
+  lrCard: ''
+};
+
+function saveMyData() {
+  // Collect current values
+  const data = {};
+  MY_FIELDS.forEach(id => { data[id] = document.getElementById(id)?.value || ''; });
+
+  // Get current HTML source
+  let html = document.documentElement.outerHTML;
+
+  // Replace the DEFAULT_DATA block with new values
+  const newDefaults = 'const DEFAULT_DATA = ' + JSON.stringify(data, null, 2) + ';';
+  html = html.replace(/const DEFAULT_DATA = \{[\s\S]*?\};/, newDefaults);
+
+  // Trigger download of updated file
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'contract_generator.html';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showStatus('✓ Файл скачан с вашими данными — замените старый файл новым', 'ok');
+}
+
+function clearMyData() {
+  if (!confirm('Очистить все поля Лицензиара?')) return;
+  MY_FIELDS.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  render();
+  showStatus('Поля очищены', 'del');
+}
+
+function loadMyData() {
+  MY_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && DEFAULT_DATA[id]) el.value = DEFAULT_DATA[id];
+  });
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('saveStatus');
+  el.textContent = msg;
+  el.className = 'save-status ' + type;
+  setTimeout(() => { el.className = 'save-status'; }, 4000);
+}
+
+// ─── TZ HELPERS ───
+function setAuto(id) {
+  const el = document.getElementById(id);
+  if (el) { el.value = 'по усмотрению Лицензиара'; render(); }
+}
+
+function setRef(type) {
+  const el = document.getElementById('tzRef');
+  if (!el) return;
+  if (type === 'noref') el.value = 'без референсов, стиль на усмотрение Лицензиара';
+  render();
+}
+
+function clearField(id) {
+  const el = document.getElementById(id);
+  if (el) { el.value = ''; render(); }
+}
+
 // Init
+loadMyData();
 render();
 </script>
 </body>
