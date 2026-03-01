@@ -19,24 +19,72 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0a0a0a;
+            background: radial-gradient(ellipse at 35% 15%, #0d1219 0%, #0a0a0a 55%, #080808 100%);
             color: #ffffff;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-       
+        }
+
+        /* ===== GRAIN TEXTURE — film noise overlay ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            pointer-events: none;
+            z-index: 9997;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 180px 180px;
+            animation: grain 0.9s steps(1) infinite;
+        }
+
+        @keyframes grain {
+            0%   { transform: translate(0px,   0px); }
+            10%  { transform: translate(-4px,  -6px); }
+            20%  { transform: translate( 3px,   7px); }
+            30%  { transform: translate(-5px,   3px); }
+            40%  { transform: translate( 4px,  -5px); }
+            50%  { transform: translate(-3px,   6px); }
+            60%  { transform: translate( 6px,  -2px); }
+            70%  { transform: translate(-2px,   4px); }
+            80%  { transform: translate( 5px,   3px); }
+            90%  { transform: translate(-4px,  -3px); }
+            100% { transform: translate( 2px,  -5px); }
+        }
+
+        /* Faint blue ambient glow — bottom-left corner */
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -250px;
+            left: -250px;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(58,140,255,0.045) 0%, transparent 65%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 0 40px;
+            position: relative;
+            z-index: 2;
         }
 
         .navbar {
             position: sticky;
             top: 0;
             z-index: 1000;
-            background-color: #0a0a0a;
+            background-color: rgba(10, 10, 10, 0.82);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -256,7 +304,7 @@
             font-size: 1rem;
             text-transform: uppercase;
             letter-spacing: 4px;
-            color: #aaa;
+            color: #3a8cff;
             margin-bottom: 20px;
         }
 
@@ -2145,25 +2193,25 @@
                     <div class="price-name">Запись вокала</div>
                     <div class="price-value">900 <span>₽/час</span></div>
                     <div class="price-description">Профессиональная запись с контролем подачи. В стоимость входит работа звукорежиссёра.</div>
-                    <a href="#" class="price-order">Заказать</a>
+                    <a href="#" class="price-order open-vocal-modal">Заказать</a>
                 </div>
                 <div class="price-card">
                     <div class="price-name">Сведение</div>
                     <div class="price-value">от 3 900 <span>₽</span></div>
                     <div class="price-description">Базовое сведение (Start Edition) – идеально для песен в подарок.</div>
-                    <a href="#" class="price-order">Заказать</a>
+                    <a href="#" class="price-order open-vocal-modal">Заказать</a>
                 </div>
                 <div class="price-card">
                     <div class="price-name">Мастеринг</div>
                     <div class="price-value">2 500 <span>₽</span></div>
                     <div class="price-description">Подготовка трека к релизу на стриминговых платформах.</div>
-                    <a href="#" class="price-order">Заказать</a>
+                    <a href="#" class="price-order open-vocal-modal">Заказать</a>
                 </div>
                 <div class="price-card">
                     <div class="price-name">Аранжировка</div>
                     <div class="price-value">от 8 000 <span>₽</span></div>
                     <div class="price-description">Создание уникальной музыкальной основы в любом жанре.</div>
-                    <a href="#" class="price-order">Заказать</a>
+                    <a href="#" class="price-order open-vocal-modal">Заказать</a>
                 </div>
             </div>
         </div>
@@ -2206,19 +2254,19 @@
                         <div class="guitar-price-name">Пробное занятие</div>
                         <div class="guitar-price-value">1 000 ₽</div>
                         <div class="guitar-price-description">45 минут, знакомство, оценка уровня</div>
-                        <a href="#" class="guitar-price-order">Записаться</a>
+                        <a href="#" class="guitar-price-order open-vocal-modal">Записаться</a>
                     </div>
                     <div class="guitar-price-card">
                         <div class="guitar-price-name">Разовое занятие</div>
                         <div class="guitar-price-value">2 000 ₽</div>
                         <div class="guitar-price-description">60 минут, полное занятие</div>
-                        <a href="#" class="guitar-price-order">Записаться</a>
+                        <a href="#" class="guitar-price-order open-vocal-modal">Записаться</a>
                     </div>
                     <div class="guitar-price-card">
                         <div class="guitar-price-name">Абонемент 4 занятия</div>
                         <div class="guitar-price-value">7 000 ₽</div>
                         <div class="guitar-price-description">Экономия 1000 ₽</div>
-                        <a href="#" class="guitar-price-order">Записаться</a>
+                        <a href="#" class="guitar-price-order open-vocal-modal">Записаться</a>
                     </div>
                 </div>
             </div>
