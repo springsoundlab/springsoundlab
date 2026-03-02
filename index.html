@@ -452,7 +452,7 @@
             background: transparent;
             border: none;
             color: white;
-            font-size: 80px;
+            font-size: 200px; /* увеличено с 80px до 200px */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -463,20 +463,22 @@
             text-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
-        /* Добавляем круглую дугу вокруг иконки */
+        /* Круглая дуга вокруг иконки */
         .play-pause-btn i {
             position: relative;
+            opacity: 0.5; /* сделано полупрозрачным */
+            transition: opacity 0.2s;
         }
         .play-pause-btn i::after {
             content: '';
             position: absolute;
-            top: -15px;
-            left: -15px;
-            right: -15px;
-            bottom: -15px;
-            border: 3px solid rgba(255, 255, 255, 0.7);
+            top: -30px;    /* увеличено с -15px */
+            left: -30px;
+            right: -30px;
+            bottom: -30px;
+            border: 6px solid rgba(255, 255, 255, 0.7); /* увеличена толщина */
             border-radius: 50%;
-            opacity: 0.7;
+            opacity: 0.5;
             pointer-events: none;
         }
 
@@ -484,13 +486,11 @@
             opacity: 1;
         }
 
-        .play-pause-btn:hover {
-            opacity: 1;
-            transform: scale(1.05);
+        .play-pause-btn:hover i {
+            opacity: 1; /* при наведении на кнопку иконка становится ярче */
         }
-
-        .play-pause-btn i {
-            font-size: inherit;
+        .play-pause-btn:hover i::after {
+            opacity: 1;
         }
 
         .artist-info {
@@ -528,15 +528,11 @@
             opacity: 1;
         }
 
-        /* Скрываем стандартную кнопку Play и меню с тремя точками */
-        audio::-webkit-media-controls-play-button,
-        audio::-webkit-media-controls-start-playback-button,
-        audio::-webkit-media-controls-overflow-button {
+        /* Скрываем стандартную кнопку Play и меню только в разделе "Примеры работ" */
+        .artist-card audio::-webkit-media-controls-play-button,
+        .artist-card audio::-webkit-media-controls-start-playback-button,
+        .artist-card audio::-webkit-media-controls-overflow-button {
             display: none !important;
-        }
-        /* Для Firefox (скрываем кнопку Play, меню не отображается отдельно) */
-        audio::-moz-range-track {
-            /* не применяется, но оставляем для совместимости */
         }
 
         .events-list {
@@ -2705,7 +2701,7 @@
                 updateButtonIcon(btn, audio);
             });
 
-            // Останавливать другие аудио при воспроизведении (уже реализовано в глобальном обработчике)
+            // Останавливать другие аудио при воспроизведении
             document.addEventListener('play', function(e) {
                 audioElements.forEach(audio => {
                     if (audio !== e.target) {
