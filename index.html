@@ -10,44 +10,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://res.smartwidgets.ru/app.js" async></script>
     <style>
-        /* === БАЗОВЫЕ СТИЛИ (ретро-вейв) === */
+        /* === БАЗОВЫЕ СТИЛИ === */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            cursor: none; /* скрываем стандартный курсор, чтобы показать наш неоновый */
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a0a0f;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(255, 106, 213, 0.15) 0%, transparent 30%),
-                radial-gradient(circle at 80% 70%, rgba(0, 255, 255, 0.1) 0%, transparent 35%),
-                linear-gradient(135deg, #0c0b16 0%, #130f1f 100%);
+            background: radial-gradient(ellipse at 35% 15%, #0d1219 0%, #0a0a0a 55%, #080808 100%);
             color: #ffffff;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
-            position: relative;
         }
 
-        /* Ретро-сетка (линии) */
+        /* ===== GRAIN TEXTURE — film noise overlay ===== */
         body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                repeating-linear-gradient(0deg, rgba(255, 106, 213, 0.03) 0px, transparent 2px, transparent 40px),
-                repeating-linear-gradient(90deg, rgba(0, 255, 255, 0.03) 0px, transparent 2px, transparent 40px);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* Шум (оставлен с уменьшенной прозрачностью) */
-        body::after {
             content: '';
             position: fixed;
             top: -50%;
@@ -56,7 +35,7 @@
             height: 200%;
             pointer-events: none;
             z-index: 9997;
-            opacity: 0.02;
+            opacity: 0.04;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
             background-repeat: repeat;
             background-size: 180px 180px;
@@ -77,24 +56,16 @@
             100% { transform: translate( 2px,  -5px); }
         }
 
-        /* Неоновые пятна по углам */
-        .retro-glow-1 {
+        /* Faint blue ambient glow — bottom-left corner */
+        body::after {
+            content: '';
             position: fixed;
-            top: -20%;
-            right: -10%;
+            bottom: -250px;
+            left: -250px;
             width: 700px;
             height: 700px;
-            background: radial-gradient(circle, rgba(255, 106, 213, 0.2) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-        .retro-glow-2 {
-            position: fixed;
-            bottom: -20%;
-            left: -10%;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(58,140,255,0.045) 0%, transparent 65%);
             pointer-events: none;
             z-index: 0;
         }
@@ -107,21 +78,18 @@
             z-index: 2;
         }
 
-        /* ===== НАВБАР ===== */
         .navbar {
             position: sticky;
             top: 0;
             z-index: 1000;
-            background-color: rgba(10, 10, 15, 0.7);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background-color: rgba(10, 10, 10, 0.82);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 24px 0;
-            border-bottom: 2px solid;
-            border-image: linear-gradient(90deg, #ff6ad5, #00ffff, #ff6ad5) 1;
-            box-shadow: 0 5px 20px rgba(255, 106, 213, 0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 40px;
         }
 
@@ -142,14 +110,12 @@
             text-transform: uppercase;
             color: #ffffff;
             cursor: pointer;
-            text-shadow: 0 0 8px #ff6ad5;
         }
 
         .logo-image {
             height: 40px;
             width: auto;
             display: block;
-            filter: drop-shadow(0 0 5px #ff6ad5);
         }
 
         .address-block {
@@ -170,12 +136,11 @@
             transition: color 0.2s;
         }
         .header-address i {
-            color: #ff6ad5;
+            color: #3a8cff;
             font-size: 1rem;
-            text-shadow: 0 0 5px #ff6ad5;
         }
         .header-address:hover {
-            color: #00ffff;
+            color: #aaa;
         }
 
         .work-hours {
@@ -202,19 +167,17 @@
             font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            transition: color 0.2s, text-shadow 0.2s;
+            transition: color 0.2s;
             cursor: pointer;
         }
 
         .nav-links > a:hover, .nav-links > .dropdown > a:hover {
-            color: #ff6ad5;
-            text-shadow: 0 0 8px #ff6ad5;
+            color: #3a8cff;
         }
 
         .nav-links .active-link {
-            color: #ff6ad5 !important;
-            border-bottom: 2px solid #ff6ad5 !important;
-            text-shadow: 0 0 8px #ff6ad5;
+            color: #3a8cff !important;
+            border-bottom: 2px solid #3a8cff !important;
         }
 
         .nav-links a, .dropdown-content a, .dropdown-content .phone-number, .header-phone, .footer-links a, .footer-dropdown-title {
@@ -234,16 +197,16 @@
             left: 50%;
             transform: translateX(-50%);
             margin-top: 5px;
-            background: rgba(20, 15, 30, 0.9);
+            background-color: rgba(26, 26, 26, 0.9);
             backdrop-filter: blur(10px);
             width: max-content;
             min-width: 140px;
             padding: 8px 0;
             z-index: 100;
             border-radius: 8px;
-            border: 1px solid #ff6ad5;
-            box-shadow: 0 0 20px rgba(255, 106, 213, 0.5);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             transition: opacity 0.15s ease, visibility 0.15s ease;
+            border: none;
         }
 
         .dropdown:hover .dropdown-content {
@@ -257,15 +220,14 @@
             padding: 8px 16px;
             text-decoration: none;
             font-size: 0.9rem;
-            border-bottom: 1px solid rgba(255, 106, 213, 0.2);
-            transition: background 0.2s, color 0.2s;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.2s;
             white-space: nowrap;
             text-align: center;
         }
 
         .dropdown-content a:hover {
-            background-color: rgba(255, 106, 213, 0.2);
-            color: #00ffff;
+            background-color: rgba(255,255,255,0.1);
         }
 
         .dropdown-content .phone-number {
@@ -278,7 +240,7 @@
         }
 
         .btn-outline {
-            border: 2px solid #ff6ad5;
+            border: 2px solid #fff;
             padding: 8px 20px;
             border-radius: 30px;
             font-weight: 600;
@@ -289,13 +251,11 @@
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(255, 106, 213, 0.5);
         }
 
         .btn-outline:hover {
-            background-color: #ff6ad5;
-            color: #0a0a0f;
-            box-shadow: 0 0 20px #ff6ad5;
+            background-color: #fff;
+            color: #0a0a0a;
         }
 
         .header-phone {
@@ -304,19 +264,17 @@
             font-weight: 500;
             font-size: 0.95rem;
             letter-spacing: 0.5px;
-            transition: color 0.2s, text-shadow 0.2s;
+            transition: color 0.2s;
             white-space: nowrap;
         }
 
         .header-phone i {
             margin-right: 5px;
             font-size: 1rem;
-            color: #ff6ad5;
         }
 
         .header-phone:hover {
-            color: #00ffff;
-            text-shadow: 0 0 8px #00ffff;
+            color: #3a8cff;
         }
 
         .page {
@@ -348,7 +306,6 @@
             letter-spacing: 4px;
             color: #ffffff;
             margin-bottom: 20px;
-            text-shadow: 0 0 5px #00ffff;
         }
 
         .hero-title {
@@ -359,19 +316,11 @@
             text-transform: uppercase;
             margin-bottom: 20px;
             color: #fff;
-            text-shadow: 
-                0 0 10px #ff6ad5,
-                0 0 20px #ff6ad5,
-                0 0 40px #00ffff,
-                2px 2px 0 #000;
         }
 
         .hero-title .hero-title-secondary {
-            color: #00ffff;
-            text-shadow: 
-                0 0 10px #00ffff,
-                0 0 20px #00ffff,
-                0 0 40px #ff6ad5;
+            color: #3a8cff;
+            font-weight: 700;
         }
 
         .hero-desc {
@@ -393,18 +342,16 @@
             font-weight: 600;
             font-size: 1rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            border: 2px solid #ff6ad5;
-            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            border: 2px solid #fff;
+            transition: all 0.2s;
             cursor: pointer;
             align-self: flex-start;
-            box-shadow: 0 0 10px rgba(255, 106, 213, 0.5);
         }
 
         .hero-btn:hover {
-            background-color: #ff6ad5;
-            color: #0a0a0f;
-            box-shadow: 0 0 20px #ff6ad5, 0 0 40px #ff6ad5;
+            background-color: #fff;
+            color: #0a0a0a;
         }
 
         .hero-slider {
@@ -414,9 +361,7 @@
             overflow: hidden;
             position: relative;
             background-color: #222;
-            border: 2px solid;
-            border-image: linear-gradient(45deg, #ff6ad5, #00ffff) 1;
-            box-shadow: 0 0 30px rgba(255, 106, 213, 0.3);
+            border: 1px solid #444;
             border-radius: 20px;
         }
 
@@ -442,7 +387,6 @@
             text-transform: uppercase;
             letter-spacing: -0.02em;
             color: #fff;
-            text-shadow: 0 0 5px #ff6ad5;
         }
 
         #portfolio .section-title,
@@ -462,95 +406,34 @@
         }
 
         .artist-card {
-            background: rgba(20, 15, 30, 0.8);
-            backdrop-filter: blur(5px);
+            background-color: #111;
             border-radius: 12px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
             display: flex;
             flex-direction: column;
             height: 100%;
-            border: 1px solid rgba(255, 106, 213, 0.3);
+            border: 1px solid transparent;
         }
 
         .artist-card:hover {
-            transform: translateY(-5px);
-            border-color: #00ffff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(255, 106, 213, 0.2);
-        }
-
-        .artist-image-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            overflow: hidden;
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
+            border-color: #3a8cff;
         }
 
         .artist-image {
             width: 100%;
-            height: 100%;
+            aspect-ratio: 1 / 1;
             background-color: #222;
             background-size: cover;
             background-position: center;
-            flex-shrink: 0;
         }
 
         .artist-image.one { background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif'); }
         .artist-image.two { background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/oblojka.jpg'); }
         .artist-image.three { background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/oblojka.jfif'); }
         .artist-image.four { background-image: linear-gradient(145deg, #2a3a2a, #3a5a3a); }
-
-        .play-pause-btn {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 10;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-
-        .play-pause-btn i {
-            position: relative;
-            opacity: 0.25;
-            transition: opacity 0.2s, text-shadow 0.2s;
-            color: #00ffff;
-            text-shadow: 0 0 15px #00ffff, 0 0 30px #ff6ad5;
-        }
-        .play-pause-btn i::after {
-            content: '';
-            position: absolute;
-            top: -15px;
-            left: -15px;
-            right: -15px;
-            bottom: -15px;
-            border: 4px solid #ff6ad5;
-            border-radius: 50%;
-            opacity: 0.25;
-            pointer-events: none;
-            box-shadow: 0 0 15px #ff6ad5;
-        }
-
-        .artist-card:hover .play-pause-btn {
-            opacity: 1;
-        }
-
-        .play-pause-btn:hover i {
-            opacity: 1;
-        }
-        .play-pause-btn:hover i::after {
-            opacity: 1;
-        }
 
         .artist-info {
             padding: 20px;
@@ -577,20 +460,17 @@
         .artist-card audio {
             width: 100%;
             margin-top: auto;
-            filter: invert(1) hue-rotate(280deg) brightness(1.2);
+            filter: invert(100%) hue-rotate(180deg) brightness(1.2);
             outline: none;
-            opacity: 0.9;
-            transition: opacity 0.3s, box-shadow 0.3s;
+            opacity: 0.8;
+            transition: opacity 0.2s;
         }
 
         .artist-card audio:hover {
             opacity: 1;
-            box-shadow: 0 0 15px #ff6ad5;
         }
 
-        /* Скрываем стандартную кнопку Play и меню только в разделе "Примеры работ" */
-        .artist-card audio::-webkit-media-controls-play-button,
-        .artist-card audio::-webkit-media-controls-start-playback-button,
+        /* Скрываем меню (три точки) в аудиоплеере, но оставляем кнопку Play */
         .artist-card audio::-webkit-media-controls-overflow-button {
             display: none !important;
         }
@@ -603,13 +483,13 @@
             display: flex;
             align-items: center;
             padding: 24px 0;
-            border-bottom: 1px solid rgba(255, 106, 213, 0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .event-item audio {
             width: 200px;
             margin-right: 20px;
-            filter: invert(1) hue-rotate(280deg) brightness(1.2);
+            filter: invert(100%) hue-rotate(180deg) brightness(1.2);
         }
 
         .event-details {
@@ -630,7 +510,7 @@
 
         .event-ticket {
             background-color: transparent;
-            border: 2px solid #ff6ad5;
+            border: 2px solid #fff;
             color: #fff;
             padding: 10px 28px;
             border-radius: 30px;
@@ -639,16 +519,14 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             text-decoration: none;
             display: inline-block;
-            box-shadow: 0 0 10px rgba(255, 106, 213, 0.5);
         }
 
         .event-ticket:hover {
-            background-color: #ff6ad5;
-            color: #0a0a0f;
-            box-shadow: 0 0 20px #ff6ad5;
+            background-color: #fff;
+            color: #0a0a0a;
         }
 
         /* ===== НОВЫЕ СЕКЦИИ НА ГЛАВНОЙ ===== */
@@ -670,29 +548,34 @@
         .service-card,
         .price-card,
         .about-card {
-            background: rgba(20, 15, 30, 0.8);
-            backdrop-filter: blur(5px);
+            background-color: #111;
             border-radius: 12px;
             padding: 30px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
             text-align: center;
             cursor: pointer;
-            border: 1px solid rgba(255, 106, 213, 0.3);
+            border: 1px solid rgba(255,255,255,0.15); /* белая полупрозрачная рамка в покое */
         }
 
         .service-card:hover,
         .price-card:hover,
         .about-card:hover {
             transform: translateY(-5px);
-            border-color: #00ffff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(255, 106, 213, 0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
+            border-color: #3a8cff; /* синяя рамка при наведении */
+        }
+
+        .service-card:hover .service-link,
+        .price-card:hover .price-link,
+        .about-card:hover .about-link {
+            background-color: #fff;
+            color: #0a0a0a;
         }
 
         .service-icon {
             font-size: 3rem;
-            color: #ff6ad5;
+            color: #3a8cff;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px #ff6ad5;
         }
 
         .service-card h3,
@@ -718,30 +601,27 @@
         .reviews-link {
             display: inline-block;
             padding: 10px 20px;
-            border: 2px solid #ff6ad5;
+            border: 2px solid #fff;
             border-radius: 30px;
             color: #fff;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(255, 106, 213, 0.5);
+            transition: all 0.2s;
         }
 
         .service-link:hover,
         .price-link:hover,
         .about-link:hover,
         .reviews-link:hover {
-            background-color: #ff6ad5;
-            color: #0a0a0f;
-            box-shadow: 0 0 20px #ff6ad5;
+            background-color: #fff;
+            color: #0a0a0a;
         }
 
         .price-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #00ffff;
+            color: #3a8cff;
             margin-bottom: 15px;
-            text-shadow: 0 0 10px #00ffff;
         }
 
         .about-image {
@@ -751,14 +631,14 @@
             background-position: center;
             border-radius: 8px;
             margin-bottom: 20px;
-            transition: transform 0.3s ease, border 0.2s, box-shadow 0.3s;
-            border: 1px solid rgba(255, 106, 213, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
+            border: 1px solid rgba(255,255,255,0.15); /* белая рамка в покое */
         }
 
         .about-image:hover {
             transform: scale(1.02);
-            border-color: #00ffff;
-            box-shadow: 0 0 20px #00ffff;
+            border-color: #3a8cff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
         }
 
         .reviews-overview .sw-app {
@@ -773,9 +653,8 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(20, 15, 30, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid #ff6ad5;
+            background-color: #111;
+            border: 1px solid #3a8cff;
             border-radius: 50px;
             padding: 10px 24px;
             color: #fff;
@@ -784,7 +663,8 @@
             align-items: center;
             gap: 20px;
             z-index: 9999;
-            box-shadow: 0 0 20px rgba(255, 106, 213, 0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
             white-space: nowrap;
             max-width: 90%;
         }
@@ -795,21 +675,20 @@
         }
 
         .cookie-consent button {
-            background-color: #ff6ad5;
+            background-color: #3a8cff;
             border: none;
-            color: #0a0a0f;
+            color: #fff;
             padding: 6px 20px;
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s, box-shadow 0.2s;
+            transition: background 0.2s;
             border: 2px solid transparent;
             flex-shrink: 0;
         }
 
         .cookie-consent button:hover {
-            background-color: #00ffff;
-            box-shadow: 0 0 15px #00ffff;
+            background-color: #1e5bbf;
         }
 
         /* ===== ПЛАВАЮЩАЯ КНОПКА СОЦСЕТЕЙ ===== */
@@ -823,31 +702,31 @@
         .social-float-button {
             width: 60px;
             height: 60px;
-            background-color: #ff6ad5;
+            background-color: #3a8cff;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 0 20px #ff6ad5;
+            box-shadow: 0 4px 15px rgba(58,140,255,0.3);
             transition: transform 0.2s, box-shadow 0.2s;
             animation: pulse 2s infinite;
         }
 
         .social-float-button i {
             font-size: 24px;
-            color: #0a0a0f;
+            color: #fff;
         }
 
         .social-float-button:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 30px #ff6ad5;
+            box-shadow: 0 6px 20px rgba(58,140,255,0.5);
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 106, 213, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 106, 213, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 106, 213, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(58,140,255,0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(58,140,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(58,140,255,0); }
         }
 
         .social-float-menu {
@@ -876,7 +755,7 @@
             justify-content: center;
             width: 56px;
             height: 56px;
-            color: #ff6ad5;
+            color: #3a8cff;
             font-size: 32px;
             text-decoration: none;
             opacity: 0;
@@ -895,7 +774,7 @@
         .social-float.active .social-float-menu a:nth-child(4) { transition-delay: 0s; }
 
         .social-float-menu a:hover {
-            color: #00ffff;
+            color: #ffffff;
         }
 
         /* ===== СТРАНИЦА ЦЕН НА СТУДИЮ ===== */
@@ -913,8 +792,7 @@
         }
 
         .studio-prices-title span {
-            color: #ff6ad5;
-            text-shadow: 0 0 10px #ff6ad5;
+            color: #3a8cff;
         }
 
         .price-grid {
@@ -924,18 +802,19 @@
         }
 
         .price-card {
-            background: rgba(20, 15, 30, 0.8);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 106, 213, 0.3);
+            background-color: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 40px 30px;
             transition: all 0.3s;
+            backdrop-filter: blur(5px);
             text-align: center;
+            border: 1px solid rgba(255,255,255,0.15); /* белая рамка в покое */
         }
 
         .price-card:hover {
-            border-color: #00ffff;
+            border-color: #3a8cff;
             transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(255, 106, 213, 0.2);
+            box-shadow: 0 0 20px rgba(58,140,255,0.1), 0 0 15px rgba(58,140,255,0.4);
         }
 
         .price-name {
@@ -949,9 +828,8 @@
         .price-value {
             font-size: 3rem;
             font-weight: 700;
-            color: #00ffff;
+            color: #ffffff;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px #00ffff;
         }
 
         .price-value span {
@@ -969,7 +847,7 @@
         .price-order {
             display: inline-block;
             background: transparent;
-            border: 2px solid #00ffff;
+            border: 2px solid #fff;
             color: #fff;
             padding: 12px 40px;
             border-radius: 30px;
@@ -977,15 +855,13 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             text-decoration: none;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
         .price-order:hover {
-            background: #00ffff;
-            color: #0a0a0f;
-            box-shadow: 0 0 20px #00ffff;
+            background: #fff;
+            color: #0a0a0a;
         }
 
         /* ===== СТРАНИЦА ЦЕН НА УРОКИ ВОКАЛА ===== */
@@ -1003,8 +879,7 @@
         }
 
         .vocal-prices-title span {
-            color: #ff6ad5;
-            text-shadow: 0 0 10px #ff6ad5;
+            color: #3a8cff;
         }
 
         .vocal-prices-content {
@@ -1028,18 +903,18 @@
         }
 
         .vocal-price-card {
-            background: rgba(20, 15, 30, 0.8);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 106, 213, 0.3);
+            background-color: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 30px;
             transition: all 0.3s;
+            backdrop-filter: blur(5px);
             text-align: center;
         }
 
         .vocal-price-card:hover {
-            border-color: #00ffff;
+            border-color: #3a8cff;
             transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(58,140,255,0.1);
         }
 
         .vocal-price-name {
@@ -1053,9 +928,8 @@
         .vocal-price-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #00ffff;
+            color: #ffffff;
             margin-bottom: 15px;
-            text-shadow: 0 0 5px #00ffff;
         }
 
         .vocal-price-description {
@@ -1067,7 +941,7 @@
         .vocal-price-order {
             display: inline-block;
             background: transparent;
-            border: 2px solid #ff6ad5;
+            border: 2px solid #fff;
             color: #fff;
             padding: 10px 30px;
             border-radius: 30px;
@@ -1076,16 +950,14 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             text-decoration: none;
             margin-top: 20px;
-            box-shadow: 0 0 10px rgba(255, 106, 213, 0.5);
         }
 
         .vocal-price-order:hover {
-            background: #ff6ad5;
-            color: #0a0a0f;
-            box-shadow: 0 0 20px #ff6ad5;
+            background: #fff;
+            color: #0a0a0a;
         }
 
         /* ===== СТРАНИЦА ЦЕН НА УРОКИ ГИТАРЫ ===== */
@@ -1103,8 +975,7 @@
         }
 
         .guitar-prices-title span {
-            color: #ff6ad5;
-            text-shadow: 0 0 10px #ff6ad5;
+            color: #3a8cff;
         }
 
         .guitar-prices-content {
@@ -1128,18 +999,18 @@
         }
 
         .guitar-price-card {
-            background: rgba(20, 15, 30, 0.8);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 106, 213, 0.3);
+            background-color: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 30px;
             transition: all 0.3s;
+            backdrop-filter: blur(5px);
             text-align: center;
         }
 
         .guitar-price-card:hover {
-            border-color: #00ffff;
+            border-color: #3a8cff;
             transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(58,140,255,0.1);
         }
 
         .guitar-price-name {
@@ -1153,9 +1024,8 @@
         .guitar-price-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #00ffff;
+            color: #ffffff;
             margin-bottom: 15px;
-            text-shadow: 0 0 5px #00ffff;
         }
 
         .guitar-price-description {
@@ -1167,7 +1037,7 @@
         .guitar-price-order {
             display: inline-block;
             background: transparent;
-            border: 2px solid #ff6ad5;
+            border: 2px solid #fff;
             color: #fff;
             padding: 10px 30px;
             border-radius: 30px;
@@ -1176,16 +1046,14 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             text-decoration: none;
             margin-top: 20px;
-            box-shadow: 0 0 10px rgba(255, 106, 213, 0.5);
         }
 
         .guitar-price-order:hover {
-            background: #ff6ad5;
-            color: #0a0a0f;
-            box-shadow: 0 0 20px #ff6ad5;
+            background: #fff;
+            color: #0a0a0a;
         }
 
         /* ===== СТРАНИЦА ОТЗЫВЫ ===== */
@@ -1203,8 +1071,7 @@
         }
 
         .reviews-title span {
-            color: #ff6ad5;
-            text-shadow: 0 0 10px #ff6ad5;
+            color: #3a8cff;
         }
 
         .sw-app {
@@ -1226,8 +1093,7 @@
         }
 
         .about-studio-title span {
-            color: #ff6ad5;
-            text-shadow: 0 0 10px #ff6ad5;
+            color: #3a8cff;
         }
 
         .studio-grid {
@@ -1251,14 +1117,14 @@
             aspect-ratio: 1 / 1;
             background-size: cover;
             background-position: center;
-            border: 1px solid rgba(255, 106, 213, 0.3);
-            transition: transform 0.3s ease, border 0.2s, box-shadow 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
         }
 
         .studio-image:hover {
             transform: scale(1.02);
-            border-color: #00ffff;
-            box-shadow: 0 0 20px #00ffff;
+            border-color: #3a8cff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
         }
 
         .studio-text-block {
@@ -1273,7 +1139,7 @@
         }
 
         .studio-text-block strong {
-            color: #ff6ad5;
+            color: #3a8cff;
             font-weight: 600;
         }
 
@@ -1292,8 +1158,7 @@
         }
 
         .equipment-title span {
-            color: #ff6ad5;
-            text-shadow: 0 0 10px #ff6ad5;
+            color: #3a8cff;
         }
 
         .equipment-grid {
@@ -1317,14 +1182,14 @@
             aspect-ratio: 1 / 1;
             background-size: cover;
             background-position: center;
-            border: 1px solid rgba(255, 106, 213, 0.3);
-            transition: transform 0.3s ease, border 0.2s, box-shadow 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
         }
 
         .equipment-image:hover {
             transform: scale(1.02);
-            border-color: #00ffff;
-            box-shadow: 0 0 20px #00ffff;
+            border-color: #3a8cff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
         }
 
         .equipment-text-block {
@@ -1339,7 +1204,7 @@
         }
 
         .equipment-text-block strong {
-            color: #ff6ad5;
+            color: #3a8cff;
             font-weight: 600;
         }
 
@@ -1358,8 +1223,7 @@
         }
 
         .space-title span {
-            color: #ff6ad5;
-            text-shadow: 0 0 10px #ff6ad5;
+            color: #3a8cff;
         }
 
         .space-grid {
@@ -1383,14 +1247,14 @@
             aspect-ratio: 1 / 1;
             background-size: cover;
             background-position: center;
-            border: 1px solid rgba(255, 106, 213, 0.3);
-            transition: transform 0.3s ease, border 0.2s, box-shadow 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
         }
 
         .space-image:hover {
             transform: scale(1.02);
-            border-color: #00ffff;
-            box-shadow: 0 0 20px #00ffff;
+            border-color: #3a8cff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
         }
 
         .space-text-block {
@@ -1405,7 +1269,7 @@
         }
 
         .space-text-block strong {
-            color: #ff6ad5;
+            color: #3a8cff;
             font-weight: 600;
         }
 
@@ -1413,7 +1277,7 @@
         .lesson-description,
         .lesson-teacher {
             padding: 80px 0;
-            border-top: 1px solid rgba(255, 106, 213, 0.2);
+            border-top: 1px solid rgba(255,255,255,0.05);
         }
 
         .lesson-description:first-of-type {
@@ -1449,10 +1313,10 @@
             display: flex;
             gap: 40px;
             align-items: center;
-            background: rgba(20, 15, 30, 0.8);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 106, 213, 0.3);
+            background-color: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 40px;
+            backdrop-filter: blur(5px);
             width: 100%;
         }
 
@@ -1461,15 +1325,14 @@
             height: 300px;
             background-size: cover;
             background-position: center;
-            border: 1px solid rgba(255, 106, 213, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
             transition: transform 0.3s;
             flex-shrink: 0;
         }
 
         .teacher-photo:hover {
             transform: scale(1.02);
-            border-color: #00ffff;
-            box-shadow: 0 0 20px #00ffff;
+            border-color: #3a8cff;
         }
 
         .teacher-info {
@@ -1485,11 +1348,10 @@
 
         .teacher-experience {
             font-size: 1.4rem;
-            color: #ff6ad5;
+            color: #3a8cff;
             margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-shadow: 0 0 5px #ff6ad5;
         }
 
         .teacher-bio {
@@ -1532,14 +1394,12 @@
             width: 520px;
             aspect-ratio: 1 / 1;
             max-width: 95%;
-            background: rgba(20, 15, 30, 0.95);
-            backdrop-filter: blur(10px);
-            border: 2px solid;
-            border-image: linear-gradient(45deg, #ff6ad5, #00ffff) 1;
+            background: #111;
+            border: 1px solid #3a8cff;
             border-radius: 20px;
             padding: 30px;
             z-index: 10001;
-            box-shadow: 0 0 40px rgba(255, 106, 213, 0.5);
+            box-shadow: 0 0 40px rgba(58,140,255,0.3);
             font-family: 'Inter', sans-serif;
         }
 
@@ -1551,7 +1411,6 @@
             color: #fff;
             text-transform: uppercase;
             text-align: center;
-            text-shadow: 0 0 10px #ff6ad5;
         }
 
         .vocal-modal-phone-block {
@@ -1568,8 +1427,8 @@
 
         .vocal-modal-phone {
             display: inline-block;
-            background: #ff6ad5;
-            color: #0a0a0f;
+            background: #3a8cff;
+            color: #fff;
             text-decoration: none;
             padding: 10px 25px;
             border-radius: 40px;
@@ -1577,13 +1436,11 @@
             font-size: 1.2rem;
             letter-spacing: 1px;
             margin-top: 5px;
-            transition: background 0.2s, box-shadow 0.2s;
-            box-shadow: 0 0 10px #ff6ad5;
+            transition: background 0.2s;
         }
 
         .vocal-modal-phone:hover {
-            background: #00ffff;
-            box-shadow: 0 0 20px #00ffff;
+            background: #1e5bbf;
         }
 
         .vocal-modal-invite {
@@ -1619,18 +1476,17 @@
             width: 100%;
             padding: 12px;
             background: #222;
-            border: 1px solid #ff6ad5;
+            border: 1px solid #333;
             color: #fff;
             border-radius: 8px;
             font-size: 1rem;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s;
         }
 
         .vocal-modal-form input:focus,
         .vocal-modal-form textarea:focus {
-            border-color: #00ffff;
-            box-shadow: 0 0 10px #00ffff;
+            border-color: #3a8cff;
         }
 
         .vocal-modal-form textarea {
@@ -1648,7 +1504,7 @@
             width: 18px;
             height: 18px;
             margin-top: 2px;
-            accent-color: #ff6ad5;
+            accent-color: #3a8cff;
         }
         .privacy-checkbox label {
             font-size: 0.85rem;
@@ -1656,14 +1512,14 @@
             text-align: left;
         }
         .privacy-checkbox a {
-            color: #ff6ad5;
+            color: #3a8cff;
             text-decoration: underline;
         }
 
         .vocal-modal-submit {
             background: #fff;
             color: #0a0a0a;
-            border: 2px solid #ff6ad5;
+            border: 2px solid #fff;
             padding: 14px;
             border-radius: 40px;
             font-weight: 600;
@@ -1671,17 +1527,15 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
-            transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
             margin-top: 10px;
             width: 100%;
             box-sizing: border-box;
         }
 
         .vocal-modal-submit:hover {
-            background: #ff6ad5;
-            color: #0a0a0f;
-            border-color: #ff6ad5;
-            box-shadow: 0 0 20px #ff6ad5;
+            background: transparent;
+            color: #fff;
         }
 
         .vocal-modal-submit.submitted {
@@ -1690,13 +1544,12 @@
             border-color: #28a745;
             cursor: default;
             pointer-events: none;
-            box-shadow: none;
         }
 
         .vocal-modal-socials {
             margin-top: 20px;
             text-align: center;
-            border-top: 1px solid rgba(255, 106, 213, 0.3);
+            border-top: 1px solid rgba(255,255,255,0.1);
             padding-top: 15px;
         }
 
@@ -1718,13 +1571,13 @@
             color: #fff;
             font-size: 1.8rem;
             opacity: 0.8;
-            transition: opacity 0.2s, transform 0.2s, color 0.2s;
+            transition: opacity 0.2s, transform 0.2s;
         }
 
         .vocal-modal-social-icons a:hover {
             opacity: 1;
             transform: scale(1.1);
-            color: #00ffff;
+            color: #3a8cff;
         }
 
         .vocal-modal-close {
@@ -1744,13 +1597,10 @@
 
         /* ===== ПОДВАЛ ===== */
         .footer {
-            border-top: 2px solid;
-            border-image: linear-gradient(90deg, #ff6ad5, #00ffff, #ff6ad5) 1;
+            border-top: 1px solid rgba(255,255,255,0.1);
             padding: 20px 0 20px;
             margin-top: 80px;
             font-size: 0.9rem;
-            background: rgba(10, 10, 15, 0.7);
-            backdrop-filter: blur(15px);
         }
 
         .footer-main {
@@ -1775,7 +1625,6 @@
             text-transform: uppercase;
             cursor: pointer;
             color: #fff;
-            text-shadow: 0 0 5px #ff6ad5;
         }
 
         .footer-info-item {
@@ -1788,7 +1637,7 @@
             transition: color 0.2s;
         }
         .footer-info-item i {
-            color: #ff6ad5;
+            color: #3a8cff;
             width: 16px;
         }
         .footer-info-item:hover {
@@ -1812,11 +1661,10 @@
             color: #fff;
             font-size: 1.2rem;
             opacity: 0.7;
-            transition: opacity 0.2s, color 0.2s;
+            transition: opacity 0.2s;
         }
         .social-icons a:hover {
             opacity: 1;
-            color: #00ffff;
         }
 
         .footer-login {
@@ -1825,8 +1673,8 @@
         }
         .login-btn {
             background: transparent;
-            border: 1px solid #ff6ad5;
-            color: #ff6ad5;
+            border: 1px solid #3a8cff;
+            color: #3a8cff;
             padding: 6px 16px;
             border-radius: 20px;
             font-size: 0.85rem;
@@ -1835,13 +1683,11 @@
             transition: all 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 0 5px rgba(255, 106, 213, 0.5);
         }
         .login-btn:hover {
-            background-color: #ff6ad5;
-            color: #0a0a0f;
-            border-color: #ff6ad5;
-            box-shadow: 0 0 10px #ff6ad5;
+            background-color: #3a8cff;
+            color: #0a0a0a;
+            border-color: #3a8cff;
         }
 
         .copyright {
@@ -1849,7 +1695,7 @@
             color: #666;
             font-size: 0.75rem;
             text-align: center;
-            border-top: 1px solid rgba(255, 106, 213, 0.2);
+            border-top: 1px solid rgba(255,255,255,0.05);
             padding-top: 15px;
         }
 
@@ -1912,40 +1758,6 @@
             .logo-image { height: 25px; }
         }
 
-        /* Неоновый курсор */
-        .cursor-glow {
-            position: fixed;
-            width: 30px;
-            height: 30px;
-            border: 2px solid #ff6ad5;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s, border-color 0.2s;
-            box-shadow: 0 0 15px #ff6ad5, inset 0 0 5px #ff6ad5;
-            z-index: 10002;
-            mix-blend-mode: screen;
-        }
-
-        /* Анимированная неоновая линия */
-        .retro-scan-line {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ff6ad5, #00ffff, #ff6ad5, transparent);
-            animation: scan 4s linear infinite;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        @keyframes scan {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
         .modal-overlay {
             display: none;
             position: fixed;
@@ -1959,15 +1771,14 @@
             position: fixed;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(20, 15, 30, 0.95);
-            backdrop-filter: blur(10px);
-            border: 2px solid #ff6ad5;
+            background: #111;
+            border: 1px solid #3a8cff;
             border-radius: 12px;
             padding: 30px;
             z-index: 10003;
             width: 320px;
             max-width: 90%;
-            box-shadow: 0 0 30px rgba(255, 106, 213, 0.5);
+            box-shadow: 0 0 30px rgba(58,140,255,0.3);
             text-align: center;
         }
         .modal-title {
@@ -1981,13 +1792,13 @@
             padding: 12px;
             margin-bottom: 15px;
             background: #222;
-            border: 1px solid #ff6ad5;
+            border: 1px solid #333;
             color: #fff;
             border-radius: 6px;
             font-size: 1rem;
         }
         .modal-input:focus {
-            border-color: #00ffff;
+            border-color: #3a8cff;
             outline: none;
         }
         .modal-btn {
@@ -2003,7 +1814,7 @@
             margin-bottom: 10px;
         }
         .modal-btn:hover {
-            background: #ff6ad5;
+            background: #3a8cff;
             color: #fff;
         }
         .modal-close {
@@ -2018,12 +1829,6 @@
     </style>
 </head>
 <body>
-    <!-- Декоративные элементы ретро-вейв -->
-    <div class="retro-glow-1"></div>
-    <div class="retro-glow-2"></div>
-    <div class="retro-scan-line"></div>
-    <div class="cursor-glow"></div>
-
     <div class="container">
         <!-- Навигация -->
         <nav class="navbar">
@@ -2108,10 +1913,7 @@
                 <div class="artist-grid">
                     <!-- Карточка 1 -->
                     <div class="artist-card">
-                        <div class="artist-image-container">
-                            <div class="artist-image one"></div>
-                            <button class="play-pause-btn" data-track="0"><i class="fas fa-play"></i></button>
-                        </div>
+                        <div class="artist-image one"></div>
                         <div class="artist-info">
                             <div class="artist-name">LUANHO - ЛЕТИ СО МНОЙ</div>
                             <div class="artist-role">Mixed by WEYTON</div>
@@ -2122,10 +1924,7 @@
                     </div>
                     <!-- Карточка 2 -->
                     <div class="artist-card">
-                        <div class="artist-image-container">
-                            <div class="artist-image two"></div>
-                            <button class="play-pause-btn" data-track="1"><i class="fas fa-play"></i></button>
-                        </div>
+                        <div class="artist-image two"></div>
                         <div class="artist-info">
                             <div class="artist-name">WEYTON - ЭТОТ ГОРОД</div>
                             <div class="artist-role">Mixed by WEYTON</div>
@@ -2136,10 +1935,7 @@
                     </div>
                     <!-- Карточка 3 -->
                     <div class="artist-card">
-                        <div class="artist-image-container">
-                            <div class="artist-image three"></div>
-                            <button class="play-pause-btn" data-track="2"><i class="fas fa-play"></i></button>
-                        </div>
+                        <div class="artist-image three"></div>
                         <div class="artist-info">
                             <div class="artist-name">ОКСАНА ШЕМАНОВСКАЯ - НЕОБЫЧАЙНО</div>
                             <div class="artist-role">Mixed by WEYTON</div>
@@ -2150,10 +1946,7 @@
                     </div>
                     <!-- Карточка 4 -->
                     <div class="artist-card">
-                        <div class="artist-image-container">
-                            <div class="artist-image four"></div>
-                            <button class="play-pause-btn" data-track="3"><i class="fas fa-play"></i></button>
-                        </div>
+                        <div class="artist-image four"></div>
                         <div class="artist-info">
                             <div class="artist-name">TRACK 04 // PLATINUM</div>
                             <div class="artist-role">Full Production</div>
@@ -2797,56 +2590,6 @@
             setInterval(nextSlide, 5000);
         }
 
-        // --- Кастомные кнопки play/pause ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const playButtons = document.querySelectorAll('.play-pause-btn');
-            const audioElements = document.querySelectorAll('audio[data-track]');
-
-            // Функция обновления иконки на кнопке
-            function updateButtonIcon(btn, audio) {
-                const icon = btn.querySelector('i');
-                if (audio.paused) {
-                    icon.className = 'fas fa-play';
-                } else {
-                    icon.className = 'fas fa-pause';
-                }
-            }
-
-            // Привязываем события к каждому аудио
-            audioElements.forEach((audio, index) => {
-                const btn = document.querySelector(`.play-pause-btn[data-track="${index}"]`);
-                if (!btn) return;
-
-                // При клике на кнопку переключаем воспроизведение
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (audio.paused) {
-                        audio.play();
-                    } else {
-                        audio.pause();
-                    }
-                });
-
-                // Слушаем события аудио, чтобы менять иконку
-                audio.addEventListener('play', () => updateButtonIcon(btn, audio));
-                audio.addEventListener('pause', () => updateButtonIcon(btn, audio));
-                audio.addEventListener('ended', () => updateButtonIcon(btn, audio));
-
-                // Начальное состояние
-                updateButtonIcon(btn, audio);
-            });
-
-            // Останавливать другие аудио при воспроизведении
-            document.addEventListener('play', function(e) {
-                audioElements.forEach(audio => {
-                    if (audio !== e.target) {
-                        audio.pause();
-                        audio.currentTime = 0;
-                    }
-                });
-            }, true);
-        });
-
         // --- Модальные окна ---
         const bookBtn = document.getElementById('bookBtn');
         const vocalModal = document.getElementById('vocal-modal-panel');
@@ -2986,6 +2729,16 @@
             if (e.key === 'Enter' && adminPanel.style.display === 'block') checkAdminAuth();
         });
 
+        // --- Остановка аудио ---
+        document.addEventListener('play', function(e) {
+            document.querySelectorAll('audio').forEach(audio => {
+                if (audio !== e.target) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            });
+        }, true);
+
         // --- Логика плашки cookie ---
         (function() {
             const cookieConsent = document.getElementById('cookie-consent');
@@ -3015,13 +2768,6 @@
                 }
             });
         })();
-
-        // --- Неоновый курсор ---
-        const cursor = document.querySelector('.cursor-glow');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
     </script>
 </body>
 </html>
