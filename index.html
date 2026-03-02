@@ -676,7 +676,7 @@
             background-color: #1e5bbf;
         }
 
-        /* ===== ПЛАВАЮЩАЯ КНОПКА СОЦСЕТЕЙ ===== */
+        /* ===== ПЛАВАЮЩАЯ КНОПКА СОЦСЕТЕЙ (обновлено) ===== */
         .social-float {
             position: fixed;
             bottom: 30px;
@@ -714,49 +714,53 @@
             100% { box-shadow: 0 0 0 0 rgba(58,140,255,0); }
         }
 
-        /* Меню соцсетей — без фона, с анимацией появления снизу вверх */
+        /* Меню соцсетей — без фона, центрировано, с анимацией вылета */
         .social-float-menu {
             position: absolute;
-            bottom: 70px;
-            right: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 70px; /* над кнопкой */
             background: transparent;
-            display: none;
+            display: flex;
             flex-direction: column;
             align-items: center;
             gap: 8px;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.3s, opacity 0.3s;
+        }
+
+        .social-float.active .social-float-menu {
+            visibility: visible;
+            opacity: 1;
         }
 
         .social-float-menu a {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
-            color: #3a8cff;          /* цвет иконки */
-            font-size: 24px;
+            width: 56px;
+            height: 56px;
+            color: #3a8cff;
+            font-size: 32px;
             text-decoration: none;
             opacity: 0;
-            transform: translateY(20px);
+            transform: scale(0.5) translateY(20px);
             transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        /* При открытии меню */
-        .social-float.active .social-float-menu {
-            display: flex;
         }
 
         .social-float.active .social-float-menu a {
             opacity: 1;
-            transform: translateY(0);
+            transform: scale(1) translateY(0);
         }
 
-        /* Задержки для появления снизу вверх: нижняя иконка (последняя) появляется первой */
-        .social-float.active .social-float-menu a:nth-child(1) { transition-delay: 0.3s; } /* верхняя */
+        /* Задержки для появления снизу вверх */
+        .social-float.active .social-float-menu a:nth-child(1) { transition-delay: 0.3s; } /* верхняя (VK) */
         .social-float.active .social-float-menu a:nth-child(2) { transition-delay: 0.2s; }
         .social-float.active .social-float-menu a:nth-child(3) { transition-delay: 0.1s; }
-        .social-float.active .social-float-menu a:nth-child(4) { transition-delay: 0s; }   /* нижняя */
+        .social-float.active .social-float-menu a:nth-child(4) { transition-delay: 0s; }   /* нижняя (Instagram) */
 
-        /* При наведении меняем цвет иконки (опционально) */
+        /* При наведении иконка становится белой */
         .social-float-menu a:hover {
             color: #ffffff;
         }
