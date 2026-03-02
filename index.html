@@ -108,7 +108,7 @@
             font-weight: 700;
             letter-spacing: -0.02em;
             text-transform: uppercase;
-            color: #fff;
+            color: #3a8cff;
             cursor: pointer;
         }
 
@@ -161,7 +161,7 @@
         }
 
         .nav-links > a, .nav-links > .dropdown > a {
-            color: #fff;
+            color: #3a8cff;
             text-decoration: none;
             font-weight: 500;
             font-size: 0.95rem;
@@ -259,7 +259,7 @@
         }
 
         .header-phone {
-            color: #fff;
+            color: #3a8cff;
             text-decoration: none;
             font-weight: 500;
             font-size: 0.95rem;
@@ -304,7 +304,7 @@
             font-size: 1rem;
             text-transform: uppercase;
             letter-spacing: 4px;
-            color: #3a8cff;  /* изменено с #fff на #3a8cff */
+            color: #3a8cff;
             margin-bottom: 20px;
         }
 
@@ -714,46 +714,51 @@
             100% { box-shadow: 0 0 0 0 rgba(58,140,255,0); }
         }
 
+        /* Меню соцсетей — без фона, с анимацией появления снизу вверх */
         .social-float-menu {
             position: absolute;
             bottom: 70px;
             right: 0;
-            background-color: #111;
-            border-radius: 12px;
-            padding: 10px;
+            background: transparent;
             display: none;
             flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            align-items: center;
+            gap: 8px;
         }
 
         .social-float-menu a {
-            color: #fff;
-            text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #222;
-            transition: background 0.2s;
-        }
-
-        .social-float-menu a i {
+            width: 40px;
+            height: 40px;
+            color: #3a8cff;          /* цвет иконки */
             font-size: 24px;
-            color: #3a8cff;
+            text-decoration: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
-        .social-float-menu a:hover {
-            background-color: #3a8cff;
-        }
-        .social-float-menu a:hover i {
-            color: #fff;
-        }
-
+        /* При открытии меню */
         .social-float.active .social-float-menu {
             display: flex;
+        }
+
+        .social-float.active .social-float-menu a {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Задержки для появления снизу вверх: нижняя иконка (последняя) появляется первой */
+        .social-float.active .social-float-menu a:nth-child(1) { transition-delay: 0.3s; } /* верхняя */
+        .social-float.active .social-float-menu a:nth-child(2) { transition-delay: 0.2s; }
+        .social-float.active .social-float-menu a:nth-child(3) { transition-delay: 0.1s; }
+        .social-float.active .social-float-menu a:nth-child(4) { transition-delay: 0s; }   /* нижняя */
+
+        /* При наведении меняем цвет иконки (опционально) */
+        .social-float-menu a:hover {
+            color: #ffffff;
         }
 
         /* ===== СТРАНИЦА ЦЕН НА СТУДИЮ ===== */
@@ -2453,7 +2458,7 @@
         <div class="modal-close" onclick="closeAdmin()">Abort Mission</div>
     </div>
 
-    <!-- Плавающая кнопка соцсетей -->
+    <!-- Плавающая кнопка соцсетей (обновлённая) -->
     <div class="social-float" id="socialFloat">
         <div class="social-float-button" id="socialFloatBtn">
             <i class="fas fa-share-alt"></i>
