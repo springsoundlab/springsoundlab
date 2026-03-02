@@ -413,18 +413,25 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            border: 1px solid transparent; /* для плавного появления рамки */
+            border: 1px solid transparent;
         }
 
         .artist-card:hover {
             transform: scale(1.02);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4); /* добавлено свечение */
-            border-color: #3a8cff; /* синяя рамка */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
+            border-color: #3a8cff;
+        }
+
+        .artist-image-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
         }
 
         .artist-image {
             width: 100%;
-            aspect-ratio: 1 / 1;
+            height: 100%;
             background-color: #222;
             background-size: cover;
             background-position: center;
@@ -435,6 +442,42 @@
         .artist-image.two { background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/oblojka.jpg'); }
         .artist-image.three { background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/oblojka.jfif'); }
         .artist-image.four { background-image: linear-gradient(145deg, #2a3a2a, #3a5a3a); }
+
+        .play-pause-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease, background-color 0.2s;
+            z-index: 10;
+            pointer-events: none; /* изначально не принимает события, чтобы не мешать hover */
+        }
+
+        .artist-card:hover .play-pause-btn {
+            opacity: 1;
+            pointer-events: auto; /* при наведении на карточку кнопка становится кликабельной */
+        }
+
+        .play-pause-btn:hover {
+            background-color: rgba(58, 140, 255, 0.9);
+            border-color: #fff;
+        }
+
+        .play-pause-btn i {
+            font-size: 28px;
+        }
 
         .artist-info {
             padding: 20px;
@@ -550,14 +593,14 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
             text-align: center;
             cursor: pointer;
-            border: 1px solid transparent; /* для плавного появления рамки */
+            border: 1px solid transparent;
         }
 
         .service-card:hover,
         .price-card:hover,
         .about-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4); /* добавлено свечение */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
             border-color: #3a8cff;
         }
 
@@ -687,7 +730,7 @@
             background-color: #1e5bbf;
         }
 
-        /* ===== ПЛАВАЮЩАЯ КНОПКА СОЦСЕТЕЙ (обновлено) ===== */
+        /* ===== ПЛАВАЮЩАЯ КНОПКА СОЦСЕТЕЙ ===== */
         .social-float {
             position: fixed;
             bottom: 30px;
@@ -725,7 +768,6 @@
             100% { box-shadow: 0 0 0 0 rgba(58,140,255,0); }
         }
 
-        /* Меню соцсетей — без фона, центрировано, с анимацией вылета */
         .social-float-menu {
             position: absolute;
             left: 50%;
@@ -805,13 +847,13 @@
             transition: all 0.3s;
             backdrop-filter: blur(5px);
             text-align: center;
-            border: 1px solid transparent; /* для плавного появления рамки */
+            border: 1px solid transparent;
         }
 
         .price-card:hover {
             border-color: #3a8cff;
             transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(58,140,255,0.1), 0 0 15px rgba(58,140,255,0.4); /* добавлено свечение */
+            box-shadow: 0 0 20px rgba(58,140,255,0.1), 0 0 15px rgba(58,140,255,0.4);
         }
 
         .price-name {
@@ -1075,7 +1117,7 @@
             min-height: 200px;
         }
 
-        /* ===== СТРАНИЦА "О СТУДИИ" (УВЕЛИЧЕННЫЙ ТЕКСТ) ===== */
+        /* ===== СТРАНИЦА "О СТУДИИ" ===== */
         .about-studio-page {
             padding: 40px 0 80px;
         }
@@ -1121,7 +1163,7 @@
         .studio-image:hover {
             transform: scale(1.02);
             border-color: #3a8cff;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4); /* добавлено свечение */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
         }
 
         .studio-text-block {
@@ -1140,7 +1182,7 @@
             font-weight: 600;
         }
 
-        /* ===== СТРАНИЦА "ОБОРУДОВАНИЕ" (УВЕЛИЧЕННЫЙ ТЕКСТ) ===== */
+        /* ===== СТРАНИЦА "ОБОРУДОВАНИЕ" ===== */
         .equipment-page {
             padding: 40px 0 80px;
         }
@@ -1186,7 +1228,7 @@
         .equipment-image:hover {
             transform: scale(1.02);
             border-color: #3a8cff;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4); /* добавлено свечение */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
         }
 
         .equipment-text-block {
@@ -1205,7 +1247,7 @@
             font-weight: 600;
         }
 
-        /* ===== СТРАНИЦА "ПРОСТРАНСТВО" (УВЕЛИЧЕННЫЙ ТЕКСТ) ===== */
+        /* ===== СТРАНИЦА "ПРОСТРАНСТВО" ===== */
         .space-page {
             padding: 40px 0 80px;
         }
@@ -1251,7 +1293,7 @@
         .space-image:hover {
             transform: scale(1.02);
             border-color: #3a8cff;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4); /* добавлено свечение */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(58,140,255,0.4);
         }
 
         .space-text-block {
@@ -1270,7 +1312,7 @@
             font-weight: 600;
         }
 
-        /* ===== СТРАНИЦЫ УРОКОВ (увеличен текст преподавателей) ===== */
+        /* ===== СТРАНИЦЫ УРОКОВ ===== */
         .lesson-description,
         .lesson-teacher {
             padding: 80px 0;
@@ -1369,7 +1411,7 @@
             }
         }
 
-        /* ===== МОДАЛЬНОЕ ОКНО (КВАДРАТНОЕ, БЕЗ СКРОЛЛА) ===== */
+        /* ===== МОДАЛЬНОЕ ОКНО ===== */
         .vocal-modal-overlay {
             display: none;
             position: fixed;
@@ -1592,7 +1634,7 @@
             color: #fff;
         }
 
-        /* ===== ПОДВАЛ (КОМПАКТНЫЙ С КНОПКОЙ LOGIN) ===== */
+        /* ===== ПОДВАЛ ===== */
         .footer {
             border-top: 1px solid rgba(255,255,255,0.1);
             padding: 20px 0 20px;
@@ -1664,7 +1706,6 @@
             opacity: 1;
         }
 
-        /* Кнопка логина */
         .footer-login {
             display: flex;
             align-items: center;
@@ -1756,7 +1797,6 @@
             .logo-image { height: 25px; }
         }
 
-        /* Стили для админ-модалки (были ранее, оставляем без изменений) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -1910,43 +1950,59 @@
             <section id="portfolio">
                 <h2 class="section-title">Примеры работ</h2>
                 <div class="artist-grid">
+                    <!-- Карточка 1 -->
                     <div class="artist-card">
-                        <div class="artist-image one"></div>
+                        <div class="artist-image-container">
+                            <div class="artist-image one"></div>
+                            <button class="play-pause-btn" data-track="0"><i class="fas fa-play"></i></button>
+                        </div>
                         <div class="artist-info">
                             <div class="artist-name">LUANHO - ЛЕТИ СО МНОЙ</div>
                             <div class="artist-role">Mixed by WEYTON</div>
                         </div>
-                        <audio controls controlslist="nodownload noplayspeed">
+                        <audio controls controlslist="nodownload noplayspeed" data-track="0">
                             <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg">
                         </audio>
                     </div>
+                    <!-- Карточка 2 -->
                     <div class="artist-card">
-                        <div class="artist-image two"></div>
+                        <div class="artist-image-container">
+                            <div class="artist-image two"></div>
+                            <button class="play-pause-btn" data-track="1"><i class="fas fa-play"></i></button>
+                        </div>
                         <div class="artist-info">
                             <div class="artist-name">WEYTON - ЭТОТ ГОРОД</div>
                             <div class="artist-role">Mixed by WEYTON</div>
                         </div>
-                        <audio controls controlslist="nodownload noplayspeed">
+                        <audio controls controlslist="nodownload noplayspeed" data-track="1">
                             <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg">
                         </audio>
                     </div>
+                    <!-- Карточка 3 -->
                     <div class="artist-card">
-                        <div class="artist-image three"></div>
+                        <div class="artist-image-container">
+                            <div class="artist-image three"></div>
+                            <button class="play-pause-btn" data-track="2"><i class="fas fa-play"></i></button>
+                        </div>
                         <div class="artist-info">
                             <div class="artist-name">ОКСАНА ШЕМАНОВСКАЯ - НЕОБЫЧАЙНО</div>
                             <div class="artist-role">Mixed by WEYTON</div>
                         </div>
-                        <audio controls controlslist="nodownload noplayspeed">
+                        <audio controls controlslist="nodownload noplayspeed" data-track="2">
                             <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3" type="audio/mpeg">
                         </audio>
                     </div>
+                    <!-- Карточка 4 -->
                     <div class="artist-card">
-                        <div class="artist-image four"></div>
+                        <div class="artist-image-container">
+                            <div class="artist-image four"></div>
+                            <button class="play-pause-btn" data-track="3"><i class="fas fa-play"></i></button>
+                        </div>
                         <div class="artist-info">
                             <div class="artist-name">TRACK 04 // PLATINUM</div>
                             <div class="artist-role">Full Production</div>
                         </div>
-                        <audio controls controlslist="nodownload noplayspeed">
+                        <audio controls controlslist="nodownload noplayspeed" data-track="3">
                             <source src="track4.mp3" type="audio/mpeg">
                         </audio>
                     </div>
@@ -2475,7 +2531,7 @@
         <div class="modal-close" onclick="closeAdmin()">Abort Mission</div>
     </div>
 
-    <!-- Плавающая кнопка соцсетей (обновлённая) -->
+    <!-- Плавающая кнопка соцсетей -->
     <div class="social-float" id="socialFloat">
         <div class="social-float-button" id="socialFloatBtn">
             <i class="fas fa-share-alt"></i>
@@ -2584,6 +2640,49 @@
             }
             setInterval(nextSlide, 5000);
         }
+
+        // --- Кастомные кнопки play/pause ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const playButtons = document.querySelectorAll('.play-pause-btn');
+            const audioElements = document.querySelectorAll('audio[data-track]');
+
+            // Функция обновления иконки на кнопке
+            function updateButtonIcon(btn, audio) {
+                const icon = btn.querySelector('i');
+                if (audio.paused) {
+                    icon.className = 'fas fa-play';
+                } else {
+                    icon.className = 'fas fa-pause';
+                }
+            }
+
+            // Привязываем события к каждому аудио
+            audioElements.forEach((audio, index) => {
+                const btn = document.querySelector(`.play-pause-btn[data-track="${index}"]`);
+                if (!btn) return;
+
+                // При клике на кнопку переключаем воспроизведение
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (audio.paused) {
+                        audio.play();
+                    } else {
+                        audio.pause();
+                    }
+                });
+
+                // Слушаем события аудио, чтобы менять иконку
+                audio.addEventListener('play', () => updateButtonIcon(btn, audio));
+                audio.addEventListener('pause', () => updateButtonIcon(btn, audio));
+                audio.addEventListener('ended', () => updateButtonIcon(btn, audio)); // по окончании показываем play
+
+                // Начальное состояние
+                updateButtonIcon(btn, audio);
+            });
+
+            // Останавливать другие аудио при воспроизведении (как уже реализовано в коде)
+            // Это уже есть в обработчике "play" ниже
+        });
 
         // --- Модальные окна ---
         const bookBtn = document.getElementById('bookBtn');
