@@ -1860,114 +1860,88 @@
         }
 
         /* ============================================================
-           ПРЕЛОАДЕР — venetian blinds (жалюзи)
+           ПРЕЛОАДЕР — typewriter
         ============================================================ */
         #preloader {
             position: fixed;
             inset: 0;
             z-index: 99999;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        /* Логотип по центру */
-        #preloader-content {
-            position: absolute;
-            inset: 0;
+            background: #0a0a0a;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 28px;
-            pointer-events: none;
-            z-index: 2;
-            transition: opacity 0.25s ease;
+            gap: 14px;
+            transition: opacity 1s ease;
         }
-        #preloader.pl-exit #preloader-content {
+        #preloader.pl-fade {
             opacity: 0;
+            pointer-events: none;
+        }
+        #preloader.done {
+            display: none;
         }
 
-        /* Каждая полоса-жалюзина */
-        .pl-bar {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            background: #0a0a0a;
-            will-change: transform;
-            transition: transform 0.72s cubic-bezier(0.76, 0, 0.24, 1);
-        }
-        /* Чётные — уходят вправо, нечётные — влево */
-        .pl-bar.to-right { transform: translateX(0); }
-        .pl-bar.to-left  { transform: translateX(0); }
-
-        #preloader.pl-exit .pl-bar.to-right { transform: translateX(105%); }
-        #preloader.pl-exit .pl-bar.to-left  { transform: translateX(-105%); }
-
-        /* Тонкая светящаяся линия между полосами */
-        .pl-bar::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: rgba(58,140,255,0.15);
-        }
-
-        #preloader.done { display: none; }
-
-        /* Логотип */
-        .preloader-logo {
-            font-size: 1.6rem;
+        /* Первая строка — название */
+        .pl-line1 {
+            font-size: clamp(1.6rem, 4vw, 2.8rem);
             font-weight: 700;
-            letter-spacing: 0.35em;
+            letter-spacing: 0.28em;
             text-transform: uppercase;
             color: #fff;
-            opacity: 0;
-            transform: translateY(16px);
-            animation: pl-logo-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            border-right: 2px solid #3a8cff;
         }
-        .preloader-logo span { color: #3a8cff; }
+        .pl-line1 .pl-blue { color: #3a8cff; }
 
-        @keyframes pl-logo-in {
-            to { opacity: 1; transform: translateY(0); }
+        /* Вторая строка — подпись */
+        .pl-line2 {
+            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+            font-weight: 400;
+            letter-spacing: 0.45em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            border-right: 2px solid rgba(58,140,255,0.6);
+            visibility: hidden; /* появится после первой строки */
         }
 
-        /* Прогресс-линия */
-        .preloader-bar {
-            width: 180px;
+        /* Мигание курсора пока идёт печатание */
+        @keyframes blink {
+            0%, 100% { border-color: transparent; }
+            50%       { border-color: #3a8cff; }
+        }
+        .pl-cursor-blink {
+            animation: blink 0.55s step-end infinite;
+        }
+
+        /* Прогресс-бар */
+        .pl-progress-wrap {
+            margin-top: 28px;
+            width: clamp(180px, 30vw, 280px);
             height: 1px;
-            background: rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.06);
             overflow: hidden;
             opacity: 0;
-            animation: pl-logo-in 0.6s ease 0.6s forwards;
+            transition: opacity 0.4s ease;
         }
-        .preloader-bar-fill {
+        .pl-progress-wrap.visible { opacity: 1; }
+        .pl-progress-fill {
             height: 100%;
             width: 0;
-            background: linear-gradient(90deg, #3a8cff 0%, rgba(58,140,255,0.3) 100%);
-            animation: preloader-fill 1.5s cubic-bezier(0.4,0,0.2,1) 0.6s forwards;
-        }
-        @keyframes preloader-fill {
-            0%   { width: 0%; }
-            60%  { width: 72%; }
-            100% { width: 100%; }
-        }
-
-        /* Маленький текст под баром */
-        .preloader-label {
-            font-size: 0.65rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.2);
-            opacity: 0;
-            animation: pl-logo-in 0.5s ease 0.8s forwards;
+            background: linear-gradient(90deg, #3a8cff, rgba(58,140,255,0.4));
+            box-shadow: 0 0 8px rgba(58,140,255,0.5);
+            transition: width 0s linear; /* управляется JS */
         }
 
         /* Сайт при появлении */
         body.site-entering .container,
         body.site-entering footer {
-            animation: site-enter 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation: site-enter 0.9s ease forwards;
         }
         @keyframes site-enter {
             from { opacity: 0; }
@@ -2137,13 +2111,10 @@
 
     <!-- ===== ПРЕЛОАДЕР ===== -->
     <div id="preloader">
-        <!-- Полосы-жалюзи генерируются JS -->
-        <div id="preloader-content">
-            <div class="preloader-logo">SPRING SOUND <span>LAB</span></div>
-            <div class="preloader-bar">
-                <div class="preloader-bar-fill"></div>
-            </div>
-            <div class="preloader-label">Волгоград · Студия звукозаписи</div>
+        <div class="pl-line1" id="plLine1"></div>
+        <div class="pl-line2" id="plLine2"></div>
+        <div class="pl-progress-wrap" id="plProgressWrap">
+            <div class="pl-progress-fill" id="plProgressFill"></div>
         </div>
     </div>
 
@@ -2857,41 +2828,114 @@
 
     <script>
         // ============================================================
-        // ПРЕЛОАДЕР — venetian blinds (жалюзи)
+        // ПРЕЛОАДЕР — typewriter
         // ============================================================
         (function () {
-            var pl = document.getElementById('preloader');
-            var BARS = 10;
-            var BAR_H = 100 / BARS;
+            var line1El   = document.getElementById('plLine1');
+            var line2El   = document.getElementById('plLine2');
+            var progressW = document.getElementById('plProgressWrap');
+            var progressF = document.getElementById('plProgressFill');
+            var pl        = document.getElementById('preloader');
 
-            // Генерируем полосы динамически
-            for (var i = 0; i < BARS; i++) {
-                var bar = document.createElement('div');
-                bar.className = 'pl-bar ' + (i % 2 === 0 ? 'to-right' : 'to-left');
-                bar.style.top    = (i * BAR_H) + 'vh';
-                bar.style.height = BAR_H + 'vh';
-                // Стаггер: каждая следующая полоса чуть позже
-                var delay = i * 55; // ms между полосами
-                bar.style.transitionDelay = delay + 'ms';
-                pl.insertBefore(bar, pl.firstChild);
+            var TEXT1 = 'SPRING SOUND LAB';   // первая строка
+            var TEXT2 = 'СТУДИЯ ЗВУКОЗАПИСИ'; // вторая строка
+
+            // Скорость печатания (мс на символ)
+            var SPEED1 = 75;
+            var SPEED2 = 55;
+
+            // Пауза перед каждой строкой
+            var PAUSE_BEFORE_1 = 300;
+            var PAUSE_BEFORE_2 = 200;
+
+            // ---- утилита: typewriter ----
+            function typewrite(el, text, speed, done) {
+                var i = 0;
+                el.style.visibility = 'visible';
+                el.classList.add('pl-cursor-blink');
+
+                function tick() {
+                    i++;
+                    // Для первой строки — LAB красим синим
+                    if (el === line1El) {
+                        var plain = text.slice(0, i);
+                        var labIdx = plain.indexOf('LAB');
+                        if (labIdx !== -1) {
+                            el.innerHTML =
+                                plain.slice(0, labIdx) +
+                                '<span class="pl-blue">LAB</span>';
+                        } else {
+                            el.textContent = plain;
+                        }
+                    } else {
+                        el.textContent = text.slice(0, i);
+                    }
+                    // Ширина по количеству символов
+                    el.style.width = 'auto';
+
+                    if (i < text.length) {
+                        setTimeout(tick, speed);
+                    } else {
+                        // Курсор мигает ещё секунду, потом гаснет
+                        setTimeout(function () {
+                            el.classList.remove('pl-cursor-blink');
+                            el.style.borderColor = 'transparent';
+                            if (done) done();
+                        }, 350);
+                    }
+                }
+                setTimeout(tick, speed);
             }
 
-            window.addEventListener('load', function () {
-                // Небольшая пауза — логотип показывается
-                setTimeout(function () {
-                    // Гасим логотип
-                    pl.classList.add('pl-exit');
+            // ---- прогресс-бар ----
+            function runProgress(duration, onDone) {
+                progressW.classList.add('visible');
+                var start = null;
+                function step(ts) {
+                    if (!start) start = ts;
+                    var pct = Math.min((ts - start) / duration * 100, 100);
+                    progressF.style.width = pct + '%';
+                    if (pct < 100) {
+                        requestAnimationFrame(step);
+                    } else {
+                        if (onDone) onDone();
+                    }
+                }
+                requestAnimationFrame(step);
+            }
 
-                    // Ждём пока все полосы уйдут (0 + 9*55 + 720 = ~1415ms)
-                    var totalDuration = (BARS - 1) * 55 + 750;
-                    setTimeout(function () {
-                        pl.classList.add('done');
-                        document.body.classList.add('site-entering');
+            // ---- главный сценарий ----
+            window.addEventListener('load', function () {
+
+                // 1. Печатаем первую строку
+                setTimeout(function () {
+                    typewrite(line1El, TEXT1, SPEED1, function () {
+
+                        // 2. Пауза → вторая строка
                         setTimeout(function () {
-                            document.body.classList.remove('site-entering');
-                        }, 950);
-                    }, totalDuration);
-                }, 1500);
+                            typewrite(line2El, TEXT2, SPEED2, function () {
+
+                                // 3. Пауза → прогресс-бар
+                                setTimeout(function () {
+                                    var barDuration = 900;
+                                    runProgress(barDuration, function () {
+
+                                        // 4. Небольшая пауза — и плавный fade
+                                        setTimeout(function () {
+                                            pl.classList.add('pl-fade');
+                                            document.body.classList.add('site-entering');
+
+                                            setTimeout(function () {
+                                                pl.classList.add('done');
+                                                document.body.classList.remove('site-entering');
+                                            }, 1050);
+                                        }, 300);
+                                    });
+                                }, PAUSE_BEFORE_2);
+                            });
+                        }, PAUSE_BEFORE_2);
+                    });
+                }, PAUSE_BEFORE_1);
             });
         })();
 
