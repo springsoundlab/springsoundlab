@@ -2237,6 +2237,346 @@
         .faq-answer-inner strong {
             color: #fff;
         }
+
+        /* ============================================================
+           КАСТОМНЫЙ КУРСОР
+        ============================================================ */
+        * { cursor: none !important; }
+
+        .cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background: #3a8cff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99998;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+        }
+
+        .cursor-ring {
+            position: fixed;
+            top: 0; left: 0;
+            width: 36px; height: 36px;
+            border: 1.5px solid rgba(58,140,255,0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99997;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+        }
+
+        .cursor-dot.hovered {
+            width: 12px; height: 12px;
+            background: #fff;
+        }
+
+        .cursor-ring.hovered {
+            width: 52px; height: 52px;
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        @media (hover: none) {
+            * { cursor: auto !important; }
+            .cursor-dot, .cursor-ring { display: none; }
+        }
+
+        /* ============================================================
+           MARQUEE
+        ============================================================ */
+        .marquee-wrap {
+            width: 100%;
+            overflow: hidden;
+            padding: 28px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            margin: 80px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 0;
+            width: max-content;
+            animation: marqueeScroll 28s linear infinite;
+        }
+
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        .marquee-item {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            padding: 0 32px;
+            white-space: nowrap;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .marquee-item span {
+            color: #3a8cff;
+            font-size: 0.5rem;
+        }
+
+        @keyframes marqueeScroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        /* ============================================================
+           STICKY BOOKING BANNER
+        ============================================================ */
+        .sticky-banner {
+            position: fixed;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9995;
+            background: rgba(10,10,10,0.92);
+            border: 1px solid rgba(58,140,255,0.35);
+            border-radius: 50px;
+            padding: 12px 20px 12px 28px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 20px rgba(58,140,255,0.08);
+            transition: bottom 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+            white-space: nowrap;
+        }
+
+        .sticky-banner.visible {
+            bottom: 24px;
+        }
+
+        .sticky-banner-text {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 0.02em;
+        }
+
+        .sticky-banner-text strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .sticky-banner-btn {
+            background: #3a8cff;
+            color: #fff;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: none;
+            transition: background 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sticky-banner-btn:hover {
+            background: #1e5bbf;
+        }
+
+        .sticky-banner-close {
+            width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.75rem;
+            cursor: none;
+            border-radius: 50%;
+            transition: color 0.2s, background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .sticky-banner-close:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+        }
+
+        /* ============================================================
+           ТАЙМЛАЙН
+        ============================================================ */
+        .timeline-section {
+            margin: 80px 0;
+        }
+
+        .timeline-steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            position: relative;
+            margin-top: 60px;
+        }
+
+        .timeline-steps::before {
+            content: '';
+            position: absolute;
+            top: 28px;
+            left: calc(12.5%);
+            width: calc(75%);
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            z-index: 0;
+        }
+
+        .timeline-line-fill {
+            position: absolute;
+            top: 28px;
+            left: calc(12.5%);
+            width: 0%;
+            height: 1px;
+            background: linear-gradient(90deg, #3a8cff, rgba(58,140,255,0.3));
+            z-index: 1;
+            transition: width 1.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        .timeline-line-fill.animated {
+            width: calc(75%);
+        }
+
+        .timeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .timeline-dot {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: #0a0a0a;
+            border: 1px solid rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.3);
+            transition: border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .timeline-step.activated .timeline-dot {
+            border-color: #3a8cff;
+            color: #3a8cff;
+            box-shadow: 0 0 20px rgba(58,140,255,0.2);
+        }
+
+        .timeline-step-num {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.2);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            transition: color 0.5s ease;
+        }
+
+        .timeline-step.activated .timeline-step-num {
+            color: #3a8cff;
+        }
+
+        .timeline-step-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: color 0.5s ease;
+        }
+
+        .timeline-step.activated .timeline-step-title {
+            color: #fff;
+        }
+
+        .timeline-step-desc {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.3);
+            line-height: 1.6;
+            transition: color 0.5s ease;
+        }
+
+        .timeline-step.activated .timeline-step-desc {
+            color: rgba(255,255,255,0.55);
+        }
+
+        @media (max-width: 900px) {
+            .timeline-steps {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 40px;
+            }
+            .timeline-steps::before,
+            .timeline-line-fill {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .timeline-steps { grid-template-columns: 1fr; }
+            .sticky-banner { padding: 10px 14px 10px 20px; gap: 12px; }
+            .sticky-banner-text { font-size: 0.75rem; }
+        }
+
+        /* ============================================================
+           ГЛИТЧ на LAB
+        ============================================================ */
+        .hero-title-secondary {
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-title-secondary.glitch::before,
+        .hero-title-secondary.glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0;
+            color: #3a8cff;
+            font-weight: 700;
+        }
+
+        .hero-title-secondary.glitch::before {
+            animation: glitchTop 0.35s ease forwards;
+            clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+            color: #7ab8ff;
+        }
+
+        .hero-title-secondary.glitch::after {
+            animation: glitchBot 0.35s ease forwards;
+            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+            color: #1e5bbf;
+        }
+
+        @keyframes glitchTop {
+            0%   { transform: translate(0,0); opacity:1; }
+            20%  { transform: translate(-4px,-2px); opacity:0.8; }
+            40%  { transform: translate(3px,0); opacity:1; }
+            60%  { transform: translate(-2px,1px); opacity:0.9; }
+            80%  { transform: translate(2px,0); opacity:1; }
+            100% { transform: translate(0,0); opacity:0; }
+        }
+
+        @keyframes glitchBot {
+            0%   { transform: translate(0,0); opacity:1; }
+            20%  { transform: translate(4px,2px); opacity:0.8; }
+            40%  { transform: translate(-3px,0); opacity:1; }
+            60%  { transform: translate(2px,-1px); opacity:0.9; }
+            80%  { transform: translate(-2px,0); opacity:1; }
+            100% { transform: translate(0,0); opacity:0; }
+        }
     </style>
 </head>
 <body>
@@ -2249,6 +2589,10 @@
             <div class="pl-progress-fill" id="plProgressFill"></div>
         </div>
     </div>
+
+    <!-- ===== КАСТОМНЫЙ КУРСОР ===== -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
 
     <!-- ===== КНОПКА "НАВЕРХ" ===== -->
     <button class="back-to-top" id="backToTop" aria-label="Наверх">&#8679;</button>
@@ -2332,7 +2676,7 @@
                     <div>
                         <div class="hero-pre">СТУДИЯ ЗВУКОЗАПИСИ</div>
                         <h1 class="hero-title">
-                            SPRING SOUND <span class="hero-title-secondary">LAB</span>
+                            SPRING SOUND <span class="hero-title-secondary" data-text="LAB" id="labGlitch">LAB</span>
                         </h1>
                         <p class="hero-desc">
                             Профессиональная архитектура звука.<br> Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
@@ -2436,6 +2780,46 @@
                             <div class="event-location">5 000 ₽</div>
                         </div>
                         <a href="#" class="event-ticket buy-btn" data-title="Аранжировка &quot;Рок&quot;" data-price="5 000 ₽" data-genre="Рок" data-bpm="120">Купить</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== MARQUEE ===== -->
+            <div class="marquee-wrap">
+                <div class="marquee-track">
+                    <div class="marquee-item">Запись вокала <span>◆</span> Сведение <span>◆</span> Мастеринг <span>◆</span> Аранжировка <span>◆</span> Уроки вокала <span>◆</span> Уроки гитары <span>◆</span> Звукорежиссура <span>◆</span> Студия в Волгограде <span>◆</span></div>
+                    <div class="marquee-item">Запись вокала <span>◆</span> Сведение <span>◆</span> Мастеринг <span>◆</span> Аранжировка <span>◆</span> Уроки вокала <span>◆</span> Уроки гитары <span>◆</span> Звукорежиссура <span>◆</span> Студия в Волгограде <span>◆</span></div>
+                </div>
+            </div>
+
+            <!-- ===== КАК МЫ РАБОТАЕМ ===== -->
+            <section class="timeline-section">
+                <h2 class="section-title">Как мы работаем</h2>
+                <div class="timeline-steps" id="timelineSteps">
+                    <div class="timeline-line-fill" id="timelineFill"></div>
+                    <div class="timeline-step">
+                        <div class="timeline-dot"><i class="fas fa-phone"></i></div>
+                        <div class="timeline-step-num">Шаг 01</div>
+                        <div class="timeline-step-title">Заявка</div>
+                        <div class="timeline-step-desc">Оставляешь заявку или звонишь. Обсуждаем задачу, жанр, сроки и бюджет.</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-dot"><i class="fas fa-music"></i></div>
+                        <div class="timeline-step-num">Шаг 02</div>
+                        <div class="timeline-step-title">Подготовка</div>
+                        <div class="timeline-step-desc">Готовим студию, подбираем микрофон и подходящий звук под твой стиль.</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-dot"><i class="fas fa-microphone"></i></div>
+                        <div class="timeline-step-num">Шаг 03</div>
+                        <div class="timeline-step-title">Запись</div>
+                        <div class="timeline-step-desc">Записываем, сводим, мастерим. Ты контролируешь результат на каждом этапе.</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-dot"><i class="fas fa-download"></i></div>
+                        <div class="timeline-step-num">Шаг 04</div>
+                        <div class="timeline-step-title">Получаешь трек</div>
+                        <div class="timeline-step-desc">Финальный файл в wav и mp3 — готов к релизу на стримингах или личному архиву.</div>
                     </div>
                 </div>
             </section>
@@ -3071,6 +3455,13 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- ===== STICKY BANNER ===== -->
+    <div class="sticky-banner" id="stickyBanner">
+        <div class="sticky-banner-text">Готов записаться? <strong>Забронируй студию прямо сейчас</strong></div>
+        <button class="sticky-banner-btn open-vocal-modal">Забронировать</button>
+        <div class="sticky-banner-close" id="stickyClose">&#10005;</div>
     </div>
 
     <!-- Модальное окно -->
@@ -3779,6 +4170,147 @@
 
             window.triggerRevealCheck = observeRevealElements;
             observeRevealElements();
+        })();
+
+        // ============================================================
+        // КАСТОМНЫЙ КУРСОР
+        // ============================================================
+        (function () {
+            var dot  = document.getElementById('cursorDot');
+            var ring = document.getElementById('cursorRing');
+            if (!dot || !ring) return;
+
+            var mouseX = 0, mouseY = 0;
+            var ringX  = 0, ringY  = 0;
+            var raf;
+
+            document.addEventListener('mousemove', function (e) {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                dot.style.left = mouseX + 'px';
+                dot.style.top  = mouseY + 'px';
+            });
+
+            function animateRing() {
+                ringX += (mouseX - ringX) * 0.12;
+                ringY += (mouseY - ringY) * 0.12;
+                ring.style.left = ringX + 'px';
+                ring.style.top  = ringY + 'px';
+                raf = requestAnimationFrame(animateRing);
+            }
+            animateRing();
+
+            var hoverTargets = 'a, button, .artist-card, .service-card, .price-card, .about-card, .faq-question, .social-float-button, .sticky-banner-btn, .sticky-banner-close, .back-to-top, .hero-btn, .open-vocal-modal';
+
+            document.addEventListener('mouseover', function (e) {
+                if (e.target.closest(hoverTargets)) {
+                    dot.classList.add('hovered');
+                    ring.classList.add('hovered');
+                }
+            });
+            document.addEventListener('mouseout', function (e) {
+                if (e.target.closest(hoverTargets)) {
+                    dot.classList.remove('hovered');
+                    ring.classList.remove('hovered');
+                }
+            });
+
+            document.addEventListener('mouseleave', function () {
+                dot.style.opacity = '0';
+                ring.style.opacity = '0';
+            });
+            document.addEventListener('mouseenter', function () {
+                dot.style.opacity = '1';
+                ring.style.opacity = '1';
+            });
+        })();
+
+        // ============================================================
+        // STICKY BANNER
+        // ============================================================
+        (function () {
+            var banner    = document.getElementById('stickyBanner');
+            var closeBtn  = document.getElementById('stickyClose');
+            if (!banner || !closeBtn) return;
+
+            var dismissed = sessionStorage.getItem('bannerDismissed');
+            if (dismissed) return;
+
+            var shown = false;
+
+            window.addEventListener('scroll', function () {
+                if (dismissed) return;
+                var scrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+                if (scrolled > 0.35 && !shown) {
+                    shown = true;
+                    banner.classList.add('visible');
+                }
+            }, { passive: true });
+
+            closeBtn.addEventListener('click', function () {
+                banner.classList.remove('visible');
+                dismissed = true;
+                sessionStorage.setItem('bannerDismissed', '1');
+            });
+
+            // Кнопка внутри баннера открывает модалку
+            var bannerBtn = banner.querySelector('.open-vocal-modal');
+            if (bannerBtn) {
+                bannerBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openVocalModal();
+                });
+            }
+        })();
+
+        // ============================================================
+        // ТАЙМЛАЙН — анимация при скролле
+        // ============================================================
+        (function () {
+            var steps = document.querySelectorAll('.timeline-step');
+            var fill  = document.getElementById('timelineFill');
+            if (!steps.length) return;
+
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        // Активируем точки с задержкой
+                        steps.forEach(function (step, i) {
+                            setTimeout(function () {
+                                step.classList.add('activated');
+                            }, i * 250);
+                        });
+                        // Заполняем линию
+                        if (fill) {
+                            setTimeout(function () {
+                                fill.classList.add('animated');
+                            }, 100);
+                        }
+                        observer.disconnect();
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            var section = document.getElementById('timelineSteps');
+            if (section) observer.observe(section);
+        })();
+
+        // ============================================================
+        // ГЛИТЧ на LAB — по наведению
+        // ============================================================
+        (function () {
+            var lab = document.getElementById('labGlitch');
+            if (!lab) return;
+
+            var timeout;
+
+            lab.addEventListener('mouseenter', function () {
+                clearTimeout(timeout);
+                lab.classList.add('glitch');
+                timeout = setTimeout(function () {
+                    lab.classList.remove('glitch');
+                }, 400);
+            });
         })();
 
         // ============================================================
