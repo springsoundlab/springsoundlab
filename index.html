@@ -2410,77 +2410,7 @@
             .timeline-steps { grid-template-columns: 1fr; }
         }
 
-                /* ============================================================
-           МЕРЦАНИЕ ЗАГОЛОВКА
-        ============================================================ */
-        /* мерцание управляется через JS opacity */
-
-        /* ============================================================
-           ГЛИТЧ на LAB
-        ============================================================ */
-        .hero-title-secondary {
-            position: relative;
-            display: inline-block;
-        }
-
-        /* LAB — синий глитч */
-        #labGlitch.glitch::before,
-        #labGlitch.glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0; left: 0;
-            font-weight: 700;
-        }
-
-        #labGlitch.glitch::before {
-            animation: glitchTop 0.35s ease forwards;
-            clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
-            color: #7ab8ff;
-        }
-
-        #labGlitch.glitch::after {
-            animation: glitchBot 0.35s ease forwards;
-            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
-            color: #1e5bbf;
-        }
-
-        /* SPRING SOUND — белый глитч */
-        #springSoundGlitch {
-            color: #ffffff;
-        }
-
-        #springSoundGlitch.glitch::before,
-        #springSoundGlitch.glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0; left: 0;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        #springSoundGlitch.glitch::before {
-            animation: glitchTop 0.35s ease forwards;
-            clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
-            opacity: 0.7;
-        }
-
-        #springSoundGlitch.glitch::after {
-            animation: glitchBot 0.35s ease forwards;
-            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
-            opacity: 0.5;
-        }
-
-        @keyframes glitchTop {
-            0%   { transform: translate(0,0); opacity:1; }
-            20%  { transform: translate(-4px,-2px); opacity:0.8; }
-            40%  { transform: translate(3px,0); opacity:1; }
-            60%  { transform: translate(-2px,1px); opacity:0.9; }
-            80%  { transform: translate(2px,0); opacity:1; }
-            100% { transform: translate(0,0); opacity:0; }
-        }
-
-        @keyframes glitchBot {
-            0%   { transform: translate(0,0); opacity:1; }
+        
             20%  { transform: translate(4px,2px); opacity:0.8; }
             40%  { transform: translate(-3px,0); opacity:1; }
             60%  { transform: translate(2px,-1px); opacity:0.9; }
@@ -2581,8 +2511,8 @@
                 <div class="hero-content">
                     <div>
                         <div class="hero-pre">СТУДИЯ ЗВУКОЗАПИСИ</div>
-                        <h1 class="hero-title" id="heroTitle">
-                            <span class="hero-word" id="wordSpring">SPRING</span> <span class="hero-word" id="wordSound">SOUND</span> <span class="hero-title-secondary hero-word" id="wordLab">LAB</span>
+                        <h1 class="hero-title">
+                            SPRING SOUND <span class="hero-title-secondary">LAB</span>
                         </h1>
                         <p class="hero-desc">
                             Профессиональная архитектура звука.<br> Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
@@ -4093,118 +4023,6 @@
 
             var section = document.getElementById('timelineSteps');
             if (section) observer.observe(section);
-        })();
-
-        // ============================================================
-        // ГЛИТЧ на SPRING SOUND и LAB — по наведению
-        // ============================================================
-        (function () {
-            ['wordSpring','wordSound','wordLab'].forEach(function(id) {
-                var el = document.getElementById(id);
-                if (!el) return;
-                var timeout;
-                el.addEventListener('mouseenter', function () {
-                    clearTimeout(timeout);
-                    el.classList.add('glitch');
-                    timeout = setTimeout(function () {
-                        el.classList.remove('glitch');
-                    }, 400);
-                });
-            });
-        })();
-
-        // ============================================================
-        // МЕРЦАНИЕ — буквы живут сами по себе
-        // ============================================================
-        (function () {
-            var title = document.getElementById('heroTitle');
-            if (!title) return;
-
-            // Разбиваем на буквы
-            function splitToLetters() {
-                var words = ['wordSpring','wordSound','wordLab'];
-                var letters = [];
-                words.forEach(function(id) {
-                    var el = document.getElementById(id);
-                    if (!el) return;
-                    var text = el.textContent;
-                    el.innerHTML = '';
-                    for (var i = 0; i < text.length; i++) {
-                        var s = document.createElement('span');
-                        s.textContent = text[i];
-                        s.style.display = 'inline-block';
-                        el.appendChild(s);
-                        letters.push(s);
-                    }
-                });
-                return letters;
-            }
-
-            var letters = splitToLetters();
-            if (!letters.length) return;
-
-            function randomBetween(a, b) {
-                return a + Math.random() * (b - a);
-            }
-
-            function flicker() {
-                if (!document.getElementById('home-page').classList.contains('active-page')) return;
-
-                // Выбираем рандомное количество букв которые будут мигать
-                var pool = letters.slice();
-                // Перемешиваем
-                for (var i = pool.length - 1; i > 0; i--) {
-                    var j = Math.floor(Math.random() * (i + 1));
-                    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
-                }
-
-                var numLetters = Math.floor(randomBetween(2, Math.min(8, pool.length)));
-                var chosen = pool.slice(0, numLetters);
-
-                // Каждая буква получает свой независимый сценарий
-                chosen.forEach(function(letter) {
-                    var timeline = [];
-                    var t = 0;
-                    var numFlicks = Math.floor(randomBetween(1, 5));
-
-                    for (var k = 0; k < numFlicks; k++) {
-                        // Гаснет
-                        timeline.push({ t: t, op: randomBetween(0, 0.12) });
-                        t += randomBetween(25, 100);
-                        // Вспыхивает (иногда не до конца)
-                        var recovers = Math.random() > 0.3;
-                        timeline.push({ t: t, op: recovers ? randomBetween(0.7, 1) : randomBetween(0.3, 0.6) });
-                        t += randomBetween(20, 120);
-                    }
-                    // Финал — всё горит
-                    timeline.push({ t: t + randomBetween(0, 80), op: 1 });
-
-                    timeline.forEach(function(frame) {
-                        setTimeout(function() {
-                            letter.style.opacity = frame.op;
-                        }, frame.t);
-                    });
-
-                    // Гарантированный сброс
-                    var maxT = timeline[timeline.length - 1].t + 150;
-                    setTimeout(function() {
-                        letter.style.opacity = '';
-                    }, maxT);
-                });
-            }
-
-            function scheduleNext() {
-                var delay = randomBetween(5000, 12000);
-                setTimeout(function () {
-                    flicker();
-                    scheduleNext();
-                }, delay);
-            }
-
-            setTimeout(function () {
-                flicker();
-                scheduleNext();
-            }, 3000);
         })();
 
 
