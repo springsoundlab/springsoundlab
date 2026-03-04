@@ -2281,77 +2281,7 @@
             to   { transform: translateX(-50%); }
         }
 
-        /* ============================================================
-           STICKY BOOKING BANNER
-        ============================================================ */
-        .sticky-banner {
-            position: fixed;
-            bottom: -80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9995;
-            background: rgba(10,10,10,0.92);
-            border: 1px solid rgba(58,140,255,0.35);
-            border-radius: 50px;
-            padding: 12px 20px 12px 28px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 8px 40px rgba(0,0,0,0.5), 0 0 20px rgba(58,140,255,0.08);
-            transition: bottom 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
-            white-space: nowrap;
-        }
-
-        .sticky-banner.visible {
-            bottom: 24px;
-        }
-
-        .sticky-banner-text {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.6);
-            letter-spacing: 0.02em;
-        }
-
-        .sticky-banner-text strong {
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .sticky-banner-btn {
-            background: #3a8cff;
-            color: #fff;
-            border: none;
-            padding: 8px 22px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .sticky-banner-btn:hover {
-            background: #1e5bbf;
-        }
-
-        .sticky-banner-close {
-            width: 26px; height: 26px;
-            display: flex; align-items: center; justify-content: center;
-            color: rgba(255,255,255,0.3);
-            font-size: 0.75rem;
-            cursor: pointer;
-            border-radius: 50%;
-            transition: color 0.2s, background 0.2s;
-            flex-shrink: 0;
-        }
-
-        .sticky-banner-close:hover {
-            color: #fff;
-            background: rgba(255,255,255,0.08);
-        }
+        
 
         /* ============================================================
            ТАЙМЛАЙН
@@ -2478,9 +2408,12 @@
 
         @media (max-width: 600px) {
             .timeline-steps { grid-template-columns: 1fr; }
-            .sticky-banner { padding: 10px 14px 10px 20px; gap: 12px; }
-            .sticky-banner-text { font-size: 0.75rem; }
         }
+
+                /* ============================================================
+           МЕРЦАНИЕ ЗАГОЛОВКА
+        ============================================================ */
+        /* мерцание управляется через JS opacity */
 
         /* ============================================================
            ГЛИТЧ на LAB
@@ -2490,25 +2423,51 @@
             display: inline-block;
         }
 
-        .hero-title-secondary.glitch::before,
-        .hero-title-secondary.glitch::after {
+        /* LAB — синий глитч */
+        #labGlitch.glitch::before,
+        #labGlitch.glitch::after {
             content: attr(data-text);
             position: absolute;
             top: 0; left: 0;
-            color: #3a8cff;
             font-weight: 700;
         }
 
-        .hero-title-secondary.glitch::before {
+        #labGlitch.glitch::before {
             animation: glitchTop 0.35s ease forwards;
             clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
             color: #7ab8ff;
         }
 
-        .hero-title-secondary.glitch::after {
+        #labGlitch.glitch::after {
             animation: glitchBot 0.35s ease forwards;
             clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
             color: #1e5bbf;
+        }
+
+        /* SPRING SOUND — белый глитч */
+        #springSoundGlitch {
+            color: #ffffff;
+        }
+
+        #springSoundGlitch.glitch::before,
+        #springSoundGlitch.glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        #springSoundGlitch.glitch::before {
+            animation: glitchTop 0.35s ease forwards;
+            clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+            opacity: 0.7;
+        }
+
+        #springSoundGlitch.glitch::after {
+            animation: glitchBot 0.35s ease forwards;
+            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+            opacity: 0.5;
         }
 
         @keyframes glitchTop {
@@ -2622,8 +2581,8 @@
                 <div class="hero-content">
                     <div>
                         <div class="hero-pre">СТУДИЯ ЗВУКОЗАПИСИ</div>
-                        <h1 class="hero-title">
-                            SPRING SOUND <span class="hero-title-secondary" data-text="LAB" id="labGlitch">LAB</span>
+                        <h1 class="hero-title" id="heroTitle">
+                            <span class="hero-word" id="wordSpring">SPRING</span> <span class="hero-word" id="wordSound">SOUND</span> <span class="hero-title-secondary hero-word" id="wordLab">LAB</span>
                         </h1>
                         <p class="hero-desc">
                             Профессиональная архитектура звука.<br> Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
@@ -3396,13 +3355,6 @@
 
     </div>
 
-    <!-- ===== STICKY BANNER ===== -->
-    <div class="sticky-banner" id="stickyBanner">
-        <div class="sticky-banner-text">Готов записаться? <strong>Забронируй студию прямо сейчас</strong></div>
-        <button class="sticky-banner-btn open-vocal-modal">Забронировать</button>
-        <div class="sticky-banner-close" id="stickyClose">&#10005;</div>
-    </div>
-
     <!-- Модальное окно -->
     <div id="vocal-modal-overlay" class="vocal-modal-overlay" onclick="closeVocalModal()"></div>
     <div id="vocal-modal-panel" class="vocal-modal-panel">
@@ -4112,44 +4064,6 @@
         })();
 
         // ============================================================
-        // STICKY BANNER
-        // ============================================================
-        (function () {
-            var banner    = document.getElementById('stickyBanner');
-            var closeBtn  = document.getElementById('stickyClose');
-            if (!banner || !closeBtn) return;
-
-            var dismissed = sessionStorage.getItem('bannerDismissed');
-            if (dismissed) return;
-
-            var shown = false;
-
-            window.addEventListener('scroll', function () {
-                if (dismissed) return;
-                var scrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-                if (scrolled > 0.35 && !shown) {
-                    shown = true;
-                    banner.classList.add('visible');
-                }
-            }, { passive: true });
-
-            closeBtn.addEventListener('click', function () {
-                banner.classList.remove('visible');
-                dismissed = true;
-                sessionStorage.setItem('bannerDismissed', '1');
-            });
-
-            // Кнопка внутри баннера открывает модалку
-            var bannerBtn = banner.querySelector('.open-vocal-modal');
-            if (bannerBtn) {
-                bannerBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    openVocalModal();
-                });
-            }
-        })();
-
-        // ============================================================
         // ТАЙМЛАЙН — анимация при скролле
         // ============================================================
         (function () {
@@ -4182,22 +4096,118 @@
         })();
 
         // ============================================================
-        // ГЛИТЧ на LAB — по наведению
+        // ГЛИТЧ на SPRING SOUND и LAB — по наведению
         // ============================================================
         (function () {
-            var lab = document.getElementById('labGlitch');
-            if (!lab) return;
-
-            var timeout;
-
-            lab.addEventListener('mouseenter', function () {
-                clearTimeout(timeout);
-                lab.classList.add('glitch');
-                timeout = setTimeout(function () {
-                    lab.classList.remove('glitch');
-                }, 400);
+            ['wordSpring','wordSound','wordLab'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (!el) return;
+                var timeout;
+                el.addEventListener('mouseenter', function () {
+                    clearTimeout(timeout);
+                    el.classList.add('glitch');
+                    timeout = setTimeout(function () {
+                        el.classList.remove('glitch');
+                    }, 400);
+                });
             });
         })();
+
+        // ============================================================
+        // МЕРЦАНИЕ — буквы живут сами по себе
+        // ============================================================
+        (function () {
+            var title = document.getElementById('heroTitle');
+            if (!title) return;
+
+            // Разбиваем на буквы
+            function splitToLetters() {
+                var words = ['wordSpring','wordSound','wordLab'];
+                var letters = [];
+                words.forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (!el) return;
+                    var text = el.textContent;
+                    el.innerHTML = '';
+                    for (var i = 0; i < text.length; i++) {
+                        var s = document.createElement('span');
+                        s.textContent = text[i];
+                        s.style.display = 'inline-block';
+                        el.appendChild(s);
+                        letters.push(s);
+                    }
+                });
+                return letters;
+            }
+
+            var letters = splitToLetters();
+            if (!letters.length) return;
+
+            function randomBetween(a, b) {
+                return a + Math.random() * (b - a);
+            }
+
+            function flicker() {
+                if (!document.getElementById('home-page').classList.contains('active-page')) return;
+
+                // Выбираем рандомное количество букв которые будут мигать
+                var pool = letters.slice();
+                // Перемешиваем
+                for (var i = pool.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+                }
+
+                var numLetters = Math.floor(randomBetween(2, Math.min(8, pool.length)));
+                var chosen = pool.slice(0, numLetters);
+
+                // Каждая буква получает свой независимый сценарий
+                chosen.forEach(function(letter) {
+                    var timeline = [];
+                    var t = 0;
+                    var numFlicks = Math.floor(randomBetween(1, 5));
+
+                    for (var k = 0; k < numFlicks; k++) {
+                        // Гаснет
+                        timeline.push({ t: t, op: randomBetween(0, 0.12) });
+                        t += randomBetween(25, 100);
+                        // Вспыхивает (иногда не до конца)
+                        var recovers = Math.random() > 0.3;
+                        timeline.push({ t: t, op: recovers ? randomBetween(0.7, 1) : randomBetween(0.3, 0.6) });
+                        t += randomBetween(20, 120);
+                    }
+                    // Финал — всё горит
+                    timeline.push({ t: t + randomBetween(0, 80), op: 1 });
+
+                    timeline.forEach(function(frame) {
+                        setTimeout(function() {
+                            letter.style.opacity = frame.op;
+                        }, frame.t);
+                    });
+
+                    // Гарантированный сброс
+                    var maxT = timeline[timeline.length - 1].t + 150;
+                    setTimeout(function() {
+                        letter.style.opacity = '';
+                    }, maxT);
+                });
+            }
+
+            function scheduleNext() {
+                var delay = randomBetween(5000, 12000);
+                setTimeout(function () {
+                    flicker();
+                    scheduleNext();
+                }, delay);
+            }
+
+            setTimeout(function () {
+                flicker();
+                scheduleNext();
+            }, 3000);
+        })();
+
+
 
         // ============================================================
         // FAQ — АККОРДЕОН
