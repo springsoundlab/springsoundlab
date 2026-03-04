@@ -2241,8 +2241,6 @@
         /* ============================================================
            КАСТОМНЫЙ КУРСОР
         ============================================================ */
-        * { cursor: none !important; }
-
         .cursor-dot {
             position: fixed;
             top: 0; left: 0;
@@ -2277,56 +2275,9 @@
             border-color: rgba(255,255,255,0.5);
         }
 
-        @media (hover: none) {
-            * { cursor: auto !important; }
-            .cursor-dot, .cursor-ring { display: none; }
-        }
+        .cursor-dot, .cursor-ring { display: none; }
 
-        /* ============================================================
-           MARQUEE
-        ============================================================ */
-        .marquee-wrap {
-            width: 100%;
-            overflow: hidden;
-            padding: 28px 0;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            margin: 80px 0;
-            position: relative;
-            z-index: 2;
-        }
-
-        .marquee-track {
-            display: flex;
-            gap: 0;
-            width: max-content;
-            animation: marqueeScroll 28s linear infinite;
-        }
-
-        .marquee-track:hover {
-            animation-play-state: paused;
-        }
-
-        .marquee-item {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            padding: 0 32px;
-            white-space: nowrap;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.28em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.2);
-        }
-
-        .marquee-item span {
-            color: #3a8cff;
-            font-size: 0.5rem;
-        }
-
-        @keyframes marqueeScroll {
-            from { transform: translateX(0); }
+        
             to   { transform: translateX(-50%); }
         }
 
@@ -2377,7 +2328,7 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            cursor: none;
+            cursor: pointer;
             transition: background 0.2s;
             font-family: 'Inter', sans-serif;
         }
@@ -2391,7 +2342,7 @@
             display: flex; align-items: center; justify-content: center;
             color: rgba(255,255,255,0.3);
             font-size: 0.75rem;
-            cursor: none;
+            cursor: pointer;
             border-radius: 50%;
             transition: color 0.2s, background 0.2s;
             flex-shrink: 0;
@@ -2590,10 +2541,6 @@
         </div>
     </div>
 
-    <!-- ===== КАСТОМНЫЙ КУРСОР ===== -->
-    <div class="cursor-dot" id="cursorDot"></div>
-    <div class="cursor-ring" id="cursorRing"></div>
-
     <!-- ===== КНОПКА "НАВЕРХ" ===== -->
     <button class="back-to-top" id="backToTop" aria-label="Наверх">&#8679;</button>
 
@@ -2783,14 +2730,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- ===== MARQUEE ===== -->
-            <div class="marquee-wrap">
-                <div class="marquee-track">
-                    <div class="marquee-item">Запись вокала <span>◆</span> Сведение <span>◆</span> Мастеринг <span>◆</span> Аранжировка <span>◆</span> Уроки вокала <span>◆</span> Уроки гитары <span>◆</span> Звукорежиссура <span>◆</span> Студия в Волгограде <span>◆</span></div>
-                    <div class="marquee-item">Запись вокала <span>◆</span> Сведение <span>◆</span> Мастеринг <span>◆</span> Аранжировка <span>◆</span> Уроки вокала <span>◆</span> Уроки гитары <span>◆</span> Звукорежиссура <span>◆</span> Студия в Волгограде <span>◆</span></div>
-                </div>
-            </div>
 
             <!-- ===== КАК МЫ РАБОТАЕМ ===== -->
             <section class="timeline-section">
@@ -4170,59 +4109,6 @@
 
             window.triggerRevealCheck = observeRevealElements;
             observeRevealElements();
-        })();
-
-        // ============================================================
-        // КАСТОМНЫЙ КУРСОР
-        // ============================================================
-        (function () {
-            var dot  = document.getElementById('cursorDot');
-            var ring = document.getElementById('cursorRing');
-            if (!dot || !ring) return;
-
-            var mouseX = 0, mouseY = 0;
-            var ringX  = 0, ringY  = 0;
-            var raf;
-
-            document.addEventListener('mousemove', function (e) {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                dot.style.left = mouseX + 'px';
-                dot.style.top  = mouseY + 'px';
-            });
-
-            function animateRing() {
-                ringX += (mouseX - ringX) * 0.12;
-                ringY += (mouseY - ringY) * 0.12;
-                ring.style.left = ringX + 'px';
-                ring.style.top  = ringY + 'px';
-                raf = requestAnimationFrame(animateRing);
-            }
-            animateRing();
-
-            var hoverTargets = 'a, button, .artist-card, .service-card, .price-card, .about-card, .faq-question, .social-float-button, .sticky-banner-btn, .sticky-banner-close, .back-to-top, .hero-btn, .open-vocal-modal';
-
-            document.addEventListener('mouseover', function (e) {
-                if (e.target.closest(hoverTargets)) {
-                    dot.classList.add('hovered');
-                    ring.classList.add('hovered');
-                }
-            });
-            document.addEventListener('mouseout', function (e) {
-                if (e.target.closest(hoverTargets)) {
-                    dot.classList.remove('hovered');
-                    ring.classList.remove('hovered');
-                }
-            });
-
-            document.addEventListener('mouseleave', function () {
-                dot.style.opacity = '0';
-                ring.style.opacity = '0';
-            });
-            document.addEventListener('mouseenter', function () {
-                dot.style.opacity = '1';
-                ring.style.opacity = '1';
-            });
         })();
 
         // ============================================================
