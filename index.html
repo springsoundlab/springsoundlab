@@ -9,6 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://res.smartwidgets.ru/app.js" async></script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://github.com/springsoundlab/portfolio/raw/main/logotip.png">
+    <link rel="apple-touch-icon" href="https://github.com/springsoundlab/portfolio/raw/main/logotip.png">
+
+    <!-- SEO & Open Graph -->
+    <meta name="description" content="Spring Sound Lab — профессиональная студия звукозаписи в Волгограде. Запись вокала, сведение, мастеринг, аранжировки. Уроки вокала и гитары.">
+    <meta name="keywords" content="студия звукозаписи Волгоград, запись вокала, сведение, мастеринг, уроки вокала, Spring Sound Lab">
+    <meta name="author" content="Spring Sound Lab">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://springsoundlab.github.io/">
+    <meta property="og:title" content="Spring Sound Lab · Студия звукозаписи в Волгограде">
+    <meta property="og:description" content="Профессиональная архитектура звука. Запись, сведение, мастеринг, аранжировки. Уроки вокала и гитары. Волгоград, ул. Тулака 9.">
+    <meta property="og:image" content="https://github.com/springsoundlab/portfolio/raw/main/photo_studia/i.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Spring Sound Lab · Студия звукозаписи">
+    <meta name="twitter:description" content="Профессиональная архитектура звука в Волгограде.">
+    <meta name="twitter:image" content="https://github.com/springsoundlab/portfolio/raw/main/photo_studia/i.jpg">
     <style>
         /* === БАЗОВЫЕ СТИЛИ === */
         * {
@@ -439,7 +459,7 @@
             position: relative;
             width: 100%;
             overflow: hidden;
-            margin-bottom: 100px;
+            margin-bottom: 0;
             padding: 15px;
         }
 
@@ -2891,6 +2911,54 @@
             z-index: 1;
         }
 
+
+        /* ===== СЧЁТЧИК И ТОЧКИ КАРУСЕЛИ ===== */
+        .carousel-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 16px;
+            margin-bottom: 80px;
+        }
+
+        .carousel-counter {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            min-width: 48px;
+            text-align: center;
+        }
+
+        .carousel-counter .current-num {
+            color: #3a8cff;
+            font-size: 0.95rem;
+        }
+
+        .carousel-dots {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .carousel-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s, width 0.3s;
+            border: none;
+            padding: 0;
+        }
+
+        .carousel-dot.active {
+            background: #3a8cff;
+            transform: scale(1.5);
+        }
+
     </style>
 </head>
 <body>
@@ -3106,6 +3174,10 @@
                     </div>
                     <button class="carousel-arrow left" id="carouselPrev"><i class="fas fa-chevron-left"></i></button>
                     <button class="carousel-arrow right" id="carouselNext"><i class="fas fa-chevron-right"></i></button>
+                    <div class="carousel-footer">
+                        <div class="carousel-dots" id="carouselDots"></div>
+                        <div class="carousel-counter"><span class="current-num" id="carouselCurrent">1</span> / <span id="carouselTotal">10</span></div>
+                    </div>
                 </div>
             </section>
 
@@ -3353,7 +3425,7 @@
                     </div>
                     <div class="map-frame">
                         <iframe
-                            src="https://yandex.ru/map-widget/v1/?ll=44.471215%2C48.674380&z=17&l=map&pt=44.471215,48.674380,pm2blm~SPRING+SOUND+LAB"
+                            src="https://yandex.ru/map-widget/v1/?ll=44.471215%2C48.674380&z=17&l=map&pt=44.471215,48.674380,pm2rdl~Spring+Sound+Lab"
                             width="100%"
                             height="100%"
                             frameborder="0"
@@ -4390,8 +4462,98 @@
                 requestAnimationFrame(function() { snapTo(current); });
             });
 
+            // ===== СЧЁТЧИК И ТОЧКИ =====
+            var dotsEl    = document.getElementById('carouselDots');
+            var curEl     = document.getElementById('carouselCurrent');
+            var totalEl   = document.getElementById('carouselTotal');
+
+            function getRealIndex() {
+                // Текущий индекс в оригинальных карточках (0-based)
+                var rel = ((current - 2 * N) % N + N) % N;
+                return rel;
+            }
+
+            function buildDots() {
+                if (!dotsEl) return;
+                dotsEl.innerHTML = '';
+                for (var i = 0; i < N; i++) {
+                    var d = document.createElement('button');
+                    d.className = 'carousel-dot';
+                    d.setAttribute('aria-label', 'Трек ' + (i + 1));
+                    (function(i) {
+                        d.addEventListener('click', function() {
+                            var rel = getRealIndex();
+                            var diff = i - rel;
+                            slideTo(current + diff);
+                            startAuto(5000);
+                        });
+                    })(i);
+                    dotsEl.appendChild(d);
+                }
+                if (totalEl) totalEl.textContent = N;
+            }
+
+            function updateUI() {
+                var rel = getRealIndex();
+                if (curEl) curEl.textContent = rel + 1;
+                if (!dotsEl) return;
+                var dots = dotsEl.querySelectorAll('.carousel-dot');
+                dots.forEach(function(d, i) {
+                    d.classList.toggle('active', i === rel);
+                });
+            }
+
+            // Перехватываем slideTo чтобы обновлять UI
+            var _origSlideTo = slideTo;
+            slideTo = function(idx) {
+                _origSlideTo(idx);
+                // Обновляем UI после небольшой задержки (анимация 500ms)
+                setTimeout(updateUI, 520);
+            };
+
+            // ===== DRAG TO SCROLL =====
+            var dragStart = null;
+            var dragThreshold = 50; // px
+
+            track.addEventListener('mousedown', function(e) {
+                dragStart = e.clientX;
+                track.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mouseup', function(e) {
+                if (dragStart === null) return;
+                var diff = dragStart - e.clientX;
+                track.style.cursor = '';
+                dragStart = null;
+                if (Math.abs(diff) > dragThreshold) {
+                    if (diff > 0) { next(); } else { prev(); }
+                    startAuto(5000);
+                }
+            });
+
+            // Touch drag
+            var touchStartX = null;
+            track.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+            }, { passive: true });
+
+            track.addEventListener('touchend', function(e) {
+                if (touchStartX === null) return;
+                var diff = touchStartX - e.changedTouches[0].clientX;
+                touchStartX = null;
+                if (Math.abs(diff) > dragThreshold) {
+                    if (diff > 0) { next(); } else { prev(); }
+                    startAuto(5000);
+                }
+            }, { passive: true });
+
+            // Cursor grab on hover
+            track.style.cursor = 'grab';
+
             function init() {
+                buildDots();
                 snapTo(startIdx);
+                updateUI();
                 startAuto(5000);
             }
             requestAnimationFrame(function() { requestAnimationFrame(init); });
