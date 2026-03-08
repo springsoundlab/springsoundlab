@@ -4249,44 +4249,31 @@
         });
 
         // ============================================================
-        // КАРУСЕЛЬ — настоящий бесконечный цикл
-        // Принцип: CSS-клонирование через дублирование карточек в DOM,
-        // но сами оригинальные данные не трогаются — дубли строятся из innerHTML
+        // КАРУСЕЛЬ — плавный бесконечный цикл без моргания
         // ============================================================
         (function () {
-            var container = document.querySelector('.carousel-container');
-            var track     = document.getElementById('carouselTrack');
-            var prevBtn   = document.getElementById('carouselPrev');
-            var nextBtn   = document.getElementById('carouselNext');
+            var track   = document.getElementById('carouselTrack');
+            var prevBtn = document.getElementById('carouselPrev');
+            var nextBtn = document.getElementById('carouselNext');
             if (!track || !prevBtn || !nextBtn) return;
 
-            // Получаем оригинальные карточки
-            var origCards = Array.from(track.children);
-            var total     = origCards.length; // 10
+            var origCards  = Array.from(track.children);
+            var total      = origCards.length;
+            var cloneCount = 4;
+            var autoTimer  = null;
+            var moving     = false;
 
-            // Клонируем карточки: добавляем копии в начало и конец трека
-            // Используем cloneNode(true) — клонирует ВСЕ атрибуты включая style и class
-            // Изображения заданы через CSS-классы (.artist-image.one и т.д.) — они сохраняются
-            var cloneCount = 4; // сколько клонов с каждой стороны
-
-            var clonesStart = origCards.slice(-cloneCount).map(function(c) { return c.cloneNode(true); });
-            var clonesEnd   = origCards.slice(0, cloneCount).map(function(c) { return c.cloneNode(true); });
-
-            clonesStart.forEach(function(c) {
-                track.insertBefore(c, track.firstChild);
+            // Клонируем: последние cloneCount в начало, первые cloneCount в конец
+            origCards.slice(-cloneCount).forEach(function(c) {
+                track.insertBefore(c.cloneNode(true), track.firstChild);
             });
-            clonesEnd.forEach(function(c) {
-                track.appendChild(c);
+            origCards.slice(0, cloneCount).forEach(function(c) {
+                track.appendChild(c.cloneNode(true));
             });
 
-            // Теперь трек: [клоны конца | оригиналы | клоны начала]
-            // Всего: cloneCount + total + cloneCount карточек
-            // Стартовая позиция = cloneCount (первый оригинал)
-            var current    = cloneCount;
-            var allCards   = Array.from(track.children);
-            var totalAll   = allCards.length;
-            var isAnimating = false;
-            var autoTimer   = null;
+            // Итоговый порядок: [клоны конца | оригиналы | клоны начала]
+            var allCards = Array.from(track.children);
+            var current  = cloneCount; // стартуем на первом оригинале
 
             function getVisible() {
                 var w = window.innerWidth;
@@ -4297,38 +4284,42 @@
 
             function getCardWidth() {
                 if (!allCards[0]) return 0;
-                var gap = parseInt(window.getComputedStyle(track).gap) || 30;
+                var style = window.getComputedStyle(track);
+                var gap   = parseFloat(style.gap) || parseFloat(style.columnGap) || 30;
                 return allCards[0].offsetWidth + gap;
             }
 
-            // Переход без анимации (для «прыжка» при бесконечном цикле)
+            // Мгновенный прыжок — без перехода, без моргания
             function jumpTo(idx) {
                 track.style.transition = 'none';
                 current = idx;
-                track.style.transform = 'translateX(-' + (current * getCardWidth()) + 'px)';
-                void track.offsetWidth; // force reflow
+                track.style.transform  = 'translateX(-' + (current * getCardWidth()) + 'px)';
+                // force reflow — браузер применяет изменение прямо сейчас
+                track.getBoundingClientRect();
             }
 
-            // Переход с анимацией
+            // Плавный слайд
             function slideTo(idx) {
-                if (isAnimating) return;
-                isAnimating = true;
-                track.style.transition = 'transform 0.5s ease';
+                if (moving) return;
+                moving = true;
                 current = idx;
-                track.style.transform = 'translateX(-' + (current * getCardWidth()) + 'px)';
+                track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                track.style.transform  = 'translateX(-' + (current * getCardWidth()) + 'px)';
             }
 
-            // После окончания анимации — проверяем нужен ли «тихий прыжок»
+            // После окончания анимации — тихий прыжок если вышли в зону клонов
             track.addEventListener('transitionend', function() {
-                isAnimating = false;
-                // Если ушли в клоны в начале — прыгаем в оригиналы в конце
-                if (current < cloneCount) {
+                var minReal = cloneCount;
+                var maxReal = cloneCount + total - 1;
+
+                if (current < minReal) {
+                    // Зашли в клоны-слева → прыгаем на соответствующий оригинал справа
                     jumpTo(current + total);
-                }
-                // Если ушли в клоны в конце — прыгаем в оригиналы в начале
-                if (current >= cloneCount + total) {
+                } else if (current > maxReal) {
+                    // Зашли в клоны-справа → прыгаем на соответствующий оригинал слева
                     jumpTo(current - total);
                 }
+                moving = false;
             });
 
             function next() { slideTo(current + 1); }
@@ -4351,17 +4342,15 @@
                 wrapper.addEventListener('mouseleave', function() { startAuto(5000); });
             }
 
-            // Пересчёт при ресайзе (без анимации)
             window.addEventListener('resize', function() {
                 requestAnimationFrame(function() { jumpTo(current); });
             });
 
-            // Инициализация — ждём первый рендер чтобы карточки имели размер
+            // Инициализация после рендера
             function init() {
                 jumpTo(cloneCount);
                 startAuto(5000);
             }
-            // requestAnimationFrame гарантирует что layout уже произошёл
             if (document.readyState === 'complete') {
                 requestAnimationFrame(init);
             } else {
