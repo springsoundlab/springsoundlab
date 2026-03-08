@@ -446,7 +446,14 @@
         .carousel-track {
             display: flex;
             gap: 30px;
-            transition: transform 0.5s ease;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .carousel-track.no-transition {
+            transition: none !important;
         }
 
         .artist-card {
@@ -4249,7 +4256,7 @@
         });
 
         // ============================================================
-        // КАРУСЕЛЬ — плавный бесконечный цикл без моргания
+        // КАРУСЕЛЬ — абсолютный offset, прыжок до анимации (нет моргания)
         // ============================================================
         (function () {
             var track   = document.getElementById('carouselTrack');
@@ -4257,23 +4264,33 @@
             var nextBtn = document.getElementById('carouselNext');
             if (!track || !prevBtn || !nextBtn) return;
 
-            var origCards  = Array.from(track.children);
-            var total      = origCards.length;
-            var cloneCount = 4;
-            var autoTimer  = null;
-            var moving     = false;
+            var origCards = Array.from(track.children);
+            var N         = origCards.length;
+            var autoTimer = null;
+            var moving    = false;
 
-            // Клонируем: последние cloneCount в начало, первые cloneCount в конец
-            origCards.slice(-cloneCount).forEach(function(c) {
-                track.insertBefore(c.cloneNode(true), track.firstChild);
-            });
-            origCards.slice(0, cloneCount).forEach(function(c) {
-                track.appendChild(c.cloneNode(true));
-            });
+            // Строим трек: 5 полных копий [A|B|C|D|E]
+            // Стартуем в середине (копия C = индекс 2*N)
+            // Буфер 2*N с каждой стороны — хватит на любое количество кликов
+            var copies = 5;
+            var bufs   = []; // все клонированные блоки
+            for (var b = 0; b < copies - 1; b++) {
+                bufs.push(origCards.map(function(c) { return c.cloneNode(true); }));
+            }
+            // Вставляем 2 копии ДО оригиналов
+            for (var b = 1; b >= 0; b--) {
+                bufs[b].slice().reverse().forEach(function(c) {
+                    track.insertBefore(c, track.firstChild);
+                });
+            }
+            // Добавляем 2 копии ПОСЛЕ оригиналов
+            for (var b = 2; b <= 3; b++) {
+                bufs[b].forEach(function(c) { track.appendChild(c); });
+            }
 
-            // Итоговый порядок: [клоны конца | оригиналы | клоны начала]
-            var allCards = Array.from(track.children);
-            var current  = cloneCount; // стартуем на первом оригинале
+            var allCards = Array.from(track.children); // 5*N карточек
+            var startIdx = 2 * N; // начинаем с середины (копия C)
+            var current  = startIdx;
 
             function getVisible() {
                 var w = window.innerWidth;
@@ -4282,52 +4299,64 @@
                 return 4;
             }
 
-            function getCardWidth() {
-                if (!allCards[0]) return 0;
-                var style = window.getComputedStyle(track);
-                var gap   = parseFloat(style.gap) || parseFloat(style.columnGap) || 30;
-                return allCards[0].offsetWidth + gap;
+            function cardW() {
+                var c = allCards[0];
+                if (!c || !c.offsetWidth) return 0;
+                var gap = parseFloat(window.getComputedStyle(track).gap) || 30;
+                return c.offsetWidth + gap;
             }
 
-            // Мгновенный прыжок — без перехода, без моргания
-            function jumpTo(idx) {
-                track.style.transition = 'none';
+            // Мгновенная установка позиции (без анимации)
+            function snapTo(idx) {
                 current = idx;
-                track.style.transform  = 'translateX(-' + (current * getCardWidth()) + 'px)';
-                // force reflow — браузер применяет изменение прямо сейчас
-                track.getBoundingClientRect();
+                track.style.transition = 'none';
+                track.style.transform  = 'translateX(-' + (idx * cardW()) + 'px)';
+                track.getBoundingClientRect(); // flush
             }
 
-            // Плавный слайд
+            // Плавный слайд к индексу
             function slideTo(idx) {
                 if (moving) return;
                 moving = true;
+
+                // КЛЮЧЕВОЙ МОМЕНТ: нормализуем current ДО начала анимации
+                // Если current слишком далеко от центра — тихо перепрыгиваем
+                // на эквивалентную позицию ближе к центру, пока трек не двигается
+                var totalW = N * 5;
+                if (current < N) {
+                    var shift = N;
+                    current  += shift;
+                    idx      += shift;
+                    track.style.transition = 'none';
+                    track.style.transform  = 'translateX(-' + (current * cardW()) + 'px)';
+                    track.getBoundingClientRect(); // flush — применяется мгновенно
+                } else if (current >= 4 * N) {
+                    var shift = N;
+                    current  -= shift;
+                    idx      -= shift;
+                    track.style.transition = 'none';
+                    track.style.transform  = 'translateX(-' + (current * cardW()) + 'px)';
+                    track.getBoundingClientRect(); // flush
+                }
+
                 current = idx;
                 track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                track.style.transform  = 'translateX(-' + (current * getCardWidth()) + 'px)';
+                track.style.transform  = 'translateX(-' + (idx * cardW()) + 'px)';
             }
 
-            // После окончания анимации — тихий прыжок если вышли в зону клонов
             track.addEventListener('transitionend', function() {
-                var minReal = cloneCount;
-                var maxReal = cloneCount + total - 1;
-
-                if (current < minReal) {
-                    // Зашли в клоны-слева → прыгаем на соответствующий оригинал справа
-                    jumpTo(current + total);
-                } else if (current > maxReal) {
-                    // Зашли в клоны-справа → прыгаем на соответствующий оригинал слева
-                    jumpTo(current - total);
-                }
                 moving = false;
             });
 
             function next() { slideTo(current + 1); }
             function prev() { slideTo(current - 1); }
 
-            function startAuto(delay) {
+            function startAuto(ms) {
                 stopAuto();
-                autoTimer = setInterval(next, delay || 5000);
+                autoTimer = setInterval(function() { slide_auto(); }, ms || 5000);
+            }
+            function slide_auto() {
+                if (!moving) slideTo(current + 1);
             }
             function stopAuto() {
                 if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
@@ -4343,19 +4372,14 @@
             }
 
             window.addEventListener('resize', function() {
-                requestAnimationFrame(function() { jumpTo(current); });
+                requestAnimationFrame(function() { snapTo(current); });
             });
 
-            // Инициализация после рендера
             function init() {
-                jumpTo(cloneCount);
+                snapTo(startIdx);
                 startAuto(5000);
             }
-            if (document.readyState === 'complete') {
-                requestAnimationFrame(init);
-            } else {
-                window.addEventListener('load', function() { requestAnimationFrame(init); });
-            }
+            requestAnimationFrame(function() { requestAnimationFrame(init); });
         })();
 
         // ============================================================
