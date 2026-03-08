@@ -4369,6 +4369,21 @@
             if (wrapper) {
                 wrapper.addEventListener('mouseenter', function() { startAuto(10000); });
                 wrapper.addEventListener('mouseleave', function() { startAuto(5000); });
+
+                // Прокрутка колёсиком мыши — листаем треки
+                var wheelTimer = null;
+                wrapper.addEventListener('wheel', function(e) {
+                    e.preventDefault(); // останавливаем скролл страницы
+                    clearTimeout(wheelTimer);
+                    wheelTimer = setTimeout(function() {
+                        if (e.deltaY > 0 || e.deltaX > 0) {
+                            next();
+                        } else {
+                            prev();
+                        }
+                        startAuto(5000);
+                    }, 50); // небольшой дебаунс чтобы не листать слишком быстро
+                }, { passive: false });
             }
 
             window.addEventListener('resize', function() {
