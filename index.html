@@ -4249,18 +4249,54 @@
         });
 
         // ============================================================
-        // КАРУСЕЛЬ — без клонирования, без точек, только стрелки
+        // КАРУСЕЛЬ — настоящий бесконечный цикл
+        // Принцип: CSS-клонирование через дублирование карточек в DOM,
+        // но сами оригинальные данные не трогаются — дубли строятся из innerHTML
         // ============================================================
         (function () {
-            var track   = document.getElementById('carouselTrack');
-            var prevBtn = document.getElementById('carouselPrev');
-            var nextBtn = document.getElementById('carouselNext');
+            var container = document.querySelector('.carousel-container');
+            var track     = document.getElementById('carouselTrack');
+            var prevBtn   = document.getElementById('carouselPrev');
+            var nextBtn   = document.getElementById('carouselNext');
             if (!track || !prevBtn || !nextBtn) return;
 
-            var cards   = Array.from(track.children);
-            var total   = cards.length;
-            var current = 0;
-            var autoTimer = null;
+            // Получаем оригинальные карточки
+            var origCards = Array.from(track.children);
+            var total     = origCards.length; // 10
+
+            // Клонируем карточки: добавляем копии в начало и конец трека
+            // Используем cloneNode(true) — клонирует ВСЕ атрибуты включая style и class
+            // Изображения заданы через CSS-классы (.artist-image.one и т.д.) — они сохраняются
+            var cloneCount = 4; // сколько клонов с каждой стороны
+
+            var clonesStart = origCards.slice(-cloneCount).map(function(c) { return c.cloneNode(true); });
+            var clonesEnd   = origCards.slice(0, cloneCount).map(function(c) { return c.cloneNode(true); });
+
+            function prepareClone(c) {
+                c.setAttribute('aria-hidden', 'true');
+                // Убираем аудио у клонов — они декоративные
+                c.querySelectorAll('audio').forEach(function(a) {
+                    a.style.display = 'none';
+                });
+            }
+
+            clonesStart.forEach(function(c) {
+                prepareClone(c);
+                track.insertBefore(c, track.firstChild);
+            });
+            clonesEnd.forEach(function(c) {
+                prepareClone(c);
+                track.appendChild(c);
+            });
+
+            // Теперь трек: [клоны конца | оригиналы | клоны начала]
+            // Всего: cloneCount + total + cloneCount карточек
+            // Стартовая позиция = cloneCount (первый оригинал)
+            var current    = cloneCount;
+            var allCards   = Array.from(track.children);
+            var totalAll   = allCards.length;
+            var isAnimating = false;
+            var autoTimer   = null;
 
             function getVisible() {
                 var w = window.innerWidth;
@@ -4270,23 +4306,43 @@
             }
 
             function getCardWidth() {
-                if (!cards[0]) return 0;
+                if (!allCards[0]) return 0;
                 var gap = parseInt(window.getComputedStyle(track).gap) || 30;
-                return cards[0].offsetWidth + gap;
+                return allCards[0].offsetWidth + gap;
             }
 
-            function goTo(idx, animate) {
-                var vis = getVisible();
-                var max = Math.max(0, total - vis);
-                if (idx > max) idx = 0;
-                if (idx < 0)   idx = max;
+            // Переход без анимации (для «прыжка» при бесконечном цикле)
+            function jumpTo(idx) {
+                track.style.transition = 'none';
                 current = idx;
-                track.style.transition = animate === false ? 'none' : 'transform 0.5s ease';
-                track.style.transform  = 'translateX(-' + (current * getCardWidth()) + 'px)';
+                track.style.transform = 'translateX(-' + (current * getCardWidth()) + 'px)';
+                void track.offsetWidth; // force reflow
             }
 
-            function next() { goTo(current + 1, true); }
-            function prev() { goTo(current - 1, true); }
+            // Переход с анимацией
+            function slideTo(idx) {
+                if (isAnimating) return;
+                isAnimating = true;
+                track.style.transition = 'transform 0.5s ease';
+                current = idx;
+                track.style.transform = 'translateX(-' + (current * getCardWidth()) + 'px)';
+            }
+
+            // После окончания анимации — проверяем нужен ли «тихий прыжок»
+            track.addEventListener('transitionend', function() {
+                isAnimating = false;
+                // Если ушли в клоны в начале — прыгаем в оригиналы в конце
+                if (current < cloneCount) {
+                    jumpTo(current + total);
+                }
+                // Если ушли в клоны в конце — прыгаем в оригиналы в начале
+                if (current >= cloneCount + total) {
+                    jumpTo(current - total);
+                }
+            });
+
+            function next() { slideTo(current + 1); }
+            function prev() { slideTo(current - 1); }
 
             function startAuto(delay) {
                 stopAuto();
@@ -4305,9 +4361,13 @@
                 wrapper.addEventListener('mouseleave', function() { startAuto(5000); });
             }
 
-            window.addEventListener('resize', function() { goTo(current, false); });
+            // Пересчёт при ресайзе (без анимации)
+            window.addEventListener('resize', function() {
+                jumpTo(current);
+            });
 
-            goTo(0, false);
+            // Инициализация — встаём на первый оригинал
+            jumpTo(cloneCount);
             startAuto(5000);
         })();
 
