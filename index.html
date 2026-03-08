@@ -377,6 +377,23 @@
             transition: all 0.2s;
             cursor: pointer;
             align-self: flex-start;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .hero-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(105deg, transparent 0%, transparent 35%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 55%, transparent 65%, transparent 100%);
+            transform: translateX(-100%) skewX(-15deg);
+            animation: shine 9s infinite;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .hero-btn:hover {
@@ -421,21 +438,29 @@
 
         #portfolio .section-title,
         #arrangements .section-title {
-            color: #aaa;
+            color: #fff; /* изменено с #aaa на белый */
         }
 
         #portfolio {
             margin-top: 270px;
         }
 
-        .artist-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
+        /* ===== КАРУСЕЛЬ ===== */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
             margin-bottom: 100px;
         }
 
+        .carousel-track {
+            display: flex;
+            gap: 30px;
+            transition: transform 0.5s ease;
+        }
+
         .artist-card {
+            flex: 0 0 calc(25% - 22.5px); /* 4 карточки в ряд, с учётом gap */
             background-color: #111;
             border-radius: 12px;
             overflow: hidden;
@@ -464,6 +489,18 @@
         .artist-image.two { background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/oblojka.jpg'); }
         .artist-image.three { background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/oblojka.jfif'); }
         .artist-image.four { background-image: linear-gradient(145deg, #2a3a2a, #3a5a3a); }
+        .artist-image.placeholder { background: linear-gradient(145deg, #1a1a1a, #2a2a2a); position: relative; }
+        .artist-image.placeholder::after {
+            content: 'Скоро';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255,255,255,0.3);
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
 
         .artist-info {
             padding: 20px;
@@ -502,6 +539,38 @@
 
         .artist-card audio::-webkit-media-controls-overflow-button {
             display: none !important;
+        }
+
+        /* Стрелки карусели */
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(58,140,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3a8cff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .carousel-arrow:hover {
+            background: #3a8cff;
+            border-color: #fff;
+            color: #fff;
+        }
+        .carousel-arrow.left {
+            left: 10px;
+        }
+        .carousel-arrow.right {
+            right: 10px;
         }
 
         .events-list {
@@ -551,6 +620,23 @@
             transition: all 0.2s;
             text-decoration: none;
             display: inline-block;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .event-ticket::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(105deg, transparent 0%, transparent 35%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 55%, transparent 65%, transparent 100%);
+            transform: translateX(-100%) skewX(-15deg);
+            animation: shine 9s infinite;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .event-ticket:hover {
@@ -558,11 +644,40 @@
             color: #0a0a0a;
         }
 
+        /* Общий эффект блика для всех кнопок */
+        .hero-btn, .price-order, .vocal-price-order, .guitar-price-order, .service-link, .price-link, .about-link, .reviews-link, .event-ticket, .map-route-btn, .login-btn {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .hero-btn::after, .price-order::after, .vocal-price-order::after, .guitar-price-order::after, .service-link::after, .price-link::after, .about-link::after, .reviews-link::after, .event-ticket::after, .map-route-btn::after, .login-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(105deg, transparent 0%, transparent 35%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 55%, transparent 65%, transparent 100%);
+            transform: translateX(-100%) skewX(-15deg);
+            animation: shine 9s infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) skewX(-15deg); }
+            5% { transform: translateX(100%) skewX(-15deg); }
+            100% { transform: translateX(100%) skewX(-15deg); }
+        }
+
         /* ===== НОВЫЕ СЕКЦИИ НА ГЛАВНОЙ ===== */
         .services-overview,
         .prices-overview,
         .about-overview,
-        .reviews-overview {
+        .reviews-overview,
+        .home-faq-section,
+        .map-section {
             margin-top: 100px;
         }
 
@@ -1768,7 +1883,8 @@
             .hero-title { font-size: 4rem; }
             .hero-slider { max-width: 100%; width: 100%; }
             .hero-desc { max-width: 100%; font-size: 1.8rem; }
-            .artist-grid { grid-template-columns: repeat(2, 1fr); }
+            .carousel-track { gap: 15px; }
+            .artist-card { flex: 0 0 calc(33.33% - 10px); } /* на планшете по 3 */
             .services-grid,
             .prices-grid,
             .about-grid {
@@ -1790,7 +1906,7 @@
             .container { padding: 0 20px; }
             .hero-title { font-size: 3rem; }
             .hero-desc { font-size: 1.5rem; }
-            .artist-grid { grid-template-columns: 1fr; }
+            .artist-card { flex: 0 0 calc(50% - 10px); } /* на телефоне по 2 */
             .services-grid,
             .prices-grid,
             .about-grid {
@@ -2293,17 +2409,11 @@
 
         .cursor-dot, .cursor-ring { display: none; }
 
-        
-            to   { transform: translateX(-50%); }
-        }
-
-        
-
         /* ============================================================
            БЛОК FAQ НА ГЛАВНОЙ
         ============================================================ */
         .home-faq-section {
-            margin-top: 0;
+            margin-top: 100px;
         }
 
         .home-faq-list {
@@ -2653,14 +2763,6 @@
         @media (max-width: 600px) {
             .timeline-steps { grid-template-columns: 1fr; }
         }
-
-        
-            20%  { transform: translate(4px,2px); opacity:0.8; }
-            40%  { transform: translate(-3px,0); opacity:1; }
-            60%  { transform: translate(2px,-1px); opacity:0.9; }
-            80%  { transform: translate(-2px,0); opacity:1; }
-            100% { transform: translate(0,0); opacity:0; }
-        }
     </style>
 </head>
 <body>
@@ -2778,49 +2880,104 @@
                 </div>
             </section>
 
+            <!-- КАРУСЕЛЬ ПРИМЕРОВ РАБОТ -->
             <section id="portfolio">
                 <h2 class="section-title">Примеры работ</h2>
-                <div class="artist-grid">
-                    <div class="artist-card">
-                        <div class="artist-image one"></div>
-                        <div class="artist-info">
-                            <div class="artist-name">LUANHO - ЛЕТИ СО МНОЙ</div>
-                            <div class="artist-role">Mixed by WEYTON</div>
+                <div class="carousel-container">
+                    <button class="carousel-arrow left" id="carouselPrev"><i class="fas fa-chevron-left"></i></button>
+                    <div class="carousel-track" id="carouselTrack">
+                        <!-- 10 карточек (первые 4 реальные, остальные заглушки) -->
+                        <div class="artist-card">
+                            <div class="artist-image one"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">LUANHO - ЛЕТИ СО МНОЙ</div>
+                                <div class="artist-role">Mixed by WEYTON</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed" data-track="0">
+                                <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg">
+                            </audio>
                         </div>
-                        <audio controls controlslist="nodownload noplayspeed" data-track="0">
-                            <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg">
-                        </audio>
-                    </div>
-                    <div class="artist-card">
-                        <div class="artist-image two"></div>
-                        <div class="artist-info">
-                            <div class="artist-name">WEYTON - ЭТОТ ГОРОД</div>
-                            <div class="artist-role">Mixed by WEYTON</div>
+                        <div class="artist-card">
+                            <div class="artist-image two"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">WEYTON - ЭТОТ ГОРОД</div>
+                                <div class="artist-role">Mixed by WEYTON</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed" data-track="1">
+                                <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg">
+                            </audio>
                         </div>
-                        <audio controls controlslist="nodownload noplayspeed" data-track="1">
-                            <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg">
-                        </audio>
-                    </div>
-                    <div class="artist-card">
-                        <div class="artist-image three"></div>
-                        <div class="artist-info">
-                            <div class="artist-name">ОКСАНА ШЕМАНОВСКАЯ - НЕОБЫЧАЙНО</div>
-                            <div class="artist-role">Mixed by WEYTON</div>
+                        <div class="artist-card">
+                            <div class="artist-image three"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">ОКСАНА ШЕМАНОВСКАЯ - НЕОБЫЧАЙНО</div>
+                                <div class="artist-role">Mixed by WEYTON</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed" data-track="2">
+                                <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3" type="audio/mpeg">
+                            </audio>
                         </div>
-                        <audio controls controlslist="nodownload noplayspeed" data-track="2">
-                            <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3" type="audio/mpeg">
-                        </audio>
-                    </div>
-                    <div class="artist-card">
-                        <div class="artist-image four"></div>
-                        <div class="artist-info">
-                            <div class="artist-name">TRACK 04 // PLATINUM</div>
-                            <div class="artist-role">Full Production</div>
+                        <div class="artist-card">
+                            <div class="artist-image four"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">TRACK 04 // PLATINUM</div>
+                                <div class="artist-role">Full Production</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed" data-track="3">
+                                <source src="track4.mp3" type="audio/mpeg">
+                            </audio>
                         </div>
-                        <audio controls controlslist="nodownload noplayspeed" data-track="3">
-                            <source src="track4.mp3" type="audio/mpeg">
-                        </audio>
+                        <!-- 6 заглушек -->
+                        <div class="artist-card">
+                            <div class="artist-image placeholder"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">Скоро здесь будет ваш трек</div>
+                                <div class="artist-role">—</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed"></audio>
+                        </div>
+                        <div class="artist-card">
+                            <div class="artist-image placeholder"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">Скоро здесь будет ваш трек</div>
+                                <div class="artist-role">—</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed"></audio>
+                        </div>
+                        <div class="artist-card">
+                            <div class="artist-image placeholder"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">Скоро здесь будет ваш трек</div>
+                                <div class="artist-role">—</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed"></audio>
+                        </div>
+                        <div class="artist-card">
+                            <div class="artist-image placeholder"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">Скоро здесь будет ваш трек</div>
+                                <div class="artist-role">—</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed"></audio>
+                        </div>
+                        <div class="artist-card">
+                            <div class="artist-image placeholder"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">Скоро здесь будет ваш трек</div>
+                                <div class="artist-role">—</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed"></audio>
+                        </div>
+                        <div class="artist-card">
+                            <div class="artist-image placeholder"></div>
+                            <div class="artist-info">
+                                <div class="artist-name">Скоро здесь будет ваш трек</div>
+                                <div class="artist-role">—</div>
+                            </div>
+                            <audio controls controlslist="nodownload noplayspeed"></audio>
+                        </div>
                     </div>
+                    <button class="carousel-arrow right" id="carouselNext"><i class="fas fa-chevron-right"></i></button>
                 </div>
             </section>
 
@@ -2998,7 +3155,38 @@
                 </div>
             </section>
 
-            <!-- ===== КАК НАС НАЙТИ ===== -->
+            <!-- ===== О НАС (КРАТКО) ===== -->
+            <section class="about-overview">
+                <h2 class="section-title">О нас</h2>
+                <div class="about-grid">
+                    <div class="about-card" data-page="about-studio">
+                        <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/i.jpg');"></div>
+                        <h3>О студии</h3>
+                        <p>История создания, философия и команда.</p>
+                        <a href="#" class="about-link">Узнать</a>
+                    </div>
+                    <div class="about-card" data-page="equipment">
+                        <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/11.jpg');"></div>
+                        <h3>Оборудование</h3>
+                        <p>Микрофоны, пульты, мониторы — всё лучшее.</p>
+                        <a href="#" class="about-link">Узнать</a>
+                    </div>
+                    <div class="about-card" data-page="space">
+                        <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/1.jpg');"></div>
+                        <h3>Пространство</h3>
+                        <p>Зоны записи, отдыха и творчества.</p>
+                        <a href="#" class="about-link">Узнать</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== ОТЗЫВЫ ===== -->
+            <section class="reviews-overview">
+                <h2 class="section-title">Отзывы</h2>
+                <div class="sw-app" data-app="e8dd4642baab0f03640c288b8528925e"></div>
+            </section>
+
+            <!-- ===== КАК НАС НАЙТИ (перенесён в самый низ) ===== -->
             <section class="map-section">
                 <h2 class="section-title">Как нас найти</h2>
                 <div class="map-wrapper">
@@ -3046,37 +3234,6 @@
                         </iframe>
                     </div>
                 </div>
-            </section>
-
-            <!-- ===== О НАС (КРАТКО) ===== -->
-            <section class="about-overview">
-                <h2 class="section-title">О нас</h2>
-                <div class="about-grid">
-                    <div class="about-card" data-page="about-studio">
-                        <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/i.jpg');"></div>
-                        <h3>О студии</h3>
-                        <p>История создания, философия и команда.</p>
-                        <a href="#" class="about-link">Узнать</a>
-                    </div>
-                    <div class="about-card" data-page="equipment">
-                        <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/11.jpg');"></div>
-                        <h3>Оборудование</h3>
-                        <p>Микрофоны, пульты, мониторы — всё лучшее.</p>
-                        <a href="#" class="about-link">Узнать</a>
-                    </div>
-                    <div class="about-card" data-page="space">
-                        <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/1.jpg');"></div>
-                        <h3>Пространство</h3>
-                        <p>Зоны записи, отдыха и творчества.</p>
-                        <a href="#" class="about-link">Узнать</a>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ===== ОТЗЫВЫ ===== -->
-            <section class="reviews-overview">
-                <h2 class="section-title">Отзывы</h2>
-                <div class="sw-app" data-app="e8dd4642baab0f03640c288b8528925e"></div>
             </section>
         </div>
 
@@ -3956,6 +4113,53 @@
         });
 
         // ============================================================
+        // КАРУСЕЛЬ
+        // ============================================================
+        (function() {
+            const track = document.getElementById('carouselTrack');
+            const prevBtn = document.getElementById('carouselPrev');
+            const nextBtn = document.getElementById('carouselNext');
+            if (!track || !prevBtn || !nextBtn) return;
+
+            const cards = track.children;
+            const cardWidth = cards[0].offsetWidth + parseInt(getComputedStyle(track).gap); // ширина карточки + gap
+            let index = 0;
+            const maxIndex = cards.length - 4; // показываем по 4 карточки
+
+            function updateCarousel() {
+                track.style.transform = `translateX(-${index * cardWidth}px)`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (index < maxIndex) {
+                    index++;
+                } else {
+                    index = 0; // зацикливание
+                }
+                updateCarousel();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (index > 0) {
+                    index--;
+                } else {
+                    index = maxIndex; // зацикливание
+                }
+                updateCarousel();
+            });
+
+            // Автопрокрутка каждые 5 секунд
+            setInterval(() => {
+                if (index < maxIndex) {
+                    index++;
+                } else {
+                    index = 0;
+                }
+                updateCarousel();
+            }, 5000);
+        })();
+
+        // ============================================================
         // СЛАЙДЕР
         // ============================================================
         document.querySelectorAll('.hero-slider').forEach(function (slider) {
@@ -4370,8 +4574,6 @@
             var section = document.getElementById('timelineSteps');
             if (section) observer.observe(section);
         })();
-
-
 
         // ============================================================
         // FAQ НА ГЛАВНОЙ — аккордеон
