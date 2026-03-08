@@ -4272,20 +4272,10 @@
             var clonesStart = origCards.slice(-cloneCount).map(function(c) { return c.cloneNode(true); });
             var clonesEnd   = origCards.slice(0, cloneCount).map(function(c) { return c.cloneNode(true); });
 
-            function prepareClone(c) {
-                c.setAttribute('aria-hidden', 'true');
-                // Убираем аудио у клонов — они декоративные
-                c.querySelectorAll('audio').forEach(function(a) {
-                    a.style.display = 'none';
-                });
-            }
-
             clonesStart.forEach(function(c) {
-                prepareClone(c);
                 track.insertBefore(c, track.firstChild);
             });
             clonesEnd.forEach(function(c) {
-                prepareClone(c);
                 track.appendChild(c);
             });
 
@@ -4363,12 +4353,20 @@
 
             // Пересчёт при ресайзе (без анимации)
             window.addEventListener('resize', function() {
-                jumpTo(current);
+                requestAnimationFrame(function() { jumpTo(current); });
             });
 
-            // Инициализация — встаём на первый оригинал
-            jumpTo(cloneCount);
-            startAuto(5000);
+            // Инициализация — ждём первый рендер чтобы карточки имели размер
+            function init() {
+                jumpTo(cloneCount);
+                startAuto(5000);
+            }
+            // requestAnimationFrame гарантирует что layout уже произошёл
+            if (document.readyState === 'complete') {
+                requestAnimationFrame(init);
+            } else {
+                window.addEventListener('load', function() { requestAnimationFrame(init); });
+            }
         })();
 
         // ============================================================
