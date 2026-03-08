@@ -2912,52 +2912,42 @@
         }
 
 
-        /* ===== СЧЁТЧИК И ТОЧКИ КАРУСЕЛИ ===== */
+        /* ===== ТОЧКИ КАРУСЕЛИ ===== */
         .carousel-footer {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 20px;
-            margin-top: 16px;
+            margin-top: 20px;
             margin-bottom: 80px;
-        }
-
-        .carousel-counter {
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.12em;
-            color: rgba(255,255,255,0.35);
-            text-transform: uppercase;
-            min-width: 48px;
-            text-align: center;
-        }
-
-        .carousel-counter .current-num {
-            color: #3a8cff;
-            font-size: 0.95rem;
         }
 
         .carousel-dots {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         .carousel-dot {
-            width: 6px;
-            height: 6px;
             border-radius: 50%;
             background: rgba(255,255,255,0.2);
             cursor: pointer;
-            transition: background 0.3s, transform 0.3s, width 0.3s;
+            transition: width 0.35s ease, height 0.35s ease, background 0.35s ease;
             border: none;
             padding: 0;
+            flex-shrink: 0;
         }
 
+        /* Активная точка — самая большая */
         .carousel-dot.active {
             background: #3a8cff;
-            transform: scale(1.5);
         }
+
+        /* Размеры точек задаются через JS по удалённости от активной */
+        .carousel-dot[data-dist="0"] { width: 12px; height: 12px; background: #3a8cff; }
+        .carousel-dot[data-dist="1"] { width: 9px;  height: 9px;  background: rgba(58,140,255,0.6); }
+        .carousel-dot[data-dist="2"] { width: 7px;  height: 7px;  background: rgba(255,255,255,0.3); }
+        .carousel-dot[data-dist="3"] { width: 5px;  height: 5px;  background: rgba(255,255,255,0.2); }
+        .carousel-dot[data-dist="4"] { width: 4px;  height: 4px;  background: rgba(255,255,255,0.15); }
 
     </style>
 </head>
@@ -3176,7 +3166,6 @@
                     <button class="carousel-arrow right" id="carouselNext"><i class="fas fa-chevron-right"></i></button>
                     <div class="carousel-footer">
                         <div class="carousel-dots" id="carouselDots"></div>
-                        <div class="carousel-counter"><span class="current-num" id="carouselCurrent">1</span> / <span id="carouselTotal">10</span></div>
                     </div>
                 </div>
             </section>
@@ -4464,8 +4453,6 @@
 
             // ===== СЧЁТЧИК И ТОЧКИ =====
             var dotsEl    = document.getElementById('carouselDots');
-            var curEl     = document.getElementById('carouselCurrent');
-            var totalEl   = document.getElementById('carouselTotal');
 
             function getRealIndex() {
                 // Текущий индекс в оригинальных карточках (0-based)
@@ -4480,6 +4467,7 @@
                     var d = document.createElement('button');
                     d.className = 'carousel-dot';
                     d.setAttribute('aria-label', 'Трек ' + (i + 1));
+                    d.setAttribute('data-dist', '4');
                     (function(i) {
                         d.addEventListener('click', function() {
                             var rel = getRealIndex();
@@ -4490,16 +4478,19 @@
                     })(i);
                     dotsEl.appendChild(d);
                 }
-                if (totalEl) totalEl.textContent = N;
             }
 
             function updateUI() {
                 var rel = getRealIndex();
-                if (curEl) curEl.textContent = rel + 1;
                 if (!dotsEl) return;
-                var dots = dotsEl.querySelectorAll('.carousel-dot');
+                var dots = Array.from(dotsEl.querySelectorAll('.carousel-dot'));
                 dots.forEach(function(d, i) {
-                    d.classList.toggle('active', i === rel);
+                    // Расстояние с учётом цикличности
+                    var dist = Math.abs(i - rel);
+                    var distCyclic = Math.min(dist, N - dist);
+                    // Ограничиваем максимальным значением data-dist
+                    var capped = Math.min(distCyclic, 4);
+                    d.setAttribute('data-dist', capped);
                 });
             }
 
