@@ -2861,6 +2861,29 @@
             80%  { transform: translate(-2px,0); opacity:1; }
             100% { transform: translate(0,0); opacity:0; }
         }
+
+        /* ===== ЭФФЕКТ БЛИКА НА КНОПКАХ ===== */
+        @keyframes shine {
+            0%   { transform: translateX(-100%) skewX(-15deg); }
+            5%   { transform: translateX(100%) skewX(-15deg); }
+            100% { transform: translateX(100%) skewX(-15deg); }
+        }
+
+        .hero-btn::after, .price-order::after, .vocal-price-order::after,
+        .guitar-price-order::after, .service-link::after, .price-link::after,
+        .about-link::after, .reviews-link::after, .event-ticket::after,
+        .map-route-btn::after, .login-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(105deg, transparent 0%, transparent 35%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 55%, transparent 65%, transparent 100%);
+            transform: translateX(-100%) skewX(-15deg);
+            animation: shine 9s infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
     </style>
 </head>
 <body>
@@ -4183,7 +4206,7 @@
                 }, 100);
             }
 
-            setTimeout(triggerRevealCheck, 100);
+            setTimeout(function(){ if(window.triggerRevealCheck) window.triggerRevealCheck(); }, 100);
             closeMobileMenu();
         }
 
@@ -4226,96 +4249,66 @@
         });
 
         // ============================================================
-        // КАРУСЕЛЬ ПОРТФОЛИО
+        // КАРУСЕЛЬ — без клонирования, без точек, только стрелки
         // ============================================================
         (function () {
-            var track    = document.getElementById('carouselTrack');
-            var prevBtn  = document.getElementById('carouselPrev');
-            var nextBtn  = document.getElementById('carouselNext');
-            var dotsWrap = document.getElementById('carouselDots');
-            if (!track) return;
+            var track   = document.getElementById('carouselTrack');
+            var prevBtn = document.getElementById('carouselPrev');
+            var nextBtn = document.getElementById('carouselNext');
+            if (!track || !prevBtn || !nextBtn) return;
 
-            var slides  = Array.from(track.querySelectorAll('.carousel-slide'));
-            var total   = slides.length;
+            var cards   = Array.from(track.children);
+            var total   = cards.length;
             var current = 0;
             var autoTimer = null;
 
             function getVisible() {
-                if (window.innerWidth <= 600) return 1;
-                if (window.innerWidth <= 900) return 2;
+                var w = window.innerWidth;
+                if (w <= 600) return 2;
+                if (w <= 900) return 3;
                 return 4;
             }
 
-            function getSlideWidth() {
-                var sl  = slides[0];
-                if (!sl) return 0;
+            function getCardWidth() {
+                if (!cards[0]) return 0;
                 var gap = parseInt(window.getComputedStyle(track).gap) || 30;
-                return sl.offsetWidth + gap;
+                return cards[0].offsetWidth + gap;
             }
 
-            function getMaxIndex() {
-                return Math.max(0, total - getVisible());
-            }
-
-            function buildDots() {
-                dotsWrap.innerHTML = '';
-                var max = getMaxIndex();
-                for (var i = 0; i <= max; i++) {
-                    var d = document.createElement('button');
-                    d.className = 'carousel-dot' + (i === current ? ' active' : '');
-                    d.setAttribute('aria-label', 'Слайд ' + (i + 1));
-                    (function(idx){ d.addEventListener('click', function(){ goTo(idx); startAuto(); }); })(i);
-                    dotsWrap.appendChild(d);
-                }
-            }
-
-            function updateDots() {
-                var dots = dotsWrap.querySelectorAll('.carousel-dot');
-                dots.forEach(function(d, i){ d.classList.toggle('active', i === current); });
-            }
-
-            function goTo(idx) {
-                var max = getMaxIndex();
-                if (idx < 0) idx = max;
+            function goTo(idx, animate) {
+                var vis = getVisible();
+                var max = Math.max(0, total - vis);
                 if (idx > max) idx = 0;
+                if (idx < 0)   idx = max;
                 current = idx;
-                track.style.transform = 'translateX(-' + (current * getSlideWidth()) + 'px)';
-                updateDots();
+                track.style.transition = animate === false ? 'none' : 'transform 0.5s ease';
+                track.style.transform  = 'translateX(-' + (current * getCardWidth()) + 'px)';
             }
 
-            function next() { goTo(current + 1); }
-            function prev() { goTo(current - 1); }
+            function next() { goTo(current + 1, true); }
+            function prev() { goTo(current - 1, true); }
 
-            function startAuto() {
+            function startAuto(delay) {
                 stopAuto();
-                autoTimer = setInterval(next, 5000);
+                autoTimer = setInterval(next, delay || 5000);
             }
             function stopAuto() {
                 if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
             }
 
-            nextBtn.addEventListener('click', function(){ next(); startAuto(); });
-            prevBtn.addEventListener('click', function(){ prev(); startAuto(); });
+            nextBtn.addEventListener('click', function() { next(); startAuto(5000); });
+            prevBtn.addEventListener('click', function() { prev(); startAuto(5000); });
 
-            track.addEventListener('mouseenter', stopAuto);
-            track.addEventListener('mouseleave', startAuto);
+            var wrapper = document.querySelector('.carousel-wrapper');
+            if (wrapper) {
+                wrapper.addEventListener('mouseenter', function() { startAuto(10000); });
+                wrapper.addEventListener('mouseleave', function() { startAuto(5000); });
+            }
 
-            var touchX = 0;
-            track.addEventListener('touchstart', function(e){ touchX = e.touches[0].clientX; }, { passive: true });
-            track.addEventListener('touchend', function(e){
-                var diff = touchX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 40) { (diff > 0 ? next : prev)(); startAuto(); }
-            }, { passive: true });
+            window.addEventListener('resize', function() { goTo(current, false); });
 
-            window.addEventListener('resize', function(){
-                buildDots();
-                track.style.transition = 'none';
-                goTo(Math.min(current, getMaxIndex()));
-                setTimeout(function(){ track.style.transition = ''; }, 50);
-            });
-
-            buildDots();
-            startAuto();
+            goTo(0, false);
+            startAuto(5000);
         })();
 
         // ============================================================
