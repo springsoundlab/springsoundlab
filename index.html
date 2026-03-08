@@ -4131,7 +4131,7 @@
         });
 
         // ============================================================
-        // КАРУСЕЛЬ
+        // КАРУСЕЛЬ (бесконечная + замедление при наведении)
         // ============================================================
         (function() {
             const track = document.getElementById('carouselTrack');
@@ -4139,43 +4139,120 @@
             const nextBtn = document.getElementById('carouselNext');
             if (!track || !prevBtn || !nextBtn) return;
 
-            const cards = track.children;
-            const cardStyle = window.getComputedStyle(cards[0]);
+            const cards = Array.from(track.children);
             const cardWidth = cards[0].offsetWidth + parseInt(getComputedStyle(track).gap); // ширина карточки + gap
-            let index = 0;
-            const maxIndex = cards.length - 4; // показываем по 4 карточки
+            const visibleCount = 4; // сколько видно одновременно
+            const totalOriginal = cards.length; // 10
 
-            function updateCarousel() {
-                track.style.transform = `translateX(-${index * cardWidth}px)`;
+            // Клонируем первые 4 карточки в конец, и последние 4 в начало
+            const clonesBefore = cards.slice(-4).map(card => card.cloneNode(true));
+            const clonesAfter = cards.slice(0, 4).map(card => card.cloneNode(true));
+
+            // Добавляем клоны в трек
+            clonesBefore.forEach(clone => track.insertBefore(clone, track.firstChild));
+            clonesAfter.forEach(clone => track.appendChild(clone));
+
+            // Обновляем массив карточек
+            const allCards = Array.from(track.children);
+            const totalClones = allCards.length;
+            const initialIndex = 4; // указываем на первый оригинальный элемент (после 4 клонов слева)
+
+            let currentIndex = initialIndex;
+            const maxIndex = totalClones - visibleCount; // последний возможный индекс
+
+            // Функция обновления позиции (без анимации или с анимацией)
+            function updatePosition(animate = true) {
+                if (!animate) {
+                    track.style.transition = 'none';
+                } else {
+                    track.style.transition = 'transform 0.5s ease';
+                }
+                track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
             }
 
+            // Сброс позиции без анимации
+            function jumpToTarget(newIndex) {
+                track.style.transition = 'none';
+                currentIndex = newIndex;
+                track.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+                // Принудительно перерисовываем
+                void track.offsetWidth;
+                track.style.transition = 'transform 0.5s ease';
+            }
+
+            // Обработка перехода
+            function handleTransitionEnd() {
+                // Если мы ушли слишком далеко вправо (за оригиналы)
+                if (currentIndex >= totalClones - visibleCount - 4) {
+                    // Перепрыгиваем на соответствующую позицию в начале
+                    jumpToTarget(initialIndex + (currentIndex - (totalClones - visibleCount - 4)));
+                }
+                // Если ушли слишком влево (за начало)
+                if (currentIndex < 4) {
+                    // Перепрыгиваем в конец
+                    jumpToTarget(totalClones - visibleCount - 4 + (currentIndex - 4));
+                }
+            }
+
+            track.addEventListener('transitionend', handleTransitionEnd);
+
+            // Листаем вправо
             nextBtn.addEventListener('click', () => {
-                if (index < maxIndex) {
-                    index++;
+                if (currentIndex < maxIndex) {
+                    currentIndex++;
                 } else {
-                    index = 0; // зацикливание
+                    // Достигли конца, плавно переходим на клон, а потом перескочим
+                    currentIndex++;
                 }
-                updateCarousel();
+                updatePosition(true);
             });
 
+            // Листаем влево
             prevBtn.addEventListener('click', () => {
-                if (index > 0) {
-                    index--;
-                } else {
-                    index = maxIndex; // зацикливание
+                if (currentIndex > 0) {
+                    currentIndex--;
                 }
-                updateCarousel();
+                updatePosition(true);
             });
 
-            // Автопрокрутка каждые 5 секунд
-            setInterval(() => {
-                if (index < maxIndex) {
-                    index++;
+            // Автопрокрутка
+            let autoInterval = setInterval(() => {
+                if (currentIndex < maxIndex) {
+                    currentIndex++;
                 } else {
-                    index = 0;
+                    currentIndex++;
                 }
-                updateCarousel();
+                updatePosition(true);
             }, 5000);
+
+            // Замедление при наведении
+            const carouselWrapper = document.querySelector('.carousel-wrapper');
+            carouselWrapper.addEventListener('mouseenter', () => {
+                clearInterval(autoInterval);
+                autoInterval = setInterval(() => {
+                    if (currentIndex < maxIndex) {
+                        currentIndex++;
+                    } else {
+                        currentIndex++;
+                    }
+                    updatePosition(true);
+                }, 10000); // в два раза медленнее
+            });
+
+            carouselWrapper.addEventListener('mouseleave', () => {
+                clearInterval(autoInterval);
+                autoInterval = setInterval(() => {
+                    if (currentIndex < maxIndex) {
+                        currentIndex++;
+                    } else {
+                        currentIndex++;
+                    }
+                    updatePosition(true);
+                }, 5000);
+            });
+
+            // Инициализация
+            updatePosition(false);
         })();
 
         // ============================================================
