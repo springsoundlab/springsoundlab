@@ -2964,7 +2964,7 @@
             .carousel-arrow.left { left: -45px; }
             .carousel-arrow.right { right: -45px; }
 
-            /* Шапка: только логотип и гамбургер */
+            /* Шапка: логотип по центру, гамбургер слева */
             .address-block,
             .work-hours,
             .navbar-divider,
@@ -2973,14 +2973,23 @@
                 display: none !important;
             }
             .navbar-left {
-                justify-content: space-between;
+                justify-content: flex-start;
                 width: 100%;
+                position: relative;
             }
             .logo {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
                 font-size: 1.4rem;
+                white-space: nowrap;
             }
             .logo-image {
                 height: 40px;
+            }
+            .hamburger {
+                margin-right: auto;
+                z-index: 1001;
             }
             /* Центрируем заголовки */
             .hero-title,
@@ -3000,9 +3009,41 @@
             .timeline-section {
                 text-align: center;
             }
-            /* Скрываем плавающую кнопку соцсетей */
-            .social-float {
-                display: none;
+            /* Скрываем плавающую кнопку соцсетей и кнопку наверх */
+            .social-float,
+            .back-to-top {
+                display: none !important;
+            }
+            /* Мобильное меню на весь экран */
+            .nav-links.mobile-open {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(10,10,10,0.98);
+                backdrop-filter: blur(20px);
+                z-index: 1000;
+                padding-top: 80px;
+                overflow-y: auto;
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+            }
+            .nav-links > a,
+            .nav-links > .dropdown > a {
+                font-size: 1.2rem !important;
+                padding: 16px 20px !important;
+            }
+            .dropdown-content {
+                background: rgba(255,255,255,0.05) !important;
+                margin: 0 !important;
+                width: 100%;
+            }
+            .dropdown-content a {
+                font-size: 1rem !important;
+                padding: 12px 20px !important;
             }
         }
 
@@ -3037,6 +3078,44 @@
             /* Карта */
             .map-wrapper { grid-template-columns: 1fr; }
             .map-info { padding: 20px; }
+            /* Модальное окно на весь экран без скролла */
+            .vocal-modal-panel {
+                width: 95%;
+                max-width: 95%;
+                height: 95%;
+                max-height: 95%;
+                padding: 30px 20px 20px;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                overflow-y: auto;
+            }
+            .vocal-modal-close-x {
+                top: 10px;
+                right: 12px;
+                font-size: 1.5rem;
+                color: #fff;
+                background: rgba(0,0,0,0.3);
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+            }
+            /* Плашка cookie — исправлено */
+            .cookie-consent {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+                padding: 15px 20px;
+                white-space: normal;
+                width: 90%;
+                max-width: 90%;
+            }
+            .cookie-consent p {
+                white-space: normal;
+            }
+            .cookie-consent button {
+                width: 100%;
+                padding: 10px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -3052,7 +3131,7 @@
             .carousel-arrow.left { left: -5px; }
             .carousel-arrow.right { right: -5px; }
             
-            /* Логотип и телефон */
+            /* Логотип */
             .logo { font-size: 1.2rem; }
             .logo-image { height: 36px; }
             
@@ -4930,6 +5009,10 @@
             function closeMobileMenuFn() {
                 hamburger.classList.remove('active');
                 navLinks.classList.remove('mobile-open');
+                // Закрываем все открытые подменю
+                document.querySelectorAll('.dropdown.mob-open').forEach(function(d) {
+                    d.classList.remove('mob-open');
+                });
             }
 
             window.closeMobileMenu = closeMobileMenuFn;
@@ -4938,6 +5021,12 @@
                 e.stopPropagation();
                 hamburger.classList.toggle('active');
                 navLinks.classList.toggle('mobile-open');
+                // Если меню закрывается, закрываем подменю
+                if (!navLinks.classList.contains('mobile-open')) {
+                    document.querySelectorAll('.dropdown.mob-open').forEach(function(d) {
+                        d.classList.remove('mob-open');
+                    });
+                }
             });
 
             navLinks.querySelectorAll('.dropdown > a').forEach(function (link) {
@@ -4955,6 +5044,13 @@
                 if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
                     closeMobileMenuFn();
                 }
+            });
+
+            // Закрываем меню при выборе пункта
+            navLinks.querySelectorAll('a[data-page]').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    closeMobileMenuFn();
+                });
             });
         })();
 
