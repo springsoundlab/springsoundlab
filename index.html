@@ -500,6 +500,7 @@
             background-color: #222;
             background-size: cover;
             background-position: center;
+            position: relative;
         }
 
         .artist-image.one { background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif'); }
@@ -680,6 +681,7 @@
             background-color: #222;
             background-size: cover;
             background-position: center;
+            position: relative;
         }
 
         .artist-image.one { background-image: url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif'); }
@@ -2951,20 +2953,7 @@
 
         /* ========== МОБИЛЬНЫЕ УЛУЧШЕНИЯ (НОВЫЕ ПРАВКИ) ========== */
         @media (max-width: 900px) {
-            /* Уменьшаем заголовки */
-            .hero-title { font-size: 3.5rem; }
-            .hero-desc { font-size: 1.5rem; }
-            .hero-pre { font-size: 0.85rem; }
-            .section-title { font-size: 1.8rem; }
-            
-            /* Карусель — показываем 3 карточки */
-            .carousel-wrapper { margin: 0 30px; }
-            .artist-card { flex: 0 0 calc(33.333% - 20px); }
-            .carousel-arrow { width: 44px; height: 44px; font-size: 1.4rem; }
-            .carousel-arrow.left { left: -45px; }
-            .carousel-arrow.right { right: -45px; }
-
-            /* Шапка: логотип по центру, гамбургер слева */
+            /* Шапка: логотип по центру, гамбургер слева, крупный логотип */
             .address-block,
             .work-hours,
             .navbar-divider,
@@ -2981,15 +2970,101 @@
                 position: absolute;
                 left: 50%;
                 transform: translateX(-50%);
-                font-size: 1.4rem;
+                font-size: 1.6rem;
                 white-space: nowrap;
             }
             .logo-image {
-                height: 40px;
+                height: 48px;
             }
             .hamburger {
                 margin-right: auto;
                 z-index: 1001;
+            }
+            /* Уменьшаем кнопки */
+            .hero-btn, .vocal-price-order, .guitar-price-order, .price-order {
+                padding: 12px 32px;
+                font-size: 0.9rem;
+            }
+            /* Плееры на мобильных — чёрные */
+            .artist-card audio, .event-item audio {
+                filter: none;
+                background: #222;
+                border-radius: 4px;
+            }
+            /* Карусели в услугах, ценах, о нас */
+            .services-grid, .prices-grid, .about-grid {
+                display: flex;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                gap: 20px;
+                padding-bottom: 20px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .services-grid::-webkit-scrollbar, .prices-grid::-webkit-scrollbar, .about-grid::-webkit-scrollbar {
+                display: none;
+            }
+            .service-card, .price-card, .about-card {
+                flex: 0 0 85%;
+                scroll-snap-align: start;
+                margin-right: 0;
+            }
+            /* Оверлей с подсказкой для каруселей */
+            .carousel-hint {
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 10px;
+                opacity: 0.8;
+                transition: opacity 0.3s;
+            }
+            .carousel-hint.hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+            .carousel-hint i {
+                font-size: 2rem;
+                color: #3a8cff;
+                margin-right: 10px;
+            }
+            .carousel-hint span {
+                font-size: 0.9rem;
+                color: #ccc;
+            }
+            /* Кнопка Play на изображении */
+            .artist-image {
+                position: relative;
+            }
+            .play-overlay {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 60px;
+                height: 60px;
+                background: rgba(0,0,0,0.5);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-size: 1.5rem;
+                cursor: pointer;
+                transition: background 0.2s, opacity 0.2s;
+                opacity: 0.7;
+                z-index: 10;
+            }
+            .play-overlay:hover {
+                background: rgba(58,140,255,0.8);
+                opacity: 1;
+            }
+            .play-overlay.playing {
+                opacity: 0;
+                pointer-events: none;
+            }
+            /* Убираем стрелки в портфолио */
+            #portfolio .carousel-arrow {
+                display: none;
             }
             /* Центрируем заголовки */
             .hero-title,
@@ -2998,7 +3073,6 @@
             .section-title {
                 text-align: center;
             }
-            /* Центрируем основной контент */
             .hero-content,
             .services-overview,
             .prices-overview,
@@ -3053,16 +3127,9 @@
             .hero-pre { font-size: 0.75rem; letter-spacing: 2px; }
             .section-title { font-size: 1.5rem; margin-bottom: 30px; }
             
-            /* Карусель — 2 карточки */
-            .carousel-wrapper { margin: 0 15px; }
-            .artist-card { flex: 0 0 calc(50% - 15px); }
-            .artist-name { font-size: 1rem; }
-            .artist-role { font-size: 0.8rem; }
-            
-            /* Сетки в один столбец */
-            .services-grid, .prices-grid, .about-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
+            /* Карусель — 2 карточки, но для услуг, цен, о нас показываем одну */
+            .service-card, .price-card, .about-card {
+                flex: 0 0 90%;
             }
             
             /* Блок аранжировок */
@@ -3124,16 +3191,9 @@
             .hero-pre { font-size: 0.7rem; }
             .section-title { font-size: 1.3rem; }
             
-            /* Карусель — 1 карточка */
-            .carousel-wrapper { margin: 0 10px; }
-            .artist-card { flex: 0 0 100%; }
-            .carousel-arrow { width: 36px; height: 36px; font-size: 1.2rem; }
-            .carousel-arrow.left { left: -5px; }
-            .carousel-arrow.right { right: -5px; }
-            
             /* Логотип */
-            .logo { font-size: 1.2rem; }
-            .logo-image { height: 36px; }
+            .logo { font-size: 1.4rem; }
+            .logo-image { height: 42px; }
             
             /* Модальное окно */
             .vocal-modal-panel { padding: 24px 16px; }
@@ -3262,7 +3322,9 @@
                     <div class="carousel-container">
                         <div class="carousel-track" id="carouselTrack">
                             <div class="artist-card">
-                                <div class="artist-image one"></div>
+                                <div class="artist-image one">
+                                    <div class="play-overlay" data-audio="0"><i class="fas fa-play"></i></div>
+                                </div>
                                 <div class="artist-info">
                                     <div class="artist-name">LUANHO - ЛЕТИ СО МНОЙ</div>
                                     <div class="artist-role">Mixed by WEYTON</div>
@@ -3272,7 +3334,9 @@
                                 </audio>
                             </div>
                             <div class="artist-card">
-                                <div class="artist-image two"></div>
+                                <div class="artist-image two">
+                                    <div class="play-overlay" data-audio="1"><i class="fas fa-play"></i></div>
+                                </div>
                                 <div class="artist-info">
                                     <div class="artist-name">WEYTON - ЭТОТ ГОРОД</div>
                                     <div class="artist-role">Mixed by WEYTON</div>
@@ -3282,7 +3346,9 @@
                                 </audio>
                             </div>
                             <div class="artist-card">
-                                <div class="artist-image three"></div>
+                                <div class="artist-image three">
+                                    <div class="play-overlay" data-audio="2"><i class="fas fa-play"></i></div>
+                                </div>
                                 <div class="artist-info">
                                     <div class="artist-name">ОКСАНА ШЕМАНОВСКАЯ - НЕОБЫЧАЙНО</div>
                                     <div class="artist-role">Mixed by WEYTON</div>
@@ -3292,7 +3358,9 @@
                                 </audio>
                             </div>
                             <div class="artist-card">
-                                <div class="artist-image four"></div>
+                                <div class="artist-image four">
+                                    <div class="play-overlay" data-audio="3"><i class="fas fa-play"></i></div>
+                                </div>
                                 <div class="artist-info">
                                     <div class="artist-name">TRACK 04 // PLATINUM</div>
                                     <div class="artist-role">Full Production</div>
@@ -3440,7 +3508,7 @@
             <!-- ===== НАШИ УСЛУГИ (КРАТКО) ===== -->
             <section class="services-overview">
                 <h2 class="section-title">Наши услуги</h2>
-                <div class="services-grid">
+                <div class="services-grid" id="servicesCarousel">
                     <div class="service-card" data-page="vocal-lessons">
                         <div class="service-icon"><i class="fas fa-microphone-alt"></i></div>
                         <h3>Уроки вокала</h3>
@@ -3460,12 +3528,13 @@
                         <a href="#" class="service-link">Подробнее</a>
                     </div>
                 </div>
+                <div class="carousel-hint" id="servicesHint"><i class="fas fa-hand-point-left"></i><span>Смахните в сторону</span></div>
             </section>
 
             <!-- ===== ЦЕНЫ (КРАТКО) ===== -->
             <section class="prices-overview">
                 <h2 class="section-title">Цены</h2>
-                <div class="prices-grid">
+                <div class="prices-grid" id="pricesCarousel">
                     <div class="price-card" data-page="studio-prices">
                         <h3>Студия</h3>
                         <div class="price-value">от 900₽/час</div>
@@ -3485,6 +3554,7 @@
                         <a href="#" class="price-link" data-page="guitar-prices">Все цены</a>
                     </div>
                 </div>
+                <div class="carousel-hint" id="pricesHint"><i class="fas fa-hand-point-left"></i><span>Смахните в сторону</span></div>
             </section>
 
             <!-- ===== ЧАСТЫЕ ВОПРОСЫ (КРАТКО) ===== -->
@@ -3536,7 +3606,7 @@
             <!-- ===== О НАС (КРАТКО) ===== -->
             <section class="about-overview">
                 <h2 class="section-title">О нас</h2>
-                <div class="about-grid">
+                <div class="about-grid" id="aboutCarousel">
                     <div class="about-card" data-page="about-studio">
                         <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/i.jpg');"></div>
                         <h3>О студии</h3>
@@ -3556,6 +3626,7 @@
                         <a href="#" class="about-link">Узнать</a>
                     </div>
                 </div>
+                <div class="carousel-hint" id="aboutHint"><i class="fas fa-hand-point-left"></i><span>Смахните в сторону</span></div>
             </section>
 
             <!-- ===== ОТЗЫВЫ ===== -->
@@ -4741,6 +4812,87 @@
         })();
 
         // ============================================================
+        // ПЛЕЙ-ОВЕРЛЕЙ (кнопка на изображении)
+        // ============================================================
+        document.querySelectorAll('.play-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const card = this.closest('.artist-card');
+                const audio = card.querySelector('audio');
+                if (!audio) return;
+                if (audio.paused) {
+                    // Останавливаем все другие аудио
+                    document.querySelectorAll('audio').forEach(a => {
+                        if (a !== audio) {
+                            a.pause();
+                            a.currentTime = 0;
+                            // Сбрасываем иконку на других
+                            const otherOverlay = a.closest('.artist-card')?.querySelector('.play-overlay i');
+                            if (otherOverlay) {
+                                otherOverlay.className = 'fas fa-play';
+                            }
+                        }
+                    });
+                    audio.play();
+                    this.querySelector('i').className = 'fas fa-pause';
+                } else {
+                    audio.pause();
+                    this.querySelector('i').className = 'fas fa-play';
+                }
+            });
+        });
+
+        // Останавливаем аудио и сбрасываем иконки при окончании
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.addEventListener('pause', function() {
+                const overlay = this.closest('.artist-card')?.querySelector('.play-overlay i');
+                if (overlay) overlay.className = 'fas fa-play';
+            });
+            audio.addEventListener('ended', function() {
+                const overlay = this.closest('.artist-card')?.querySelector('.play-overlay i');
+                if (overlay) overlay.className = 'fas fa-play';
+            });
+        });
+
+        // ============================================================
+        // ПОДСКАЗКИ ДЛЯ КАРУСЕЛЕЙ (скрываем после первого взаимодействия)
+        // ============================================================
+        (function() {
+            const hints = {
+                services: document.getElementById('servicesHint'),
+                prices: document.getElementById('pricesHint'),
+                about: document.getElementById('aboutHint')
+            };
+            const carousels = {
+                services: document.getElementById('servicesCarousel'),
+                prices: document.getElementById('pricesCarousel'),
+                about: document.getElementById('aboutCarousel')
+            };
+
+            // Проверяем localStorage
+            if (!localStorage.getItem('hintShown')) {
+                // Показываем все подсказки
+                Object.values(hints).forEach(h => h && h.classList.remove('hidden'));
+                // Слушаем события прокрутки для каждого каруселя
+                Object.keys(carousels).forEach(key => {
+                    const car = carousels[key];
+                    const hint = hints[key];
+                    if (!car || !hint) return;
+                    const handler = function() {
+                        hint.classList.add('hidden');
+                        localStorage.setItem('hintShown', 'true');
+                        car.removeEventListener('scroll', handler);
+                        car.removeEventListener('touchstart', handler);
+                    };
+                    car.addEventListener('scroll', handler);
+                    car.addEventListener('touchstart', handler);
+                });
+            } else {
+                Object.values(hints).forEach(h => h && h.classList.add('hidden'));
+            }
+        })();
+
+        // ============================================================
         // МОДАЛЬНЫЕ ОКНА
         // ============================================================
         const vocalModal = document.getElementById('vocal-modal-panel');
@@ -4961,6 +5113,9 @@
                 if (audio !== e.target) {
                     audio.pause();
                     audio.currentTime = 0;
+                    // Сбрасываем иконку
+                    const overlay = audio.closest('.artist-card')?.querySelector('.play-overlay i');
+                    if (overlay) overlay.className = 'fas fa-play';
                 }
             });
         }, true);
