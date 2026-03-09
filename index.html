@@ -2985,20 +2985,22 @@
                 padding: 12px 32px;
                 font-size: 0.9rem;
             }
-            /* Плееры на мобильных — чёрные */
+            /* Плееры на мобильных — чёрные (как на десктопе), убираем фильтр */
             .artist-card audio, .event-item audio {
                 filter: none;
                 background: #222;
                 border-radius: 4px;
+                width: 100%;
             }
-            /* Карусели в услугах, ценах, о нас */
+            /* Карусели в услугах, ценах, о нас — горизонтальная прокрутка */
             .services-grid, .prices-grid, .about-grid {
                 display: flex;
                 overflow-x: auto;
                 scroll-snap-type: x mandatory;
                 gap: 20px;
-                padding-bottom: 20px;
+                padding-bottom: 10px;
                 -webkit-overflow-scrolling: touch;
+                scrollbar-width: none; /* скрыть скроллбар */
             }
             .services-grid::-webkit-scrollbar, .prices-grid::-webkit-scrollbar, .about-grid::-webkit-scrollbar {
                 display: none;
@@ -3007,29 +3009,54 @@
                 flex: 0 0 85%;
                 scroll-snap-align: start;
                 margin-right: 0;
-            }
-            /* Оверлей с подсказкой для каруселей */
-            .carousel-hint {
-                position: relative;
+                min-height: 350px; /* обеспечить достаточную высоту, чтобы не обрезалось */
                 display: flex;
-                justify-content: center;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            /* Оверлей с анимированной рукой на первом элементе карусели */
+            .swipe-hint {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.3);
+                display: flex;
                 align-items: center;
-                margin-top: 10px;
+                justify-content: center;
+                z-index: 15;
+                pointer-events: none;
                 opacity: 0.8;
                 transition: opacity 0.3s;
             }
-            .carousel-hint.hidden {
+            .swipe-hint.hidden {
                 opacity: 0;
                 pointer-events: none;
             }
-            .carousel-hint i {
-                font-size: 2rem;
-                color: #3a8cff;
-                margin-right: 10px;
+            .swipe-animation {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #fff;
+                font-size: 3rem;
+                text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+                animation: swipeMove 1.5s infinite ease-in-out;
             }
-            .carousel-hint span {
-                font-size: 0.9rem;
-                color: #ccc;
+            .swipe-animation i {
+                font-size: 4rem;
+            }
+            @keyframes swipeMove {
+                0% { transform: translateX(-10px); }
+                50% { transform: translateX(10px); }
+                100% { transform: translateX(-10px); }
+            }
+            /* Позиционирование для каруселей */
+            .services-grid, .prices-grid, .about-grid {
+                position: relative;
+            }
+            .service-card:first-child, .price-card:first-child, .about-card:first-child {
+                position: relative;
             }
             /* Кнопка Play на изображении */
             .artist-image {
@@ -3065,6 +3092,10 @@
             /* Убираем стрелки в портфолио */
             #portfolio .carousel-arrow {
                 display: none;
+            }
+            /* Добавляем оверлей с подсказкой для первого слайда портфолио */
+            .carousel-track .artist-card:first-child {
+                position: relative;
             }
             /* Центрируем заголовки */
             .hero-title,
@@ -3321,7 +3352,7 @@
                 <div class="carousel-wrapper">
                     <div class="carousel-container">
                         <div class="carousel-track" id="carouselTrack">
-                            <div class="artist-card">
+                            <div class="artist-card" data-first="true">
                                 <div class="artist-image one">
                                     <div class="play-overlay" data-audio="0"><i class="fas fa-play"></i></div>
                                 </div>
@@ -3509,7 +3540,7 @@
             <section class="services-overview">
                 <h2 class="section-title">Наши услуги</h2>
                 <div class="services-grid" id="servicesCarousel">
-                    <div class="service-card" data-page="vocal-lessons">
+                    <div class="service-card" data-page="vocal-lessons" data-first="true">
                         <div class="service-icon"><i class="fas fa-microphone-alt"></i></div>
                         <h3>Уроки вокала</h3>
                         <p>Постановка голоса, дыхание, расширение диапазона. Индивидуальный подход.</p>
@@ -3528,14 +3559,13 @@
                         <a href="#" class="service-link">Подробнее</a>
                     </div>
                 </div>
-                <div class="carousel-hint" id="servicesHint"><i class="fas fa-hand-point-left"></i><span>Смахните в сторону</span></div>
             </section>
 
             <!-- ===== ЦЕНЫ (КРАТКО) ===== -->
             <section class="prices-overview">
                 <h2 class="section-title">Цены</h2>
                 <div class="prices-grid" id="pricesCarousel">
-                    <div class="price-card" data-page="studio-prices">
+                    <div class="price-card" data-page="studio-prices" data-first="true">
                         <h3>Студия</h3>
                         <div class="price-value">от 900₽/час</div>
                         <p>Запись, сведение, мастеринг, аранжировка.</p>
@@ -3554,7 +3584,6 @@
                         <a href="#" class="price-link" data-page="guitar-prices">Все цены</a>
                     </div>
                 </div>
-                <div class="carousel-hint" id="pricesHint"><i class="fas fa-hand-point-left"></i><span>Смахните в сторону</span></div>
             </section>
 
             <!-- ===== ЧАСТЫЕ ВОПРОСЫ (КРАТКО) ===== -->
@@ -3607,7 +3636,7 @@
             <section class="about-overview">
                 <h2 class="section-title">О нас</h2>
                 <div class="about-grid" id="aboutCarousel">
-                    <div class="about-card" data-page="about-studio">
+                    <div class="about-card" data-page="about-studio" data-first="true">
                         <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/i.jpg');"></div>
                         <h3>О студии</h3>
                         <p>История создания, философия и команда.</p>
@@ -3626,7 +3655,6 @@
                         <a href="#" class="about-link">Узнать</a>
                     </div>
                 </div>
-                <div class="carousel-hint" id="aboutHint"><i class="fas fa-hand-point-left"></i><span>Смахните в сторону</span></div>
             </section>
 
             <!-- ===== ОТЗЫВЫ ===== -->
@@ -4855,40 +4883,52 @@
         });
 
         // ============================================================
-        // ПОДСКАЗКИ ДЛЯ КАРУСЕЛЕЙ (скрываем после первого взаимодействия)
+        // АНИМИРОВАННЫЕ ПОДСКАЗКИ (ОВЕРЛЕЙ) ДЛЯ КАРУСЕЛЕЙ
         // ============================================================
         (function() {
-            const hints = {
-                services: document.getElementById('servicesHint'),
-                prices: document.getElementById('pricesHint'),
-                about: document.getElementById('aboutHint')
-            };
-            const carousels = {
-                services: document.getElementById('servicesCarousel'),
-                prices: document.getElementById('pricesCarousel'),
-                about: document.getElementById('aboutCarousel')
-            };
-
-            // Проверяем localStorage
+            // Проверяем, показывали ли уже подсказку
             if (!localStorage.getItem('hintShown')) {
-                // Показываем все подсказки
-                Object.values(hints).forEach(h => h && h.classList.remove('hidden'));
-                // Слушаем события прокрутки для каждого каруселя
-                Object.keys(carousels).forEach(key => {
-                    const car = carousels[key];
-                    const hint = hints[key];
-                    if (!car || !hint) return;
-                    const handler = function() {
-                        hint.classList.add('hidden');
-                        localStorage.setItem('hintShown', 'true');
-                        car.removeEventListener('scroll', handler);
-                        car.removeEventListener('touchstart', handler);
-                    };
-                    car.addEventListener('scroll', handler);
-                    car.addEventListener('touchstart', handler);
-                });
-            } else {
-                Object.values(hints).forEach(h => h && h.classList.add('hidden'));
+                // Функция для добавления оверлея к элементу
+                function addHint(element) {
+                    if (!element) return;
+                    const hintDiv = document.createElement('div');
+                    hintDiv.className = 'swipe-hint';
+                    hintDiv.innerHTML = '<div class="swipe-animation"><i class="fas fa-hand-pointer"></i><i class="fas fa-arrow-left"></i><i class="fas fa-arrow-right"></i></div>';
+                    element.style.position = 'relative';
+                    element.appendChild(hintDiv);
+                    
+                    // Удаляем подсказку при первом взаимодействии с родительским контейнером
+                    const parentContainer = element.closest('.services-grid, .prices-grid, .about-grid, .carousel-track');
+                    if (parentContainer) {
+                        const removeHint = function() {
+                            hintDiv.remove();
+                            localStorage.setItem('hintShown', 'true');
+                            parentContainer.removeEventListener('scroll', removeHint);
+                            parentContainer.removeEventListener('touchstart', removeHint);
+                        };
+                        parentContainer.addEventListener('scroll', removeHint);
+                        parentContainer.addEventListener('touchstart', removeHint);
+                    }
+                }
+
+                // Добавляем подсказки на первые элементы каруселей
+                setTimeout(() => {
+                    // Для портфолио
+                    const firstPortfolio = document.querySelector('.carousel-track .artist-card[data-first="true"]');
+                    addHint(firstPortfolio);
+                    
+                    // Для услуг
+                    const firstService = document.querySelector('.services-grid .service-card[data-first="true"]');
+                    addHint(firstService);
+                    
+                    // Для цен
+                    const firstPrice = document.querySelector('.prices-grid .price-card[data-first="true"]');
+                    addHint(firstPrice);
+                    
+                    // Для о нас
+                    const firstAbout = document.querySelector('.about-grid .about-card[data-first="true"]');
+                    addHint(firstAbout);
+                }, 500); // небольшая задержка, чтобы DOM точно загрузился
             }
         })();
 
