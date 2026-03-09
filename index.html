@@ -2980,16 +2980,17 @@
                 margin-right: auto;
                 z-index: 1001;
             }
-            /* Уменьшаем кнопки */
+            /* Уменьшаем кнопки и центрируем */
             .hero-btn, .vocal-price-order, .guitar-price-order, .price-order {
                 padding: 12px 32px;
                 font-size: 0.9rem;
+                margin-left: auto;
+                margin-right: auto;
+                align-self: center;
             }
-            /* Плееры на мобильных — чёрные (как на десктопе), убираем фильтр */
+            /* Плееры на мобильных — убираем filter:none, чтобы сохранить инверсию (чёрный плеер) */
             .artist-card audio, .event-item audio {
-                filter: none;
-                background: #222;
-                border-radius: 4px;
+                /* filter не трогаем, он остаётся из общих стилей */
                 width: 100%;
             }
             /* Карусели в услугах, ценах, о нас — горизонтальная прокрутка */
@@ -3001,6 +3002,8 @@
                 padding-bottom: 10px;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: none; /* скрыть скроллбар */
+                padding-left: 10px; /* отступ слева, чтобы первая карточка не прилипала к краю */
+                padding-right: 10px; /* отступ справа */
             }
             .services-grid::-webkit-scrollbar, .prices-grid::-webkit-scrollbar, .about-grid::-webkit-scrollbar {
                 display: none;
@@ -3036,15 +3039,24 @@
             }
             .swipe-animation {
                 display: flex;
+                flex-direction: column;
                 align-items: center;
                 gap: 10px;
                 color: #fff;
-                font-size: 3rem;
+                font-size: 2rem;
                 text-shadow: 0 2px 5px rgba(0,0,0,0.5);
                 animation: swipeMove 1.5s infinite ease-in-out;
             }
             .swipe-animation i {
-                font-size: 4rem;
+                font-size: 3rem;
+            }
+            .swipe-animation span {
+                font-size: 1.2rem;
+                font-weight: 600;
+                letter-spacing: 2px;
+                background: rgba(0,0,0,0.5);
+                padding: 5px 15px;
+                border-radius: 30px;
             }
             @keyframes swipeMove {
                 0% { transform: translateX(-10px); }
@@ -4382,7 +4394,7 @@
         <button id="cookie-accept">Принять</button>
     </div>
 
-    <!-- Кастомный курсор -->
+    <!-- Кастомный курсор (будет работать только на десктопе, на мобильных не виден) -->
     <div class="cursor-dot" id="cursorDot"></div>
     <div class="cursor-ring" id="cursorRing"></div>
 
@@ -4887,17 +4899,17 @@
         });
 
         // ============================================================
-        // АНИМИРОВАННЫЕ ПОДСКАЗКИ (ОВЕРЛЕЙ) ДЛЯ КАРУСЕЛЕЙ
+        // АНИМИРОВАННЫЕ ПОДСКАЗКИ (ОВЕРЛЕЙ) ДЛЯ КАРУСЕЛЕЙ — ТОЛЬКО НА МОБИЛЬНЫХ
         // ============================================================
         (function() {
-            // Проверяем, показывали ли уже подсказку
-            if (!localStorage.getItem('hintShown')) {
+            // Проверяем ширину экрана — добавляем подсказки только если ширина <= 900px
+            if (window.innerWidth <= 900 && !localStorage.getItem('hintShown')) {
                 // Функция для добавления оверлея к элементу
                 function addHint(element) {
                     if (!element) return;
                     const hintDiv = document.createElement('div');
                     hintDiv.className = 'swipe-hint';
-                    hintDiv.innerHTML = '<div class="swipe-animation"><i class="fas fa-hand-pointer"></i><i class="fas fa-arrow-left"></i><i class="fas fa-arrow-right"></i></div>';
+                    hintDiv.innerHTML = '<div class="swipe-animation"><i class="fas fa-hand-pointer"></i><i class="fas fa-arrow-left"></i><i class="fas fa-arrow-right"></i><span>ЛИСТАЙ</span></div>';
                     element.style.position = 'relative';
                     element.appendChild(hintDiv);
                     
@@ -5390,6 +5402,31 @@
                     el.classList.remove('open');
                 });
                 if (!isOpen) item.classList.add('open');
+            });
+        })();
+
+        // ============================================================
+        // КАСТОМНЫЙ КУРСОР (только для десктопа, на мобильных скрыт через CSS)
+        // ============================================================
+        (function() {
+            const dot = document.getElementById('cursorDot');
+            const ring = document.getElementById('cursorRing');
+            if (!dot || !ring) return;
+
+            document.addEventListener('mousemove', function(e) {
+                dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+                ring.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+            });
+
+            document.querySelectorAll('a, button, .artist-card, .service-card, .price-card, .about-card, .event-ticket').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    dot.classList.add('hovered');
+                    ring.classList.add('hovered');
+                });
+                el.addEventListener('mouseleave', () => {
+                    dot.classList.remove('hovered');
+                    ring.classList.remove('hovered');
+                });
             });
         })();
     </script>
