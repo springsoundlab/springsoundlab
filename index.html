@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zvuk Studio | Студия звукозаписи</title>
+    <title>NDR Studio | Звукозапись</title>
     <style>
-        /* Обнуление и базовые стили */
+        /* ========== ОБЩИЕ СБРОСЫ И ПЕРЕМЕННЫЕ ========== */
         * {
             margin: 0;
             padding: 0;
@@ -13,50 +13,55 @@
         }
 
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background-color: #0b0b0b; /* Глубокий черный фон, как у референса */
-            color: #e0e0e0; /* Светлый, но не белый текст для комфорта глаз */
-            line-height: 1.5;
+            background-color: #0a0a0a;   /* глубокий чёрный фон, как в референсе */
+            font-family: 'Helvetica Neue', 'Inter', system-ui, -apple-system, sans-serif;
+            color: #f0f0f0;
+            line-height: 1.4;
+            font-weight: 300;
+            -webkit-font-smoothing: antialiased;
         }
 
         a {
-            color: #ffffff;
+            color: #fff;
             text-decoration: none;
         }
 
+        /* Контейнер — строго по центру, максимальная ширина как на референсе (≈1400px) */
         .container {
-            max-width: 1280px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 30px;
+            padding: 0 60px;
         }
 
-        /* Типографика */
-        h1, h2, h3 {
-            font-weight: 400; /* Более тонкое начертание, как в референсе */
+        /* ========== ТИПОГРАФИКА ========== */
+        h1, h2, h3, h4 {
+            font-weight: 400;
             letter-spacing: -0.02em;
         }
 
         h1 {
-            font-size: clamp(3rem, 8vw, 5rem);
-            line-height: 1.1;
+            font-size: clamp(3.2rem, 10vw, 6rem);
+            line-height: 1.0;
+            text-transform: uppercase;
             margin-bottom: 1.5rem;
         }
 
         h2 {
-            font-size: clamp(2.2rem, 5vw, 3.2rem);
-            margin-bottom: 3rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            padding-bottom: 0.75rem;
+            font-size: 2.8rem;
+            margin-bottom: 2.5rem;
+            font-weight: 350;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 1rem;
         }
 
-        /* Шапка */
+        /* ========== ШАПКА ========== */
         .header {
-            padding: 30px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 40px;
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
         }
 
-        .header-inner {
+        .header .container {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -74,13 +79,14 @@
 
         .nav {
             display: flex;
-            gap: 40px;
+            gap: 50px;
         }
 
         .nav a {
-            font-size: 1rem;
+            font-size: 0.9rem;
+            font-weight: 400;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
             color: #aaa;
             transition: color 0.2s;
         }
@@ -89,48 +95,49 @@
             color: #fff;
         }
 
-        /* Главный экран (Hero) */
+        /* ========== ГЛАВНЫЙ ЭКРАН ========== */
         .hero {
-            min-height: 70vh;
+            min-height: 80vh;
             display: flex;
             align-items: center;
-            margin-bottom: 60px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 80px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .hero-content {
-            max-width: 900px;
+            max-width: 1000px;
         }
 
-        .hero-tagline {
-            font-size: 1.1rem;
+        .hero-suptitle {
+            font-size: 1rem;
             text-transform: uppercase;
             letter-spacing: 0.3em;
-            color: #888;
-            margin-bottom: 1.5rem;
+            color: #777;
+            margin-bottom: 1rem;
         }
 
         .hero p {
             font-size: 1.3rem;
-            color: #b0b0b0;
+            color: #bbb;
             max-width: 700px;
+            margin-top: 2rem;
         }
 
-        /* Сетка услуг — как на референсе, плиточная */
+        /* ========== СЕТКА УСЛУГ — ТОЧНО КАК НА NDRPROD.COM ========== */
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2px; /* Тонкие разделители, как вдохновлено референсом */
-            background-color: #222; /* Цвет разделителей */
-            margin-bottom: 80px;
-            border: 1px solid #222; /* Внешняя граница сетки */
+            grid-template-columns: repeat(2, 1fr);  /* ровно две колонки, как в референсе */
+            gap: 2px; /* тонкие линии-разделители */
+            background-color: #222; /* цвет разделителей */
+            border: 1px solid #222;
+            margin-bottom: 100px;
         }
 
         .service-card {
-            background-color: #0f0f0f; /* Чуть светлее фона */
-            padding: 2.5rem 1.8rem;
-            transition: background-color 0.3s;
-            border: 1px solid transparent; /* Для эффекта при наведении */
+            background-color: #0f0f0f;
+            padding: 3rem 2.5rem;
+            transition: background-color 0.3s ease;
+            border: 1px solid transparent;
         }
 
         .service-card:hover {
@@ -139,234 +146,313 @@
         }
 
         .service-title {
-            font-size: 1.6rem;
+            font-size: 2rem;
             font-weight: 400;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
             color: #fff;
+            line-height: 1.2;
         }
 
         .service-desc {
-            color: #a0a0a0;
-            font-size: 0.95rem;
+            color: #aaa;
+            font-size: 1rem;
             line-height: 1.6;
+            max-width: 400px;
         }
 
-        /* Секция "О студии" — минималистичная, как референс */
-        .about-section {
-            display: flex;
-            flex-wrap: wrap;
+        /* ========== БЛОК О СТУДИИ (с двумя колонками, как в референсе) ========== */
+        .about-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 60px;
-            margin-bottom: 80px;
-            padding: 40px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 100px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 60px 0;
         }
 
-        .about-text {
-            flex: 2;
-            min-width: 300px;
-        }
-
-        .about-text p {
-            font-size: 1.2rem;
-            color: #ccc;
+        .about-left h2 {
+            border-bottom: none;
+            padding-bottom: 0;
             margin-bottom: 1.5rem;
         }
 
-        .about-feature {
-            flex: 1;
-            min-width: 250px;
+        .about-left p {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .about-right {
             background-color: #111;
-            padding: 30px;
+            padding: 40px;
         }
 
-        .feature-item {
-            margin-bottom: 20px;
+        .feature-list {
+            list-style: none;
         }
-        .feature-item strong {
-            color: white;
+
+        .feature-list li {
+            margin-bottom: 30px;
+        }
+
+        .feature-list li strong {
             display: block;
-            margin-bottom: 5px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 1.1rem;
             text-transform: uppercase;
-            font-size: 0.9rem;
             letter-spacing: 0.1em;
+            margin-bottom: 8px;
         }
 
-        /* Подвал */
+        .feature-list li span {
+            color: #aaa;
+            font-size: 1rem;
+        }
+
+        /* ========== ДОПОЛНИТЕЛЬНАЯ СЕКЦИЯ (цифры / партнёры) ========== */
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 100px;
+            padding: 40px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-item {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #666;
+            margin-bottom: 0.8rem;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-desc {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* ========== ПОДВАЛ ========== */
         .footer {
             padding: 60px 0 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255,255,255,0.1);
             color: #777;
         }
 
-        .footer-grid {
+        .footer .container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 40px;
         }
 
         .footer-col p {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
         }
 
-        .footer a {
+        .footer-col a {
             color: #aaa;
-        }
-        .footer a:hover {
-            color: white;
+            transition: color 0.2s;
         }
 
-        /* Адаптивность */
-        @media (max-width: 700px) {
-            .nav {
-                gap: 20px;
+        .footer-col a:hover {
+            color: #fff;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 500;
+            background: linear-gradient(135deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        /* ========== АДАПТИВНОСТЬ ========== */
+        @media (max-width: 1000px) {
+            .container {
+                padding: 0 30px;
             }
-            .header-inner {
+            .services-grid {
+                grid-template-columns: 1fr; /* на планшете одна колонка */
+            }
+            .about-block {
+                grid-template-columns: 1fr;
+            }
+            .footer .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .header .container {
                 flex-direction: column;
                 gap: 20px;
             }
+            .nav {
+                gap: 30px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
             .hero {
-                min-height: 50vh;
+                min-height: 60vh;
             }
             .service-card {
-                padding: 1.8rem;
+                padding: 2rem 1.5rem;
             }
-            .about-section {
+            .stats {
                 flex-direction: column;
                 gap: 30px;
             }
-        }
-
-        /* Дополнительные детали в духе референса */
-        .motto {
-            font-size: 0.9rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
+            .footer .container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Шапка сайта -->
-    <header class="header">
-        <div class="container header-inner">
-            <div class="logo">ZVUK Studio</div>
-            <nav class="nav">
-                <a href="#">Услуги</a>
-                <a href="#">Работы</a>
-                <a href="#">Контакты</a>
-            </nav>
-        </div>
-    </header>
 
-    <main>
-        <!-- Главный экран (Hero) -->
-        <section class="hero">
-            <div class="container hero-content">
-                <div class="hero-tagline">Студия звукозаписи</div>
-                <h1>Сведение, мастеринг,<br>озвучка и саунд-дизайн</h1>
-                <p>Полный цикл производства аудио — от записи вокала до финального мастеринга и создания музыки для видео.</p>
-            </div>
-        </section>
+<!-- ШАПКА -->
+<header class="header">
+    <div class="container">
+        <div class="logo">NDR Studio</div>
+        <nav class="nav">
+            <a href="#">Услуги</a>
+            <a href="#">Работы</a>
+            <a href="#">Оборудование</a>
+            <a href="#">Контакты</a>
+        </nav>
+    </div>
+</header>
 
-        <!-- Блок услуг — вдохновлен сеткой из референса -->
-        <div class="container">
-            <h2>Наши услуги</h2>
-        </div>
-        <div class="services-grid">
-            <!-- Карточки услуг, повторяющие дух списка из референса -->
-            <div class="service-card">
-                <div class="service-title">Запись и сведение</div>
-                <div class="service-desc">Профессиональная запись вокала, инструментов. Сведение любого уровня сложности в аналоговом и цифровом формате.</div>
-            </div>
-            <div class="service-card">
-                <div class="service-title">Мастеринг</div>
-                <div class="service-desc">Подготовка вашего трека к релизу на всех платформах. Громкий, чистый и сбалансированный звук.</div>
-            </div>
-            <div class="service-card">
-                <div class="service-title">Озвучка и дикторы</div>
-                <div class="service-desc">База профессиональных дикторов с узнаваемыми голосами. Озвучивание рекламы, аудиокниг, подкастов.</div>
-            </div>
-            <div class="service-card">
-                <div class="service-title">Саунд-дизайн для видео</div>
-                <div class="service-desc">Создание уникальной звуковой атмосферы для фильмов, роликов и игр: от шумов до композиций.</div>
-            </div>
-            <div class="service-card">
-                <div class="service-title">Аудио для рекламы</div>
-                <div class="service-desc">Разработка джинглов, айдентики, голосовых слоганов. Интеграция в ваш рекламный ролик.</div>
-            </div>
-            <div class="service-card">
-                <div class="service-title">Локализация игр</div>
-                <div class="service-desc">Полный цикл: перевод, адаптация шрифтов, запись и встраивание качественной озвучки в ваш проект.</div>
-            </div>
-        </div>
+<!-- ГЛАВНЫЙ ЭКРАН (HERO) -->
+<section class="hero">
+    <div class="container hero-content">
+        <div class="hero-suptitle">Студия звукозаписи</div>
+        <h1>ЗАПИСЬ<br>СВЕДЕНИЕ<br>МАСТЕРИНГ</h1>
+        <p>Полный цикл производства аудио — от вокала до финального мастера. Оборудование уровня High-End, команда профессионалов с 20-летним опытом.</p>
+    </div>
+</section>
 
-        <!-- Секция "О студии" и преимущества -->
-        <div class="container">
-            <section class="about-section">
-                <div class="about-text">
-                    <h2 style="border-bottom: none; padding-bottom: 0; margin-bottom: 1.5rem;">О студии</h2>
-                    <p>Мы — команда звукорежиссёров, композиторов и инженеров, объединённых страстью к чистому, мощному звуку. Оборудование класса High-End и акустически выверенные комнаты позволяют реализовать проекты любого масштаба.</p>
-                    <p>Сотрудничаем с музыкантами, брендами, режиссёрами и продюсерами. Наш опыт — в вашем звуке.</p>
-                </div>
-                <div class="about-feature">
-                    <div class="feature-item">
-                        <strong>Оборудование</strong>
-                        <span style="color:#aaa;">Neve, API, Neumann, AKG</span>
-                    </div>
-                    <div class="feature-item">
-                        <strong>Акустика</strong>
-                        <span style="color:#aaa;">Комнаты переменного объема с индивидуальной обработкой</span>
-                    </div>
-                    <div class="feature-item">
-                        <strong>Сроки</strong>
-                        <span style="color:#aaa;">Работаем срочно без потери качества</span>
-                    </div>
-                </div>
-            </section>
-        </div>
+<!-- СЕТКА УСЛУГ (ТОЧНО КАК В РЕФЕРЕНСЕ) -->
+<div class="container">
+    <h2>Наши услуги</h2>
+</div>
+<div class="services-grid">
+    <!-- Карточки услуг — копируют структуру ndrprod.com (6 услуг, заголовок + описание) -->
+    <div class="service-card">
+        <div class="service-title">Запись вокала</div>
+        <div class="service-desc">Изолированные комнаты, микрофоны Neumann, AKG, Telefunken. Работа с артистами любого уровня.</div>
+    </div>
+    <div class="service-card">
+        <div class="service-title">Сведение и мастеринг</div>
+        <div class="service-desc">Аналоговая обработка (Neve, API) и цифровой мастеринг. Подготовка треков для всех стриминговых платформ.</div>
+    </div>
+    <div class="service-card">
+        <div class="service-title">Озвучка и дикторы</div>
+        <div class="service-desc">База профессиональных дикторов с уникальными голосами. Озвучивание рекламы, фильмов, аудиокниг.</div>
+    </div>
+    <div class="service-card">
+        <div class="service-title">Саунд-дизайн для видео</div>
+        <div class="service-desc">Создание звуковых эффектов, шумов, атмосфер. Полное звуковое оформление роликов и фильмов.</div>
+    </div>
+    <div class="service-card">
+        <div class="service-title">Музыка для рекламы</div>
+        <div class="service-desc">Написание джинглов, аранжировок, голосовых слоганов. Интеграция в рекламные кампании брендов.</div>
+    </div>
+    <div class="service-card">
+        <div class="service-title">Локализация игр</div>
+        <div class="service-desc">Перевод, адаптация шрифтов, запись голосов и встройка в игровой движок. Полный цикл аудио для игр.</div>
+    </div>
+</div>
 
-        <!-- Дополнительный блок с проектами / подчеркивание стиля -->
-        <div class="container" style="margin-bottom: 80px;">
-            <div style="display: flex; gap: 30px; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px;">
-                <div>
-                    <span class="motto">Нам доверяют</span>
-                    <div style="font-size: 2rem; font-weight: 300; color: white;">100+</div>
-                    <div style="color: #aaa;">реализованных проектов</div>
-                </div>
-                <div>
-                    <span class="motto">Дистрибуция</span>
-                    <div style="font-size: 2rem; font-weight: 300; color: white;">все</div>
-                    <div style="color: #aaa;">цифровые площадки</div>
-                </div>
-                <div>
-                    <span class="motto">Режим работы</span>
-                    <div style="font-size: 2rem; font-weight: 300; color: white;">24/7</div>
-                    <div style="color: #aaa;">по предзаказу</div>
-                </div>
-            </div>
+<!-- БЛОК О СТУДИИ + ОСОБЕННОСТИ (как на ndrprod.com) -->
+<div class="container">
+    <div class="about-block">
+        <div class="about-left">
+            <h2>О студии</h2>
+            <p>NDR Studio — это пространство, где рождается качественный звук. Мы объединили лучшее аналоговое оборудование и современные цифровые технологии, чтобы вы получали результат мирового уровня.</p>
+            <p>С нами работают известные музыканты, бренды и режиссёры. Главное для нас — чистый, мощный и эмоциональный звук.</p>
         </div>
-    </main>
+        <div class="about-right">
+            <ul class="feature-list">
+                <li>
+                    <strong>Оборудование</strong>
+                    <span>Neve 8068, API 1608, микрофоны Neumann U87, AKG C12, Telefunken ELA M 260.</span>
+                </li>
+                <li>
+                    <strong>Акустика</strong>
+                    <span>Комнаты переменного объёма с индивидуальной акустической обработкой, изолированные от внешних шумов.</span>
+                </li>
+                <li>
+                    <strong>Инженеры</strong>
+                    <span>Команда звукорежиссёров с опытом работы на крупнейших студиях Европы.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
 
-    <!-- Подвал -->
-    <footer class="footer">
-        <div class="container footer-grid">
-            <div class="footer-col">
-                <p><strong style="color:#fff;">ZVUK Studio</strong></p>
-                <p>Студия звукозаписи и продакшена</p>
-                <p>Москва, ул. Звуковая, 1</p>
-            </div>
-            <div class="footer-col">
-                <p><a href="#">Услуги</a></p>
-                <p><a href="#">Портфолио</a></p>
-                <p><a href="#">Оборудование</a></p>
-            </div>
-            <div class="footer-col">
-                <p><a href="#">+7 (495) 000-00-00</a></p>
-                <p><a href="#">info@zvuk.studio</a></p>
-                <p>© 2025</p>
-            </div>
+<!-- СТАТИСТИКА / ПАРТНЁРЫ (штрих из референса) -->
+<div class="container">
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-label">Проектов</div>
+            <div class="stat-number">500+</div>
+            <div class="stat-desc">записанных альбомов и синглов</div>
         </div>
-    </footer>
+        <div class="stat-item">
+            <div class="stat-label">Дикторов</div>
+            <div class="stat-number">50+</div>
+            <div class="stat-desc">профессиональных голосов</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">Платформ</div>
+            <div class="stat-number">Все</div>
+            <div class="stat-desc">дистрибуция на Spotify, Apple Music и др.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ПОДВАЛ -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-col">
+            <div class="footer-logo">NDR Studio</div>
+            <p>Студия звукозаписи и продакшена</p>
+            <p>Москва, ул. Звуковая, 10</p>
+        </div>
+        <div class="footer-col">
+            <p><a href="#">Услуги</a></p>
+            <p><a href="#">Портфолио</a></p>
+            <p><a href="#">Оборудование</a></p>
+            <p><a href="#">Команда</a></p>
+        </div>
+        <div class="footer-col">
+            <p><a href="tel:+74950000000">+7 (495) 000-00-00</a></p>
+            <p><a href="mailto:info@ndrstudio.ru">info@ndrstudio.ru</a></p>
+            <p>© 2025 NDR Studio</p>
+        </div>
+    </div>
+</footer>
+
 </body>
 </html>
