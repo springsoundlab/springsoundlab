@@ -96,8 +96,10 @@
             padding: 0 40px;
             position: relative;
             z-index: 2;
+            width: 100%;
         }
 
+        /* ===== НАВИГАЦИЯ (уже на всю ширину) ===== */
         .navbar {
             position: sticky;
             top: 0;
@@ -107,10 +109,8 @@
             -webkit-backdrop-filter: blur(20px);
             display: flex;
             align-items: center;
-            padding: 18px 0;
+            padding: 18px 40px; /* вместо 0, чтобы не зависеть от контейнера */
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 40px;
-            gap: 0;
             width: 100%;
         }
 
@@ -335,9 +335,36 @@
             }
         }
 
+        /* ===== СЕКЦИИ НА ВСЮ ШИРИНУ ===== */
+        .full-width-section {
+            width: 100%;
+            padding: 80px 0; /* базовый вертикальный отступ */
+        }
+
+        /* Специфичные отступы для разных секций (можно переопределить) */
+        .hero-section {
+            padding: 120px 0 100px;
+        }
+        .portfolio-section {
+            padding: 0 0 80px; /* у #portfolio был margin-top:270px, заменяем на padding-top */
+        }
+        .arrangements-section {
+            padding: 80px 0;
+        }
+        .timeline-section {
+            padding: 100px 0;
+        }
+        .services-overview-section,
+        .prices-overview-section,
+        .home-faq-section,
+        .about-overview-section,
+        .reviews-overview-section,
+        .map-section {
+            padding: 100px 0;
+        }
+
         /* ===== ГЛАВНАЯ ===== */
         .hero {
-            margin: 80px 0 100px 0;
             display: flex;
             align-items: stretch;
             gap: 40px;
@@ -443,10 +470,6 @@
         #portfolio .section-title,
         #arrangements .section-title {
             color: #ffffff;
-        }
-
-        #portfolio {
-            margin-top: 270px;
         }
 
         /* ===== КАРУСЕЛЬ ===== */
@@ -785,11 +808,7 @@
         .prices-overview,
         .about-overview,
         .reviews-overview {
-            margin-top: 100px;
-        }
-
-        .prices-overview {
-            margin-bottom: 120px;
+            margin-top: 0; /* убираем внешние отступы, они теперь в padding секции */
         }
 
         .services-grid,
@@ -1878,9 +1897,11 @@
         /* ===== ПОДВАЛ ===== */
         .footer {
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 20px 0 20px;
-            margin-top: 80px;
+            padding: 20px 40px 20px;
+            margin-top: 0; /* убираем отступ, теперь фон футера на всю ширину */
             font-size: 0.9rem;
+            width: 100%;
+            background-color: #050307;
         }
 
         .footer-main {
@@ -1889,6 +1910,8 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
         .footer-info {
@@ -1977,15 +2000,15 @@
             text-align: center;
             border-top: 1px solid rgba(255,255,255,0.05);
             padding-top: 15px;
+            max-width: 1600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* ===== АДАПТАЦИЯ ===== */
         @media (max-width: 900px) {
-            .container { padding: 0 30px; }
-            .navbar { flex-direction: column; align-items: stretch; gap: 15px; flex-wrap: wrap; padding: 12px 0; }
-            .navbar-left { justify-content: space-between; gap: 20px; width: 100%; flex-wrap: wrap; }
-            .nav-links { justify-content: center; gap: 25px; flex-wrap: wrap; }
-            .hero { flex-direction: column; align-items: center; margin: 40px 0 60px; }
+            .navbar { padding: 18px 30px; }
+            .hero { flex-direction: column; align-items: center; }
             .hero-content { width: 100%; }
             .hero-title { font-size: 4rem; }
             .hero-slider { max-width: 100%; width: 100%; }
@@ -2003,7 +2026,6 @@
             .event-item audio { width: 100%; margin-right: 0; }
             .studio-row, .studio-row.reverse, .equipment-row, .equipment-row.reverse, .space-row, .space-row.reverse { flex-direction: column; gap: 20px; }
             .studio-image, .equipment-image, .space-image { width: 100%; }
-            #portfolio { margin-top: 80px; }
             .logo-image { height: 28px; }
             .logo { font-size: 0.95rem; }
             .carousel-slide { flex: 0 0 calc(50% - 15px); }
@@ -2012,7 +2034,7 @@
         }
 
         @media (max-width: 600px) {
-            .container { padding: 0 20px; }
+            .navbar { padding: 12px 20px; }
             .hero-title { font-size: 3rem; }
             .hero-desc { font-size: 1.5rem; }
             .artist-grid { grid-template-columns: 1fr; }
@@ -2028,12 +2050,12 @@
             .nav-links > a, .nav-links > .dropdown > a { font-size: 0.8rem; }
             .header-phone { font-size: 0.8rem; }
             .vocal-modal-panel { width: 95%; padding: 24px 20px; }
-            #portfolio { margin-top: 60px; }
             .logo { font-size: 1rem; }
             .logo-image { height: 26px; }
             .footer-info { flex-direction: column; gap: 10px; }
             .carousel-slide { flex: 0 0 100%; }
             .carousel-outer { padding: 0 20px; }
+            .footer { padding: 20px; }
         }
 
         @media (max-width: 480px) {
@@ -2619,7 +2641,7 @@
            БЛОК КАРТЫ
         ============================================================ */
         .map-section {
-            margin-top: 100px;
+            margin-top: 0;
         }
 
         .map-wrapper {
@@ -2758,7 +2780,7 @@
            ТАЙМЛАЙН
         ============================================================ */
         .timeline-section {
-            margin: 80px 0;
+            margin: 0;
         }
 
         .timeline-steps {
@@ -3234,97 +3256,34 @@
         }
 
         /* === ОТТЕНКИ ФОНА ДЛЯ СЕКЦИЙ (как в примере Nova Sound) === */
-        .hero {
-            background-color: rgba(13,18,25,0.9); /* #0d1219 с прозрачностью */
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        #portfolio {
-            background-color: rgba(10,10,10,0.85); /* #0a0a0a */
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        #arrangements {
-            background-color: rgba(8,8,8,0.8); /* #080808 */
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .timeline-section {
-            background-color: rgba(13,18,25,0.75);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .services-overview {
-            background-color: rgba(10,10,10,0.9);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .prices-overview {
-            background-color: rgba(8,8,8,0.85);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .home-faq-section {
-            background-color: rgba(13,18,25,0.7);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .about-overview {
-            background-color: rgba(10,10,10,0.8);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .reviews-overview {
-            background-color: rgba(8,8,8,0.9);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .map-section {
-            background-color: rgba(13,18,25,0.85);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
+        .hero-section { background-color: rgba(13,18,25,0.9); }
+        .portfolio-section { background-color: rgba(10,10,10,0.85); }
+        .arrangements-section { background-color: rgba(8,8,8,0.8); }
+        .timeline-section { background-color: rgba(13,18,25,0.75); }
+        .services-overview-section { background-color: rgba(10,10,10,0.9); }
+        .prices-overview-section { background-color: rgba(8,8,8,0.85); }
+        .home-faq-section { background-color: rgba(13,18,25,0.7); }
+        .about-overview-section { background-color: rgba(10,10,10,0.8); }
+        .reviews-overview-section { background-color: rgba(8,8,8,0.9); }
+        .map-section { background-color: rgba(13,18,25,0.85); }
         /* Для страниц уроков */
-        .vocal-lessons-page .hero,
-        .guitar-lessons-page .hero,
-        .production-lessons-page .hero {
+        .vocal-lessons-page .hero-section,
+        .guitar-lessons-page .hero-section,
+        .production-lessons-page .hero-section {
             background-color: rgba(13,18,25,0.9);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
         }
-        .lesson-description {
-            background-color: rgba(10,10,10,0.85);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .lesson-teacher {
-            background-color: rgba(8,8,8,0.8);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
+        .lesson-description-section { background-color: rgba(10,10,10,0.85); }
+        .lesson-teacher-section { background-color: rgba(8,8,8,0.8); }
         /* Для страниц цен */
-        .studio-prices-page {
-            background-color: rgba(13,18,25,0.75);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .vocal-prices-page {
-            background-color: rgba(10,10,10,0.85);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .guitar-prices-page {
-            background-color: rgba(8,8,8,0.9);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
+        .studio-prices-page { background-color: rgba(13,18,25,0.75); }
+        .vocal-prices-page { background-color: rgba(10,10,10,0.85); }
+        .guitar-prices-page { background-color: rgba(8,8,8,0.9); }
         /* Для страниц о нас */
-        .about-studio-page {
-            background-color: rgba(13,18,25,0.8);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .equipment-page {
-            background-color: rgba(10,10,10,0.9);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        .space-page {
-            background-color: rgba(8,8,8,0.85);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
+        .about-studio-page { background-color: rgba(13,18,25,0.8); }
+        .equipment-page { background-color: rgba(10,10,10,0.9); }
+        .space-page { background-color: rgba(8,8,8,0.85); }
         /* FAQ страница */
-        .faq-page {
-            background-color: rgba(13,18,25,0.7);
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-        }
-        /* Подвал */
-        .footer {
-            background-color: #050307; /* более тёмный, как в примере */
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
+        .faq-page { background-color: rgba(13,18,25,0.7); }
     </style>
 </head>
 <body>
@@ -3340,109 +3299,112 @@
     <!-- ===== КНОПКА "НАВЕРХ" ===== -->
     <button class="back-to-top" id="backToTop" aria-label="Наверх">&#8679;</button>
 
-    <div class="container">
-        <!-- Навигация -->
-        <nav class="navbar">
-            <div class="navbar-left">
-                <div class="logo" data-page="home">
-                    <img src="https://github.com/springsoundlab/portfolio/raw/main/logotip.png" alt="Spring Sound Lab" class="logo-image">
-                    <span>SPRING SOUND LAB</span>
-                </div>
-                <div class="navbar-divider"></div>
-                <div class="address-block">
-                    <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="header-address">
-                        <i class="fas fa-map-marker-alt"></i> <span>г. Волгоград, ул. Тулака 9</span>
-                    </a>
-                    <span class="work-hours">&nbsp;·&nbsp;Ежедневно 10:00–22:00</span>
-                </div>
-                <div class="navbar-divider"></div>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="logo" data-page="home">
+                <img src="https://github.com/springsoundlab/portfolio/raw/main/logotip.png" alt="Spring Sound Lab" class="logo-image">
+                <span>SPRING SOUND LAB</span>
             </div>
-
-            <button class="hamburger" id="hamburger" aria-label="Меню">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-
-            <div class="nav-links" id="navLinks">
-                <a data-page="home">Главная</a>
-                <div class="dropdown" id="services-dropdown">
-                    <a>Наши услуги</a>
-                    <div class="dropdown-content">
-                        <a data-page="vocal-lessons">Уроки вокала</a>
-                        <a data-page="guitar-lessons">Уроки гитары</a>
-                        <a data-page="production-lessons">Уроки звукорежиссуры</a>
-                    </div>
-                </div>
-                <div class="dropdown" id="prices-dropdown">
-                    <a>Цены</a>
-                    <div class="dropdown-content">
-                        <a data-page="studio-prices">Студия</a>
-                        <a data-page="vocal-prices">Уроки вокала</a>
-                        <a data-page="guitar-prices">Уроки гитары</a>
-                    </div>
-                </div>
-                <div class="dropdown" id="about-dropdown">
-                    <a>О нас</a>
-                    <div class="dropdown-content">
-                        <a data-page="about-studio">О студии</a>
-                        <a data-page="equipment">Оборудование</a>
-                        <a data-page="space">Пространство</a>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <a href="#">Контакты</a>
-                    <div class="dropdown-content">
-                        <a href="#"><i class="fab fa-vk"></i> ВКонтакте</a>
-                        <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i> Telegram</a>
-                        <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i> YouTube</a>
-                        <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
-                        <div class="phone-number"><i class="fas fa-phone"></i> +7 917 838 20 17</div>
-                    </div>
-                </div>
-                <div class="dropdown" id="faq-dropdown">
-                    <a>FAQ</a>
-                    <div class="dropdown-content">
-                        <a data-page="faq" data-anchor="general">📋 Общие вопросы</a>
-                        <a data-page="faq" data-anchor="prep">🎤 Подготовка к записи</a>
-                        <a data-page="faq" data-anchor="tech">🎚️ Технические вопросы</a>
-                        <a data-page="faq" data-anchor="process">🪑 Процесс записи</a>
-                    </div>
-                </div>
-                <a data-page="reviews">Отзывы</a>
+            <div class="navbar-divider"></div>
+            <div class="address-block">
+                <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="header-address">
+                    <i class="fas fa-map-marker-alt"></i> <span>г. Волгоград, ул. Тулака 9</span>
+                </a>
+                <span class="work-hours">&nbsp;·&nbsp;Ежедневно 10:00–22:00</span>
             </div>
+            <div class="navbar-divider"></div>
+        </div>
 
-            <div class="navbar-right">
-                <div class="navbar-divider"></div>
-                <a href="tel:+79178382017" class="header-phone"><i class="fas fa-phone"></i> +7 917 838 20 17</a>
+        <button class="hamburger" id="hamburger" aria-label="Меню">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a data-page="home">Главная</a>
+            <div class="dropdown" id="services-dropdown">
+                <a>Наши услуги</a>
+                <div class="dropdown-content">
+                    <a data-page="vocal-lessons">Уроки вокала</a>
+                    <a data-page="guitar-lessons">Уроки гитары</a>
+                    <a data-page="production-lessons">Уроки звукорежиссуры</a>
+                </div>
             </div>
-        </nav>
+            <div class="dropdown" id="prices-dropdown">
+                <a>Цены</a>
+                <div class="dropdown-content">
+                    <a data-page="studio-prices">Студия</a>
+                    <a data-page="vocal-prices">Уроки вокала</a>
+                    <a data-page="guitar-prices">Уроки гитары</a>
+                </div>
+            </div>
+            <div class="dropdown" id="about-dropdown">
+                <a>О нас</a>
+                <div class="dropdown-content">
+                    <a data-page="about-studio">О студии</a>
+                    <a data-page="equipment">Оборудование</a>
+                    <a data-page="space">Пространство</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#">Контакты</a>
+                <div class="dropdown-content">
+                    <a href="#"><i class="fab fa-vk"></i> ВКонтакте</a>
+                    <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i> Telegram</a>
+                    <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i> YouTube</a>
+                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+                    <div class="phone-number"><i class="fas fa-phone"></i> +7 917 838 20 17</div>
+                </div>
+            </div>
+            <div class="dropdown" id="faq-dropdown">
+                <a>FAQ</a>
+                <div class="dropdown-content">
+                    <a data-page="faq" data-anchor="general">📋 Общие вопросы</a>
+                    <a data-page="faq" data-anchor="prep">🎤 Подготовка к записи</a>
+                    <a data-page="faq" data-anchor="tech">🎚️ Технические вопросы</a>
+                    <a data-page="faq" data-anchor="process">🪑 Процесс записи</a>
+                </div>
+            </div>
+            <a data-page="reviews">Отзывы</a>
+        </div>
 
-        <!-- Главная страница -->
-        <div id="home-page" class="page active-page">
-            <section class="hero">
-                <div class="hero-content">
-                    <div>
-                        <div class="hero-pre">СТУДИЯ ЗВУКОЗАПИСИ</div>
-                        <h1 class="hero-title">
-                            SPRING SOUND <span class="hero-title-secondary">LAB</span>
-                        </h1>
-                        <p class="hero-desc">
-                            Профессиональная архитектура звука.<br> Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
-                        </p>
+        <div class="navbar-right">
+            <div class="navbar-divider"></div>
+            <a href="tel:+79178382017" class="header-phone"><i class="fas fa-phone"></i> +7 917 838 20 17</a>
+        </div>
+    </nav>
+
+    <!-- Главная страница -->
+    <div id="home-page" class="page active-page">
+        <section class="hero-section full-width-section">
+            <div class="container">
+                <div class="hero">
+                    <div class="hero-content">
+                        <div>
+                            <div class="hero-pre">СТУДИЯ ЗВУКОЗАПИСИ</div>
+                            <h1 class="hero-title">
+                                SPRING SOUND <span class="hero-title-secondary">LAB</span>
+                            </h1>
+                            <p class="hero-desc">
+                                Профессиональная архитектура звука.<br> Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов, которые готовы к большой сцене.
+                            </p>
+                        </div>
+                        <a class="hero-btn open-vocal-modal" id="bookBtn">Забронировать студию</a>
                     </div>
-                    <a class="hero-btn open-vocal-modal" id="bookBtn">Забронировать студию</a>
+                    <div class="hero-slider">
+                        <img class="slider-image active" src="https://via.placeholder.com/600x800/2a2a2a/ffffff?text=Studio+1" alt="Студия 1">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/1f2a3a/ffffff?text=Studio+2" alt="Студия 2">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/3a2a2a/ffffff?text=Studio+3" alt="Студия 3">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Studio+4" alt="Студия 4">
+                    </div>
                 </div>
-                <div class="hero-slider">
-                    <img class="slider-image active" src="https://via.placeholder.com/600x800/2a2a2a/ffffff?text=Studio+1" alt="Студия 1">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/1f2a3a/ffffff?text=Studio+2" alt="Студия 2">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/3a2a2a/ffffff?text=Studio+3" alt="Студия 3">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Studio+4" alt="Студия 4">
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- КАРУСЕЛЬ вместо artist-grid (добавлено, оригинальные 4 трека сохранены + 6 новых) -->
-            <section id="portfolio">
+        <section id="portfolio" class="portfolio-section full-width-section">
+            <div class="container">
                 <h2 class="section-title">Примеры работ</h2>
                 <div class="carousel-wrapper">
                     <div class="carousel-container">
@@ -3543,9 +3505,11 @@
                         <div class="carousel-dots" id="carouselDots"></div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section id="arrangements">
+        <section id="arrangements" class="arrangements-section full-width-section">
+            <div class="container">
                 <h2 class="section-title">Аранжировки в наличии</h2>
                 <div class="events-list">
                     <div class="event-item">
@@ -3589,10 +3553,11 @@
                         <a href="#" class="event-ticket buy-btn" data-title="Аранжировка &quot;Рок&quot;" data-price="5 000 ₽" data-genre="Рок" data-bpm="120">Купить</a>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- ===== КАК МЫ РАБОТАЕМ ===== -->
-            <section class="timeline-section">
+        <section class="timeline-section full-width-section">
+            <div class="container">
                 <h2 class="section-title">Как мы работаем</h2>
                 <div class="timeline-steps" id="timelineSteps">
                     <div class="timeline-line-fill" id="timelineFill"></div>
@@ -3621,80 +3586,87 @@
                         <div class="timeline-step-desc">Финальный файл в wav и mp3 — готов к релизу на стримингах или личному архиву.</div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- ===== НАШИ УСЛУГИ (КРАТКО) ===== -->
-            <section class="services-overview">
-                <h2 class="section-title">Наши услуги</h2>
-                <!-- Мобильная подсказка -->
-                <div class="swipe-hint" id="servicesSwipeHint">
-                    <i class="fas fa-hand-point-right"></i>
-                    <span>Листайте →</span>
-                </div>
-                <div class="services-grid" id="servicesGrid">
-                    <div class="service-card" data-page="vocal-lessons">
-                        <div class="service-icon"><i class="fas fa-microphone-alt"></i></div>
-                        <h3>Уроки вокала</h3>
-                        <p>Постановка голоса, дыхание, расширение диапазона. Индивидуальный подход.</p>
-                        <a href="#" class="service-link">Подробнее</a>
+        <section class="services-overview-section full-width-section">
+            <div class="container">
+                <div class="services-overview">
+                    <h2 class="section-title">Наши услуги</h2>
+                    <!-- Мобильная подсказка -->
+                    <div class="swipe-hint" id="servicesSwipeHint">
+                        <i class="fas fa-hand-point-right"></i>
+                        <span>Листайте →</span>
                     </div>
-                    <div class="service-card" data-page="guitar-lessons">
-                        <div class="service-icon"><i class="fas fa-guitar"></i></div>
-                        <h3>Уроки гитары</h3>
-                        <p>Акустика, электро, бас. С нуля до профи. Техника и теория.</p>
-                        <a href="#" class="service-link">Подробнее</a>
+                    <div class="services-grid" id="servicesGrid">
+                        <div class="service-card" data-page="vocal-lessons">
+                            <div class="service-icon"><i class="fas fa-microphone-alt"></i></div>
+                            <h3>Уроки вокала</h3>
+                            <p>Постановка голоса, дыхание, расширение диапазона. Индивидуальный подход.</p>
+                            <a href="#" class="service-link">Подробнее</a>
+                        </div>
+                        <div class="service-card" data-page="guitar-lessons">
+                            <div class="service-icon"><i class="fas fa-guitar"></i></div>
+                            <h3>Уроки гитары</h3>
+                            <p>Акустика, электро, бас. С нуля до профи. Техника и теория.</p>
+                            <a href="#" class="service-link">Подробнее</a>
+                        </div>
+                        <div class="service-card" data-page="production-lessons">
+                            <div class="service-icon"><i class="fas fa-sliders-h"></i></div>
+                            <h3>Звукорежиссура</h3>
+                            <p>Сведение, мастеринг, работа в DAW. Индивидуальные занятия.</p>
+                            <a href="#" class="service-link">Подробнее</a>
+                        </div>
                     </div>
-                    <div class="service-card" data-page="production-lessons">
-                        <div class="service-icon"><i class="fas fa-sliders-h"></i></div>
-                        <h3>Звукорежиссура</h3>
-                        <p>Сведение, мастеринг, работа в DAW. Индивидуальные занятия.</p>
-                        <a href="#" class="service-link">Подробнее</a>
+                    <!-- Мобильная навигация -->
+                    <div class="mobile-carousel-nav" id="servicesNav">
+                        <button class="mobile-carousel-arrow" id="servicesPrev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="mobile-carousel-arrow" id="servicesNext"><i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
-                <!-- Мобильная навигация -->
-                <div class="mobile-carousel-nav" id="servicesNav">
-                    <button class="mobile-carousel-arrow" id="servicesPrev"><i class="fas fa-chevron-left"></i></button>
-                    <button class="mobile-carousel-arrow" id="servicesNext"><i class="fas fa-chevron-right"></i></button>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- ===== ЦЕНЫ (КРАТКО) ===== -->
-            <section class="prices-overview">
-                <h2 class="section-title">Цены</h2>
-                <!-- Мобильная подсказка -->
-                <div class="swipe-hint" id="pricesSwipeHint">
-                    <i class="fas fa-hand-point-right"></i>
-                    <span>Листайте →</span>
-                </div>
-                <div class="prices-grid" id="pricesGrid">
-                    <div class="price-card" data-page="studio-prices">
-                        <h3>Студия</h3>
-                        <div class="price-value">от 900₽/час</div>
-                        <p>Запись, сведение, мастеринг, аранжировка.</p>
-                        <a href="#" class="price-link" data-page="studio-prices">Все цены</a>
+        <section class="prices-overview-section full-width-section">
+            <div class="container">
+                <div class="prices-overview">
+                    <h2 class="section-title">Цены</h2>
+                    <!-- Мобильная подсказка -->
+                    <div class="swipe-hint" id="pricesSwipeHint">
+                        <i class="fas fa-hand-point-right"></i>
+                        <span>Листайте →</span>
                     </div>
-                    <div class="price-card" data-page="vocal-prices">
-                        <h3>Уроки вокала</h3>
-                        <div class="price-value">от 1 000₽</div>
-                        <p>Пробное, разовое, абонементы.</p>
-                        <a href="#" class="price-link" data-page="vocal-prices">Все цены</a>
+                    <div class="prices-grid" id="pricesGrid">
+                        <div class="price-card" data-page="studio-prices">
+                            <h3>Студия</h3>
+                            <div class="price-value">от 900₽/час</div>
+                            <p>Запись, сведение, мастеринг, аранжировка.</p>
+                            <a href="#" class="price-link" data-page="studio-prices">Все цены</a>
+                        </div>
+                        <div class="price-card" data-page="vocal-prices">
+                            <h3>Уроки вокала</h3>
+                            <div class="price-value">от 1 000₽</div>
+                            <p>Пробное, разовое, абонементы.</p>
+                            <a href="#" class="price-link" data-page="vocal-prices">Все цены</a>
+                        </div>
+                        <div class="price-card" data-page="guitar-prices">
+                            <h3>Уроки гитары</h3>
+                            <div class="price-value">от 1 000₽</div>
+                            <p>Пробное, разовое, абонементы.</p>
+                            <a href="#" class="price-link" data-page="guitar-prices">Все цены</a>
+                        </div>
                     </div>
-                    <div class="price-card" data-page="guitar-prices">
-                        <h3>Уроки гитары</h3>
-                        <div class="price-value">от 1 000₽</div>
-                        <p>Пробное, разовое, абонементы.</p>
-                        <a href="#" class="price-link" data-page="guitar-prices">Все цены</a>
+                    <!-- Мобильная навигация -->
+                    <div class="mobile-carousel-nav" id="pricesNav">
+                        <button class="mobile-carousel-arrow" id="pricesPrev"><i class="fas fa-chevron-left"></i></button>
+                        <button class="mobile-carousel-arrow" id="pricesNext"><i class="fas fa-chevron-right"></i></button>
                     </div>
                 </div>
-                <!-- Мобильная навигация -->
-                <div class="mobile-carousel-nav" id="pricesNav">
-                    <button class="mobile-carousel-arrow" id="pricesPrev"><i class="fas fa-chevron-left"></i></button>
-                    <button class="mobile-carousel-arrow" id="pricesNext"><i class="fas fa-chevron-right"></i></button>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- ===== ЧАСТЫЕ ВОПРОСЫ (КРАТКО) ===== -->
-            <section class="home-faq-section">
+        <section class="home-faq-section full-width-section">
+            <div class="container">
                 <h2 class="section-title">Частые вопросы</h2>
                 <div class="home-faq-list">
                     <div class="home-faq-item">
@@ -3737,41 +3709,48 @@
                 <div class="home-faq-more">
                     <a data-page="faq" class="home-faq-link">Все вопросы и ответы →</a>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- ===== О НАС (КРАТКО) ===== -->
-            <section class="about-overview">
-                <h2 class="section-title">О нас</h2>
-                <div class="about-grid">
-                    <div class="about-card" data-page="about-studio">
-                        <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/i.jpg');"></div>
-                        <h3>О студии</h3>
-                        <p>История создания, философия и команда.</p>
-                        <a href="#" class="about-link">Узнать</a>
-                    </div>
-                    <div class="about-card" data-page="equipment">
-                        <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/11.jpg');"></div>
-                        <h3>Оборудование</h3>
-                        <p>Микрофоны, пульты, мониторы — всё лучшее.</p>
-                        <a href="#" class="about-link">Узнать</a>
-                    </div>
-                    <div class="about-card" data-page="space">
-                        <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/1.jpg');"></div>
-                        <h3>Пространство</h3>
-                        <p>Зоны записи, отдыха и творчества.</p>
-                        <a href="#" class="about-link">Узнать</a>
+        <section class="about-overview-section full-width-section">
+            <div class="container">
+                <div class="about-overview">
+                    <h2 class="section-title">О нас</h2>
+                    <div class="about-grid">
+                        <div class="about-card" data-page="about-studio">
+                            <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/i.jpg');"></div>
+                            <h3>О студии</h3>
+                            <p>История создания, философия и команда.</p>
+                            <a href="#" class="about-link">Узнать</a>
+                        </div>
+                        <div class="about-card" data-page="equipment">
+                            <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/11.jpg');"></div>
+                            <h3>Оборудование</h3>
+                            <p>Микрофоны, пульты, мониторы — всё лучшее.</p>
+                            <a href="#" class="about-link">Узнать</a>
+                        </div>
+                        <div class="about-card" data-page="space">
+                            <div class="about-image" style="background-image: url('https://github.com/springsoundlab/portfolio/raw/main/photo_studia/1.jpg');"></div>
+                            <h3>Пространство</h3>
+                            <p>Зоны записи, отдыха и творчества.</p>
+                            <a href="#" class="about-link">Узнать</a>
+                        </div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- ===== ОТЗЫВЫ ===== -->
-            <section class="reviews-overview">
-                <h2 class="section-title">Отзывы</h2>
-                <div class="sw-app" data-app="e8dd4642baab0f03640c288b8528925e"></div>
-            </section>
+        <section class="reviews-overview-section full-width-section">
+            <div class="container">
+                <div class="reviews-overview">
+                    <h2 class="section-title">Отзывы</h2>
+                    <div class="sw-app" data-app="e8dd4642baab0f03640c288b8528925e"></div>
+                </div>
+            </div>
+        </section>
 
-            <!-- ===== КАК НАС НАЙТИ — ПЕРЕНЕСЕНО В САМЫЙ НИЗ ===== -->
-            <section class="map-section">
+        <section class="map-section full-width-section">
+            <div class="container">
                 <h2 class="section-title">Как нас найти</h2>
                 <div class="map-wrapper">
                     <div class="map-info">
@@ -3818,138 +3797,175 @@
                         </iframe>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
+    </div>
 
-        </div>
-
-        <!-- Страница "Уроки вокала" -->
-        <div id="vocal-lessons-page" class="page">
-            <section class="hero">
-                <div class="hero-content">
-                    <div>
-                        <div class="hero-pre">УРОКИ ВОКАЛА</div>
-                        <h1 class="hero-title">
-                            SPRING SOUND <span class="hero-title-secondary">VOCAL</span>
-                        </h1>
-                        <p class="hero-desc">
-                            Раскрой свой голос с профессиональным педагогом. Индивидуальные занятия для любого уровня. Постановка дыхания, расширение диапазона, работа над песнями.
-                        </p>
+    <!-- Страница "Уроки вокала" -->
+    <div id="vocal-lessons-page" class="page">
+        <section class="hero-section full-width-section">
+            <div class="container">
+                <div class="hero">
+                    <div class="hero-content">
+                        <div>
+                            <div class="hero-pre">УРОКИ ВОКАЛА</div>
+                            <h1 class="hero-title">
+                                SPRING SOUND <span class="hero-title-secondary">VOCAL</span>
+                            </h1>
+                            <p class="hero-desc">
+                                Раскрой свой голос с профессиональным педагогом. Индивидуальные занятия для любого уровня. Постановка дыхания, расширение диапазона, работа над песнями.
+                            </p>
+                        </div>
+                        <a class="hero-btn open-vocal-modal">Записаться на пробное занятие</a>
                     </div>
-                    <a class="hero-btn open-vocal-modal">Записаться на пробное занятие</a>
+                    <div class="hero-slider">
+                        <img class="slider-image active" src="https://via.placeholder.com/600x800/2a2a2a/ffffff?text=Vocal+1" alt="Вокал 1">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/1f2a3a/ffffff?text=Vocal+2" alt="Вокал 2">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/3a2a2a/ffffff?text=Vocal+3" alt="Вокал 3">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Vocal+4" alt="Вокал 4">
+                    </div>
                 </div>
-                <div class="hero-slider">
-                    <img class="slider-image active" src="https://via.placeholder.com/600x800/2a2a2a/ffffff?text=Vocal+1" alt="Вокал 1">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/1f2a3a/ffffff?text=Vocal+2" alt="Вокал 2">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/3a2a2a/ffffff?text=Vocal+3" alt="Вокал 3">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Vocal+4" alt="Вокал 4">
+            </div>
+        </section>
+        <section class="lesson-description-section full-width-section">
+            <div class="container">
+                <div class="lesson-description">
+                    <h2>Подробное описание и методика</h2>
+                    <p>Наши уроки вокала построены на индивидуальном подходе. Мы используем современные методики постановки голоса, работаем над дыханием, артикуляцией и расширением диапазона. Вы сможете петь любые песни — от классики до современного попа, с комфортом и без зажимов.</p>
+                    <p>Формат занятий: 60 минут. Возможны разовые уроки или абонементы. Занятия проходят в звукоизолированном классе с профессиональным оборудованием.</p>
                 </div>
-            </section>
-            <section class="lesson-description">
-                <h2>Подробное описание и методика</h2>
-                <p>Наши уроки вокала построены на индивидуальном подходе. Мы используем современные методики постановки голоса, работаем над дыханием, артикуляцией и расширением диапазона. Вы сможете петь любые песни — от классики до современного попа, с комфортом и без зажимов.</p>
-                <p>Формат занятий: 60 минут. Возможны разовые уроки или абонементы. Занятия проходят в звукоизолированном классе с профессиональным оборудованием.</p>
-            </section>
-            <section class="lesson-teacher">
-                <h2>О преподавателе</h2>
-                <div class="teacher-card">
-                    <div class="teacher-photo" style="background-image: linear-gradient(145deg, #2a2a2a, #3c3c3c);"></div>
-                    <div class="teacher-info">
-                        <div class="teacher-name">Анна Иванова</div>
-                        <div class="teacher-experience">Стаж 8 лет</div>
-                        <div class="teacher-bio">
-                            Анна — выпускница музыкального училища, лауреат всероссийских конкурсов. Преподаёт эстрадный и академический вокал. Её ученики успешно выступают на сцене и поступают в музыкальные вузы. Анна находит подход к каждому, помогает раскрыть природный тембр и избавиться от зажимов.
+            </div>
+        </section>
+        <section class="lesson-teacher-section full-width-section">
+            <div class="container">
+                <div class="lesson-teacher">
+                    <h2>О преподавателе</h2>
+                    <div class="teacher-card">
+                        <div class="teacher-photo" style="background-image: linear-gradient(145deg, #2a2a2a, #3c3c3c);"></div>
+                        <div class="teacher-info">
+                            <div class="teacher-name">Анна Иванова</div>
+                            <div class="teacher-experience">Стаж 8 лет</div>
+                            <div class="teacher-bio">
+                                Анна — выпускница музыкального училища, лауреат всероссийских конкурсов. Преподаёт эстрадный и академический вокал. Её ученики успешно выступают на сцене и поступают в музыкальные вузы. Анна находит подход к каждому, помогает раскрыть природный тембр и избавиться от зажимов.
+                            </div>
                         </div>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
+    </div>
 
-        <!-- Страница "Уроки гитары" -->
-        <div id="guitar-lessons-page" class="page">
-            <section class="hero">
-                <div class="hero-content">
-                    <div>
-                        <div class="hero-pre">УРОКИ ГИТАРЫ</div>
-                        <h1 class="hero-title">
-                            SPRING SOUND <span class="hero-title-secondary">GUITAR</span>
-                        </h1>
-                        <p class="hero-desc">
-                            Акустическая, электрогитара, бас. Обучение с нуля и для продвинутых. Техника, теория, импровизация. Индивидуальный подход.
-                        </p>
+    <!-- Страница "Уроки гитары" -->
+    <div id="guitar-lessons-page" class="page">
+        <section class="hero-section full-width-section">
+            <div class="container">
+                <div class="hero">
+                    <div class="hero-content">
+                        <div>
+                            <div class="hero-pre">УРОКИ ГИТАРЫ</div>
+                            <h1 class="hero-title">
+                                SPRING SOUND <span class="hero-title-secondary">GUITAR</span>
+                            </h1>
+                            <p class="hero-desc">
+                                Акустическая, электрогитара, бас. Обучение с нуля и для продвинутых. Техника, теория, импровизация. Индивидуальный подход.
+                            </p>
+                        </div>
+                        <a class="hero-btn open-vocal-modal">Записаться на пробное занятие</a>
                     </div>
-                    <a class="hero-btn open-vocal-modal">Записаться на пробное занятие</a>
+                    <div class="hero-slider">
+                        <img class="slider-image active" src="https://via.placeholder.com/600x800/2a2a2a/ffffff?text=Guitar+1" alt="Гитара 1">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/1f2a3a/ffffff?text=Guitar+2" alt="Гитара 2">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/3a2a2a/ffffff?text=Guitar+3" alt="Гитара 3">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Guitar+4" alt="Гитара 4">
+                    </div>
                 </div>
-                <div class="hero-slider">
-                    <img class="slider-image active" src="https://via.placeholder.com/600x800/2a2a2a/ffffff?text=Guitar+1" alt="Гитара 1">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/1f2a3a/ffffff?text=Guitar+2" alt="Гитара 2">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/3a2a2a/ffffff?text=Guitar+3" alt="Гитара 3">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Guitar+4" alt="Гитара 4">
+            </div>
+        </section>
+        <section class="lesson-description-section full-width-section">
+            <div class="container">
+                <div class="lesson-description">
+                    <h2>Подробное описание и методика</h2>
+                    <p>Уроки гитары для любого уровня — от первых аккордов до сольных партий. Мы обучаем игре на акустической, электрогитаре и бас-гитаре. В программе: постановка рук, изучение аккордов, гамм, теория музыки, импровизация, работа в ансамбле.</p>
+                    <p>Занятия проходят индивидуально, 60 минут. Вы можете выбрать удобное время и формат — разовые уроки или абонемент.</p>
                 </div>
-            </section>
-            <section class="lesson-description">
-                <h2>Подробное описание и методика</h2>
-                <p>Уроки гитары для любого уровня — от первых аккордов до сольных партий. Мы обучаем игре на акустической, электрогитаре и бас-гитаре. В программе: постановка рук, изучение аккордов, гамм, теория музыки, импровизация, работа в ансамбле.</p>
-                <p>Занятия проходят индивидуально, 60 минут. Вы можете выбрать удобное время и формат — разовые уроки или абонемент.</p>
-            </section>
-            <section class="lesson-teacher">
-                <h2>О преподавателе</h2>
-                <div class="teacher-card">
-                    <div class="teacher-photo" style="background-image: linear-gradient(145deg, #1f2a3a, #2c3e50);"></div>
-                    <div class="teacher-info">
-                        <div class="teacher-name">Дмитрий Смирнов</div>
-                        <div class="teacher-experience">Стаж 10 лет</div>
-                        <div class="teacher-bio">
-                            Дмитрий — профессиональный гитарист и педагог. Выступал в различных группах, имеет опыт студийной записи. Преподаёт акустическую и электрогитару, а также теорию музыки. Его ученики успешно выступают на концертах и записывают собственные треки.
+            </div>
+        </section>
+        <section class="lesson-teacher-section full-width-section">
+            <div class="container">
+                <div class="lesson-teacher">
+                    <h2>О преподавателе</h2>
+                    <div class="teacher-card">
+                        <div class="teacher-photo" style="background-image: linear-gradient(145deg, #1f2a3a, #2c3e50);"></div>
+                        <div class="teacher-info">
+                            <div class="teacher-name">Дмитрий Смирнов</div>
+                            <div class="teacher-experience">Стаж 10 лет</div>
+                            <div class="teacher-bio">
+                                Дмитрий — профессиональный гитарист и педагог. Выступал в различных группах, имеет опыт студийной записи. Преподаёт акустическую и электрогитару, а также теорию музыки. Его ученики успешно выступают на концертах и записывают собственные треки.
+                            </div>
                         </div>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
+    </div>
 
-        <!-- Страница "Уроки звукорежиссуры" -->
-        <div id="production-lessons-page" class="page">
-            <section class="hero">
-                <div class="hero-content">
-                    <div>
-                        <div class="hero-pre">УРОКИ ЗВУКОРЕЖИССУРЫ</div>
-                        <h1 class="hero-title">
-                            SPRING SOUND <span class="hero-title-secondary">PRODUCTION</span>
-                        </h1>
-                        <p class="hero-desc">
-                            Научись создавать качественный звук с нуля. Сведение, мастеринг, работа в DAW, запись инструментов и вокала. Индивидуальные занятия для начинающих и практикующих.
-                        </p>
+    <!-- Страница "Уроки звукорежиссуры" -->
+    <div id="production-lessons-page" class="page">
+        <section class="hero-section full-width-section">
+            <div class="container">
+                <div class="hero">
+                    <div class="hero-content">
+                        <div>
+                            <div class="hero-pre">УРОКИ ЗВУКОРЕЖИССУРЫ</div>
+                            <h1 class="hero-title">
+                                SPRING SOUND <span class="hero-title-secondary">PRODUCTION</span>
+                            </h1>
+                            <p class="hero-desc">
+                                Научись создавать качественный звук с нуля. Сведение, мастеринг, работа в DAW, запись инструментов и вокала. Индивидуальные занятия для начинающих и практикующих.
+                            </p>
+                        </div>
+                        <a class="hero-btn open-vocal-modal">Записаться на пробное занятие</a>
                     </div>
-                    <a class="hero-btn open-vocal-modal">Записаться на пробное занятие</a>
+                    <div class="hero-slider">
+                        <img class="slider-image active" src="https://via.placeholder.com/600x800/2a2a2a/ffffff?text=Studio+1" alt="Звукорежиссура 1">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/1f2a3a/ffffff?text=Studio+2" alt="Звукорежиссура 2">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/3a2a2a/ffffff?text=Studio+3" alt="Звукорежиссура 3">
+                        <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Studio+4" alt="Звукорежиссура 4">
+                    </div>
                 </div>
-                <div class="hero-slider">
-                    <img class="slider-image active" src="https://via.placeholder.com/600x800/2a2a2a/ffffff?text=Studio+1" alt="Звукорежиссура 1">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/1f2a3a/ffffff?text=Studio+2" alt="Звукорежиссура 2">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/3a2a2a/ffffff?text=Studio+3" alt="Звукорежиссура 3">
-                    <img class="slider-image" src="https://via.placeholder.com/600x800/2a3a2a/ffffff?text=Studio+4" alt="Звукорежиссура 4">
+            </div>
+        </section>
+        <section class="lesson-description-section full-width-section">
+            <div class="container">
+                <div class="lesson-description">
+                    <h2>Подробное описание и методика</h2>
+                    <p>Курс звукорежиссуры охватывает все этапы создания музыки: от записи до финального мастеринга. Вы научитесь работать в профессиональных программах (Ableton, Logic Pro, Pro Tools), разбираться в акустике, обрабатывать звук эффектами и готовить треки к релизу. Занятия проходят в реальной студии с профессиональным оборудованием.</p>
+                    <p>Формат: индивидуальные уроки, 90 минут. Возможна подготовка к поступлению в профильные вузы.</p>
                 </div>
-            </section>
-            <section class="lesson-description">
-                <h2>Подробное описание и методика</h2>
-                <p>Курс звукорежиссуры охватывает все этапы создания музыки: от записи до финального мастеринга. Вы научитесь работать в профессиональных программах (Ableton, Logic Pro, Pro Tools), разбираться в акустике, обрабатывать звук эффектами и готовить треки к релизу. Занятия проходят в реальной студии с профессиональным оборудованием.</p>
-                <p>Формат: индивидуальные уроки, 90 минут. Возможна подготовка к поступлению в профильные вузы.</p>
-            </section>
-            <section class="lesson-teacher">
-                <h2>О преподавателе</h2>
-                <div class="teacher-card">
-                    <div class="teacher-photo" style="background-image: linear-gradient(145deg, #2a2a2a, #3c3c3c);"></div>
-                    <div class="teacher-info">
-                        <div class="teacher-name">Александр Громов</div>
-                        <div class="teacher-experience">Стаж 12 лет</div>
-                        <div class="teacher-bio">
-                            Александр — основатель студии Spring Sound Lab, звукорежиссёр с многолетним опытом работы с артистами разных жанров. Автор курсов по звукопроизводству, его ученики успешно работают на студиях и выпускают собственные треки.
+            </div>
+        </section>
+        <section class="lesson-teacher-section full-width-section">
+            <div class="container">
+                <div class="lesson-teacher">
+                    <h2>О преподавателе</h2>
+                    <div class="teacher-card">
+                        <div class="teacher-photo" style="background-image: linear-gradient(145deg, #2a2a2a, #3c3c3c);"></div>
+                        <div class="teacher-info">
+                            <div class="teacher-name">Александр Громов</div>
+                            <div class="teacher-experience">Стаж 12 лет</div>
+                            <div class="teacher-bio">
+                                Александр — основатель студии Spring Sound Lab, звукорежиссёр с многолетним опытом работы с артистами разных жанров. Автор курсов по звукопроизводству, его ученики успешно работают на студиях и выпускают собственные треки.
+                            </div>
                         </div>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
+    </div>
 
-        <!-- Страница "Цены: Студия" -->
-        <div id="studio-prices-page" class="page studio-prices-page">
+    <!-- Страница "Цены: Студия" -->
+    <div id="studio-prices-page" class="page studio-prices-page full-width-section">
+        <div class="container">
             <h1 class="studio-prices-title">Цены на услуги <span>студии</span></h1>
             <div class="price-grid">
                 <div class="price-card">
@@ -3978,9 +3994,11 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Страница "Цены: Уроки вокала" -->
-        <div id="vocal-prices-page" class="page vocal-prices-page">
+    <!-- Страница "Цены: Уроки вокала" -->
+    <div id="vocal-prices-page" class="page vocal-prices-page full-width-section">
+        <div class="container">
             <h1 class="vocal-prices-title">Цены на уроки <span>вокала</span></h1>
             <div class="vocal-prices-content">
                 <p>Индивидуальные занятия вокалом для любого уровня. Постановка голоса, дыхание, расширение диапазона, работа с песнями.</p>
@@ -4006,9 +4024,11 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Страница "Цены: Уроки гитары" -->
-        <div id="guitar-prices-page" class="page guitar-prices-page">
+    <!-- Страница "Цены: Уроки гитары" -->
+    <div id="guitar-prices-page" class="page guitar-prices-page full-width-section">
+        <div class="container">
             <h1 class="guitar-prices-title">Цены на уроки <span>гитары</span></h1>
             <div class="guitar-prices-content">
                 <p>Обучение игре на акустической, электрогитаре и бас-гитаре. Техника, теория, импровизация.</p>
@@ -4034,15 +4054,19 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Страница "Отзывы" -->
-        <div id="reviews-page" class="page reviews-page">
+    <!-- Страница "Отзывы" -->
+    <div id="reviews-page" class="page reviews-page full-width-section">
+        <div class="container">
             <h1 class="reviews-title">Отзывы <span>клиентов</span></h1>
             <div class="sw-app" data-app="e8dd4642baab0f03640c288b8528925e"></div>
         </div>
+    </div>
 
-        <!-- Страница "О студии" -->
-        <div id="about-studio-page" class="page about-studio-page">
+    <!-- Страница "О студии" -->
+    <div id="about-studio-page" class="page about-studio-page full-width-section">
+        <div class="container">
             <h1 class="about-studio-title">О <span>студии</span></h1>
             <div class="studio-grid">
                 <div class="studio-row">
@@ -4075,9 +4099,11 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Страница "Оборудование" -->
-        <div id="equipment-page" class="page equipment-page">
+    <!-- Страница "Оборудование" -->
+    <div id="equipment-page" class="page equipment-page full-width-section">
+        <div class="container">
             <h1 class="equipment-title">Наше <span>оборудование</span></h1>
             <div class="equipment-grid">
                 <div class="equipment-row">
@@ -4096,9 +4122,11 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Страница "Пространство" -->
-        <div id="space-page" class="page space-page">
+    <!-- Страница "Пространство" -->
+    <div id="space-page" class="page space-page full-width-section">
+        <div class="container">
             <h1 class="space-title">Наше <span>пространство</span></h1>
             <div class="space-grid">
                 <div class="space-row">
@@ -4123,9 +4151,11 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- ===== СТРАНИЦА FAQ ===== -->
-        <div id="faq-page" class="page faq-page">
+    <!-- ===== СТРАНИЦА FAQ ===== -->
+    <div id="faq-page" class="page faq-page full-width-section">
+        <div class="container">
             <h1 class="faq-title">Частые <span>вопросы</span></h1>
 
             <!-- ОБЩИЕ ВОПРОСЫ -->
@@ -4370,7 +4400,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <!-- Модальное окно -->
@@ -4433,30 +4462,28 @@
 
     <!-- Подвал -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-main">
-                <div class="footer-info">
-                    <div class="footer-logo" data-page="home" id="footerLogo">SPRING SOUND LAB</div>
-                    <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="footer-info-item">
-                        <i class="fas fa-map-marker-alt"></i> адрес: г. Волгоград, ул. Тулака 9
-                    </a>
-                    <a href="tel:+79178382017" class="footer-info-item">
-                        <i class="fas fa-phone"></i> телефон: +7 917 838 20 17
-                    </a>
-                </div>
-                <div class="footer-social">
-                    <h4>Мы в соцсетях</h4>
-                    <div class="social-icons">
-                        <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
-                        <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
-                        <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i></a>
-                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
-                    </div>
+        <div class="footer-main">
+            <div class="footer-info">
+                <div class="footer-logo" data-page="home" id="footerLogo">SPRING SOUND LAB</div>
+                <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" class="footer-info-item">
+                    <i class="fas fa-map-marker-alt"></i> адрес: г. Волгоград, ул. Тулака 9
+                </a>
+                <a href="tel:+79178382017" class="footer-info-item">
+                    <i class="fas fa-phone"></i> телефон: +7 917 838 20 17
+                </a>
+            </div>
+            <div class="footer-social">
+                <h4>Мы в соцсетях</h4>
+                <div class="social-icons">
+                    <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
+                    <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
+                    <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
-            <div class="copyright">
-                © 2026 SPRING SOUND LAB. Все права защищены.
-            </div>
+        </div>
+        <div class="copyright">
+            © 2026 SPRING SOUND LAB. Все права защищены.
         </div>
     </footer>
 
