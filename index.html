@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SPRING SOUND LAB</title>
+<title>NOVA SOUND — студия звукозаписи в Москве</title>
+<meta name="description" content="Профессиональная студия звукозаписи Nova Sound в Москве. Аналоговый SSL 4000 E, Neumann U87, Dolby Atmos. Запись, сведение, мастеринг.">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#080509;--c1:#b44fff;--c2:#00f5c4;--c3:#ff3c6e;--white:#f2eeff;--dim:rgba(242,238,255,0.35);--glass:rgba(255,255,255,0.04);--gb:rgba(255,255,255,0.08)}
@@ -18,6 +19,7 @@ body::after{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;back
 #cur.big{width:80px;height:80px}
 #mesh-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .mb{position:absolute;border-radius:50%;filter:blur(120px);animation:blobA 12s ease-in-out infinite alternate}
+@media (prefers-reduced-motion: reduce) { .mb { animation: none; } }
 .mb1{width:600px;height:600px;background:rgba(180,79,255,.18);top:-100px;left:-150px;animation-delay:0s}
 .mb2{width:500px;height:500px;background:rgba(0,245,196,.12);bottom:-80px;right:-100px;animation-delay:-4s}
 .mb3{width:400px;height:400px;background:rgba(255,60,110,.1);top:40%;left:50%;animation-delay:-8s}
@@ -60,6 +62,7 @@ nav ul a:hover{color:var(--white)}
 .sa{animation:sb 1.8s ease-in-out infinite}
 @keyframes sb{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 .marquee-strip{position:relative;z-index:2;overflow:hidden;border-top:1px solid var(--gb);border-bottom:1px solid var(--gb);background:rgba(180,79,255,.06)}
+@media (prefers-reduced-motion: reduce) { .marquee-strip .mq { animation: none; } }
 .marquee-strip::before,.marquee-strip::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:1;pointer-events:none}
 .marquee-strip::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
 .marquee-strip::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
@@ -198,7 +201,7 @@ footer{padding:52px 20px 28px}
 <div id="mesh-bg"><div class="mb mb1"></div><div class="mb mb2"></div><div class="mb mb3"></div></div>
 
 <nav>
-  <div class="nav-logo"><div class="nav-mark">NS</div>SPRING SOUND LAB</div>
+  <div class="nav-logo"><div class="nav-mark">NS</div>NOVA SOUND</div>
   <ul>
     <li><a href="#services">Услуги</a></li>
     <li><a href="#about">О нас</a></li>
@@ -209,7 +212,7 @@ footer{padding:52px 20px 28px}
 </nav>
 
 <section id="hero">
-  <div class="hero-vis"><canvas id="heroCanvas"></canvas></div>
+  <div class="hero-vis"><canvas id="heroCanvas" aria-hidden="true"></canvas></div>
   <p class="hero-pre rv"><span class="blink"></span>Студия звукозаписи · Москва · 2009</p>
   <h1 class="hero-h rv d1"><span class="line-a">NOVA</span><span class="line-b">SOUND</span></h1>
   <div class="hero-row rv d2">
@@ -267,7 +270,7 @@ footer{padding:52px 20px 28px}
           <div class="sc-card"><div class="sc-n">15+</div><div class="sc-l">Лет на рынке</div></div>
           <div class="sc-card"><div class="sc-n">4</div><div class="sc-l">Студийных зала</div></div>
         </div>
-        <div class="cc"><canvas id="aboutCanvas"></canvas><div class="cc-label"><span>SSL 4000 E · Studio A</span><span class="cc-live"><span class="ld"></span>LIVE SESSION</span></div></div>
+        <div class="cc"><canvas id="aboutCanvas" aria-hidden="true"></canvas><div class="cc-label"><span>SSL 4000 E · Studio A</span><span class="cc-live"><span class="ld"></span>LIVE SESSION</span></div></div>
       </div>
     </div>
   </div>
@@ -344,6 +347,7 @@ footer{padding:52px 20px 28px}
 </footer>
 
 <script>
+// === Кастомный курсор ===
 const cur=document.getElementById('cur');
 let cx=window.innerWidth/2,cy=window.innerHeight/2;
 document.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY});
@@ -353,61 +357,92 @@ document.querySelectorAll('a,button,.svc-card,.track,.room-card').forEach(el=>{
   el.addEventListener('mouseleave',()=>cur.classList.remove('big'));
 });
 
-// Hero canvas
+// === roundRect для canvas (исправление ошибки) ===
+CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+  if (w < 2 * r) r = w / 2;
+  if (h < 2 * r) r = h / 2;
+  this.moveTo(x + r, y);
+  this.lineTo(x + w - r, y);
+  this.quadraticCurveTo(x + w, y, x + w, y + r);
+  this.lineTo(x + w, y + h - r);
+  this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  this.lineTo(x + r, y + h);
+  this.quadraticCurveTo(x, y + h, x, y + h - r);
+  this.lineTo(x, y + r);
+  this.quadraticCurveTo(x, y, x + r, y);
+  this.closePath();
+  return this;
+};
+
+// === Hero canvas ===
 const hc=document.getElementById('heroCanvas');
 const hx=hc.getContext('2d');
 const HBARS=80;
 const hb=Array.from({length:HBARS},(_,i)=>({v:0.1+Math.abs(Math.sin(i*.4))*.3,vel:0,spd:.3+Math.random()*1.2,ph:Math.random()*Math.PI*2}));
 let ht=0;
+let heroFrame;
 function rzH(){const dpr=devicePixelRatio||1,w=hc.parentElement.offsetWidth,h=hc.parentElement.offsetHeight;hc.width=w*dpr;hc.height=h*dpr;hx.scale(dpr,dpr);hc.style.width=w+'px';hc.style.height=h+'px'}
 rzH();window.addEventListener('resize',rzH);
-(function dH(){const W=hc.offsetWidth,H=hc.offsetHeight;hx.clearRect(0,0,W,H);
-const bw=W/HBARS;
-hb.forEach((b,i)=>{
-  const t=(b.v+.5*Math.abs(Math.sin(ht*b.spd*.02+b.ph)))*H*.85;
-  b.vel+=(t-b.v)*.1;b.vel*=.78;b.v+=b.vel;
-  const x=i*bw+bw*.15,w=bw*.55,h=b.v;
-  const g=hx.createLinearGradient(0,H-h,0,H);
-  const r=h/H;
-  g.addColorStop(0,`rgba(180,79,255,${r*.9})`);
-  g.addColorStop(.5,`rgba(0,245,196,${r*.6})`);
-  g.addColorStop(1,'rgba(8,5,9,0)');
-  hx.fillStyle=g;
-  hx.beginPath();hx.roundRect(x,H-h,w,h,2);hx.fill();
-});
-ht++;requestAnimationFrame(dH)})();
+function drawHero(){
+  const W=hc.offsetWidth,H=hc.offsetHeight;
+  if(!W||!H) return;
+  hx.clearRect(0,0,W,H);
+  const bw=W/HBARS;
+  hb.forEach((b,i)=>{
+    const t=(b.v+.5*Math.abs(Math.sin(ht*b.spd*.02+b.ph)))*H*.85;
+    b.vel+=(t-b.v)*.1;b.vel*=.78;b.v+=b.vel;
+    const x=i*bw+bw*.15,w=bw*.55,h=b.v;
+    const g=hx.createLinearGradient(0,H-h,0,H);
+    const r=h/H;
+    g.addColorStop(0,`rgba(180,79,255,${r*.9})`);
+    g.addColorStop(.5,`rgba(0,245,196,${r*.6})`);
+    g.addColorStop(1,'rgba(8,5,9,0)');
+    hx.fillStyle=g;
+    hx.beginPath();hx.roundRect(x,H-h,w,h,2);hx.fill();
+  });
+  ht++;
+  heroFrame=requestAnimationFrame(drawHero);
+}
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) drawHero();
 
-// About canvas
+// === About canvas ===
 const ac=document.getElementById('aboutCanvas');
 const ax=ac.getContext('2d');
 const AB=24;
 const ab=Array.from({length:AB},()=>({v:.2+Math.random()*.5,vel:0,target:.2+Math.random()*.5,spd:.4+Math.random()*1.4,ph:Math.random()*Math.PI*2,timer:Math.random()*120}));
 let at=0;
+let aboutFrame;
 function rzA(){const dpr=devicePixelRatio||1,el=ac.parentElement,w=el.offsetWidth,h=el.offsetHeight-32;ac.width=w*dpr;ac.height=h*dpr;ax.scale(dpr,dpr);ac.style.width=w+'px';ac.style.height=h+'px'}
 setTimeout(rzA,80);window.addEventListener('resize',rzA);
-(function dA(){const W=ac.offsetWidth,H=ac.offsetHeight;
-if(!W||!H){at++;requestAnimationFrame(dA);return}
-ax.clearRect(0,0,W,H);ax.fillStyle='#0a0710';ax.fillRect(0,0,W,H);
-const bw=W/AB;
-ab.forEach((b,i)=>{
-  b.timer--;
-  if(b.timer<=0){b.target=.1+Math.random()*.85;b.timer=60+Math.random()*180}
-  b.vel+=(b.target-b.v)*.06;b.vel*=.82;b.v+=b.vel;
-  const x=i*bw+bw*.2,w=bw*.55,h=b.v*H*.88;
-  const g=ax.createLinearGradient(0,H-h,0,H);
-  g.addColorStop(0,b.v>.8?'rgba(255,60,110,.9)':'rgba(180,79,255,.8)');
-  g.addColorStop(.6,'rgba(0,245,196,.4)');
-  g.addColorStop(1,'rgba(10,7,16,0)');
-  ax.fillStyle=g;ax.beginPath();ax.roundRect(x,H-h,w,h,2);ax.fill();
-  ax.fillStyle=b.v>.8?'rgba(255,60,110,1)':'rgba(200,79,255,.9)';
-  ax.fillRect(x,H-h-2,w,2);
-});
-at++;requestAnimationFrame(dA)})();
+function drawAbout(){
+  const W=ac.offsetWidth,H=ac.offsetHeight;
+  if(!W||!H){at++;aboutFrame=requestAnimationFrame(drawAbout);return}
+  ax.clearRect(0,0,W,H);ax.fillStyle='#0a0710';ax.fillRect(0,0,W,H);
+  const bw=W/AB;
+  ab.forEach((b,i)=>{
+    b.timer--;
+    if(b.timer<=0){b.target=.1+Math.random()*.85;b.timer=60+Math.random()*180}
+    b.vel+=(b.target-b.v)*.06;b.vel*=.82;b.v+=b.vel;
+    const x=i*bw+bw*.2,w=bw*.55,h=b.v*H*.88;
+    const g=ax.createLinearGradient(0,H-h,0,H);
+    g.addColorStop(0,b.v>.8?'rgba(255,60,110,.9)':'rgba(180,79,255,.8)');
+    g.addColorStop(.6,'rgba(0,245,196,.4)');
+    g.addColorStop(1,'rgba(10,7,16,0)');
+    ax.fillStyle=g;ax.beginPath();ax.roundRect(x,H-h,w,h,2);ax.fill();
+    ax.fillStyle=b.v>.8?'rgba(255,60,110,1)':'rgba(200,79,255,.9)';
+    ax.fillRect(x,H-h-2,w,2);
+  });
+  at++;
+  aboutFrame=requestAnimationFrame(drawAbout);
+}
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) drawAbout();
 
+// === Intersection Observer (появление блоков) ===
 document.querySelectorAll('.rv').forEach(el=>{
   new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')})},{threshold:.06}).observe(el);
 });
 
+// === Отправка формы (демо) ===
 function doSubmit(e){
   e.preventDefault();
   const btn=e.target.querySelector('.bs'),ok=document.getElementById('fOk');
