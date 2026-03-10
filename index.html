@@ -128,7 +128,7 @@
       min-height: 100vh;
       display: flex; flex-direction: column;
       justify-content: flex-end;
-      padding: 0 48px 80px;
+      padding: 64px 48px 80px;
       position: relative; overflow: hidden;
     }
     .hero-bg {
@@ -620,6 +620,169 @@
     /* ── REVEAL ── */
     .fade-up { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
     .fade-up.vis { opacity: 1; transform: none; }
+
+    /* ══════════════════════════════════════════
+       HAMBURGER
+    ══════════════════════════════════════════ */
+    .hamburger {
+      display: none; flex-direction: column; justify-content: center;
+      gap: 5px; width: 36px; height: 36px;
+      background: transparent; border: none; cursor: pointer; padding: 2px;
+      flex-shrink: 0; z-index: 300;
+    }
+    .hamburger span {
+      display: block; width: 100%; height: 2px;
+      background: var(--white); border-radius: 2px;
+      transition: transform .3s, opacity .3s, background .2s;
+    }
+    .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ══════════════════════════════════════════
+       MOBILE MENU OVERLAY
+    ══════════════════════════════════════════ */
+    .mob-menu {
+      display: none; position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+      background: rgba(8,8,8,.98); backdrop-filter: blur(20px);
+      z-index: 250; flex-direction: column;
+      padding: 32px 24px 40px; gap: 0;
+      overflow-y: auto;
+    }
+    .mob-menu.open { display: flex; }
+    .mob-menu a {
+      display: block; color: var(--white); text-decoration: none;
+      font-family: 'Bebas Neue', sans-serif; font-size: 36px;
+      letter-spacing: 3px; padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      transition: color .2s;
+    }
+    .mob-menu a:hover, .mob-menu a:active { color: var(--accent); }
+    .mob-menu .mob-contact {
+      margin-top: 32px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .mob-menu .mob-phone {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 18px; color: var(--white); text-decoration: none;
+    }
+    .mob-menu .mob-phone i { color: var(--accent); }
+    .mob-menu .mob-addr {
+      font-size: 12px; color: var(--muted); letter-spacing: 1px; line-height: 1.6;
+    }
+    .mob-menu .mob-cta {
+      margin-top: 8px;
+      display: block; background: var(--accent); color: var(--white);
+      border: none; padding: 16px; border-radius: 6px;
+      font-family: 'Space Mono', monospace; font-size: 12px;
+      letter-spacing: 2px; text-transform: uppercase; text-align: center;
+      text-decoration: none;
+    }
+    .mob-menu .mob-socials { display: flex; gap: 24px; margin-top: 8px; }
+    .mob-menu .mob-socials a { font-size: 24px; color: var(--muted); border: none; padding: 0; }
+    .mob-menu .mob-socials a:hover { color: var(--white); }
+
+    /* ══════════════════════════════════════════
+       MOBILE BREAKPOINTS
+    ══════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      body { cursor: auto; }
+      .cursor, .cursor-ring { display: none; }
+
+      /* Nav */
+      nav { padding: 0 20px; height: 60px; }
+      .nav-meta, .nav-links, .nav-right { display: none !important; }
+      .hamburger { display: flex; }
+      .nav-logo { font-size: 16px; letter-spacing: 2px; }
+      .nav-logo img { height: 26px; }
+
+      /* Hero */
+      .hero { padding: 0 20px 60px; min-height: 100svh; padding-top: 60px; }
+      .hero-title { font-size: clamp(48px, 13vw, 90px); letter-spacing: -1px; margin-bottom: 28px; }
+      .hero-tag { font-size: 9px; letter-spacing: 2px; margin-bottom: 16px; }
+      .hero-bottom { flex-direction: column; align-items: flex-start; gap: 28px; }
+      .hero-desc { max-width: 100%; font-size: 12px; }
+      .hero-actions { flex-direction: column; width: 100%; gap: 12px; }
+      .btn-hero, .btn-hero-ghost { width: 100%; text-align: center; padding: 16px; font-size: 12px; }
+
+      /* Stats */
+      .stats-strip { grid-template-columns: repeat(2, 1fr); }
+      .stat-cell { padding: 20px 24px; }
+      .stat-val { font-size: 36px; }
+
+      /* Portfolio */
+      .portfolio-section { padding: 60px 0 50px; }
+      .portfolio-section .sec-label,
+      .portfolio-section .sec-title { padding: 0 20px; }
+      .carousel-outer { padding: 0 20px; }
+      .track-card { flex: 0 0 calc(80vw - 40px); }
+
+      /* Sections */
+      .section { padding: 60px 20px; }
+      .sec-title { font-size: clamp(32px, 9vw, 56px); margin-bottom: 36px; }
+
+      /* Services grid */
+      .services-grid { grid-template-columns: 1fr; }
+      .srv-card { padding: 28px 24px; }
+      .srv-num { font-size: 40px; margin-bottom: 12px; }
+
+      /* Arrangements */
+      .arr-section { padding: 0 20px 60px; }
+      .arr-item { flex-wrap: wrap; gap: 16px; }
+      .arr-item audio { width: 100%; order: 2; }
+      .arr-info { order: 1; flex: 1 1 100%; }
+      .arr-btn { order: 3; width: 100%; text-align: center; }
+
+      /* Pricing */
+      .pricing-grid { grid-template-columns: 1fr; }
+
+      /* Timeline */
+      .timeline-grid { grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 36px; }
+      .tl-step::after { display: none; }
+      .tl-num { font-size: 48px; }
+
+      /* Lessons */
+      .lessons-grid { grid-template-columns: 1fr; }
+
+      /* Contact */
+      .contact-section { grid-template-columns: 1fr; gap: 40px; padding: 0 20px 60px; }
+
+      /* Map */
+      .map-section { padding: 0 20px 60px; }
+      .map-wrapper { grid-template-columns: 1fr; height: auto; }
+      .map-frame { height: 280px; }
+      .map-info { padding: 24px 20px; }
+
+      /* Footer */
+      footer { flex-direction: column; align-items: center; padding: 32px 20px; text-align: center; gap: 20px; }
+      .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+
+      /* Cookie */
+      .cookie-bar {
+        flex-direction: column; white-space: normal;
+        width: 90%; border-radius: 16px; padding: 16px 20px; gap: 12px; bottom: 12px;
+      }
+      .cookie-btn { width: 100%; padding: 10px; }
+
+      /* Modal */
+      .modal-panel { width: 95%; padding: 28px 20px; }
+
+      /* Forms */
+      .cf-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .nav-logo { font-size: 14px; letter-spacing: 1px; }
+      .hero-title { font-size: clamp(40px, 14vw, 64px); }
+      .stats-strip { grid-template-columns: 1fr 1fr; }
+      .stat-cell { padding: 16px 16px; }
+      .stat-val { font-size: 28px; }
+      .stat-key { font-size: 9px; }
+      .timeline-grid { grid-template-columns: 1fr; }
+      .track-card { flex: 0 0 calc(90vw - 40px); }
+      .mob-menu a { font-size: 28px; }
+      .social-float { bottom: 16px; right: 16px; }
+      .sf-btn { width: 44px; height: 44px; }
+    }
   </style>
 </head>
 <body>
@@ -633,14 +796,12 @@
     <img src="https://github.com/springsoundlab/portfolio/raw/main/logotip.png" alt="SSL" onerror="this.style.display='none'"/>
     SPRING <span>SOUND</span> LAB
   </a>
-
   <div class="nav-meta">
     <i class="fas fa-map-marker-alt"></i>
     <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank">г. Волгоград, ул. Тулака 9</a>
     <span style="color:var(--border)">·</span>
     <span>Ежедн. 10:00–22:00</span>
   </div>
-
   <ul class="nav-links">
     <li><a href="#portfolio">Работы</a></li>
     <li><a href="#services">Услуги</a></li>
@@ -648,7 +809,6 @@
     <li><a href="#lessons">Обучение</a></li>
     <li><a href="#contact">Контакт</a></li>
   </ul>
-
   <div class="nav-right">
     <div class="audio-indicator">
       <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
@@ -656,7 +816,32 @@
     <a href="tel:+79178382017" class="nav-phone"><i class="fas fa-phone"></i>+7 917 838 20 17</a>
     <button class="nav-cta" onclick="openModal()">Записаться</button>
   </div>
+  <button class="hamburger" id="hamburger" aria-label="Меню">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mobMenu">
+  <a href="#portfolio" onclick="closeMobMenu()">Работы</a>
+  <a href="#services" onclick="closeMobMenu()">Услуги</a>
+  <a href="#pricing" onclick="closeMobMenu()">Цены</a>
+  <a href="#lessons" onclick="closeMobMenu()">Обучение</a>
+  <a href="#arrangements" onclick="closeMobMenu()">Аранжировки</a>
+  <a href="#faq" onclick="closeMobMenu()">FAQ</a>
+  <a href="#contact" onclick="closeMobMenu()">Контакт</a>
+  <div class="mob-contact">
+    <a href="tel:+79178382017" class="mob-phone"><i class="fas fa-phone"></i> +7 917 838 20 17</a>
+    <div class="mob-addr"><i class="fas fa-map-marker-alt" style="color:var(--accent);margin-right:6px"></i>г. Волгоград, ул. Тулака 9 · Ежедн. 10:00–22:00</div>
+    <button class="mob-cta" onclick="closeMobMenu(); openModal()">Забронировать студию</button>
+    <div class="mob-socials">
+      <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
+      <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
+      <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i></a>
+      <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+  </div>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -1341,6 +1526,23 @@
     } catch(e) {}
     setTimeout(() => { btn.textContent = 'Отправить заявку →'; btn.style.background = ''; }, 4000);
   }
+
+  // Hamburger menu
+  const hamburger = document.getElementById('hamburger');
+  const mobMenu = document.getElementById('mobMenu');
+  function closeMobMenu() {
+    hamburger.classList.remove('active');
+    mobMenu.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobMenu.classList.toggle('open');
+    hamburger.classList.toggle('active', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+  document.addEventListener('click', e => {
+    if (!hamburger.contains(e.target) && !mobMenu.contains(e.target)) closeMobMenu();
+  });
 
   // Social float
   const sfloat = document.getElementById('sfloat');
