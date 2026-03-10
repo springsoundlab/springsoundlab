@@ -134,61 +134,61 @@
     .hero {
       min-height: 100vh;
       display: flex; flex-direction: column;
-      justify-content: flex-end;
-      padding: 64px 48px 80px;
+      justify-content: center; align-items: center;
+      padding: 64px 48px 60px;
       position: relative; overflow: hidden;
     }
     .hero-bg {
       position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 70% 40%, rgba(255,59,0,.07) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(212,168,67,.05) 0%, transparent 60%);
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,59,0,.05) 0%, transparent 70%);
     }
+
+    .hero-center {
+      display: flex; flex-direction: column; align-items: center;
+      position: relative; z-index: 1;
+      width: 100%;
+    }
+
+    .hero-tag {
+      font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 12px; display: block; text-align: center;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 8vw, 120px);
+      line-height: 1; letter-spacing: 4px;
+      white-space: nowrap; text-align: center;
+      margin-bottom: 6px;
+    }
+    .hero-title .accent { color: var(--accent); }
+
+    /* Осциллограмма — точно по ширине заголовка */
     .hero-waveform {
-      position: absolute; top: 50%; left: 0; right: 0;
-      transform: translateY(-50%);
       display: flex; align-items: center; justify-content: center;
-      gap: 3px; height: 200px; opacity: .06;
+      gap: 3px; height: 48px;
+      width: 100%; max-width: fit-content;
+      margin: 0 auto;
+      overflow: hidden;
     }
     .hero-waveform .bar {
       flex-shrink: 0; width: 3px; background: var(--white); border-radius: 2px;
       animation: wave 1.4s ease-in-out infinite alternate;
     }
-    @keyframes wave { 0%{transform:scaleY(.2)} 100%{transform:scaleY(1)} }
+    @keyframes wave { 0%{transform:scaleY(.15)} 100%{transform:scaleY(1)} }
 
-    .hero-tag { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; position: relative; z-index: 1; text-align: center; }
-    .hero-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(52px, 9vw, 130px);
-      line-height: 1; letter-spacing: 4px; margin-bottom: 0;
-      position: relative; z-index: 1;
-      text-align: center; white-space: nowrap;
+    .hero-desc-center {
+      font-size: 13px; line-height: 1.9; color: var(--muted);
+      text-align: center; max-width: 580px;
+      margin-top: 8px;
     }
-    .hero-title .accent { color: var(--accent); }
-    .hero-logo-big {
-      display: block; margin: 16px auto 0;
-      height: clamp(120px, 22vw, 280px); width: auto;
-      filter: brightness(0) invert(1);
-      opacity: .92;
-      position: relative; z-index: 1;
-      animation: heroLogoFloat 5s ease-in-out infinite;
+
+    .hero-actions {
+      display: flex; gap: 16px; align-items: center;
+      margin-top: 40px;
     }
-    @keyframes heroLogoFloat {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-10px); }
-    }
-    .hero-subtitle {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(14px, 2.2vw, 28px);
-      letter-spacing: 10px; color: var(--muted);
-      text-align: center; margin-top: 16px; margin-bottom: 52px;
-      position: relative; z-index: 1;
-    }
-    .hero-bottom {
-      display: flex; align-items: flex-end; justify-content: space-between;
-      position: relative; z-index: 1;
-    }
-    .hero-desc { max-width: 380px; font-size: 13px; line-height: 2; color: var(--muted); }
+
+    .hero-bottom { display: none; }
     .hero-actions { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
     .btn-hero {
       display: inline-block; background: var(--accent); color: var(--white);
@@ -345,12 +345,11 @@
     .arr-list { display: flex; flex-direction: column; }
     .arr-item {
       display: flex; align-items: center; gap: 24px;
-      padding: 24px 0; border-bottom: 1px solid var(--border);
-      transition: background .2s;
+      padding: 20px 0; border-bottom: 1px solid var(--border);
     }
     .arr-item:first-child { border-top: 1px solid var(--border); }
     .arr-item audio {
-      width: 220px; flex-shrink: 0;
+      width: 180px; height: 32px; flex-shrink: 0;
       filter: invert(100%) hue-rotate(180deg) brightness(1.2);
       opacity: .8; outline: none;
     }
@@ -743,14 +742,11 @@
       .hero-logo-img { height: 72px; }
 
       /* Hero */
-      .hero { padding: 64px 20px 60px; min-height: 100svh; }
-      .hero-title { font-size: clamp(36px, 10vw, 72px); letter-spacing: 2px; white-space: nowrap; }
-      .hero-logo-big { height: clamp(100px, 40vw, 180px); }
-      .hero-subtitle { font-size: clamp(12px, 3.5vw, 18px); letter-spacing: 5px; margin-bottom: 32px; }
-      .hero-tag { font-size: 9px; letter-spacing: 2px; margin-bottom: 16px; }
-      .hero-bottom { flex-direction: column; align-items: center; gap: 24px; text-align: center; }
-      .hero-desc { max-width: 100%; font-size: 12px; }
-      .hero-actions { flex-direction: column; width: 100%; gap: 12px; }
+      .hero { padding: 64px 24px 48px; min-height: 100svh; justify-content: center; }
+      .hero-title { font-size: clamp(32px, 9vw, 64px); letter-spacing: 2px; }
+      .hero-waveform { height: 36px; }
+      .hero-desc-center { font-size: 12px; margin-top: 6px; }
+      .hero-actions { flex-direction: column; width: 100%; gap: 12px; margin-top: 28px; }
       .btn-hero, .btn-hero-ghost { width: 100%; text-align: center; padding: 16px; font-size: 12px; }
 
       /* Stats */
@@ -897,20 +893,12 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
-  <div class="hero-waveform" id="heroWave"></div>
-  <p class="hero-tag fade-up">// Профессиональная студия звукозаписи · Волгоград</p>
-  <h1 class="hero-title fade-up" style="transition-delay:.08s">
-    SPRING SOUND <span class="accent">LAB</span>
-  </h1>
-  <img
-    src="https://github.com/springsoundlab/portfolio/raw/main/logotip.png"
-    alt="Spring Sound Lab"
-    class="hero-logo-big fade-up"
-    style="transition-delay:.16s"
-  />
-  <p class="hero-subtitle fade-up" style="transition-delay:.22s">СТУДИЯ ЗВУКОЗАПИСИ</p>
-  <div class="hero-bottom fade-up" style="transition-delay:.30s">
-    <p class="hero-desc">Профессиональная архитектура звука. Запись, сведение, мастеринг, аранжировки. Уроки вокала и гитары. Мы не просто записываем — мы создаём стандарт звучания.</p>
+
+  <div class="hero-center fade-up">
+    <span class="hero-tag">// Волгоград</span>
+    <h1 class="hero-title">SPRING SOUND <span class="accent">LAB</span></h1>
+    <div class="hero-waveform" id="heroWave"></div>
+    <p class="hero-desc-center">Профессиональная архитектура звука. Запись, сведение, мастеринг, аранжировки. Уроки вокала и гитары.</p>
     <div class="hero-actions">
       <button class="btn-hero" onclick="openModal()">Забронировать студию</button>
       <a href="#portfolio" class="btn-hero-ghost">Наши работы</a>
@@ -1462,16 +1450,35 @@
     ring.style.top = e.clientY - 18 + 'px';
   });
 
-  // Waveform
-  const wf = document.getElementById('heroWave');
-  for (let i = 0; i < 120; i++) {
-    const b = document.createElement('div');
-    b.className = 'bar';
-    b.style.height = (Math.random() * 80 + 20) + '%';
-    b.style.animationDelay = (Math.random() * 1.4) + 's';
-    b.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
-    wf.appendChild(b);
-  }
+  // Waveform — ширина под заголовок
+  (function() {
+    const wf = document.getElementById('heroWave');
+    // После рендера берём ширину заголовка и заполняем барами
+    function buildWave() {
+      const title = document.querySelector('.hero-title');
+      if (!title) return;
+      const w = title.offsetWidth;
+      wf.style.width = w + 'px';
+      const barW = 3, gap = 3;
+      const count = Math.floor(w / (barW + gap));
+      wf.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const b = document.createElement('div');
+        b.className = 'bar';
+        b.style.height = (Math.random() * 80 + 20) + '%';
+        b.style.animationDelay = (Math.random() * 1.4) + 's';
+        b.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
+        wf.appendChild(b);
+      }
+    }
+    // Ждём загрузки шрифта
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(buildWave);
+    } else {
+      setTimeout(buildWave, 300);
+    }
+    window.addEventListener('resize', buildWave);
+  })();
 
   // Scroll reveal
   const obs = new IntersectionObserver(entries => {
