@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SOUNDCORE STUDIO</title>
+  <title>SPRING SOUND LAB · Студия звукозаписи · Волгоград</title>
+  <meta name="description" content="Spring Sound Lab — профессиональная студия звукозаписи в Волгограде. Запись вокала, сведение, мастеринг, аранжировки. Уроки вокала и гитары."/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
   <style>
     :root {
       --bg: #080808;
@@ -17,7 +19,6 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -28,681 +29,649 @@
       cursor: none;
     }
 
-    /* CUSTOM CURSOR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+    /* CURSOR */
     .cursor {
-      position: fixed;
-      width: 12px; height: 12px;
-      background: var(--accent);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
+      position: fixed; width: 12px; height: 12px;
+      background: var(--accent); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
       transition: transform 0.1s ease;
       mix-blend-mode: difference;
     }
     .cursor-ring {
-      position: fixed;
-      width: 36px; height: 36px;
-      border: 1px solid var(--accent);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
+      position: fixed; width: 36px; height: 36px;
+      border: 1px solid var(--accent); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
       transition: all 0.15s ease;
       mix-blend-mode: difference;
     }
 
-    /* NOISE OVERLAY */
+    /* NOISE */
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9997;
-      opacity: 0.4;
+      pointer-events: none; z-index: 9997; opacity: 0.4;
     }
 
-    /* NAV */
+    /* ── NAV ── */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 24px 48px;
-      background: linear-gradient(to bottom, rgba(8,8,8,0.95), transparent);
-      mix-blend-mode: normal;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px;
+      height: 64px;
+      background: rgba(8,8,8,.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
     }
     .nav-logo {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 28px;
-      letter-spacing: 4px;
-      color: var(--white);
-      text-decoration: none;
+      font-size: 20px; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--white); text-decoration: none; white-space: nowrap;
+      display: flex; align-items: center; gap: 10px;
     }
+    .nav-logo img { height: 32px; width: auto; }
     .nav-logo span { color: var(--accent); }
-    .nav-links { display: flex; gap: 40px; list-style: none; }
+
+    .nav-meta {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 10px; color: var(--muted); letter-spacing: 1px;
+    }
+    .nav-meta i { color: var(--accent); font-size: 10px; }
+    .nav-meta a { color: var(--muted); text-decoration: none; transition: color .2s; }
+    .nav-meta a:hover { color: var(--white); }
+
+    .nav-links { display: flex; gap: 28px; list-style: none; }
     .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: color 0.2s;
+      color: var(--muted); text-decoration: none;
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      transition: color .2s; cursor: none;
     }
     .nav-links a:hover { color: var(--white); }
+
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+    .nav-phone {
+      font-size: 11px; color: var(--muted); text-decoration: none;
+      letter-spacing: 1px; transition: color .2s;
+    }
+    .nav-phone i { color: var(--accent); margin-right: 4px; }
+    .nav-phone:hover { color: var(--white); }
+
     .nav-cta {
-      background: var(--accent);
-      color: var(--white);
-      border: none;
-      padding: 10px 24px;
+      background: var(--accent); color: var(--white);
+      border: none; padding: 8px 20px;
       font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: none;
-      transition: background 0.2s, transform 0.2s;
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      cursor: none; border-radius: 4px;
+      transition: background .2s, transform .2s;
     }
     .nav-cta:hover { background: #FF5520; transform: translateY(-1px); }
 
-    /* HERO */
+    /* AUDIO indicator */
+    .audio-indicator {
+      display: flex; align-items: center; gap: 3px; height: 16px;
+    }
+    .audio-indicator .bar {
+      width: 3px; background: var(--accent); border-radius: 1px;
+      animation: audioBars 0.8s ease-in-out infinite alternate;
+    }
+    .audio-indicator .bar:nth-child(2) { animation-delay: .15s; }
+    .audio-indicator .bar:nth-child(3) { animation-delay: .3s; }
+    .audio-indicator .bar:nth-child(4) { animation-delay: .45s; }
+    @keyframes audioBars { 0%{height:4px} 100%{height:14px} }
+
+    /* ── HERO ── */
     .hero {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
       justify-content: flex-end;
       padding: 0 48px 80px;
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden;
     }
     .hero-bg {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background:
-        radial-gradient(ellipse 80% 60% at 70% 40%, rgba(255,59,0,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(212,168,67,0.05) 0%, transparent 60%);
+        radial-gradient(ellipse 80% 60% at 70% 40%, rgba(255,59,0,.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 20% 80%, rgba(212,168,67,.05) 0%, transparent 60%);
     }
     .hero-waveform {
-      position: absolute;
-      top: 50%;
-      left: 0; right: 0;
+      position: absolute; top: 50%; left: 0; right: 0;
       transform: translateY(-50%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      height: 200px;
-      opacity: 0.06;
+      display: flex; align-items: center; justify-content: center;
+      gap: 3px; height: 200px; opacity: .06;
     }
     .hero-waveform .bar {
-      flex-shrink: 0;
-      width: 3px;
-      background: var(--white);
-      border-radius: 2px;
+      flex-shrink: 0; width: 3px; background: var(--white); border-radius: 2px;
       animation: wave 1.4s ease-in-out infinite alternate;
     }
-    @keyframes wave {
-      0% { transform: scaleY(0.2); }
-      100% { transform: scaleY(1); }
-    }
+    @keyframes wave { 0%{transform:scaleY(.2)} 100%{transform:scaleY(1)} }
 
-    .hero-tag {
-      font-size: 11px;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 24px;
-    }
+    .hero-tag { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; position: relative; z-index: 1; }
     .hero-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(80px, 14vw, 200px);
-      line-height: 0.9;
-      letter-spacing: -2px;
-      margin-bottom: 40px;
+      font-size: clamp(64px, 11vw, 160px);
+      line-height: .95; letter-spacing: -2px; margin-bottom: 40px;
+      position: relative; z-index: 1;
     }
     .hero-title .line2 { color: transparent; -webkit-text-stroke: 1px var(--white); }
     .hero-title .line2 span { color: var(--accent); -webkit-text-stroke: 0; }
     .hero-bottom {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      position: relative; z-index: 1;
     }
-    .hero-desc {
-      max-width: 340px;
-      font-size: 13px;
-      line-height: 2;
-      color: var(--muted);
+    .hero-desc { max-width: 380px; font-size: 13px; line-height: 2; color: var(--muted); }
+    .hero-actions { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
+    .btn-hero {
+      display: inline-block; background: var(--accent); color: var(--white);
+      border: none; padding: 14px 32px; border-radius: 6px;
+      font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+      text-transform: uppercase; cursor: none; text-decoration: none;
+      transition: background .2s, transform .2s;
     }
-    .hero-scroll {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--muted);
+    .btn-hero:hover { background: #FF5520; transform: translateY(-2px); }
+    .btn-hero-ghost {
+      display: inline-block; background: transparent; color: var(--white);
+      border: 1px solid var(--border); padding: 14px 32px; border-radius: 6px;
+      font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+      text-transform: uppercase; cursor: none; text-decoration: none;
+      transition: border-color .2s;
     }
-    .scroll-line {
-      width: 60px;
-      height: 1px;
-      background: var(--muted);
-      animation: scrollLine 2s ease-in-out infinite;
-    }
-    @keyframes scrollLine {
-      0%, 100% { transform: scaleX(1); }
-      50% { transform: scaleX(0.4); transform-origin: left; }
-    }
+    .btn-hero-ghost:hover { border-color: rgba(255,255,255,.2); }
 
-    /* MARQUEE */
+    /* ── MARQUEE ── */
     .marquee-wrap {
       overflow: hidden;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
-      padding: 18px 0;
-      background: var(--surface);
+      padding: 18px 0; background: var(--surface);
     }
     .marquee-track {
-      display: flex;
-      gap: 64px;
-      white-space: nowrap;
-      animation: marquee 20s linear infinite;
+      display: flex; gap: 64px; white-space: nowrap;
+      animation: marquee 22s linear infinite;
     }
-    .marquee-item {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
-      letter-spacing: 4px;
-      color: var(--muted);
-      flex-shrink: 0;
-    }
+    .marquee-item { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 4px; color: var(--muted); flex-shrink: 0; }
     .marquee-item span { color: var(--accent); margin-right: 64px; }
-    @keyframes marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
+    @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
 
-    /* SERVICES */
-    .section { padding: 120px 48px; }
-    .section-label {
-      font-size: 11px;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 16px;
-    }
-    .section-title {
+    /* ── SECTIONS ── */
+    .section { padding: 100px 48px; }
+    .sec-label { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+    .sec-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(42px, 6vw, 80px);
-      line-height: 1;
-      letter-spacing: 1px;
-      margin-bottom: 80px;
+      font-size: clamp(36px, 5vw, 68px); line-height: 1; letter-spacing: 1px;
+      margin-bottom: 60px;
     }
 
+    /* ── STATS ── */
+    .stats-strip {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+    .stat-cell { padding: 32px 48px; border-right: 1px solid var(--border); }
+    .stat-cell:last-child { border-right: none; }
+    .stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 44px; line-height: 1; margin-bottom: 6px; }
+    .stat-val em { color: var(--accent); font-style: normal; }
+    .stat-key { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ── PORTFOLIO / TRACKS ── */
+    .portfolio-section { padding: 100px 0 80px; }
+    .portfolio-section .sec-label,
+    .portfolio-section .sec-title { padding: 0 48px; }
+
+    .carousel-outer { padding: 0 48px; position: relative; }
+    .carousel-container { overflow: hidden; }
+    .carousel-track {
+      display: flex; gap: 24px;
+      transition: transform .5s cubic-bezier(.25,.46,.45,.94);
+      will-change: transform;
+    }
+
+    .track-card {
+      flex: 0 0 calc(25% - 18px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      transition: border-color .3s, transform .3s;
+    }
+    .track-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .track-img {
+      width: 100%; aspect-ratio: 1/1;
+      background: #1a1a1a; background-size: cover; background-position: center;
+      position: relative;
+    }
+    .track-img.placeholder {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .track-info { padding: 20px 20px 8px; }
+    .track-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+    .track-role { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .track-card audio {
+      width: 100%; margin-top: 12px; padding: 0 12px 16px;
+      filter: invert(100%) hue-rotate(180deg) brightness(1.2);
+      opacity: .8; outline: none; display: block;
+      transition: opacity .2s;
+    }
+    .track-card audio:hover { opacity: 1; }
+
+    .carousel-arrows {
+      display: flex; gap: 12px; margin-top: 28px; justify-content: center;
+    }
+    .c-arrow {
+      width: 48px; height: 48px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 16px;
+      cursor: none; transition: all .2s;
+    }
+    .c-arrow:hover { background: var(--accent); border-color: var(--accent); color: var(--white); }
+
+    /* ── SERVICES ── */
     .services-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border); border: 1px solid var(--border);
     }
-    .service-card {
-      background: var(--bg);
-      padding: 48px 40px;
-      transition: background 0.3s;
-      position: relative;
-      overflow: hidden;
+    .srv-card {
+      background: var(--bg); padding: 40px 36px;
+      transition: background .3s; position: relative; overflow: hidden;
     }
-    .service-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 3px;
-      height: 0;
-      background: var(--accent);
-      transition: height 0.4s ease;
+    .srv-card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 3px; height: 0; background: var(--accent);
+      transition: height .4s ease;
     }
-    .service-card:hover { background: #0f0f0f; }
-    .service-card:hover::before { height: 100%; }
-    .service-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 64px;
-      color: var(--border);
-      line-height: 1;
-      margin-bottom: 24px;
-      transition: color 0.3s;
+    .srv-card:hover { background: #0f0f0f; }
+    .srv-card:hover::before { height: 100%; }
+    .srv-num {
+      font-family: 'Bebas Neue', sans-serif; font-size: 56px;
+      color: var(--border); line-height: 1; margin-bottom: 20px;
+      transition: color .3s;
     }
-    .service-card:hover .service-num { color: rgba(255,59,0,0.15); }
-    .service-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 28px;
-      letter-spacing: 2px;
-      margin-bottom: 16px;
-    }
-    .service-desc {
-      font-size: 12px;
-      line-height: 2;
-      color: var(--muted);
-    }
+    .srv-card:hover .srv-num { color: rgba(255,59,0,.2); }
+    .srv-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; margin-bottom: 12px; }
+    .srv-desc { font-size: 11px; line-height: 2; color: var(--muted); margin-bottom: 16px; }
+    .srv-price { font-size: 12px; color: var(--accent); letter-spacing: 1px; }
 
-    /* STUDIO SECTION */
-    .studio-section {
-      padding: 0 48px 120px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
+    /* ── ARRANGEMENTS ── */
+    .arr-section { padding: 0 48px 100px; }
+    .arr-list { display: flex; flex-direction: column; }
+    .arr-item {
+      display: flex; align-items: center; gap: 24px;
+      padding: 24px 0; border-bottom: 1px solid var(--border);
+      transition: background .2s;
     }
-    .studio-visual {
-      position: relative;
-      height: 520px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      overflow: hidden;
+    .arr-item:first-child { border-top: 1px solid var(--border); }
+    .arr-item audio {
+      width: 220px; flex-shrink: 0;
+      filter: invert(100%) hue-rotate(180deg) brightness(1.2);
+      opacity: .8; outline: none;
     }
-    .studio-visual-inner {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
+    .arr-info { flex: 1; }
+    .arr-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .arr-price { font-size: 12px; color: var(--accent); letter-spacing: 1px; }
+    .arr-btn {
+      background: transparent; border: 1px solid var(--white);
+      color: var(--white); padding: 10px 24px;
+      font-family: 'Space Mono', monospace; font-size: 10px;
+      letter-spacing: 2px; text-transform: uppercase;
+      cursor: none; border-radius: 4px;
+      transition: all .2s; white-space: nowrap;
     }
-    /* Mixing board visual */
-    .mixer {
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-      padding: 40px 30px;
-      border: 1px solid var(--border);
-      background: #0d0d0d;
-    }
-    .fader-channel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-    .fader-label { font-size: 8px; letter-spacing: 1px; color: var(--muted); }
-    .fader-track {
-      width: 2px;
-      height: 80px;
-      background: var(--border);
-      position: relative;
-    }
-    .fader-handle {
-      position: absolute;
-      left: -5px;
-      width: 12px; height: 4px;
-      background: var(--gold);
-    }
-    .fader-knob {
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      border: 2px solid var(--muted);
-      position: relative;
-    }
-    .fader-knob::after {
-      content: '';
-      position: absolute;
-      top: 2px; left: 50%;
-      transform: translateX(-50%);
-      width: 2px; height: 5px;
-      background: var(--gold);
-    }
-    .vu-meter {
-      width: 8px; height: 80px;
-      background: var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-    .vu-fill {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      background: linear-gradient(to top, #00FF7F, #FFFF00, var(--accent));
-      animation: vu 1.8s ease-in-out infinite alternate;
-    }
-    @keyframes vu {
-      0% { height: 20%; }
-      100% { height: 85%; }
-    }
-    .studio-tag-overlay {
-      position: absolute;
-      bottom: 24px; left: 24px;
-      font-size: 10px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .studio-content .section-title { margin-bottom: 24px; }
-    .studio-content p {
-      font-size: 13px;
-      line-height: 2.2;
-      color: var(--muted);
-      margin-bottom: 48px;
-    }
-    .stats-row { display: flex; gap: 48px; margin-bottom: 48px; }
-    .stat-item {}
-    .stat-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 52px;
-      color: var(--white);
-      line-height: 1;
-    }
-    .stat-num span { color: var(--accent); }
-    .stat-label { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
-    .btn-outline {
-      display: inline-block;
-      border: 1px solid var(--white);
-      color: var(--white);
-      padding: 14px 32px;
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .btn-outline:hover { background: var(--white); color: var(--bg); }
+    .arr-btn:hover { background: var(--white); color: var(--bg); }
 
-    /* ARTISTS */
-    .artists-section { padding: 0 48px 120px; }
-    .artists-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      margin-top: 80px;
-    }
-    .artist-card {
-      position: relative;
-      aspect-ratio: 3/4;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 24px;
-      transition: transform 0.3s;
-    }
-    .artist-card:hover { transform: translateY(-6px); }
-    .artist-bg {
-      position: absolute;
-      inset: 0;
-      opacity: 0.3;
-    }
-    .artist-card:nth-child(1) .artist-bg { background: radial-gradient(circle at 50% 30%, #FF3B00 0%, transparent 60%); }
-    .artist-card:nth-child(2) .artist-bg { background: radial-gradient(circle at 50% 30%, #D4A843 0%, transparent 60%); }
-    .artist-card:nth-child(3) .artist-bg { background: radial-gradient(circle at 50% 30%, #4A90D9 0%, transparent 60%); }
-    .artist-card:nth-child(4) .artist-bg { background: radial-gradient(circle at 50% 30%, #8B5CF6 0%, transparent 60%); }
-    .artist-icon {
-      font-size: 64px;
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -60%);
-      opacity: 0.15;
-    }
-    .artist-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 24px;
-      letter-spacing: 2px;
-      position: relative;
-      z-index: 1;
-    }
-    .artist-genre {
-      font-size: 10px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 6px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* PRICING */
-    .pricing-section { padding: 0 48px 120px; }
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-top: 80px;
-    }
+    /* ── PRICING ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .price-card {
-      border: 1px solid var(--border);
-      padding: 48px 40px;
-      position: relative;
-      transition: border-color 0.3s;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 36px; position: relative;
+      transition: border-color .25s;
     }
-    .price-card:hover { border-color: var(--accent); }
-    .price-card.featured {
-      border-color: var(--accent);
-      background: linear-gradient(135deg, rgba(255,59,0,0.05), transparent);
+    .price-card:hover { border-color: rgba(255,255,255,.14); }
+    .price-card.hot { border-color: var(--accent); background: linear-gradient(160deg, rgba(255,59,0,.05) 0%, var(--surface) 60%); }
+    .hot-label {
+      position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); border-radius: 0 0 6px 6px;
+      font-size: 9px; font-weight: 700; letter-spacing: 2px;
+      padding: 4px 14px; text-transform: uppercase;
     }
-    .price-card.featured .featured-badge {
-      position: absolute;
-      top: -1px; right: 32px;
-      background: var(--accent);
-      font-size: 9px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      padding: 4px 12px;
+    .price-tier { font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 24px; }
+    .price-num { font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 1; margin-bottom: 4px; }
+    .price-num sup { font-size: 20px; color: var(--muted); vertical-align: top; margin-top: 10px; display: inline-block; }
+    .price-per { font-size: 10px; color: var(--muted); margin-bottom: 28px; letter-spacing: 1px; }
+    .price-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
+    .price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; flex: 1; margin-bottom: 28px; }
+    .price-features li { font-size: 12px; color: var(--muted); display: flex; gap: 10px; align-items: flex-start; }
+    .price-features li span { color: var(--accent); flex-shrink: 0; }
+    .price-btn {
+      width: 100%; height: 44px; border-radius: 6px; border: none;
+      font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+      text-transform: uppercase; cursor: none; transition: opacity .2s;
     }
-    .price-tier {
-      font-size: 11px;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
-    .price-amount {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 72px;
-      line-height: 1;
-      color: var(--white);
-      margin-bottom: 8px;
-    }
-    .price-amount span { font-size: 28px; color: var(--muted); }
-    .price-per { font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-bottom: 40px; }
-    .price-features { list-style: none; margin-bottom: 40px; }
-    .price-features li {
-      font-size: 12px;
-      line-height: 1;
-      color: var(--muted);
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .price-features li::before {
-      content: '→';
-      color: var(--accent);
-      flex-shrink: 0;
-    }
-    .btn-primary {
-      display: block;
-      width: 100%;
-      background: var(--accent);
-      color: var(--white);
-      border: none;
-      padding: 14px;
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      cursor: none;
-      text-align: center;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-primary:hover { background: #FF5520; }
-    .btn-secondary {
-      display: block;
-      width: 100%;
-      background: transparent;
-      color: var(--white);
-      border: 1px solid var(--border);
-      padding: 14px;
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      cursor: none;
-      text-align: center;
-      text-decoration: none;
-      transition: border-color 0.2s;
-    }
-    .btn-secondary:hover { border-color: var(--white); }
+    .price-btn.filled { background: var(--accent); color: #fff; }
+    .price-btn.filled:hover { opacity: .85; }
+    .price-btn.outline { background: transparent; color: var(--white); border: 1px solid var(--border); }
+    .price-btn.outline:hover { border-color: rgba(255,255,255,.2); }
 
-    /* CONTACT */
+    /* ── HOW WE WORK ── */
+    .timeline-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+      margin-top: 60px;
+    }
+    .tl-step { padding: 0 32px 0 0; position: relative; }
+    .tl-step:not(:last-child)::after {
+      content: '→'; position: absolute; right: 0; top: 16px;
+      color: var(--muted); font-size: 20px;
+    }
+    .tl-num {
+      font-family: 'Bebas Neue', sans-serif; font-size: 64px;
+      color: var(--border); line-height: 1; margin-bottom: 16px;
+    }
+    .tl-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 12px; }
+    .tl-desc { font-size: 11px; line-height: 2; color: var(--muted); }
+
+    /* ── LESSONS ── */
+    .lessons-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .lesson-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 36px;
+      transition: border-color .3s, transform .3s;
+    }
+    .lesson-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .lesson-icon { font-size: 32px; margin-bottom: 20px; }
+    .lesson-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 1px; margin-bottom: 12px; }
+    .lesson-desc { font-size: 11px; line-height: 2; color: var(--muted); margin-bottom: 20px; }
+    .lesson-prices { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .lesson-prices li { display: flex; justify-content: space-between; font-size: 11px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .lesson-prices li span { color: var(--accent); }
+    .lesson-btn {
+      display: block; width: 100%; height: 40px;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--white); border-radius: 6px;
+      font-family: 'Space Mono', monospace; font-size: 10px;
+      letter-spacing: 2px; text-transform: uppercase; cursor: none;
+      transition: all .2s;
+    }
+    .lesson-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; }
+    .faq-item { border-bottom: 1px solid var(--border); overflow: hidden; }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-q {
+      width: 100%; background: transparent; border: none;
+      color: var(--white); font-family: 'Space Mono', monospace;
+      font-size: 13px; font-weight: 700;
+      text-align: left; padding: 22px 0;
+      cursor: none; display: flex; justify-content: space-between;
+      align-items: center; gap: 20px; transition: color .2s;
+    }
+    .faq-q:hover { color: var(--accent); }
+    .faq-icon {
+      flex-shrink: 0; width: 24px; height: 24px;
+      border: 1px solid var(--border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--accent);
+      transition: transform .3s, border-color .2s;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); border-color: var(--accent); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height .4s ease, padding .3s ease; }
+    .faq-item.open .faq-a { max-height: 300px; padding-bottom: 20px; }
+    .faq-a p { font-size: 12px; line-height: 2; color: var(--muted); }
+
+    /* ── CONTACT ── */
     .contact-section {
-      padding: 0 48px 120px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
+      padding: 0 48px 100px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
     }
-    .contact-info h2 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(42px, 5vw, 72px);
-      line-height: 1;
-      margin-bottom: 32px;
+    .contact-left .sec-title { margin-bottom: 20px; }
+    .contact-left > p { font-size: 13px; line-height: 2; color: var(--muted); margin-bottom: 40px; }
+    .contact-cards { display: flex; flex-direction: column; gap: 12px; }
+    .ccard {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 22px;
+      display: flex; align-items: center; gap: 16px;
+      transition: border-color .2s;
     }
-    .contact-info h2 em { font-style: normal; color: var(--accent); }
-    .contact-info p { font-size: 13px; line-height: 2.2; color: var(--muted); margin-bottom: 48px; }
-    .contact-details { list-style: none; }
-    .contact-details li {
-      display: flex;
-      gap: 16px;
-      padding: 18px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-    }
-    .contact-details li strong {
-      color: var(--muted);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-size: 10px;
-      min-width: 80px;
-    }
-    .contact-form { display: flex; flex-direction: column; gap: 16px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .form-field { display: flex; flex-direction: column; gap: 8px; }
-    .form-field label {
-      font-size: 10px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .form-field input,
-    .form-field textarea,
-    .form-field select {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--white);
-      padding: 14px 16px;
-      font-family: 'Space Mono', monospace;
-      font-size: 12px;
-      outline: none;
-      transition: border-color 0.2s;
-      resize: none;
+    .ccard:hover { border-color: var(--accent); }
+    .ccard-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,59,0,.1); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; color: var(--accent); }
+    .ccard-label { font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
+    .ccard-val { font-size: 13px; }
+    .ccard-val a { color: var(--white); text-decoration: none; transition: color .2s; }
+    .ccard-val a:hover { color: var(--accent); }
+
+    .contact-form { display: flex; flex-direction: column; gap: 14px; }
+    .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .cf-field { display: flex; flex-direction: column; gap: 6px; }
+    .cf-field label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .cf-field input, .cf-field textarea, .cf-field select {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 14px;
+      color: var(--white); font-family: 'Space Mono', monospace;
+      font-size: 12px; outline: none; transition: border-color .2s; resize: none;
       -webkit-appearance: none;
     }
-    .form-field input:focus,
-    .form-field textarea:focus,
-    .form-field select:focus { border-color: var(--accent); }
-    .form-field select option { background: var(--surface); }
+    .cf-field input:focus, .cf-field textarea:focus, .cf-field select:focus { border-color: var(--accent); }
+    .cf-field select option { background: #1a1a1a; }
+    .cf-submit {
+      height: 48px; border-radius: 8px;
+      background: var(--accent); color: #fff; border: none;
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase;
+      cursor: none; transition: opacity .2s;
+    }
+    .cf-submit:hover { opacity: .85; }
 
-    /* FOOTER */
+    /* ── MAP ── */
+    .map-section { padding: 0 48px 100px; }
+    .map-wrapper {
+      display: grid; grid-template-columns: 280px 1fr;
+      border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; height: 380px;
+    }
+    .map-info { background: var(--surface); padding: 32px 24px; display: flex; flex-direction: column; gap: 20px; border-right: 1px solid var(--border); }
+    .map-info-item { display: flex; align-items: flex-start; gap: 12px; }
+    .map-info-item > i { color: var(--accent); font-size: 12px; margin-top: 2px; width: 14px; flex-shrink: 0; }
+    .map-info-label { font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
+    .map-info-val { font-size: 12px; line-height: 1.4; }
+    .map-info-val a { color: var(--white); text-decoration: none; transition: color .2s; }
+    .map-info-val a:hover { color: var(--accent); }
+    .map-route {
+      margin-top: auto; display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border); color: var(--muted); padding: 8px 16px;
+      border-radius: 20px; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; text-decoration: none;
+      transition: all .2s; cursor: none;
+    }
+    .map-route:hover { border-color: var(--accent); color: var(--accent); }
+    .map-frame { position: relative; overflow: hidden; }
+    .map-frame iframe { width: 100%; height: 100%; border: none; filter: invert(.92) hue-rotate(180deg) brightness(.85) saturate(.7); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.85); z-index: 10000;
+      backdrop-filter: blur(8px);
+    }
+    .modal-panel {
+      display: none; position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 440px; max-width: 95vw; max-height: 92vh;
+      overflow-y: auto;
+      background: #111; border: 1px solid rgba(255,59,0,.4);
+      border-radius: 16px; padding: 36px 32px;
+      z-index: 10001;
+      box-shadow: 0 0 60px rgba(255,59,0,.15), 0 20px 60px rgba(0,0,0,.6);
+    }
+    .modal-close-x {
+      position: absolute; top: 14px; right: 16px;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      cursor: none; color: var(--muted); font-size: 16px; border-radius: 50%;
+      transition: color .2s, background .2s;
+    }
+    .modal-close-x:hover { color: var(--white); background: rgba(255,255,255,.08); }
+    .modal-title-text {
+      font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .modal-phone-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff; text-decoration: none;
+      padding: 8px 18px; border-radius: 30px; font-size: 13px; font-weight: 700;
+      transition: background .2s; margin-bottom: 20px;
+    }
+    .modal-phone-link:hover { background: #FF5520; }
+    .modal-form { display: flex; flex-direction: column; gap: 12px; }
+    .modal-field { display: flex; flex-direction: column; gap: 5px; }
+    .modal-field label { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .modal-field input, .modal-field textarea {
+      background: #181818; border: 1px solid #2a2a2a; color: var(--white);
+      border-radius: 8px; padding: 11px 14px; font-family: 'Space Mono', monospace;
+      font-size: 12px; outline: none; transition: border-color .2s; resize: none;
+    }
+    .modal-field input:focus, .modal-field textarea:focus { border-color: var(--accent); }
+    .privacy-row { display: flex; align-items: flex-start; gap: 10px; }
+    .privacy-row input[type="checkbox"] { width: 16px; height: 16px; min-width: 16px; margin-top: 2px; accent-color: var(--accent); cursor: none; }
+    .privacy-row label { font-size: 11px; color: var(--muted); line-height: 1.6; cursor: none; }
+    .modal-submit {
+      background: var(--white); color: var(--bg);
+      border: none; padding: 13px; border-radius: 30px;
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      cursor: none; transition: background .2s, color .2s; width: 100%;
+    }
+    .modal-submit:hover { background: var(--accent); color: #fff; }
+    .modal-submit.sent { background: #22c55e; color: #fff; pointer-events: none; }
+    .modal-socials { margin-top: 20px; text-align: center; border-top: 1px solid var(--border); padding-top: 16px; }
+    .modal-socials p { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+    .modal-social-icons { display: flex; justify-content: center; gap: 20px; }
+    .modal-social-icons a { color: var(--muted); font-size: 20px; transition: color .2s; }
+    .modal-social-icons a:hover { color: var(--accent); }
+
+    /* ── FOOTER ── */
     footer {
-      border-top: 1px solid var(--border);
-      padding: 48px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      border-top: 1px solid var(--border); padding: 40px 48px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;
     }
-    .footer-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 32px;
-      letter-spacing: 4px;
-    }
+    .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 4px; }
     .footer-logo span { color: var(--accent); }
-    footer p { font-size: 11px; color: var(--muted); letter-spacing: 2px; }
-    .footer-links { display: flex; gap: 32px; }
-    .footer-links a {
-      font-size: 11px;
-      color: var(--muted);
-      text-decoration: none;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
+    .footer-center { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .footer-social { display: flex; gap: 20px; }
+    .footer-social a { color: var(--muted); font-size: 18px; transition: color .2s; }
+    .footer-social a:hover { color: var(--white); }
+    .footer-copy { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 10px; color: var(--muted); text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: color .2s; }
     .footer-links a:hover { color: var(--white); }
 
-    /* ANIMATIONS */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
+    /* ── COOKIE ── */
+    .cookie-bar {
+      display: none; position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%); background: var(--surface);
+      border: 1px solid var(--accent); border-radius: 40px;
+      padding: 10px 24px; z-index: 9999;
+      display: flex; align-items: center; gap: 20px;
+      white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,.5);
     }
-    .fade-up.visible {
-      opacity: 1;
-      transform: translateY(0);
+    .cookie-bar p { font-size: 11px; color: var(--muted); white-space: normal; max-width: 360px; }
+    .cookie-btn {
+      background: var(--accent); border: none; color: #fff;
+      padding: 6px 18px; border-radius: 20px; font-family: 'Space Mono', monospace;
+      font-size: 10px; letter-spacing: 1px; cursor: none; transition: background .2s; flex-shrink: 0;
     }
+    .cookie-btn:hover { background: #FF5520; }
 
-    /* AUDIO VIZ in nav */
-    .audio-indicator {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      height: 16px;
+    /* ── SOCIAL FLOAT ── */
+    .social-float { position: fixed; bottom: 28px; right: 28px; z-index: 10000; }
+    .sf-btn {
+      width: 52px; height: 52px; background: var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: none; box-shadow: 0 4px 16px rgba(255,59,0,.3);
+      transition: transform .2s;
+      animation: sfPulse 2s infinite;
     }
-    .audio-indicator .bar {
-      width: 3px;
-      background: var(--accent);
-      border-radius: 1px;
-      animation: audioBars 0.8s ease-in-out infinite alternate;
+    .sf-btn i { font-size: 20px; color: #fff; }
+    .sf-btn:hover { transform: scale(1.1); }
+    @keyframes sfPulse { 0%{box-shadow:0 0 0 0 rgba(255,59,0,.6)} 70%{box-shadow:0 0 0 14px rgba(255,59,0,0)} 100%{box-shadow:0 0 0 0 rgba(255,59,0,0)} }
+    .sf-menu {
+      position: absolute; bottom: 62px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      visibility: hidden; opacity: 0; transition: all .3s;
     }
-    .audio-indicator .bar:nth-child(2) { animation-delay: 0.15s; }
-    .audio-indicator .bar:nth-child(3) { animation-delay: 0.3s; }
-    .audio-indicator .bar:nth-child(4) { animation-delay: 0.45s; }
-    @keyframes audioBars {
-      0% { height: 4px; }
-      100% { height: 14px; }
+    .social-float.open .sf-menu { visibility: visible; opacity: 1; }
+    .sf-menu a {
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      color: var(--accent); font-size: 24px; text-decoration: none;
+      opacity: 0; transform: scale(.5) translateY(20px);
+      transition: opacity .3s, transform .3s, color .2s;
     }
+    .social-float.open .sf-menu a { opacity: 1; transform: scale(1) translateY(0); }
+    .social-float.open .sf-menu a:nth-child(1) { transition-delay: .3s; }
+    .social-float.open .sf-menu a:nth-child(2) { transition-delay: .2s; }
+    .social-float.open .sf-menu a:nth-child(3) { transition-delay: .1s; }
+    .social-float.open .sf-menu a:nth-child(4) { transition-delay: 0s; }
+    .sf-menu a:hover { color: #fff; }
+
+    /* ── REVEAL ── */
+    .fade-up { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+    .fade-up.vis { opacity: 1; transform: none; }
   </style>
 </head>
 <body>
 
 <div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursor-ring"></div>
+<div class="cursor-ring" id="curRing"></div>
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">SOUND<span>CORE</span></a>
+  <a href="#" class="nav-logo">
+    <img src="https://github.com/springsoundlab/portfolio/raw/main/logotip.png" alt="SSL" onerror="this.style.display='none'"/>
+    SPRING <span>SOUND</span> LAB
+  </a>
+
+  <div class="nav-meta">
+    <i class="fas fa-map-marker-alt"></i>
+    <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank">г. Волгоград, ул. Тулака 9</a>
+    <span style="color:var(--border)">·</span>
+    <span>Ежедн. 10:00–22:00</span>
+  </div>
+
   <ul class="nav-links">
+    <li><a href="#portfolio">Работы</a></li>
     <li><a href="#services">Услуги</a></li>
-    <li><a href="#studio">Студия</a></li>
-    <li><a href="#artists">Артисты</a></li>
-    <li><a href="#pricing">Тарифы</a></li>
+    <li><a href="#pricing">Цены</a></li>
+    <li><a href="#lessons">Обучение</a></li>
     <li><a href="#contact">Контакт</a></li>
   </ul>
-  <div style="display:flex;align-items:center;gap:20px">
+
+  <div class="nav-right">
     <div class="audio-indicator">
       <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
     </div>
-    <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Забронировать</button>
+    <a href="tel:+79178382017" class="nav-phone"><i class="fas fa-phone"></i>+7 917 838 20 17</a>
+    <button class="nav-cta" onclick="openModal()">Записаться</button>
   </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
-  <div class="hero-waveform" id="waveform"></div>
-
-  <p class="hero-tag fade-up">// Профессиональная студия звукозаписи — Москва</p>
-  <h1 class="hero-title fade-up" style="transition-delay:0.1s">
-    СОЗДАЙ<br>
-    <span class="line2">СВОЙ <span>ЗВУК</span></span>
+  <div class="hero-waveform" id="heroWave"></div>
+  <p class="hero-tag fade-up">// Профессиональная студия звукозаписи · Волгоград</p>
+  <h1 class="hero-title fade-up" style="transition-delay:.1s">
+    SPRING SOUND<br>
+    <span class="line2">LAB <span>·</span> STUDIO</span>
   </h1>
-  <div class="hero-bottom fade-up" style="transition-delay:0.2s">
-    <p class="hero-desc">Полный цикл звукозаписи — от написания партий до мастеринга мирового уровня. Твоя музыка заслуживает лучшего.</p>
-    <div class="hero-scroll">
-      <div class="scroll-line"></div>
-      SCROLL
+  <div class="hero-bottom fade-up" style="transition-delay:.2s">
+    <p class="hero-desc">Профессиональная архитектура звука. Запись, сведение, мастеринг, аранжировки. Уроки вокала и гитары. Мы не просто записываем — мы создаём стандарт звучания.</p>
+    <div class="hero-actions">
+      <button class="btn-hero" onclick="openModal()">Забронировать студию</button>
+      <a href="#portfolio" class="btn-hero-ghost">Наши работы</a>
     </div>
   </div>
 </section>
@@ -713,324 +682,700 @@
     <div class="marquee-item">ЗАПИСЬ <span>✦</span></div>
     <div class="marquee-item">СВЕДЕНИЕ <span>✦</span></div>
     <div class="marquee-item">МАСТЕРИНГ <span>✦</span></div>
-    <div class="marquee-item">ПРОДАКШН <span>✦</span></div>
-    <div class="marquee-item">БИТМЕЙКИНГ <span>✦</span></div>
-    <div class="marquee-item">ВОКАЛЬНЫЕ ТРЕКИ <span>✦</span></div>
-    <div class="marquee-item">ЗВУКОВОЙ ДИЗАЙН <span>✦</span></div>
+    <div class="marquee-item">АРАНЖИРОВКА <span>✦</span></div>
+    <div class="marquee-item">УРОКИ ВОКАЛА <span>✦</span></div>
+    <div class="marquee-item">УРОКИ ГИТАРЫ <span>✦</span></div>
+    <div class="marquee-item">ЗВУКОРЕЖИССУРА <span>✦</span></div>
     <div class="marquee-item">ЗАПИСЬ <span>✦</span></div>
     <div class="marquee-item">СВЕДЕНИЕ <span>✦</span></div>
     <div class="marquee-item">МАСТЕРИНГ <span>✦</span></div>
-    <div class="marquee-item">ПРОДАКШН <span>✦</span></div>
-    <div class="marquee-item">БИТМЕЙКИНГ <span>✦</span></div>
-    <div class="marquee-item">ВОКАЛЬНЫЕ ТРЕКИ <span>✦</span></div>
-    <div class="marquee-item">ЗВУКОВОЙ ДИЗАЙН <span>✦</span></div>
+    <div class="marquee-item">АРАНЖИРОВКА <span>✦</span></div>
+    <div class="marquee-item">УРОКИ ВОКАЛА <span>✦</span></div>
+    <div class="marquee-item">УРОКИ ГИТАРЫ <span>✦</span></div>
+    <div class="marquee-item">ЗВУКОРЕЖИССУРА <span>✦</span></div>
   </div>
 </div>
 
+<!-- STATS -->
+<div class="stats-strip fade-up">
+  <div class="stat-cell">
+    <div class="stat-val">12<em>+</em></div>
+    <div class="stat-key">Лет на рынке</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">850<em>+</em></div>
+    <div class="stat-key">Записанных треков</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">3</div>
+    <div class="stat-key">Студийных зала</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-val">24<em>/7</em></div>
+    <div class="stat-key">По согласованию</div>
+  </div>
+</div>
+
+<!-- PORTFOLIO -->
+<section class="portfolio-section" id="portfolio">
+  <p class="sec-label fade-up">// 01 — Примеры работ</p>
+  <h2 class="sec-title fade-up" style="transition-delay:.06s">ПОСЛУШАЙ<br>ЧТО МЫ ДЕЛАЕМ</h2>
+  <div class="carousel-outer fade-up" style="transition-delay:.12s">
+    <div class="carousel-container">
+      <div class="carousel-track" id="carTrack">
+
+        <!-- CARD 1 -->
+        <div class="track-card">
+          <div class="track-img" style="background-image:url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif');"></div>
+          <div class="track-info">
+            <div class="track-name">LUANHO — ЛЕТИ СО МНОЙ</div>
+            <div class="track-role">Mixed by WEYTON</div>
+          </div>
+          <audio controls controlslist="nodownload noplayspeed">
+            <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/Leti_so_mnoi.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="track-card">
+          <div class="track-img" style="background-image:url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/oblojka.jpg');"></div>
+          <div class="track-info">
+            <div class="track-name">WEYTON — ЭТОТ ГОРОД</div>
+            <div class="track-role">Mixed by WEYTON</div>
+          </div>
+          <audio controls controlslist="nodownload noplayspeed">
+            <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/etot_gorod/etot_gorod.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="track-card">
+          <div class="track-img" style="background-image:url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/oblojka.jfif');"></div>
+          <div class="track-info">
+            <div class="track-name">ОКСАНА ШЕМАНОВСКАЯ — НЕОБЫЧАЙНО</div>
+            <div class="track-role">Mixed by WEYTON</div>
+          </div>
+          <audio controls controlslist="nodownload noplayspeed">
+            <source src="https://github.com/springsoundlab/portfolio/raw/refs/heads/main/neobichaeno/neobichaeno.mp3" type="audio/mpeg">
+          </audio>
+        </div>
+
+        <!-- CARD 4 placeholder -->
+        <div class="track-card">
+          <div class="track-img placeholder">Скоро</div>
+          <div class="track-info">
+            <div class="track-name">Скоро здесь будет ваш трек</div>
+            <div class="track-role">Full Production</div>
+          </div>
+          <audio controls controlslist="nodownload noplayspeed"></audio>
+        </div>
+
+        <!-- CARD 5 placeholder -->
+        <div class="track-card">
+          <div class="track-img placeholder">Скоро</div>
+          <div class="track-info">
+            <div class="track-name">Скоро здесь будет ваш трек</div>
+            <div class="track-role">—</div>
+          </div>
+          <audio controls controlslist="nodownload noplayspeed"></audio>
+        </div>
+
+        <!-- CARD 6 placeholder -->
+        <div class="track-card">
+          <div class="track-img placeholder">Скоро</div>
+          <div class="track-info">
+            <div class="track-name">Скоро здесь будет ваш трек</div>
+            <div class="track-role">—</div>
+          </div>
+          <audio controls controlslist="nodownload noplayspeed"></audio>
+        </div>
+
+      </div>
+    </div>
+    <div class="carousel-arrows">
+      <button class="c-arrow" id="carPrev"><i class="fas fa-chevron-left"></i></button>
+      <button class="c-arrow" id="carNext"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+</section>
+
 <!-- SERVICES -->
 <section class="section" id="services">
-  <p class="section-label fade-up">// 01 — Услуги</p>
-  <h2 class="section-title fade-up">ЧТО МЫ<br>ДЕЛАЕМ</h2>
-  <div class="services-grid fade-up">
-    <div class="service-card">
-      <div class="service-num">01</div>
-      <h3 class="service-name">Студийная запись</h3>
-      <p class="service-desc">Запись вокала, инструментов и живых оркестров в нашем акустически выверенном пространстве с топовым оборудованием Neve и SSL.</p>
+  <p class="sec-label fade-up">// 02 — Что мы делаем</p>
+  <h2 class="sec-title fade-up" style="transition-delay:.06s">НАШИ<br>УСЛУГИ</h2>
+  <div class="services-grid fade-up" style="transition-delay:.12s">
+    <div class="srv-card">
+      <div class="srv-num">01</div>
+      <div class="srv-name">Запись вокала</div>
+      <p class="srv-desc">Профессиональная запись с контролем подачи. Работа звукорежиссёра включена. Звукоизолированные кабины.</p>
+      <div class="srv-price">от 900 ₽/час</div>
     </div>
-    <div class="service-card">
-      <div class="service-num">02</div>
-      <h3 class="service-name">Сведение</h3>
-      <p class="service-desc">Профессиональное сведение многодорожечных проектов. Баланс, пространство и динамика — каждый элемент на своём месте.</p>
+    <div class="srv-card">
+      <div class="srv-num">02</div>
+      <div class="srv-name">Сведение</div>
+      <p class="srv-desc">Аналоговое и цифровое сведение. Баланс, пространство, динамика. Принимаем исходники с других студий (wav).</p>
+      <div class="srv-price">от 3 900 ₽/трек</div>
     </div>
-    <div class="service-card">
-      <div class="service-num">03</div>
-      <h3 class="service-name">Мастеринг</h3>
-      <p class="service-desc">Финальная полировка для стриминга, винила и физических носителей. Громко, чисто, конкурентоспособно.</p>
+    <div class="srv-card">
+      <div class="srv-num">03</div>
+      <div class="srv-name">Мастеринг</div>
+      <p class="srv-desc">Финальная обработка для стриминга, CD и винила. Подготовка к релизу на цифровых площадках.</p>
+      <div class="srv-price">от 2 500 ₽/трек</div>
     </div>
-    <div class="service-card">
-      <div class="service-num">04</div>
-      <h3 class="service-name">Битмейкинг</h3>
-      <p class="service-desc">Создание оригинальных битов и аранжировок в любом жанре — от хип-хопа до электронной музыки и поп-продакшна.</p>
+    <div class="srv-card">
+      <div class="srv-num">04</div>
+      <div class="srv-name">Аранжировка</div>
+      <p class="srv-desc">Создание уникальной музыкальной основы в любом жанре — поп, рэп, рок, электроника, инди.</p>
+      <div class="srv-price">от 8 000 ₽</div>
     </div>
-    <div class="service-card">
-      <div class="service-num">05</div>
-      <h3 class="service-name">Вокальный продакшн</h3>
-      <p class="service-desc">Стековые вокалы, автотюн, гармонии — полное вокальное оформление трека от A до Z.</p>
+    <div class="srv-card">
+      <div class="srv-num">05</div>
+      <div class="srv-name">Звук для видео</div>
+      <p class="srv-desc">Саундтреки, джинглы и звуковое сопровождение для рекламы, кино и цифрового контента.</p>
+      <div class="srv-price">по запросу</div>
     </div>
-    <div class="service-card">
-      <div class="service-num">06</div>
-      <h3 class="service-name">Звуковой дизайн</h3>
-      <p class="service-desc">Создание уникальных звуковых эффектов, jingles и саундтреков для кино, игр и рекламы.</p>
+    <div class="srv-card">
+      <div class="srv-num">06</div>
+      <div class="srv-name">Полный продакшн</div>
+      <p class="srv-desc">Запись + сведение + мастеринг под ключ. Сопровождение от идеи до релиза на стриминговых платформах.</p>
+      <div class="srv-price">по запросу</div>
     </div>
   </div>
 </section>
 
-<!-- STUDIO -->
-<section class="studio-section" id="studio">
-  <div class="studio-visual fade-up">
-    <div class="studio-visual-inner">
-      <div class="mixer">
-        <!-- Fader channels -->
-        <div class="fader-channel">
-          <div class="vu-meter"><div class="vu-fill" style="animation-delay:0s"></div></div>
-        </div>
-        <div class="fader-channel">
-          <div class="vu-meter"><div class="vu-fill" style="animation-delay:0.3s"></div></div>
-        </div>
-        <div style="width:24px"></div>
-        <div class="fader-channel">
-          <div class="fader-knob"></div>
-          <div class="fader-track"><div class="fader-handle" style="top:30%"></div></div>
-          <div class="fader-label">VOC</div>
-        </div>
-        <div class="fader-channel">
-          <div class="fader-knob"></div>
-          <div class="fader-track"><div class="fader-handle" style="top:50%"></div></div>
-          <div class="fader-label">GTR</div>
-        </div>
-        <div class="fader-channel">
-          <div class="fader-knob"></div>
-          <div class="fader-track"><div class="fader-handle" style="top:20%"></div></div>
-          <div class="fader-label">BASS</div>
-        </div>
-        <div class="fader-channel">
-          <div class="fader-knob"></div>
-          <div class="fader-track"><div class="fader-handle" style="top:40%"></div></div>
-          <div class="fader-label">DRUM</div>
-        </div>
-        <div class="fader-channel">
-          <div class="fader-knob"></div>
-          <div class="fader-track"><div class="fader-handle" style="top:60%"></div></div>
-          <div class="fader-label">KEYS</div>
-        </div>
-        <div style="width:24px"></div>
-        <div class="fader-channel">
-          <div class="vu-meter"><div class="vu-fill" style="animation-delay:0.6s"></div></div>
-        </div>
-        <div class="fader-channel">
-          <div class="vu-meter"><div class="vu-fill" style="animation-delay:0.9s"></div></div>
-        </div>
+<!-- ARRANGEMENTS -->
+<section class="arr-section" id="arrangements">
+  <p class="sec-label fade-up">// 03 — Аранжировки в наличии</p>
+  <h2 class="sec-title fade-up" style="transition-delay:.06s">ГОТОВЫЕ<br>МИНУСОВКИ</h2>
+  <div class="arr-list fade-up" style="transition-delay:.12s">
+    <div class="arr-item">
+      <audio controls controlslist="nodownload noplayspeed">
+        <source src="arr1.mp3" type="audio/mpeg">
+      </audio>
+      <div class="arr-info">
+        <div class="arr-title">Аранжировка «Поп-баллада»</div>
+        <div class="arr-price">3 500 ₽</div>
       </div>
-      <div style="color:var(--muted);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-top:24px">
-        Neve 8078 · SSL 4000 · Pro Tools HDX
+      <button class="arr-btn" onclick="openModal()">Купить</button>
+    </div>
+    <div class="arr-item">
+      <audio controls controlslist="nodownload noplayspeed">
+        <source src="arr2.mp3" type="audio/mpeg">
+      </audio>
+      <div class="arr-info">
+        <div class="arr-title">Аранжировка «Хип-хоп»</div>
+        <div class="arr-price">4 000 ₽</div>
       </div>
+      <button class="arr-btn" onclick="openModal()">Купить</button>
     </div>
-    <div class="studio-tag-overlay">Studio A // Live Room</div>
-  </div>
-  <div class="studio-content fade-up">
-    <p class="section-label">// 02 — О студии</p>
-    <h2 class="section-title">500 М² ЧИСТОГО<br>ЗВУКА</h2>
-    <p>Две полностью оборудованные студии, отдельная live room и вокальные кабины. Акустика, спроектированная легендарным Rindy Mattingley. Оборудование уровня Abbey Road — в Москве.</p>
-    <div class="stats-row">
-      <div class="stat-item">
-        <div class="stat-num">12<span>+</span></div>
-        <div class="stat-label">Лет работы</div>
+    <div class="arr-item">
+      <audio controls controlslist="nodownload noplayspeed">
+        <source src="arr3.mp3" type="audio/mpeg">
+      </audio>
+      <div class="arr-info">
+        <div class="arr-title">Аранжировка «Электроника»</div>
+        <div class="arr-price">4 500 ₽</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-num">840<span>+</span></div>
-        <div class="stat-label">Релизов</div>
+      <button class="arr-btn" onclick="openModal()">Купить</button>
+    </div>
+    <div class="arr-item">
+      <audio controls controlslist="nodownload noplayspeed">
+        <source src="arr4.mp3" type="audio/mpeg">
+      </audio>
+      <div class="arr-info">
+        <div class="arr-title">Аранжировка «Рок»</div>
+        <div class="arr-price">5 000 ₽</div>
       </div>
-      <div class="stat-item">
-        <div class="stat-num">3<span>×</span></div>
-        <div class="stat-label">Grammy Рос.</div>
-      </div>
-    </div>
-    <a href="#contact" class="btn-outline">Забронировать тур</a>
-  </div>
-</section>
-
-<!-- ARTISTS -->
-<section class="artists-section" id="artists">
-  <p class="section-label fade-up">// 03 — Артисты</p>
-  <h2 class="section-title fade-up">РАБОТАЛИ<br>С ЛУЧШИМИ</h2>
-  <div class="artists-grid fade-up">
-    <div class="artist-card">
-      <div class="artist-bg"></div>
-      <div class="artist-icon">🎤</div>
-      <div class="artist-name">NOVA K</div>
-      <div class="artist-genre">R&B · Soul</div>
-    </div>
-    <div class="artist-card">
-      <div class="artist-bg"></div>
-      <div class="artist-icon">🎸</div>
-      <div class="artist-name">DARK STATIC</div>
-      <div class="artist-genre">Alt Rock · Indie</div>
-    </div>
-    <div class="artist-card">
-      <div class="artist-bg"></div>
-      <div class="artist-icon">🎹</div>
-      <div class="artist-name">LUMEN</div>
-      <div class="artist-genre">Electronic · Ambient</div>
-    </div>
-    <div class="artist-card">
-      <div class="artist-bg"></div>
-      <div class="artist-icon">🎧</div>
-      <div class="artist-name">CRUX</div>
-      <div class="artist-genre">Hip-Hop · Trap</div>
+      <button class="arr-btn" onclick="openModal()">Купить</button>
     </div>
   </div>
 </section>
 
 <!-- PRICING -->
-<section class="pricing-section" id="pricing">
-  <p class="section-label fade-up">// 04 — Тарифы</p>
-  <h2 class="section-title fade-up">ПРОЗРАЧНЫЕ<br>ЦЕНЫ</h2>
-  <div class="pricing-grid fade-up">
+<section class="section" id="pricing">
+  <p class="sec-label fade-up">// 04 — Цены на студию</p>
+  <h2 class="sec-title fade-up" style="transition-delay:.06s">ПРОЗРАЧНЫЕ<br>ТАРИФЫ</h2>
+  <div class="pricing-grid fade-up" style="transition-delay:.12s">
     <div class="price-card">
-      <div class="price-tier">Базовый</div>
-      <div class="price-amount"><span>₽</span>3 500</div>
-      <div class="price-per">/ час</div>
+      <div class="price-tier">Запись вокала</div>
+      <div class="price-num"><sup>₽</sup>900</div>
+      <div class="price-per">в час</div>
+      <div class="price-divider"></div>
       <ul class="price-features">
-        <li>Студия B (40 м²)</li>
-        <li>1 звукорежиссёр</li>
-        <li>Pro Tools + плагины</li>
-        <li>Вокальная кабина</li>
-        <li>Базовый мониторинг</li>
+        <li><span>+</span> Работа звукорежиссёра</li>
+        <li><span>+</span> Звукоизолированная кабина</li>
+        <li><span>+</span> Всё оборудование студии</li>
+        <li><span>+</span> Запись треков</li>
       </ul>
-      <a href="#contact" class="btn-secondary">Выбрать</a>
+      <button class="price-btn outline" onclick="openModal()">Записаться</button>
     </div>
-    <div class="price-card featured">
-      <div class="featured-badge">Популярный</div>
-      <div class="price-tier">Профессиональный</div>
-      <div class="price-amount"><span>₽</span>7 000</div>
-      <div class="price-per">/ час</div>
+    <div class="price-card hot">
+      <div class="hot-label">Популярное</div>
+      <div class="price-tier">Сведение трека</div>
+      <div class="price-num"><sup>₽</sup>3 900</div>
+      <div class="price-per">от / трек</div>
+      <div class="price-divider"></div>
       <ul class="price-features">
-        <li>Студия A — Neve 8078</li>
-        <li>Senior звукорежиссёр</li>
-        <li>Полная outboard цепочка</li>
-        <li>Live room + кабины</li>
-        <li>Черновое сведение в подарок</li>
-        <li>Unlimited ревизии (24ч)</li>
+        <li><span>+</span> Start Edition — для подарка</li>
+        <li><span>+</span> Баланс, эффекты, динамика</li>
+        <li><span>+</span> Принимаем wav с любых студий</li>
+        <li><span>+</span> Финальный файл wav + mp3</li>
+        <li><span>+</span> Правки по согласованию</li>
       </ul>
-      <a href="#contact" class="btn-primary">Выбрать</a>
+      <button class="price-btn filled" onclick="openModal()">Заказать</button>
     </div>
     <div class="price-card">
-      <div class="price-tier">Альбомный</div>
-      <div class="price-amount"><span>₽</span>по запросу</div>
-      <div class="price-per">полный цикл</div>
+      <div class="price-tier">Мастеринг</div>
+      <div class="price-num"><sup>₽</sup>2 500</div>
+      <div class="price-per">трек</div>
+      <div class="price-divider"></div>
       <ul class="price-features">
-        <li>Запись, сведение, мастеринг</li>
-        <li>Продюссер + аранжировщик</li>
-        <li>Все студии без ограничений</li>
-        <li>Сопровождение релиза</li>
-        <li>Эксклюзивное расписание</li>
-        <li>Видеосъёмка сессий</li>
+        <li><span>+</span> Подготовка к стримингу</li>
+        <li><span>+</span> Нормировка LUFS</li>
+        <li><span>+</span> Форматы: wav, mp3, FLAC</li>
+        <li><span>+</span> Готов к релизу</li>
       </ul>
-      <a href="#contact" class="btn-secondary">Обсудить проект</a>
+      <button class="price-btn outline" onclick="openModal()">Заказать</button>
+    </div>
+  </div>
+</section>
+
+<!-- HOW WE WORK -->
+<section class="section" style="padding-top:0">
+  <p class="sec-label fade-up">// 05 — Как мы работаем</p>
+  <h2 class="sec-title fade-up" style="transition-delay:.06s">ЧЕТЫРЕ ШАГА<br>ДО ТРЕКА</h2>
+  <div class="timeline-grid fade-up" style="transition-delay:.12s">
+    <div class="tl-step">
+      <div class="tl-num">01</div>
+      <div class="tl-title">Заявка</div>
+      <p class="tl-desc">Оставляешь заявку или звонишь. Обсуждаем задачу, жанр, сроки и бюджет.</p>
+    </div>
+    <div class="tl-step">
+      <div class="tl-num">02</div>
+      <div class="tl-title">Подготовка</div>
+      <p class="tl-desc">Готовим студию, подбираем микрофон и подходящий звук под твой стиль.</p>
+    </div>
+    <div class="tl-step">
+      <div class="tl-num">03</div>
+      <div class="tl-title">Запись</div>
+      <p class="tl-desc">Записываем, сводим, мастерим. Ты контролируешь результат на каждом этапе.</p>
+    </div>
+    <div class="tl-step">
+      <div class="tl-num">04</div>
+      <div class="tl-title">Получаешь трек</div>
+      <p class="tl-desc">Финальный файл в wav и mp3 — готов к релизу на стримингах.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LESSONS -->
+<section class="section" id="lessons">
+  <p class="sec-label fade-up">// 06 — Обучение</p>
+  <h2 class="sec-title fade-up" style="transition-delay:.06s">УРОКИ<br>В СТУДИИ</h2>
+  <div class="lessons-grid fade-up" style="transition-delay:.12s">
+    <div class="lesson-card">
+      <div class="lesson-icon">🎤</div>
+      <div class="lesson-name">Уроки вокала</div>
+      <p class="lesson-desc">Постановка голоса, дыхание, расширение диапазона. Индивидуальный подход для любого уровня.</p>
+      <ul class="lesson-prices">
+        <li>Пробное занятие (45 мин) <span>1 000 ₽</span></li>
+        <li>Разовое занятие (60 мин) <span>2 000 ₽</span></li>
+        <li>Абонемент 4 занятия <span>7 000 ₽</span></li>
+      </ul>
+      <button class="lesson-btn" onclick="openModal()">Записаться на пробное</button>
+    </div>
+    <div class="lesson-card">
+      <div class="lesson-icon">🎸</div>
+      <div class="lesson-name">Уроки гитары</div>
+      <p class="lesson-desc">Акустика, электро, бас. С нуля до профи. Техника, теория, импровизация, работа в ансамбле.</p>
+      <ul class="lesson-prices">
+        <li>Пробное занятие (45 мин) <span>1 000 ₽</span></li>
+        <li>Разовое занятие (60 мин) <span>2 000 ₽</span></li>
+        <li>Абонемент 4 занятия <span>7 000 ₽</span></li>
+      </ul>
+      <button class="lesson-btn" onclick="openModal()">Записаться на пробное</button>
+    </div>
+    <div class="lesson-card">
+      <div class="lesson-icon">🎛</div>
+      <div class="lesson-name">Звукорежиссура</div>
+      <p class="lesson-desc">Сведение, мастеринг, работа в DAW (Ableton, Logic, Pro Tools). Занятия в реальной студии.</p>
+      <ul class="lesson-prices">
+        <li>Индивидуальный урок (90 мин) <span>по запросу</span></li>
+        <li>Курс с нуля <span>по запросу</span></li>
+        <li>Подготовка к поступлению <span>по запросу</span></li>
+      </ul>
+      <button class="lesson-btn" onclick="openModal()">Узнать подробнее</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" style="padding-top:0" id="faq">
+  <p class="sec-label fade-up">// 07 — FAQ</p>
+  <h2 class="sec-title fade-up" style="transition-delay:.06s">ЧАСТЫЕ<br>ВОПРОСЫ</h2>
+  <div class="faq-list fade-up" style="transition-delay:.12s">
+    <div class="faq-item">
+      <button class="faq-q">Можно прийти без опыта и записать песню? <span class="faq-icon">+</span></button>
+      <div class="faq-a"><p>Да, абсолютно. Мы работаем со всеми — от полных новичков до профессиональных артистов. Объясним каждый шаг, поможем с подготовкой и сделаем столько дублей, сколько нужно.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Сколько времени займёт запись одной песни? <span class="faq-icon">+</span></button>
+      <div class="faq-a"><p>Если у вас готовый минус и вы знаете текст — 2–3 часа на запись вокала. Если песня пишется с нуля (аранжировка + запись + сведение) — от нескольких дней.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Что входит в стоимость аренды студии? <span class="faq-icon">+</span></button>
+      <div class="faq-a"><p>В стоимость часа входит работа звукорежиссёра, использование всего оборудования и запись. Сведение и мастеринг оплачиваются отдельно по договорённости.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Можно взять с собой друзей? <span class="faq-icon">+</span></button>
+      <div class="faq-a"><p>Конечно. Друзья и родственники могут присутствовать, снимать на телефон и поддерживать. Главное — тишина во время записи дублей.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Можно ли свести материал, записанный в другой студии? <span class="faq-icon">+</span></button>
+      <div class="faq-a"><p>Да, принимаем исходники с других студий. Главное условие — качественные файлы в формате wav, не mp3. Присылайте, послушаем и рассчитаем стоимость.</p></div>
     </div>
   </div>
 </section>
 
 <!-- CONTACT -->
 <section class="contact-section" id="contact">
-  <div class="contact-info fade-up">
-    <p class="section-label">// 05 — Контакт</p>
-    <h2>ГОТОВ <em>ЗАПИСАТЬ</em><br>ЧТО-ТО<br>ВЕЛИКОЕ?</h2>
-    <p>Напиши нам или позвони — мы подберём время и формат, который подойдёт именно тебе. Первая консультация бесплатна.</p>
-    <ul class="contact-details">
-      <li><strong>Адрес</strong> Москва, ул. Большая Дмитровка, 7</li>
-      <li><strong>Тел.</strong> +7 (495) 000-00-00</li>
-      <li><strong>Email</strong> hello@soundcore.studio</li>
-      <li><strong>Часы</strong> Ежедневно 10:00 — 02:00</li>
-    </ul>
+  <div class="contact-left fade-up">
+    <p class="sec-label">// 08 — Контакт</p>
+    <h2 class="sec-title" style="margin-bottom:16px">ГОТОВ<br>ЗАПИСАТЬСЯ?</h2>
+    <p>Оставь заявку — перезвоним в течение 2 часов. Первая консультация бесплатна.</p>
+    <div class="contact-cards">
+      <div class="ccard">
+        <div class="ccard-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <div>
+          <div class="ccard-label">Адрес</div>
+          <div class="ccard-val">г. Волгоград, ул. Тулака 9</div>
+        </div>
+      </div>
+      <div class="ccard">
+        <div class="ccard-icon"><i class="fas fa-phone"></i></div>
+        <div>
+          <div class="ccard-label">Телефон</div>
+          <div class="ccard-val"><a href="tel:+79178382017">+7 917 838 20 17</a></div>
+        </div>
+      </div>
+      <div class="ccard">
+        <div class="ccard-icon"><i class="fab fa-telegram"></i></div>
+        <div>
+          <div class="ccard-label">Telegram</div>
+          <div class="ccard-val"><a href="https://t.me/springsound_lab" target="_blank">@springsound_lab</a></div>
+        </div>
+      </div>
+      <div class="ccard">
+        <div class="ccard-icon"><i class="fas fa-clock"></i></div>
+        <div>
+          <div class="ccard-label">Режим работы</div>
+          <div class="ccard-val">Ежедневно 10:00 — 22:00</div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="contact-form fade-up" style="transition-delay:0.15s">
-    <div class="form-row">
-      <div class="form-field">
-        <label>Имя</label>
-        <input type="text" placeholder="Твоё имя" />
-      </div>
-      <div class="form-field">
-        <label>Телефон</label>
-        <input type="tel" placeholder="+7 (___) ___-__-__" />
-      </div>
+  <div class="contact-form fade-up" style="transition-delay:.12s">
+    <div class="cf-row">
+      <div class="cf-field"><label>Имя</label><input type="text" id="cf-name" placeholder="Ваше имя"/></div>
+      <div class="cf-field"><label>Телефон</label><input type="tel" id="cf-phone" placeholder="+7 (___) ___-__-__"/></div>
     </div>
-    <div class="form-field">
-      <label>Email</label>
-      <input type="email" placeholder="your@email.com" />
-    </div>
-    <div class="form-field">
+    <div class="cf-field"><label>Email</label><input type="email" id="cf-email" placeholder="your@email.com"/></div>
+    <div class="cf-field">
       <label>Услуга</label>
-      <select>
+      <select id="cf-service">
         <option value="">Выберите услугу</option>
         <option>Студийная запись</option>
         <option>Сведение</option>
         <option>Мастеринг</option>
-        <option>Битмейкинг</option>
-        <option>Полный цикл — Альбом</option>
+        <option>Аранжировка</option>
+        <option>Полный цикл</option>
+        <option>Урок вокала</option>
+        <option>Урок гитары</option>
+        <option>Звукорежиссура</option>
       </select>
     </div>
-    <div class="form-field">
-      <label>Сообщение</label>
-      <textarea rows="5" placeholder="Расскажи о своём проекте..."></textarea>
+    <div class="cf-field"><label>Комментарий</label><textarea id="cf-msg" rows="4" placeholder="Расскажите о вашем проекте..."></textarea></div>
+    <button class="cf-submit" onclick="handleContactForm(this)">Отправить заявку →</button>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-section">
+  <h2 class="sec-title fade-up">КАК НАС<br>НАЙТИ</h2>
+  <div class="map-wrapper fade-up" style="transition-delay:.06s">
+    <div class="map-info">
+      <div class="map-info-item">
+        <i class="fas fa-map-marker-alt"></i>
+        <div><div class="map-info-label">Адрес</div><div class="map-info-val">г. Волгоград, ул. Тулака 9</div></div>
+      </div>
+      <div class="map-info-item">
+        <i class="fas fa-clock"></i>
+        <div><div class="map-info-label">Режим работы</div><div class="map-info-val">Ежедневно 10:00–22:00</div></div>
+      </div>
+      <div class="map-info-item">
+        <i class="fas fa-phone"></i>
+        <div><div class="map-info-label">Телефон</div><div class="map-info-val"><a href="tel:+79178382017">+7 917 838 20 17</a></div></div>
+      </div>
+      <div class="map-info-item">
+        <i class="fab fa-telegram"></i>
+        <div><div class="map-info-label">Telegram</div><div class="map-info-val"><a href="https://t.me/springsound_lab" target="_blank">@springsound_lab</a></div></div>
+      </div>
+      <a class="map-route" href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank">
+        <i class="fas fa-route"></i> Построить маршрут
+      </a>
     </div>
-    <button class="btn-primary" style="cursor:none" onclick="handleSubmit(this)">Отправить заявку →</button>
+    <div class="map-frame">
+      <iframe src="https://yandex.ru/map-widget/v1/?ll=44.471215%2C48.674380&z=17&l=map&pt=44.471215,48.674380,pm2rdl~Spring+Sound+Lab" allowfullscreen></iframe>
+    </div>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <div>
-    <div class="footer-logo">SOUND<span>CORE</span></div>
-    <p style="margin-top:8px">© 2025 Soundcore Studio. Все права защищены.</p>
+  <div class="footer-logo">SPRING <span>SOUND</span> LAB</div>
+  <div class="footer-center">
+    <div class="footer-social">
+      <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
+      <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
+      <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i></a>
+      <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+    <div class="footer-copy">© 2026 Spring Sound Lab · Все права защищены</div>
   </div>
   <nav class="footer-links">
+    <a href="#portfolio">Работы</a>
     <a href="#services">Услуги</a>
-    <a href="#studio">Студия</a>
-    <a href="#pricing">Тарифы</a>
+    <a href="#pricing">Цены</a>
+    <a href="#lessons">Обучение</a>
     <a href="#contact">Контакт</a>
   </nav>
 </footer>
 
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+<div class="modal-panel" id="modalPanel">
+  <div class="modal-close-x" onclick="closeModal()">✕</div>
+  <div class="modal-title-text" id="modalTitle">Забронировать студию</div>
+  <a href="tel:+79178382017" class="modal-phone-link"><i class="fas fa-phone"></i> +7 917 838 20 17</a>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:18px;">Оставьте заявку — перезвоним в течение 2 часов</p>
+  <div class="modal-form">
+    <div class="modal-field"><label>Имя</label><input type="text" id="m-name" placeholder="Ваше имя"/></div>
+    <div class="modal-field"><label>Телефон</label><input type="tel" id="m-phone" placeholder="+7 (___) ___-__-__"/></div>
+    <div class="modal-field"><label>Комментарий</label><textarea id="m-comment" rows="3" placeholder="Ваши пожелания..."></textarea></div>
+    <div class="privacy-row">
+      <input type="checkbox" id="m-privacy"/>
+      <label for="m-privacy">Согласен(-на) на обработку персональных данных</label>
+    </div>
+    <button class="modal-submit" id="modalSubmit" onclick="submitModal()">Отправить заявку</button>
+  </div>
+  <div class="modal-socials">
+    <p>Или напишите напрямую</p>
+    <div class="modal-social-icons">
+      <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
+      <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
+      <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i></a>
+      <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL FLOAT -->
+<div class="social-float" id="sfloat">
+  <div class="sf-btn" id="sfBtn"><i class="fas fa-share-alt"></i></div>
+  <div class="sf-menu">
+    <a href="#" target="_blank"><i class="fab fa-vk"></i></a>
+    <a href="https://t.me/springsound_lab" target="_blank"><i class="fab fa-telegram"></i></a>
+    <a href="https://www.youtube.com/@SpringSoundLab" target="_blank"><i class="fab fa-youtube"></i></a>
+    <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+  </div>
+</div>
+
+<!-- COOKIE -->
+<div class="cookie-bar" id="cookieBar">
+  <p>Мы используем файлы cookie. Продолжая пользоваться сайтом, вы соглашаетесь с их использованием.</p>
+  <button class="cookie-btn" onclick="acceptCookie()">Принять</button>
+</div>
+
 <script>
   // Cursor
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursor-ring');
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('curRing');
   document.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX - 6 + 'px';
-    cursor.style.top = e.clientY - 6 + 'px';
+    cur.style.left = e.clientX - 6 + 'px';
+    cur.style.top = e.clientY - 6 + 'px';
     ring.style.left = e.clientX - 18 + 'px';
     ring.style.top = e.clientY - 18 + 'px';
   });
-  document.querySelectorAll('a, button').forEach(el => {
-    el.addEventListener('mouseenter', () => { cursor.style.transform = 'scale(2.5)'; ring.style.transform = 'scale(0.5)'; });
-    el.addEventListener('mouseleave', () => { cursor.style.transform = 'scale(1)'; ring.style.transform = 'scale(1)'; });
+
+  // Waveform
+  const wf = document.getElementById('heroWave');
+  for (let i = 0; i < 120; i++) {
+    const b = document.createElement('div');
+    b.className = 'bar';
+    b.style.height = (Math.random() * 80 + 20) + '%';
+    b.style.animationDelay = (Math.random() * 1.4) + 's';
+    b.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
+    wf.appendChild(b);
+  }
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+  setTimeout(() => {
+    document.querySelectorAll('.hero .fade-up, .stats-strip.fade-up').forEach((el, i) => {
+      setTimeout(() => el.classList.add('vis'), i * 150 + 200);
+    });
+  }, 100);
+
+  // CAROUSEL
+  (function() {
+    const track = document.getElementById('carTrack');
+    const prev = document.getElementById('carPrev');
+    const next = document.getElementById('carNext');
+    if (!track) return;
+    let cur = 0;
+    function getVis() {
+      if (window.innerWidth <= 600) return 1;
+      if (window.innerWidth <= 900) return 2;
+      return 3;
+    }
+    function cardW() {
+      const c = track.children[0];
+      if (!c) return 0;
+      const gap = parseFloat(window.getComputedStyle(track).gap) || 24;
+      return c.offsetWidth + gap;
+    }
+    function total() { return track.children.length; }
+    function clamp(v) { return Math.max(0, Math.min(v, total() - getVis())); }
+    function go(n) {
+      cur = clamp(n);
+      track.style.transition = 'transform .5s cubic-bezier(.25,.46,.45,.94)';
+      track.style.transform = 'translateX(-' + (cur * cardW()) + 'px)';
+    }
+    prev.onclick = () => go(cur - 1);
+    next.onclick = () => go(cur + 1);
+    window.addEventListener('resize', () => { track.style.transition = 'none'; track.style.transform = 'translateX(-' + (cur * cardW()) + 'px)'; });
+
+    // touch swipe
+    let tx = null;
+    track.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+    track.addEventListener('touchend', e => {
+      if (tx === null) return;
+      const diff = tx - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) diff > 0 ? go(cur+1) : go(cur-1);
+      tx = null;
+    }, {passive:true});
+  })();
+
+  // Stop multiple audio
+  document.addEventListener('play', e => {
+    document.querySelectorAll('audio').forEach(a => { if (a !== e.target) { a.pause(); a.currentTime = 0; } });
+  }, true);
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
   });
 
-  // Waveform bars
-  const wf = document.getElementById('waveform');
-  for (let i = 0; i < 140; i++) {
-    const bar = document.createElement('div');
-    bar.className = 'bar';
-    const h = Math.random() * 80 + 20;
-    bar.style.height = h + '%';
-    bar.style.animationDelay = (Math.random() * 1.4) + 's';
-    bar.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
-    wf.appendChild(bar);
+  // Modal
+  function openModal(title) {
+    document.getElementById('modalTitle').textContent = title || 'Забронировать студию';
+    document.getElementById('modalPanel').style.display = 'block';
+    document.getElementById('modalOverlay').style.display = 'block';
+    document.getElementById('modalSubmit').classList.remove('sent');
+    document.getElementById('modalSubmit').textContent = 'Отправить заявку';
   }
-
-  // Fade in on scroll
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-
-  // Immediately show hero elements
-  setTimeout(() => {
-    document.querySelectorAll('.hero .fade-up').forEach((el, i) => {
-      setTimeout(() => el.classList.add('visible'), i * 150);
-    });
-  }, 200);
-
-  // Form submit
-  function handleSubmit(btn) {
+  function closeModal() {
+    document.getElementById('modalPanel').style.display = 'none';
+    document.getElementById('modalOverlay').style.display = 'none';
+  }
+  document.querySelectorAll('.lesson-btn').forEach(btn => {
+    btn.addEventListener('click', () => openModal('Записаться на занятие'));
+  });
+  async function submitModal() {
+    const privacy = document.getElementById('m-privacy');
+    if (!privacy.checked) { alert('Дайте согласие на обработку данных'); return; }
+    const name = document.getElementById('m-name').value;
+    const phone = document.getElementById('m-phone').value;
+    const comment = document.getElementById('m-comment').value;
+    const btn = document.getElementById('modalSubmit');
+    btn.classList.add('sent');
     btn.textContent = '✓ Заявка отправлена!';
-    btn.style.background = '#1a6b2a';
-    setTimeout(() => {
-      btn.textContent = 'Отправить заявку →';
-      btn.style.background = '';
-    }, 3000);
+    const token = '8743026282:AAGvt8mSj-3L25iCZMYoN46LC2XFDyTZeZY';
+    const chatId = '8246220926';
+    const text = `🔔 Новая заявка с сайта!\n\nИмя: ${name}\nТелефон: ${phone}\nКомментарий: ${comment || '—'}`;
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({chat_id: chatId, text})
+      });
+    } catch(e) { console.error(e); }
+    setTimeout(closeModal, 2000);
   }
+
+  // Contact form
+  async function handleContactForm(btn) {
+    const name = document.getElementById('cf-name').value;
+    const phone = document.getElementById('cf-phone').value;
+    const email = document.getElementById('cf-email').value;
+    const service = document.getElementById('cf-service').value;
+    const msg = document.getElementById('cf-msg').value;
+    btn.textContent = '✓ Отправлено!';
+    btn.style.background = '#22c55e';
+    const token = '8743026282:AAGvt8mSj-3L25iCZMYoN46LC2XFDyTZeZY';
+    const chatId = '8246220926';
+    const text = `🔔 Заявка с формы контакта!\n\nИмя: ${name}\nТелефон: ${phone}\nEmail: ${email}\nУслуга: ${service}\nСообщение: ${msg || '—'}`;
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({chat_id: chatId, text})
+      });
+    } catch(e) {}
+    setTimeout(() => { btn.textContent = 'Отправить заявку →'; btn.style.background = ''; }, 4000);
+  }
+
+  // Social float
+  const sfloat = document.getElementById('sfloat');
+  document.getElementById('sfBtn').addEventListener('click', e => { e.stopPropagation(); sfloat.classList.toggle('open'); });
+  document.addEventListener('click', e => { if (!sfloat.contains(e.target)) sfloat.classList.remove('open'); });
+
+  // Cookie
+  if (!localStorage.getItem('ssl_cookie')) {
+    document.getElementById('cookieBar').style.display = 'flex';
+  }
+  function acceptCookie() {
+    localStorage.setItem('ssl_cookie', '1');
+    document.getElementById('cookieBar').style.display = 'none';
+  }
+
+  // Phone mask
+  (function() {
+    const inputs = document.querySelectorAll('input[type="tel"]');
+    inputs.forEach(inp => {
+      inp.addEventListener('focus', function() {
+        if (!this.value) this.value = '+7 (';
+      });
+      inp.addEventListener('input', function() {
+        let v = this.value.replace(/\D/g,'');
+        if (v[0]==='7'||v[0]==='8') v=v.slice(1);
+        v = v.slice(0,10);
+        let r = '+7 (';
+        if (v.length>0) r += v.slice(0,3);
+        if (v.length>=4) r += ') ' + v.slice(3,6);
+        if (v.length>=7) r += '-' + v.slice(6,8);
+        if (v.length>=9) r += '-' + v.slice(8,10);
+        this.value = r;
+      });
+    });
+  })();
 </script>
 </body>
 </html>
