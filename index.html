@@ -162,6 +162,7 @@
       margin-bottom: 0;
     }
     .hero-title .accent { color: var(--accent); }
+    .hero-title .word { display: inline; }
 
     /* Осциллограмма — точно по ширине заголовка */
     .hero-waveform {
@@ -742,13 +743,39 @@
       .hero-logo-img { height: 72px; }
 
       /* Hero */
-      .hero { padding: 72px 20px 40px; min-height: 100svh; justify-content: center; }
-      .hero-tag { font-size: 10px; letter-spacing: 3px; margin-bottom: 8px; }
-      .hero-title { font-size: clamp(52px, 13vw, 100px); letter-spacing: 1px; }
-      .hero-waveform { height: 40px; }
-      .hero-desc-center { font-size: 13px; margin-top: 6px; }
-      .hero-actions { flex-direction: column; width: 100%; gap: 12px; margin-top: 24px; }
-      .btn-hero, .btn-hero-ghost { width: 100%; text-align: center; padding: 16px; font-size: 12px; }
+      .hero {
+        padding: 64px 20px 24px;
+        min-height: 100svh;
+        justify-content: space-between;
+      }
+      .hero-center { gap: 0; justify-content: space-between; height: 100%; flex: 1; }
+      .hero-tag { font-size: 9px; letter-spacing: 3px; margin-bottom: 6px; }
+
+      /* Название в три строки: SPRING / SOUND / LAB */
+      .hero-title {
+        font-size: clamp(72px, 23vw, 120px);
+        letter-spacing: 2px;
+        white-space: normal;
+        word-break: break-word;
+        line-height: .92;
+        margin-bottom: 0;
+      }
+      /* Название в три строки: SPRING / SOUND / LAB */
+      .hero-title {
+        font-size: clamp(72px, 23vw, 120px);
+        letter-spacing: 2px;
+        white-space: normal;
+        line-height: .95;
+        margin-bottom: 0;
+      }
+      .hero-title .word {
+        display: block;
+      }
+
+      .hero-waveform { height: 36px; margin-top: 6px; }
+      .hero-desc-center { font-size: 12px; line-height: 1.7; margin-top: 8px; max-width: 100%; }
+      .hero-actions { flex-direction: column; width: 100%; gap: 10px; margin-top: 20px; }
+      .btn-hero, .btn-hero-ghost { width: 100%; text-align: center; padding: 15px; font-size: 11px; }
 
       /* Stats */
       .stats-strip { grid-template-columns: repeat(2, 1fr); }
@@ -897,7 +924,7 @@
 
   <div class="hero-center fade-up">
     <span class="hero-tag">// Студия звукозаписи · Волгоград</span>
-    <h1 class="hero-title">SPRING SOUND <span class="accent">LAB</span></h1>
+    <h1 class="hero-title"><span class="word">SPRING </span><span class="word">SOUND </span><span class="word accent">LAB</span></h1>
     <div class="hero-waveform" id="heroWave"></div>
     <p class="hero-desc-center">Профессиональная архитектура звука. Запись, сведение, мастеринг, аранжировки. Уроки вокала и гитары.</p>
     <div class="hero-actions">
@@ -1454,11 +1481,14 @@
   // Waveform — ширина под заголовок
   (function() {
     const wf = document.getElementById('heroWave');
-    // После рендера берём ширину заголовка и заполняем барами
     function buildWave() {
       const title = document.querySelector('.hero-title');
       if (!title) return;
-      const w = title.offsetWidth;
+      // На мобиле берём ширину контейнера, на десктопе — ширину заголовка
+      const isMobile = window.innerWidth <= 900;
+      const w = isMobile
+        ? (document.querySelector('.hero-center')?.offsetWidth || window.innerWidth - 40)
+        : title.offsetWidth;
       wf.style.width = w + 'px';
       const barW = 3, gap = 3;
       const count = Math.floor(w / (barW + gap));
@@ -1472,7 +1502,6 @@
         wf.appendChild(b);
       }
     }
-    // Ждём загрузки шрифта
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(buildWave);
     } else {
