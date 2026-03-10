@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WaveLab | Студия звука</title>
-    <!-- Google Fonts & Font Awesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>SoundWave Studio | Главная</title>
     <style>
         * {
             margin: 0;
@@ -14,937 +11,734 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --bg: #0b0b0f;
-            --bg-light: #14141a;
-            --surface: #1c1c24;
-            --primary: #00f0ff;
-            --secondary: #ff4dff;
-            --text: #ffffff;
-            --text-secondary: #a0a0b0;
-            --border: #2a2a35;
-            --font: 'Inter', sans-serif;
-        }
-
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: var(--font);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8f9ff;
+            color: #1a1e2b;
             line-height: 1.5;
         }
 
         .container {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 32px;
         }
 
-        /* Типография */
-        h1, h2, h3 {
+        /* header */
+        .header {
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            background-color: white;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 28px;
             font-weight: 700;
-            line-height: 1.2;
-        }
-
-        .section {
-            padding: 100px 0;
-        }
-
-        .section-title {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #fff, var(--primary), var(--secondary));
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #3b2a7a, #7b4b9f);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .section-subtitle {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin-bottom: 4rem;
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            font-weight: 500;
         }
 
-        /* Кнопки */
+        .nav-links a {
+            text-decoration: none;
+            color: #2d2f39;
+            font-size: 16px;
+        }
+
+        .nav-links a:hover {
+            color: #6d4fc7;
+        }
+
         .btn {
             display: inline-block;
-            padding: 14px 38px;
+            padding: 12px 28px;
             border-radius: 40px;
             font-weight: 600;
             text-decoration: none;
             transition: all 0.2s;
             border: none;
             cursor: pointer;
+            font-size: 16px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #000;
-            box-shadow: 0 10px 20px rgba(0, 240, 255, 0.2);
+            background: #1e1127;
+            color: white;
+            box-shadow: 0 4px 12px rgba(85, 51, 153, 0.2);
         }
 
         .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 30px rgba(255, 77, 255, 0.3);
+            background: #2f1d3b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(85, 51, 153, 0.3);
         }
 
         .btn-outline {
             background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--text);
+            border: 1.5px solid #1e1127;
+            color: #1e1127;
         }
 
         .btn-outline:hover {
-            background: var(--primary);
-            color: #000;
+            background: #f4f0fa;
         }
 
-        /* Шапка */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(11, 11, 15, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            z-index: 100;
-            padding: 16px 0;
-        }
-
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav ul {
-            display: flex;
-            gap: 40px;
-            list-style: none;
-        }
-
-        .nav a {
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 500;
-            transition: color 0.2s;
-            position: relative;
-        }
-
-        .nav a::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: 0.2s;
-        }
-
-        .nav a:hover {
-            color: var(--primary);
-        }
-
-        .nav a:hover::after {
-            width: 100%;
-        }
-
-        .burger {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .burger span {
-            width: 30px;
-            height: 3px;
-            background: var(--text);
-            transition: 0.2s;
-        }
-
-        #menu-toggle {
-            display: none;
-        }
-
-        /* Hero */
+        /* hero section */
         .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
+            padding: 80px 0 60px;
+            background: white;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 50%, rgba(0, 240, 255, 0.1), transparent 50%),
-                        radial-gradient(circle at 70% 50%, rgba(255, 77, 255, 0.1), transparent 50%);
-            pointer-events: none;
+        .hero-grid {
+            display: flex;
+            align-items: center;
+            gap: 60px;
         }
 
         .hero-content {
-            max-width: 800px;
-            position: relative;
+            flex: 1;
         }
 
-        .hero-meta {
-            display: inline-block;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-            border-radius: 60px;
-            padding: 8px 24px;
-            margin-bottom: 30px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .hero-meta i {
-            color: var(--primary);
-            margin-right: 8px;
-        }
-
-        .hero-title {
-            font-size: clamp(2.8rem, 10vw, 5.5rem);
+        .hero-content h1 {
+            font-size: 64px;
             font-weight: 800;
-            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
         }
 
-        .hero-title span {
-            background: linear-gradient(135deg, #fff, var(--primary), var(--secondary));
+        .hero-highlight {
+            background: linear-gradient(120deg, #ffd166, #b185db);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .hero-text {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin-bottom: 40px;
+        .hero-description {
+            font-size: 20px;
+            color: #4a4e62;
+            max-width: 540px;
+            margin-bottom: 32px;
         }
 
         .hero-stats {
             display: flex;
-            gap: 50px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
+            gap: 40px;
+            margin-top: 48px;
         }
 
         .stat-item {
-            font-size: 2.2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-size: 36px;
             font-weight: 700;
-            color: var(--primary);
+            color: #1e1127;
         }
 
         .stat-label {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            font-weight: 400;
+            color: #6f7285;
+            font-size: 15px;
         }
 
-        .hero-buttons {
+        .hero-image {
+            flex: 1;
+            background: linear-gradient(145deg, #f0eaff, #d9ccff);
+            border-radius: 32px;
+            padding: 40px;
+            min-height: 400px;
             display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            color: #3a2c5a;
+            font-size: 22px;
+            font-weight: 500;
+            box-shadow: 0 30px 40px -20px rgba(0,0,0,0.2);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234b3b6b" width="120px" height="120px"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: center 40%;
+            background-size: 100px;
         }
 
-        /* Trusted */
-        .trusted {
-            background: var(--bg-light);
-            padding: 60px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .trusted-title {
+        /* trust bar */
+        .trust-bar {
+            background: #f3f1f9;
+            padding: 40px 0;
             text-align: center;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 0.9rem;
-            margin-bottom: 40px;
         }
 
-        .trusted-logos {
+        .trust-bar p {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            color: #4b3b6b;
+            margin-bottom: 24px;
+        }
+
+        .logos {
             display: flex;
             justify-content: center;
             gap: 60px;
+            color: #5f5280;
+            font-weight: 500;
+            font-size: 18px;
             flex-wrap: wrap;
-            opacity: 0.7;
         }
 
-        .trusted-logos i {
-            font-size: 2.5rem;
-            color: var(--text-secondary);
+        .logo-item {
+            opacity: 0.7;
             transition: 0.2s;
         }
 
-        .trusted-logos i:hover {
-            color: var(--primary);
+        .logo-item:hover {
+            opacity: 1;
         }
 
-        /* Steps */
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+        /* steps section */
+        .steps {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: #5f5f75;
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .step-grid {
+            display: flex;
             gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .step-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 40px 30px;
-            transition: 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .step-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
+            background: #faf8ff;
+            border-radius: 32px;
+            padding: 32px;
+            flex: 1 1 280px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            border: 1px solid #eceaff;
         }
 
         .step-number {
-            font-size: 5rem;
+            font-size: 48px;
             font-weight: 800;
+            color: #d8cfff;
             line-height: 1;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            opacity: 0.2;
-            position: absolute;
-            top: 10px;
-            right: 20px;
+            margin-bottom: 16px;
         }
 
         .step-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
+            font-size: 24px;
+            margin-bottom: 12px;
         }
 
         .step-card p {
-            color: var(--text-secondary);
+            color: #4f4f66;
         }
 
-        /* Audience */
-        .audience-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
+        /* options cards */
+        .options {
+            padding: 80px 0;
+            background: #f8f6ff;
         }
 
-        .audience-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 40px 30px;
-            text-align: center;
-            transition: 0.2s;
+        .card-group {
+            display: flex;
+            gap: 24px;
+            margin-top: 40px;
+            flex-wrap: wrap;
         }
 
-        .audience-card:hover {
-            border-color: var(--secondary);
+        .option-card {
+            background: white;
+            border-radius: 40px;
+            padding: 40px;
+            flex: 1 1 300px;
+            box-shadow: 0 20px 40px -12px rgba(55, 41, 90, 0.12);
+            transition: transform 0.2s;
         }
 
-        .audience-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .option-card:hover {
+            transform: scale(1.02);
         }
 
-        .audience-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
+        .option-card h3 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
         }
 
-        .audience-card p {
-            color: var(--text-secondary);
-            margin-bottom: 25px;
-        }
-
-        .audience-link {
-            color: var(--primary);
-            text-decoration: none;
+        .option-card .tagline {
+            color: #6d4fc7;
             font-weight: 600;
-            display: inline-flex;
+            margin-bottom: 20px;
+        }
+
+        .option-card ul {
+            list-style: none;
+            margin: 24px 0;
+        }
+
+        .option-card li {
+            margin: 12px 0;
+            display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .audience-link i {
-            transition: 0.2s;
+        .option-card li::before {
+            content: "✓";
+            color: #8f6ed5;
+            font-weight: 700;
         }
 
-        .audience-link:hover i {
-            transform: translateX(5px);
+        .badge {
+            background: #eae3ff;
+            color: #3b2a7a;
+            border-radius: 100px;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
         }
 
-        /* Advantages */
-        .advantages-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
+        /* ethical section (crafted) */
+        .crafted {
+            padding: 100px 0;
+            background: #1a1025;
+            color: white;
         }
 
-        .advantage-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 40px;
+        .crafted .container {
+            display: flex;
+            gap: 60px;
+            align-items: center;
         }
 
-        .advantage-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
+        .crafted-content {
+            flex: 1;
         }
 
-        .advantage-card p {
-            color: var(--text-secondary);
-        }
-
-        /* Stats */
-        .stats-block {
-            background: var(--bg-light);
-            padding: 80px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-            text-align: center;
-        }
-
-        .stat-number-large {
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .crafted-content h2 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 24px;
             line-height: 1.2;
         }
 
-        .stat-desc {
-            color: var(--text-secondary);
-            margin-top: 10px;
+        .crafted-list {
+            list-style: none;
+            margin: 40px 0;
         }
 
-        /* FAQ */
-        .faq-list {
+        .crafted-list li {
+            margin: 20px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .crafted-list li::before {
+            content: "⚡";
+            color: #b185db;
+            font-size: 24px;
+        }
+
+        .crafted-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat-big {
+            font-size: 44px;
+            font-weight: 800;
+            color: #ccb5ff;
+        }
+
+        .crafted-image {
+            flex: 1;
+            background: #2e1f3a;
+            border-radius: 40px;
+            padding: 60px 40px;
+            text-align: center;
+            color: #bba6e6;
+            border: 1px solid #4f3b6b;
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* metrics */
+        .metrics {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .metric-grid {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .metric-item {
+            background: #f3efff;
+            border-radius: 32px;
+            padding: 40px;
+            text-align: center;
+            flex: 1 1 200px;
+        }
+
+        .metric-number {
+            font-size: 56px;
+            font-weight: 800;
+            color: #3c2a6b;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .metric-desc {
+            color: #4e4273;
+        }
+
+        /* faq */
+        .faq {
+            padding: 100px 0;
+            background: #f8f6ff;
+        }
+
+        .faq-grid {
             max-width: 800px;
             margin: 0 auto;
         }
 
         .faq-item {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            margin-bottom: 16px;
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
         }
 
-        .faq-question {
-            padding: 20px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .faq-question h3 {
-            font-size: 1.2rem;
+        .faq-item h4 {
+            font-size: 20px;
+            margin-bottom: 12px;
             font-weight: 600;
         }
 
-        .faq-question i {
-            color: var(--primary);
-            transition: 0.2s;
+        .faq-item p {
+            color: #4b4b63;
         }
 
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            padding: 0 30px;
-            color: var(--text-secondary);
-            transition: 0.3s;
-            border-top: 0 solid var(--border);
+        /* footer */
+        .footer {
+            background: #0d0915;
+            color: #cbc2e6;
+            padding: 60px 0 30px;
         }
 
-        .faq-item.active .faq-answer {
-            max-height: 300px;
-            padding: 0 30px 20px;
-            border-top-width: 1px;
-        }
-
-        .faq-item.active .faq-question i {
-            transform: rotate(180deg);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--bg-light);
-            padding: 60px 0 20px;
-            border-top: 1px solid var(--border);
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 1.5fr repeat(3, 1fr);
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 16px;
-        }
-
-        .footer-about p {
-            color: var(--text-secondary);
-        }
-
-        .footer-col h4 {
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-        }
-
-        .footer-col ul {
-            list-style: none;
-        }
-
-        .footer-col li {
-            margin-bottom: 10px;
-        }
-
-        .footer-col a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: 0.2s;
-        }
-
-        .footer-col a:hover {
-            color: var(--primary);
-        }
-
-        .social-links {
+        .footer-top {
             display: flex;
-            gap: 16px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 60px;
         }
 
-        .social-links a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 50%;
-            transition: 0.2s;
+        .footer-col p {
+            margin: 16px 0;
+            max-width: 260px;
         }
 
-        .social-links a:hover {
-            background: var(--primary);
-            color: #000;
+        .footer-links {
+            display: flex;
+            gap: 80px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #cbc2e6;
+            text-decoration: none;
+            display: block;
+            margin: 8px 0;
+        }
+
+        .footer-links a:hover {
+            color: white;
         }
 
         .copyright {
             text-align: center;
-            color: var(--text-secondary);
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
+            border-top: 1px solid #2d2240;
+            padding-top: 30px;
+            color: #8a7aa3;
         }
 
-        /* Анимация появления */
-        .fade-up {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: 0.6s;
-        }
-
-        .fade-up.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Адаптивность */
-        @media (max-width: 1024px) {
-            .steps-grid, .audience-grid, .advantages-grid {
-                grid-template-columns: repeat(2, 1fr);
+        @media (max-width: 900px) {
+            .hero-grid, .crafted .container {
+                flex-direction: column;
             }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .hero-content h1 {
+                font-size: 48px;
             }
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav {
+            .nav-links {
                 display: none;
             }
-            .burger {
-                display: flex;
-            }
-            #menu-toggle:checked ~ .nav {
-                display: block;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: var(--bg-light);
-                padding: 30px;
-                border-top: 1px solid var(--border);
-            }
-            .nav ul {
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-            }
-            .steps-grid, .audience-grid, .advantages-grid {
-                grid-template-columns: 1fr;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            .hero-stats {
-                gap: 30px;
-            }
-            .section-title {
-                font-size: 2.5rem;
-            }
-            .footer-grid {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            .social-links {
-                justify-content: center;
+            .header-inner {
+                justify-content: space-between;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container header-row">
-            <a href="#" class="logo">WAVELAB</a>
-            <input type="checkbox" id="menu-toggle">
-            <label for="menu-toggle" class="burger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </label>
-            <nav class="nav">
-                <ul>
-                    <li><a href="#home">Главная</a></li>
-                    <li><a href="#process">Процесс</a></li>
-                    <li><a href="#formats">Форматы</a></li>
-                    <li><a href="#advantages">Преимущества</a></li>
-                    <li><a href="#faq">FAQ</a></li>
-                    <li><a href="#contact">Контакты</a></li>
-                </ul>
+    <header class="header">
+        <div class="container header-inner">
+            <div class="logo">SoundWave Studio</div>
+            <nav class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">Services</a>
+                <a href="#">Artists</a>
+                <a href="#">Rates</a>
+                <a href="#">Contact</a>
             </nav>
+            <a href="#" class="btn btn-primary">Book session →</a>
         </div>
     </header>
 
-    <main>
-        <!-- Hero -->
-        <section id="home" class="hero">
-            <div class="container hero-content">
-                <div class="hero-meta fade-up">
-                    <i class="fas fa-waveform"></i> 2500+ записанных треков
+    <section class="hero">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <h1>Where <span class="hero-highlight">sound</span> becomes emotion</h1>
+                <p class="hero-description">Профессиональная запись, сведение и мастеринг. Аналоговое тепло и цифровая точность в самом сердце города.</p>
+                <div style="display: flex; gap: 16px;">
+                    <a href="#" class="btn btn-primary">Начать проект</a>
+                    <a href="#" class="btn btn-outline">Экскурсия по студии</a>
                 </div>
-                <h1 class="hero-title fade-up">
-                    <span>Твой звук</span><br>на новой высоте
-                </h1>
-                <p class="hero-text fade-up">
-                    Профессиональная студия с аналоговым характером и опытными продюсерами. Поможем воплотить твои идеи в треки, готовые к радио.
-                </p>
-                <div class="hero-stats fade-up">
-                    <div class="stat-item">500+ <span class="stat-label">артистов</span></div>
-                    <div class="stat-item">12 лет <span class="stat-label">опыта</span></div>
-                    <div class="stat-item">98% <span class="stat-label">довольных</span></div>
-                </div>
-                <div class="hero-buttons fade-up">
-                    <a href="#contact" class="btn btn-primary">Записаться</a>
-                    <a href="#process" class="btn btn-outline">Как мы работаем</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Trusted -->
-        <section class="trusted">
-            <div class="container">
-                <div class="trusted-title fade-up">НАМ ДОВЕРЯЮТ</div>
-                <div class="trusted-logos fade-up">
-                    <i class="fab fa-spotify"></i>
-                    <i class="fab fa-apple"></i>
-                    <i class="fab fa-yandex-international"></i>
-                    <i class="fab fa-soundcloud"></i>
-                    <i class="fab fa-bandcamp"></i>
-                </div>
-            </div>
-        </section>
-
-        <!-- How it works -->
-        <section id="process" class="section">
-            <div class="container">
-                <h2 class="section-title fade-up">Как мы создаём музыку</h2>
-                <p class="section-subtitle fade-up">Прозрачный процесс от первой идеи до финального мастера</p>
-                <div class="steps-grid">
-                    <div class="step-card fade-up">
-                        <span class="step-number">01</span>
-                        <h3>Концепция</h3>
-                        <p>Встречаемся, обсуждаем жанр, настрой, подбираем оборудование под твой голос или инструмент.</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">2 800+</span>
+                        <span class="stat-label">записанных треков</span>
                     </div>
-                    <div class="step-card fade-up">
-                        <span class="step-number">02</span>
-                        <h3>Запись</h3>
-                        <p>Работаем в комфортной обстановке, используем лучшие микрофоны и преампы. Ты всегда слышишь результат.</p>
-                    </div>
-                    <div class="step-card fade-up">
-                        <span class="step-number">03</span>
-                        <h3>Сведение / Мастеринг</h3>
-                        <p>Доводим трек до идеала, готовим к релизу на всех платформах. Ты получаешь готовые файлы.</p>
+                    <div class="stat-item">
+                        <span class="stat-number">47</span>
+                        <span class="stat-label">золотых/платиновых</span>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Get started (audience) -->
-        <section id="formats" class="section" style="background: var(--bg-light);">
-            <div class="container">
-                <h2 class="section-title fade-up">Выбери свой формат</h2>
-                <p class="section-subtitle fade-up">Мы подстраиваемся под твои цели</p>
-                <div class="audience-grid">
-                    <div class="audience-card fade-up">
-                        <div class="audience-icon"><i class="fas fa-microphone-alt"></i></div>
-                        <h3>Музыканты</h3>
-                        <p>Запись синглов, EP, альбомов. Помощь в аранжировке, подборе звука.</p>
-                        <a href="#" class="audience-link">Подробнее <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                    <div class="audience-card fade-up">
-                        <div class="audience-icon"><i class="fas fa-bullhorn"></i></div>
-                        <h3>Бренды</h3>
-                        <p>Джинглы, реклама, подкасты, озвучка. Создадим звуковой образ.</p>
-                        <a href="#" class="audience-link">Подробнее <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                    <div class="audience-card fade-up">
-                        <div class="audience-icon"><i class="fas fa-clock"></i></div>
-                        <h3>Новички</h3>
-                        <p>Аренда студии с консультацией. Попробуй запись без обязательств.</p>
-                        <a href="#" class="audience-link">Подробнее <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
+            <div class="hero-image">
+                <!-- image placeholder -->
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Advantages (crafted) -->
-        <section id="advantages" class="section">
-            <div class="container">
-                <h2 class="section-title fade-up">Сделано с душой, <br>не шаблонно</h2>
-                <p class="section-subtitle fade-up">Почему артисты выбирают нас</p>
-                <div class="advantages-grid">
-                    <div class="advantage-card fade-up">
-                        <h3>Аналоговое оборудование</h3>
-                        <p>Ламповые микрофоны, винтажные консоли, легендарные компрессоры — звук с характером.</p>
-                    </div>
-                    <div class="advantage-card fade-up">
-                        <h3>Команда профессионалов</h3>
-                        <p>Звукорежиссёры с опытом работы со звёздами и пониманием современных трендов.</p>
-                    </div>
-                    <div class="advantage-card fade-up">
-                        <h3>Идеальная акустика</h3>
-                        <p>Комнаты спроектированы для точного контроля — никаких сюрпризов на сведении.</p>
-                    </div>
-                    <div class="advantage-card fade-up">
-                        <h3>100% прав на музыку</h3>
-                        <p>Мы не забираем роялти. Ты владеешь всем, что записал у нас.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Statistics -->
-        <section class="stats-block">
-            <div class="container">
-                <div class="stats-grid">
-                    <div class="fade-up">
-                        <div class="stat-number-large">97%</div>
-                        <div class="stat-desc">клиентов возвращаются</div>
-                    </div>
-                    <div class="fade-up">
-                        <div class="stat-number-large">3 дня</div>
-                        <div class="stat-desc">средний срок сведения</div>
-                    </div>
-                    <div class="fade-up">
-                        <div class="stat-number-large">50+</div>
-                        <div class="stat-desc">релизов на лейблах</div>
-                    </div>
-                    <div class="fade-up">
-                        <div class="stat-number-large">24/7</div>
-                        <div class="stat-desc">доступ для постоянных</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- FAQ -->
-        <section id="faq" class="section">
-            <div class="container">
-                <h2 class="section-title fade-up">Часто задаваемые вопросы</h2>
-                <p class="section-subtitle fade-up">Ответим на всё, что важно</p>
-                <div class="faq-list">
-                    <div class="faq-item fade-up">
-                        <div class="faq-question">
-                            <h3>Сколько стоит час записи?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            2500 ₽/час — включает работу звукорежиссёра и всё оборудование. Есть абонементы на 5 и 10 часов со скидкой.
-                        </div>
-                    </div>
-                    <div class="faq-item fade-up">
-                        <div class="faq-question">
-                            <h3>Можно ли прийти со своим инструментом?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Да, конечно. У нас также есть качественный backline: гитарные кабинеты, бас-усилители, ударная установка.
-                        </div>
-                    </div>
-                    <div class="faq-item fade-up">
-                        <div class="faq-question">
-                            <h3>Сколько длится сведение?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            Обычно 3-5 рабочих дней. Срочные проекты обсуждаем отдельно.
-                        </div>
-                    </div>
-                    <div class="faq-item fade-up">
-                        <div class="faq-question">
-                            <h3>Кому принадлежат права?</h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="faq-answer">
-                            100% прав остаются у тебя. Мы не получаем никаких отчислений.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact -->
-        <section id="contact" class="section" style="background: var(--bg-light); text-align: center;">
-            <div class="container">
-                <h2 class="section-title fade-up">Начнём работу?</h2>
-                <p class="fade-up" style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 40px;">
-                    Оставь заявку, и мы свяжемся в течение часа, чтобы подобрать удобное время.
-                </p>
-                <a href="#" class="btn btn-primary fade-up">Записаться на сессию</a>
-            </div>
-        </section>
-    </main>
-
-    <footer>
+    <section class="trust-bar">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <div class="footer-logo">WAVELAB</div>
-                    <p>Студия звукозаписи с характером. Помогаем артистам звучать профессионально с 2012 года.</p>
+            <p>Нам доверяют</p>
+            <div class="logos">
+                <span class="logo-item">UNIVERSAL MUSIC</span>
+                <span class="logo-item">SONY</span>
+                <span class="logo-item">WARNER</span>
+                <span class="logo-item">RED MUSIC</span>
+                <span class="logo-item">INDEPENDENT</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="steps">
+        <div class="container">
+            <h2 class="section-title">Как мы работаем</h2>
+            <p class="section-sub">От идеи до готового релиза — прозрачный процесс и полное погружение</p>
+            <div class="step-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <h3>Встреча и концепция</h3>
+                    <p>Обсуждаем жанр, референсы, цели. Составляем план записи и бюджет.</p>
                 </div>
-                <div class="footer-col">
-                    <h4>Навигация</h4>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <h3>Запись в зале</h3>
+                    <p>Акустически обработанные комнаты, микрофонный парк Neumann, Telefunken.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <h3>Сведение / мастеринг</h3>
+                    <p>Опытные инженеры, аналоговые компрессоры и профессиональный мониторинг.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="options">
+        <div class="container">
+            <h2 class="section-title">Выберите свой формат</h2>
+            <p class="section-sub">Разные варианты сотрудничества — от часовой аренды до полного продюсирования</p>
+            <div class="card-group">
+                <div class="option-card">
+                    <span class="badge">Старт</span>
+                    <h3>Почасовая</h3>
+                    <div class="tagline">Для демо и репетиций</div>
                     <ul>
-                        <li><a href="#home">Главная</a></li>
-                        <li><a href="#process">Процесс</a></li>
-                        <li><a href="#formats">Форматы</a></li>
-                        <li><a href="#advantages">Преимущества</a></li>
+                        <li>Зал + инженер</li>
+                        <li>Доступ к микрофонам</li>
+                        <li>Сессия от 3 часов</li>
                     </ul>
+                    <a href="#" class="btn btn-outline">Подробнее</a>
                 </div>
-                <div class="footer-col">
-                    <h4>Информация</h4>
+                <div class="option-card">
+                    <span class="badge">Хит</span>
+                    <h3>Full production</h3>
+                    <div class="tagline">Запись + сведение + мастеринг</div>
                     <ul>
-                        <li><a href="#faq">FAQ</a></li>
-                        <li><a href="#contact">Контакты</a></li>
-                        <li><a href="#">Политика</a></li>
+                        <li>Неограниченное время в студии</li>
+                        <li>Продакшн / аранжировка</li>
+                        <li>Сведение у топ-инженера</div></li>
                     </ul>
+                    <a href="#" class="btn btn-primary">Забронировать</a>
                 </div>
+                <div class="option-card">
+                    <span class="badge">Для лейблов</span>
+                    <h3>Альбомный пакет</h3>
+                    <div class="tagline">От 8 треков под ключ</div>
+                    <ul>
+                        <li>Приоритетное бронирование</li>
+                        <li>Скидка 20%</li>
+                        <li>Мастеринг в подарок</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline">Связаться</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="crafted">
+        <div class="container">
+            <div class="crafted-content">
+                <h2>Создано с душой,<br>записано на легендарных консолях</h2>
+                <ul class="crafted-list">
+                    <li>Аналоговая консоль SSL 4000E</li>
+                    <li>Винтажные микрофоны и внешние процессоры</li>
+                    <li>Команда саунд-продюсеров с опытом работы с топ-артистами</li>
+                    <li>Акустика, спроектированная студией Walters-Storyk</li>
+                    <li>Уютная лаунж-зона и чай/кофе</li>
+                </ul>
+                <div class="crafted-stats">
+                    <div><span class="stat-big">14</span> лет работы</div>
+                    <div><span class="stat-big">7</span> залов</div>
+                </div>
+            </div>
+            <div class="crafted-image">
+                <span style="font-size: 40px; margin-bottom: 20px;">🎛️</span>
+                <p>Neve, API, Neumann — лучшее для вашего звука</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="metrics">
+        <div class="container">
+            <h2 class="section-title">Цифры и факты</h2>
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-number">97%</div>
+                    <div class="metric-desc">клиентов рекомендуют нас</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-number">380+</div>
+                    <div class="metric-desc">релизов в год</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-number">52</div>
+                    <div class="metric-desc">микрофона в коллекции</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-number">24/7</div>
+                    <div class="metric-desc">доступ для резидентов</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq">
+        <div class="container">
+            <h2 class="section-title">Часто задаваемые вопросы</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h4>Нужно ли приносить свои инструменты?</h4>
+                    <p>У нас есть рояль Steinway, гитарные усилители Fender/Marshall, ударная установка DW. Но вы можете привезти своё оборудование.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Можно ли присутствовать на сведении?</h4>
+                    <p>Да, мы поддерживаем совместную работу. Вы можете сидеть рядом с инженером или наблюдать онлайн.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Какие права на запись?</h4>
+                    <p>Вы получаете 100% прав на мастер-запись. Мы не удерживаем роялти.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Есть ли парковка?</h4>
+                    <p>Да, охраняемая парковка во дворе — бесплатно для клиентов.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
                 <div class="footer-col">
-                    <h4>Соцсети</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-telegram"></i></a>
-                        <a href="#"><i class="fab fa-vk"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    <div class="logo" style="color: white; -webkit-text-fill-color: white;">SoundWave Studio</div>
+                    <p>Москва, ул. Звуковая 11<br>+7 (495) 123-45-67<br>info@soundwave.ru</p>
+                </div>
+                <div class="footer-links">
+                    <div>
+                        <strong style="color:white;">Услуги</strong>
+                        <a href="#">Запись</a>
+                        <a href="#">Сведение</a>
+                        <a href="#">Мастеринг</a>
+                        <a href="#">Аренда залов</a>
+                    </div>
+                    <div>
+                        <strong style="color:white;">Студия</strong>
+                        <a href="#">Оборудование</a>
+                        <a href="#">Команда</a>
+                        <a href="#">Портфолио</a>
+                        <a href="#">Контакты</a>
                     </div>
                 </div>
             </div>
             <div class="copyright">
-                © 2025 WAVELAB. Все права защищены.
+                © 2025 SoundWave Studio. Все права защищены. Этичный подход к звуку.
             </div>
         </div>
     </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Анимация появления
-            const faders = document.querySelectorAll('.fade-up');
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.2 });
-            faders.forEach(el => observer.observe(el));
-
-            // FAQ аккордеон
-            const faqItems = document.querySelectorAll('.faq-item');
-            faqItems.forEach(item => {
-                const question = item.querySelector('.faq-question');
-                question.addEventListener('click', () => {
-                    const isActive = item.classList.contains('active');
-                    faqItems.forEach(i => i.classList.remove('active'));
-                    if (!isActive) {
-                        item.classList.add('active');
-                    }
-                });
-            });
-
-            // Плавный скролл
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({ behavior: 'smooth' });
-                        document.getElementById('menu-toggle').checked = false;
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>
