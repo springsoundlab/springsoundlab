@@ -37,14 +37,14 @@
     .cursor {
       position: fixed; width: 12px; height: 12px;
       background: var(--accent); border-radius: 50%;
-      pointer-events: none; z-index: 9999;
+      pointer-events: none; z-index: 999999;
       transition: transform 0.1s ease;
       mix-blend-mode: difference;
     }
     .cursor-ring {
       position: fixed; width: 36px; height: 36px;
       border: 1px solid var(--accent); border-radius: 50%;
-      pointer-events: none; z-index: 9998;
+      pointer-events: none; z-index: 999998;
       transition: all 0.15s ease;
       mix-blend-mode: difference;
     }
@@ -341,7 +341,26 @@
       color: var(--accent); letter-spacing: 1px; line-height: 1;
     }
 
-    /* ── ARRANGEMENTS ── */
+    /* ── SWIPE HINT (mobile only) ── */
+    .swipe-hint {
+      display: none;
+      position: absolute; bottom: 12px; left: 0; right: 0;
+      justify-content: center; align-items: center; gap: 8px;
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--white); background: rgba(255,59,0,.85);
+      padding: 8px 16px; z-index: 10;
+      animation: swipeHintPulse 2s ease-in-out infinite;
+    }
+    .swipe-hint i { font-size: 14px; animation: swipeArrow 1.2s ease-in-out infinite; }
+    @keyframes swipeArrow {
+      0%,100% { transform: translateX(0); }
+      50%      { transform: translateX(6px); }
+    }
+    @keyframes swipeHintPulse {
+      0%,100% { opacity: 1; }
+      50%      { opacity: .7; }
+    }
+    .swipe-hint.hidden { display: none !important; }
     .arr-section { padding: 0 48px 100px; }
     .arr-list { display: flex; flex-direction: column; }
     .arr-item {
@@ -753,24 +772,16 @@
 
       /* Название в три строки: SPRING / SOUND / LAB */
       .hero-title {
-        font-size: clamp(72px, 23vw, 120px);
-        letter-spacing: 2px;
+        font-size: 23.5vw;
+        letter-spacing: -1px;
         white-space: normal;
-        word-break: break-word;
-        line-height: .92;
+        line-height: .9;
         margin-bottom: 0;
+        text-align: center;
       }
-      /* Название в три строки: SPRING / SOUND / LAB */
-      .hero-title {
-        font-size: clamp(72px, 23vw, 120px);
-        letter-spacing: 2px;
-        white-space: normal;
-        line-height: .95;
-        margin-bottom: 0;
-      }
-      .hero-title .word {
-        display: block;
-      }
+      .hero-title .word { display: block; text-align: center; }
+      .hero-center { align-items: center; text-align: center; }
+      .hero-tag { text-align: center; }
 
       .hero-waveform { height: 36px; margin-top: 6px; }
       .hero-desc-center { font-size: 12px; line-height: 1.7; margin-top: 8px; max-width: 100%; }
@@ -788,6 +799,7 @@
       .portfolio-section .sec-title { padding: 0 20px; }
       .carousel-outer { padding: 0 20px; }
       .track-card { flex: 0 0 calc(80vw - 40px); }
+      .swipe-hint { display: flex; }
 
       /* Sections */
       .section { padding: 60px 20px; }
@@ -984,7 +996,9 @@
 
         <!-- CARD 1 -->
         <div class="track-card">
-          <div class="track-img" style="background-image:url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif');"></div>
+          <div class="track-img" style="background-image:url('https://github.com/springsoundlab/portfolio/raw/refs/heads/main/Leti_so_mnoi/ls.jfif');">
+            <div class="swipe-hint" id="swipeHint"><i class="fas fa-hand-point-right"></i> Свайп</div>
+          </div>
           <div class="track-info">
             <div class="track-name">LUANHO — ЛЕТИ СО МНОЙ</div>
             <div class="track-role">Mixed by WEYTON</div>
@@ -1788,6 +1802,20 @@
     } catch(e) {}
     setTimeout(() => { btn.textContent = 'Отправить заявку →'; btn.style.background = ''; }, 4000);
   }
+
+  // Swipe hint — hide after first touch swipe
+  (function() {
+    const hint = document.getElementById('swipeHint');
+    if (!hint) return;
+    function hideHint() {
+      hint.classList.add('hidden');
+    }
+    document.getElementById('carTrack')?.addEventListener('touchend', function() {
+      setTimeout(hideHint, 400);
+    }, { passive: true, once: true });
+    // Также скрыть через 5 секунд автоматически
+    setTimeout(hideHint, 5000);
+  })();
 
   // Hamburger menu
   const hamburger = document.getElementById('hamburger');
