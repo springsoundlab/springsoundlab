@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NDR Studio | Звукозапись</title>
+    <title>NDR | Студия озвучки и локализации</title>
     <style>
-        /* ========== ОБЩИЕ СБРОСЫ И ПЕРЕМЕННЫЕ ========== */
+        /* Базовые сбросы и переменные */
         * {
             margin: 0;
             padding: 0;
@@ -13,446 +13,314 @@
         }
 
         body {
-            background-color: #0a0a0a;   /* глубокий чёрный фон, как в референсе */
-            font-family: 'Helvetica Neue', 'Inter', system-ui, -apple-system, sans-serif;
-            color: #f0f0f0;
-            line-height: 1.4;
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Helvetica Neue', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.5;
             font-weight: 300;
             -webkit-font-smoothing: antialiased;
         }
 
-        a {
-            color: #fff;
-            text-decoration: none;
-        }
-
-        /* Контейнер — строго по центру, максимальная ширина как на референсе (≈1400px) */
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 60px;
         }
 
-        /* ========== ТИПОГРАФИКА ========== */
-        h1, h2, h3, h4 {
+        /* Типографика */
+        h1, h2, h3 {
             font-weight: 400;
             letter-spacing: -0.02em;
         }
 
         h1 {
-            font-size: clamp(3.2rem, 10vw, 6rem);
-            line-height: 1.0;
-            text-transform: uppercase;
+            font-size: 3.5rem;
             margin-bottom: 1.5rem;
+            line-height: 1.1;
         }
 
         h2 {
             font-size: 2.8rem;
-            margin-bottom: 2.5rem;
-            font-weight: 350;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 1rem;
+            margin: 3rem 0 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 0.75rem;
         }
 
-        /* ========== ШАПКА ========== */
+        h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Ссылки и кнопки */
+        a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        a:hover {
+            opacity: 0.7;
+        }
+
+        .learn-more {
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #aaa;
+            border-bottom: 1px solid #aaa;
+            padding-bottom: 2px;
+        }
+        .learn-more:hover {
+            color: #fff;
+            border-color: #fff;
+        }
+
+        /* Шапка */
         .header {
-            padding: 40px 0;
+            padding: 30px 0;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 30px;
         }
-
         .header .container {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
         }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 500;
-            letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav {
+        .logo-area {
             display: flex;
-            gap: 50px;
+            flex-direction: column;
         }
-
-        .nav a {
+        .logo {
+            font-size: 3rem;
+            font-weight: 500;
+            line-height: 1;
+        }
+        .tagline {
             font-size: 0.9rem;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
             color: #aaa;
-            transition: color 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-top: 5px;
         }
-
-        .nav a:hover {
+        .header-links {
+            display: flex;
+            gap: 30px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .header-links a {
+            color: #aaa;
+        }
+        .header-links a:hover {
             color: #fff;
         }
 
-        /* ========== ГЛАВНЫЙ ЭКРАН ========== */
-        .hero {
-            min-height: 80vh;
+        /* Секция About */
+        .about {
+            margin: 60px 0;
+            max-width: 900px;
+        }
+        .about p {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin: 1.5rem 0;
+        }
+
+        /* Секция Services */
+        .services-list {
             display: flex;
-            align-items: center;
-            margin-bottom: 80px;
+            flex-direction: column;
+            gap: 2.5rem;
+            margin: 40px 0;
+        }
+        .service-item {
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 2.5rem;
         }
-
-        .hero-content {
-            max-width: 1000px;
+        .service-item:last-child {
+            border-bottom: none;
         }
-
-        .hero-suptitle {
+        .service-title {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 0.8rem;
+        }
+        .service-description {
             font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3em;
-            color: #777;
-            margin-bottom: 1rem;
+            color: #aaa;
+            max-width: 800px;
+            margin-bottom: 0.5rem;
+        }
+        .service-divider {
+            text-align: center;
+            color: #444;
+            font-size: 1.2rem;
+            letter-spacing: 0.2em;
+            margin: -1rem 0 0.5rem;
         }
 
-        .hero p {
-            font-size: 1.3rem;
-            color: #bbb;
-            max-width: 700px;
-            margin-top: 2rem;
-        }
-
-        /* ========== СЕТКА УСЛУГ — ТОЧНО КАК НА NDRPROD.COM ========== */
-        .services-grid {
+        /* Секция Projects */
+        .projects-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);  /* ровно две колонки, как в референсе */
-            gap: 2px; /* тонкие линии-разделители */
-            background-color: #222; /* цвет разделителей */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0 60px;
+        }
+        .project-card {
+            background-color: #111;
+            padding: 40px 20px;
+            text-align: center;
             border: 1px solid #222;
-            margin-bottom: 100px;
+            transition: 0.2s;
+            font-size: 1.2rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #fff;
         }
-
-        .service-card {
-            background-color: #0f0f0f;
-            padding: 3rem 2.5rem;
-            transition: background-color 0.3s ease;
-            border: 1px solid transparent;
-        }
-
-        .service-card:hover {
+        .project-card:hover {
             background-color: #1a1a1a;
             border-color: #444;
         }
 
-        .service-title {
-            font-size: 2rem;
-            font-weight: 400;
-            margin-bottom: 1.2rem;
-            color: #fff;
-            line-height: 1.2;
-        }
-
-        .service-desc {
-            color: #aaa;
-            font-size: 1rem;
-            line-height: 1.6;
-            max-width: 400px;
-        }
-
-        /* ========== БЛОК О СТУДИИ (с двумя колонками, как в референсе) ========== */
-        .about-block {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            margin-bottom: 100px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding: 60px 0;
-        }
-
-        .about-left h2 {
-            border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 1.5rem;
-        }
-
-        .about-left p {
-            font-size: 1.2rem;
-            color: #ccc;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .about-right {
-            background-color: #111;
-            padding: 40px;
-        }
-
-        .feature-list {
-            list-style: none;
-        }
-
-        .feature-list li {
-            margin-bottom: 30px;
-        }
-
-        .feature-list li strong {
-            display: block;
-            color: #fff;
-            font-weight: 500;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 8px;
-        }
-
-        .feature-list li span {
-            color: #aaa;
-            font-size: 1rem;
-        }
-
-        /* ========== ДОПОЛНИТЕЛЬНАЯ СЕКЦИЯ (цифры / партнёры) ========== */
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 40px;
-            margin-bottom: 100px;
-            padding: 40px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .stat-item {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: #666;
-            margin-bottom: 0.8rem;
-        }
-
-        .stat-number {
-            font-size: 3.5rem;
-            font-weight: 300;
-            color: #fff;
-            line-height: 1;
-            margin-bottom: 0.3rem;
-        }
-
-        .stat-desc {
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-
-        /* ========== ПОДВАЛ ========== */
+        /* Футер */
         .footer {
-            padding: 60px 0 40px;
+            margin-top: 80px;
+            padding: 50px 0;
             border-top: 1px solid rgba(255,255,255,0.1);
-            color: #777;
         }
-
-        .footer .container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px 50px;
+            list-style: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
         }
-
-        .footer-col p {
-            margin-bottom: 12px;
-            font-size: 0.95rem;
-        }
-
-        .footer-col a {
+        .footer-nav a {
             color: #aaa;
-            transition: color 0.2s;
         }
-
-        .footer-col a:hover {
+        .footer-nav a:hover {
             color: #fff;
         }
-
-        .footer-logo {
-            font-size: 1.5rem;
-            font-weight: 500;
-            background: linear-gradient(135deg, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 15px;
+        .language-link {
+            color: #fff !important;
+            border-left: 1px solid #444;
+            padding-left: 30px;
         }
 
-        /* ========== АДАПТИВНОСТЬ ========== */
-        @media (max-width: 1000px) {
+        /* Адаптивность */
+        @media (max-width: 800px) {
             .container {
                 padding: 0 30px;
             }
-            .services-grid {
-                grid-template-columns: 1fr; /* на планшете одна колонка */
-            }
-            .about-block {
-                grid-template-columns: 1fr;
-            }
-            .footer .container {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 700px) {
+            h1 { font-size: 2.8rem; }
+            h2 { font-size: 2.2rem; }
             .header .container {
                 flex-direction: column;
+                align-items: start;
+            }
+            .footer-nav {
+                flex-direction: column;
+                align-items: center;
                 gap: 20px;
             }
-            .nav {
-                gap: 30px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .hero {
-                min-height: 60vh;
-            }
-            .service-card {
-                padding: 2rem 1.5rem;
-            }
-            .stats {
-                flex-direction: column;
-                gap: 30px;
-            }
-            .footer .container {
-                grid-template-columns: 1fr;
+            .language-link {
+                border-left: none;
+                padding-left: 0;
             }
         }
     </style>
 </head>
 <body>
-
-<!-- ШАПКА -->
-<header class="header">
-    <div class="container">
-        <div class="logo">NDR Studio</div>
-        <nav class="nav">
-            <a href="#">Услуги</a>
-            <a href="#">Работы</a>
-            <a href="#">Оборудование</a>
-            <a href="#">Контакты</a>
-        </nav>
-    </div>
-</header>
-
-<!-- ГЛАВНЫЙ ЭКРАН (HERO) -->
-<section class="hero">
-    <div class="container hero-content">
-        <div class="hero-suptitle">Студия звукозаписи</div>
-        <h1>ЗАПИСЬ<br>СВЕДЕНИЕ<br>МАСТЕРИНГ</h1>
-        <p>Полный цикл производства аудио — от вокала до финального мастера. Оборудование уровня High-End, команда профессионалов с 20-летним опытом.</p>
-    </div>
-</section>
-
-<!-- СЕТКА УСЛУГ (ТОЧНО КАК В РЕФЕРЕНСЕ) -->
-<div class="container">
-    <h2>Наши услуги</h2>
-</div>
-<div class="services-grid">
-    <!-- Карточки услуг — копируют структуру ndrprod.com (6 услуг, заголовок + описание) -->
-    <div class="service-card">
-        <div class="service-title">Запись вокала</div>
-        <div class="service-desc">Изолированные комнаты, микрофоны Neumann, AKG, Telefunken. Работа с артистами любого уровня.</div>
-    </div>
-    <div class="service-card">
-        <div class="service-title">Сведение и мастеринг</div>
-        <div class="service-desc">Аналоговая обработка (Neve, API) и цифровой мастеринг. Подготовка треков для всех стриминговых платформ.</div>
-    </div>
-    <div class="service-card">
-        <div class="service-title">Озвучка и дикторы</div>
-        <div class="service-desc">База профессиональных дикторов с уникальными голосами. Озвучивание рекламы, фильмов, аудиокниг.</div>
-    </div>
-    <div class="service-card">
-        <div class="service-title">Саунд-дизайн для видео</div>
-        <div class="service-desc">Создание звуковых эффектов, шумов, атмосфер. Полное звуковое оформление роликов и фильмов.</div>
-    </div>
-    <div class="service-card">
-        <div class="service-title">Музыка для рекламы</div>
-        <div class="service-desc">Написание джинглов, аранжировок, голосовых слоганов. Интеграция в рекламные кампании брендов.</div>
-    </div>
-    <div class="service-card">
-        <div class="service-title">Локализация игр</div>
-        <div class="service-desc">Перевод, адаптация шрифтов, запись голосов и встройка в игровой движок. Полный цикл аудио для игр.</div>
-    </div>
-</div>
-
-<!-- БЛОК О СТУДИИ + ОСОБЕННОСТИ (как на ndrprod.com) -->
-<div class="container">
-    <div class="about-block">
-        <div class="about-left">
-            <h2>О студии</h2>
-            <p>NDR Studio — это пространство, где рождается качественный звук. Мы объединили лучшее аналоговое оборудование и современные цифровые технологии, чтобы вы получали результат мирового уровня.</p>
-            <p>С нами работают известные музыканты, бренды и режиссёры. Главное для нас — чистый, мощный и эмоциональный звук.</p>
+    <!-- ШАПКА -->
+    <header class="header">
+        <div class="container">
+            <div class="logo-area">
+                <div class="logo">NDR</div>
+                <div class="tagline">Your choice in the world of professional dubbing!</div>
+            </div>
+            <div class="header-links">
+                <a href="#">Contact Us</a>
+                <a href="#">Language</a>
+            </div>
         </div>
-        <div class="about-right">
-            <ul class="feature-list">
-                <li>
-                    <strong>Оборудование</strong>
-                    <span>Neve 8068, API 1608, микрофоны Neumann U87, AKG C12, Telefunken ELA M 260.</span>
-                </li>
-                <li>
-                    <strong>Акустика</strong>
-                    <span>Комнаты переменного объёма с индивидуальной акустической обработкой, изолированные от внешних шумов.</span>
-                </li>
-                <li>
-                    <strong>Инженеры</strong>
-                    <span>Команда звукорежиссёров с опытом работы на крупнейших студиях Европы.</span>
-                </li>
+    </header>
+
+    <main class="container">
+        <!-- ABOUT US -->
+        <section class="about">
+            <h2>About Us</h2>
+            <p>Our team specializes in dubbing of video content and game localization for all eastern europe countries. Additionally, we have experts in music composition, motion design, video editing, animation, and many other fields.</p>
+            <p>We have grown from a small YouTube channel into a full-scale production studio, committed to upholding the highest standards of quality in all our work.</p>
+        </section>
+
+        <!-- OUR SERVICES -->
+        <section>
+            <h2>Our Services</h2>
+            <div class="services-list">
+                <!-- 1 -->
+                <div class="service-item">
+                    <h3 class="service-title">Voice Acting</h3>
+                    <div class="service-description">
+                        High-quality voice acting and dubbing of your project by actors whose voices every Russian-speaking person has heard.
+                    </div>
+                    <a href="#" class="learn-more">[Learn More]</a>
+                </div>
+                <div class="service-divider">---</div>
+
+                <!-- 2 -->
+                <div class="service-item">
+                    <h3 class="service-title">Audio & Video</h3>
+                    <div class="service-description">
+                        A full range of post-production services for audio and video, restoration of sound design or authoring of your projects from a team of professionals.
+                    </div>
+                    <a href="#" class="learn-more">[Learn More]</a>
+                </div>
+                <div class="service-divider">---</div>
+
+                <!-- 3 -->
+                <div class="service-item">
+                    <h3 class="service-title">Content Distribution</h3>
+                    <div class="service-description">
+                        Full suite of content distribution services, ensuring seamless delivery, optimized reach, and audience engagement - lead by professionals.
+                    </div>
+                    <a href="#" class="learn-more">[Learn More]</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROJECTS WE'VE WORKED ON -->
+        <section>
+            <h2>Projects We've Worked On</h2>
+            <div class="projects-grid">
+                <div class="project-card">Profilu pod kynot chirka, gle not nihnete neoboshnogo</div>
+                <div class="project-card">ДРФНЫ ГЫНЦЫБ!</div>
+                <div class="project-card">JACK SUCKS AT LIFE!</div>
+                <div class="project-card">Студия ЗВУКОЗАПИСЬ!</div>
+                <div class="project-card">NDR Studio | Звукозаписи</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ФУТЕР -->
+    <footer class="footer">
+        <div class="container">
+            <ul class="footer-nav">
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="#">Projects</a></li>
+                <li><a href="#">Partners</a></li>
+                <li><a href="#">Demo Videos</a></li>
+                <li><a href="#">Contact Us</a></li>
+                <li><a href="#" class="language-link">Language</a></li>
             </ul>
         </div>
-    </div>
-</div>
-
-<!-- СТАТИСТИКА / ПАРТНЁРЫ (штрих из референса) -->
-<div class="container">
-    <div class="stats">
-        <div class="stat-item">
-            <div class="stat-label">Проектов</div>
-            <div class="stat-number">500+</div>
-            <div class="stat-desc">записанных альбомов и синглов</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">Дикторов</div>
-            <div class="stat-number">50+</div>
-            <div class="stat-desc">профессиональных голосов</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">Платформ</div>
-            <div class="stat-number">Все</div>
-            <div class="stat-desc">дистрибуция на Spotify, Apple Music и др.</div>
-        </div>
-    </div>
-</div>
-
-<!-- ПОДВАЛ -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-col">
-            <div class="footer-logo">NDR Studio</div>
-            <p>Студия звукозаписи и продакшена</p>
-            <p>Москва, ул. Звуковая, 10</p>
-        </div>
-        <div class="footer-col">
-            <p><a href="#">Услуги</a></p>
-            <p><a href="#">Портфолио</a></p>
-            <p><a href="#">Оборудование</a></p>
-            <p><a href="#">Команда</a></p>
-        </div>
-        <div class="footer-col">
-            <p><a href="tel:+74950000000">+7 (495) 000-00-00</a></p>
-            <p><a href="mailto:info@ndrstudio.ru">info@ndrstudio.ru</a></p>
-            <p>© 2025 NDR Studio</p>
-        </div>
-    </div>
-</footer>
-
+    </footer>
 </body>
 </html>
