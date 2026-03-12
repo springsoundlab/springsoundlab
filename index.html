@@ -33,20 +33,34 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
 
-    /* CURSOR */
-    .cursor {
-      position: fixed; width: 12px; height: 12px;
-      background: var(--accent); border-radius: 50%;
-      pointer-events: none; z-index: 999999;
-      transition: transform 0.1s ease;
-      mix-blend-mode: difference;
+    /* CURSOR — стандартный системный, всегда поверх всего */
+    .cursor, .cursor-ring { display: none !important; }
+
+    /* Запрет выделения текста по всему сайту */
+    * {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      cursor: default !important;
     }
-    .cursor-ring {
-      position: fixed; width: 36px; height: 36px;
-      border: 1px solid var(--accent); border-radius: 50%;
-      pointer-events: none; z-index: 999998;
-      transition: all 0.15s ease;
-      mix-blend-mode: difference;
+
+    /* Только на кликабельных элементах — pointer */
+    a, button, [onclick], label, select,
+    .c-arrow, .faq-q, .lesson-btn, .arr-btn,
+    .price-btn, .cf-submit, .modal-submit,
+    .nav-cta, .btn-hero, .btn-hero-ghost,
+    .map-route, .mob-cta, .cookie-btn,
+    .carousel-dot, .sf-btn, .sf-menu a,
+    .footer-social a, .footer-links a {
+      cursor: pointer !important;
+    }
+
+    /* Поля ввода — текстовый курсор разрешён, но выделение запрещено */
+    input, textarea {
+      cursor: text !important;
+      user-select: text !important;
+      -webkit-user-select: text !important;
     }
 
     /* NOISE */
@@ -60,75 +74,62 @@
     /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 40px;
-      height: 72px;
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 28px;
+      height: 68px;
       background: rgba(8,8,8,.92);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
     }
+    /* Центр — только картинка логотипа */
     .nav-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 28px; letter-spacing: 6px; text-transform: uppercase;
-      color: var(--white); text-decoration: none; white-space: nowrap;
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: center; justify-content: center;
+      grid-column: 2; text-decoration: none;
     }
     .nav-logo img {
-      height: 44px; width: auto;
+      height: 42px; width: auto;
       filter: brightness(0) invert(1);
-      transition: filter .3s;
+      transition: filter .3s, transform .3s;
+      display: block;
     }
-    .nav-logo:hover img { filter: brightness(0) saturate(100%) invert(40%) sepia(90%) saturate(800%) hue-rotate(340deg); }
-    .nav-logo span { color: var(--accent); }
-
-    /* HERO LOGO — убран */
-
-    .nav-meta {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 10px; color: var(--muted); letter-spacing: 1px;
+    .nav-logo:hover img {
+      filter: brightness(0) saturate(100%) invert(40%) sepia(90%) saturate(800%) hue-rotate(340deg);
+      transform: scale(1.08);
     }
-    .nav-meta i { color: var(--accent); font-size: 10px; }
-    .nav-meta a { color: var(--muted); text-decoration: none; transition: color .2s; }
-    .nav-meta a:hover { color: var(--white); }
+    .nav-logo .w1, .nav-logo .w2, .nav-logo .w3 { display: none; }
 
-    .nav-links { display: flex; gap: 28px; list-style: none; }
+    /* Прямоугольные кнопки-ссылки */
+    .nav-links { display: flex; gap: 4px; list-style: none; align-items: center; }
+    .nav-links-right { justify-content: flex-end; grid-column: 3; }
     .nav-links a {
       color: var(--muted); text-decoration: none;
-      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-      transition: color .2s; cursor: none;
+      font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 7px 13px; border-radius: 4px;
+      border: 1px solid var(--border);
+      background: transparent;
+      transition: color .2s, border-color .2s, background .2s, box-shadow .2s, transform .15s;
+      cursor: pointer; display: block; white-space: nowrap;
     }
-    .nav-links a:hover { color: var(--white); }
-
-    .nav-right { display: flex; align-items: center; gap: 20px; }
-    .nav-phone {
-      font-size: 11px; color: var(--muted); text-decoration: none;
-      letter-spacing: 1px; transition: color .2s;
+    .nav-links a:hover {
+      color: var(--white);
+      border-color: rgba(255,59,0,.5);
+      background: rgba(255,59,0,.09);
+      box-shadow: 0 0 14px rgba(255,59,0,.18);
+      transform: translateY(-1px);
     }
-    .nav-phone i { color: var(--accent); margin-right: 4px; }
-    .nav-phone:hover { color: var(--white); }
-
     .nav-cta {
       background: var(--accent); color: var(--white);
-      border: none; padding: 8px 20px;
+      border: 1px solid var(--accent); padding: 7px 16px; border-radius: 4px;
       font-family: 'Space Mono', monospace;
-      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-      cursor: none; border-radius: 4px;
-      transition: background .2s, transform .2s;
+      font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s;
     }
-    .nav-cta:hover { background: #FF5520; transform: translateY(-1px); }
-
-    /* AUDIO indicator */
-    .audio-indicator {
-      display: flex; align-items: center; gap: 3px; height: 16px;
-    }
-    .audio-indicator .bar {
-      width: 3px; background: var(--accent); border-radius: 1px;
-      animation: audioBars 0.8s ease-in-out infinite alternate;
-    }
-    .audio-indicator .bar:nth-child(2) { animation-delay: .15s; }
-    .audio-indicator .bar:nth-child(3) { animation-delay: .3s; }
-    .audio-indicator .bar:nth-child(4) { animation-delay: .45s; }
-    @keyframes audioBars { 0%{height:4px} 100%{height:14px} }
+    .nav-cta:hover { background: #FF5520; border-color: #FF5520; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,59,0,.3); }
+    .nav-meta { display: none; }
+    .nav-right { display: none; }
+    .audio-indicator { display: none; }
 
     /* ── HERO ── */
     .hero {
@@ -315,17 +316,23 @@
     .services-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
       gap: 1px; background: var(--border); border: 1px solid var(--border);
+      position: relative;
     }
     .srv-card {
       background: var(--bg); padding: 40px 36px;
-      transition: background .3s; position: relative; overflow: hidden;
+      transition: background .3s, transform .35s, box-shadow .35s; position: relative; overflow: hidden;
     }
     .srv-card::before {
       content: ''; position: absolute; top: 0; left: 0;
       width: 3px; height: 0; background: var(--accent);
       transition: height .4s ease;
     }
-    .srv-card:hover { background: #0f0f0f; }
+    .srv-card:hover {
+      background: #0f0f0f;
+      transform: scale(1.03) translateZ(0);
+      box-shadow: 0 24px 48px rgba(0,0,0,.6), 0 0 24px rgba(255,59,0,.07);
+      z-index: 1;
+    }
     .srv-card:hover::before { height: 100%; }
     .srv-num {
       font-family: 'Bebas Neue', sans-serif; font-size: 56px;
@@ -490,11 +497,13 @@
     /* ── CONTACT ── */
     .contact-section {
       padding: 0 48px 100px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+      align-items: stretch;
     }
-    .contact-left .sec-title { margin-bottom: 20px; }
-    .contact-left > p { font-size: 13px; line-height: 2; color: var(--muted); margin-bottom: 40px; }
-    .contact-cards { display: flex; flex-direction: column; gap: 12px; }
+    .contact-left { display: flex; flex-direction: column; }
+    .contact-left .sec-title { margin-bottom: 12px; }
+    .contact-left > p { font-size: 13px; line-height: 2; color: var(--muted); margin-bottom: 20px; }
+    .contact-cards { display: flex; flex-direction: column; gap: 10px; flex: 1; }
     .ccard {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: 10px; padding: 18px 22px;
@@ -751,68 +760,63 @@
       body { cursor: auto; }
       .cursor, .cursor-ring { display: none; }
 
-      /* Nav */
-      nav { padding: 0 20px; height: 64px; }
-      .nav-meta, .nav-links, .nav-right { display: none !important; }
+      /* Nav — только логотип + гамбургер */
+      nav { padding: 0 16px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+      .nav-links, .nav-links-right { display: none !important; }
       .hamburger { display: flex; }
-      .nav-logo { font-size: 15px; letter-spacing: 2px; gap: 8px; }
-      .nav-logo img { height: 32px; }
+      .nav-logo { font-size: 15px; letter-spacing: 2px; gap: 6px; grid-column: auto; justify-content: flex-start; }
+      .nav-logo img { height: 24px; }
+      .nav-logo .w1, .nav-logo .w2, .nav-logo .w3 { display: inline; font-size: inherit; letter-spacing: inherit; padding: 0; }
+      .nav-logo .w1::after { content: '\00a0'; }
+      .nav-logo .w2::after { content: '\00a0'; }
 
-      /* Hero logo */
-      .hero-logo-img { height: 72px; }
+      .mob-menu { top: 56px; padding-top: 32px; }
 
       /* Hero */
-      .hero {
-        padding: 64px 20px 24px;
-        min-height: 100svh;
-        justify-content: space-between;
-      }
-      .hero-center { gap: 0; justify-content: space-between; height: 100%; flex: 1; }
-      .hero-tag { font-size: 9px; letter-spacing: 3px; margin-bottom: 6px; }
-
-      /* Название в три строки: SPRING / SOUND / LAB */
+      .hero { padding: 56px 16px 32px; min-height: 100svh; justify-content: space-between; }
+      .hero-center { align-items: center; text-align: center; width: 100%; }
+      .hero-tag { font-size: 9px; letter-spacing: 3px; margin-bottom: 6px; text-align: center; }
+      /* Название — адаптировано под мобиль, читабельно */
       .hero-title {
-        font-size: 23.5vw;
-        letter-spacing: -1px;
-        white-space: normal;
-        line-height: .9;
-        margin-bottom: 0;
-        text-align: center;
+        font-size: clamp(36px, 10.5vw, 72px);
+        white-space: nowrap; letter-spacing: 2px; line-height: 1;
       }
-      .hero-title .word { display: block; text-align: center; }
-      .hero-center { align-items: center; text-align: center; }
-      .hero-tag { text-align: center; }
-
-      .hero-waveform { height: 36px; margin-top: 6px; }
-      .hero-desc-center { font-size: 12px; line-height: 1.7; margin-top: 8px; max-width: 100%; }
+      .hero-title .word { display: inline; }
+      .hero-title .word:last-child { letter-spacing: inherit; padding: 0; }
+      .hero-waveform { height: 32px; margin-top: 4px; }
+      .hero-desc-center { font-size: 12px; line-height: 1.7; margin-top: 6px; max-width: 100%; }
       .hero-actions { flex-direction: column; width: 100%; gap: 10px; margin-top: 20px; }
-      .btn-hero, .btn-hero-ghost { width: 100%; text-align: center; padding: 15px; font-size: 11px; }
+      .btn-hero, .btn-hero-ghost { width: 100%; text-align: center; padding: 14px; font-size: 11px; }
 
       /* Stats */
       .stats-strip { grid-template-columns: repeat(2, 1fr); }
-      .stat-cell { padding: 20px 24px; }
-      .stat-val { font-size: 36px; }
+      .stat-cell { padding: 16px 20px; }
+      .stat-val { font-size: 32px; }
 
-      /* Portfolio */
-      .portfolio-section { padding: 60px 0 50px; }
+      /* Portfolio — убрать лишний отступ снизу */
+      .portfolio-section { padding: 48px 0 24px; }
       .portfolio-section .sec-label,
       .portfolio-section .sec-title { padding: 0 20px; }
       .carousel-outer { padding: 0 20px; }
       .track-card { flex: 0 0 calc(80vw - 40px); }
       .swipe-hint { display: flex; }
 
+      /* Marquee — убрать лишнее расстояние */
+      .marquee-wrap { padding: 12px 0; }
+      .marquee-item { font-size: 16px; }
+
       /* Sections */
-      .section { padding: 60px 20px; }
-      .sec-title { font-size: clamp(32px, 9vw, 56px); margin-bottom: 36px; }
+      .section { padding: 48px 20px; }
+      .sec-title { font-size: clamp(28px, 8vw, 48px); margin-bottom: 28px; }
 
       /* Services grid */
       .services-grid { grid-template-columns: 1fr; }
-      .srv-card { padding: 28px 24px; }
-      .srv-num { font-size: 40px; margin-bottom: 12px; }
+      .srv-card { padding: 24px 20px; }
+      .srv-num { font-size: 40px; margin-bottom: 10px; }
 
       /* Arrangements */
-      .arr-section { padding: 0 20px 60px; }
-      .arr-item { flex-wrap: wrap; gap: 16px; }
+      .arr-section { padding: 0 20px 48px; }
+      .arr-item { flex-wrap: wrap; gap: 12px; }
       .arr-item audio { width: 100%; order: 2; }
       .arr-info { order: 1; flex: 1 1 100%; }
       .arr-btn { order: 3; width: 100%; text-align: center; }
@@ -821,35 +825,32 @@
       .pricing-grid { grid-template-columns: 1fr; }
 
       /* Timeline */
-      .timeline-grid { grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 36px; }
+      .timeline-grid { grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 28px; }
       .tl-step::after { display: none; }
-      .tl-num { font-size: 48px; }
+      .tl-num { font-size: 44px; }
 
       /* Lessons */
       .lessons-grid { grid-template-columns: 1fr; }
 
       /* Contact */
-      .contact-section { grid-template-columns: 1fr; gap: 40px; padding: 0 20px 60px; }
+      .contact-section { grid-template-columns: 1fr; gap: 32px; padding: 0 20px 48px; }
 
       /* Map */
-      .map-section { padding: 0 20px 60px; }
+      .map-section { padding: 0 20px 48px; }
       .map-wrapper { grid-template-columns: 1fr; height: auto; }
-      .map-frame { height: 280px; }
-      .map-info { padding: 24px 20px; }
+      .map-frame { height: 260px; }
+      .map-info { padding: 20px 16px; }
 
       /* Footer */
-      footer { flex-direction: column; align-items: center; padding: 32px 20px; text-align: center; gap: 20px; }
-      .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+      footer { flex-direction: column; align-items: center; padding: 28px 20px; text-align: center; gap: 16px; }
+      .footer-links { flex-wrap: wrap; justify-content: center; gap: 12px; }
 
       /* Cookie */
-      .cookie-bar {
-        flex-direction: column; white-space: normal;
-        width: 90%; border-radius: 16px; padding: 16px 20px; gap: 12px; bottom: 12px;
-      }
+      .cookie-bar { flex-direction: column; white-space: normal; width: 90%; border-radius: 16px; padding: 14px 16px; gap: 10px; bottom: 10px; }
       .cookie-btn { width: 100%; padding: 10px; }
 
       /* Modal */
-      .modal-panel { width: 95%; padding: 28px 20px; }
+      .modal-panel { width: 95%; padding: 24px 16px; }
 
       /* Forms */
       .cf-row { grid-template-columns: 1fr; }
@@ -879,30 +880,26 @@
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo">
-    <img src="https://github.com/springsoundlab/portfolio/raw/main/logotip.png" alt="Spring Sound Lab"/>
-    SPRING SOUND <span>LAB</span>
-  </a>
-  <div class="nav-meta">
-    <i class="fas fa-map-marker-alt"></i>
-    <a href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank">г. Волгоград, ул. Тулака 9</a>
-    <span style="color:var(--border)">·</span>
-    <span>Ежедн. 10:00–22:00</span>
-  </div>
+  <!-- Левая часть: ссылки -->
   <ul class="nav-links">
     <li><a href="#portfolio">Работы</a></li>
     <li><a href="#services">Услуги</a></li>
     <li><a href="#pricing">Цены</a></li>
+  </ul>
+
+  <!-- Центр: логотип -->
+  <a href="#" class="nav-logo">
+    <img src="https://github.com/springsoundlab/portfolio/raw/main/logotip.png" alt="Spring Sound Lab"/>
+    <span class="w1">SPRING</span><span class="w2">SOUND</span><span class="w3">LAB</span>
+  </a>
+
+  <!-- Правая часть: ссылки + кнопка -->
+  <ul class="nav-links nav-links-right">
     <li><a href="#lessons">Обучение</a></li>
     <li><a href="#contact">Контакт</a></li>
+    <li><button class="nav-cta" onclick="openModal()">Записаться</button></li>
   </ul>
-  <div class="nav-right">
-    <div class="audio-indicator">
-      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-    </div>
-    <a href="tel:+79178382017" class="nav-phone"><i class="fas fa-phone"></i>+7 917 838 20 17</a>
-    <button class="nav-cta" onclick="openModal()">Записаться</button>
-  </div>
+
   <button class="hamburger" id="hamburger" aria-label="Меню">
     <span></span><span></span><span></span>
   </button>
@@ -1377,30 +1374,14 @@
 <!-- MAP -->
 <section class="map-section">
   <h2 class="sec-title fade-up">КАК НАС<br>НАЙТИ</h2>
-  <div class="map-wrapper fade-up" style="transition-delay:.06s">
-    <div class="map-info">
-      <div class="map-info-item">
-        <i class="fas fa-map-marker-alt"></i>
-        <div><div class="map-info-label">Адрес</div><div class="map-info-val">г. Волгоград, ул. Тулака 9</div></div>
-      </div>
-      <div class="map-info-item">
-        <i class="fas fa-clock"></i>
-        <div><div class="map-info-label">Режим работы</div><div class="map-info-val">Ежедневно 10:00–22:00</div></div>
-      </div>
-      <div class="map-info-item">
-        <i class="fas fa-phone"></i>
-        <div><div class="map-info-label">Телефон</div><div class="map-info-val"><a href="tel:+79178382017">+7 917 838 20 17</a></div></div>
-      </div>
-      <div class="map-info-item">
-        <i class="fab fa-telegram"></i>
-        <div><div class="map-info-label">Telegram</div><div class="map-info-val"><a href="https://t.me/springsound_lab" target="_blank">@springsound_lab</a></div></div>
-      </div>
-      <a class="map-route" href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank">
-        <i class="fas fa-route"></i> Построить маршрут
-      </a>
-    </div>
-    <div class="map-frame">
+  <div class="map-wrapper-full fade-up" style="transition-delay:.06s">
+    <div class="map-frame" style="height:380px; border-radius:12px; overflow:hidden; border:1px solid var(--border);">
       <iframe src="https://yandex.ru/map-widget/v1/?ll=44.471215%2C48.674380&z=17&l=map&pt=44.471215,48.674380,pm2rdl~Spring+Sound+Lab" allowfullscreen></iframe>
+    </div>
+    <div style="margin-top:16px; text-align:center;">
+      <a class="map-route" href="https://yandex.ru/maps/?text=Волгоград+Тулака+9" target="_blank" style="display:inline-flex;">
+        <i class="fas fa-route"></i> г. Волгоград, ул. Тулака 9 — Построить маршрут
+      </a>
     </div>
   </div>
 </section>
@@ -1482,14 +1463,14 @@
 </div>
 
 <script>
-  // Cursor
+  // Cursor — мгновенный, без заторможенности
   const cur = document.getElementById('cursor');
   const ring = document.getElementById('curRing');
   document.addEventListener('mousemove', e => {
-    cur.style.left = e.clientX - 6 + 'px';
-    cur.style.top = e.clientY - 6 + 'px';
-    ring.style.left = e.clientX - 18 + 'px';
-    ring.style.top = e.clientY - 18 + 'px';
+    cur.style.left = e.clientX + 'px';
+    cur.style.top = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
   });
 
   // Waveform — ширина под заголовок
@@ -1617,17 +1598,23 @@
     nextBtn.addEventListener('click', function() { next(); startAuto(6000); });
     prevBtn.addEventListener('click', function() { prev(); startAuto(6000); });
 
-    // Колёсико мыши
-    var wheelTimer = null;
+    // Колёсико — активируется только после 3 сек наведения на карусель
     var carOuter = document.querySelector('.carousel-outer');
+    var wheelReady = false;
+    var hoverTimer = null;
     if (carOuter) {
+      carOuter.addEventListener('mouseenter', function() {
+        hoverTimer = setTimeout(function() { wheelReady = true; }, 2000);
+      });
+      carOuter.addEventListener('mouseleave', function() {
+        clearTimeout(hoverTimer);
+        wheelReady = false;
+      });
       carOuter.addEventListener('wheel', function(e) {
+        if (!wheelReady) return; // не мешаем скроллу страницы
         e.preventDefault();
-        clearTimeout(wheelTimer);
-        wheelTimer = setTimeout(function() {
-          if (e.deltaY > 0 || e.deltaX > 0) { next(); } else { prev(); }
-          startAuto(5000);
-        }, 50);
+        if (e.deltaY > 0 || e.deltaX > 0) { next(); } else { prev(); }
+        startAuto(5000);
       }, { passive: false });
     }
 
