@@ -3214,7 +3214,7 @@
             display: none;
         }
 
-        /* ===== МИНИ-ПЛЕЕР (обновлённая версия) ===== */
+        /* ===== МИНИ-ПЛЕЕР (финальная версия) ===== */
         .mini-player {
             position: fixed;
             bottom: 0;
@@ -3229,12 +3229,15 @@
             transition: transform 0.3s ease, background 0.3s ease;
             color: #fff;
             font-family: 'Inter', sans-serif;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
         }
 
         .mini-player.collapsed {
             background: rgba(10, 10, 10, 0.3);
             backdrop-filter: blur(5px);
             transform: translateY(calc(100% - 50px));
+            border-radius: 12px 12px 0 0;
         }
 
         .mini-player .player-content {
@@ -5161,7 +5164,7 @@
         })();
 
         // ============================================================
-        // МИНИ-ПЛЕЕР (исправленная версия)
+        // МИНИ-ПЛЕЕР (финальная версия с корректной работой кнопок)
         // ============================================================
         (function() {
             var miniPlayer = document.getElementById('miniPlayer');
@@ -5183,7 +5186,6 @@
 
             var currentAudio = null;
             var currentCard = null;
-            var isPlaying = false;
             var updateInterval = null;
             var isDraggingVolume = false;
 
@@ -5216,25 +5218,76 @@
                 updateInterval = setInterval(updatePlayerInfo, 200);
             }
 
-            function attachToAudio(audio, card) {
-                if (currentAudio) {
-                    currentAudio.pause();
+            function setPlayerState(audio, card) {
+                if (audio !== currentAudio) {
+                    if (currentAudio) {
+                        currentAudio.pause();
+                    }
+                    currentAudio = audio;
+                    currentCard = card;
                 }
-                currentAudio = audio;
-                currentCard = card;
-                isPlaying = true;
+                if (audio.paused) {
+                    miniPlayPause.innerHTML = '<i class="fas fa-play"></i>';
+                } else {
+                    miniPlayPause.innerHTML = '<i class="fas fa-pause"></i>';
+                }
+                miniVolumeFill.style.width = (audio.volume * 100) + '%';
+                if (audio.muted) {
+                    miniVolumeIcon.classList.add('muted');
+                    miniVolumeIcon.querySelector('i').className = 'fas fa-volume-mute';
+                } else {
+                    miniVolumeIcon.classList.remove('muted');
+                    miniVolumeIcon.querySelector('i').className = 'fas fa-volume-up';
+                }
                 miniPlayer.style.display = 'block';
                 miniPlayer.classList.remove('collapsed');
-                miniPlayPause.innerHTML = '<i class="fas fa-pause"></i>';
-                miniVolumeIcon.classList.remove('muted');
-                miniVolumeIcon.querySelector('i').className = 'fas fa-volume-up';
                 updatePlayerInfo();
                 startUpdating();
+            }
 
-                audio.addEventListener('volumechange', function onVolumeChange() {
-                    if (currentAudio) {
-                        miniVolumeFill.style.width = (currentAudio.volume * 100) + '%';
-                        if (currentAudio.muted) {
+            function activatePlayer(audio, card) {
+                setPlayerState(audio, card);
+            }
+
+            // Назначаем обработчики на все аудио в портфолио
+            document.querySelectorAll('#portfolio audio').forEach(function(audio) {
+                audio.addEventListener('play', function(e) {
+                    var card = e.target.closest('.artist-card');
+                    activatePlayer(e.target, card);
+                });
+
+                audio.addEventListener('pause', function(e) {
+                    if (e.target === currentAudio) {
+                        miniPlayPause.innerHTML = '<i class="fas fa-play"></i>';
+                        stopUpdating();
+                    }
+                });
+
+                audio.addEventListener('ended', function(e) {
+                    if (e.target === currentAudio) {
+                        miniPlayPause.innerHTML = '<i class="fas fa-play"></i>';
+                        stopUpdating();
+                        miniCurrentTime.textContent = '0:00';
+                        miniProgressFill.style.width = '0%';
+                    }
+                });
+
+                audio.addEventListener('timeupdate', function(e) {
+                    if (e.target === currentAudio) {
+                        updatePlayerInfo();
+                    }
+                });
+
+                audio.addEventListener('loadedmetadata', function(e) {
+                    if (e.target === currentAudio) {
+                        updatePlayerInfo();
+                    }
+                });
+
+                audio.addEventListener('volumechange', function(e) {
+                    if (e.target === currentAudio) {
+                        miniVolumeFill.style.width = (e.target.volume * 100) + '%';
+                        if (e.target.muted) {
                             miniVolumeIcon.classList.add('muted');
                             miniVolumeIcon.querySelector('i').className = 'fas fa-volume-mute';
                         } else {
@@ -5243,74 +5296,39 @@
                         }
                     }
                 });
-
-                audio.addEventListener('ended', function onEnded() {
-                    isPlaying = false;
-                    miniPlayPause.innerHTML = '<i class="fas fa-play"></i>';
-                    stopUpdating();
-                    miniCurrentTime.textContent = '0:00';
-                    miniProgressFill.style.width = '0%';
-                });
-
-                audio.addEventListener('play', function() {
-                    isPlaying = true;
-                    miniPlayPause.innerHTML = '<i class="fas fa-pause"></i>';
-                    startUpdating();
-                });
-
-                audio.addEventListener('pause', function() {
-                    isPlaying = false;
-                    miniPlayPause.innerHTML = '<i class="fas fa-play"></i>';
-                    stopUpdating();
-                });
-
-                audio.addEventListener('timeupdate', updatePlayerInfo);
-                audio.addEventListener('loadedmetadata', updatePlayerInfo);
-            }
-
-            function findAudioByIndex(direction) {
-                if (!currentCard) return null;
-                var cards = Array.from(document.querySelectorAll('#portfolio .artist-card'));
-                var currentIndex = cards.indexOf(currentCard);
-                if (currentIndex === -1) return null;
-                var newIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
-                if (newIndex < 0) newIndex = cards.length - 1;
-                if (newIndex >= cards.length) newIndex = 0;
-                return cards[newIndex].querySelector('audio');
-            }
-
-            document.querySelectorAll('#portfolio audio').forEach(function(audio) {
-                audio.addEventListener('play', function(e) {
-                    var card = e.target.closest('.artist-card');
-                    if (card) {
-                        attachToAudio(e.target, card);
-                    }
-                });
             });
 
+            // Управление плеером
             miniPlayPause.addEventListener('click', function() {
                 if (!currentAudio) return;
-                if (isPlaying) {
-                    currentAudio.pause();
-                    // иконка изменится по событию pause, но меняем сразу для отзывчивости
-                    miniPlayPause.innerHTML = '<i class="fas fa-play"></i>';
-                    isPlaying = false;
-                } else {
+                if (currentAudio.paused) {
                     currentAudio.play();
-                    miniPlayPause.innerHTML = '<i class="fas fa-pause"></i>';
-                    isPlaying = true;
+                } else {
+                    currentAudio.pause();
                 }
             });
 
             miniPrev.addEventListener('click', function() {
-                var newAudio = findAudioByIndex('prev');
+                if (!currentCard) return;
+                var cards = Array.from(document.querySelectorAll('#portfolio .artist-card'));
+                var currentIndex = cards.indexOf(currentCard);
+                if (currentIndex === -1) return;
+                var newIndex = currentIndex - 1;
+                if (newIndex < 0) newIndex = cards.length - 1;
+                var newAudio = cards[newIndex].querySelector('audio');
                 if (newAudio) {
                     newAudio.play();
                 }
             });
 
             miniNext.addEventListener('click', function() {
-                var newAudio = findAudioByIndex('next');
+                if (!currentCard) return;
+                var cards = Array.from(document.querySelectorAll('#portfolio .artist-card'));
+                var currentIndex = cards.indexOf(currentCard);
+                if (currentIndex === -1) return;
+                var newIndex = currentIndex + 1;
+                if (newIndex >= cards.length) newIndex = 0;
+                var newAudio = cards[newIndex].querySelector('audio');
                 if (newAudio) {
                     newAudio.play();
                 }
@@ -5331,7 +5349,6 @@
                 var percent = Math.min(1, Math.max(0, x / rect.width));
                 currentAudio.volume = percent;
                 currentAudio.muted = false;
-                miniVolumeFill.style.width = (percent * 100) + '%';
             }
 
             miniVolumeBar.addEventListener('mousedown', function(e) {
