@@ -4859,9 +4859,9 @@
         (function() {
             var portfolioSection = document.getElementById('portfolio');
             if (!portfolioSection) return;
-            var wheelTimer = null;
-            var wheelBlocked = false; // флаг, что мы перехватили колёсико
-            var hoverTimer = null;
+
+            var wheelTimer = null;           // таймер для активации режима
+            var wheelBlocked = false;        // разрешено ли перехватывать колёсико
 
             // Функция для переключения карусели
             function doCarouselAction(deltaY) {
@@ -4875,53 +4875,73 @@
                 }
             }
 
-            // Обработчик колесика мыши
-            function onWheel(e) {
-                // Работает только на десктопе (ширина > 900)
+            // Проверка, находится ли курсор над аудиоплеером внутри portfolio
+            function isMouseOverAudioInPortfolio(target) {
+                if (!target) return false;
+                // Поднимаемся по дереву до portfolio или до body
+                var el = target;
+                while (el && el !== document.body) {
+                    if (el === portfolioSection) {
+                        // Нашли блок portfolio, теперь проверяем, был ли target аудио или внутри аудио
+                        return target.closest('audio') !== null;
+                    }
+                    el = el.parentNode;
+                }
+                return false;
+            }
+
+            // Сброс таймера и режима
+            function resetWheelMode() {
+                if (wheelTimer) {
+                    clearTimeout(wheelTimer);
+                    wheelTimer = null;
+                }
+                wheelBlocked = false;
+            }
+
+            // Обработчик движения мыши — следим, над плеером ли курсор
+            document.addEventListener('mousemove', function(e) {
+                // Работает только на десктопе
                 if (window.innerWidth <= 900) return;
 
-                // Проверяем, находится ли мышь над каким-либо аудиоплеером внутри блока
-                var hovered = document.querySelector('#portfolio audio:hover');
-                if (!hovered) {
-                    // Если мышь не над плеером, сбрасываем таймеры и уходим
-                    if (hoverTimer) {
-                        clearTimeout(hoverTimer);
-                        hoverTimer = null;
-                    }
-                    if (wheelBlocked) {
-                        wheelBlocked = false;
-                        // восстанавливаем обычный скролл (ничего не делаем)
-                    }
-                    return;
-                }
+                var isOverAudio = isMouseOverAudioInPortfolio(e.target);
 
-                // Мышь над плеером — запускаем таймер, если его нет
-                if (!hoverTimer) {
-                    hoverTimer = setTimeout(function() {
-                        // Через 2 секунды активируем режим перехвата колёсика
-                        wheelBlocked = true;
-                        hoverTimer = null;
-                    }, 2000);
+                if (isOverAudio) {
+                    // Курсор над плеером
+                    if (!wheelTimer && !wheelBlocked) {
+                        // Таймер ещё не запущен — запускаем
+                        wheelTimer = setTimeout(function() {
+                            // Через 2 секунды активируем режим
+                            wheelBlocked = true;
+                            wheelTimer = null;
+                            // Можно добавить визуальную индикацию, но не обязательно
+                        }, 2000);
+                    }
+                } else {
+                    // Курсор не над плеером — сбрасываем всё
+                    resetWheelMode();
                 }
+            });
 
+            // Обработчик колёсика мыши
+            window.addEventListener('wheel', function(e) {
+                // Работает только на десктопе
+                if (window.innerWidth <= 900) return;
+
+                // Любое движение колёсика сбрасывает таймер и режим (если они были)
+                resetWheelMode();
+
+                // Если режим перехвата активен, то листаем карусель и блокируем скролл
                 if (wheelBlocked) {
-                    // Если режим активен, перехватываем событие и листаем карусель
                     e.preventDefault();
                     doCarouselAction(e.deltaY);
                 }
-                // Если режим не активен, ничего не делаем — страница скроллится обычно
-            }
+                // Если режим не активен, страница скроллится как обычно
+            }, { passive: false });
 
-            // Добавляем обработчик на секцию (используем захват, чтобы перехватить раньше)
-            portfolioSection.addEventListener('wheel', onWheel, { passive: false });
-
-            // Сбрасываем состояние при уходе мыши с блока
-            portfolioSection.addEventListener('mouseleave', function() {
-                if (hoverTimer) {
-                    clearTimeout(hoverTimer);
-                    hoverTimer = null;
-                }
-                wheelBlocked = false;
+            // Сбрасываем всё при уходе мыши с окна (на всякий случай)
+            document.addEventListener('mouseleave', function() {
+                resetWheelMode();
             });
         })();
 
