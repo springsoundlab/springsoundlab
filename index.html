@@ -566,7 +566,7 @@
             display: none !important;
         }
 
-        /* СТРЕЛКИ ПЕРЕМЕЩЕНЫ ВНИЗ */
+        /* СТРЕЛКИ ПЕРЕМЕЩЕНЫ ВНИЗ И РАСПОЛОЖЕНЫ СЛЕВА И СПРАВА ОТ ТОЧЕК */
         .carousel-footer {
             display: flex;
             align-items: center;
@@ -605,11 +605,6 @@
         .carousel-dot[data-dist="4"] { width: 4px;  height: 4px;  background: rgba(255,255,255,0.15); }
 
         /* Кнопки-стрелки под каруселью (круглые) */
-        .carousel-nav-bottom {
-            display: flex;
-            gap: 20px;
-        }
-
         .carousel-arrow-bottom {
             width: 56px;
             height: 56px;
@@ -2162,7 +2157,7 @@
         }
 
         /* ============================================================
-           ПРЕЛОАДЕР — typewriter
+           ПРЕЛОАДЕР — ускоренный, стартует сразу
         ============================================================ */
         #preloader {
             position: fixed;
@@ -3444,11 +3439,9 @@
                 </div>
                 <!-- Нижний блок с точками и стрелками -->
                 <div class="carousel-footer">
-                    <div class="carousel-nav-bottom">
-                        <button class="carousel-arrow-bottom" id="carouselPrev"><i class="fas fa-chevron-left"></i></button>
-                        <button class="carousel-arrow-bottom" id="carouselNext"><i class="fas fa-chevron-right"></i></button>
-                    </div>
+                    <button class="carousel-arrow-bottom" id="carouselPrev"><i class="fas fa-chevron-left"></i></button>
                     <div class="carousel-dots" id="carouselDots"></div>
+                    <button class="carousel-arrow-bottom" id="carouselNext"><i class="fas fa-chevron-right"></i></button>
                 </div>
             </section>
 
@@ -4411,7 +4404,7 @@
 
     <script>
         // ============================================================
-        // ПРЕЛОАДЕР — typewriter
+        // ПРЕЛОАДЕР — ускоренный, стартует сразу
         // ============================================================
         (function () {
             var line1El   = document.getElementById('plLine1');
@@ -4423,11 +4416,11 @@
             var TEXT1 = 'SPRING SOUND LAB';
             var TEXT2 = 'СТУДИЯ ЗВУКОЗАПИСИ';
 
-            var SPEED1 = 75;
-            var SPEED2 = 55;
-
-            var PAUSE_BEFORE_1 = 300;
-            var PAUSE_BEFORE_2 = 200;
+            // Уменьшаем скорость печати и паузы
+            var SPEED1 = 40;      // было 75
+            var SPEED2 = 30;      // было 55
+            var PAUSE_BEFORE_1 = 100;  // было 300
+            var PAUSE_BEFORE_2 = 100;  // было 200
 
             function typewrite(el, text, speed, done) {
                 var i = 0;
@@ -4458,7 +4451,7 @@
                             el.classList.remove('pl-cursor-blink');
                             el.style.borderColor = 'transparent';
                             if (done) done();
-                        }, 350);
+                        }, 150); // уменьшили задержку после окончания
                     }
                 }
                 setTimeout(tick, speed);
@@ -4480,29 +4473,28 @@
                 requestAnimationFrame(step);
             }
 
-            window.addEventListener('load', function () {
-                setTimeout(function () {
-                    typewrite(line1El, TEXT1, SPEED1, function () {
-                        setTimeout(function () {
-                            typewrite(line2El, TEXT2, SPEED2, function () {
-                                setTimeout(function () {
-                                    var barDuration = 900;
-                                    runProgress(barDuration, function () {
+            // Запускаем сразу после парсинга DOM (не ждём load)
+            setTimeout(function () {
+                typewrite(line1El, TEXT1, SPEED1, function () {
+                    setTimeout(function () {
+                        typewrite(line2El, TEXT2, SPEED2, function () {
+                            setTimeout(function () {
+                                var barDuration = 400; // было 900 – ускорили
+                                runProgress(barDuration, function () {
+                                    setTimeout(function () {
+                                        pl.classList.add('pl-fade');
+                                        document.body.classList.add('site-entering');
                                         setTimeout(function () {
-                                            pl.classList.add('pl-fade');
-                                            document.body.classList.add('site-entering');
-                                            setTimeout(function () {
-                                                pl.classList.add('done');
-                                                document.body.classList.remove('site-entering');
-                                            }, 1050);
-                                        }, 300);
-                                    });
-                                }, PAUSE_BEFORE_2);
-                            });
-                        }, PAUSE_BEFORE_2);
-                    });
-                }, PAUSE_BEFORE_1);
-            });
+                                            pl.classList.add('done');
+                                            document.body.classList.remove('site-entering');
+                                        }, 500);
+                                    }, 150);
+                                });
+                            }, PAUSE_BEFORE_2);
+                        });
+                    }, PAUSE_BEFORE_2);
+                });
+            }, PAUSE_BEFORE_1);
         })();
 
         // ============================================================
