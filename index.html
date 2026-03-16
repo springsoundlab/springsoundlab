@@ -4846,14 +4846,14 @@
         })();
 
         // ============================================================
-        // ПОВЕДЕНИЕ КОЛЁСИКА НА БЛОКЕ "ПРИМЕРЫ РАБОТ" (десктоп) — исправленная версия
+        // ПОВЕДЕНИЕ КОЛЁСИКА НА БЛОКЕ "ПРИМЕРЫ РАБОТ" (десктоп) — окончательная версия
         // ============================================================
         (function() {
             var portfolio = document.getElementById('portfolio');
             if (!portfolio) return;
 
             var activeMode = false;          // разрешено ли перехватывать колёсико внутри портфолио
-            var timer = null;
+            var wheelTimer = null;
             var isVisible = false;
 
             var prevBtn = document.getElementById('carouselPrev');
@@ -4869,22 +4869,11 @@
             }
 
             function resetTimerAndMode() {
-                if (timer) {
-                    clearTimeout(timer);
-                    timer = null;
+                if (wheelTimer) {
+                    clearTimeout(wheelTimer);
+                    wheelTimer = null;
                 }
                 activeMode = false;
-            }
-
-            function startTimer() {
-                if (!isVisible) return;                 // блок не виден – таймер не нужен
-                resetTimerAndMode();                     // сбрасываем старый таймер и режим
-                timer = setTimeout(function() {
-                    if (isVisible) {                     // если блок всё ещё виден
-                        activeMode = true;
-                    }
-                    timer = null;
-                }, 2000);
             }
 
             // Отслеживание видимости блока
@@ -4894,7 +4883,6 @@
                     if (!isVisible) {
                         resetTimerAndMode();              // блок ушёл – сбрасываем всё
                     }
-                    // Если блок стал видимым – таймер запустится при первом движении колёсика (см. ниже)
                 });
             }, { threshold: 0.3 }); // 30% блока в зоне видимости
 
@@ -4908,9 +4896,9 @@
                 var targetInPortfolio = portfolio.contains(e.target);
 
                 // Любое движение колёсика сбрасывает таймер
-                if (timer) {
-                    clearTimeout(timer);
-                    timer = null;
+                if (wheelTimer) {
+                    clearTimeout(wheelTimer);
+                    wheelTimer = null;
                 }
 
                 if (activeMode) {
@@ -4924,19 +4912,15 @@
                         activeMode = false;
                     }
                 } else {
-                    // Режим не активен
-                    if (targetInPortfolio) {
-                        // Курсор над блоком – запускаем таймер паузы
-                        startTimer(); // внутри проверка isVisible
-                    }
-                    // в противном случае – обычный скролл, ничего не делаем
+                    // Режим не активен, но блок видим – запускаем таймер для возможной активации
+                    wheelTimer = setTimeout(function() {
+                        if (isVisible) {
+                            activeMode = true;
+                        }
+                        wheelTimer = null;
+                    }, 2000);
                 }
             }, { passive: false });
-
-            // Сброс при уходе мыши с окна (на всякий случай)
-            document.addEventListener('mouseleave', function() {
-                resetTimerAndMode();
-            });
         })();
 
         // ============================================================
