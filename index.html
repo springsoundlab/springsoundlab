@@ -4854,19 +4854,20 @@
         })();
 
         // ============================================================
-        // ПОВЕДЕНИЕ КОЛЁСИКА НА БЛОКЕ "ПРИМЕРЫ РАБОТ" (десктоп)
+        // ПОВЕДЕНИЕ КОЛЁСИКА НА БЛОКЕ "ПРИМЕРЫ РАБОТ" (десктоп) — исправленная версия
         // ============================================================
         (function() {
-            var portfolioSection = document.getElementById('portfolio');
-            if (!portfolioSection) return;
+            var portfolio = document.getElementById('portfolio');
+            if (!portfolio) return;
 
-            var wheelTimer = null;           // таймер для активации режима
-            var wheelBlocked = false;        // разрешено ли перехватывать колёсико
+            var activeMode = false;          // разрешено ли перехватывать колёсико внутри портфолио
+            var timer = null;
+            var isVisible = false;
 
-            // Функция для переключения карусели
+            var prevBtn = document.getElementById('carouselPrev');
+            var nextBtn = document.getElementById('carouselNext');
+
             function doCarouselAction(deltaY) {
-                var prevBtn = document.getElementById('carouselPrev');
-                var nextBtn = document.getElementById('carouselNext');
                 if (!prevBtn || !nextBtn) return;
                 if (deltaY > 0) {
                     nextBtn.click();
@@ -4875,73 +4876,74 @@
                 }
             }
 
-            // Проверка, находится ли курсор над аудиоплеером внутри portfolio
-            function isMouseOverAudioInPortfolio(target) {
-                if (!target) return false;
-                // Поднимаемся по дереву до portfolio или до body
-                var el = target;
-                while (el && el !== document.body) {
-                    if (el === portfolioSection) {
-                        // Нашли блок portfolio, теперь проверяем, был ли target аудио или внутри аудио
-                        return target.closest('audio') !== null;
+            function resetTimerAndMode() {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+                activeMode = false;
+            }
+
+            function startTimer() {
+                if (!isVisible) return;                 // блок не виден – таймер не нужен
+                resetTimerAndMode();                     // сбрасываем старый таймер и режим
+                timer = setTimeout(function() {
+                    if (isVisible) {                     // если блок всё ещё виден
+                        activeMode = true;
                     }
-                    el = el.parentNode;
-                }
-                return false;
+                    timer = null;
+                }, 2000);
             }
 
-            // Сброс таймера и режима
-            function resetWheelMode() {
-                if (wheelTimer) {
-                    clearTimeout(wheelTimer);
-                    wheelTimer = null;
+            // Отслеживание видимости блока
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    isVisible = entry.isIntersecting;
+                    if (!isVisible) {
+                        resetTimerAndMode();              // блок ушёл – сбрасываем всё
+                    }
+                    // Если блок стал видимым – таймер запустится при первом движении колёсика (см. ниже)
+                });
+            }, { threshold: 0.3 }); // 30% блока в зоне видимости
+
+            observer.observe(portfolio);
+
+            // Глобальный обработчик колёсика мыши
+            window.addEventListener('wheel', function(e) {
+                // Если блок не видим – ничего не делаем (скролл обычный)
+                if (!isVisible) return;
+
+                var targetInPortfolio = portfolio.contains(e.target);
+
+                // Любое движение колёсика сбрасывает таймер
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
                 }
-                wheelBlocked = false;
-            }
 
-            // Обработчик движения мыши — следим, над плеером ли курсор
-            document.addEventListener('mousemove', function(e) {
-                // Работает только на десктопе
-                if (window.innerWidth <= 900) return;
-
-                var isOverAudio = isMouseOverAudioInPortfolio(e.target);
-
-                if (isOverAudio) {
-                    // Курсор над плеером
-                    if (!wheelTimer && !wheelBlocked) {
-                        // Таймер ещё не запущен — запускаем
-                        wheelTimer = setTimeout(function() {
-                            // Через 2 секунды активируем режим
-                            wheelBlocked = true;
-                            wheelTimer = null;
-                            // Можно добавить визуальную индикацию, но не обязательно
-                        }, 2000);
+                if (activeMode) {
+                    // Режим активен – перехватываем, только если курсор внутри блока
+                    if (targetInPortfolio) {
+                        e.preventDefault();
+                        doCarouselAction(e.deltaY);
+                        // режим остаётся активным
+                    } else {
+                        // Курсор вне блока – деактивируем режим и разрешаем обычный скролл
+                        activeMode = false;
                     }
                 } else {
-                    // Курсор не над плеером — сбрасываем всё
-                    resetWheelMode();
+                    // Режим не активен
+                    if (targetInPortfolio) {
+                        // Курсор над блоком – запускаем таймер паузы
+                        startTimer(); // внутри проверка isVisible
+                    }
+                    // в противном случае – обычный скролл, ничего не делаем
                 }
-            });
-
-            // Обработчик колёсика мыши
-            window.addEventListener('wheel', function(e) {
-                // Работает только на десктопе
-                if (window.innerWidth <= 900) return;
-
-                // Любое движение колёсика сбрасывает таймер и режим (если они были)
-                resetWheelMode();
-
-                // Если режим перехвата активен, то листаем карусель и блокируем скролл
-                if (wheelBlocked) {
-                    e.preventDefault();
-                    doCarouselAction(e.deltaY);
-                }
-                // Если режим не активен, страница скроллится как обычно
             }, { passive: false });
 
-            // Сбрасываем всё при уходе мыши с окна (на всякий случай)
+            // Сброс при уходе мыши с окна (на всякий случай)
             document.addEventListener('mouseleave', function() {
-                resetWheelMode();
+                resetTimerAndMode();
             });
         })();
 
