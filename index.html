@@ -610,8 +610,9 @@
             color: #3a8cff;
             font-size: 1.8rem;
             cursor: pointer;
-            transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+            transition: opacity 0.2s, background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
             backdrop-filter: blur(6px);
+            opacity: 0.6;
         }
 
         .carousel-arrow-bottom:hover {
@@ -619,6 +620,7 @@
             border-color: #fff;
             color: #fff;
             transform: scale(1.1);
+            opacity: 1;
         }
 
         .carousel-arrow.left, .carousel-arrow.right {
@@ -3214,39 +3216,45 @@
             display: none;
         }
 
-        /* ===== МИНИ-ПЛЕЕР (финальная версия) ===== */
+        /* ===== МИНИ-ПЛЕЕР (обновлённый компактный) ===== */
         .mini-player {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 10005;
+            pointer-events: none;
+        }
+
+        .mini-player .mini-player-container {
+            max-width: 1800px;
+            width: 100%;
+            margin: 0 40px;
             background: rgba(10, 10, 10, 0.85);
             backdrop-filter: blur(20px);
             border-top: 1px solid rgba(58, 140, 255, 0.3);
             box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
-            z-index: 10005;
-            display: none;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+            pointer-events: auto;
             transition: transform 0.3s ease, background 0.3s ease;
             color: #fff;
             font-family: 'Inter', sans-serif;
-            border-radius: 12px 12px 0 0;
-            overflow: hidden;
         }
 
-        .mini-player.collapsed {
+        .mini-player.collapsed .mini-player-container {
             background: rgba(10, 10, 10, 0.3);
             backdrop-filter: blur(5px);
             transform: translateY(calc(100% - 50px));
-            border-radius: 12px 12px 0 0;
         }
 
         .mini-player .player-content {
-            max-width: 1800px;
-            margin: 0 auto;
-            padding: 12px 20px;
+            padding: 10px 20px;
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
@@ -3257,20 +3265,20 @@
         .mini-player .track-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            min-width: 200px;
-            flex: 1 1 250px;
+            gap: 8px;
+            min-width: 180px;
+            flex: 1 1 200px;
         }
 
         .mini-player .track-name-wrapper {
             overflow: hidden;
             white-space: nowrap;
-            max-width: 200px;
+            max-width: 160px;
         }
 
         .mini-player .track-name {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             display: inline-block;
             animation: marquee 10s linear infinite;
             padding-left: 100%;
@@ -3284,26 +3292,25 @@
 
         .mini-player .track-artist {
             color: #aaa;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             white-space: nowrap;
         }
 
         .mini-player .player-controls {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             flex: 0 0 auto;
-            justify-content: center;
         }
 
         .mini-player .control-btn {
             background: transparent;
             border: none;
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -3320,7 +3327,7 @@
         .mini-player .control-btn.play-pause {
             background: #3a8cff;
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .mini-player .control-btn.play-pause:hover {
@@ -3330,15 +3337,15 @@
         .mini-player .progress-container {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex: 2 1 300px;
-            min-width: 200px;
+            gap: 8px;
+            flex: 2 1 250px;
+            min-width: 160px;
         }
 
         .mini-player .time {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #aaa;
-            min-width: 45px;
+            min-width: 40px;
         }
 
         .mini-player .progress-bar {
@@ -3348,6 +3355,17 @@
             border-radius: 2px;
             cursor: pointer;
             position: relative;
+        }
+
+        /* Увеличенная область захвата */
+        .mini-player .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 0;
+            width: 100%;
+            height: 24px;
+            cursor: pointer;
         }
 
         .mini-player .progress-fill {
@@ -3361,8 +3379,8 @@
         .mini-player .volume-container {
             display: flex;
             align-items: center;
-            gap: 8px;
-            min-width: 120px;
+            gap: 6px;
+            min-width: 100px;
             flex: 0 0 auto;
         }
 
@@ -3370,10 +3388,10 @@
             background: transparent;
             border: none;
             color: #fff;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -3393,12 +3411,22 @@
         }
 
         .mini-player .volume-bar {
-            width: 80px;
+            width: 60px;
             height: 4px;
             background: rgba(255,255,255,0.2);
             border-radius: 2px;
             cursor: pointer;
             position: relative;
+        }
+
+        .mini-player .volume-bar::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            cursor: pointer;
         }
 
         .mini-player .volume-fill {
@@ -3411,7 +3439,7 @@
         .mini-player .extra-controls {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
             margin-left: auto;
             flex: 0 0 auto;
         }
@@ -3420,10 +3448,10 @@
             background: transparent;
             border: none;
             color: #aaa;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -3453,10 +3481,10 @@
             display: none;
             width: 100%;
             text-align: center;
-            padding: 12px;
+            padding: 10px;
             cursor: pointer;
             color: #3a8cff;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             border-top: 1px solid rgba(255,255,255,0.1);
             background: rgba(10,10,10,0.3);
             backdrop-filter: blur(5px);
@@ -3467,10 +3495,13 @@
         }
 
         @media (max-width: 900px) {
+            .mini-player .mini-player-container {
+                margin: 0 20px;
+            }
             .mini-player .player-content {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 10px;
+                gap: 8px;
             }
             .mini-player .track-info {
                 justify-content: center;
@@ -3497,41 +3528,43 @@
 
     <!-- ===== МИНИ-ПЛЕЕР ===== -->
     <div class="mini-player" id="miniPlayer">
-        <div class="player-content">
-            <div class="track-info">
-                <i class="fas fa-music" style="color:#3a8cff;"></i>
-                <div class="track-name-wrapper">
-                    <span class="track-name" id="miniTrackName">Название трека</span>
+        <div class="mini-player-container">
+            <div class="player-content">
+                <div class="track-info">
+                    <i class="fas fa-music" style="color:#3a8cff;"></i>
+                    <div class="track-name-wrapper">
+                        <span class="track-name" id="miniTrackName">Название трека</span>
+                    </div>
+                    <span class="track-artist" id="miniTrackArtist">—</span>
                 </div>
-                <span class="track-artist" id="miniTrackArtist">—</span>
-            </div>
-            <div class="player-controls">
-                <button class="control-btn" id="miniPrev"><i class="fas fa-step-backward"></i></button>
-                <button class="control-btn play-pause" id="miniPlayPause"><i class="fas fa-play"></i></button>
-                <button class="control-btn" id="miniNext"><i class="fas fa-step-forward"></i></button>
-            </div>
-            <div class="progress-container">
-                <span class="time" id="miniCurrentTime">0:00</span>
-                <div class="progress-bar" id="miniProgressBar">
-                    <div class="progress-fill" id="miniProgressFill"></div>
+                <div class="player-controls">
+                    <button class="control-btn" id="miniPrev"><i class="fas fa-step-backward"></i></button>
+                    <button class="control-btn play-pause" id="miniPlayPause"><i class="fas fa-play"></i></button>
+                    <button class="control-btn" id="miniNext"><i class="fas fa-step-forward"></i></button>
                 </div>
-                <span class="time" id="miniDuration">0:00</span>
-            </div>
-            <div class="volume-container">
-                <button class="volume-icon" id="miniVolumeIcon" title="Отключить звук">
-                    <i class="fas fa-volume-up"></i>
-                </button>
-                <div class="volume-bar" id="miniVolumeBar">
-                    <div class="volume-fill" id="miniVolumeFill"></div>
+                <div class="progress-container">
+                    <span class="time" id="miniCurrentTime">0:00</span>
+                    <div class="progress-bar" id="miniProgressBar">
+                        <div class="progress-fill" id="miniProgressFill"></div>
+                    </div>
+                    <span class="time" id="miniDuration">0:00</span>
+                </div>
+                <div class="volume-container">
+                    <button class="volume-icon" id="miniVolumeIcon" title="Отключить звук">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <div class="volume-bar" id="miniVolumeBar">
+                        <div class="volume-fill" id="miniVolumeFill"></div>
+                    </div>
+                </div>
+                <div class="extra-controls">
+                    <button class="collapse-btn" id="miniCollapse" title="Свернуть"><i class="fas fa-chevron-down"></i></button>
+                    <button class="close-btn" id="miniClose" title="Закрыть"><i class="fas fa-times"></i></button>
                 </div>
             </div>
-            <div class="extra-controls">
-                <button class="collapse-btn" id="miniCollapse" title="Свернуть"><i class="fas fa-chevron-down"></i></button>
-                <button class="close-btn" id="miniClose" title="Закрыть"><i class="fas fa-times"></i></button>
+            <div class="collapse-indicator" id="miniExpand">
+                <i class="fas fa-chevron-up"></i> Развернуть плеер
             </div>
-        </div>
-        <div class="collapse-indicator" id="miniExpand">
-            <i class="fas fa-chevron-up"></i> Развернуть плеер
         </div>
     </div>
 
