@@ -2094,6 +2094,11 @@
                             "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
         document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
 
+        // ── НОВОЕ: подписи дней недели ──────────────────────────────
+        const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+        dayNames.forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
+        // ────────────────────────────────────────────────────────────
+
         const firstDay = new Date(y, m, 1).getDay();
         const lastDate = new Date(y, m + 1, 0).getDate();
         const shift = firstDay === 0 ? 6 : firstDay - 1;
@@ -2344,12 +2349,6 @@
         }
     };
 
-    // ============================================================
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ saveSession
-    // Теперь позволяет сохранять запись с нулевым балансом —
-    // для клиентов без предоплаты, поставленных в расписание.
-    // Единственное обязательное условие — указать имя клиента.
-    // ============================================================
     window.saveSession = async function(event) {
         if (event) event.preventDefault();
 
@@ -2361,7 +2360,6 @@
 
         const clientSong = (document.getElementById('clientSongInput')?.value || '').trim();
 
-        // Требуем только имя клиента — услуги и сумма могут быть нулевыми
         if (!clientSong) {
             alert('Укажите имя клиента — чтобы знать, кто записан.');
             return;
@@ -2370,7 +2368,6 @@
         const time = document.getElementById('bookingTime')?.value || '';
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
 
-        // Обработка сертификата
         if (selectedCertId) {
             const input = document.getElementById('in-' + selectedCertId);
             if (!input || input.value.trim() === '') {
@@ -2399,7 +2396,6 @@
         try {
             const isOnline = navigator.onLine;
 
-            // Если услуг нет — сохраняем как «бронь без оплаты»
             const details = cart.details.length > 0
                 ? JSON.parse(JSON.stringify(cart.details))
                 : [];
@@ -2434,11 +2430,29 @@
         }
     };
 
+    // ── ИЗМЕНЕНО: markCompleted теперь сохраняет дату закрытия и остаток ──
     window.markCompleted = function(id) {
         const row = window.crmData.find(r => r.id === id);
         if (!row) return;
-        crmCollection.doc(id).update({ completed: !row.completed });
+        const isCompleting = !row.completed;
+        const updateData = { completed: isCompleting };
+
+        if (isCompleting) {
+            const full = Number(row.fullTotal) || Number(row.total) || 0;
+            const paid = Number(row.total) || 0;
+            const remaining = full - paid;
+            const today = new Date().toLocaleDateString('ru-RU');
+            updateData.completedDate = today;
+            if (remaining > 0) {
+                // Остаток оплачивается сейчас — фиксируем его в текущем месяце
+                updateData.completionPayment = remaining;
+                updateData.total = full; // Прогресс-бар становится 100%
+            }
+        }
+
+        crmCollection.doc(id).update(updateData);
     };
+    // ─────────────────────────────────────────────────────────────────────
 
     window.editRecord = function(id) {
         openEditModal(id);
@@ -2579,13 +2593,31 @@
         renderCalendar();
     }
 
+    // ── ИЗМЕНЕНО: учитываем доплаты, поступившие в текущем месяце ──────
     function updateMonthTotal() {
         const el = document.getElementById('monthTotal');
         if(!el || !window.crmData) return;
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
-        const sum = window.crmData.filter(r => r.date.includes(mKey)).reduce((a, b) => a + Number(b.total), 0);
-        el.innerText = sum.toLocaleString() + ' ₽';
+
+        // Платежи по сессиям, изначально записанным в этом месяце
+        const sum = window.crmData
+            .filter(r => r.date.includes(mKey))
+            .reduce((a, b) => a + Number(b.total), 0);
+
+        // Остатки, закрытые в этом месяце (сессии из других месяцев)
+        // completionPayment — сумма, которую клиент доплатил при закрытии
+        const completionSum = window.crmData
+            .filter(r =>
+                !r.date.includes(mKey) &&
+                r.completedDate &&
+                r.completedDate.includes(mKey) &&
+                r.completionPayment > 0
+            )
+            .reduce((a, b) => a + Number(b.completionPayment), 0);
+
+        el.innerText = (sum + completionSum).toLocaleString() + ' ₽';
     }
+    // ─────────────────────────────────────────────────────────────────────
 
     function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
