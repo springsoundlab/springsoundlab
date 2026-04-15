@@ -1831,6 +1831,95 @@
     </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════
+     SERVICE WORKER — встроен прямо в страницу через Blob URL.
+     Кэширует HTML и статику при первом открытии,
+     отдаёт из кэша когда нет интернета.
+════════════════════════════════════════════════════════════ -->
+<script>
+(function() {
+    if (!('serviceWorker' in navigator)) return;
+
+    const SW_CODE = `
+const CACHE_NAME = 'ssl-crm-v1';
+const PRECACHE_URLS = ['/', '/index.html'];
+
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(PRECACHE_URLS);
+        }).then(() => self.skipWaiting())
+    );
+});
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames
+                    .filter((name) => name !== CACHE_NAME)
+                    .map((name) => caches.delete(name))
+            );
+        }).then(() => self.clients.claim())
+    );
+});
+
+self.addEventListener('fetch', (event) => {
+    const url = event.request.url;
+
+    // Пропускаем Firebase — у него свой офлайн-механизм
+    if (
+        url.includes('firestore.googleapis.com') ||
+        url.includes('firebase') ||
+        url.includes('gstatic.com/firebasejs')
+    ) return;
+
+    // Навигация (открытие приложения): сеть → при ошибке кэш
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+                    return response;
+                })
+                .catch(() => {
+                    return caches.match(event.request)
+                        .then((cached) => cached || caches.match('/index.html') || caches.match('/'));
+                })
+        );
+        return;
+    }
+
+    // Статика: сначала кэш, фоном обновляем
+    event.respondWith(
+        caches.match(event.request).then((cached) => {
+            const networkFetch = fetch(event.request).then((response) => {
+                if (response && response.status === 200) {
+                    const clone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+                }
+                return response;
+            }).catch(() => null);
+            return cached || networkFetch;
+        })
+    );
+});
+`;
+
+    const blob = new Blob([SW_CODE], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+
+    navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then((reg) => {
+            console.log('✅ Service Worker зарегистрирован (офлайн-режим активен)', reg.scope);
+        })
+        .catch((err) => {
+            console.warn('⚠️ Service Worker не зарегистрирован:', err);
+        });
+})();
+</script>
+
 <script>
     window.crmData = [];
     window.vocalData = [];
@@ -2094,10 +2183,8 @@
                             "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
         document.getElementById('calMonthName').innerText = `${monthNames[m]} ${y}`;
 
-        // ── НОВОЕ: подписи дней недели ──────────────────────────────
         const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
         dayNames.forEach(d => grid.innerHTML += `<div class="day-name">${d}</div>`);
-        // ────────────────────────────────────────────────────────────
 
         const firstDay = new Date(y, m, 1).getDay();
         const lastDate = new Date(y, m + 1, 0).getDate();
@@ -2430,7 +2517,6 @@
         }
     };
 
-    // ── ИЗМЕНЕНО: markCompleted теперь сохраняет дату закрытия и остаток ──
     window.markCompleted = function(id) {
         const row = window.crmData.find(r => r.id === id);
         if (!row) return;
@@ -2444,15 +2530,13 @@
             const today = new Date().toLocaleDateString('ru-RU');
             updateData.completedDate = today;
             if (remaining > 0) {
-                // Остаток оплачивается сейчас — фиксируем его в текущем месяце
                 updateData.completionPayment = remaining;
-                updateData.total = full; // Прогресс-бар становится 100%
+                updateData.total = full;
             }
         }
 
         crmCollection.doc(id).update(updateData);
     };
-    // ─────────────────────────────────────────────────────────────────────
 
     window.editRecord = function(id) {
         openEditModal(id);
@@ -2593,19 +2677,15 @@
         renderCalendar();
     }
 
-    // ── ИЗМЕНЕНО: учитываем доплаты, поступившие в текущем месяце ──────
     function updateMonthTotal() {
         const el = document.getElementById('monthTotal');
         if(!el || !window.crmData) return;
         const mKey = `.${String(currentCalDate.getMonth()+1).padStart(2,'0')}.${currentCalDate.getFullYear()}`;
 
-        // Платежи по сессиям, изначально записанным в этом месяце
         const sum = window.crmData
             .filter(r => r.date.includes(mKey))
             .reduce((a, b) => a + Number(b.total), 0);
 
-        // Остатки, закрытые в этом месяце (сессии из других месяцев)
-        // completionPayment — сумма, которую клиент доплатил при закрытии
         const completionSum = window.crmData
             .filter(r =>
                 !r.date.includes(mKey) &&
@@ -2617,7 +2697,6 @@
 
         el.innerText = (sum + completionSum).toLocaleString() + ' ₽';
     }
-    // ─────────────────────────────────────────────────────────────────────
 
     function updateNextSession(clickedDate = null) {
         const container = document.getElementById('futureListContainer');
@@ -2935,12 +3014,6 @@ window.addEventListener('load', async () => {
     initTooltipLogic();
     initNotifications();
 });
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed', err));
-  });
-}
 </script>
 </body>
 </html>
