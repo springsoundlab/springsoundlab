@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="SSL CRM">
     
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiU1BSSU5HIFNPVU5EIExBQiBDUk0iLCJzaG9ydF9uYW1lIjoiU1NMIENSTSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMDUwNTA1IiwidGhlbWVfY29sb3IiOiIjYmYwMGZmIiwiaWNvbnMiOlt7InNyYyI6Ii9sb2dvX20uanBnIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL2pwZWcifSx7InNyYyI6Ii9sb2dvX20uanBnIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL2pwZWcifV19">
-<link rel="apple-touch-icon" href="https://github.com/springsoundlab/springsoundlab/raw/main/logo_m.jpg"">
+    <link rel="apple-touch-icon" href="https://github.com/springsoundlab/springsoundlab/raw/main/logo_m.jpg">
 
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -21,7 +21,7 @@
             --bg-dark: #050505; 
             --card-bg: #0a0a0a; 
             --status-green: #008f39; 
-            --artist-red: #cc0000; 
+            --artist-red: #cc0000;
             --platinum-gold: #b89600;
             --azure-blue: #00ccff; 
             --text-gray: #b0b0b0;
@@ -1291,21 +1291,28 @@
             cursor: pointer;
         }
 
-        /* Выбранная дата — зелёная обводка, слегка серый фон */
+        /* Выбранная дата — зелёная обводка (сегодня или прошлое) */
         .cal-grid .day.selected {
             background: rgba(255,255,255,0.08) !important;
             border: 1px solid #00ff66 !important;
             color: #ffffff !important;
         }
 
-        /* Сегодняшняя дата — те же стили, что и selected */
+        /* Выбранная дата — красная обводка (будущее) */
+        .cal-grid .day.selected-future {
+            background: rgba(204,0,0,0.06) !important;
+            border: 1px solid #cc0000 !important;
+            color: #ffffff !important;
+        }
+
+        /* Сегодняшняя дата */
         .cal-grid .day.today {
             background: rgba(255,255,255,0.08) !important;
             border: 1px solid #00ff66 !important;
             color: #ffffff !important;
         }
 
-        /* Если сегодня И выбрана — оба класса, одинаково */
+        /* Если сегодня И выбрана */
         .cal-grid .day.today.selected {
             background: rgba(255,255,255,0.08) !important;
             border: 1px solid #00ff66 !important;
@@ -1330,16 +1337,24 @@
             color: #ffffff !important;
         }
 
-        /* Сессии с выбором — добавляем зелёную обводку поверх цвета */
+        /* Сессии с выбором — добавляем обводку поверх цвета */
         .cal-grid .day.past-session.selected,
-        .cal-grid .day.future-session.selected,
         .cal-grid .day.today-session.selected,
         .cal-grid .day.vocal-only.selected,
+        .cal-grid .day.past-session.selected-future,
+        .cal-grid .day.future-session.selected-future,
+        .cal-grid .day.today-session.selected-future,
+        .cal-grid .day.vocal-only.selected-future,
         .cal-grid .day.past-session.today,
         .cal-grid .day.future-session.today,
         .cal-grid .day.today-session.today,
         .cal-grid .day.vocal-only.today {
             border: 1px solid #00ff66 !important;
+        }
+
+        /* future-session при выборе — красная обводка */
+        .cal-grid .day.future-session.selected {
+            border: 1px solid #cc0000 !important;
         }
 
         .cal-grid .day.completed-day {
@@ -1946,9 +1961,8 @@ self.addEventListener('fetch', (event) => {
     var currentCart = window.currentCart; 
     let currentCalDate = new Date();
 
-    // ───── ИЗМЕНЕНИЕ: сегодняшняя дата выбрана по умолчанию ─────
+    // Сегодняшняя дата выбрана по умолчанию
     let selectedDate = new Date().toLocaleDateString('ru-RU');
-    // ─────────────────────────────────────────────────────────────
 
     let hoverTimer;
     const hoverDelay = 700;
@@ -2252,8 +2266,18 @@ self.addEventListener('fetch', (event) => {
                 classList += ' vocal-only';
             }
             
-            // Выбранная дата
-            if (selectedDate === dateStr) classList += ' selected';
+            // Выбранная дата — красная обводка если будущее, зелёная если сегодня/прошлое
+            if (selectedDate === dateStr) {
+                const [dd2, mm2, yy2] = dateStr.split('.').map(Number);
+                const selDateObj = new Date(yy2, mm2 - 1, dd2);
+                selDateObj.setHours(0, 0, 0, 0);
+                if (selDateObj > today) {
+                    classList += ' selected-future';
+                } else {
+                    classList += ' selected';
+                }
+            }
+
             // Сегодняшняя дата
             if (dateStr === todayStr) classList += ' today';
             
@@ -2271,7 +2295,6 @@ self.addEventListener('fetch', (event) => {
 
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
-        // При смене месяца сбрасываем выбор только если ушли с текущего месяца
         const today = new Date();
         const isCurrentMonth = currentCalDate.getMonth() === today.getMonth() && 
                                currentCalDate.getFullYear() === today.getFullYear();
@@ -3044,11 +3067,9 @@ vocalCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
 });
 
 window.addEventListener('load', async () => {
-    // ───── ИЗМЕНЕНИЕ: выставляем метку и виджет записей на сегодня ─────
     const todayStr = new Date().toLocaleDateString('ru-RU');
     const label = document.getElementById('sessionDateLabel');
     if (label) label.innerText = `ТЕКУЩИЙ ЧЕК (${todayStr}):`;
-    // ────────────────────────────────────────────────────────────────────
 
     await migrateOldCerts();
     subscribeCerts();
