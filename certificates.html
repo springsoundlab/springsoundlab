@@ -618,7 +618,8 @@
             position: relative;
             overflow: hidden;
         }
-        .day.today { border: 1px solid var(--neon-purple); }
+        /* ИЗМЕНЕНО: сегодняшняя дата — серый фон без обводки */
+        .day.today { background: rgba(255,255,255,0.08); border: 1px solid transparent !important; }
         .day.has-data { }
         .day.sound-only { }
         .day.vocal-only { background: var(--vocal-pastel) !important; color: #000 !important; }
@@ -1296,6 +1297,12 @@
             color: #ffffff !important;
         }
 
+        /* ИЗМЕНЕНО: сегодняшняя дата в cal-grid — серый фон, без обводки */
+        .cal-grid .day.today {
+            background: rgba(255,255,255,0.08) !important;
+            border: 1px solid transparent !important;
+        }
+
         .cal-grid .day.past-session {
             background: #36648B !important; 
             border: 1px solid transparent !important;
@@ -1831,11 +1838,6 @@
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     SERVICE WORKER — встроен прямо в страницу через Blob URL.
-     Кэширует HTML и статику при первом открытии,
-     отдаёт из кэша когда нет интернета.
-════════════════════════════════════════════════════════════ -->
 <script>
 (function() {
     if (!('serviceWorker' in navigator)) return;
@@ -1867,14 +1869,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = event.request.url;
 
-    // Пропускаем Firebase — у него свой офлайн-механизм
     if (
         url.includes('firestore.googleapis.com') ||
         url.includes('firebase') ||
         url.includes('gstatic.com/firebasejs')
     ) return;
 
-    // Навигация (открытие приложения): сеть → при ошибке кэш
     if (event.request.mode === 'navigate') {
         event.respondWith(
             fetch(event.request)
@@ -1891,7 +1891,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Статика: сначала кэш, фоном обновляем
     event.respondWith(
         caches.match(event.request).then((cached) => {
             const networkFetch = fetch(event.request).then((response) => {
