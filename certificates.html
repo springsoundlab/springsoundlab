@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="SSL CRM">
     
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiU1BSSU5HIFNPVU5EIExBQiBDUk0iLCJzaG9ydF9uYW1lIjoiU1NMIENSTSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMDUwNTA1IiwidGhlbWVfY29sb3IiOiIjYmYwMGZmIiwiaWNvbnMiOlt7InNyYyI6Ii9sb2dvX20uanBnIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL2pwZWcifSx7InNyYyI6Ii9sb2dvX20uanBnIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL2pwZWcifV19">
-<link rel="apple-touch-icon" href="https://github.com/springsoundlab/springsoundlab/raw/main/logo_m.jpg"">
+    <link rel="apple-touch-icon" href="https://github.com/springsoundlab/springsoundlab/raw/main/logo_m.jpg">
 
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -618,8 +618,14 @@
             position: relative;
             overflow: hidden;
         }
-        /* ИЗМЕНЕНО: сегодняшняя дата — серый фон без обводки */
-        .day.today { background: rgba(255,255,255,0.35); border: 1px solid transparent !important; }
+
+        /* ===== ИЗМЕНЕНО: сегодняшняя дата — белая рамка, прозрачный фон ===== */
+        .day.today { 
+            background: transparent !important; 
+            border: 1px solid #ffffff !important; 
+        }
+        /* ================================================================== */
+
         .day.has-data { }
         .day.sound-only { }
         .day.vocal-only { background: var(--vocal-pastel) !important; color: #000 !important; }
@@ -1279,6 +1285,7 @@
             }
         }
 
+        /* ===== ИЗМЕНЕНО: today в cal-grid — белая рамка, прозрачный фон ===== */
         .cal-grid .day {
             transition: all 0.2s ease;
             border: 1px solid transparent !important;
@@ -1297,11 +1304,11 @@
             color: #ffffff !important;
         }
 
-        /* ИЗМЕНЕНО: сегодняшняя дата в cal-grid — серый фон, без обводки */
         .cal-grid .day.today {
-            background: rgba(255,255,255,0.08) !important;
-            border: 1px solid transparent !important;
+            background: transparent !important;
+            border: 1px solid #ffffff !important;
         }
+        /* ================================================================== */
 
         .cal-grid .day.past-session {
             background: #36648B !important; 
@@ -1320,6 +1327,13 @@
             background: #008f39 !important;
             border: 1px solid transparent !important;
             color: #ffffff !important;
+        }
+
+        /* today с сессией — сохраняем белую рамку поверх цвета сессии */
+        .cal-grid .day.today.past-session,
+        .cal-grid .day.today.future-session,
+        .cal-grid .day.today.today-session {
+            border: 2px solid #ffffff !important;
         }
 
         .cal-grid .day.completed-day {
@@ -1838,68 +1852,110 @@
     </div>
 </div>
 
+<!-- ===================================================
+     SERVICE WORKER — максимально надёжный офлайн-режим
+     =================================================== -->
 <script>
 (function() {
     if (!('serviceWorker' in navigator)) return;
 
     const SW_CODE = `
-const CACHE_NAME = 'ssl-crm-v1';
-const PRECACHE_URLS = ['/', '/index.html'];
+const CACHE_NAME = 'ssl-crm-v3';
+
+// Всё, что нужно для работы приложения без интернета
+const PRECACHE_URLS = [
+    '/',
+    '/index.html'
+];
+
+// CDN-ресурсы, которые кешируем при первом запросе
+const CDN_PATTERNS = [
+    'fonts.googleapis.com',
+    'fonts.gstatic.com',
+    'cdnjs.cloudflare.com',
+    'gstatic.com/firebasejs'
+];
+
+// Firebase не кешируем — он сам управляет своим кешем через IndexedDB
+const SKIP_PATTERNS = [
+    'firestore.googleapis.com',
+    'firebase.googleapis.com',
+    '__/auth'
+];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(PRECACHE_URLS);
-        }).then(() => self.skipWaiting())
+        caches.open(CACHE_NAME)
+            .then((cache) => cache.addAll(PRECACHE_URLS))
+            .then(() => self.skipWaiting())
     );
 });
 
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames
-                    .filter((name) => name !== CACHE_NAME)
-                    .map((name) => caches.delete(name))
-            );
-        }).then(() => self.clients.claim())
+        caches.keys().then((names) =>
+            Promise.all(
+                names.filter(n => n !== CACHE_NAME).map(n => caches.delete(n))
+            )
+        ).then(() => self.clients.claim())
     );
 });
 
 self.addEventListener('fetch', (event) => {
     const url = event.request.url;
 
-    if (
-        url.includes('firestore.googleapis.com') ||
-        url.includes('firebase') ||
-        url.includes('gstatic.com/firebasejs')
-    ) return;
+    // Firebase — пропускаем, он сам всё кеширует в IndexedDB
+    if (SKIP_PATTERNS.some(p => url.includes(p))) return;
 
+    // Навигация (открытие страницы) — сначала сеть, потом кеш
     if (event.request.mode === 'navigate') {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+                    if (response && response.status === 200) {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+                    }
                     return response;
                 })
-                .catch(() => {
-                    return caches.match(event.request)
-                        .then((cached) => cached || caches.match('/index.html') || caches.match('/'));
-                })
+                .catch(() =>
+                    caches.match(event.request)
+                        .then(cached => cached || caches.match('/index.html') || caches.match('/'))
+                )
         );
         return;
     }
 
+    // CDN-ресурсы (шрифты, иконки) — сначала кеш, потом сеть
+    if (CDN_PATTERNS.some(p => url.includes(p))) {
+        event.respondWith(
+            caches.match(event.request).then(cached => {
+                if (cached) return cached;
+                return fetch(event.request).then(response => {
+                    if (response && response.status === 200) {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+                    }
+                    return response;
+                }).catch(() => cached);
+            })
+        );
+        return;
+    }
+
+    // Всё остальное — stale-while-revalidate
     event.respondWith(
-        caches.match(event.request).then((cached) => {
-            const networkFetch = fetch(event.request).then((response) => {
-                if (response && response.status === 200) {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-                }
-                return response;
-            }).catch(() => null);
+        caches.match(event.request).then(cached => {
+            const networkFetch = fetch(event.request)
+                .then(response => {
+                    if (response && response.status === 200 && event.request.method === 'GET') {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+                    }
+                    return response;
+                })
+                .catch(() => null);
+
             return cached || networkFetch;
         })
     );
@@ -1910,12 +1966,12 @@ self.addEventListener('fetch', (event) => {
     const swUrl = URL.createObjectURL(blob);
 
     navigator.serviceWorker.register(swUrl, { scope: '/' })
-        .then((reg) => {
-            console.log('✅ Service Worker зарегистрирован (офлайн-режим активен)', reg.scope);
+        .then(reg => {
+            console.log('✅ Service Worker активен, офлайн-режим включён');
+            // Проверяем обновления каждые 30 минут
+            setInterval(() => reg.update(), 30 * 60 * 1000);
         })
-        .catch((err) => {
-            console.warn('⚠️ Service Worker не зарегистрирован:', err);
-        });
+        .catch(err => console.warn('⚠️ Service Worker:', err));
 })();
 </script>
 
@@ -1925,7 +1981,12 @@ self.addEventListener('fetch', (event) => {
     window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
     var currentCart = window.currentCart; 
     let currentCalDate = new Date();
-    let selectedDate = null;
+
+    // ===== ИЗМЕНЕНО: автоматически выбираем сегодняшнюю дату =====
+    const _today = new Date();
+    let selectedDate = _today.toLocaleDateString('ru-RU');
+    // =============================================================
+
     let hoverTimer;
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
@@ -2191,9 +2252,9 @@ self.addEventListener('fetch', (event) => {
 
         for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const todayStr = today.toLocaleDateString('ru-RU');
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const todayStr = now.toLocaleDateString('ru-RU');
 
         for (let d = 1; d <= lastDate; d++) {
             const dayStr = String(d).padStart(2, '0');
@@ -2212,7 +2273,7 @@ self.addEventListener('fetch', (event) => {
                 cellDate.setHours(0,0,0,0);
                 if (dateStr === todayStr) {
                     soundStatus = 'today-session';
-                } else if (cellDate < today) {
+                } else if (cellDate < now) {
                     soundStatus = 'past-session';
                 } else {
                     soundStatus = 'future-session';
@@ -2228,8 +2289,11 @@ self.addEventListener('fetch', (event) => {
                 classList += ' vocal-only';
             }
             
-            if (selectedDate === dateStr) classList += ' selected';
+            // today — всегда добавляем класс, он даст белую рамку
             if (dateStr === todayStr) classList += ' today';
+
+            // selected — подсвечиваем выбранную дату
+            if (selectedDate === dateStr) classList += ' selected';
             
             grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
         }
@@ -2245,9 +2309,7 @@ self.addEventListener('fetch', (event) => {
 
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
-        selectedDate = null; 
-        const label = document.getElementById('sessionDateLabel');
-        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК:`;
+        // При смене месяца НЕ сбрасываем selectedDate — сохраняем выбранную дату
         updateTable(); renderCalendar(); 
     }
 
@@ -2452,7 +2514,9 @@ self.addEventListener('fetch', (event) => {
         }
 
         const time = document.getElementById('bookingTime')?.value || '';
+        // ===== ИЗМЕНЕНО: используем selectedDate (всегда = сегодня по умолчанию) =====
         const date = selectedDate || new Date().toLocaleDateString('ru-RU');
+        // ==============================================================================
 
         if (selectedCertId) {
             const input = document.getElementById('in-' + selectedCertId);
@@ -2512,7 +2576,7 @@ self.addEventListener('fetch', (event) => {
             renderCart();
         } catch (error) {
             console.error("Ошибка сохранения:", error);
-            alert('Ошибка при сохранении. Возможно, нет соединения с Firebase.');
+            alert('Ошибка при сохранении. Проверьте подключение.');
         }
     };
 
@@ -2945,6 +3009,7 @@ self.addEventListener('fetch', (event) => {
         if (!sorted.length) topEl.innerHTML = '<div style="color:#333; font-size:12px; font-family:Inter;">Нет данных</div>';
     }
 
+    // ===== Онлайн / Офлайн индикатор =====
     function updateOnlineStatus() {
         const indicator = document.getElementById('offlineIndicator');
         if (navigator.onLine) {
@@ -2957,6 +3022,15 @@ self.addEventListener('fetch', (event) => {
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
     updateOnlineStatus();
+
+    // ===== ИЗМЕНЕНО: ставим лейбл с сегодняшней датой сразу при загрузке =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const label = document.getElementById('sessionDateLabel');
+        if (label) {
+            label.innerText = `ТЕКУЩИЙ ЧЕК (${selectedDate}):`;
+        }
+    });
+    // =========================================================================
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -2975,36 +3049,53 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-db.enablePersistence()
+// ===== ОФЛАЙН: включаем персистентность с долгим кешем =====
+db.enablePersistence({ synchronizeTabs: true })
+  .then(() => {
+      console.log('✅ Firebase офлайн-режим активен (IndexedDB)');
+  })
   .catch((err) => {
-    if (err.code == 'failed-precondition') {
-      console.log('Persistence failed: multiple tabs open');
-    } else if (err.code == 'unimplemented') {
-      console.log('Persistence not supported');
+    if (err.code === 'failed-precondition') {
+        // Несколько вкладок открыто — в одной из них персистентность уже работает
+        console.log('ℹ️ Персистентность уже активна в другой вкладке');
+    } else if (err.code === 'unimplemented') {
+        console.warn('⚠️ Браузер не поддерживает офлайн-персистентность');
     }
   });
 
 const crmCollection = db.collection("sessions");
 const vocalCollection = db.collection("vocal_sessions");
 
-crmCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-    window.crmData = [];
-    snapshot.forEach((doc) => {
-        window.crmData.push({ id: doc.id, ...doc.data() });
-    });
-    updateTable();
-    renderCalendar();
-    updateNextSession(selectedDate);
-});
+crmCollection.orderBy("timestamp", "desc").onSnapshot(
+    { includeMetadataChanges: false },
+    (snapshot) => {
+        window.crmData = [];
+        snapshot.forEach((doc) => {
+            window.crmData.push({ id: doc.id, ...doc.data() });
+        });
+        updateTable();
+        renderCalendar();
+        updateNextSession(selectedDate);
+    },
+    (error) => {
+        console.warn('Firestore snapshot error (офлайн?):', error);
+    }
+);
 
-vocalCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-    window.vocalData = [];
-    snapshot.forEach((doc) => {
-        window.vocalData.push({ id: doc.id, ...doc.data() });
-    });
-    renderCalendar();
-    updateNextSession(selectedDate);
-});
+vocalCollection.orderBy("timestamp", "desc").onSnapshot(
+    { includeMetadataChanges: false },
+    (snapshot) => {
+        window.vocalData = [];
+        snapshot.forEach((doc) => {
+            window.vocalData.push({ id: doc.id, ...doc.data() });
+        });
+        renderCalendar();
+        updateNextSession(selectedDate);
+    },
+    (error) => {
+        console.warn('Vocal snapshot error (офлайн?):', error);
+    }
+);
 
 window.addEventListener('load', async () => {
     await migrateOldCerts();
@@ -3012,6 +3103,8 @@ window.addEventListener('load', async () => {
     renderCalendar();
     initTooltipLogic();
     initNotifications();
+    // Показываем записи на сегодня сразу при загрузке
+    updateNextSession(selectedDate);
 });
 </script>
 </body>
