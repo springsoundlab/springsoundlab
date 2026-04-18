@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="SSL CRM">
     
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiU1BSSU5HIFNPVU5EIExBQiBDUk0iLCJzaG9ydF9uYW1lIjoiU1NMIENSTSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMDUwNTA1IiwidGhlbWVfY29sb3IiOiIjYmYwMGZmIiwiaWNvbnMiOlt7InNyYyI6Ii9sb2dvX20uanBnIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL2pwZWcifSx7InNyYyI6Ii9sb2dvX20uanBnIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL2pwZWcifV19">
-    <link rel="apple-touch-icon" href="https://github.com/springsoundlab/springsoundlab/raw/main/logo_m.jpg">
+<link rel="apple-touch-icon" href="https://github.com/springsoundlab/springsoundlab/raw/main/logo_m.jpg"">
 
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -21,7 +21,7 @@
             --bg-dark: #050505; 
             --card-bg: #0a0a0a; 
             --status-green: #008f39; 
-            --artist-red: #cc0000;
+            --artist-red: #cc0000; 
             --platinum-gold: #b89600;
             --azure-blue: #00ccff; 
             --text-gray: #b0b0b0;
@@ -618,7 +618,8 @@
             position: relative;
             overflow: hidden;
         }
-        .day.today { background: rgba(255,255,255,0.08); border: 1px solid transparent !important; }
+        /* ИЗМЕНЕНО: сегодняшняя дата — серый фон без обводки */
+        .day.today { background: rgba(255,255,255,0.20); border: 1px solid transparent !important; }
         .day.has-data { }
         .day.sound-only { }
         .day.vocal-only { background: var(--vocal-pastel) !important; color: #000 !important; }
@@ -1278,7 +1279,6 @@
             }
         }
 
-        /* ===== КАЛЕНДАРЬ ===== */
         .cal-grid .day {
             transition: all 0.2s ease;
             border: 1px solid transparent !important;
@@ -1291,31 +1291,16 @@
             cursor: pointer;
         }
 
-        /* Выбранная дата — зелёная обводка (сегодня или прошлое) */
         .cal-grid .day.selected {
-            background: rgba(255,255,255,0.08) !important;
+            background: #333 !important; 
             border: 1px solid #00ff66 !important;
             color: #ffffff !important;
         }
 
-        /* Выбранная дата — красная обводка (будущее) */
-        .cal-grid .day.selected-future {
-            background: rgba(204,0,0,0.06) !important;
-            border: 1px solid #cc0000 !important;
-            color: #ffffff !important;
-        }
-
-        /* Сегодняшняя дата */
+        /* ИЗМЕНЕНО: сегодняшняя дата в cal-grid — серый фон, без обводки */
         .cal-grid .day.today {
             background: rgba(255,255,255,0.08) !important;
-            border: 1px solid #00ff66 !important;
-            color: #ffffff !important;
-        }
-
-        /* Если сегодня И выбрана */
-        .cal-grid .day.today.selected {
-            background: rgba(255,255,255,0.08) !important;
-            border: 1px solid #00ff66 !important;
+            border: 1px solid transparent !important;
         }
 
         .cal-grid .day.past-session {
@@ -1335,26 +1320,6 @@
             background: #008f39 !important;
             border: 1px solid transparent !important;
             color: #ffffff !important;
-        }
-
-        /* Сессии с выбором — добавляем обводку поверх цвета */
-        .cal-grid .day.past-session.selected,
-        .cal-grid .day.today-session.selected,
-        .cal-grid .day.vocal-only.selected,
-        .cal-grid .day.past-session.selected-future,
-        .cal-grid .day.future-session.selected-future,
-        .cal-grid .day.today-session.selected-future,
-        .cal-grid .day.vocal-only.selected-future,
-        .cal-grid .day.past-session.today,
-        .cal-grid .day.future-session.today,
-        .cal-grid .day.today-session.today,
-        .cal-grid .day.vocal-only.today {
-            border: 1px solid #00ff66 !important;
-        }
-
-        /* future-session при выборе — красная обводка */
-        .cal-grid .day.future-session.selected {
-            border: 1px solid #cc0000 !important;
         }
 
         .cal-grid .day.completed-day {
@@ -1960,10 +1925,7 @@ self.addEventListener('fetch', (event) => {
     window.currentCart = { details: [], total: 0, fullPriceTotal: 0 };
     var currentCart = window.currentCart; 
     let currentCalDate = new Date();
-
-    // Сегодняшняя дата выбрана по умолчанию
-    let selectedDate = new Date().toLocaleDateString('ru-RU');
-
+    let selectedDate = null;
     let hoverTimer;
     const hoverDelay = 700;
     const colorMap = { white: '#fff', purple: '#bf00ff', red: '#cc0000', green: '#008f39', gold: '#b89600', blue: '#00ccff' };
@@ -2266,19 +2228,7 @@ self.addEventListener('fetch', (event) => {
                 classList += ' vocal-only';
             }
             
-            // Выбранная дата — красная обводка если будущее, зелёная если сегодня/прошлое
-            if (selectedDate === dateStr) {
-                const [dd2, mm2, yy2] = dateStr.split('.').map(Number);
-                const selDateObj = new Date(yy2, mm2 - 1, dd2);
-                selDateObj.setHours(0, 0, 0, 0);
-                if (selDateObj > today) {
-                    classList += ' selected-future';
-                } else {
-                    classList += ' selected';
-                }
-            }
-
-            // Сегодняшняя дата
+            if (selectedDate === dateStr) classList += ' selected';
             if (dateStr === todayStr) classList += ' today';
             
             grid.innerHTML += `<div class="${classList}" onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
@@ -2295,20 +2245,10 @@ self.addEventListener('fetch', (event) => {
 
     function changeMonth(dir) { 
         currentCalDate.setMonth(currentCalDate.getMonth() + dir); 
-        const today = new Date();
-        const isCurrentMonth = currentCalDate.getMonth() === today.getMonth() && 
-                               currentCalDate.getFullYear() === today.getFullYear();
-        if (isCurrentMonth) {
-            selectedDate = today.toLocaleDateString('ru-RU');
-            const label = document.getElementById('sessionDateLabel');
-            if(label) label.innerText = `ТЕКУЩИЙ ЧЕК (${selectedDate}):`;
-        } else {
-            selectedDate = null;
-            const label = document.getElementById('sessionDateLabel');
-            if(label) label.innerText = `ТЕКУЩИЙ ЧЕК:`;
-        }
+        selectedDate = null; 
+        const label = document.getElementById('sessionDateLabel');
+        if(label) label.innerText = `ТЕКУЩИЙ ЧЕК:`;
         updateTable(); renderCalendar(); 
-        updateNextSession(selectedDate);
     }
 
     function applyPrepaidToggle() {
@@ -3067,16 +3007,11 @@ vocalCollection.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
 });
 
 window.addEventListener('load', async () => {
-    const todayStr = new Date().toLocaleDateString('ru-RU');
-    const label = document.getElementById('sessionDateLabel');
-    if (label) label.innerText = `ТЕКУЩИЙ ЧЕК (${todayStr}):`;
-
     await migrateOldCerts();
     subscribeCerts();
     renderCalendar();
     initTooltipLogic();
     initNotifications();
-    updateNextSession(todayStr);
 });
 </script>
 </body>
