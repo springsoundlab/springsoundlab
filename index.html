@@ -1,839 +1,997 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Spring Sound Lab | Студия звукозаписи</title>
-  <!-- Google Fonts: Inter + Montserrat для акцентов -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Sound Lab — Студия звукозаписи</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --bg2: #0d1219;
+    --accent: #00e5a0;
+    --accent2: #00b87a;
+    --accent-glow: rgba(0,229,160,0.18);
+    --accent-glow2: rgba(0,229,160,0.07);
+    --white: #ffffff;
+    --white70: rgba(255,255,255,0.7);
+    --white30: rgba(255,255,255,0.3);
+    --white10: rgba(255,255,255,0.07);
+    --card-bg: rgba(255,255,255,0.04);
+    --border: rgba(0,229,160,0.18);
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'Raleway', sans-serif;
+  }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #0A0C0F;
-      color: #FFFFFF;
-      line-height: 1.5;
-      scroll-behavior: smooth;
-      overflow-x: hidden;
-    }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* изумрудные акценты */
-    :root {
-      --emerald: #10B981;
-      --emerald-glow: rgba(16, 185, 129, 0.4);
-      --emerald-dark: #059669;
-      --slate-light: #CBD5E1;
-      --bg-card: rgba(18, 22, 28, 0.7);
-      --border-glow: rgba(16, 185, 129, 0.25);
-    }
+  html { scroll-behavior: smooth; }
 
-    /* ----- плавная навигация (fixed) ----- */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(10, 12, 15, 0.85);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      z-index: 1000;
-      transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      border-bottom: 1px solid rgba(16, 185, 129, 0.2);
-    }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-weight: 400;
+    overflow-x: hidden;
+    cursor: default;
+  }
 
-    .navbar.hide {
-      transform: translateY(-100%);
-    }
+  /* ───── NOISE OVERLAY ───── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: .45;
+  }
 
-    .nav-container {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
+  /* ───── NAV ───── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 22px 6vw;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background .4s, backdrop-filter .4s, border-bottom .4s;
+  }
+  nav.scrolled {
+    background: rgba(8,12,16,.88);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    letter-spacing: .12em;
+    color: var(--white);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2.4rem; list-style: none; }
+  .nav-links a {
+    color: var(--white70); text-decoration: none;
+    font-size: .85rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    position: relative; padding-bottom: 2px;
+    transition: color .3s;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 1px; background: var(--accent);
+    transition: width .35s ease;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    background: transparent; border: 1.5px solid var(--accent);
+    color: var(--accent); padding: 9px 22px;
+    font-family: var(--font-body); font-size: .82rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase; cursor: pointer;
+    border-radius: 3px;
+    position: relative; overflow: hidden;
+    transition: color .3s, box-shadow .3s;
+  }
+  .nav-cta::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--accent); transform: scaleX(0); transform-origin: left;
+    transition: transform .35s ease; z-index: -1;
+  }
+  .nav-cta:hover { color: var(--bg); box-shadow: 0 0 20px var(--accent-glow); }
+  .nav-cta:hover::before { transform: scaleX(1); }
 
-    .logo {
-      font-size: 1.6rem;
-      font-weight: 700;
-      font-family: 'Montserrat', sans-serif;
-      background: linear-gradient(135deg, #FFFFFF, #10B981);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      letter-spacing: -0.02em;
-    }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 25px; height: 2px; background: var(--white); border-radius: 2px; transition: all .3s; }
 
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      align-items: center;
-      list-style: none;
-    }
+  /* ───── HERO ───── */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    padding: 120px 6vw 80px;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(0,229,160,.09) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(0,100,80,.12) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(0,229,160,.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0,229,160,.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 800px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border); padding: 6px 16px;
+    border-radius: 100px; margin-bottom: 28px;
+    font-size: .78rem; font-weight: 600; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--accent);
+    animation: fadeUp .8s ease both;
+  }
+  .hero-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    line-height: .95; letter-spacing: .04em;
+    animation: fadeUp .8s .1s ease both;
+  }
+  .hero-title .line2 { color: var(--accent); display: block; }
+  .hero-sub {
+    margin-top: 24px; max-width: 500px;
+    font-size: clamp(.9rem, 1.5vw, 1.05rem); font-weight: 300; line-height: 1.7;
+    color: var(--white70);
+    animation: fadeUp .8s .2s ease both;
+  }
+  .hero-actions {
+    margin-top: 40px; display: flex; gap: 16px; flex-wrap: wrap;
+    animation: fadeUp .8s .3s ease both;
+  }
+  .btn-primary {
+    padding: 15px 36px; background: var(--accent); color: var(--bg);
+    font-family: var(--font-body); font-size: .88rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    border: none; cursor: pointer; border-radius: 3px;
+    position: relative; overflow: hidden;
+    transition: box-shadow .3s, transform .3s;
+  }
+  .btn-primary::after {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(255,255,255,.2); transform: scaleX(0); transform-origin: left;
+    transition: transform .35s;
+  }
+  .btn-primary:hover { box-shadow: 0 0 32px rgba(0,229,160,.5); transform: translateY(-2px); }
+  .btn-primary:hover::after { transform: scaleX(1); }
+  .btn-secondary {
+    padding: 15px 36px; background: transparent;
+    border: 1.5px solid var(--white30); color: var(--white);
+    font-family: var(--font-body); font-size: .88rem; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px;
+    transition: border-color .3s, color .3s, transform .3s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
 
-    .nav-links li a {
-      text-decoration: none;
-      color: #E2E8F0;
-      font-weight: 500;
-      transition: all 0.3s;
-      position: relative;
-      font-size: 0.95rem;
-    }
+  .hero-wave {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    display: flex; align-items: flex-end; gap: 3px;
+    padding: 0 6vw 30px; pointer-events: none;
+    animation: fadeUp .8s .5s ease both;
+  }
+  .hero-wave-bar {
+    flex: 1; max-width: 8px;
+    background: var(--accent); border-radius: 2px 2px 0 0;
+    opacity: .35;
+    animation: waveAnim 1.4s ease-in-out infinite alternate;
+  }
+  @keyframes waveAnim { from{height:4px} to{height:var(--h)} }
 
-    .nav-links li a::after {
-      content: '';
-      position: absolute;
-      bottom: -6px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: #10B981;
-      transition: width 0.3s ease;
-    }
+  /* ───── SECTIONS COMMON ───── */
+  section { padding: 100px 6vw; position: relative; }
+  .section-tag {
+    font-size: .75rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    letter-spacing: .04em; line-height: 1;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: clamp(.88rem, 1.3vw, 1rem); font-weight: 300; line-height: 1.7;
+    color: var(--white70); max-width: 560px;
+  }
+  .section-header { margin-bottom: 60px; }
 
-    .nav-links li a:hover::after {
-      width: 100%;
-    }
+  /* reveal animation */
+  .reveal { opacity: 0; transform: translateY(36px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: .1s; }
+  .reveal-delay-2 { transition-delay: .2s; }
+  .reveal-delay-3 { transition-delay: .3s; }
+  .reveal-delay-4 { transition-delay: .4s; }
 
-    .nav-links li a:hover {
-      color: #FFFFFF;
-    }
+  /* ───── ABOUT ───── */
+  #about { background: var(--bg2); }
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+  }
+  .about-visual {
+    position: relative; aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .about-circle {
+    width: 260px; height: 260px; border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    animation: rotate 18s linear infinite;
+  }
+  @keyframes rotate { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  .about-circle::before {
+    content: ''; position: absolute; inset: 16px; border-radius: 50%;
+    border: 1px dashed rgba(0,229,160,.2);
+  }
+  .about-inner {
+    width: 160px; height: 160px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,229,160,.15), transparent);
+    border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    animation: rotate 18s linear infinite reverse;
+  }
+  .about-inner-icon { font-size: 3rem; }
+  .about-dot {
+    position: absolute; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 12px var(--accent);
+  }
+  .about-dot:nth-child(1) { top: 20px; left: 50%; transform: translateX(-50%); }
+  .about-dot:nth-child(3) { bottom: 20px; left: 50%; transform: translateX(-50%); }
+  .about-features { display: flex; flex-direction: column; gap: 16px; margin-top: 32px; }
+  .about-feature {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 20px; background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,.06); border-radius: 8px;
+    transition: border-color .3s, transform .3s;
+  }
+  .about-feature:hover { border-color: var(--border); transform: translateX(6px); }
+  .about-feature-icon {
+    width: 36px; height: 36px; border-radius: 6px;
+    background: var(--accent-glow2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .about-feature-text h4 { font-size: .9rem; font-weight: 600; margin-bottom: 4px; }
+  .about-feature-text p { font-size: .8rem; color: var(--white70); line-height: 1.5; }
 
-    .btn-nav {
-      background: transparent;
-      border: 1.5px solid #10B981;
-      padding: 0.5rem 1.2rem;
-      border-radius: 40px;
-      color: #10B981;
-      font-weight: 600;
-      transition: 0.25s;
-      cursor: pointer;
-    }
+  /* ───── SERVICES ───── */
+  #services { }
+  .services-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;
+  }
+  .service-card {
+    background: var(--card-bg); border: 1px solid rgba(255,255,255,.06);
+    border-radius: 12px; padding: 32px 28px;
+    position: relative; overflow: hidden;
+    transition: transform .4s, border-color .4s, box-shadow .4s;
+  }
+  .service-card::before {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: scaleX(0); transition: transform .4s;
+  }
+  .service-card:hover { transform: translateY(-8px); border-color: var(--border); box-shadow: 0 20px 50px rgba(0,0,0,.4); }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-card-num {
+    font-family: var(--font-display); font-size: 3rem; color: rgba(0,229,160,.12);
+    line-height: 1; margin-bottom: 16px; letter-spacing: .06em;
+  }
+  .service-card-icon { font-size: 2rem; margin-bottom: 16px; }
+  .service-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; letter-spacing: .04em; }
+  .service-card p { font-size: .84rem; color: var(--white70); line-height: 1.65; }
 
-    .btn-nav:hover {
-      background: #10B981;
-      color: #0A0C0F;
-      transform: scale(1.02);
-      box-shadow: 0 0 12px var(--emerald-glow);
-    }
+  /* ───── WORKS ───── */
+  #works { background: var(--bg2); }
+  .works-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;
+  }
+  .work-card {
+    background: var(--card-bg); border: 1px solid rgba(255,255,255,.06);
+    border-radius: 12px; overflow: hidden;
+    transition: transform .4s, box-shadow .4s, border-color .4s;
+  }
+  .work-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,.5); border-color: var(--border); }
+  .work-cover {
+    aspect-ratio: 1; background: linear-gradient(135deg, #0d2a20, #081810);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .work-cover-placeholder {
+    width: 70px; height: 70px; border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    position: relative; z-index: 1;
+  }
+  .work-cover-lines {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 14px, rgba(0,229,160,.04) 14px, rgba(0,229,160,.04) 15px);
+  }
+  .work-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .work-info { padding: 20px; }
+  .work-artist { font-size: .75rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+  .work-title { font-size: .95rem; font-weight: 700; margin-bottom: 14px; }
+  .work-audio {
+    width: 100%;
+    filter: invert(1) sepia(1) saturate(2) hue-rotate(110deg);
+    opacity: .8;
+    cursor: pointer;
+  }
+  .work-audio::-webkit-media-controls-panel { background: rgba(0,229,160,.08); }
 
-    /* плавающая фикс-кнопка */
-    .floating-book {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      z-index: 1100;
-      background: #10B981;
-      border: none;
-      padding: 0.9rem 1.8rem;
-      border-radius: 60px;
-      font-weight: 700;
-      font-size: 1rem;
-      color: #0A0C0F;
-      cursor: pointer;
-      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5);
-      transition: all 0.25s ease;
-      font-family: 'Inter', sans-serif;
-      backdrop-filter: blur(4px);
-    }
+  /* ───── REVIEWS ───── */
+  #reviews {}
+  .reviews-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;
+  }
+  .review-card {
+    background: var(--card-bg); border: 1px solid rgba(255,255,255,.06);
+    border-radius: 12px; padding: 32px 28px;
+    position: relative;
+    transition: transform .4s, border-color .4s;
+  }
+  .review-card:hover { transform: translateY(-6px); border-color: var(--border); }
+  .review-quote {
+    font-family: var(--font-display); font-size: 5rem; line-height: .6;
+    color: var(--accent); opacity: .3; margin-bottom: 16px;
+  }
+  .review-text { font-size: .9rem; line-height: 1.7; color: var(--white70); margin-bottom: 24px; }
+  .review-stars { color: var(--accent); font-size: 1rem; margin-bottom: 16px; letter-spacing: 2px; }
+  .review-author { display: flex; align-items: center; gap: 12px; }
+  .review-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--accent-glow2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+  }
+  .review-name { font-size: .88rem; font-weight: 700; }
+  .review-role { font-size: .75rem; color: var(--white70); }
 
-    .floating-book:hover {
-      transform: scale(1.07);
-      background: #0f9d7e;
-      box-shadow: 0 0 22px var(--emerald-glow);
-    }
+  /* ───── CTA ───── */
+  #cta {
+    background: var(--bg2);
+    text-align: center;
+  }
+  .cta-inner { max-width: 680px; margin: 0 auto; }
+  .cta-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,229,160,.07), transparent);
+    pointer-events: none;
+  }
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    letter-spacing: .04em; margin-bottom: 20px;
+  }
+  .cta-title span { color: var(--accent); }
+  .cta-sub { font-size: 1rem; color: var(--white70); line-height: 1.7; margin-bottom: 40px; }
 
-    /* main content */
-    main {
-      overflow-x: hidden;
-    }
+  /* ───── FOOTER ───── */
+  footer {
+    background: #050709;
+    padding: 48px 6vw 32px;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 48px;
+  }
+  .footer-brand { }
+  .footer-logo {
+    font-family: var(--font-display); font-size: 1.6rem; letter-spacing: .12em;
+    margin-bottom: 14px;
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-desc { font-size: .85rem; color: var(--white70); line-height: 1.7; max-width: 260px; }
+  .footer-col h4 {
+    font-size: .78rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 18px;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col ul a {
+    font-size: .85rem; color: var(--white70); text-decoration: none;
+    transition: color .3s; position: relative; padding-left: 12px;
+  }
+  .footer-col ul a::before {
+    content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+    width: 5px; height: 1px; background: var(--accent); opacity: 0; transition: opacity .3s;
+  }
+  .footer-col ul a:hover { color: var(--white); }
+  .footer-col ul a:hover::before { opacity: 1; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.06); padding-top: 24px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+  }
+  .footer-copy { font-size: .78rem; color: var(--white30); }
+  .footer-socials { display: flex; gap: 12px; }
+  .social-link {
+    width: 36px; height: 36px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem; text-decoration: none; color: var(--white70);
+    transition: border-color .3s, color .3s, transform .3s;
+  }
+  .social-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-3px); }
 
-    section {
-      padding: 5rem 2rem;
-      max-width: 1280px;
-      margin: 0 auto;
-    }
+  /* ───── MODAL ───── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(4,6,10,.88); backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .4s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: #0d1219; border: 1px solid var(--border);
+    border-radius: 16px; padding: 44px 40px;
+    width: 100%; max-width: 480px;
+    position: relative;
+    transform: scale(.92) translateY(20px);
+    transition: transform .4s;
+    box-shadow: 0 40px 100px rgba(0,0,0,.7), 0 0 60px rgba(0,229,160,.06);
+  }
+  .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+  .modal-close {
+    position: absolute; top: 18px; right: 18px;
+    width: 32px; height: 32px; border-radius: 6px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    color: var(--white70); font-size: 1.1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .3s, color .3s;
+  }
+  .modal-close:hover { background: rgba(0,229,160,.12); color: var(--accent); }
+  .modal-title {
+    font-family: var(--font-display); font-size: 2rem; letter-spacing: .06em;
+    margin-bottom: 6px;
+  }
+  .modal-subtitle { font-size: .85rem; color: var(--white70); margin-bottom: 28px; }
+  .modal-phone {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px; background: var(--accent-glow2);
+    border: 1px solid var(--border); border-radius: 8px;
+    margin-bottom: 28px; text-decoration: none; color: var(--white);
+    font-size: 1.05rem; font-weight: 600;
+    transition: background .3s, box-shadow .3s;
+  }
+  .modal-phone:hover { background: rgba(0,229,160,.12); box-shadow: 0 0 20px var(--accent-glow); }
+  .modal-phone-icon { font-size: 1.2rem; color: var(--accent); }
+  .modal-divider {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+  }
+  .modal-divider::before,.modal-divider::after {
+    content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.1);
+  }
+  .modal-divider span { font-size: .75rem; color: var(--white30); letter-spacing: .1em; text-transform: uppercase; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block; font-size: .78rem; font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--white70); margin-bottom: 7px;
+  }
+  .form-group input {
+    width: 100%; padding: 12px 16px;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 6px; color: var(--white); font-family: var(--font-body); font-size: .9rem;
+    outline: none; transition: border-color .3s, background .3s;
+  }
+  .form-group input:focus { border-color: var(--accent); background: rgba(0,229,160,.05); }
+  .form-group input::placeholder { color: var(--white30); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-check {
+    display: flex; align-items: flex-start; gap: 10px;
+    margin-bottom: 24px; cursor: pointer;
+  }
+  .form-check input[type=checkbox] {
+    width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;
+    accent-color: var(--accent); cursor: pointer;
+    border-radius: 3px;
+  }
+  .form-check-text { font-size: .8rem; color: var(--white70); line-height: 1.5; }
+  .form-check-text a { color: var(--accent); text-decoration: none; }
+  .btn-submit {
+    width: 100%; padding: 14px;
+    background: var(--accent); color: var(--bg);
+    font-family: var(--font-body); font-size: .88rem; font-weight: 700;
+    letter-spacing: .12em; text-transform: uppercase;
+    border: none; border-radius: 6px; cursor: pointer;
+    transition: opacity .3s, box-shadow .3s, transform .3s;
+  }
+  .btn-submit:disabled { opacity: .4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+  .btn-submit:not(:disabled):hover { box-shadow: 0 0 28px rgba(0,229,160,.45); transform: translateY(-1px); }
+  .success-msg {
+    text-align: center; padding: 20px;
+    display: none; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .success-icon { font-size: 3rem; color: var(--accent); }
+  .success-msg h3 { font-family: var(--font-display); font-size: 1.8rem; }
+  .success-msg p { font-size: .88rem; color: var(--white70); }
 
-    /* Hero */
-    .hero {
-      min-height: 90vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-      padding-top: 6rem;
-    }
+  /* ───── ANIMATIONS ───── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .hero-content {
-      z-index: 2;
-      max-width: 800px;
+  /* ───── RESPONSIVE ───── */
+  @media (max-width: 900px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .about-visual { display: none; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+    nav.menu-open .nav-links {
+      display: flex; flex-direction: column;
+      position: fixed; top: 70px; left: 0; right: 0;
+      background: rgba(8,12,16,.97); padding: 24px 6vw;
+      border-bottom: 1px solid var(--border);
     }
-
-    .hero h1 {
-      font-size: 3.8rem;
-      font-weight: 700;
-      font-family: 'Montserrat', sans-serif;
-      background: linear-gradient(to right, #FFF, #10B981);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      margin-bottom: 1.2rem;
-    }
-
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--slate-light);
-      margin-bottom: 2rem;
-    }
-
-    .btn-glow {
-      background: #10B981;
-      border: none;
-      padding: 1rem 2.5rem;
-      font-size: 1.1rem;
-      font-weight: 600;
-      border-radius: 50px;
-      color: #0A0C0F;
-      cursor: pointer;
-      transition: 0.2s;
-      animation: pulseGlow 2s infinite;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
-    }
-
-    @keyframes pulseGlow {
-      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); transform: scale(1);}
-      70% { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); transform: scale(1.02);}
-      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); transform: scale(1);}
-    }
-
-    .btn-glow:hover {
-      transform: scale(1.05);
-      background: #0f9d7e;
-      box-shadow: 0 0 20px var(--emerald-glow);
-    }
-
-    /* звуковые волны */
-    .sound-waves {
-      position: absolute;
-      bottom: 20%;
-      left: 0;
-      width: 100%;
-      height: 120px;
-      display: flex;
-      justify-content: center;
-      gap: 6px;
-      z-index: 1;
-      opacity: 0.4;
-    }
-    .wave {
-      width: 4px;
-      height: 30px;
-      background: #10B981;
-      border-radius: 4px;
-      animation: waveAnim 1.2s infinite ease-in-out alternate;
-    }
-    .wave:nth-child(2) { height: 50px; animation-delay: 0.2s; }
-    .wave:nth-child(3) { height: 70px; animation-delay: 0.4s; }
-    .wave:nth-child(4) { height: 90px; animation-delay: 0.1s; }
-    .wave:nth-child(5) { height: 55px; animation-delay: 0.3s; }
-    .wave:nth-child(6) { height: 35px; animation-delay: 0.5s; }
-
-    @keyframes waveAnim {
-      0% { transform: scaleY(0.4); opacity: 0.3; }
-      100% { transform: scaleY(1); opacity: 1; }
-    }
-
-    /* общие заголовки */
-    .section-title {
-      text-align: center;
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 3rem;
-      font-family: 'Montserrat', sans-serif;
-      background: linear-gradient(135deg, #FFF, #CBD5E1);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    /* карточки и анимация появления */
-    .fade-up {
-      opacity: 0;
-      transform: translateY(35px);
-      transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.7s ease;
-    }
-    .fade-up.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* 3 иконки */
-    .features-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      justify-content: center;
-    }
-    .feature-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(4px);
-      border-radius: 28px;
-      padding: 2rem 1.8rem;
-      text-align: center;
-      width: 280px;
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      transition: all 0.3s;
-    }
-    .feature-card:hover {
-      border-color: #10B981;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15);
-      transform: translateY(-5px);
-    }
-    .feature-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-    .feature-card h3 {
-      font-size: 1.4rem;
-      margin-bottom: 0.5rem;
-    }
-    .feature-card p {
-      color: var(--slate-light);
-    }
-
-    /* услуги grid */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 1.8rem;
-    }
-    .service-card {
-      background: rgba(20, 24, 30, 0.8);
-      backdrop-filter: blur(4px);
-      border-radius: 24px;
-      padding: 1.8rem;
-      text-align: center;
-      transition: all 0.3s;
-      border: 1px solid rgba(16, 185, 129, 0.1);
-    }
-    .service-card:hover {
-      border-color: #10B981;
-      box-shadow: 0 0 16px var(--border-glow);
-      transform: scale(1.02);
-    }
-    .service-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-    .service-card h3 {
-      margin-bottom: 0.5rem;
-    }
-
-    /* примеры работ */
-    .works-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-    .work-card {
-      background: #12161C;
-      border-radius: 20px;
-      overflow: hidden;
-      transition: 0.25s;
-      border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-    .work-card:hover {
-      border-color: #10B981;
-      transform: translateY(-6px);
-      box-shadow: 0 15px 25px -12px rgba(0,0,0,0.5);
-    }
-    .work-cover {
-      height: 180px;
-      background: linear-gradient(145deg, #1F2A36, #0F1419);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      color: #10B981;
-    }
-    .work-info {
-      padding: 1.2rem;
-    }
-    .work-info h4 {
-      font-size: 1.2rem;
-      margin-bottom: 0.25rem;
-    }
-    .work-info p {
-      color: var(--slate-light);
-      font-size: 0.85rem;
-      margin-bottom: 1rem;
-    }
-    .listen-btn {
-      background: transparent;
-      border: 1px solid #10B981;
-      padding: 0.4rem 1.2rem;
-      border-radius: 40px;
-      color: #10B981;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .listen-btn:hover {
-      background: #10B981;
-      color: #0A0C0F;
-    }
-
-    /* контакты */
-    .contacts-flex {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 2rem;
-      background: rgba(18, 22, 28, 0.5);
-      border-radius: 32px;
-      padding: 2rem;
-      backdrop-filter: blur(8px);
-    }
-    .contact-info p {
-      margin: 0.7rem 0;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-    .contact-info a {
-      color: #10B981;
-      text-decoration: none;
-      font-weight: 500;
-      transition: 0.2s;
-    }
-    .contact-info a:hover {
-      text-shadow: 0 0 5px #10B981;
-    }
-    .social-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-    .social-icon {
-      font-size: 1.8rem;
-      color: #CBD5E1;
-      transition: 0.2s;
-      text-decoration: none;
-    }
-    .social-icon:hover {
-      color: #10B981;
-      transform: translateY(-3px);
-    }
-
-    footer {
-      text-align: center;
-      padding: 2rem;
-      border-top: 1px solid rgba(16, 185, 129, 0.15);
-      color: #94A3B8;
-    }
-
-    /* модалка */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(5px);
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      transition: opacity 0.2s;
-    }
-    .modal.active {
-      display: flex;
-      animation: fadeModal 0.25s ease;
-    }
-    @keyframes fadeModal {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
-    }
-    .modal-content {
-      background: #0F1218;
-      border-radius: 32px;
-      max-width: 500px;
-      width: 90%;
-      padding: 2rem;
-      position: relative;
-      border: 1px solid #10B981;
-      box-shadow: 0 30px 40px rgba(0,0,0,0.5);
-    }
-    .close-modal {
-      position: absolute;
-      top: 1rem;
-      right: 1.5rem;
-      font-size: 2rem;
-      cursor: pointer;
-      color: #CBD5E1;
-      transition: 0.2s;
-    }
-    .close-modal:hover {
-      color: #10B981;
-    }
-    .modal-content h2 {
-      margin-bottom: 1rem;
-    }
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
-    .form-group input {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      background: #1E2329;
-      border: 1px solid #2D3741;
-      border-radius: 16px;
-      color: white;
-      font-size: 1rem;
-      outline: none;
-      transition: 0.2s;
-    }
-    .form-group input:focus {
-      border-color: #10B981;
-      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
-    }
-    .checkbox {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin: 1.2rem 0;
-    }
-    .checkbox input {
-      width: 18px;
-      height: 18px;
-      accent-color: #10B981;
-    }
-    .submit-btn {
-      background: #10B981;
-      width: 100%;
-      padding: 0.9rem;
-      border: none;
-      border-radius: 40px;
-      font-weight: 700;
-      font-size: 1rem;
-      color: #0A0C0F;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .submit-btn:disabled {
-      background: #3C4A5A;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-    .phone-link {
-      margin: 1rem 0;
-      display: inline-block;
-      font-weight: bold;
-      color: #10B981;
-      font-size: 1.2rem;
-    }
-    .success-msg {
-      background: #10B98120;
-      padding: 1rem;
-      border-radius: 20px;
-      text-align: center;
-      margin-top: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      .nav-container {
-        flex-direction: column;
-        gap: 0.8rem;
-      }
-      .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-      }
-      .hero h1 {
-        font-size: 2.5rem;
-      }
-      section {
-        padding: 3rem 1.2rem;
-      }
-      .contacts-flex {
-        flex-direction: column;
-      }
-      .floating-book {
-        padding: 0.6rem 1.2rem;
-        bottom: 1rem;
-        right: 1rem;
-      }
-    }
-    @media (max-width: 480px) {
-      .hero h1 {
-        font-size: 2rem;
-      }
-      .btn-glow {
-        padding: 0.7rem 1.6rem;
-      }
-    }
-  </style>
+    nav.menu-open .nav-cta { display: block; width: calc(100% - 12vw); margin: 0 6vw 24px; }
+    .form-row { grid-template-columns: 1fr; }
+    .modal { padding: 32px 24px; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+  }
+</style>
 </head>
 <body>
 
-<nav class="navbar" id="navbar">
-  <div class="nav-container">
-    <div class="logo">Spring Sound Lab</div>
-    <ul class="nav-links">
-      <li><a href="#hero" class="nav-link">Главная</a></li>
-      <li><a href="#about" class="nav-link">О студии</a></li>
-      <li><a href="#services" class="nav-link">Услуги</a></li>
-      <li><a href="#works" class="nav-link">Примеры работ</a></li>
-      <li><a href="#contacts" class="nav-link">Контакты</a></li>
-      <li><button class="btn-nav open-modal-btn">Записаться</button></li>
-    </ul>
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">Spring <span>Sound</span> Lab</a>
+  <ul class="nav-links">
+    <li><a href="#about">О студии</a></li>
+    <li><a href="#services">Услуги</a></li>
+    <li><a href="#works">Работы</a></li>
+    <li><a href="#reviews">Отзывы</a></li>
+  </ul>
+  <button class="nav-cta" onclick="openModal()">Записаться</button>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
   </div>
 </nav>
 
-<button class="floating-book open-modal-btn">✨ Записаться</button>
-
-<main>
-  <!-- HERO -->
-  <section id="hero" class="hero">
-    <div class="hero-content">
-      <h1>Твой звук — твоя история</h1>
-      <p>Профессиональная запись, сведение и мастеринг в студии Spring Sound Lab</p>
-      <button class="btn-glow open-modal-btn">Записаться в студию</button>
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag"><span class="dot"></span> Профессиональная студия звукозаписи</div>
+    <h1 class="hero-title">Spring<br><span class="line2">Sound Lab</span></h1>
+    <p class="hero-sub">Твой звук — наша страсть. Создаём музыку, которая остаётся в памяти. Запись, сведение, мастеринг — всё под одной крышей.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="openModal()">Записаться в студию</button>
+      <button class="btn-secondary" onclick="document.getElementById('works').scrollIntoView({behavior:'smooth'})">Примеры работ</button>
     </div>
-    <div class="sound-waves">
-      <div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div>
-    </div>
-  </section>
+  </div>
+  <div class="hero-wave" id="heroWave"></div>
+</section>
 
-  <!-- О студии -->
-  <section id="about">
-    <h2 class="section-title">О студии</h2>
-    <div class="features-grid">
-      <div class="feature-card fade-up">
-        <div class="feature-icon">🎚️</div>
-        <h3>Профессиональное оборудование</h3>
-        <p>Neumann, API, SSL консоли и лучшие микрофоны для чистого сигнала.</p>
-      </div>
-      <div class="feature-card fade-up">
-        <div class="feature-icon">🎧</div>
-        <h3>Опытная команда</h3>
-        <p>Звукорежиссёры с 10+ годами практики в жанрах от джаза до металла.</p>
-      </div>
-      <div class="feature-card fade-up">
-        <div class="feature-icon">🛋️</div>
-        <h3>Уютная атмосфера</h3>
-        <p>Lounge-зона, кофе, комфорт для творчества без лишнего стресса.</p>
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-visual reveal">
+      <div class="about-circle">
+        <span class="about-dot"></span>
+        <div class="about-inner"><div class="about-inner-icon">🎛️</div></div>
+        <span class="about-dot"></span>
       </div>
     </div>
-  </section>
-
-  <!-- Услуги -->
-  <section id="services">
-    <h2 class="section-title">Услуги</h2>
-    <div class="services-grid">
-      <div class="service-card fade-up"><div class="service-icon">🎤</div><h3>Запись вокала</h3><p>Изолированная кабинка, Preamp высшего класса</p></div>
-      <div class="service-card fade-up"><div class="service-icon">🎸</div><h3>Запись инструментов</h3><p>Гитары, барабаны, рояль — любой формат</p></div>
-      <div class="service-card fade-up"><div class="service-icon">🎛️</div><h3>Сведение</h3><p>Глубокий баланс, современный подход</p></div>
-      <div class="service-card fade-up"><div class="service-icon">🔊</div><h3>Мастеринг</h3><p>Громкость, плотность, подготовка к релизу</p></div>
-      <div class="service-card fade-up"><div class="service-icon">🎙️</div><h3>Подкасты</h3><p>Чистый голос, обработка, монтаж под любые площадки</p></div>
-    </div>
-  </section>
-
-  <!-- Примеры работ (заглушки) -->
-  <section id="works">
-    <h2 class="section-title">Примеры работ</h2>
-    <div class="works-grid">
-      <div class="work-card fade-up"><div class="work-cover">🎵</div><div class="work-info"><h4>Ethereal Dreams</h4><p>INDI / POP</p><button class="listen-btn" data-track="Ethereal Dreams">▶ Слушать</button></div></div>
-      <div class="work-card fade-up"><div class="work-cover">🎸</div><div class="work-info"><h4>Midnight Drive</h4><p>ROCK / ALTERNATIVE</p><button class="listen-btn" data-track="Midnight Drive">▶ Слушать</button></div></div>
-      <div class="work-card fade-up"><div class="work-cover">🎹</div><div class="work-info"><h4>Velvet Horizon</h4><p>ELECTRONIC</p><button class="listen-btn" data-track="Velvet Horizon">▶ Слушать</button></div></div>
-      <div class="work-card fade-up"><div class="work-cover">🎧</div><div class="work-info"><h4>Neon City Lights</h4><p>SYNTHWAVE</p><button class="listen-btn" data-track="Neon City Lights">▶ Слушать</button></div></div>
-      <div class="work-card fade-up"><div class="work-cover">🥁</div><div class="work-info"><h4>Rough Cut</h4><p>HIP-HOP</p><button class="listen-btn" data-track="Rough Cut">▶ Слушать</button></div></div>
-      <div class="work-card fade-up"><div class="work-cover">🎻</div><div class="work-info"><h4>Autumn Strings</h4><p>CLASSICAL / CROSSOVER</p><button class="listen-btn" data-track="Autumn Strings">▶ Слушать</button></div></div>
-    </div>
-  </section>
-
-  <!-- Контакты -->
-  <section id="contacts">
-    <h2 class="section-title">Контакты</h2>
-    <div class="contacts-flex">
-      <div class="contact-info">
-        <p>📍 Адрес: Москва, ул. Звуковая, 12, стр. 4</p>
-        <p>📞 <a href="tel:+74951234567">+7 (495) 123-45-67</a></p>
-        <p>✉️ <a href="mailto:info@springsoundlab.ru">info@springsoundlab.ru</a></p>
+    <div>
+      <div class="reveal">
+        <p class="section-tag">О нас</p>
+        <h2 class="section-title">Звук, который<br>говорит за тебя</h2>
+        <p class="section-sub">Spring Sound Lab — это пространство, где рождается настоящая музыка. Мы используем профессиональное оборудование и работаем с каждым артистом индивидуально, чтобы передать именно его уникальный звук.</p>
       </div>
-      <div class="social-links">
-        <a href="#" class="social-icon">📷 IG</a>
-        <a href="#" class="social-icon">🎵 TikTok</a>
-        <a href="#" class="social-icon">📘 FB</a>
-        <a href="#" class="social-icon">🎧 SoundCloud</a>
+      <div class="about-features">
+        <div class="about-feature reveal reveal-delay-1">
+          <div class="about-feature-icon">🎚️</div>
+          <div class="about-feature-text">
+            <h4>Топовое оборудование</h4>
+            <p>Профессиональные микрофоны, предусилители и мониторы для идеального звука.</p>
+          </div>
+        </div>
+        <div class="about-feature reveal reveal-delay-2">
+          <div class="about-feature-icon">🎧</div>
+          <div class="about-feature-text">
+            <h4>Опытная команда</h4>
+            <p>Звукорежиссёры с многолетним опытом в студийной и концертной работе.</p>
+          </div>
+        </div>
+        <div class="about-feature reveal reveal-delay-3">
+          <div class="about-feature-icon">✨</div>
+          <div class="about-feature-text">
+            <h4>Комфортная атмосфера</h4>
+            <p>Уютное пространство, где каждый артист чувствует себя свободно и вдохновлённо.</p>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
-</main>
+  </div>
+</section>
 
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header reveal">
+    <p class="section-tag">Услуги</p>
+    <h2 class="section-title">Что мы делаем</h2>
+    <p class="section-sub">Полный цикл создания музыкального продукта — от идеи до финального мастера.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal reveal-delay-1">
+      <div class="service-card-num">01</div>
+      <div class="service-card-icon">🎤</div>
+      <h3>Запись вокала</h3>
+      <p>Студийная запись вокала с живым мониторингом, работа с интонацией и подачей.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <div class="service-card-num">02</div>
+      <div class="service-card-icon">🎸</div>
+      <h3>Запись инструментов</h3>
+      <p>Запись гитары, баса, клавишных и других инструментов в акустически обработанном зале.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-3">
+      <div class="service-card-num">03</div>
+      <div class="service-card-icon">🎚️</div>
+      <h3>Сведение</h3>
+      <p>Профессиональное сведение всех треков в единую, сбалансированную звуковую картину.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-4">
+      <div class="service-card-num">04</div>
+      <div class="service-card-icon">💿</div>
+      <h3>Мастеринг</h3>
+      <p>Финальная обработка для стриминговых площадок, радио и физических носителей.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-1">
+      <div class="service-card-num">05</div>
+      <div class="service-card-icon">🎹</div>
+      <h3>Аранжировка</h3>
+      <p>Создание и доработка аранжировок, подбор инструментария и звуковой палитры.</p>
+    </div>
+    <div class="service-card reveal reveal-delay-2">
+      <div class="service-card-num">06</div>
+      <div class="service-card-icon">🎬</div>
+      <h3>Саундтреки</h3>
+      <p>Написание музыки для кино, рекламы, игр и видеопроектов под ключ.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORKS -->
+<section id="works">
+  <div class="section-header reveal">
+    <p class="section-tag">Примеры работ</p>
+    <h2 class="section-title">Наши треки</h2>
+    <p class="section-sub">Послушайте, что выходит из стен нашей студии — каждый трек уникален.</p>
+  </div>
+  <div class="works-grid">
+
+    <!-- Карточка 1 -->
+    <div class="work-card reveal reveal-delay-1">
+      <div class="work-cover">
+        <div class="work-cover-lines"></div>
+        <!-- Замените src на путь к вашей обложке: <img src="cover1.jpg" alt="Обложка"> -->
+        <div class="work-cover-placeholder">🎵</div>
+      </div>
+      <div class="work-info">
+        <p class="work-artist">Артист 1</p>
+        <p class="work-title">Название трека</p>
+        <!-- Замените src на путь к вашему аудио: src="track1.mp3" -->
+        <audio class="work-audio" controls>
+          <source src="" type="audio/mpeg">
+          Ваш браузер не поддерживает аудио.
+        </audio>
+      </div>
+    </div>
+
+    <!-- Карточка 2 -->
+    <div class="work-card reveal reveal-delay-2">
+      <div class="work-cover">
+        <div class="work-cover-lines"></div>
+        <div class="work-cover-placeholder">🎵</div>
+      </div>
+      <div class="work-info">
+        <p class="work-artist">Артист 2</p>
+        <p class="work-title">Название трека</p>
+        <audio class="work-audio" controls>
+          <source src="" type="audio/mpeg">
+        </audio>
+      </div>
+    </div>
+
+    <!-- Карточка 3 -->
+    <div class="work-card reveal reveal-delay-3">
+      <div class="work-cover">
+        <div class="work-cover-lines"></div>
+        <div class="work-cover-placeholder">🎵</div>
+      </div>
+      <div class="work-info">
+        <p class="work-artist">Артист 3</p>
+        <p class="work-title">Название трека</p>
+        <audio class="work-audio" controls>
+          <source src="" type="audio/mpeg">
+        </audio>
+      </div>
+    </div>
+
+    <!-- Карточка 4 -->
+    <div class="work-card reveal reveal-delay-4">
+      <div class="work-cover">
+        <div class="work-cover-lines"></div>
+        <div class="work-cover-placeholder">🎵</div>
+      </div>
+      <div class="work-info">
+        <p class="work-artist">Артист 4</p>
+        <p class="work-title">Название трека</p>
+        <audio class="work-audio" controls>
+          <source src="" type="audio/mpeg">
+        </audio>
+      </div>
+    </div>
+
+    <!-- Карточка 5 -->
+    <div class="work-card reveal reveal-delay-1">
+      <div class="work-cover">
+        <div class="work-cover-lines"></div>
+        <div class="work-cover-placeholder">🎵</div>
+      </div>
+      <div class="work-info">
+        <p class="work-artist">Артист 5</p>
+        <p class="work-title">Название трека</p>
+        <audio class="work-audio" controls>
+          <source src="" type="audio/mpeg">
+        </audio>
+      </div>
+    </div>
+
+    <!-- Карточка 6 -->
+    <div class="work-card reveal reveal-delay-2">
+      <div class="work-cover">
+        <div class="work-cover-lines"></div>
+        <div class="work-cover-placeholder">🎵</div>
+      </div>
+      <div class="work-info">
+        <p class="work-artist">Артист 6</p>
+        <p class="work-title">Название трека</p>
+        <audio class="work-audio" controls>
+          <source src="" type="audio/mpeg">
+        </audio>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="section-header reveal">
+    <p class="section-tag">Отзывы</p>
+    <h2 class="section-title">Говорят клиенты</h2>
+    <p class="section-sub">Нам доверяют артисты, которые ценят качество и профессионализм.</p>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card reveal reveal-delay-1">
+      <div class="review-quote">"</div>
+      <p class="review-text">Записывался здесь впервые — и сразу понял, что нашёл своё место. Ребята знают, как выжать максимум из каждого дубля. Звук получился просто огонь!</p>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-author">
+        <div class="review-avatar">👤</div>
+        <div>
+          <p class="review-name">Алексей М.</p>
+          <p class="review-role">R&B артист</p>
+        </div>
+      </div>
+    </div>
+    <div class="review-card reveal reveal-delay-2">
+      <div class="review-quote">"</div>
+      <p class="review-text">Spring Sound Lab — это не просто студия, это целая культура. Атмосфера вдохновляет, звукорежиссёр слышит то, что ты хочешь сказать своей музыкой.</p>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-author">
+        <div class="review-avatar">👤</div>
+        <div>
+          <p class="review-name">Катя В.</p>
+          <p class="review-role">Поп-исполнительница</p>
+        </div>
+      </div>
+    </div>
+    <div class="review-card reveal reveal-delay-3">
+      <div class="review-quote">"</div>
+      <p class="review-text">Сводил здесь целый EP — доволен на все 100%. Чётко, быстро, без лишних правок. Результат превзошёл все ожидания. Однозначно вернусь снова.</p>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-author">
+        <div class="review-avatar">👤</div>
+        <div>
+          <p class="review-name">Дима К.</p>
+          <p class="review-role">Рэп-исполнитель</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-glow"></div>
+  <div class="cta-inner reveal">
+    <p class="section-tag" style="text-align:center">Готов записаться?</p>
+    <h2 class="cta-title">Твой <span>хит</span> начинается здесь</h2>
+    <p class="cta-sub">Оставь заявку прямо сейчас — мы свяжемся с тобой и согласуем удобное время для записи.</p>
+    <button class="btn-primary" onclick="openModal()">Записаться в студию</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-  © 2025 Spring Sound Lab. Все права защищены.
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <p class="footer-logo">Spring <span>Sound</span> Lab</p>
+      <p class="footer-desc">Профессиональная студия звукозаписи. Запись, сведение, мастеринг и аранжировка для артистов любого уровня.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Навигация</h4>
+      <ul>
+        <li><a href="#about">О студии</a></li>
+        <li><a href="#services">Услуги</a></li>
+        <li><a href="#works">Примеры работ</a></li>
+        <li><a href="#reviews">Отзывы</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Контакты</h4>
+      <ul>
+        <!-- Замените на ваш реальный номер -->
+        <li><a href="tel:+70000000000">+7 (000) 000-00-00</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">VK</a></li>
+        <li><a href="#">Telegram</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 Spring Sound Lab. Все права защищены.</p>
+    <div class="footer-socials">
+      <a class="social-link" href="#" title="Instagram">📷</a>
+      <a class="social-link" href="#" title="VK">💬</a>
+      <a class="social-link" href="#" title="Telegram">✈️</a>
+    </div>
+  </div>
 </footer>
 
-<!-- Модальное окно -->
-<div id="bookingModal" class="modal">
-  <div class="modal-content">
-    <span class="close-modal">&times;</span>
-    <h2>Запись в студию</h2>
-    <p>Или позвоните нам прямо сейчас:</p>
-    <a href="tel:+74951234567" class="phone-link">📞 +7 (495) 123-45-67</a>
-    <form id="bookingForm">
-      <div class="form-group"><input type="text" id="firstName" placeholder="Имя *" required></div>
-      <div class="form-group"><input type="text" id="lastName" placeholder="Фамилия *" required></div>
-      <div class="form-group"><input type="tel" id="phone" placeholder="Номер телефона *" required></div>
-      <div class="checkbox"><input type="checkbox" id="privacyCheck"> <label>Я соглашаюсь с политикой конфиденциальности</label></div>
-      <button type="submit" id="submitBooking" class="submit-btn" disabled>Отправить заявку</button>
-    </form>
-    <div id="formMessage"></div>
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" onclick="closeModal()" title="Закрыть">✕</button>
+
+    <div id="formContent">
+      <h2 class="modal-title" id="modalTitle">Записаться</h2>
+      <p class="modal-subtitle">Мы свяжемся с вами для подтверждения времени.</p>
+
+      <!-- Кликабельный телефон — замените номер -->
+      <a class="modal-phone" href="tel:+70000000000">
+        <span class="modal-phone-icon">📞</span>
+        +7 (000) 000-00-00
+      </a>
+
+      <div class="modal-divider"><span>или заполните форму</span></div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">Имя</label>
+          <input type="text" id="fname" placeholder="Иван" autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label for="lname">Фамилия</label>
+          <input type="text" id="lname" placeholder="Иванов" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="phone">Номер телефона</label>
+        <input type="tel" id="phone" placeholder="+7 (___) ___-__-__" autocomplete="tel">
+      </div>
+
+      <label class="form-check">
+        <input type="checkbox" id="agree" onchange="toggleSubmit()">
+        <span class="form-check-text">Я соглашаюсь на <a href="#">обработку персональных данных</a> в соответствии с политикой конфиденциальности.</span>
+      </label>
+
+      <button class="btn-submit" id="submitBtn" disabled onclick="submitForm()">Отправить заявку</button>
+    </div>
+
+    <div class="success-msg" id="successMsg">
+      <div class="success-icon">✅</div>
+      <h3>Заявка отправлена!</h3>
+      <p>Мы свяжемся с вами в ближайшее время для подтверждения записи.</p>
+    </div>
   </div>
 </div>
 
 <script>
-  // ---------- плавное появление/скрытие navbar ----------
-  let lastScroll = 0;
+  // ── NAV scroll ──
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-    if (currentScroll <= 0) {
-      navbar.classList.remove('hide');
-      return;
-    }
-    if (currentScroll > lastScroll && currentScroll > 80) {
-      navbar.classList.add('hide');
-    } else if (currentScroll < lastScroll) {
-      navbar.classList.remove('hide');
-    }
-    lastScroll = currentScroll;
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
   });
 
-  // плавный скролл к секциям по навигации
-  document.querySelectorAll('.nav-link').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = this.getAttribute('href').substring(1);
-      const target = document.getElementById(targetId);
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
+  // ── Hamburger ──
+  const hamburger = document.getElementById('hamburger');
+  hamburger.addEventListener('click', () => navbar.classList.toggle('menu-open'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.addEventListener('click', () => navbar.classList.remove('menu-open')));
+
+  // ── Hero wave ──
+  const waveEl = document.getElementById('heroWave');
+  const heights = [8,14,20,28,36,48,60,72,80,88,80,72,60,48,38,28,22,16,10,7,5,8,14,22,32,44,56,68,76,84,76,68,56,44,34,26,18,12,8,6,5,8,12,18,26,36,48,60,70,78,84,78,70,60,48,36,26,18,12,8,6,5,8,14,22,32,44,56,66,74,80,74,66,56,44,32,22,14,8,5];
+  heights.forEach(h => {
+    const bar = document.createElement('div');
+    bar.className = 'hero-wave-bar';
+    bar.style.setProperty('--h', h + 'px');
+    bar.style.animationDelay = (Math.random() * 1.4) + 's';
+    bar.style.animationDuration = (1 + Math.random() * .8) + 's';
+    waveEl.appendChild(bar);
   });
 
-  // Intersection Observer анимации
-  const fadeElements = document.querySelectorAll('.fade-up');
+  // ── Reveal on scroll ──
+  const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.2, rootMargin: "0px 0px -40px 0px" });
-  fadeElements.forEach(el => observer.observe(el));
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  reveals.forEach(r => observer.observe(r));
 
-  // кнопки "Слушать" (заглушка)
-  document.querySelectorAll('.listen-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const track = btn.getAttribute('data-track') || 'трек';
-      alert(`🎧 Плеер заглушка: "${track}" — в реальной версии здесь будет аудио-плеер.`);
-    });
-  });
-
-  // ---------- Модалка ----------
-  const modal = document.getElementById('bookingModal');
-  const openBtns = document.querySelectorAll('.open-modal-btn');
-  const closeBtn = document.querySelector('.close-modal');
-
+  // ── Modal ──
   function openModal() {
-    modal.classList.add('active');
+    document.getElementById('modalOverlay').classList.add('open');
     document.body.style.overflow = 'hidden';
-    resetForm();
+    document.getElementById('formContent').style.display = 'block';
+    document.getElementById('successMsg').style.display = 'none';
+    document.getElementById('successMsg').style.flexDirection = '';
+    document.getElementById('fname').value = '';
+    document.getElementById('lname').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('agree').checked = false;
+    document.getElementById('submitBtn').disabled = true;
   }
   function closeModal() {
-    modal.classList.remove('active');
+    document.getElementById('modalOverlay').classList.remove('open');
     document.body.style.overflow = '';
-    const msgDiv = document.getElementById('formMessage');
-    msgDiv.innerHTML = '';
   }
-  openBtns.forEach(btn => btn.addEventListener('click', openModal));
-  closeBtn.addEventListener('click', closeModal);
-  window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('active')) closeModal(); });
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  // Маска телефона +7 (___) ___-__-__
+  function toggleSubmit() {
+    document.getElementById('submitBtn').disabled = !document.getElementById('agree').checked;
+  }
+
+  function submitForm() {
+    const fname = document.getElementById('fname').value.trim();
+    const lname = document.getElementById('lname').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    if (!fname || !lname || !phone) { alert('Пожалуйста, заполните все поля.'); return; }
+    document.getElementById('formContent').style.display = 'none';
+    const sm = document.getElementById('successMsg');
+    sm.style.display = 'flex';
+    sm.style.flexDirection = 'column';
+  }
+
+  // ── Phone input mask ──
   const phoneInput = document.getElementById('phone');
-  function phoneMask(e) {
-    let val = phoneInput.value.replace(/\D/g, '');
-    if (val.length > 11) val = val.slice(0,11);
-    let formatted = '';
-    if (val.length > 0) formatted = '+7';
-    if (val.length > 1) formatted += ' (' + val.slice(1,4);
-    if (val.length >= 5) formatted += ') ' + val.slice(4,7);
-    if (val.length >= 8) formatted += '-' + val.slice(7,9);
-    if (val.length >= 10) formatted += '-' + val.slice(9,11);
-    phoneInput.value = formatted;
-  }
-  phoneInput.addEventListener('input', phoneMask);
-  phoneInput.addEventListener('focus', () => { if (!phoneInput.value) phoneInput.value = '+7 '; });
-  phoneInput.addEventListener('blur', () => { if (phoneInput.value === '+7 ') phoneInput.value = ''; });
-
-  // валидация формы и активация кнопки
-  const firstName = document.getElementById('firstName');
-  const lastName = document.getElementById('lastName');
-  const privacyCheck = document.getElementById('privacyCheck');
-  const submitBtn = document.getElementById('submitBooking');
-  const form = document.getElementById('bookingForm');
-  const msgDiv = document.getElementById('formMessage');
-
-  function checkFormValidity() {
-    const isName = firstName.value.trim() !== '';
-    const isLastName = lastName.value.trim() !== '';
-    const phoneRaw = phoneInput.value.replace(/\D/g, '');
-    const isPhoneValid = phoneRaw.length === 11 && phoneRaw.startsWith('7');
-    const isChecked = privacyCheck.checked;
-    submitBtn.disabled = !(isName && isLastName && isPhoneValid && isChecked);
-  }
-  [firstName, lastName, phoneInput, privacyCheck].forEach(field => {
-    field.addEventListener('input', checkFormValidity);
-    if(field === privacyCheck) field.addEventListener('change', checkFormValidity);
+  phoneInput.addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '');
+    if (v.startsWith('8')) v = '7' + v.slice(1);
+    if (v.startsWith('7')) {
+      this.value = '+7 (' + v.slice(1,4) + (v.length>4?') '+v.slice(4,7):'') + (v.length>7?'-'+v.slice(7,9):'') + (v.length>9?'-'+v.slice(9,11):'');
+    }
   });
-
-  function resetForm() {
-    firstName.value = '';
-    lastName.value = '';
-    phoneInput.value = '';
-    privacyCheck.checked = false;
-    submitBtn.disabled = true;
-    msgDiv.innerHTML = '';
-  }
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (submitBtn.disabled) return;
-    // Имитация отправки
-    msgDiv.innerHTML = '<div class="success-msg">✅ Мы свяжемся с вами в ближайшее время!</div>';
-    submitBtn.disabled = true;
-    setTimeout(() => {
-      closeModal();
-      resetForm();
-    }, 2000);
-  });
-
-  // Дополнительно для кнопок модалки: если любой "Записаться"
-  // также добавим блокировку скролла при модалке
 </script>
 </body>
 </html>
