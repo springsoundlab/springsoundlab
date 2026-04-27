@@ -1,1950 +1,783 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spring Sound Lab — Студия звукозаписи</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
-<style>
-/* ═══════════════════════════════════
-   CSS ПЕРЕМЕННЫЕ И СБРОС СТИЛЕЙ
-═══════════════════════════════════ */
-:root {
-  --bg-deep:       #0A0F2C;
-  --bg-navy:       #0D1B4B;
-  --bg-card:       #0F1F55;
-  --accent:        #2563EB;
-  --accent-bright: #3B82F6;
-  --accent-glow:   rgba(59,130,246,0.35);
-  --text-white:    #FFFFFF;
-  --text-muted:    #CBD5E1;
-  --text-faint:    #7A90B8;
-  --border:        rgba(59,130,246,0.18);
-  --radius:        14px;
-  --radius-sm:     8px;
-  --transition:    0.3s cubic-bezier(.4,0,.2,1);
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: 'Montserrat', sans-serif;
-  background: var(--bg-deep);
-  color: var(--text-white);
-  overflow-x: hidden;
-  line-height: 1.6;
-}
-
-img { display: block; max-width: 100%; }
-a  { color: inherit; text-decoration: none; }
-button { cursor: pointer; font-family: inherit; border: none; outline: none; }
-
-/* ═══════════════════════════════════
-   УТИЛИТЫ
-═══════════════════════════════════ */
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.section-title {
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 0.5rem;
-  line-height: 1.15;
-}
-
-.section-sub {
-  color: var(--text-muted);
-  font-size: 1rem;
-  margin-bottom: 3.5rem;
-  font-weight: 400;
-}
-
-.section-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
-  color: var(--accent-bright);
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-  display: block;
-}
-
-/* Анимация появления при скролле */
-.reveal {
-  opacity: 0;
-  transform: translateY(36px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.reveal-delay-1 { transition-delay: 0.12s; }
-.reveal-delay-2 { transition-delay: 0.24s; }
-.reveal-delay-3 { transition-delay: 0.36s; }
-.reveal-delay-4 { transition-delay: 0.48s; }
-.reveal-delay-5 { transition-delay: 0.60s; }
-.reveal-delay-6 { transition-delay: 0.72s; }
-
-/* ═══════════════════════════════════
-   НАВИГАЦИЯ
-═══════════════════════════════════ */
-.navbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 1000;
-  transition: transform 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
-  padding: 0;
-}
-
-.navbar.scrolled {
-  background: rgba(10,15,44,0.96);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 2px 40px rgba(0,0,0,0.5);
-}
-
-.navbar.hidden { transform: translateY(-100%); }
-
-.navbar-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 70px;
-  gap: 24px;
-}
-
-.logo {
-  font-size: 1.15rem;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.logo-icon {
-  width: 36px; height: 36px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 14px var(--accent-glow);
-}
-
-.logo-icon svg { width: 20px; height: 20px; }
-
-.logo span { color: var(--accent-bright); }
-
-.nav-links {
-  display: flex;
-  list-style: none;
-  gap: 8px;
-  align-items: center;
-}
-
-.nav-links a {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  transition: color var(--transition);
-  position: relative;
-}
-
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: 2px; left: 12px; right: 12px;
-  height: 1.5px;
-  background: var(--accent-bright);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.3s ease;
-  border-radius: 2px;
-}
-
-.nav-links a:hover { color: var(--text-white); }
-.nav-links a:hover::after { transform: scaleX(1); }
-
-/* Кнопка «Записаться» в navbar */
-.btn-book {
-  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: 10px 22px;
-  border-radius: 40px;
-  transition: transform var(--transition), box-shadow var(--transition);
-  box-shadow: 0 0 18px var(--accent-glow);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.btn-book:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 32px rgba(59,130,246,0.55);
-}
-
-/* Бургер */
-.burger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  padding: 6px;
-  border-radius: var(--radius-sm);
-}
-.burger span {
-  display: block;
-  width: 24px; height: 2px;
-  background: var(--text-white);
-  border-radius: 2px;
-  transition: transform 0.3s, opacity 0.3s;
-}
-.burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.burger.open span:nth-child(2) { opacity: 0; }
-.burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-/* Мобильное меню */
-.mobile-menu {
-  display: none;
-  position: fixed;
-  top: 70px; left: 0; right: 0;
-  background: rgba(10,15,44,0.98);
-  backdrop-filter: blur(18px);
-  padding: 24px;
-  z-index: 999;
-  flex-direction: column;
-  gap: 8px;
-  border-bottom: 1px solid var(--border);
-  transform: translateY(-10px);
-  opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-.mobile-menu.open {
-  display: flex;
-  transform: translateY(0);
-  opacity: 1;
-}
-.mobile-menu a {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-  transition: color 0.2s;
-}
-.mobile-menu a:hover { color: var(--text-white); }
-.mobile-menu .btn-book {
-  margin-top: 12px;
-  text-align: center;
-  display: block;
-  padding: 14px;
-}
-
-/* ═══════════════════════════════════
-   HERO
-═══════════════════════════════════ */
-.hero {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  overflow: hidden;
-  background: radial-gradient(ellipse 80% 60% at 50% 30%, #0D2272 0%, var(--bg-deep) 70%);
-}
-
-#hero-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Сетка-фон */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(37,99,235,0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37,99,235,0.06) 1px, transparent 1px);
-  background-size: 60px 60px;
-  z-index: 1;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-  max-width: 820px;
-  padding: 0 24px;
-}
-
-.hero-eyebrow {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.28em;
-  color: var(--accent-bright);
-  text-transform: uppercase;
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  opacity: 0;
-  animation: fadeSlideUp 0.9s ease 0.2s forwards;
-}
-.hero-eyebrow::before,
-.hero-eyebrow::after {
-  content: '';
-  width: 36px; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-bright));
-}
-.hero-eyebrow::after { transform: scaleX(-1); }
-
-.hero-title {
-  font-size: clamp(2.6rem, 7vw, 5.5rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  margin-bottom: 1.5rem;
-  opacity: 0;
-  animation: fadeSlideUp 0.9s ease 0.4s forwards;
-}
-
-.hero-title em {
-  font-style: normal;
-  background: linear-gradient(135deg, #fff 30%, var(--accent-bright));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-subtitle {
-  font-size: clamp(1rem, 2.2vw, 1.2rem);
-  color: var(--text-muted);
-  font-weight: 400;
-  max-width: 560px;
-  margin: 0 auto 2.5rem;
-  line-height: 1.65;
-  opacity: 0;
-  animation: fadeSlideUp 0.9s ease 0.6s forwards;
-}
-
-.btn-hero {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 700;
-  padding: 18px 40px;
-  border-radius: 50px;
-  box-shadow: 0 0 28px var(--accent-glow), 0 0 60px rgba(37,99,235,0.2);
-  transition: transform var(--transition), box-shadow var(--transition);
-  animation: fadeSlideUp 0.9s ease 0.8s forwards, heroPulse 3s ease-in-out 1.8s infinite;
-  opacity: 0;
-  letter-spacing: 0.01em;
-}
-.btn-hero svg { width: 18px; height: 18px; }
-.btn-hero:hover {
-  transform: scale(1.06);
-  box-shadow: 0 0 50px rgba(59,130,246,0.65), 0 0 90px rgba(37,99,235,0.3);
-}
-
-.hero-scroll {
-  position: absolute;
-  bottom: 36px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-faint);
-  font-family: 'Space Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
-  animation: bounce 2s ease-in-out infinite;
-}
-.hero-scroll svg { width: 20px; height: 20px; opacity: 0.5; }
-
-/* ═══════════════════════════════════
-   О СТУДИИ
-═══════════════════════════════════ */
-.about {
-  padding: 110px 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.about::before {
-  content: '';
-  position: absolute;
-  top: -80px; right: -120px;
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.about-header { margin-bottom: 3.5rem; }
-
-.about-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.about-card {
-  background: linear-gradient(145deg, rgba(15,31,85,0.8), rgba(13,27,75,0.5));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 36px 28px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
-}
-
-.about-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-bright), transparent);
-  border-radius: var(--radius) var(--radius) 0 0;
-}
-
-.about-card:hover {
-  border-color: rgba(59,130,246,0.4);
-  box-shadow: 0 0 40px rgba(37,99,235,0.12);
-  transform: translateY(-4px);
-}
-
-.about-icon {
-  width: 56px; height: 56px;
-  background: rgba(37,99,235,0.12);
-  border: 1px solid rgba(59,130,246,0.25);
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 20px;
-  transition: background var(--transition), box-shadow var(--transition);
-}
-.about-card:hover .about-icon {
-  background: rgba(37,99,235,0.22);
-  box-shadow: 0 0 20px var(--accent-glow);
-}
-.about-icon svg { width: 26px; height: 26px; color: var(--accent-bright); }
-
-.about-card h3 {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  letter-spacing: -0.02em;
-}
-
-.about-card p {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  line-height: 1.65;
-}
-
-/* ═══════════════════════════════════
-   УСЛУГИ
-═══════════════════════════════════ */
-.services {
-  padding: 110px 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(13,27,75,0.3) 50%, transparent 100%);
-  position: relative;
-}
-
-.services-header { margin-bottom: 3.5rem; }
-
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-}
-
-.service-card {
-  background: linear-gradient(145deg, rgba(15,31,85,0.7), rgba(10,15,44,0.9));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 32px 26px;
-  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
-  cursor: default;
-  position: relative;
-  overflow: hidden;
-}
-
-.service-card::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
-  opacity: 0;
-  z-index: -1;
-  transition: opacity var(--transition);
-}
-
-.service-card:hover {
-  border-color: rgba(59,130,246,0.5);
-  box-shadow: 0 0 50px rgba(37,99,235,0.18), inset 0 0 30px rgba(37,99,235,0.05);
-  transform: translateY(-5px);
-}
-
-.service-badge {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.18em;
-  color: var(--accent-bright);
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  display: block;
-}
-
-.service-icon {
-  width: 48px; height: 48px;
-  background: rgba(37,99,235,0.1);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 16px;
-  transition: all var(--transition);
-}
-.service-card:hover .service-icon {
-  background: rgba(37,99,235,0.25);
-  box-shadow: 0 0 18px var(--accent-glow);
-}
-.service-icon svg { width: 22px; height: 22px; color: var(--accent-bright); }
-
-.service-card h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  letter-spacing: -0.02em;
-}
-
-.service-card p {
-  font-size: 0.87rem;
-  color: var(--text-muted);
-  line-height: 1.65;
-}
-
-.service-price {
-  margin-top: 18px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--accent-bright);
-}
-
-/* ═══════════════════════════════════
-   ПРИМЕРЫ РАБОТ
-═══════════════════════════════════ */
-.portfolio {
-  padding: 110px 0;
-  position: relative;
-}
-
-.portfolio::before {
-  content: '';
-  position: absolute;
-  top: -60px; left: -100px;
-  width: 450px; height: 450px;
-  background: radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.portfolio-header { margin-bottom: 3.5rem; }
-
-.portfolio-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-}
-
-.portfolio-card {
-  background: linear-gradient(145deg, rgba(15,31,85,0.6), rgba(10,15,44,0.8));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
-}
-
-.portfolio-card:hover {
-  border-color: rgba(59,130,246,0.45);
-  box-shadow: 0 8px 48px rgba(37,99,235,0.15);
-  transform: translateY(-5px);
-}
-
-.portfolio-cover {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  background: linear-gradient(135deg, #0D1B4B, #0F2470);
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
-}
-
-/* Декоративные волны в обложках */
-.portfolio-cover::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, rgba(37,99,235,0.2) 0%, transparent 70%);
-}
-
-.cover-waveform {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  height: 50px;
-  position: relative;
-  z-index: 1;
-}
-
-.cover-waveform span {
-  display: block;
-  width: 3px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
-  opacity: 0.7;
-}
-
-.portfolio-cover .play-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(10,15,44,0.5);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0;
-  transition: opacity var(--transition);
-  z-index: 2;
-}
-.portfolio-card:hover .play-overlay { opacity: 1; }
-
-.play-btn-lg {
-  width: 60px; height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 30px var(--accent-glow);
-  transform: scale(0.8);
-  transition: transform var(--transition);
-}
-.portfolio-card:hover .play-btn-lg { transform: scale(1); }
-.play-btn-lg svg { width: 22px; height: 22px; color: #fff; margin-left: 3px; }
-
-.portfolio-info {
-  padding: 18px 20px;
-}
-
-.track-tag {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
-  color: var(--accent-bright);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.track-name {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-  letter-spacing: -0.01em;
-}
-
-.track-artist {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 14px;
-}
-
-.btn-listen {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--accent-bright);
-  border: 1px solid rgba(59,130,246,0.35);
-  padding: 7px 16px;
-  border-radius: 30px;
-  transition: all var(--transition);
-}
-.btn-listen svg { width: 13px; height: 13px; }
-.btn-listen:hover {
-  background: rgba(37,99,235,0.15);
-  border-color: var(--accent-bright);
-  box-shadow: 0 0 14px var(--accent-glow);
-}
-
-/* ═══════════════════════════════════
-   КОНТАКТЫ
-═══════════════════════════════════ */
-.contacts {
-  padding: 110px 0;
-  background: linear-gradient(180deg, transparent, rgba(13,27,75,0.3) 50%, transparent);
-}
-
-.contacts-header { margin-bottom: 3.5rem; }
-
-.contacts-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: start;
-}
-
-.contacts-info { display: flex; flex-direction: column; gap: 28px; }
-
-.contact-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.contact-icon {
-  width: 48px; height: 48px;
-  background: rgba(37,99,235,0.1);
-  border: 1px solid rgba(59,130,246,0.22);
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.contact-icon svg { width: 22px; height: 22px; color: var(--accent-bright); }
-
-.contact-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.16em;
-  color: var(--text-faint);
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.contact-value {
-  font-size: 1rem;
-  font-weight: 600;
-  transition: color var(--transition);
-}
-
-a.contact-value:hover { color: var(--accent-bright); }
-
-.socials {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.social-btn {
-  width: 44px; height: 44px;
-  background: rgba(37,99,235,0.08);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all var(--transition);
-}
-.social-btn svg { width: 20px; height: 20px; color: var(--text-muted); }
-.social-btn:hover {
-  background: rgba(37,99,235,0.2);
-  border-color: rgba(59,130,246,0.45);
-  box-shadow: 0 0 16px var(--accent-glow);
-}
-.social-btn:hover svg { color: var(--text-white); }
-
-/* Карта-заглушка */
-.contacts-map {
-  background: linear-gradient(145deg, rgba(15,31,85,0.7), rgba(10,15,44,0.8));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  height: 280px;
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column;
-  gap: 14px;
-  color: var(--text-faint);
-  font-size: 0.9rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.contacts-map::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
-  background-size: 30px 30px;
-}
-
-.map-dot {
-  width: 12px; height: 12px;
-  background: var(--accent-bright);
-  border-radius: 50%;
-  box-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(59,130,246,0.3);
-  animation: mapPulse 2s ease-in-out infinite;
-  position: relative;
-  z-index: 1;
-}
-.contacts-map span { position: relative; z-index: 1; }
-
-/* CTA блок в контактах */
-.contacts-cta {
-  margin-top: 40px;
-  background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(59,130,246,0.06));
-  border: 1px solid rgba(59,130,246,0.25);
-  border-radius: var(--radius);
-  padding: 32px;
-  text-align: center;
-}
-
-.contacts-cta p {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  margin-bottom: 20px;
-}
-
-/* ═══════════════════════════════════
-   FOOTER
-═══════════════════════════════════ */
-.footer {
-  border-top: 1px solid var(--border);
-  padding: 30px 0;
-}
-
-.footer-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.footer-copy {
-  font-size: 0.83rem;
-  color: var(--text-faint);
-}
-
-.footer-links {
-  display: flex;
-  gap: 20px;
-}
-.footer-links a {
-  font-size: 0.83rem;
-  color: var(--text-faint);
-  transition: color var(--transition);
-}
-.footer-links a:hover { color: var(--accent-bright); }
-
-/* ═══════════════════════════════════
-   МОДАЛЬНОЕ ОКНО
-═══════════════════════════════════ */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(5,8,25,0.85);
-  backdrop-filter: blur(12px);
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.modal {
-  background: linear-gradient(145deg, #0F1F55, #0A0F2C);
-  border: 1px solid rgba(59,130,246,0.3);
-  border-radius: 20px;
-  padding: 44px 40px;
-  width: 100%;
-  max-width: 480px;
-  position: relative;
-  box-shadow: 0 0 80px rgba(37,99,235,0.2), 0 30px 80px rgba(0,0,0,0.5);
-  transform: scale(0.92);
-  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
-}
-
-.modal-overlay.active .modal { transform: scale(1); }
-
-.modal-close {
-  position: absolute;
-  top: 18px; right: 18px;
-  width: 36px; height: 36px;
-  background: rgba(59,130,246,0.1);
-  border: 1px solid rgba(59,130,246,0.2);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  transition: all var(--transition);
-  color: var(--text-muted);
-}
-.modal-close:hover {
-  background: rgba(59,130,246,0.2);
-  color: var(--text-white);
-  box-shadow: 0 0 12px var(--accent-glow);
-}
-.modal-close svg { width: 16px; height: 16px; }
-
-.modal-title {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 8px;
-}
-
-.modal-phone-block {
-  margin: 16px 0 24px;
-  padding: 16px 20px;
-  background: rgba(37,99,235,0.08);
-  border: 1px solid rgba(59,130,246,0.2);
-  border-radius: var(--radius-sm);
-}
-
-.modal-phone-block p {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-.modal-phone {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: var(--accent-bright);
-  display: inline-block;
-  transition: color var(--transition), text-shadow var(--transition);
-  letter-spacing: 0.02em;
-}
-.modal-phone:hover {
-  color: #60a5fa;
-  text-shadow: 0 0 20px rgba(59,130,246,0.5);
-}
-
-.form-group {
-  margin-bottom: 14px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  letter-spacing: 0.02em;
-}
-
-.form-group input {
-  width: 100%;
-  background: rgba(15,31,85,0.5);
-  border: 1px solid rgba(59,130,246,0.2);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  color: var(--text-white);
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.93rem;
-  outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition);
-}
-
-.form-group input::placeholder { color: var(--text-faint); }
-
-.form-group input:focus {
-  border-color: var(--accent-bright);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-}
-
-.form-group input.error { border-color: #EF4444; }
-
-.checkbox-group {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin: 16px 0 20px;
-}
-
-.checkbox-group input[type="checkbox"] {
-  width: 18px; height: 18px;
-  accent-color: var(--accent-bright);
-  cursor: pointer;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.checkbox-group label {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  line-height: 1.5;
-}
-.checkbox-group label a { color: var(--accent-bright); text-decoration: underline; }
-
-.btn-submit {
-  width: 100%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
-  color: #fff;
-  font-size: 0.97rem;
-  font-weight: 700;
-  padding: 15px;
-  border-radius: 50px;
-  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
-  letter-spacing: 0.02em;
-}
-.btn-submit:not(:disabled):hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 30px rgba(59,130,246,0.5);
-}
-.btn-submit:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Сообщение об успехе */
-.success-msg {
-  display: none;
-  text-align: center;
-  padding: 24px 0 8px;
-}
-.success-msg.show { display: block; }
-
-.success-icon {
-  width: 70px; height: 70px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 18px;
-  box-shadow: 0 0 40px var(--accent-glow);
-  animation: scaleIn 0.5s cubic-bezier(.34,1.56,.64,1);
-}
-.success-icon svg { width: 30px; height: 30px; color: #fff; }
-
-.success-msg h3 {
-  font-size: 1.4rem;
-  font-weight: 800;
-  margin-bottom: 10px;
-  letter-spacing: -0.02em;
-}
-
-.success-msg p { color: var(--text-muted); font-size: 0.93rem; }
-
-/* ═══════════════════════════════════
-   АНИМАЦИИ (KEYFRAMES)
-═══════════════════════════════════ */
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes heroPulse {
-  0%, 100% { box-shadow: 0 0 28px var(--accent-glow), 0 0 60px rgba(37,99,235,0.2); }
-  50%       { box-shadow: 0 0 50px rgba(59,130,246,0.55), 0 0 90px rgba(37,99,235,0.35); }
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%       { transform: translateX(-50%) translateY(8px); }
-}
-
-@keyframes mapPulse {
-  0%, 100% { box-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(59,130,246,0.3); transform: scale(1); }
-  50%       { box-shadow: 0 0 30px rgba(59,130,246,0.5), 0 0 60px rgba(37,99,235,0.4); transform: scale(1.15); }
-}
-
-@keyframes scaleIn {
-  from { transform: scale(0.5); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-
-/* ═══════════════════════════════════
-   АДАПТИВНОСТЬ
-═══════════════════════════════════ */
-@media (max-width: 1024px) {
-  .services-grid   { grid-template-columns: repeat(2, 1fr); }
-  .portfolio-grid  { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 768px) {
-  .about-grid      { grid-template-columns: 1fr; }
-  .services-grid   { grid-template-columns: 1fr; }
-  .portfolio-grid  { grid-template-columns: repeat(2, 1fr); }
-  .contacts-layout { grid-template-columns: 1fr; gap: 36px; }
-  .nav-links       { display: none; }
-  .burger          { display: flex; }
-  .modal           { padding: 32px 24px; }
-  .contacts-map    { height: 200px; }
-}
-
-@media (max-width: 480px) {
-  .portfolio-grid  { grid-template-columns: 1fr; }
-  .footer-inner    { flex-direction: column; text-align: center; }
-  .footer-links    { justify-content: center; flex-wrap: wrap; }
-  .modal           { padding: 28px 20px; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Spring Sound Lab | Студия звукозаписи</title>
+    <!-- Google Fonts: Montserrat + Inter для чистоты -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0A0F2C;
+            font-family: 'Inter', 'Montserrat', sans-serif;
+            color: #FFFFFF;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* Глобальные переменные */
+        :root {
+            --dark-bg: #0A0F2C;
+            --dark-card: #0D1B4B;
+            --electric-blue: #2563EB;
+            --electric-glow: #3B82F6;
+            --text-light: #CBD5E1;
+            --transition-smooth: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        /* Кастомный скролл */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0F2C;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2563EB;
+            border-radius: 10px;
+        }
+
+        /* Типографика */
+        h1, h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        h2 {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #FFFFFF, #3B82F6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        section {
+            padding: 80px 0;
+            border-bottom: 1px solid rgba(59,130,246,0.2);
+        }
+
+        /* ========== NAVBAR ========== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 15, 44, 0.9);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: transform 0.4s ease, background 0.3s;
+            border-bottom: 1px solid rgba(37,99,235,0.3);
+        }
+        .navbar.scroll-down {
+            transform: translateY(-100%);
+        }
+        .navbar.scroll-up {
+            transform: translateY(0);
+            background: rgba(10, 15, 44, 0.95);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(120deg, #FFFFFF, #3B82F6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            list-style: none;
+        }
+        .nav-links a {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding-bottom: 5px;
+            transition: color 0.2s;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: var(--electric-blue);
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .btn-book-nav {
+            background: linear-gradient(135deg, #2563EB, #1E40AF);
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        .btn-book-nav:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 14px rgba(37,99,235,0.6);
+        }
+        .menu-icon {
+            display: none;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        /* ========== АНИМАЦИЯ ГЛОУ КНОПКИ ========== */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); transform: scale(1);}
+            70% { box-shadow: 0 0 0 15px rgba(59,130,246,0); transform: scale(1.02);}
+            100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); transform: scale(1);}
+        }
+        .btn-glow {
+            animation: pulse-glow 2s infinite;
+            background: linear-gradient(95deg, #2563EB, #3B82F6);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .btn-glow:hover {
+            transform: scale(1.05);
+            background: linear-gradient(95deg, #3B82F6, #2563EB);
+            box-shadow: 0 0 20px #3B82F6;
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 1.5px solid var(--electric-blue);
+            padding: 0.7rem 1.4rem;
+            border-radius: 40px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: var(--electric-blue);
+            box-shadow: 0 0 12px var(--electric-blue);
+            transform: scale(1.02);
+        }
+
+        /* Hero canvas волны */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+        #waveCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #FFFFFF, #a0c4ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        /* Карточки (о студии + услуги) */
+        .grid-3, .services-grid, .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .card {
+            background: rgba(13, 27, 75, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: var(--transition-smooth);
+            border: 1px solid rgba(37,99,235,0.2);
+        }
+        .card:hover {
+            border-color: #2563EB;
+            box-shadow: 0 10px 25px -5px rgba(37,99,235,0.3);
+            transform: translateY(-6px);
+        }
+        .card svg {
+            margin-bottom: 1.2rem;
+        }
+        .card h3 {
+            margin-bottom: 0.8rem;
+            font-size: 1.5rem;
+        }
+        .card p {
+            color: var(--text-light);
+        }
+
+        /* Карточки услуг с особенным эффектом свечения */
+        .service-card {
+            background: #0D1B4B;
+            border-radius: 28px;
+            padding: 1.8rem;
+            transition: all 0.25s ease;
+            border: 1px solid rgba(59,130,246,0.3);
+        }
+        .service-card:hover {
+            border-color: #3B82F6;
+            box-shadow: 0 0 20px rgba(59,130,246,0.5);
+            transform: scale(1.02);
+        }
+
+        /* Порфолио сетка */
+        .portfolio-item {
+            background: #0F1A3A;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: 0.2s;
+        }
+        .portfolio-cover {
+            background: linear-gradient(145deg, #1E2A5E, #0A0F2C);
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        .portfolio-info {
+            padding: 1rem;
+        }
+        .listen-btn {
+            background: none;
+            border: 1px solid #3B82F6;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            color: white;
+            font-weight: 500;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .listen-btn:hover {
+            background: #2563EB;
+            box-shadow: 0 0 8px #2563EB;
+        }
+
+        /* Контакты */
+        .contacts-flex {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            background: #0D1B4B40;
+            border-radius: 40px;
+            padding: 2rem;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.1rem;
+        }
+        .social-icons {
+            display: flex;
+            gap: 1.2rem;
+        }
+        .social-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #1E2A5E;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .social-icon:hover {
+            background: #2563EB;
+            transform: translateY(-3px);
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.2s;
+        }
+        .modal.active {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background: #0A0F2C;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 32px;
+            padding: 2rem;
+            border: 1px solid #2563EB;
+            position: relative;
+            transform: scale(0.9);
+            animation: scaleUp 0.25s forwards;
+        }
+        @keyframes scaleUp {
+            to { transform: scale(1); }
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 28px;
+            cursor: pointer;
+            color: #CBD5E1;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        input, .checkbox-label {
+            width: 100%;
+            padding: 0.9rem;
+            background: #0D1B4B;
+            border: 1px solid #2D4A8A;
+            border-radius: 20px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        input:focus {
+            border-color: #3B82F6;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: transparent;
+            border: none;
+            padding-left: 0;
+        }
+        .btn-submit {
+            width: 100%;
+            background: #2563EB;
+            border: none;
+            padding: 1rem;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-submit:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .success-message {
+            text-align: center;
+            padding: 1rem;
+            background: #0F3B2C;
+            border-radius: 28px;
+            color: #86efac;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #6c86a3;
+            font-size: 0.9rem;
+        }
+
+        /* Анимация появления */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                background: #0A0F2C;
+                width: 100%;
+                padding: 1rem 0;
+            }
+            .nav-links.show {
+                display: flex;
+            }
+            .menu-icon {
+                display: block;
+            }
+            .hero h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.9rem; }
+            section { padding: 60px 0; }
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- ═══════════════════════════════════
-     НАВИГАЦИЯ
-═══════════════════════════════════ -->
 <nav class="navbar" id="navbar">
-  <div class="container">
-    <div class="navbar-inner">
-      <a href="#hero" class="logo">
-        <div class="logo-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
-            <path d="M12 2 L12 22 M7 6 L7 18 M17 6 L17 18 M2 10 L2 14 M22 10 L22 14"/>
-          </svg>
-        </div>
-        Spring <span>Sound</span> Lab
-      </a>
-
-      <ul class="nav-links">
-        <li><a href="#hero">Главная</a></li>
-        <li><a href="#about">О студии</a></li>
-        <li><a href="#services">Услуги</a></li>
-        <li><a href="#portfolio">Примеры работ</a></li>
-        <li><a href="#contacts">Контакты</a></li>
-      </ul>
-
-      <button class="btn-book" id="openModal">Записаться</button>
-      <button class="burger" id="burger" aria-label="Меню">
-        <span></span><span></span><span></span>
-      </button>
+    <div class="nav-container">
+        <div class="logo">🎧 Spring Sound Lab</div>
+        <div class="menu-icon" id="menuToggle">☰</div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home">Главная</a></li>
+            <li><a href="#about">О студии</a></li>
+            <li><a href="#services">Услуги</a></li>
+            <li><a href="#portfolio">Примеры работ</a></li>
+            <li><a href="#contacts">Контакты</a></li>
+            <li><button class="btn-book-nav book-trigger">Записаться</button></li>
+        </ul>
     </div>
-  </div>
 </nav>
 
-<!-- Мобильное меню -->
-<div class="mobile-menu" id="mobileMenu">
-  <a href="#hero"      onclick="closeMobileMenu()">Главная</a>
-  <a href="#about"     onclick="closeMobileMenu()">О студии</a>
-  <a href="#services"  onclick="closeMobileMenu()">Услуги</a>
-  <a href="#portfolio" onclick="closeMobileMenu()">Примеры работ</a>
-  <a href="#contacts"  onclick="closeMobileMenu()">Контакты</a>
-  <button class="btn-book" onclick="closeMobileMenu(); openModalFn()">Записаться</button>
-</div>
-
-<!-- ═══════════════════════════════════
-     HERO
-═══════════════════════════════════ -->
-<section class="hero" id="hero">
-  <canvas id="hero-canvas"></canvas>
-
-  <div class="hero-content">
-    <div class="hero-eyebrow">Студия звукозаписи · Москва</div>
-    <h1 class="hero-title">
-      Твой звук —<br><em>твоя история</em>
-    </h1>
-    <p class="hero-subtitle">
-      Профессиональная запись, сведение и мастеринг в студии Spring Sound Lab.
-      Создадим звучание, которое запомнится навсегда.
-    </p>
-    <button class="btn-hero" id="openModalHero">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M8 2v4 M16 2v4 M3 10h18 M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
-      </svg>
-      Записаться в студию
-    </button>
-  </div>
-
-  <div class="hero-scroll">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <path d="M12 5v14 M19 12l-7 7-7-7"/>
-    </svg>
-    SCROLL
-  </div>
+<!-- Hero c canvas волнами -->
+<section id="home" class="hero">
+    <canvas id="waveCanvas"></canvas>
+    <div class="hero-content">
+        <h1>Твой звук — твоя история</h1>
+        <p>Профессиональная запись, сведение и мастеринг в студии Spring Sound Lab</p>
+        <button class="btn-glow book-trigger">Записаться в студию</button>
+    </div>
 </section>
 
-<!-- ═══════════════════════════════════
-     О СТУДИИ
-═══════════════════════════════════ -->
-<section class="about" id="about">
-  <div class="container">
-    <div class="about-header">
-      <span class="section-label">О нас</span>
-      <h2 class="section-title">Звучи как профессионал</h2>
-      <p class="section-sub">
-        Spring Sound Lab — это не просто студия, это пространство, где рождается настоящее искусство.
-      </p>
+<!-- О студии -->
+<section id="about">
+    <div class="container">
+        <h2>О студии</h2>
+        <div class="grid-3">
+            <div class="card fade-up">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5"><path d="M12 2v4M8 8l-2-2M16 8l2-2M5 12h14M8 16l-2 2M16 16l2 2M12 20v2"/><circle cx="12" cy="12" r="3"/></svg>
+                <h3>Профессиональное оборудование</h3>
+                <p>Консоли SSL, микрофоны Neumann, мониторы Genelec — всё для кристально чистого звука.</p>
+            </div>
+            <div class="card fade-up">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5"><path d="M12 6v12M8 10h8M6 18h12"/><path d="M20 12a8 8 0 1 0-16 0 8 8 0 0 0 16 0z"/></svg>
+                <h3>Опытная команда</h3>
+                <p>Звукорежиссёры с金奖, работавшие с ведущими артистами, помогут найти твой саунд.</p>
+            </div>
+            <div class="card fade-up">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5"><path d="M4 16l4-4 4 4 4-4 4 4"/><path d="M4 8l4 4 4-4 4 4 4-4"/></svg>
+                <h3>Уютная атмосфера</h3>
+                <p>Звукоизолированные комнаты, lounge-зона и вдохновляющий интерьер для творчества.</p>
+            </div>
+        </div>
     </div>
-
-    <div class="about-grid">
-      <div class="about-card reveal">
-        <div class="about-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M9 18V5l12-2v13 M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-          </svg>
-        </div>
-        <h3>Профессиональное оборудование</h3>
-        <p>
-          Студия оснащена топовыми микрофонами Neumann, предусилителями API и Neve,
-          а также акустически выверенным помещением для идеального звука без компромиссов.
-        </p>
-      </div>
-
-      <div class="about-card reveal reveal-delay-1">
-        <div class="about-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-        </div>
-        <h3>Опытная команда</h3>
-        <p>
-          Наши звукорежиссёры и продюсеры работают в индустрии более 10 лет.
-          Мы знаем, как раскрыть твой уникальный голос и довести трек до идеала.
-        </p>
-      </div>
-
-      <div class="about-card reveal reveal-delay-2">
-        <div class="about-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10"/>
-          </svg>
-        </div>
-        <h3>Уютная атмосфера</h3>
-        <p>
-          Комфортная лаунж-зона, кофе и спокойная обстановка — всё для того,
-          чтобы ты чувствовал себя как дома и записывался с удовольствием.
-        </p>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- ═══════════════════════════════════
-     УСЛУГИ
-═══════════════════════════════════ -->
-<section class="services" id="services">
-  <div class="container">
-    <div class="services-header">
-      <span class="section-label">Что мы делаем</span>
-      <h2 class="section-title">Наши услуги</h2>
-      <p class="section-sub">От идеи до готового трека — полный цикл производства</p>
+<!-- Услуги -->
+<section id="services">
+    <div class="container">
+        <h2>Услуги студии</h2>
+        <div class="services-grid">
+            <div class="service-card fade-up"><h3>🎤 Запись вокала</h3><p>Профессиональная запись с топовыми микрофонами и предусилителями</p></div>
+            <div class="service-card fade-up"><h3>🎸 Запись инструментов</h3><p>Гитары, барабаны, рояль — изолированные комнаты и лучшие преампы</p></div>
+            <div class="service-card fade-up"><h3>🎛️ Сведение</h3><p>Баланс, глубина, мощь — сведём ваш трек на конкурентном уровне</p></div>
+            <div class="service-card fade-up"><h3>✨ Мастеринг</h3><p>Финальный этап: громкость, чистота, подготовка к релизу на всех платформах</p></div>
+            <div class="service-card fade-up"><h3>🎙️ Подкасты</h3><p>Обработка голоса, монтаж, чистка шумов — звук вашего подкаста премиум-класса</p></div>
+            <div class="service-card fade-up"><h3>🎧 Саунд-дизайн</h3><p>Создание уникальных звуков и аудио-эффектов для медиа</p></div>
+        </div>
     </div>
-
-    <div class="services-grid">
-      <!-- Запись вокала -->
-      <div class="service-card reveal">
-        <span class="service-badge">01 · Запись</span>
-        <div class="service-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z M19 10v2a7 7 0 0 1-14 0v-2 M12 19v3 M8 22h8"/>
-          </svg>
-        </div>
-        <h3>Запись вокала</h3>
-        <p>Звукоизолированная вокальная кабина с акустической обработкой и лучшими конденсаторными микрофонами.</p>
-        <div class="service-price">от 2 500 ₽ / час</div>
-      </div>
-
-      <!-- Запись инструментов -->
-      <div class="service-card reveal reveal-delay-1">
-        <span class="service-badge">02 · Запись</span>
-        <div class="service-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M9 18V5l12-2v13 M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-          </svg>
-        </div>
-        <h3>Запись инструментов</h3>
-        <p>Большой живой зал для акустики, барабанов и оркестровых инструментов. Пианино Yamaha Grand в наличии.</p>
-        <div class="service-price">от 3 500 ₽ / час</div>
-      </div>
-
-      <!-- Сведение -->
-      <div class="service-card reveal reveal-delay-2">
-        <span class="service-badge">03 · Постпродакшн</span>
-        <div class="service-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M2 12h4 M18 12h4 M6 12a6 6 0 0 0 12 0 M12 6V2 M12 22v-4"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </div>
-        <h3>Сведение</h3>
-        <p>Профессиональное сведение на студийных мониторах высокого класса. Добиваемся баланса, пространства и характера.</p>
-        <div class="service-price">от 5 000 ₽ / трек</div>
-      </div>
-
-      <!-- Мастеринг -->
-      <div class="service-card reveal reveal-delay-3">
-        <span class="service-badge">04 · Финальный этап</span>
-        <div class="service-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-          </svg>
-        </div>
-        <h3>Мастеринг</h3>
-        <p>Финальная обработка для стриминга, радио и физических носителей. LUFS-нормализация и широкая совместимость.</p>
-        <div class="service-price">от 3 000 ₽ / трек</div>
-      </div>
-
-      <!-- Подкасты -->
-      <div class="service-card reveal reveal-delay-4">
-        <span class="service-badge">05 · Подкасты</span>
-        <div class="service-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M18 8h1a4 4 0 0 1 0 8h-1 M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z M6 1v3 M10 1v3 M14 1v3"/>
-          </svg>
-        </div>
-        <h3>Подкасты</h3>
-        <p>Полный цикл для подкастеров: запись, монтаж, обработка голоса и вывод в Spotify, Apple, Яндекс.Музыку.</p>
-        <div class="service-price">от 2 000 ₽ / эпизод</div>
-      </div>
-
-      <!-- Индивидуальный пакет -->
-      <div class="service-card reveal reveal-delay-5" style="border-color: rgba(59,130,246,0.3); background: linear-gradient(145deg, rgba(37,99,235,0.12), rgba(10,15,44,0.9));">
-        <span class="service-badge">06 · Комплекс</span>
-        <div class="service-icon" style="background: rgba(37,99,235,0.2);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
-        </div>
-        <h3>Индивидуальный пакет</h3>
-        <p>Обсудим твой проект и соберём индивидуальный пакет услуг под твои задачи и бюджет. Без переплат.</p>
-        <div class="service-price" style="color: #60a5fa;">Цена по запросу</div>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- ═══════════════════════════════════
-     ПРИМЕРЫ РАБОТ
-═══════════════════════════════════ -->
-<section class="portfolio" id="portfolio">
-  <div class="container">
-    <div class="portfolio-header">
-      <span class="section-label">Портфолио</span>
-      <h2 class="section-title">Примеры работ</h2>
-      <p class="section-sub">Треки, записанные и спродюсированные в нашей студии</p>
+<!-- Примеры работ -->
+<section id="portfolio">
+    <div class="container">
+        <h2>Примеры работ</h2>
+        <div class="portfolio-grid" id="portfolioGrid">
+            <!-- 6 плейсхолдеров -->
+            <div class="portfolio-item fade-up"><div class="portfolio-cover">🎵</div><div class="portfolio-info"><h4>Эйфория</h4><p>Анна Велс</p><button class="listen-btn" data-track="Эйфория - Анна Велс">▶ Слушать</button></div></div>
+            <div class="portfolio-item fade-up"><div class="portfolio-cover">🎶</div><div class="portfolio-info"><h4>Городские огни</h4><p>N.E.S.</p><button class="listen-btn" data-track="Городские огни - N.E.S.">▶ Слушать</button></div></div>
+            <div class="portfolio-item fade-up"><div class="portfolio-cover">🎸</div><div class="portfolio-info"><h4>Пустота</h4><p>Mirror State</p><button class="listen-btn" data-track="Пустота - Mirror State">▶ Слушать</button></div></div>
+            <div class="portfolio-item fade-up"><div class="portfolio-cover">🎹</div><div class="portfolio-info"><h4>Лунная соната (remix)</h4><p>DJ Luna</p><button class="listen-btn" data-track="Лунная соната remix - DJ Luna">▶ Слушать</button></div></div>
+            <div class="portfolio-item fade-up"><div class="portfolio-cover">🥁</div><div class="portfolio-info"><h4>Break The Silence</h4><p>Radioray</p><button class="listen-btn" data-track="Break The Silence - Radioray">▶ Слушать</button></div></div>
+            <div class="portfolio-item fade-up"><div class="portfolio-cover">🎧</div><div class="portfolio-info"><h4>Просто космос</h4><p>Violet Day</p><button class="listen-btn" data-track="Просто космос - Violet Day">▶ Слушать</button></div></div>
+        </div>
     </div>
-
-    <div class="portfolio-grid">
-      <!-- Карточка 1 -->
-      <div class="portfolio-card reveal">
-        <div class="portfolio-cover" style="background: linear-gradient(135deg, #0D1B4B, #1E3A8A);">
-          <div class="cover-waveform" id="wf1"></div>
-          <div class="play-overlay">
-            <div class="play-btn-lg">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-info">
-          <span class="track-tag">Поп · 2024</span>
-          <div class="track-name">Весенний дождь</div>
-          <div class="track-artist">Анна Светлова</div>
-          <button class="btn-listen">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            Слушать
-          </button>
-        </div>
-      </div>
-
-      <!-- Карточка 2 -->
-      <div class="portfolio-card reveal reveal-delay-1">
-        <div class="portfolio-cover" style="background: linear-gradient(135deg, #1E1B4B, #2563EB);">
-          <div class="cover-waveform" id="wf2"></div>
-          <div class="play-overlay">
-            <div class="play-btn-lg">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-info">
-          <span class="track-tag">R&amp;B · 2024</span>
-          <div class="track-name">Ночной город</div>
-          <div class="track-artist">Максим Грей</div>
-          <button class="btn-listen">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            Слушать
-          </button>
-        </div>
-      </div>
-
-      <!-- Карточка 3 -->
-      <div class="portfolio-card reveal reveal-delay-2">
-        <div class="portfolio-cover" style="background: linear-gradient(135deg, #0C4A6E, #0369A1);">
-          <div class="cover-waveform" id="wf3"></div>
-          <div class="play-overlay">
-            <div class="play-btn-lg">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-info">
-          <span class="track-tag">Инди · 2024</span>
-          <div class="track-name">Горизонт</div>
-          <div class="track-artist">Trio Waves</div>
-          <button class="btn-listen">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            Слушать
-          </button>
-        </div>
-      </div>
-
-      <!-- Карточка 4 -->
-      <div class="portfolio-card reveal reveal-delay-3">
-        <div class="portfolio-cover" style="background: linear-gradient(135deg, #1E3A5F, #1D4ED8);">
-          <div class="cover-waveform" id="wf4"></div>
-          <div class="play-overlay">
-            <div class="play-btn-lg">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-info">
-          <span class="track-tag">Электро · 2023</span>
-          <div class="track-name">Нейронные пути</div>
-          <div class="track-artist">DJ Syntax</div>
-          <button class="btn-listen">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            Слушать
-          </button>
-        </div>
-      </div>
-
-      <!-- Карточка 5 -->
-      <div class="portfolio-card reveal reveal-delay-4">
-        <div class="portfolio-cover" style="background: linear-gradient(135deg, #0F172A, #1E40AF);">
-          <div class="cover-waveform" id="wf5"></div>
-          <div class="play-overlay">
-            <div class="play-btn-lg">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-info">
-          <span class="track-tag">Хип-хоп · 2023</span>
-          <div class="track-name">Уличная философия</div>
-          <div class="track-artist">Саша Блэк</div>
-          <button class="btn-listen">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            Слушать
-          </button>
-        </div>
-      </div>
-
-      <!-- Карточка 6 — заглушка -->
-      <div class="portfolio-card reveal reveal-delay-5">
-        <div class="portfolio-cover" style="background: linear-gradient(135deg, #0A0F2C, #1E3A8A); opacity: 0.6;">
-          <div style="text-align: center; color: var(--text-faint); position: relative; z-index: 1; padding: 20px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;margin:0 auto 12px;opacity:0.5;">
-              <path d="M12 5v14 M5 12h14" stroke-linecap="round"/>
-            </svg>
-            <div style="font-size:0.82rem;">Здесь будет<br>ваша работа</div>
-          </div>
-        </div>
-        <div class="portfolio-info">
-          <span class="track-tag">Скоро</span>
-          <div class="track-name">Новый трек</div>
-          <div class="track-artist">Ваш артист</div>
-          <button class="btn-listen" style="opacity:0.5;cursor:default;">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            Слушать
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- ═══════════════════════════════════
-     КОНТАКТЫ
-═══════════════════════════════════ -->
-<section class="contacts" id="contacts">
-  <div class="container">
-    <div class="contacts-header">
-      <span class="section-label">Связаться</span>
-      <h2 class="section-title">Контакты</h2>
-      <p class="section-sub">Приходи к нам или напиши — ответим в течение часа</p>
+<!-- Контакты -->
+<section id="contacts">
+    <div class="container">
+        <h2>Контакты</h2>
+        <div class="contacts-flex">
+            <div class="contact-item">📍 г. Москва, ул. Звуковая, 15, этаж 4 (м. Курская)</div>
+            <div class="contact-item">📧 studio@springsoundlab.ru</div>
+            <div class="contact-item">📞 <a href="tel:+74951234567" style="color:#3B82F6; text-decoration: none;">+7 (495) 123-45-67</a></div>
+            <div class="social-icons">
+                <a href="#" class="social-icon">📷</a>
+                <a href="#" class="social-icon">🎥</a>
+                <a href="#" class="social-icon">✈️</a>
+            </div>
+        </div>
     </div>
-
-    <div class="contacts-layout">
-      <div class="contacts-info">
-
-        <div class="contact-item reveal">
-          <div class="contact-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z M12 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-            </svg>
-          </div>
-          <div>
-            <div class="contact-label">Адрес</div>
-            <div class="contact-value">Москва, ул. Студийная, д. 12, этаж 3</div>
-          </div>
-        </div>
-
-        <div class="contact-item reveal reveal-delay-1">
-          <div class="contact-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11.6 19.79 19.79 0 0 1 1.61 3a2 2 0 0 1 1.99-2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.07a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.72 15.5z"/>
-            </svg>
-          </div>
-          <div>
-            <div class="contact-label">Телефон</div>
-            <a href="tel:+79001234567" class="contact-value">+7 (900) 123-45-67</a>
-          </div>
-        </div>
-
-        <div class="contact-item reveal reveal-delay-2">
-          <div class="contact-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22 6l-10 7L2 6"/>
-            </svg>
-          </div>
-          <div>
-            <div class="contact-label">Email</div>
-            <a href="mailto:info@springsoundlab.ru" class="contact-value">info@springsoundlab.ru</a>
-          </div>
-        </div>
-
-        <div class="contact-item reveal reveal-delay-3">
-          <div class="contact-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-          </div>
-          <div>
-            <div class="contact-label">Часы работы</div>
-            <div class="contact-value">Ежедневно, 10:00 — 22:00</div>
-          </div>
-        </div>
-
-        <div class="reveal reveal-delay-4">
-          <div class="contact-label" style="margin-bottom: 12px;">Соцсети</div>
-          <div class="socials">
-            <!-- ВКонтакте -->
-            <a href="#" class="social-btn" aria-label="ВКонтакте">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21.547 7h-3.29a.743.743 0 0 0-.655.392s-1.312 2.416-1.734 3.23C14.734 12.813 14 12.126 14 11.11V7.603A1.104 1.104 0 0 0 12.896 6.5h-2.474a1.982 1.982 0 0 0-1.75.813s1.255-.204 1.255 1.49c0 .42.022 1.626.04 2.64a.73.73 0 0 1-1.272.503 21.54 21.54 0 0 1-2.498-4.543.693.693 0 0 0-.63-.403h-2.99a.508.508 0 0 0-.48.685C3.005 10.175 6.918 18 11.38 18h1.878a.742.742 0 0 0 .742-.742v-1.135a.73.73 0 0 1 1.23-.53l2.247 2.112a1.09 1.09 0 0 0 .746.295h2.953c1.424 0 1.424-.988.647-1.753-.546-.538-2.518-2.617-2.518-2.617a1.02 1.02 0 0 1-.078-1.323c.637-.84 1.68-2.212 2.122-2.8.603-.804 1.697-2.507.197-2.507z"/>
-              </svg>
-            </a>
-            <!-- Telegram -->
-            <a href="#" class="social-btn" aria-label="Telegram">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-              </svg>
-            </a>
-            <!-- YouTube -->
-            <a href="#" class="social-btn" aria-label="YouTube">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-              </svg>
-            </a>
-            <!-- Instagram -->
-            <a href="#" class="social-btn" aria-label="Instagram">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
-              </svg>
-            </a>
-          </div>
-        </div>
-
-        <div class="contacts-cta reveal">
-          <p>Готов воплотить свою идею в жизнь? Запишись на сессию прямо сейчас!</p>
-          <button class="btn-book" id="openModalContacts" style="font-size:0.95rem; padding:13px 30px;">
-            Записаться в студию
-          </button>
-        </div>
-      </div>
-
-      <!-- Карта-заглушка -->
-      <div class="contacts-map reveal reveal-delay-2">
-        <div class="map-dot"></div>
-        <span>Москва, ул. Студийная, д. 12</span>
-        <span style="font-size:0.78rem; color: var(--accent-bright);">Здесь будет интерактивная карта</span>
-      </div>
-    </div>
-  </div>
 </section>
 
-<!-- ═══════════════════════════════════
-     ФУТЕР
-═══════════════════════════════════ -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-copy">© 2025 Spring Sound Lab. Все права защищены.</div>
-      <div class="footer-links">
-        <a href="#">Политика конфиденциальности</a>
-        <a href="#">Публичная оферта</a>
-      </div>
-    </div>
-  </div>
+<footer>
+    <p>© 2025 Spring Sound Lab. Все права защищены.</p>
 </footer>
 
-<!-- ═══════════════════════════════════
-     МОДАЛЬНОЕ ОКНО
-═══════════════════════════════════ -->
-<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Запись в студию">
-  <div class="modal" id="modal">
-    <button class="modal-close" id="modalClose" aria-label="Закрыть">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <path d="M18 6L6 18 M6 6l12 12"/>
-      </svg>
-    </button>
-
-    <div id="modalForm">
-      <span class="section-label" style="margin-bottom: 4px;">Бронирование</span>
-      <h2 class="modal-title">Запись в студию</h2>
-
-      <div class="modal-phone-block">
-        <p>Или позвоните нам прямо сейчас:</p>
-        <a href="tel:+79001234567" class="modal-phone">+7 (900) 123-45-67</a>
-      </div>
-
-      <div class="form-group">
-        <label for="fname">Имя *</label>
-        <input type="text" id="fname" placeholder="Иван" autocomplete="given-name" required>
-      </div>
-
-      <div class="form-group">
-        <label for="lname">Фамилия *</label>
-        <input type="text" id="lname" placeholder="Иванов" autocomplete="family-name" required>
-      </div>
-
-      <div class="form-group">
-        <label for="phone">Номер телефона *</label>
-        <input type="tel" id="phone" placeholder="+7 (___) ___-__-__" autocomplete="tel" required>
-      </div>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="agree">
-        <label for="agree">
-          Я соглашаюсь с <a href="#">политикой конфиденциальности</a>
-        </label>
-      </div>
-
-      <button class="btn-submit" id="submitBtn" disabled>Отправить заявку</button>
+<!-- Модальное окно -->
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3 style="margin-bottom: 1rem;">Запись в студию</h3>
+        <p style="margin-bottom: 1rem;">Или позвоните нам прямо сейчас: <strong><a href="tel:+74951234567" style="color:#3B82F6;">+7 (495) 123-45-67</a></strong></p>
+        <form id="bookingForm">
+            <div class="form-group"><input type="text" id="firstName" placeholder="Имя *" required></div>
+            <div class="form-group"><input type="text" id="lastName" placeholder="Фамилия *" required></div>
+            <div class="form-group"><input type="tel" id="phone" placeholder="+7 (___) ___-__-__" required></div>
+            <label class="checkbox-label"><input type="checkbox" id="consentCheckbox"> Я соглашаюсь с политикой конфиденциальности</label>
+            <button type="submit" id="submitBtn" class="btn-submit" disabled>Отправить заявку</button>
+            <div id="formMessage"></div>
+        </form>
     </div>
-
-    <!-- Сообщение об успехе -->
-    <div class="success-msg" id="successMsg">
-      <div class="success-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
-      </div>
-      <h3>Заявка отправлена!</h3>
-      <p>Мы свяжемся с вами в ближайшее время.<br>Спасибо, что выбрали Spring Sound Lab!</p>
-    </div>
-  </div>
 </div>
 
-
-<!-- ═══════════════════════════════════
-     JAVASCRIPT
-═══════════════════════════════════ -->
 <script>
-// ─────────────────────────────────────
-// АНИМИРОВАННЫЕ ЗВУКОВЫЕ ВОЛНЫ (HERO)
-// ─────────────────────────────────────
-(function () {
-  const canvas = document.getElementById('hero-canvas');
-  const ctx = canvas.getContext('2d');
-  let W, H, raf;
-  let t = 0;
+    // ----- Анимированные звуковые волны (canvas) -----
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let timeOffset = 0;
 
-  function resize() {
-    W = canvas.width  = canvas.offsetWidth;
-    H = canvas.height = canvas.offsetHeight;
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  // Параметры волн
-  const waves = [
-    { amp: 60,  freq: 0.008, speed: 0.4,  alpha: 0.12, width: 2,   yOffset: 0   },
-    { amp: 40,  freq: 0.012, speed: 0.6,  alpha: 0.18, width: 1.5, yOffset: 30  },
-    { amp: 80,  freq: 0.005, speed: 0.25, alpha: 0.08, width: 2.5, yOffset: -20 },
-    { amp: 25,  freq: 0.018, speed: 0.9,  alpha: 0.22, width: 1,   yOffset: 50  },
-    { amp: 55,  freq: 0.007, speed: 0.35, alpha: 0.1,  width: 2,   yOffset: -45 },
-  ];
-
-  // Визуализатор снизу — вертикальные полосы
-  const barCount = 64;
-  let barHeights = new Float32Array(barCount).fill(0);
-  let barTargets  = new Float32Array(barCount);
-
-  function randomizeBarTargets() {
-    for (let i = 0; i < barCount; i++) {
-      barTargets[i] = 10 + Math.random() * 120 * Math.sin(i * 0.15 + t * 0.3);
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
     }
-  }
+    function drawWaves() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        const centerY = height / 2;
+        const gradient = ctx.createLinearGradient(0,0, width,0);
+        gradient.addColorStop(0, '#2563EB20');
+        gradient.addColorStop(0.5, '#3B82F640');
+        gradient.addColorStop(1, '#2563EB20');
+        
+        for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            const amp = 25 + i * 8;
+            const freq = 0.008 + i * 0.003;
+            const phase = timeOffset + i * 2;
+            for (let x = 0; x <= width; x += 12) {
+                const y = centerY + Math.sin(x * freq + phase) * amp + Math.sin(x * 0.015 + timeOffset) * 12;
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = `rgba(59,130,246,${0.25 - i*0.05})`;
+            ctx.lineWidth = 2 + i;
+            ctx.stroke();
+        }
+        timeOffset += 0.02;
+        requestAnimationFrame(drawWaves);
+    }
+    window.addEventListener('resize', () => { resizeCanvas(); });
+    resizeCanvas();
+    drawWaves();
 
-  setInterval(randomizeBarTargets, 180);
-  randomizeBarTargets();
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-
-    const cy = H * 0.52;
-
-    // Рисуем горизонтальные синусоиды
-    waves.forEach(w => {
-      ctx.beginPath();
-      ctx.strokeStyle = `rgba(59,130,246,${w.alpha})`;
-      ctx.lineWidth = w.width;
-
-      for (let x = 0; x <= W; x += 2) {
-        const y = cy + w.yOffset + w.amp * Math.sin(x * w.freq + t * w.speed);
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.stroke();
+    // ----- Navbar скрытие при скролле -----
+    let lastScroll = 0;
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.scrollY;
+        if (currentScroll <= 0) {
+            navbar.classList.remove('scroll-down');
+            navbar.classList.add('scroll-up');
+            return;
+        }
+        if (currentScroll > lastScroll && !navbar.classList.contains('scroll-down')) {
+            navbar.classList.add('scroll-down');
+            navbar.classList.remove('scroll-up');
+        } else if (currentScroll < lastScroll && navbar.classList.contains('scroll-down')) {
+            navbar.classList.remove('scroll-down');
+            navbar.classList.add('scroll-up');
+        }
+        lastScroll = currentScroll;
     });
 
-    // Вертикальный визуализатор (снизу по центру)
-    const barW  = Math.floor(W / barCount);
-    const barGap = Math.max(1, barW * 0.25);
-    const barX0  = 0;
-
-    for (let i = 0; i < barCount; i++) {
-      barHeights[i] += (barTargets[i] - barHeights[i]) * 0.12;
-      const bh = barHeights[i];
-      const x  = barX0 + i * barW + barGap / 2;
-      const bw = barW - barGap;
-      const y  = H - 80 - bh;
-
-      const grad = ctx.createLinearGradient(0, y, 0, H - 80);
-      grad.addColorStop(0, 'rgba(59,130,246,0.5)');
-      grad.addColorStop(1, 'rgba(37,99,235,0.05)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.roundRect(x, y, bw, bh, [3, 3, 0, 0]);
-      ctx.fill();
-    }
-
-    // Центральная горизонтальная линия
-    const lineGrad = ctx.createLinearGradient(0, 0, W, 0);
-    lineGrad.addColorStop(0,   'transparent');
-    lineGrad.addColorStop(0.3, 'rgba(59,130,246,0.3)');
-    lineGrad.addColorStop(0.7, 'rgba(59,130,246,0.3)');
-    lineGrad.addColorStop(1,   'transparent');
-    ctx.beginPath();
-    ctx.strokeStyle = lineGrad;
-    ctx.lineWidth = 1;
-    ctx.moveTo(0, H - 80);
-    ctx.lineTo(W, H - 80);
-    ctx.stroke();
-
-    t += 0.016;
-    raf = requestAnimationFrame(draw);
-  }
-
-  draw();
-
-  // Приостановить анимацию вне видимости
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) cancelAnimationFrame(raf);
-    else draw();
-  });
-})();
-
-// ─────────────────────────────────────
-// ДЕКОРАТИВНЫЕ ВОЛНЫ В ОБЛОЖКАХ
-// ─────────────────────────────────────
-function buildCoverWaveforms() {
-  const configs = [
-    [12, 20, 35, 50, 45, 30, 48, 38, 22, 44, 36, 28, 50, 42, 18],
-    [20, 40, 30, 45, 28, 50, 22, 48, 36, 42, 18, 44, 38, 30, 46],
-    [35, 22, 48, 30, 45, 18, 50, 38, 42, 26, 44, 32, 50, 28, 40],
-    [28, 46, 20, 44, 32, 50, 26, 48, 36, 42, 22, 46, 34, 50, 18],
-    [42, 28, 50, 22, 44, 36, 48, 20, 46, 32, 50, 26, 42, 38, 22],
-  ];
-  configs.forEach((heights, i) => {
-    const el = document.getElementById('wf' + (i + 1));
-    if (!el) return;
-    heights.forEach(h => {
-      const span = document.createElement('span');
-      span.style.height = h + 'px';
-      el.appendChild(span);
+    // Мобильное меню
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('show');
     });
-  });
-}
-buildCoverWaveforms();
 
-// ─────────────────────────────────────
-// NAVBAR: СКРЫТИЕ / ПОЯВЛЕНИЕ
-// ─────────────────────────────────────
-(function () {
-  const navbar = document.getElementById('navbar');
-  let lastY  = 0;
-  let ticking = false;
+    // Плавный скролл навигации
+    document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if(target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                navLinks.classList.remove('show');
+            }
+        });
+    });
 
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        const y = window.scrollY;
-        navbar.classList.toggle('scrolled', y > 20);
-        if (y > lastY && y > 100) navbar.classList.add('hidden');
-        else navbar.classList.remove('hidden');
-        lastY = y;
-        ticking = false;
-      });
-      ticking = true;
+    // Intersection Observer для анимаций
+    const fadeElements = document.querySelectorAll('.fade-up');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2 });
+    fadeElements.forEach(el => observer.observe(el));
+
+    // ----- Модальное окно -----
+    const modal = document.getElementById('bookingModal');
+    const openTriggers = document.querySelectorAll('.book-trigger');
+    const closeModalBtn = document.querySelector('.close-modal');
+    const form = document.getElementById('bookingForm');
+    const firstName = document.getElementById('firstName');
+    const lastName = document.getElementById('lastName');
+    const phoneInput = document.getElementById('phone');
+    const consentBox = document.getElementById('consentCheckbox');
+    const submitBtn = document.getElementById('submitBtn');
+    const formMessageDiv = document.getElementById('formMessage');
+
+    // Маска телефона +7 (___) ___-__-__
+    function phoneMask(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 11) value = value.slice(0,11);
+        let formatted = '+7 ';
+        if (value.length > 1) {
+            formatted += '(' + value.substring(1, 4);
+        } else if (value.length === 1) formatted += '(';
+        if (value.length >= 4) formatted += ') ' + value.substring(4, 7);
+        if (value.length >= 7) formatted += '-' + value.substring(7, 9);
+        if (value.length >= 9) formatted += '-' + value.substring(9, 11);
+        e.target.value = formatted;
     }
-  });
-})();
+    phoneInput.addEventListener('input', phoneMask);
 
-// ─────────────────────────────────────
-// МОБИЛЬНОЕ МЕНЮ — БУРГЕР
-// ─────────────────────────────────────
-const burger     = document.getElementById('burger');
-const mobileMenu = document.getElementById('mobileMenu');
-
-burger.addEventListener('click', () => {
-  burger.classList.toggle('open');
-  mobileMenu.classList.toggle('open');
-});
-
-function closeMobileMenu() {
-  burger.classList.remove('open');
-  mobileMenu.classList.remove('open');
-}
-
-// ─────────────────────────────────────
-// INTERSECTION OBSERVER — REVEAL
-// ─────────────────────────────────────
-const io = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      io.unobserve(e.target);
+    function checkFormValidity() {
+        const isNameValid = firstName.value.trim() !== '';
+        const isLastNameValid = lastName.value.trim() !== '';
+        const phoneRaw = phoneInput.value.replace(/\D/g, '');
+        const isPhoneValid = phoneRaw.length >= 11;
+        const isConsent = consentBox.checked;
+        submitBtn.disabled = !(isNameValid && isLastNameValid && isPhoneValid && isConsent);
     }
-  });
-}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    firstName.addEventListener('input', checkFormValidity);
+    lastName.addEventListener('input', checkFormValidity);
+    phoneInput.addEventListener('input', checkFormValidity);
+    consentBox.addEventListener('change', checkFormValidity);
 
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    function openModal() {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        formMessageDiv.innerHTML = '';
+        form.reset();
+        phoneInput.value = '+7 ';
+        submitBtn.disabled = true;
+        consentBox.checked = false;
+    }
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        formMessageDiv.innerHTML = '';
+    }
+    openTriggers.forEach(btn => btn.addEventListener('click', openModal));
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && modal.classList.contains('active')) closeModal(); });
 
-// ─────────────────────────────────────
-// МОДАЛЬНОЕ ОКНО
-// ─────────────────────────────────────
-const overlay  = document.getElementById('modalOverlay');
-const modalEl  = document.getElementById('modal');
-const closeBtn = document.getElementById('modalClose');
-const formDiv  = document.getElementById('modalForm');
-const successDiv = document.getElementById('successMsg');
+    // Отправка формы
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if(submitBtn.disabled) return;
+        // Имитация отправки
+        const successMsg = document.createElement('div');
+        successMsg.className = 'success-message';
+        successMsg.innerText = 'Мы свяжемся с вами в ближайшее время!';
+        formMessageDiv.innerHTML = '';
+        formMessageDiv.appendChild(successMsg);
+        form.reset();
+        phoneInput.value = '+7 ';
+        submitBtn.disabled = true;
+        consentBox.checked = false;
+        setTimeout(() => {
+            closeModal();
+        }, 2000);
+    });
 
-function openModalFn() {
-  overlay.classList.add('active');
-  document.body.style.overflow = 'hidden';
-  // Сбросить форму
-  formDiv.style.display = 'block';
-  successDiv.classList.remove('show');
-  document.getElementById('fname').value = '';
-  document.getElementById('lname').value = '';
-  document.getElementById('phone').value = '';
-  document.getElementById('agree').checked = false;
-  updateSubmitBtn();
-}
+    // Кнопки "Слушать" (заглушка)
+    document.querySelectorAll('.listen-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const trackName = btn.getAttribute('data-track') || 'трек';
+            alert(`🎧 Демо-плеер: "${trackName}" \nПолная версия доступна владельцу студии.`);
+        });
+    });
 
-function closeModal() {
-  overlay.classList.remove('active');
-  document.body.style.overflow = '';
-}
-
-document.getElementById('openModal').addEventListener('click', openModalFn);
-document.getElementById('openModalHero').addEventListener('click', openModalFn);
-document.getElementById('openModalContacts').addEventListener('click', openModalFn);
-closeBtn.addEventListener('click', closeModal);
-
-overlay.addEventListener('click', e => {
-  if (e.target === overlay) closeModal();
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
-
-// ─────────────────────────────────────
-// ТЕЛЕФОННАЯ МАСКА
-// ─────────────────────────────────────
-const phoneInput = document.getElementById('phone');
-
-phoneInput.addEventListener('input', function () {
-  let val = this.value.replace(/\D/g, '');
-  if (val.startsWith('8')) val = '7' + val.slice(1);
-  if (!val.startsWith('7')) val = '7' + val;
-  val = val.slice(0, 11);
-
-  let formatted = '+7';
-  if (val.length > 1) formatted += ' (' + val.slice(1, 4);
-  if (val.length >= 4) formatted += ') ' + val.slice(4, 7);
-  if (val.length >= 7) formatted += '-' + val.slice(7, 9);
-  if (val.length >= 9) formatted += '-' + val.slice(9, 11);
-
-  this.value = formatted;
-  updateSubmitBtn();
-});
-
-phoneInput.addEventListener('keydown', function (e) {
-  if (e.key === 'Backspace' && this.value.length <= 2) e.preventDefault();
-});
-
-// ─────────────────────────────────────
-// ВАЛИДАЦИЯ ФОРМЫ
-// ─────────────────────────────────────
-const submitBtn = document.getElementById('submitBtn');
-const agreeCheck = document.getElementById('agree');
-
-function updateSubmitBtn() {
-  const fname = document.getElementById('fname').value.trim();
-  const lname = document.getElementById('lname').value.trim();
-  const ph    = document.getElementById('phone').value.replace(/\D/g, '');
-  const ok    = fname.length > 0 && lname.length > 0 && ph.length === 11 && agreeCheck.checked;
-  submitBtn.disabled = !ok;
-}
-
-['fname', 'lname'].forEach(id => {
-  document.getElementById(id).addEventListener('input', updateSubmitBtn);
-});
-agreeCheck.addEventListener('change', updateSubmitBtn);
-
-// ─────────────────────────────────────
-// ОТПРАВКА ФОРМЫ (ЗАГЛУШКА)
-// ─────────────────────────────────────
-submitBtn.addEventListener('click', function () {
-  if (this.disabled) return;
-  // Здесь интегрируйте реальную отправку данных (fetch / axios)
-  formDiv.style.display = 'none';
-  successDiv.classList.add('show');
-});
-
-// ─────────────────────────────────────
-// ПЛАВНЫЙ СКРОЛЛ ПО НАВИГАЦИИ
-// ─────────────────────────────────────
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', function (e) {
-    const target = document.querySelector(this.getAttribute('href'));
-    if (!target) return;
-    e.preventDefault();
-    const offset = 70;
-    const top = target.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({ top, behavior: 'smooth' });
-    closeMobileMenu();
-  });
-});
+    // Дополнительная анимация для кнопок
+    // Первоначальный триггер для проверки видимых элементов (на случай уже видимых)
+    setTimeout(() => {
+        fadeElements.forEach(el => { if(el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible'); });
+    }, 200);
 </script>
-
 </body>
 </html>
