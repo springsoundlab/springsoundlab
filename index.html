@@ -3,1772 +3,1948 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEONWAVE STUDIO — Звукозапись нового поколения</title>
+<title>Spring Sound Lab — Студия звукозаписи</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
-  :root {
-    --cream: #FAF6F0;
-    --warm-white: #FFF8F2;
-    --blush: #F5E6D8;
-    --neon-pink: #FF2D78;
-    --neon-cyan: #00E5FF;
-    --neon-purple: #B24BF3;
-    --neon-gold: #FFB800;
-    --dark: #1A0A2E;
-    --dark-mid: #2D1B4E;
-    --mid-gray: #7B6FA0;
-    --text-body: #3D2B5C;
-    --text-light: #8A7DAA;
-    --border: rgba(178,75,243,0.15);
-  }
+/* ═══════════════════════════════════
+   CSS ПЕРЕМЕННЫЕ И СБРОС СТИЛЕЙ
+═══════════════════════════════════ */
+:root {
+  --bg-deep:       #0A0F2C;
+  --bg-navy:       #0D1B4B;
+  --bg-card:       #0F1F55;
+  --accent:        #2563EB;
+  --accent-bright: #3B82F6;
+  --accent-glow:   rgba(59,130,246,0.35);
+  --text-white:    #FFFFFF;
+  --text-muted:    #CBD5E1;
+  --text-faint:    #7A90B8;
+  --border:        rgba(59,130,246,0.18);
+  --radius:        14px;
+  --radius-sm:     8px;
+  --transition:    0.3s cubic-bezier(.4,0,.2,1);
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; }
 
-  body {
-    font-family: 'Outfit', sans-serif;
-    background: var(--cream);
-    color: var(--text-body);
-    overflow-x: hidden;
-  }
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-white);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
 
-  /* ─── CURSOR ─── */
-  body { cursor: none; }
-  #cursor {
-    width: 12px; height: 12px;
-    background: var(--neon-pink);
-    border-radius: 50%;
-    position: fixed; top: 0; left: 0;
-    pointer-events: none; z-index: 9999;
-    transition: transform 0.1s ease;
-    mix-blend-mode: multiply;
-  }
-  #cursor-ring {
-    width: 36px; height: 36px;
-    border: 1.5px solid var(--neon-purple);
-    border-radius: 50%;
-    position: fixed; top: 0; left: 0;
-    pointer-events: none; z-index: 9998;
-    transition: transform 0.18s ease, width 0.2s, height 0.2s;
-  }
+img { display: block; max-width: 100%; }
+a  { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; border: none; outline: none; }
 
-  /* ─── SCROLLBAR ─── */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--blush); }
-  ::-webkit-scrollbar-thumb { background: var(--neon-purple); border-radius: 2px; }
+/* ═══════════════════════════════════
+   УТИЛИТЫ
+═══════════════════════════════════ */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
 
-  /* ─── NAV ─── */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    padding: 20px 60px;
-    display: flex; align-items: center; justify-content: space-between;
-    background: rgba(250,246,240,0.85);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    transition: all 0.3s ease;
-  }
-  nav.scrolled {
-    padding: 14px 60px;
-    background: rgba(250,246,240,0.95);
-    box-shadow: 0 4px 40px rgba(178,75,243,0.08);
-  }
-  .nav-logo {
-    font-family: 'Space Mono', monospace;
-    font-weight: 700;
-    font-size: 1.2rem;
-    letter-spacing: 0.1em;
-    color: var(--dark);
-    text-decoration: none;
-  }
-  .nav-logo span { color: var(--neon-pink); }
-  .nav-links { display: flex; gap: 36px; list-style: none; }
-  .nav-links a {
-    font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-body); text-decoration: none;
-    position: relative; transition: color 0.2s;
-  }
-  .nav-links a::after {
-    content: ''; position: absolute; bottom: -3px; left: 0;
-    width: 0; height: 1px;
-    background: var(--neon-pink);
-    transition: width 0.3s ease;
-  }
-  .nav-links a:hover { color: var(--neon-pink); }
-  .nav-links a:hover::after { width: 100%; }
-  .nav-cta {
-    background: var(--dark);
-    color: #fff !important;
-    padding: 10px 24px;
-    border-radius: 4px;
-    font-size: 0.82rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.1em;
-    transition: background 0.2s, box-shadow 0.2s !important;
-  }
-  .nav-cta:hover {
-    background: var(--neon-pink) !important;
-    box-shadow: 0 0 20px rgba(255,45,120,0.4) !important;
-  }
-  .nav-cta::after { display: none !important; }
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+  line-height: 1.15;
+}
 
-  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-  .hamburger span { width: 24px; height: 2px; background: var(--dark); border-radius: 2px; transition: all 0.3s; }
+.section-sub {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-bottom: 3.5rem;
+  font-weight: 400;
+}
 
-  /* ─── HERO ─── */
-  .hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center;
-    padding: 120px 40px 60px;
-    position: relative;
-    overflow: hidden;
-  }
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  color: var(--accent-bright);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  display: block;
+}
 
-  /* Grid lines background */
-  .hero::before {
-    content: '';
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(rgba(178,75,243,0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(178,75,243,0.06) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
-  }
+/* Анимация появления при скролле */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.12s; }
+.reveal-delay-2 { transition-delay: 0.24s; }
+.reveal-delay-3 { transition-delay: 0.36s; }
+.reveal-delay-4 { transition-delay: 0.48s; }
+.reveal-delay-5 { transition-delay: 0.60s; }
+.reveal-delay-6 { transition-delay: 0.72s; }
 
-  /* Gradient orbs */
-  .orb {
-    position: absolute; border-radius: 50%;
-    filter: blur(80px); pointer-events: none; opacity: 0.55;
-  }
-  .orb-1 {
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(255,45,120,0.18), transparent);
-    top: -100px; right: -100px;
-    animation: float1 8s ease-in-out infinite;
-  }
-  .orb-2 {
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(0,229,255,0.14), transparent);
-    bottom: 0px; left: -80px;
-    animation: float2 10s ease-in-out infinite;
-  }
-  .orb-3 {
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(178,75,243,0.12), transparent);
-    top: 50%; left: 50%; transform: translate(-50%,-50%);
-    animation: float3 12s ease-in-out infinite;
-  }
+/* ═══════════════════════════════════
+   НАВИГАЦИЯ
+═══════════════════════════════════ */
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  transition: transform 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+  padding: 0;
+}
 
-  @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,30px)} }
-  @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-20px)} }
-  @keyframes float3 { 0%,100%{transform:translate(-50%,-50%)} 50%{transform:translate(-48%,-52%)} }
+.navbar.scrolled {
+  background: rgba(10,15,44,0.96);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 2px 40px rgba(0,0,0,0.5);
+}
 
-  .hero-tag {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(178,75,243,0.08);
-    border: 1px solid rgba(178,75,243,0.2);
-    border-radius: 100px;
-    padding: 6px 16px;
-    font-size: 0.75rem; font-weight: 600;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--neon-purple);
-    margin-bottom: 28px;
-    animation: fadeUp 0.8s ease forwards;
-    opacity: 0;
-  }
-  .hero-tag .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--neon-pink);
-    animation: blink 1.5s ease-in-out infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.navbar.hidden { transform: translateY(-100%); }
 
-  .hero h1 {
-    font-size: clamp(3.5rem, 8vw, 8rem);
-    font-weight: 900;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    color: var(--dark);
-    margin-bottom: 10px;
-    animation: fadeUp 0.8s 0.15s ease forwards;
-    opacity: 0;
-  }
-  .hero h1 .line-2 {
-    display: block;
-    background: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-purple) 60%, var(--neon-cyan) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+  gap: 24px;
+}
 
-  .hero-sub {
-    font-size: 1.1rem; font-weight: 300;
-    color: var(--text-light); max-width: 560px;
-    line-height: 1.7; margin: 24px auto 44px;
-    animation: fadeUp 0.8s 0.3s ease forwards;
-    opacity: 0;
-  }
+.logo {
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
 
-  .hero-actions {
-    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-    animation: fadeUp 0.8s 0.45s ease forwards;
-    opacity: 0;
-  }
-  .btn-primary {
-    background: var(--dark);
-    color: #fff;
-    padding: 16px 36px;
-    border-radius: 6px;
-    font-size: 0.9rem; font-weight: 600;
-    letter-spacing: 0.06em; text-decoration: none;
-    border: none; cursor: pointer;
-    position: relative; overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .btn-primary::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-    opacity: 0; transition: opacity 0.3s;
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,45,120,0.35); }
-  .btn-primary:hover::before { opacity: 1; }
-  .btn-primary span { position: relative; z-index: 1; }
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 14px var(--accent-glow);
+}
 
-  .btn-secondary {
-    background: transparent;
-    color: var(--dark);
-    padding: 15px 36px;
-    border-radius: 6px;
-    font-size: 0.9rem; font-weight: 600;
-    letter-spacing: 0.06em; text-decoration: none;
-    border: 1.5px solid rgba(26,10,46,0.2);
-    cursor: pointer; display: flex; align-items: center; gap: 10px;
-    transition: border-color 0.2s, color 0.2s;
-  }
-  .btn-secondary:hover { border-color: var(--neon-pink); color: var(--neon-pink); }
-  .btn-secondary .play-icon {
-    width: 28px; height: 28px; border-radius: 50%;
-    background: var(--dark);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: background 0.2s;
-  }
-  .btn-secondary:hover .play-icon { background: var(--neon-pink); }
-  .play-icon svg { width: 10px; margin-left: 2px; }
+.logo-icon svg { width: 20px; height: 20px; }
 
-  /* Waveform visual */
-  .waveform-container {
-    margin-top: 70px; width: 100%; max-width: 760px;
-    animation: fadeUp 0.8s 0.6s ease forwards;
-    opacity: 0;
-  }
-  .waveform {
-    display: flex; align-items: center; justify-content: center;
-    gap: 3px; height: 64px;
-  }
-  .wave-bar {
-    width: 3px; border-radius: 3px;
-    background: linear-gradient(to top, var(--neon-pink), var(--neon-purple));
-    animation: wave var(--dur, 1.2s) ease-in-out infinite alternate;
-    animation-delay: var(--delay, 0s);
-  }
-  @keyframes wave {
-    0% { height: 8px; opacity: 0.3; }
-    100% { height: var(--h, 40px); opacity: 0.9; }
-  }
+.logo span { color: var(--accent-bright); }
 
-  .stats-row {
-    display: flex; gap: 48px; justify-content: center; flex-wrap: wrap;
-    margin-top: 60px;
-    animation: fadeUp 0.8s 0.75s ease forwards;
-    opacity: 0;
-  }
-  .stat-item { text-align: center; }
-  .stat-num {
-    font-family: 'Space Mono', monospace;
-    font-size: 2.4rem; font-weight: 700;
-    color: var(--dark);
-    line-height: 1;
-  }
-  .stat-num span { color: var(--neon-pink); }
-  .stat-label {
-    font-size: 0.78rem; font-weight: 500;
-    color: var(--text-light); letter-spacing: 0.1em;
-    text-transform: uppercase; margin-top: 4px;
-  }
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 8px;
+  align-items: center;
+}
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+.nav-links a {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition);
+  position: relative;
+}
 
-  /* ─── MARQUEE ─── */
-  .marquee-section {
-    padding: 20px 0;
-    background: var(--dark);
-    overflow: hidden;
-    position: relative;
-  }
-  .marquee-track {
-    display: flex; gap: 48px;
-    animation: marquee 25s linear infinite;
-    white-space: nowrap;
-  }
-  .marquee-item {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.75rem; font-weight: 700;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-    display: flex; align-items: center; gap: 20px;
-    flex-shrink: 0;
-  }
-  .marquee-item .sep { color: var(--neon-pink); font-size: 1rem; }
-  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 2px; left: 12px; right: 12px;
+  height: 1.5px;
+  background: var(--accent-bright);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+  border-radius: 2px;
+}
 
-  /* ─── SECTIONS GENERAL ─── */
-  section { padding: 100px 60px; }
-  .section-tag {
-    display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem; font-weight: 700;
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--neon-pink);
-    margin-bottom: 16px;
-  }
-  .section-title {
-    font-size: clamp(2.2rem, 4vw, 3.8rem);
-    font-weight: 800; line-height: 1.1;
-    color: var(--dark); letter-spacing: -0.02em;
-    margin-bottom: 16px;
-  }
-  .section-sub {
-    font-size: 1.05rem; color: var(--text-light);
-    line-height: 1.7; max-width: 520px;
-  }
+.nav-links a:hover { color: var(--text-white); }
+.nav-links a:hover::after { transform: scaleX(1); }
 
-  /* ─── SERVICES ─── */
-  .services { background: var(--warm-white); }
-  .services-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; flex-wrap: wrap; gap: 24px; }
-  .services-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-  }
-  .service-card {
-    background: #fff;
-    border: 1px solid rgba(178,75,243,0.1);
-    border-radius: 16px;
-    padding: 36px 32px;
-    position: relative; overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-    cursor: pointer;
-  }
-  .service-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
-    transform: scaleX(0); transform-origin: left;
-    transition: transform 0.4s ease;
-  }
-  .service-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(178,75,243,0.12); border-color: rgba(178,75,243,0.25); }
-  .service-card:hover::before { transform: scaleX(1); }
-  .service-icon {
-    width: 52px; height: 52px; border-radius: 12px;
-    background: var(--blush);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 24px; font-size: 1.5rem;
-    transition: background 0.3s;
-  }
-  .service-card:hover .service-icon { background: rgba(255,45,120,0.1); }
-  .service-card h3 { font-size: 1.15rem; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
-  .service-card p { font-size: 0.9rem; color: var(--text-light); line-height: 1.65; }
-  .service-price {
-    margin-top: 24px; padding-top: 20px;
-    border-top: 1px solid var(--border);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.85rem; font-weight: 700;
-    color: var(--neon-purple);
-  }
-  .service-price small { font-size: 0.7rem; font-family: 'Outfit', sans-serif; font-weight: 400; color: var(--text-light); margin-left: 6px; }
+/* Кнопка «Записаться» в navbar */
+.btn-book {
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 40px;
+  transition: transform var(--transition), box-shadow var(--transition);
+  box-shadow: 0 0 18px var(--accent-glow);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-book:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 32px rgba(59,130,246,0.55);
+}
 
-  /* ─── ABOUT / STUDIO ─── */
-  .about {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 80px; align-items: center;
-  }
-  .about-visual {
-    position: relative;
-  }
-  .about-img-main {
-    width: 100%; aspect-ratio: 4/5;
-    border-radius: 20px;
-    background: linear-gradient(135deg, var(--dark) 0%, var(--dark-mid) 100%);
-    position: relative; overflow: hidden;
-  }
-  .studio-3d {
-    width: 100%; height: 100%;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 12px;
-    position: relative;
-  }
-  /* Retro 3D room */
-  .studio-floor {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 50%;
-    background: linear-gradient(to top, rgba(178,75,243,0.15), transparent);
-  }
-  .studio-grid-h {
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(0,229,255,0.06) 0px, rgba(0,229,255,0.06) 1px,
-      transparent 1px, transparent 40px
-    );
-  }
-  .studio-grid-v {
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(
-      to right,
-      rgba(0,229,255,0.06) 0px, rgba(0,229,255,0.06) 1px,
-      transparent 1px, transparent 40px
-    );
-  }
-  .console-svg {
-    width: 80%; position: relative; z-index: 2;
-  }
-  .about-float-badge {
-    position: absolute; bottom: -20px; right: -20px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px 24px;
-    box-shadow: 0 10px 40px rgba(178,75,243,0.1);
-    text-align: center;
-  }
-  .about-float-badge .big { font-size: 2rem; font-weight: 800; color: var(--dark); font-family: 'Space Mono', monospace; }
-  .about-float-badge .small { font-size: 0.75rem; color: var(--text-light); font-weight: 500; }
+/* Бургер */
+.burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+}
+.burger span {
+  display: block;
+  width: 24px; height: 2px;
+  background: var(--text-white);
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+.burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.burger.open span:nth-child(2) { opacity: 0; }
+.burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-  .about-content .features-list { list-style: none; margin-top: 36px; display: flex; flex-direction: column; gap: 16px; }
-  .features-list li {
-    display: flex; align-items: flex-start; gap: 14px;
-    font-size: 0.95rem; color: var(--text-body); line-height: 1.5;
-  }
-  .features-list .check {
-    width: 22px; height: 22px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; margin-top: 1px; font-size: 0.65rem; color: #fff;
-  }
+/* Мобильное меню */
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 70px; left: 0; right: 0;
+  background: rgba(10,15,44,0.98);
+  backdrop-filter: blur(18px);
+  padding: 24px;
+  z-index: 999;
+  flex-direction: column;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.mobile-menu.open {
+  display: flex;
+  transform: translateY(0);
+  opacity: 1;
+}
+.mobile-menu a {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  transition: color 0.2s;
+}
+.mobile-menu a:hover { color: var(--text-white); }
+.mobile-menu .btn-book {
+  margin-top: 12px;
+  text-align: center;
+  display: block;
+  padding: 14px;
+}
 
-  /* ─── PORTFOLIO ─── */
-  .portfolio { background: var(--dark); }
-  .portfolio .section-tag { color: var(--neon-cyan); }
-  .portfolio .section-title { color: #fff; }
-  .portfolio .section-sub { color: rgba(255,255,255,0.5); }
-  .portfolio-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 50px; flex-wrap: wrap; gap: 20px; }
-  .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-  .filter-tab {
-    padding: 7px 18px; border-radius: 100px;
-    font-size: 0.8rem; font-weight: 600;
-    letter-spacing: 0.06em; cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.12);
-    color: rgba(255,255,255,0.5);
-    background: transparent; transition: all 0.2s;
-  }
-  .filter-tab.active {
-    background: var(--neon-pink);
-    border-color: var(--neon-pink);
-    color: #fff;
-    box-shadow: 0 0 16px rgba(255,45,120,0.4);
-  }
-  .filter-tab:hover:not(.active) { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); }
+/* ═══════════════════════════════════
+   HERO
+═══════════════════════════════════ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background: radial-gradient(ellipse 80% 60% at 50% 30%, #0D2272 0%, var(--bg-deep) 70%);
+}
 
-  .portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-  }
-  .portfolio-card {
-    border-radius: 14px; overflow: hidden;
-    position: relative;
-    aspect-ratio: 1;
-    cursor: pointer;
-    background: var(--dark-mid);
-  }
-  .portfolio-card:first-child { grid-column: span 2; aspect-ratio: unset; min-height: 280px; }
-  .portfolio-bg {
-    position: absolute; inset: 0;
-    transition: transform 0.5s ease;
-  }
-  .portfolio-card:hover .portfolio-bg { transform: scale(1.05); }
-  .portfolio-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(26,10,46,0.95) 0%, rgba(26,10,46,0.3) 60%, transparent 100%);
-    display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 24px;
-  }
-  .p-card-genre {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--neon-cyan); margin-bottom: 8px;
-  }
-  .p-card-title { font-size: 1.1rem; font-weight: 700; color: #fff; }
-  .p-card-artist { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-top: 4px; }
-  .p-card-play {
-    position: absolute; top: 16px; right: 16px;
-    width: 42px; height: 42px; border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; transform: scale(0.8);
-    transition: opacity 0.3s, transform 0.3s;
-  }
-  .portfolio-card:hover .p-card-play { opacity: 1; transform: scale(1); }
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
 
-  /* ─── AUDIO PLAYER ─── */
-  .player-bar {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 900;
-    background: rgba(26,10,46,0.95);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(178,75,243,0.2);
-    padding: 14px 60px;
-    display: flex; align-items: center; gap: 24px;
-    transform: translateY(100%);
-    transition: transform 0.4s ease;
-  }
-  .player-bar.visible { transform: translateY(0); }
-  .player-info { flex: 1; }
-  .player-title { font-size: 0.88rem; font-weight: 600; color: #fff; }
-  .player-artist { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
-  .player-controls { display: flex; align-items: center; gap: 16px; }
-  .player-btn {
-    width: 36px; height: 36px; border-radius: 50%; border: none;
-    background: rgba(255,255,255,0.08);
-    color: rgba(255,255,255,0.6); cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.8rem; transition: all 0.2s;
-  }
-  .player-btn:hover { background: var(--neon-pink); color: #fff; }
-  .player-btn.main {
-    width: 44px; height: 44px;
-    background: var(--neon-pink);
-    color: #fff;
-    box-shadow: 0 0 16px rgba(255,45,120,0.4);
-  }
-  .player-progress { flex: 2; display: flex; align-items: center; gap: 12px; }
-  .progress-track {
-    flex: 1; height: 3px; background: rgba(255,255,255,0.12);
-    border-radius: 3px; cursor: pointer; position: relative;
-  }
-  .progress-fill {
-    height: 100%; width: 35%; background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
-    border-radius: 3px; transition: width 0.1s;
-    position: relative;
-  }
-  .progress-fill::after {
-    content: ''; position: absolute; right: -4px; top: 50%;
-    transform: translateY(-50%);
-    width: 10px; height: 10px; border-radius: 50%;
-    background: #fff; box-shadow: 0 0 6px rgba(255,45,120,0.6);
-  }
-  .time-label { font-family: 'Space Mono', monospace; font-size: 0.68rem; color: rgba(255,255,255,0.4); white-space: nowrap; }
+/* Сетка-фон */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  z-index: 1;
+}
 
-  /* ─── EQUIPMENT ─── */
-  .equipment { background: var(--blush); }
-  .equipment-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px; margin-top: 52px;
-  }
-  .equip-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 28px 24px;
-    border: 1px solid rgba(178,75,243,0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  .equip-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(178,75,243,0.1); }
-  .equip-brand {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.65rem; color: var(--neon-pink);
-    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;
-  }
-  .equip-name { font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
-  .equip-desc { font-size: 0.8rem; color: var(--text-light); line-height: 1.5; }
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 820px;
+  padding: 0 24px;
+}
 
-  /* ─── PROCESS ─── */
-  .process { background: var(--warm-white); }
-  .process-steps {
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    gap: 0; margin-top: 60px;
-    position: relative;
-  }
-  .process-steps::before {
-    content: '';
-    position: absolute; top: 30px; left: 10%; right: 10%;
-    height: 1px;
-    background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple), var(--neon-cyan));
-  }
-  .process-step { text-align: center; padding: 0 16px; }
-  .step-num {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: #fff;
-    border: 2px solid var(--neon-purple);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Mono', monospace; font-size: 1rem; font-weight: 700;
-    color: var(--neon-purple); margin: 0 auto 20px;
-    position: relative; z-index: 1;
-    transition: all 0.3s;
-  }
-  .process-step:hover .step-num {
-    background: var(--neon-purple); color: #fff;
-    box-shadow: 0 0 20px rgba(178,75,243,0.4);
-  }
-  .process-step h4 { font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
-  .process-step p { font-size: 0.8rem; color: var(--text-light); line-height: 1.55; }
+.hero-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  color: var(--accent-bright);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  animation: fadeSlideUp 0.9s ease 0.2s forwards;
+}
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  width: 36px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-bright));
+}
+.hero-eyebrow::after { transform: scaleX(-1); }
 
-  /* ─── TESTIMONIALS ─── */
-  .testimonials { background: var(--cream); }
-  .testimonials-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 20px; margin-top: 52px;
-  }
-  .testimonial-card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 16px; padding: 32px;
-    position: relative;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  .testimonial-card:hover { transform: translateY(-4px); box-shadow: 0 16px 50px rgba(178,75,243,0.1); }
-  .testimonial-card .quote {
-    font-size: 3rem; line-height: 0.8;
-    font-family: 'Space Mono', monospace;
-    color: var(--neon-pink); opacity: 0.3;
-    margin-bottom: 16px;
-  }
-  .testimonial-card p { font-size: 0.92rem; color: var(--text-body); line-height: 1.7; font-style: italic; }
-  .testimonial-author { display: flex; align-items: center; gap: 12px; margin-top: 24px; }
-  .author-avatar {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; color: #fff; font-size: 0.9rem;
-  }
-  .author-name { font-weight: 700; font-size: 0.88rem; color: var(--dark); }
-  .author-role { font-size: 0.75rem; color: var(--text-light); }
-  .stars { color: var(--neon-gold); font-size: 0.75rem; margin-bottom: 4px; }
+.hero-title {
+  font-size: clamp(2.6rem, 7vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeSlideUp 0.9s ease 0.4s forwards;
+}
 
-  /* ─── PRICING ─── */
-  .pricing { background: var(--dark); }
-  .pricing .section-tag { color: var(--neon-cyan); }
-  .pricing .section-title { color: #fff; }
-  .pricing .section-sub { color: rgba(255,255,255,0.5); }
-  .pricing-header { text-align: center; margin-bottom: 52px; }
-  .pricing-toggle {
-    display: inline-flex; gap: 0;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 100px;
-    padding: 4px; margin-top: 24px;
-  }
-  .toggle-btn {
-    padding: 8px 24px; border-radius: 100px;
-    font-size: 0.8rem; font-weight: 600;
-    cursor: pointer; border: none; background: transparent;
-    color: rgba(255,255,255,0.4);
-    transition: all 0.2s;
-  }
-  .toggle-btn.active {
-    background: var(--neon-pink);
-    color: #fff;
-    box-shadow: 0 0 14px rgba(255,45,120,0.4);
-  }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .pricing-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px; padding: 36px 32px;
-    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-    position: relative; overflow: hidden;
-  }
-  .pricing-card.popular {
-    background: rgba(178,75,243,0.1);
-    border-color: var(--neon-purple);
-    box-shadow: 0 0 40px rgba(178,75,243,0.15);
-  }
-  .popular-badge {
-    position: absolute; top: 20px; right: 20px;
-    background: var(--neon-purple);
-    color: #fff; font-size: 0.68rem; font-weight: 700;
-    padding: 4px 12px; border-radius: 100px;
-    letter-spacing: 0.1em; text-transform: uppercase;
-  }
-  .pricing-card:hover { transform: translateY(-6px); }
-  .plan-name { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
-  .plan-price {
-    font-family: 'Space Mono', monospace;
-    font-size: 3rem; font-weight: 700; color: #fff; line-height: 1;
-    margin-bottom: 4px;
-  }
-  .plan-price span { font-size: 1.1rem; vertical-align: super; }
-  .plan-desc { font-size: 0.82rem; color: rgba(255,255,255,0.35); margin-bottom: 28px; }
-  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
-  .plan-features li {
-    font-size: 0.85rem; color: rgba(255,255,255,0.65);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .plan-features li .chk { color: var(--neon-cyan); font-weight: 700; }
-  .plan-features li .no { color: rgba(255,255,255,0.2); }
-  .btn-plan {
-    width: 100%; padding: 14px;
-    border-radius: 8px; font-weight: 600;
-    font-size: 0.88rem; cursor: pointer;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: transparent; color: rgba(255,255,255,0.7);
-    transition: all 0.2s; letter-spacing: 0.05em;
-  }
-  .btn-plan:hover, .pricing-card.popular .btn-plan {
-    background: var(--neon-pink);
-    border-color: var(--neon-pink);
-    color: #fff; box-shadow: 0 0 20px rgba(255,45,120,0.4);
-  }
+.hero-title em {
+  font-style: normal;
+  background: linear-gradient(135deg, #fff 30%, var(--accent-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  /* ─── BOOKING ─── */
-  .booking {
-    background: linear-gradient(135deg, var(--blush) 0%, var(--cream) 100%);
-  }
-  .booking-inner {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
-  }
-  .booking-form {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 20px; padding: 40px;
-    box-shadow: 0 10px 60px rgba(178,75,243,0.08);
-  }
-  .booking-form h3 { font-size: 1.4rem; font-weight: 800; color: var(--dark); margin-bottom: 28px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-light); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
-  .form-group input, .form-group select, .form-group textarea {
-    width: 100%; padding: 12px 16px;
-    border: 1.5px solid rgba(178,75,243,0.15);
-    border-radius: 8px; font-family: 'Outfit', sans-serif;
-    font-size: 0.9rem; color: var(--dark);
-    background: var(--warm-white);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-  }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-    border-color: var(--neon-purple);
-    box-shadow: 0 0 0 3px rgba(178,75,243,0.1);
-  }
-  .form-group textarea { resize: vertical; min-height: 100px; }
-  .btn-book {
-    width: 100%; padding: 16px;
-    background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-    border: none; border-radius: 8px;
-    color: #fff; font-family: 'Outfit', sans-serif;
-    font-size: 0.92rem; font-weight: 700;
-    letter-spacing: 0.06em; cursor: pointer;
-    box-shadow: 0 4px 24px rgba(255,45,120,0.35);
-    transition: opacity 0.2s, transform 0.2s;
-  }
-  .btn-book:hover { opacity: 0.9; transform: translateY(-2px); }
+.hero-subtitle {
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  color: var(--text-muted);
+  font-weight: 400;
+  max-width: 560px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.65;
+  opacity: 0;
+  animation: fadeSlideUp 0.9s ease 0.6s forwards;
+}
 
-  .booking-info { padding-top: 20px; }
-  .booking-info .section-sub { margin-bottom: 36px; }
-  .contact-items { display: flex; flex-direction: column; gap: 20px; }
-  .contact-item { display: flex; align-items: center; gap: 16px; }
-  .contact-icon {
-    width: 48px; height: 48px; border-radius: 12px;
-    background: white;
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem; flex-shrink: 0;
-    box-shadow: 0 2px 12px rgba(178,75,243,0.06);
-  }
-  .contact-item h4 { font-size: 0.8rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.08em; }
-  .contact-item p { font-size: 0.92rem; font-weight: 600; color: var(--dark); margin-top: 2px; }
+.btn-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 18px 40px;
+  border-radius: 50px;
+  box-shadow: 0 0 28px var(--accent-glow), 0 0 60px rgba(37,99,235,0.2);
+  transition: transform var(--transition), box-shadow var(--transition);
+  animation: fadeSlideUp 0.9s ease 0.8s forwards, heroPulse 3s ease-in-out 1.8s infinite;
+  opacity: 0;
+  letter-spacing: 0.01em;
+}
+.btn-hero svg { width: 18px; height: 18px; }
+.btn-hero:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 50px rgba(59,130,246,0.65), 0 0 90px rgba(37,99,235,0.3);
+}
 
-  .map-preview {
-    margin-top: 32px; border-radius: 16px; overflow: hidden;
-    border: 1px solid var(--border);
-    background: var(--dark);
-    height: 180px; position: relative;
-  }
-  .map-grid-h {
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(0,229,255,0.05) 0, rgba(0,229,255,0.05) 1px,
-      transparent 1px, transparent 30px
-    );
-  }
-  .map-grid-v {
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(
-      to right,
-      rgba(0,229,255,0.05) 0, rgba(0,229,255,0.05) 1px,
-      transparent 1px, transparent 30px
-    );
-  }
-  .map-pin {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex; flex-direction: column; align-items: center;
-  }
-  .map-pin-dot {
-    width: 16px; height: 16px; border-radius: 50%;
-    background: var(--neon-pink);
-    box-shadow: 0 0 0 6px rgba(255,45,120,0.3), 0 0 20px rgba(255,45,120,0.5);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%,100% { box-shadow: 0 0 0 6px rgba(255,45,120,0.3), 0 0 20px rgba(255,45,120,0.5); }
-    50% { box-shadow: 0 0 0 12px rgba(255,45,120,0.1), 0 0 30px rgba(255,45,120,0.3); }
-  }
-  .map-label {
-    margin-top: 8px; background: rgba(255,45,120,0.9);
-    color: #fff; font-size: 0.7rem; font-weight: 700;
-    padding: 4px 10px; border-radius: 4px;
-    white-space: nowrap;
-  }
+.hero-scroll {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-faint);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  animation: bounce 2s ease-in-out infinite;
+}
+.hero-scroll svg { width: 20px; height: 20px; opacity: 0.5; }
 
-  /* ─── CTA BANNER ─── */
-  .cta-banner {
-    padding: 80px 60px;
-    background: linear-gradient(135deg, var(--dark) 0%, var(--dark-mid) 100%);
-    text-align: center; position: relative; overflow: hidden;
-  }
-  .cta-banner::before {
-    content: '';
-    position: absolute; inset: 0;
-    background-image: radial-gradient(circle at 30% 50%, rgba(255,45,120,0.12) 0%, transparent 60%),
-                      radial-gradient(circle at 70% 50%, rgba(0,229,255,0.08) 0%, transparent 60%);
-  }
-  .cta-banner h2 {
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 900; color: #fff;
-    line-height: 1.1; letter-spacing: -0.02em;
-    margin-bottom: 16px; position: relative;
-  }
-  .cta-banner p { font-size: 1.05rem; color: rgba(255,255,255,0.5); position: relative; margin-bottom: 36px; }
-  .cta-banner .hero-actions { animation: none; opacity: 1; }
-  .cta-banner .btn-secondary { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.2); }
+/* ═══════════════════════════════════
+   О СТУДИИ
+═══════════════════════════════════ */
+.about {
+  padding: 110px 0;
+  position: relative;
+  overflow: hidden;
+}
 
-  /* ─── FOOTER ─── */
-  footer {
-    background: var(--dark);
-    padding: 60px 60px 30px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-  }
-  .footer-top {
-    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 48px; margin-bottom: 48px;
-  }
-  .footer-brand .nav-logo { font-size: 1.4rem; color: #fff; display: inline-block; margin-bottom: 16px; }
-  .footer-brand p { font-size: 0.85rem; color: rgba(255,255,255,0.35); line-height: 1.7; max-width: 280px; }
-  .footer-socials { display: flex; gap: 10px; margin-top: 24px; }
-  .social-link {
-    width: 38px; height: 38px; border-radius: 8px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,0.4); font-size: 0.85rem; text-decoration: none;
-    transition: all 0.2s;
-  }
-  .social-link:hover { background: var(--neon-pink); border-color: var(--neon-pink); color: #fff; }
-  .footer-col h4 {
-    font-size: 0.75rem; font-weight: 700;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    color: rgba(255,255,255,0.3); margin-bottom: 20px;
-  }
-  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-  .footer-col ul li a {
-    font-size: 0.88rem; color: rgba(255,255,255,0.5);
-    text-decoration: none; transition: color 0.2s;
-  }
-  .footer-col ul li a:hover { color: var(--neon-pink); }
-  .footer-bottom {
-    border-top: 1px solid rgba(255,255,255,0.06);
-    padding-top: 24px; display: flex; justify-content: space-between;
-    align-items: center; flex-wrap: wrap; gap: 12px;
-  }
-  .footer-bottom p { font-size: 0.78rem; color: rgba(255,255,255,0.2); }
+.about::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -120px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
 
-  /* ─── SCROLL ANIMATIONS ─── */
-  .reveal {
-    opacity: 0; transform: translateY(30px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
+.about-header { margin-bottom: 3.5rem; }
 
-  /* ─── MOBILE NAV ─── */
-  .mobile-menu {
-    display: none; position: fixed; inset: 0; z-index: 999;
-    background: rgba(26,10,46,0.97);
-    backdrop-filter: blur(20px);
-    flex-direction: column; align-items: center; justify-content: center;
-    gap: 36px;
-  }
-  .mobile-menu.open { display: flex; }
-  .mobile-menu a {
-    font-size: 1.5rem; font-weight: 700; color: #fff;
-    text-decoration: none; transition: color 0.2s;
-  }
-  .mobile-menu a:hover { color: var(--neon-pink); }
-  .mobile-close {
-    position: absolute; top: 24px; right: 24px;
-    width: 40px; height: 40px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem; color: rgba(255,255,255,0.5);
-  }
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
 
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 1100px) {
-    .services-grid, .equipment-grid { grid-template-columns: repeat(2, 1fr); }
-    .process-steps { grid-template-columns: repeat(3, 1fr); gap: 32px; }
-    .process-steps::before { display: none; }
-    .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
-    .portfolio-card:first-child { grid-column: span 1; }
-  }
-  @media (max-width: 900px) {
-    section { padding: 70px 32px; }
-    nav { padding: 16px 32px; }
-    nav.scrolled { padding: 12px 32px; }
-    .nav-links { display: none; }
-    .hamburger { display: flex; }
-    .footer-top { grid-template-columns: 1fr 1fr; }
-    .about { grid-template-columns: 1fr; }
-    .booking-inner { grid-template-columns: 1fr; }
-    .pricing-grid, .testimonials-grid { grid-template-columns: 1fr; }
-    .services-grid { grid-template-columns: 1fr; }
-    .equipment-grid { grid-template-columns: repeat(2, 1fr); }
-    .form-row { grid-template-columns: 1fr; }
-    .player-bar { padding: 14px 20px; }
-  }
-  @media (max-width: 600px) {
-    .footer-top { grid-template-columns: 1fr; }
-    .equipment-grid { grid-template-columns: 1fr; }
-    .portfolio-grid { grid-template-columns: 1fr; }
-    .process-steps { grid-template-columns: 1fr; }
-    footer { padding: 50px 24px 24px; }
-    .cta-banner { padding: 60px 24px; }
-  }
+.about-card {
+  background: linear-gradient(145deg, rgba(15,31,85,0.8), rgba(13,27,75,0.5));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.about-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright), transparent);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.about-card:hover {
+  border-color: rgba(59,130,246,0.4);
+  box-shadow: 0 0 40px rgba(37,99,235,0.12);
+  transform: translateY(-4px);
+}
+
+.about-icon {
+  width: 56px; height: 56px;
+  background: rgba(37,99,235,0.12);
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+.about-card:hover .about-icon {
+  background: rgba(37,99,235,0.22);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.about-icon svg { width: 26px; height: 26px; color: var(--accent-bright); }
+
+.about-card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.about-card p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+/* ═══════════════════════════════════
+   УСЛУГИ
+═══════════════════════════════════ */
+.services {
+  padding: 110px 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(13,27,75,0.3) 50%, transparent 100%);
+  position: relative;
+}
+
+.services-header { margin-bottom: 3.5rem; }
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.service-card {
+  background: linear-gradient(145deg, rgba(15,31,85,0.7), rgba(10,15,44,0.9));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 26px;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  opacity: 0;
+  z-index: -1;
+  transition: opacity var(--transition);
+}
+
+.service-card:hover {
+  border-color: rgba(59,130,246,0.5);
+  box-shadow: 0 0 50px rgba(37,99,235,0.18), inset 0 0 30px rgba(37,99,235,0.05);
+  transform: translateY(-5px);
+}
+
+.service-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: var(--accent-bright);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: block;
+}
+
+.service-icon {
+  width: 48px; height: 48px;
+  background: rgba(37,99,235,0.1);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+  transition: all var(--transition);
+}
+.service-card:hover .service-icon {
+  background: rgba(37,99,235,0.25);
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+.service-icon svg { width: 22px; height: 22px; color: var(--accent-bright); }
+
+.service-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.service-card p {
+  font-size: 0.87rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.service-price {
+  margin-top: 18px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent-bright);
+}
+
+/* ═══════════════════════════════════
+   ПРИМЕРЫ РАБОТ
+═══════════════════════════════════ */
+.portfolio {
+  padding: 110px 0;
+  position: relative;
+}
+
+.portfolio::before {
+  content: '';
+  position: absolute;
+  top: -60px; left: -100px;
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.portfolio-header { margin-bottom: 3.5rem; }
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.portfolio-card {
+  background: linear-gradient(145deg, rgba(15,31,85,0.6), rgba(10,15,44,0.8));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.portfolio-card:hover {
+  border-color: rgba(59,130,246,0.45);
+  box-shadow: 0 8px 48px rgba(37,99,235,0.15);
+  transform: translateY(-5px);
+}
+
+.portfolio-cover {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, #0D1B4B, #0F2470);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+/* Декоративные волны в обложках */
+.portfolio-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(37,99,235,0.2) 0%, transparent 70%);
+}
+
+.cover-waveform {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 50px;
+  position: relative;
+  z-index: 1;
+}
+
+.cover-waveform span {
+  display: block;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  opacity: 0.7;
+}
+
+.portfolio-cover .play-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10,15,44,0.5);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition);
+  z-index: 2;
+}
+.portfolio-card:hover .play-overlay { opacity: 1; }
+
+.play-btn-lg {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 30px var(--accent-glow);
+  transform: scale(0.8);
+  transition: transform var(--transition);
+}
+.portfolio-card:hover .play-btn-lg { transform: scale(1); }
+.play-btn-lg svg { width: 22px; height: 22px; color: #fff; margin-left: 3px; }
+
+.portfolio-info {
+  padding: 18px 20px;
+}
+
+.track-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: var(--accent-bright);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.track-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.track-artist {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.btn-listen {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-bright);
+  border: 1px solid rgba(59,130,246,0.35);
+  padding: 7px 16px;
+  border-radius: 30px;
+  transition: all var(--transition);
+}
+.btn-listen svg { width: 13px; height: 13px; }
+.btn-listen:hover {
+  background: rgba(37,99,235,0.15);
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+/* ═══════════════════════════════════
+   КОНТАКТЫ
+═══════════════════════════════════ */
+.contacts {
+  padding: 110px 0;
+  background: linear-gradient(180deg, transparent, rgba(13,27,75,0.3) 50%, transparent);
+}
+
+.contacts-header { margin-bottom: 3.5rem; }
+
+.contacts-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.contacts-info { display: flex; flex-direction: column; gap: 28px; }
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.contact-icon {
+  width: 48px; height: 48px;
+  background: rgba(37,99,235,0.1);
+  border: 1px solid rgba(59,130,246,0.22);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.contact-icon svg { width: 22px; height: 22px; color: var(--accent-bright); }
+
+.contact-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.contact-value {
+  font-size: 1rem;
+  font-weight: 600;
+  transition: color var(--transition);
+}
+
+a.contact-value:hover { color: var(--accent-bright); }
+
+.socials {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.social-btn {
+  width: 44px; height: 44px;
+  background: rgba(37,99,235,0.08);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.social-btn svg { width: 20px; height: 20px; color: var(--text-muted); }
+.social-btn:hover {
+  background: rgba(37,99,235,0.2);
+  border-color: rgba(59,130,246,0.45);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+.social-btn:hover svg { color: var(--text-white); }
+
+/* Карта-заглушка */
+.contacts-map {
+  background: linear-gradient(145deg, rgba(15,31,85,0.7), rgba(10,15,44,0.8));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  height: 280px;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--text-faint);
+  font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.contacts-map::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.map-dot {
+  width: 12px; height: 12px;
+  background: var(--accent-bright);
+  border-radius: 50%;
+  box-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(59,130,246,0.3);
+  animation: mapPulse 2s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+.contacts-map span { position: relative; z-index: 1; }
+
+/* CTA блок в контактах */
+.contacts-cta {
+  margin-top: 40px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(59,130,246,0.06));
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+}
+
+.contacts-cta p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+/* ═══════════════════════════════════
+   FOOTER
+═══════════════════════════════════ */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 30px 0;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-copy {
+  font-size: 0.83rem;
+  color: var(--text-faint);
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+.footer-links a {
+  font-size: 0.83rem;
+  color: var(--text-faint);
+  transition: color var(--transition);
+}
+.footer-links a:hover { color: var(--accent-bright); }
+
+/* ═══════════════════════════════════
+   МОДАЛЬНОЕ ОКНО
+═══════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,8,25,0.85);
+  backdrop-filter: blur(12px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: linear-gradient(145deg, #0F1F55, #0A0F2C);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 20px;
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  box-shadow: 0 0 80px rgba(37,99,235,0.2), 0 30px 80px rgba(0,0,0,0.5);
+  transform: scale(0.92);
+  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+}
+
+.modal-overlay.active .modal { transform: scale(1); }
+
+.modal-close {
+  position: absolute;
+  top: 18px; right: 18px;
+  width: 36px; height: 36px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+  color: var(--text-muted);
+}
+.modal-close:hover {
+  background: rgba(59,130,246,0.2);
+  color: var(--text-white);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.modal-close svg { width: 16px; height: 16px; }
+
+.modal-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+
+.modal-phone-block {
+  margin: 16px 0 24px;
+  padding: 16px 20px;
+  background: rgba(37,99,235,0.08);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: var(--radius-sm);
+}
+
+.modal-phone-block p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.modal-phone {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--accent-bright);
+  display: inline-block;
+  transition: color var(--transition), text-shadow var(--transition);
+  letter-spacing: 0.02em;
+}
+.modal-phone:hover {
+  color: #60a5fa;
+  text-shadow: 0 0 20px rgba(59,130,246,0.5);
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+.form-group input {
+  width: 100%;
+  background: rgba(15,31,85,0.5);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--text-white);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.93rem;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form-group input::placeholder { color: var(--text-faint); }
+
+.form-group input:focus {
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+.form-group input.error { border-color: #EF4444; }
+
+.checkbox-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 0 20px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px; height: 18px;
+  accent-color: var(--accent-bright);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkbox-group label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1.5;
+}
+.checkbox-group label a { color: var(--accent-bright); text-decoration: underline; }
+
+.btn-submit {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  color: #fff;
+  font-size: 0.97rem;
+  font-weight: 700;
+  padding: 15px;
+  border-radius: 50px;
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+  letter-spacing: 0.02em;
+}
+.btn-submit:not(:disabled):hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 30px rgba(59,130,246,0.5);
+}
+.btn-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Сообщение об успехе */
+.success-msg {
+  display: none;
+  text-align: center;
+  padding: 24px 0 8px;
+}
+.success-msg.show { display: block; }
+
+.success-icon {
+  width: 70px; height: 70px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px;
+  box-shadow: 0 0 40px var(--accent-glow);
+  animation: scaleIn 0.5s cubic-bezier(.34,1.56,.64,1);
+}
+.success-icon svg { width: 30px; height: 30px; color: #fff; }
+
+.success-msg h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.success-msg p { color: var(--text-muted); font-size: 0.93rem; }
+
+/* ═══════════════════════════════════
+   АНИМАЦИИ (KEYFRAMES)
+═══════════════════════════════════ */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heroPulse {
+  0%, 100% { box-shadow: 0 0 28px var(--accent-glow), 0 0 60px rgba(37,99,235,0.2); }
+  50%       { box-shadow: 0 0 50px rgba(59,130,246,0.55), 0 0 90px rgba(37,99,235,0.35); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(8px); }
+}
+
+@keyframes mapPulse {
+  0%, 100% { box-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(59,130,246,0.3); transform: scale(1); }
+  50%       { box-shadow: 0 0 30px rgba(59,130,246,0.5), 0 0 60px rgba(37,99,235,0.4); transform: scale(1.15); }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ═══════════════════════════════════
+   АДАПТИВНОСТЬ
+═══════════════════════════════════ */
+@media (max-width: 1024px) {
+  .services-grid   { grid-template-columns: repeat(2, 1fr); }
+  .portfolio-grid  { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .about-grid      { grid-template-columns: 1fr; }
+  .services-grid   { grid-template-columns: 1fr; }
+  .portfolio-grid  { grid-template-columns: repeat(2, 1fr); }
+  .contacts-layout { grid-template-columns: 1fr; gap: 36px; }
+  .nav-links       { display: none; }
+  .burger          { display: flex; }
+  .modal           { padding: 32px 24px; }
+  .contacts-map    { height: 200px; }
+}
+
+@media (max-width: 480px) {
+  .portfolio-grid  { grid-template-columns: 1fr; }
+  .footer-inner    { flex-direction: column; text-align: center; }
+  .footer-links    { justify-content: center; flex-wrap: wrap; }
+  .modal           { padding: 28px 20px; }
+}
 </style>
 </head>
+
 <body>
 
-<!-- Cursor -->
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
+<!-- ═══════════════════════════════════
+     НАВИГАЦИЯ
+═══════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <div class="navbar-inner">
+      <a href="#hero" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+            <path d="M12 2 L12 22 M7 6 L7 18 M17 6 L17 18 M2 10 L2 14 M22 10 L22 14"/>
+          </svg>
+        </div>
+        Spring <span>Sound</span> Lab
+      </a>
 
-<!-- Mobile Menu -->
-<div class="mobile-menu" id="mobileMenu">
-  <div class="mobile-close" id="mobileClose">✕</div>
-  <a href="#services" onclick="closeMob()">Услуги</a>
-  <a href="#about" onclick="closeMob()">О Студии</a>
-  <a href="#portfolio" onclick="closeMob()">Портфолио</a>
-  <a href="#equipment" onclick="closeMob()">Оборудование</a>
-  <a href="#pricing" onclick="closeMob()">Тарифы</a>
-  <a href="#booking" onclick="closeMob()">Бронирование</a>
-</div>
+      <ul class="nav-links">
+        <li><a href="#hero">Главная</a></li>
+        <li><a href="#about">О студии</a></li>
+        <li><a href="#services">Услуги</a></li>
+        <li><a href="#portfolio">Примеры работ</a></li>
+        <li><a href="#contacts">Контакты</a></li>
+      </ul>
 
-<!-- NAV -->
-<nav id="mainNav">
-  <a href="#" class="nav-logo">NEON<span>WAVE</span></a>
-  <ul class="nav-links">
-    <li><a href="#services">Услуги</a></li>
-    <li><a href="#about">О Студии</a></li>
-    <li><a href="#portfolio">Портфолио</a></li>
-    <li><a href="#equipment">Оборудование</a></li>
-    <li><a href="#pricing">Тарифы</a></li>
-    <li><a href="#booking" class="nav-cta">Забронировать</a></li>
-  </ul>
-  <div class="hamburger" id="hamburger">
-    <span></span><span></span><span></span>
+      <button class="btn-book" id="openModal">Записаться</button>
+      <button class="burger" id="burger" aria-label="Меню">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero" id="hero">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-
-  <div class="hero-tag"><span class="dot"></span>Студия звукозаписи · Москва</div>
-  <h1>ЗВУК,<span class="line-2">который чувствуют</span></h1>
-  <p class="hero-sub">Профессиональная запись, сведение и мастеринг. Создаём музыку, которая живёт вечно — от инди до крупных лейблов.</p>
-  <div class="hero-actions">
-    <a href="#booking" class="btn-primary"><span>Забронировать сессию</span></a>
-    <a href="#portfolio" class="btn-secondary">
-      <span class="play-icon">
-        <svg viewBox="0 0 10 12" fill="white"><polygon points="0,0 10,6 0,12"/></svg>
-      </span>
-      Слушать портфолио
-    </a>
-  </div>
-
-  <div class="waveform-container">
-    <div class="waveform" id="heroWaveform"></div>
-  </div>
-
-  <div class="stats-row">
-    <div class="stat-item">
-      <div class="stat-num">12<span>+</span></div>
-      <div class="stat-label">Лет опыта</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">840<span>+</span></div>
-      <div class="stat-label">Треков выпущено</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">200<span>+</span></div>
-      <div class="stat-label">Артистов</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">3<span>×</span></div>
-      <div class="stat-label">Grammy Nominated</div>
-    </div>
-  </div>
-</section>
-
-<!-- MARQUEE -->
-<div class="marquee-section">
-  <div class="marquee-track" id="marqueeTrack">
-    <div class="marquee-item">Запись<span class="sep">✦</span></div>
-    <div class="marquee-item">Сведение<span class="sep">✦</span></div>
-    <div class="marquee-item">Мастеринг<span class="sep">✦</span></div>
-    <div class="marquee-item">Продакшн<span class="sep">✦</span></div>
-    <div class="marquee-item">Аранжировка<span class="sep">✦</span></div>
-    <div class="marquee-item">Битмейкинг<span class="sep">✦</span></div>
-    <div class="marquee-item">Вокальный коучинг<span class="sep">✦</span></div>
-    <div class="marquee-item">Подкасты<span class="sep">✦</span></div>
-    <div class="marquee-item">Запись<span class="sep">✦</span></div>
-    <div class="marquee-item">Сведение<span class="sep">✦</span></div>
-    <div class="marquee-item">Мастеринг<span class="sep">✦</span></div>
-    <div class="marquee-item">Продакшн<span class="sep">✦</span></div>
-    <div class="marquee-item">Аранжировка<span class="sep">✦</span></div>
-    <div class="marquee-item">Битмейкинг<span class="sep">✦</span></div>
-    <div class="marquee-item">Вокальный коучинг<span class="sep">✦</span></div>
-    <div class="marquee-item">Подкасты<span class="sep">✦</span></div>
-  </div>
+<!-- Мобильное меню -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hero"      onclick="closeMobileMenu()">Главная</a>
+  <a href="#about"     onclick="closeMobileMenu()">О студии</a>
+  <a href="#services"  onclick="closeMobileMenu()">Услуги</a>
+  <a href="#portfolio" onclick="closeMobileMenu()">Примеры работ</a>
+  <a href="#contacts"  onclick="closeMobileMenu()">Контакты</a>
+  <button class="btn-book" onclick="closeMobileMenu(); openModalFn()">Записаться</button>
 </div>
 
-<!-- SERVICES -->
-<section class="services" id="services">
-  <div class="services-header reveal">
-    <div>
-      <span class="section-tag">// 01 — Услуги</span>
-      <h2 class="section-title">Всё, что нужно<br>для хита</h2>
-    </div>
-    <p class="section-sub">От первой ноты до финального мастера — полный цикл работы с вашей музыкой под одной крышей.</p>
+<!-- ═══════════════════════════════════
+     HERO
+═══════════════════════════════════ -->
+<section class="hero" id="hero">
+  <canvas id="hero-canvas"></canvas>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">Студия звукозаписи · Москва</div>
+    <h1 class="hero-title">
+      Твой звук —<br><em>твоя история</em>
+    </h1>
+    <p class="hero-subtitle">
+      Профессиональная запись, сведение и мастеринг в студии Spring Sound Lab.
+      Создадим звучание, которое запомнится навсегда.
+    </p>
+    <button class="btn-hero" id="openModalHero">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M8 2v4 M16 2v4 M3 10h18 M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+      </svg>
+      Записаться в студию
+    </button>
   </div>
-  <div class="services-grid">
-    <div class="service-card reveal">
-      <div class="service-icon">🎙️</div>
-      <h3>Запись вокала и инструментов</h3>
-      <p>Акустически изолированные кабины, Neumann U87, Grace Design предусилители. Фиксируем каждый нюанс вашего звука.</p>
-      <div class="service-price">от 3 500 ₽/час <small>+ 1 звукорежиссёр</small></div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">🎚️</div>
-      <h3>Сведение (Mixing)</h3>
-      <p>Pro Tools HDX, Neve 8078, SSL бас-процессоры. Сведение в Dolby Atmos для стриминга следующего поколения.</p>
-      <div class="service-price">от 8 000 ₽/трек <small>2 ревизии включены</small></div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">💿</div>
-      <h3>Мастеринг</h3>
-      <p>Аналоговый Manley Vari-Mu + Weiss DS1-MK3. Оптимизация для Spotify, Apple Music, клубного и виниловых форматов.</p>
-      <div class="service-price">от 4 000 ₽/трек <small>стерео и Atmos</small></div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">🎹</div>
-      <h3>Музыкальный продакшн</h3>
-      <p>In-house продюсеры в стилях: Trap, R&B, House, Indie, Pop, Classical. Создаём биты и аранжировки с нуля.</p>
-      <div class="service-price">от 15 000 ₽ <small>за трек под ключ</small></div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">🎬</div>
-      <h3>Саундтреки и джинглы</h3>
-      <p>Музыка для рекламы, кино, игр и брендов. Оркестровые аранжировки, электронные саундскейпы, ambient.</p>
-      <div class="service-price">от 25 000 ₽ <small>по брифу</small></div>
-    </div>
-    <div class="service-card reveal">
-      <div class="service-icon">🎤</div>
-      <h3>Вокальный коучинг & Подкасты</h3>
-      <p>Индивидуальные занятия с профессиональным вокальным коучем. Студийная запись подкастов с монтажом.</p>
-      <div class="service-price">от 2 500 ₽/час <small>первая консультация — free</small></div>
-    </div>
+
+  <div class="hero-scroll">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 5v14 M19 12l-7 7-7-7"/>
+    </svg>
+    SCROLL
   </div>
 </section>
 
-<!-- ABOUT -->
-<section id="about" style="padding: 100px 60px;">
-  <div class="about">
-    <div class="about-visual reveal">
-      <div class="about-img-main">
-        <div class="studio-3d">
-          <div class="studio-floor"></div>
-          <div class="studio-grid-h"></div>
-          <div class="studio-grid-v"></div>
-          <!-- Mixing console SVG -->
-          <svg class="console-svg" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Console body -->
-            <rect x="30" y="80" width="340" height="100" rx="8" fill="rgba(255,255,255,0.05)" stroke="rgba(178,75,243,0.3)" stroke-width="1"/>
-            <!-- Faders row 1 -->
-            <g opacity="0.8">
-              <rect x="50" y="90" width="6" height="40" rx="3" fill="rgba(255,255,255,0.08)"/>
-              <rect x="50" y="105" width="6" height="10" rx="2" fill="#FF2D78"/>
-              <rect x="70" y="90" width="6" height="40" rx="3" fill="rgba(255,255,255,0.08)"/>
-              <rect x="70" y="115" width="6" height="10" rx="2" fill="#B24BF3"/>
-              <rect x="90" y="90" width="6" height="40" rx="3" fill="rgba(255,255,255,0.08)"/>
-              <rect x="90" y="100" width="6" height="10" rx="2" fill="#00E5FF"/>
-              <rect x="110" y="90" width="6" height="40" rx="3" fill="rgba(255,255,255,0.08)"/>
-              <rect x="110" y="108" width="6" height="10" rx="2" fill="#FF2D78"/>
-              <rect x="130" y="90" width="6" height="40" rx="3" fill="rgba(255,255,255,0.08)"/>
-              <rect x="130" y="112" width="6" height="10" rx="2" fill="#B24BF3"/>
-              <rect x="150" y="90" width="6" height="40" rx="3" fill="rgba(255,255,255,0.08)"/>
-              <rect x="150" y="102" width="6" height="10" rx="2" fill="#00E5FF"/>
-              <rect x="170" y="90" width="6" height="40" rx="3" fill="rgba(255,255,255,0.08)"/>
-              <rect x="170" y="118" width="6" height="10" rx="2" fill="#FF2D78"/>
-              <rect x="190" y="90" width="6" height="40" rx="3" fill="rgba(255,255,255,0.08)"/>
-              <rect x="190" y="106" width="6" height="10" rx="2" fill="#B24BF3"/>
-            </g>
-            <!-- Knobs -->
-            <g opacity="0.7">
-              <circle cx="230" cy="110" r="8" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
-              <line x1="230" y1="103" x2="230" y2="107" stroke="#FF2D78" stroke-width="1.5" stroke-linecap="round"/>
-              <circle cx="255" cy="110" r="8" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
-              <line x1="249" y1="106" x2="252" y2="109" stroke="#B24BF3" stroke-width="1.5" stroke-linecap="round"/>
-              <circle cx="280" cy="110" r="8" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
-              <line x1="280" y1="103" x2="280" y2="107" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round"/>
-              <circle cx="305" cy="110" r="8" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
-              <line x1="305" y1="103" x2="305" y2="107" stroke="#FF2D78" stroke-width="1.5" stroke-linecap="round"/>
-            </g>
-            <!-- VU meters -->
-            <rect x="230" y="130" width="120" height="16" rx="3" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-            <rect x="232" y="132" width="60" height="12" rx="2" fill="url(#vuGrad)"/>
-            <defs>
-              <linearGradient id="vuGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#00E5FF"/>
-                <stop offset="70%" stop-color="#B24BF3"/>
-                <stop offset="100%" stop-color="#FF2D78"/>
-              </linearGradient>
-            </defs>
-            <!-- Screen -->
-            <rect x="50" y="145" width="160" height="26" rx="4" fill="rgba(0,229,255,0.06)" stroke="rgba(0,229,255,0.2)" stroke-width="1"/>
-            <text x="58" y="162" font-family="monospace" font-size="9" fill="rgba(0,229,255,0.7)">▶ TRACK 01 — 3:42</text>
+<!-- ═══════════════════════════════════
+     О СТУДИИ
+═══════════════════════════════════ -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-header">
+      <span class="section-label">О нас</span>
+      <h2 class="section-title">Звучи как профессионал</h2>
+      <p class="section-sub">
+        Spring Sound Lab — это не просто студия, это пространство, где рождается настоящее искусство.
+      </p>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-card reveal">
+        <div class="about-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M9 18V5l12-2v13 M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
           </svg>
         </div>
+        <h3>Профессиональное оборудование</h3>
+        <p>
+          Студия оснащена топовыми микрофонами Neumann, предусилителями API и Neve,
+          а также акустически выверенным помещением для идеального звука без компромиссов.
+        </p>
       </div>
-      <div class="about-float-badge">
-        <div class="big">A+</div>
-        <div class="small">Акустика</div>
+
+      <div class="about-card reveal reveal-delay-1">
+        <div class="about-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3>Опытная команда</h3>
+        <p>
+          Наши звукорежиссёры и продюсеры работают в индустрии более 10 лет.
+          Мы знаем, как раскрыть твой уникальный голос и довести трек до идеала.
+        </p>
       </div>
-    </div>
-    <div class="about-content">
-      <span class="section-tag">// 02 — О студии</span>
-      <h2 class="section-title reveal">Построено для перфекционистов</h2>
-      <p class="section-sub reveal">NeonWave Studio — это 800 м² профессионального пространства в центре Москвы. Три live-зала, два control-room'а и репетиционное пространство.</p>
-      <ul class="features-list reveal">
-        <li><span class="check">✓</span><span>Звукоизоляция Floyd Rose — NRC 0.95, полная акустическая независимость залов</span></li>
-        <li><span class="check">✓</span><span>Аналоговый тракт Neve + SSL с прямым подключением к Pro Tools HDX 32-bit / 192kHz</span></li>
-        <li><span class="check">✓</span><span>Зал для живых оркестров до 24 музыкантов с панорамным окном</span></li>
-        <li><span class="check">✓</span><span>Dolby Atmos сертифицированный мониторинг — 9.1.6 speaker setup</span></li>
-        <li><span class="check">✓</span><span>Лицензированные сэмпл-библиотеки Spitfire, Native Instruments, Output</span></li>
-        <li><span class="check">✓</span><span>Комната отдыха для артистов, кухня, лаунж-зона 24/7</span></li>
-      </ul>
+
+      <div class="about-card reveal reveal-delay-2">
+        <div class="about-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10"/>
+          </svg>
+        </div>
+        <h3>Уютная атмосфера</h3>
+        <p>
+          Комфортная лаунж-зона, кофе и спокойная обстановка — всё для того,
+          чтобы ты чувствовал себя как дома и записывался с удовольствием.
+        </p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- PORTFOLIO -->
+<!-- ═══════════════════════════════════
+     УСЛУГИ
+═══════════════════════════════════ -->
+<section class="services" id="services">
+  <div class="container">
+    <div class="services-header">
+      <span class="section-label">Что мы делаем</span>
+      <h2 class="section-title">Наши услуги</h2>
+      <p class="section-sub">От идеи до готового трека — полный цикл производства</p>
+    </div>
+
+    <div class="services-grid">
+      <!-- Запись вокала -->
+      <div class="service-card reveal">
+        <span class="service-badge">01 · Запись</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z M19 10v2a7 7 0 0 1-14 0v-2 M12 19v3 M8 22h8"/>
+          </svg>
+        </div>
+        <h3>Запись вокала</h3>
+        <p>Звукоизолированная вокальная кабина с акустической обработкой и лучшими конденсаторными микрофонами.</p>
+        <div class="service-price">от 2 500 ₽ / час</div>
+      </div>
+
+      <!-- Запись инструментов -->
+      <div class="service-card reveal reveal-delay-1">
+        <span class="service-badge">02 · Запись</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M9 18V5l12-2v13 M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+          </svg>
+        </div>
+        <h3>Запись инструментов</h3>
+        <p>Большой живой зал для акустики, барабанов и оркестровых инструментов. Пианино Yamaha Grand в наличии.</p>
+        <div class="service-price">от 3 500 ₽ / час</div>
+      </div>
+
+      <!-- Сведение -->
+      <div class="service-card reveal reveal-delay-2">
+        <span class="service-badge">03 · Постпродакшн</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M2 12h4 M18 12h4 M6 12a6 6 0 0 0 12 0 M12 6V2 M12 22v-4"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <h3>Сведение</h3>
+        <p>Профессиональное сведение на студийных мониторах высокого класса. Добиваемся баланса, пространства и характера.</p>
+        <div class="service-price">от 5 000 ₽ / трек</div>
+      </div>
+
+      <!-- Мастеринг -->
+      <div class="service-card reveal reveal-delay-3">
+        <span class="service-badge">04 · Финальный этап</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <h3>Мастеринг</h3>
+        <p>Финальная обработка для стриминга, радио и физических носителей. LUFS-нормализация и широкая совместимость.</p>
+        <div class="service-price">от 3 000 ₽ / трек</div>
+      </div>
+
+      <!-- Подкасты -->
+      <div class="service-card reveal reveal-delay-4">
+        <span class="service-badge">05 · Подкасты</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1 M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z M6 1v3 M10 1v3 M14 1v3"/>
+          </svg>
+        </div>
+        <h3>Подкасты</h3>
+        <p>Полный цикл для подкастеров: запись, монтаж, обработка голоса и вывод в Spotify, Apple, Яндекс.Музыку.</p>
+        <div class="service-price">от 2 000 ₽ / эпизод</div>
+      </div>
+
+      <!-- Индивидуальный пакет -->
+      <div class="service-card reveal reveal-delay-5" style="border-color: rgba(59,130,246,0.3); background: linear-gradient(145deg, rgba(37,99,235,0.12), rgba(10,15,44,0.9));">
+        <span class="service-badge">06 · Комплекс</span>
+        <div class="service-icon" style="background: rgba(37,99,235,0.2);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h3>Индивидуальный пакет</h3>
+        <p>Обсудим твой проект и соберём индивидуальный пакет услуг под твои задачи и бюджет. Без переплат.</p>
+        <div class="service-price" style="color: #60a5fa;">Цена по запросу</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     ПРИМЕРЫ РАБОТ
+═══════════════════════════════════ -->
 <section class="portfolio" id="portfolio">
-  <div class="portfolio-header reveal">
-    <div>
-      <span class="section-tag">// 03 — Портфолио</span>
-      <h2 class="section-title">Музыка,<br>которую мы создали</h2>
+  <div class="container">
+    <div class="portfolio-header">
+      <span class="section-label">Портфолио</span>
+      <h2 class="section-title">Примеры работ</h2>
+      <p class="section-sub">Треки, записанные и спродюсированные в нашей студии</p>
     </div>
-    <div class="filter-tabs">
-      <button class="filter-tab active">Все</button>
-      <button class="filter-tab">Pop</button>
-      <button class="filter-tab">Hip-Hop</button>
-      <button class="filter-tab">Electronic</button>
-      <button class="filter-tab">R&B</button>
-    </div>
-  </div>
-  <div class="portfolio-grid reveal">
-    <div class="portfolio-card" onclick="playTrack('Midnight Drive','Ariel Nova')">
-      <div class="portfolio-bg" style="background: linear-gradient(135deg, #1a0a2e 0%, #4a1060 40%, #ff2d78 100%);"></div>
-      <div class="portfolio-overlay">
-        <div class="p-card-genre">Electronic / Synthwave</div>
-        <div class="p-card-title">Midnight Drive</div>
-        <div class="p-card-artist">Ariel Nova · 2024</div>
-      </div>
-      <div class="p-card-play"><svg width="10" viewBox="0 0 10 12" fill="white"><polygon points="0,0 10,6 0,12"/></svg></div>
-    </div>
-    <div class="portfolio-card" onclick="playTrack('Golden Hour','Marcus Veil')">
-      <div class="portfolio-bg" style="background: linear-gradient(135deg, #1a1a0a 0%, #4a3a10 40%, #ffb800 100%);"></div>
-      <div class="portfolio-overlay">
-        <div class="p-card-genre">R&B / Soul</div>
-        <div class="p-card-title">Golden Hour</div>
-        <div class="p-card-artist">Marcus Veil · 2024</div>
-      </div>
-      <div class="p-card-play"><svg width="10" viewBox="0 0 10 12" fill="white"><polygon points="0,0 10,6 0,12"/></svg></div>
-    </div>
-    <div class="portfolio-card" onclick="playTrack('Static City','KVRN')">
-      <div class="portfolio-bg" style="background: linear-gradient(135deg, #0a1a2e 0%, #104060 40%, #00e5ff 100%);"></div>
-      <div class="portfolio-overlay">
-        <div class="p-card-genre">Hip-Hop / Trap</div>
-        <div class="p-card-title">Static City</div>
-        <div class="p-card-artist">KVRN · 2023</div>
-      </div>
-      <div class="p-card-play"><svg width="10" viewBox="0 0 10 12" fill="white"><polygon points="0,0 10,6 0,12"/></svg></div>
-    </div>
-    <div class="portfolio-card" onclick="playTrack('Bloom','Sena Park')">
-      <div class="portfolio-bg" style="background: linear-gradient(135deg, #1a0a1a 0%, #3d1060 40%, #b24bf3 100%);"></div>
-      <div class="portfolio-overlay">
-        <div class="p-card-genre">Indie Pop</div>
-        <div class="p-card-title">Bloom</div>
-        <div class="p-card-artist">Sena Park · 2023</div>
-      </div>
-      <div class="p-card-play"><svg width="10" viewBox="0 0 10 12" fill="white"><polygon points="0,0 10,6 0,12"/></svg></div>
-    </div>
-  </div>
-</section>
 
-<!-- EQUIPMENT -->
-<section class="equipment" id="equipment">
-  <div class="reveal">
-    <span class="section-tag">// 04 — Оборудование</span>
-    <h2 class="section-title">Только топовое железо</h2>
-    <p class="section-sub">Инвестиции в оборудование — это инвестиции в ваш звук. Никаких компромиссов.</p>
-  </div>
-  <div class="equipment-grid">
-    <div class="equip-card reveal">
-      <div class="equip-brand">Neumann</div>
-      <div class="equip-name">U87 Ai + TLM 103</div>
-      <div class="equip-desc">Классика студийной записи. Мягкий, детальный звук для любого источника.</div>
-    </div>
-    <div class="equip-card reveal">
-      <div class="equip-brand">Neve</div>
-      <div class="equip-name">8078 Console</div>
-      <div class="equip-desc">Аналоговый тёплый звук, который сделал сотни хитов. 72 канала, VCA-группы.</div>
-    </div>
-    <div class="equip-card reveal">
-      <div class="equip-brand">Avid</div>
-      <div class="equip-name">Pro Tools | HDX</div>
-      <div class="equip-desc">Профессиональная DAW с аппаратным DSP. 32-bit float, 192kHz, 256 треков.</div>
-    </div>
-    <div class="equip-card reveal">
-      <div class="equip-brand">Manley</div>
-      <div class="equip-name">Vari-Mu Mastering</div>
-      <div class="equip-desc">Легендарный ламповый компрессор для мастеринга. Тот самый "склей".</div>
-    </div>
-    <div class="equip-card reveal">
-      <div class="equip-brand">Genelec</div>
-      <div class="equip-name">The Ones + 1032C</div>
-      <div class="equip-desc">Студийные мониторы с коаксиальным динамиком. Идеальная стереосцена.</div>
-    </div>
-    <div class="equip-card reveal">
-      <div class="equip-brand">Universal Audio</div>
-      <div class="equip-name">Apollo x16 + UAD Plugins</div>
-      <div class="equip-desc">DSP-ускоренные плагины: 1176, LA-2A, Neve 1073 — аналог без задержки.</div>
-    </div>
-    <div class="equip-card reveal">
-      <div class="equip-brand">Steinway</div>
-      <div class="equip-name">Model D Grand Piano</div>
-      <div class="equip-desc">274 см концертный рояль в специально акустически настроенном зале.</div>
-    </div>
-    <div class="equip-card reveal">
-      <div class="equip-brand">Roland / Moog</div>
-      <div class="equip-name">Синтезаторный парк</div>
-      <div class="equip-desc">Roland Jupiter-8, Moog Minimoog, Prophet-6, Oberheim OB-X8 и более 30 единиц.</div>
-    </div>
-  </div>
-</section>
-
-<!-- PROCESS -->
-<section class="process">
-  <div style="text-align:center;" class="reveal">
-    <span class="section-tag">// 05 — Как мы работаем</span>
-    <h2 class="section-title">От идеи до релиза</h2>
-  </div>
-  <div class="process-steps">
-    <div class="process-step reveal">
-      <div class="step-num">01</div>
-      <h4>Консультация</h4>
-      <p>Обсуждаем ваш проект, референсы и цели. Бесплатно, 30 минут.</p>
-    </div>
-    <div class="process-step reveal">
-      <div class="step-num">02</div>
-      <h4>Пре-продакшн</h4>
-      <p>Подбираем продюсера, планируем сессии, согласовываем смету.</p>
-    </div>
-    <div class="process-step reveal">
-      <div class="step-num">03</div>
-      <h4>Запись</h4>
-      <p>Основные сессии: вокал, инструменты, overdubs в нашем зале.</p>
-    </div>
-    <div class="process-step reveal">
-      <div class="step-num">04</div>
-      <h4>Mix & Master</h4>
-      <p>Профессиональное сведение и мастеринг с ревизиями.</p>
-    </div>
-    <div class="process-step reveal">
-      <div class="step-num">05</div>
-      <h4>Релиз</h4>
-      <p>Дистрибуция на все платформы через наших партнёров.</p>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section class="testimonials">
-  <div style="text-align:center;" class="reveal">
-    <span class="section-tag">// 06 — Отзывы</span>
-    <h2 class="section-title">Артисты о нас</h2>
-  </div>
-  <div class="testimonials-grid">
-    <div class="testimonial-card reveal">
-      <div class="quote">"</div>
-      <div class="stars">★★★★★</div>
-      <p>NeonWave полностью изменила мой звук. Команда понимает тебя с полуслова — пришёл с идеей, вышел с хитом. Мастеринг звучит профессионально на любой системе.</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">AR</div>
-        <div>
-          <div class="author-name">Ariel Nova</div>
-          <div class="author-role">Electronic artist · 4M стримов</div>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card reveal">
-      <div class="quote">"</div>
-      <div class="stars">★★★★★</div>
-      <p>Работал с разными студиями Москвы — NeonWave на голову выше. Neve-пульт даёт такую теплоту, которую не добить плагинами. Рекомендую всем серьёзным артистам.</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">MV</div>
-        <div>
-          <div class="author-name">Marcus Veil</div>
-          <div class="author-role">R&B / Soul · Universal Music</div>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card reveal">
-      <div class="quote">"</div>
-      <div class="stars">★★★★★</div>
-      <p>Записывала саундтрек к сериалу в три ночи — ребята были с нами до последнего. Атмосфера студии вдохновляет. Мой трек попал в топ Яндекс.Музыки!</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">SP</div>
-        <div>
-          <div class="author-name">Sena Park</div>
-          <div class="author-role">Indie Pop · 2.1M слушателей</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PRICING -->
-<section class="pricing" id="pricing">
-  <div class="pricing-header reveal">
-    <span class="section-tag">// 07 — Тарифы</span>
-    <h2 class="section-title">Прозрачные цены</h2>
-    <p class="section-sub">Никаких скрытых платежей. Выбирайте пакет или составьте своё.</p>
-    <div class="pricing-toggle">
-      <button class="toggle-btn active" onclick="setPricing('hourly', this)">Почасово</button>
-      <button class="toggle-btn" onclick="setPricing('package', this)">Пакеты</button>
-    </div>
-  </div>
-  <div class="pricing-grid" id="pricingGrid">
-    <div class="pricing-card reveal">
-      <div class="plan-name">Starter</div>
-      <div class="plan-price"><span>₽</span>3 500</div>
-      <div class="plan-desc">в час · минимум 3 часа</div>
-      <ul class="plan-features">
-        <li><span class="chk">✓</span>Один зал записи</li>
-        <li><span class="chk">✓</span>Звукорежиссёр включён</li>
-        <li><span class="chk">✓</span>Базовый микрофонный парк</li>
-        <li><span class="chk">✓</span>Запись в Pro Tools</li>
-        <li><span class="no">—</span><span style="opacity:0.3">Аналоговый пульт Neve</span></li>
-        <li><span class="no">—</span><span style="opacity:0.3">Мастеринг включён</span></li>
-      </ul>
-      <button class="btn-plan">Выбрать</button>
-    </div>
-    <div class="pricing-card popular reveal">
-      <div class="popular-badge">Хит</div>
-      <div class="plan-name">Professional</div>
-      <div class="plan-price"><span>₽</span>7 200</div>
-      <div class="plan-desc">в час · полный доступ</div>
-      <ul class="plan-features">
-        <li><span class="chk">✓</span>Все три зала записи</li>
-        <li><span class="chk">✓</span>Старший звукорежиссёр</li>
-        <li><span class="chk">✓</span>Neve 8078 Console</li>
-        <li><span class="chk">✓</span>Полный синтезаторный парк</li>
-        <li><span class="chk">✓</span>Dolby Atmos мониторинг</li>
-        <li><span class="no">—</span><span style="opacity:0.3">Мастеринг включён</span></li>
-      </ul>
-      <button class="btn-plan">Выбрать</button>
-    </div>
-    <div class="pricing-card reveal">
-      <div class="plan-name">Full Production</div>
-      <div class="plan-price"><span>₽</span>42 000</div>
-      <div class="plan-desc">в день · трек под ключ</div>
-      <ul class="plan-features">
-        <li><span class="chk">✓</span>8 часов студии</li>
-        <li><span class="chk">✓</span>Продюсер + звукорежиссёр</li>
-        <li><span class="chk">✓</span>Neve 8078 + все студии</li>
-        <li><span class="chk">✓</span>Сведение включено</li>
-        <li><span class="chk">✓</span>Мастеринг включён</li>
-        <li><span class="chk">✓</span>Дистрибуция на платформы</li>
-      </ul>
-      <button class="btn-plan">Выбрать</button>
-    </div>
-  </div>
-</section>
-
-<!-- BOOKING -->
-<section class="booking" id="booking">
-  <div class="booking-inner">
-    <div class="booking-info reveal">
-      <span class="section-tag">// 08 — Бронирование</span>
-      <h2 class="section-title">Запишитесь<br>прямо сейчас</h2>
-      <p class="section-sub">Студия доступна 24/7. Ответим в течение 2 часов и подберём удобное время для вашего проекта.</p>
-      <div class="contact-items">
-        <div class="contact-item">
-          <div class="contact-icon">📞</div>
-          <div>
-            <h4>Телефон</h4>
-            <p>+7 (495) 123-45-67</p>
+    <div class="portfolio-grid">
+      <!-- Карточка 1 -->
+      <div class="portfolio-card reveal">
+        <div class="portfolio-cover" style="background: linear-gradient(135deg, #0D1B4B, #1E3A8A);">
+          <div class="cover-waveform" id="wf1"></div>
+          <div class="play-overlay">
+            <div class="play-btn-lg">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
           </div>
         </div>
-        <div class="contact-item">
-          <div class="contact-icon">✉️</div>
-          <div>
-            <h4>Email</h4>
-            <p>hello@neonwave.studio</p>
+        <div class="portfolio-info">
+          <span class="track-tag">Поп · 2024</span>
+          <div class="track-name">Весенний дождь</div>
+          <div class="track-artist">Анна Светлова</div>
+          <button class="btn-listen">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Слушать
+          </button>
+        </div>
+      </div>
+
+      <!-- Карточка 2 -->
+      <div class="portfolio-card reveal reveal-delay-1">
+        <div class="portfolio-cover" style="background: linear-gradient(135deg, #1E1B4B, #2563EB);">
+          <div class="cover-waveform" id="wf2"></div>
+          <div class="play-overlay">
+            <div class="play-btn-lg">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
           </div>
         </div>
-        <div class="contact-item">
-          <div class="contact-icon">📍</div>
-          <div>
-            <h4>Адрес</h4>
-            <p>Москва, ул. Арбат, 12, этаж 3</p>
+        <div class="portfolio-info">
+          <span class="track-tag">R&amp;B · 2024</span>
+          <div class="track-name">Ночной город</div>
+          <div class="track-artist">Максим Грей</div>
+          <button class="btn-listen">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Слушать
+          </button>
+        </div>
+      </div>
+
+      <!-- Карточка 3 -->
+      <div class="portfolio-card reveal reveal-delay-2">
+        <div class="portfolio-cover" style="background: linear-gradient(135deg, #0C4A6E, #0369A1);">
+          <div class="cover-waveform" id="wf3"></div>
+          <div class="play-overlay">
+            <div class="play-btn-lg">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
           </div>
         </div>
-        <div class="contact-item">
-          <div class="contact-icon">🕐</div>
-          <div>
-            <h4>Режим работы</h4>
-            <p>24 / 7 — без выходных</p>
+        <div class="portfolio-info">
+          <span class="track-tag">Инди · 2024</span>
+          <div class="track-name">Горизонт</div>
+          <div class="track-artist">Trio Waves</div>
+          <button class="btn-listen">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Слушать
+          </button>
+        </div>
+      </div>
+
+      <!-- Карточка 4 -->
+      <div class="portfolio-card reveal reveal-delay-3">
+        <div class="portfolio-cover" style="background: linear-gradient(135deg, #1E3A5F, #1D4ED8);">
+          <div class="cover-waveform" id="wf4"></div>
+          <div class="play-overlay">
+            <div class="play-btn-lg">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="map-preview">
-        <div class="map-grid-h"></div>
-        <div class="map-grid-v"></div>
-        <div class="map-pin">
-          <div class="map-pin-dot"></div>
-          <div class="map-label">NEONWAVE STUDIO</div>
+        <div class="portfolio-info">
+          <span class="track-tag">Электро · 2023</span>
+          <div class="track-name">Нейронные пути</div>
+          <div class="track-artist">DJ Syntax</div>
+          <button class="btn-listen">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Слушать
+          </button>
         </div>
       </div>
-    </div>
-    <div class="booking-form reveal">
-      <h3>Оставить заявку</h3>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Имя</label>
-          <input type="text" placeholder="Ваше имя">
+
+      <!-- Карточка 5 -->
+      <div class="portfolio-card reveal reveal-delay-4">
+        <div class="portfolio-cover" style="background: linear-gradient(135deg, #0F172A, #1E40AF);">
+          <div class="cover-waveform" id="wf5"></div>
+          <div class="play-overlay">
+            <div class="play-btn-lg">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
         </div>
-        <div class="form-group">
-          <label>Телефон / Telegram</label>
-          <input type="text" placeholder="+7 (___) ___-__-__">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" placeholder="your@email.com">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Услуга</label>
-          <select>
-            <option>Запись</option>
-            <option>Сведение</option>
-            <option>Мастеринг</option>
-            <option>Продакшн</option>
-            <option>Полный пакет</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Желаемая дата</label>
-          <input type="date">
+        <div class="portfolio-info">
+          <span class="track-tag">Хип-хоп · 2023</span>
+          <div class="track-name">Уличная философия</div>
+          <div class="track-artist">Саша Блэк</div>
+          <button class="btn-listen">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Слушать
+          </button>
         </div>
       </div>
-      <div class="form-group">
-        <label>О проекте</label>
-        <textarea placeholder="Расскажите о вашем проекте, жанре, референсах..."></textarea>
+
+      <!-- Карточка 6 — заглушка -->
+      <div class="portfolio-card reveal reveal-delay-5">
+        <div class="portfolio-cover" style="background: linear-gradient(135deg, #0A0F2C, #1E3A8A); opacity: 0.6;">
+          <div style="text-align: center; color: var(--text-faint); position: relative; z-index: 1; padding: 20px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;margin:0 auto 12px;opacity:0.5;">
+              <path d="M12 5v14 M5 12h14" stroke-linecap="round"/>
+            </svg>
+            <div style="font-size:0.82rem;">Здесь будет<br>ваша работа</div>
+          </div>
+        </div>
+        <div class="portfolio-info">
+          <span class="track-tag">Скоро</span>
+          <div class="track-name">Новый трек</div>
+          <div class="track-artist">Ваш артист</div>
+          <button class="btn-listen" style="opacity:0.5;cursor:default;">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Слушать
+          </button>
+        </div>
       </div>
-      <button class="btn-book" onclick="submitForm()">Отправить заявку →</button>
     </div>
   </div>
 </section>
 
-<!-- CTA BANNER -->
-<div class="cta-banner">
-  <h2>Готовы записать<br>свой лучший трек?</h2>
-  <p>Первая консультация бесплатно. Без обязательств.</p>
-  <div class="hero-actions">
-    <a href="#booking" class="btn-primary"><span>Начать сейчас</span></a>
-    <a href="tel:+74951234567" class="btn-secondary" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.2);">
-      <span class="play-icon">
-        <svg viewBox="0 0 24 24" width="12" fill="white"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-      </span>
-      Позвонить сейчас
-    </a>
-  </div>
-</div>
+<!-- ═══════════════════════════════════
+     КОНТАКТЫ
+═══════════════════════════════════ -->
+<section class="contacts" id="contacts">
+  <div class="container">
+    <div class="contacts-header">
+      <span class="section-label">Связаться</span>
+      <h2 class="section-title">Контакты</h2>
+      <p class="section-sub">Приходи к нам или напиши — ответим в течение часа</p>
+    </div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <a href="#" class="nav-logo">NEON<span style="color:var(--neon-pink)">WAVE</span></a>
-      <p>Профессиональная студия звукозаписи в центре Москвы. Мы создаём музыку, которая работает.</p>
-      <div class="footer-socials">
-        <a class="social-link" href="#" title="Instagram">in</a>
-        <a class="social-link" href="#" title="VK">VK</a>
-        <a class="social-link" href="#" title="YouTube">YT</a>
-        <a class="social-link" href="#" title="Telegram">TG</a>
-        <a class="social-link" href="#" title="Spotify">SP</a>
+    <div class="contacts-layout">
+      <div class="contacts-info">
+
+        <div class="contact-item reveal">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z M12 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-label">Адрес</div>
+            <div class="contact-value">Москва, ул. Студийная, д. 12, этаж 3</div>
+          </div>
+        </div>
+
+        <div class="contact-item reveal reveal-delay-1">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11.6 19.79 19.79 0 0 1 1.61 3a2 2 0 0 1 1.99-2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.07a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.72 15.5z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-label">Телефон</div>
+            <a href="tel:+79001234567" class="contact-value">+7 (900) 123-45-67</a>
+          </div>
+        </div>
+
+        <div class="contact-item reveal reveal-delay-2">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22 6l-10 7L2 6"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-label">Email</div>
+            <a href="mailto:info@springsoundlab.ru" class="contact-value">info@springsoundlab.ru</a>
+          </div>
+        </div>
+
+        <div class="contact-item reveal reveal-delay-3">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div>
+            <div class="contact-label">Часы работы</div>
+            <div class="contact-value">Ежедневно, 10:00 — 22:00</div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-4">
+          <div class="contact-label" style="margin-bottom: 12px;">Соцсети</div>
+          <div class="socials">
+            <!-- ВКонтакте -->
+            <a href="#" class="social-btn" aria-label="ВКонтакте">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21.547 7h-3.29a.743.743 0 0 0-.655.392s-1.312 2.416-1.734 3.23C14.734 12.813 14 12.126 14 11.11V7.603A1.104 1.104 0 0 0 12.896 6.5h-2.474a1.982 1.982 0 0 0-1.75.813s1.255-.204 1.255 1.49c0 .42.022 1.626.04 2.64a.73.73 0 0 1-1.272.503 21.54 21.54 0 0 1-2.498-4.543.693.693 0 0 0-.63-.403h-2.99a.508.508 0 0 0-.48.685C3.005 10.175 6.918 18 11.38 18h1.878a.742.742 0 0 0 .742-.742v-1.135a.73.73 0 0 1 1.23-.53l2.247 2.112a1.09 1.09 0 0 0 .746.295h2.953c1.424 0 1.424-.988.647-1.753-.546-.538-2.518-2.617-2.518-2.617a1.02 1.02 0 0 1-.078-1.323c.637-.84 1.68-2.212 2.122-2.8.603-.804 1.697-2.507.197-2.507z"/>
+              </svg>
+            </a>
+            <!-- Telegram -->
+            <a href="#" class="social-btn" aria-label="Telegram">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+              </svg>
+            </a>
+            <!-- YouTube -->
+            <a href="#" class="social-btn" aria-label="YouTube">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </a>
+            <!-- Instagram -->
+            <a href="#" class="social-btn" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="contacts-cta reveal">
+          <p>Готов воплотить свою идею в жизнь? Запишись на сессию прямо сейчас!</p>
+          <button class="btn-book" id="openModalContacts" style="font-size:0.95rem; padding:13px 30px;">
+            Записаться в студию
+          </button>
+        </div>
+      </div>
+
+      <!-- Карта-заглушка -->
+      <div class="contacts-map reveal reveal-delay-2">
+        <div class="map-dot"></div>
+        <span>Москва, ул. Студийная, д. 12</span>
+        <span style="font-size:0.78rem; color: var(--accent-bright);">Здесь будет интерактивная карта</span>
       </div>
     </div>
-    <div class="footer-col">
-      <h4>Услуги</h4>
-      <ul>
-        <li><a href="#">Запись</a></li>
-        <li><a href="#">Сведение</a></li>
-        <li><a href="#">Мастеринг</a></li>
-        <li><a href="#">Продакшн</a></li>
-        <li><a href="#">Подкасты</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Студия</h4>
-      <ul>
-        <li><a href="#">О нас</a></li>
-        <li><a href="#">Портфолио</a></li>
-        <li><a href="#">Оборудование</a></li>
-        <li><a href="#">Команда</a></li>
-        <li><a href="#">Блог</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Контакты</h4>
-      <ul>
-        <li><a href="#">+7 (495) 123-45-67</a></li>
-        <li><a href="#">hello@neonwave.studio</a></li>
-        <li><a href="#">Арбат, 12, Москва</a></li>
-        <li><a href="#">Бронирование</a></li>
-        <li><a href="#">FAQ</a></li>
-      </ul>
-    </div>
   </div>
-  <div class="footer-bottom">
-    <p>© 2025 NeonWave Studio. Все права защищены.</p>
-    <p>Политика конфиденциальности · Договор оферты</p>
+</section>
+
+<!-- ═══════════════════════════════════
+     ФУТЕР
+═══════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-copy">© 2025 Spring Sound Lab. Все права защищены.</div>
+      <div class="footer-links">
+        <a href="#">Политика конфиденциальности</a>
+        <a href="#">Публичная оферта</a>
+      </div>
+    </div>
   </div>
 </footer>
 
-<!-- AUDIO PLAYER -->
-<div class="player-bar" id="playerBar">
-  <div class="player-info">
-    <div class="player-title" id="playerTitle">Midnight Drive</div>
-    <div class="player-artist" id="playerArtist">Ariel Nova</div>
-  </div>
-  <div class="player-controls">
-    <button class="player-btn">⏮</button>
-    <button class="player-btn main" id="playBtn" onclick="togglePlay()">▶</button>
-    <button class="player-btn">⏭</button>
-  </div>
-  <div class="player-progress">
-    <span class="time-label">1:23</span>
-    <div class="progress-track" onclick="seekTrack(event)">
-      <div class="progress-fill" id="progressFill"></div>
+<!-- ═══════════════════════════════════
+     МОДАЛЬНОЕ ОКНО
+═══════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-label="Запись в студию">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modalClose" aria-label="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M18 6L6 18 M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <div id="modalForm">
+      <span class="section-label" style="margin-bottom: 4px;">Бронирование</span>
+      <h2 class="modal-title">Запись в студию</h2>
+
+      <div class="modal-phone-block">
+        <p>Или позвоните нам прямо сейчас:</p>
+        <a href="tel:+79001234567" class="modal-phone">+7 (900) 123-45-67</a>
+      </div>
+
+      <div class="form-group">
+        <label for="fname">Имя *</label>
+        <input type="text" id="fname" placeholder="Иван" autocomplete="given-name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="lname">Фамилия *</label>
+        <input type="text" id="lname" placeholder="Иванов" autocomplete="family-name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Номер телефона *</label>
+        <input type="tel" id="phone" placeholder="+7 (___) ___-__-__" autocomplete="tel" required>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="agree">
+        <label for="agree">
+          Я соглашаюсь с <a href="#">политикой конфиденциальности</a>
+        </label>
+      </div>
+
+      <button class="btn-submit" id="submitBtn" disabled>Отправить заявку</button>
     </div>
-    <span class="time-label">3:47</span>
+
+    <!-- Сообщение об успехе -->
+    <div class="success-msg" id="successMsg">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h3>Заявка отправлена!</h3>
+      <p>Мы свяжемся с вами в ближайшее время.<br>Спасибо, что выбрали Spring Sound Lab!</p>
+    </div>
   </div>
-  <button class="player-btn" onclick="closePlayer()" style="margin-left:8px;">✕</button>
 </div>
 
+
+<!-- ═══════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════ -->
 <script>
-  /* ── CURSOR ── */
-  const cur = document.getElementById('cursor');
-  const ring = document.getElementById('cursor-ring');
-  let mx=0,my=0,rx=0,ry=0;
-  document.addEventListener('mousemove',e=>{
-    mx=e.clientX; my=e.clientY;
-    cur.style.transform=`translate(${mx-6}px,${my-6}px)`;
-  });
-  function animRing(){
-    rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
-    ring.style.transform=`translate(${rx-18}px,${ry-18}px)`;
-    requestAnimationFrame(animRing);
+// ─────────────────────────────────────
+// АНИМИРОВАННЫЕ ЗВУКОВЫЕ ВОЛНЫ (HERO)
+// ─────────────────────────────────────
+(function () {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, raf;
+  let t = 0;
+
+  function resize() {
+    W = canvas.width  = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
   }
-  animRing();
-  document.querySelectorAll('a,button,.service-card,.portfolio-card,.equip-card').forEach(el=>{
-    el.addEventListener('mouseenter',()=>{ring.style.width='54px';ring.style.height='54px';});
-    el.addEventListener('mouseleave',()=>{ring.style.width='36px';ring.style.height='36px';});
-  });
+  window.addEventListener('resize', resize);
+  resize();
 
-  /* ── NAV SCROLL ── */
-  const nav = document.getElementById('mainNav');
-  window.addEventListener('scroll',()=>{
-    nav.classList.toggle('scrolled', window.scrollY > 60);
-  });
-
-  /* ── HAMBURGER ── */
-  const ham = document.getElementById('hamburger');
-  const mob = document.getElementById('mobileMenu');
-  ham.addEventListener('click',()=>mob.classList.add('open'));
-  document.getElementById('mobileClose').addEventListener('click',()=>mob.classList.remove('open'));
-  function closeMob(){mob.classList.remove('open');}
-
-  /* ── WAVEFORM ── */
-  const wf = document.getElementById('heroWaveform');
-  const heights = [12,20,34,48,56,42,60,52,40,28,46,58,64,50,38,30,44,56,48,36,52,44,60,48,40,32,50,58,42,28,36,46,56,48,38,30,44,54,46,36];
-  const durations = [1.1,1.3,0.9,1.4,1.0,1.2,0.8,1.3,1.1,1.5,0.9,1.2,1.0,1.4,1.1,0.9];
-  heights.forEach((h,i)=>{
-    const bar = document.createElement('div');
-    bar.className = 'wave-bar';
-    bar.style.setProperty('--h', h+'px');
-    bar.style.setProperty('--dur', durations[i%durations.length]+'s');
-    bar.style.setProperty('--delay', (i*0.04)+'s');
-    bar.style.height = '8px';
-    wf.appendChild(bar);
-  });
-
-  /* ── SCROLL REVEAL ── */
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); }
-    });
-  },{threshold:0.12});
-  reveals.forEach(el=>observer.observe(el));
-
-  /* ── FILTER TABS ── */
-  document.querySelectorAll('.filter-tab').forEach(btn=>{
-    btn.addEventListener('click',function(){
-      document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));
-      this.classList.add('active');
-    });
-  });
-
-  /* ── AUDIO PLAYER ── */
-  let isPlaying = false;
-  let progressInterval;
-  let progress = 35;
-
-  function playTrack(title, artist){
-    document.getElementById('playerTitle').textContent = title;
-    document.getElementById('playerArtist').textContent = artist;
-    document.getElementById('playerBar').classList.add('visible');
-    isPlaying = true;
-    document.getElementById('playBtn').textContent = '⏸';
-    startProgress();
-  }
-  function togglePlay(){
-    isPlaying = !isPlaying;
-    document.getElementById('playBtn').textContent = isPlaying ? '⏸' : '▶';
-    if(isPlaying) startProgress(); else clearInterval(progressInterval);
-  }
-  function startProgress(){
-    clearInterval(progressInterval);
-    progressInterval = setInterval(()=>{
-      if(progress >= 100){ progress = 0; }
-      progress += 0.15;
-      document.getElementById('progressFill').style.width = progress + '%';
-    }, 50);
-  }
-  function seekTrack(e){
-    const rect = e.currentTarget.getBoundingClientRect();
-    progress = ((e.clientX - rect.left) / rect.width) * 100;
-    document.getElementById('progressFill').style.width = progress + '%';
-  }
-  function closePlayer(){
-    document.getElementById('playerBar').classList.remove('visible');
-    clearInterval(progressInterval);
-    isPlaying = false;
-  }
-
-  /* ── PRICING TOGGLE ── */
-  const hourlyPrices = [
-    {plan:'Starter', price:'3 500', desc:'в час · минимум 3 часа'},
-    {plan:'Professional', price:'7 200', desc:'в час · полный доступ'},
-    {plan:'Full Production', price:'42 000', desc:'в день · трек под ключ'},
+  // Параметры волн
+  const waves = [
+    { amp: 60,  freq: 0.008, speed: 0.4,  alpha: 0.12, width: 2,   yOffset: 0   },
+    { amp: 40,  freq: 0.012, speed: 0.6,  alpha: 0.18, width: 1.5, yOffset: 30  },
+    { amp: 80,  freq: 0.005, speed: 0.25, alpha: 0.08, width: 2.5, yOffset: -20 },
+    { amp: 25,  freq: 0.018, speed: 0.9,  alpha: 0.22, width: 1,   yOffset: 50  },
+    { amp: 55,  freq: 0.007, speed: 0.35, alpha: 0.1,  width: 2,   yOffset: -45 },
   ];
-  const packagePrices = [
-    {plan:'EP (3 трека)', price:'79 000', desc:'полный цикл · 3 трека'},
-    {plan:'Альбом (10)', price:'210 000', desc:'полный цикл · 10 треков'},
-    {plan:'Лейбл', price:'по запросу', desc:'индивидуальный контракт'},
+
+  // Визуализатор снизу — вертикальные полосы
+  const barCount = 64;
+  let barHeights = new Float32Array(barCount).fill(0);
+  let barTargets  = new Float32Array(barCount);
+
+  function randomizeBarTargets() {
+    for (let i = 0; i < barCount; i++) {
+      barTargets[i] = 10 + Math.random() * 120 * Math.sin(i * 0.15 + t * 0.3);
+    }
+  }
+
+  setInterval(randomizeBarTargets, 180);
+  randomizeBarTargets();
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    const cy = H * 0.52;
+
+    // Рисуем горизонтальные синусоиды
+    waves.forEach(w => {
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(59,130,246,${w.alpha})`;
+      ctx.lineWidth = w.width;
+
+      for (let x = 0; x <= W; x += 2) {
+        const y = cy + w.yOffset + w.amp * Math.sin(x * w.freq + t * w.speed);
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    });
+
+    // Вертикальный визуализатор (снизу по центру)
+    const barW  = Math.floor(W / barCount);
+    const barGap = Math.max(1, barW * 0.25);
+    const barX0  = 0;
+
+    for (let i = 0; i < barCount; i++) {
+      barHeights[i] += (barTargets[i] - barHeights[i]) * 0.12;
+      const bh = barHeights[i];
+      const x  = barX0 + i * barW + barGap / 2;
+      const bw = barW - barGap;
+      const y  = H - 80 - bh;
+
+      const grad = ctx.createLinearGradient(0, y, 0, H - 80);
+      grad.addColorStop(0, 'rgba(59,130,246,0.5)');
+      grad.addColorStop(1, 'rgba(37,99,235,0.05)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.roundRect(x, y, bw, bh, [3, 3, 0, 0]);
+      ctx.fill();
+    }
+
+    // Центральная горизонтальная линия
+    const lineGrad = ctx.createLinearGradient(0, 0, W, 0);
+    lineGrad.addColorStop(0,   'transparent');
+    lineGrad.addColorStop(0.3, 'rgba(59,130,246,0.3)');
+    lineGrad.addColorStop(0.7, 'rgba(59,130,246,0.3)');
+    lineGrad.addColorStop(1,   'transparent');
+    ctx.beginPath();
+    ctx.strokeStyle = lineGrad;
+    ctx.lineWidth = 1;
+    ctx.moveTo(0, H - 80);
+    ctx.lineTo(W, H - 80);
+    ctx.stroke();
+
+    t += 0.016;
+    raf = requestAnimationFrame(draw);
+  }
+
+  draw();
+
+  // Приостановить анимацию вне видимости
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) cancelAnimationFrame(raf);
+    else draw();
+  });
+})();
+
+// ─────────────────────────────────────
+// ДЕКОРАТИВНЫЕ ВОЛНЫ В ОБЛОЖКАХ
+// ─────────────────────────────────────
+function buildCoverWaveforms() {
+  const configs = [
+    [12, 20, 35, 50, 45, 30, 48, 38, 22, 44, 36, 28, 50, 42, 18],
+    [20, 40, 30, 45, 28, 50, 22, 48, 36, 42, 18, 44, 38, 30, 46],
+    [35, 22, 48, 30, 45, 18, 50, 38, 42, 26, 44, 32, 50, 28, 40],
+    [28, 46, 20, 44, 32, 50, 26, 48, 36, 42, 22, 46, 34, 50, 18],
+    [42, 28, 50, 22, 44, 36, 48, 20, 46, 32, 50, 26, 42, 38, 22],
   ];
-  function setPricing(type, btn){
-    document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const data = type === 'hourly' ? hourlyPrices : packagePrices;
-    document.querySelectorAll('.pricing-card').forEach((card,i)=>{
-      card.querySelector('.plan-name').textContent = data[i].plan;
-      const pp = card.querySelector('.plan-price');
-      pp.innerHTML = data[i].price === 'по запросу'
-        ? '<span style="font-size:1.6rem">По запросу</span>'
-        : `<span>₽</span>${data[i].price}`;
-      card.querySelector('.plan-desc').textContent = data[i].desc;
+  configs.forEach((heights, i) => {
+    const el = document.getElementById('wf' + (i + 1));
+    if (!el) return;
+    heights.forEach(h => {
+      const span = document.createElement('span');
+      span.style.height = h + 'px';
+      el.appendChild(span);
     });
-  }
+  });
+}
+buildCoverWaveforms();
 
-  /* ── FORM SUBMIT ── */
-  function submitForm(){
-    const btn = document.querySelector('.btn-book');
-    btn.textContent = '✓ Заявка отправлена!';
-    btn.style.background = 'linear-gradient(135deg, #00b894, #00cec9)';
-    setTimeout(()=>{
-      btn.textContent = 'Отправить заявку →';
-      btn.style.background = '';
-    }, 3000);
-  }
+// ─────────────────────────────────────
+// NAVBAR: СКРЫТИЕ / ПОЯВЛЕНИЕ
+// ─────────────────────────────────────
+(function () {
+  const navbar = document.getElementById('navbar');
+  let lastY  = 0;
+  let ticking = false;
 
-  /* ── NUMBER COUNTER ANIMATION ── */
-  function animateNumbers(){
-    document.querySelectorAll('.stat-num').forEach(el=>{
-      const text = el.innerHTML;
-      const num = parseInt(text.replace(/\D/g,''));
-      const suffix = text.replace(/[\d\s]/g,'');
-      if(!num) return;
-      let start = 0; const dur = 1800;
-      const step = timestamp => {
-        if(!start) start = timestamp;
-        const progress = Math.min((timestamp - start)/dur, 1);
-        const eased = 1 - Math.pow(1-progress, 3);
-        el.innerHTML = Math.floor(eased * num) + suffix;
-        if(progress < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
-  }
-  const heroObs = new IntersectionObserver(entries=>{
-    if(entries[0].isIntersecting){ animateNumbers(); heroObs.disconnect(); }
-  },{threshold:0.5});
-  heroObs.observe(document.querySelector('.stats-row'));
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        navbar.classList.toggle('scrolled', y > 20);
+        if (y > lastY && y > 100) navbar.classList.add('hidden');
+        else navbar.classList.remove('hidden');
+        lastY = y;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+})();
+
+// ─────────────────────────────────────
+// МОБИЛЬНОЕ МЕНЮ — БУРГЕР
+// ─────────────────────────────────────
+const burger     = document.getElementById('burger');
+const mobileMenu = document.getElementById('mobileMenu');
+
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+
+function closeMobileMenu() {
+  burger.classList.remove('open');
+  mobileMenu.classList.remove('open');
+}
+
+// ─────────────────────────────────────
+// INTERSECTION OBSERVER — REVEAL
+// ─────────────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// ─────────────────────────────────────
+// МОДАЛЬНОЕ ОКНО
+// ─────────────────────────────────────
+const overlay  = document.getElementById('modalOverlay');
+const modalEl  = document.getElementById('modal');
+const closeBtn = document.getElementById('modalClose');
+const formDiv  = document.getElementById('modalForm');
+const successDiv = document.getElementById('successMsg');
+
+function openModalFn() {
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  // Сбросить форму
+  formDiv.style.display = 'block';
+  successDiv.classList.remove('show');
+  document.getElementById('fname').value = '';
+  document.getElementById('lname').value = '';
+  document.getElementById('phone').value = '';
+  document.getElementById('agree').checked = false;
+  updateSubmitBtn();
+}
+
+function closeModal() {
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('openModal').addEventListener('click', openModalFn);
+document.getElementById('openModalHero').addEventListener('click', openModalFn);
+document.getElementById('openModalContacts').addEventListener('click', openModalFn);
+closeBtn.addEventListener('click', closeModal);
+
+overlay.addEventListener('click', e => {
+  if (e.target === overlay) closeModal();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ─────────────────────────────────────
+// ТЕЛЕФОННАЯ МАСКА
+// ─────────────────────────────────────
+const phoneInput = document.getElementById('phone');
+
+phoneInput.addEventListener('input', function () {
+  let val = this.value.replace(/\D/g, '');
+  if (val.startsWith('8')) val = '7' + val.slice(1);
+  if (!val.startsWith('7')) val = '7' + val;
+  val = val.slice(0, 11);
+
+  let formatted = '+7';
+  if (val.length > 1) formatted += ' (' + val.slice(1, 4);
+  if (val.length >= 4) formatted += ') ' + val.slice(4, 7);
+  if (val.length >= 7) formatted += '-' + val.slice(7, 9);
+  if (val.length >= 9) formatted += '-' + val.slice(9, 11);
+
+  this.value = formatted;
+  updateSubmitBtn();
+});
+
+phoneInput.addEventListener('keydown', function (e) {
+  if (e.key === 'Backspace' && this.value.length <= 2) e.preventDefault();
+});
+
+// ─────────────────────────────────────
+// ВАЛИДАЦИЯ ФОРМЫ
+// ─────────────────────────────────────
+const submitBtn = document.getElementById('submitBtn');
+const agreeCheck = document.getElementById('agree');
+
+function updateSubmitBtn() {
+  const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+  const ph    = document.getElementById('phone').value.replace(/\D/g, '');
+  const ok    = fname.length > 0 && lname.length > 0 && ph.length === 11 && agreeCheck.checked;
+  submitBtn.disabled = !ok;
+}
+
+['fname', 'lname'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateSubmitBtn);
+});
+agreeCheck.addEventListener('change', updateSubmitBtn);
+
+// ─────────────────────────────────────
+// ОТПРАВКА ФОРМЫ (ЗАГЛУШКА)
+// ─────────────────────────────────────
+submitBtn.addEventListener('click', function () {
+  if (this.disabled) return;
+  // Здесь интегрируйте реальную отправку данных (fetch / axios)
+  formDiv.style.display = 'none';
+  successDiv.classList.add('show');
+});
+
+// ─────────────────────────────────────
+// ПЛАВНЫЙ СКРОЛЛ ПО НАВИГАЦИИ
+// ─────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', function (e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    const offset = 70;
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+    closeMobileMenu();
+  });
+});
 </script>
+
 </body>
 </html>
