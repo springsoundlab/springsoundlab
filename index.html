@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Профессиональная Студия Звукозаписи</title>
+<title>Профессиональная Студия Звукозаписи | SPRING SOUND LAB</title>
 <meta name="description" content="SPRING SOUND LAB — профессиональная студия звукозаписи. Запись, сведение, мастеринг. Создайте звук мирового уровня.">
 <!-- Подключаем округлый жирный шрифт Poppins -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -217,42 +217,71 @@ section{padding:100px 5%}
 .svc-text{font-size:0.85rem;color:var(--white50);line-height:1.7;position:relative;z-index:1;font-weight:500}
 .svc-price{margin-top:1.25rem;font-size:1rem;color:var(--blue2);font-weight:800;position:relative;z-index:1}
 
-/* ── TEAM ── */
+/* ── TEAM (ИСПРАВЛЕНО: overlay на всю карточку с центрированием при ховере) ── */
 .team-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:1rem}
 .team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.team-card{border-radius:var(--r2);overflow:hidden;position:relative;aspect-ratio:3/4;background:var(--navy3);cursor:pointer}
-.team-card img{width:100%;height:100%;object-fit:cover;opacity:0.75;transition:opacity 0.3s,transform 0.5s}
-.team-card:hover img{opacity:1;transform:scale(1.04)}
+.team-card{
+  border-radius:var(--r2);overflow:hidden;position:relative;aspect-ratio:3/4;
+  background:var(--navy3);cursor:pointer;
+}
+.team-card img{width:100%;height:100%;object-fit:cover;opacity:0.8;transition:opacity 0.3s,transform 0.5s}
+.team-card:hover img{opacity:0.3;transform:scale(1.04)} /* легкое затемнение, фон будет перекрыт оверлеем */
 .team-overlay{
   position:absolute;inset:0;
-  padding:1.5rem 1.25rem 1.25rem;
-  background:linear-gradient(to top,rgba(6,13,31,0.95) 0%,transparent 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  transition: background 0.4s ease, backdrop-filter 0.4s ease;
+  padding:1.5rem;
+  background:linear-gradient(to top, rgba(6,13,31,0.95) 0%, transparent 100%);
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end; /* по умолчанию текст (имя+роль) внизу */
+  transition:all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  text-align:left;
 }
-.team-card:hover .team-overlay {
-  background: rgba(6,13,31,0.7);
-  backdrop-filter: blur(8px);
+.team-card:hover .team-overlay{
+  background:rgba(6,13,31,0.88);
+  backdrop-filter:blur(10px);
+  justify-content:center;  /* при наведении центрируем всё содержимое по вертикали */
+  text-align:center;
+  padding:1.8rem;
 }
-.team-name{font-family:var(--display);font-size:1rem;font-weight:800;margin-bottom:0.2rem}
-.team-role{font-size:0.75rem;color:var(--blue2);font-weight:700}
+.team-name{
+  font-family:var(--display);
+  font-size:1rem;
+  font-weight:800;
+  margin-bottom:0.2rem;
+  transition:0.2s;
+  color:var(--white);
+}
+.team-role{
+  font-size:0.75rem;
+  color:var(--blue2);
+  font-weight:700;
+  transition:0.2s;
+}
 .team-desc{
-  font-size: 0.8rem;
-  color: var(--white80);
-  line-height: 1.5;
-  margin-top: 0;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  font-weight: 500;
-  transition: all 0.4s ease;
+  font-size:0.8rem;
+  color:var(--white80);
+  line-height:1.5;
+  margin-top:0;
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  font-weight:500;
+  transition:max-height 0.4s ease, opacity 0.3s ease, margin 0.3s;
+  width:100%;
 }
-.team-card:hover .team-desc {
-  margin-top: 0.75rem;
-  max-height: 150px;
-  opacity: 1;
+.team-card:hover .team-desc{
+  margin-top:0.75rem;
+  max-height:250px;     /* достаточно для полного текста */
+  opacity:1;
+}
+/* улучшенная читаемость при центрировании */
+.team-card:hover .team-name{
+  font-size:1.1rem;
+  letter-spacing:-0.01em;
+}
+.team-card:hover .team-role{
+  font-size:0.8rem;
+  margin-bottom:0;
 }
 
 /* ── MARQUEE ── */
@@ -572,6 +601,7 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   <a href="#contact" onclick="toggleNav()">Контакты</a>
 </div>
 
+<!-- HERO -->
 <section class="hero" id="top">
   <div class="hero-orb1"></div>
   <div class="hero-orb2"></div>
@@ -585,6 +615,7 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   </div>
 </section>
 
+<!-- ABOUT -->
 <section id="about">
   <div class="section-inner">
     <div class="about-grid">
@@ -609,6 +640,7 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   </div>
 </section>
 
+<!-- SERVICES -->
 <section id="services" style="background:var(--navy2)">
   <div class="section-inner">
     <div class="section-eyebrow">Что мы делаем</div>
@@ -624,6 +656,7 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   </div>
 </section>
 
+<!-- TEAM (исправлено: полное описание на всю фотографию при ховере) -->
 <section id="team">
   <div class="section-inner">
     <div class="team-header"><div><div class="section-eyebrow">Наши специалисты</div><h2 class="section-title">Команда</h2></div></div>
@@ -664,6 +697,7 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   </div>
 </section>
 
+<!-- остальные секции (проекты, видео, портфолио и т.д.) без изменений, они не влияют на задачу -->
 <section id="projects" style="background:var(--navy2)">
   <div class="section-inner">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:10px">
