@@ -358,20 +358,33 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   padding:14px 16px;gap:0;
 }
 
-/* Track info & added controls — left */
+/* Track info — left */
 .player-info{
   display:flex;align-items:center;gap:10px;
-  flex:1;min-width:0;overflow:hidden;
+  width:auto;
+  min-width:0;overflow:hidden;
 }
 .player-cover{width:40px;height:40px;border-radius:8px;overflow:hidden;background:var(--navy3);flex-shrink:0;border:1px solid var(--border)}
 .player-cover img{width:100%;height:100%;object-fit:cover}
 .player-title{font-size:12px;font-weight:800;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .player-artist{font-size:10px;color:var(--blue2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
+/* Moved Metrics (Time & Volume next to each other, on the left) */
+.player-metrics-left {
+  display:flex; align-items:center; gap:20px; flex:1; padding-left:20px;
+}
+
+.player-volume{display:flex;align-items:center;gap:6px}
+.vol-icon{color:var(--white50);cursor:pointer;transition:color .2s;background:none;border:none;display:flex;align-items:center;padding:4px;}
+.vol-icon:hover{color:var(--white)}
+.volume-slider{width:64px;height:4px;background:var(--white15);border-radius:2px;position:relative;cursor:pointer;}
+.volume-fill{height:100%;background:var(--white50);border-radius:2px;pointer-events:none}
+#vol-range{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;margin:0;}
+
 /* Controls — center */
 .player-controls{
   display:flex;flex-direction:column;align-items:center;gap:4px;
-  padding:0 8px;
+  padding:0 8px; flex:1;
 }
 .player-btns{display:flex;align-items:center;justify-content:center;gap:4px;}
 
@@ -397,12 +410,6 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   display:flex;align-items:center;gap:8px;
   flex:1;justify-content:flex-end;
 }
-.player-volume{display:flex;align-items:center;gap:6px}
-.vol-icon{color:var(--white50);cursor:pointer;transition:color .2s;background:none;border:none;display:flex;align-items:center;padding:4px;}
-.vol-icon:hover{color:var(--white)}
-.volume-slider{width:64px;height:4px;background:var(--white15);border-radius:2px;position:relative;cursor:pointer;}
-.volume-fill{height:100%;background:var(--white50);border-radius:2px;pointer-events:none}
-#vol-range{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;margin:0;}
 
 .queue-toggle-btn{
   background:transparent;border:none;cursor:pointer;
@@ -471,7 +478,7 @@ body.player-open{padding-bottom:68px}
   .newsletter{flex-direction:column}
   .gallery-grid{grid-template-columns:1fr;grid-auto-rows:220px}
   .gallery-item:first-child{grid-column:span 1}
-  .player-volume{display:none}
+  .player-metrics-left{display:none}
 }
 </style>
 </head>
@@ -566,7 +573,7 @@ body.player-open{padding-bottom:68px}
         <div class="team-overlay">
           <div class="team-name">Марина Соколова</div>
           <div class="team-role">Продюсер</div>
-          <div class="team-desc">Курирует проекты от идеи до релиза. Знает, как сделать ваш трек хитом и вывести его на нужные платформы.</div>
+          <div class="team-desc">Курирует проектов от идеи до релиза. Знает, как сделать ваш трек хитом и вывести его на нужные платформы.</div>
         </div>
       </div>
       <div class="team-card">
@@ -880,13 +887,14 @@ body.player-open{padding-bottom:68px}
 
     <div class="player-info">
       <div class="player-cover"><img id="player-cover-img" src="" alt=""></div>
-      
-      <div style="min-width:0; overflow:hidden; margin-right:15px;">
+      <div style="min-width:0; overflow:hidden;">
         <div class="player-title" id="player-title">—</div>
         <div class="player-artist" id="player-artist">—</div>
       </div>
-      
-      <div style="font-size:11px; color:var(--white50); font-weight:600; white-space:nowrap; margin-right: 15px;">
+    </div>
+
+    <div class="player-metrics-left">
+      <div style="font-size:11px; color:var(--white50); font-weight:600; white-space:nowrap;">
         <span id="p-current">0:00</span> / <span id="p-total">0:00</span>
       </div>
 
