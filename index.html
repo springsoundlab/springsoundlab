@@ -138,14 +138,12 @@ section{padding:100px 5%}
 .svc-text{font-size:0.85rem;color:var(--white50);line-height:1.7;position:relative;z-index:1;font-weight:500}
 .svc-price{margin-top:1.25rem;font-size:1rem;color:var(--blue2);font-weight:800;position:relative;z-index:1}
 
-/* ── TEAM — плавные переходы ── */
+/* ── TEAM ── */
 .team-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:1rem}
 .team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .team-card{border-radius:var(--r2);overflow:hidden;position:relative;aspect-ratio:3/4;background:var(--navy3);cursor:pointer;}
 .team-card img{width:100%;height:100%;object-fit:cover;opacity:0.85;transition:opacity 0.6s ease, transform 0.6s ease;}
 .team-card:hover img{opacity:0.25;transform:scale(1.04);}
-
-/* Базовый оверлей — тёмный снизу, имя+роль внизу */
 .team-overlay{
   position:absolute;inset:0;padding:1.5rem;
   display:flex;flex-direction:column;justify-content:flex-end;
@@ -160,12 +158,10 @@ section{padding:100px 5%}
   justify-content:center;
   text-align:center;
 }
-
 .team-name{font-family:var(--display);font-size:1rem;font-weight:800;margin-bottom:0.2rem;color:var(--white);transition:font-size 0.4s ease, letter-spacing 0.4s ease;}
 .team-role{font-size:0.75rem;color:var(--blue2);font-weight:700;transition:font-size 0.4s ease;}
 .team-card:hover .team-name{font-size:1.1rem;letter-spacing:-0.01em;}
 .team-card:hover .team-role{font-size:0.8rem;}
-
 .team-desc{
   font-size:0.82rem;color:var(--white80);line-height:1.6;
   font-weight:500;width:100%;
@@ -208,14 +204,34 @@ section{padding:100px 5%}
 .releases-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
 .release-card{background:var(--white04);border:1px solid var(--border);border-radius:var(--r2);padding:1.5rem;transition:all 0.3s;cursor:pointer}
 .release-card:hover{border-color:var(--border2);transform:translateY(-3px)}
-.release-cover{aspect-ratio:1;border-radius:var(--r);overflow:hidden;margin-bottom:1.25rem;background:var(--navy3)}
-.release-cover img{width:100%;height:100%;object-fit:cover}
+.release-cover{aspect-ratio:1;border-radius:var(--r);overflow:hidden;margin-bottom:1.25rem;background:var(--navy3);position:relative;cursor:pointer;}
+.release-cover img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
+.release-cover:hover img{transform:scale(1.04)}
+/* Always-visible play overlay on release covers */
+.release-cover-overlay{
+  position:absolute;inset:0;
+  background:rgba(6,13,31,0.35);
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.3s;
+}
+.release-cover:hover .release-cover-overlay{background:rgba(6,13,31,0.55)}
+.release-cover-play-icon{
+  width:56px;height:56px;border-radius:50%;
+  background:rgba(26,111,255,0.85);
+  border:2px solid rgba(255,255,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.3s,background 0.3s;
+  box-shadow:0 4px 20px rgba(26,111,255,0.5);
+}
+.release-cover:hover .release-cover-play-icon{transform:scale(1.12);background:var(--blue2)}
+.release-cover-play-icon svg{fill:white;margin-left:3px}
+
 .release-type{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue2);font-weight:800;margin-bottom:0.4rem}
 .release-title{font-family:var(--display);font-size:1.2rem;font-weight:800;margin-bottom:0.3rem}
 .release-sub{font-size:0.85rem;color:var(--white50);margin-bottom:1.2rem;font-weight:500}
 .release-price{font-size:1.4rem;color:var(--white);font-family:var(--display);font-weight:800;margin-bottom:1rem}
 
-/* ── TABS (works section) ── */
+/* ── TABS ── */
 .tabs-nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:30px;overflow-x:auto;scrollbar-width:none}
 .tabs-nav::-webkit-scrollbar{display:none}
 .tab-btn{padding:0.75rem 1.5rem;background:transparent;border:none;color:var(--white50);font-family:var(--sans);font-size:0.82rem;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;}
@@ -225,8 +241,27 @@ section{padding:100px 5%}
 .works-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .work-item{background:var(--white04);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;display:flex;gap:1.25rem;align-items:center;cursor:pointer;transition:all 0.2s;}
 .work-item:hover{border-color:var(--border2);background:var(--white08)}
-.work-cover{width:56px;height:56px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--navy3)}
-.work-cover img{width:100%;height:100%;object-fit:cover}
+
+/* Work cover with always-visible play icon */
+.work-cover{width:56px;height:56px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--navy3);position:relative;}
+.work-cover img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s}
+.work-item:hover .work-cover img{transform:scale(1.08)}
+.work-cover-play-overlay{
+  position:absolute;inset:0;
+  background:rgba(6,13,31,0.45);
+  display:flex;align-items:center;justify-content:center;
+  border-radius:10px;
+}
+.work-cover-play-btn{
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(26,111,255,0.9);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.25s,background 0.25s;
+  box-shadow:0 2px 8px rgba(26,111,255,0.6);
+}
+.work-item:hover .work-cover-play-btn{transform:scale(1.15);background:var(--blue2)}
+.work-cover-play-btn svg{fill:white;margin-left:2px}
+
 .work-artist{font-size:0.72rem;color:var(--blue2);font-weight:800;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.2rem}
 .work-title{font-size:0.95rem;font-weight:800;margin-bottom:0.2rem}
 .work-desc{font-size:0.78rem;color:var(--white50);font-weight:500}
@@ -238,7 +273,7 @@ section{padding:100px 5%}
 .gallery-item img{width:100%;height:100%;object-fit:cover;opacity:0.75;transition:opacity 0.3s,transform 0.5s}
 .gallery-item:hover img{opacity:1;transform:scale(1.04)}
 
-/* ── PRICING — с переключателем категорий ── */
+/* ── PRICING ── */
 .pricing-tabs{display:flex;gap:8px;margin-bottom:40px;flex-wrap:wrap;}
 .ptab-btn{
   padding:0.6rem 1.4rem;background:var(--white04);border:1px solid var(--border);
@@ -355,6 +390,94 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 .footer-bottom a{color:var(--white50);text-decoration:none;transition:color 0.2s;font-weight:600}
 .footer-bottom a:hover{color:var(--blue2)}
 
+/* ── BOTTOM PLAYER ── */
+#bottom-player{
+  position:fixed;bottom:-120px;left:0;right:0;z-index:200;
+  background:rgba(6,13,31,0.96);
+  backdrop-filter:blur(24px);
+  border-top:1px solid var(--border2);
+  padding:0 5%;height:96px;
+  display:flex;align-items:center;gap:1.5rem;
+  transition:bottom 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow:0 -8px 40px rgba(0,0,0,0.5);
+}
+#bottom-player.visible{bottom:0}
+
+/* Track info */
+.player-info{display:flex;align-items:center;gap:1rem;min-width:220px;flex:0 0 auto}
+.player-cover{width:56px;height:56px;border-radius:10px;overflow:hidden;background:var(--navy3);flex-shrink:0;border:1px solid var(--border)}
+.player-cover img{width:100%;height:100%;object-fit:cover}
+.player-title{font-size:0.9rem;font-weight:800;margin-bottom:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.player-artist{font-size:0.75rem;color:var(--blue2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+
+/* Controls */
+.player-controls{display:flex;align-items:center;gap:0;flex:1;flex-direction:column;gap:0.5rem;max-width:640px;margin:0 auto}
+.player-btns{display:flex;align-items:center;gap:0.75rem}
+.p-btn{
+  background:transparent;border:none;cursor:pointer;
+  color:var(--white50);transition:color 0.2s,transform 0.15s;
+  display:flex;align-items:center;justify-content:center;
+  padding:0;
+}
+.p-btn:hover{color:var(--white);transform:scale(1.1)}
+.p-btn-play{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--blue);color:var(--white);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+  box-shadow:0 0 20px rgba(26,111,255,0.4);
+}
+.p-btn-play:hover{background:var(--blue2);transform:scale(1.08);box-shadow:0 0 30px rgba(26,111,255,0.6)}
+
+/* Progress bar */
+.player-progress-wrap{width:100%;display:flex;align-items:center;gap:0.75rem}
+.player-time{font-size:0.72rem;color:var(--white50);font-weight:600;min-width:36px;text-align:center}
+.player-progress{
+  flex:1;height:4px;background:var(--white15);border-radius:2px;
+  cursor:pointer;position:relative;overflow:visible;
+}
+.player-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:2px;pointer-events:none;transition:width 0.1s linear}
+.player-progress-thumb{
+  position:absolute;right:-6px;top:50%;transform:translateY(-50%);
+  width:12px;height:12px;border-radius:50%;background:var(--white);
+  box-shadow:0 0 6px rgba(26,111,255,0.5);
+  pointer-events:none;
+  opacity:0;transition:opacity 0.2s;
+}
+.player-progress:hover .player-progress-thumb{opacity:1}
+#player-range{
+  position:absolute;inset:0;opacity:0;cursor:pointer;
+  width:100%;height:100%;margin:0;
+}
+
+/* Volume */
+.player-volume{display:flex;align-items:center;gap:0.6rem;min-width:130px;flex:0 0 auto}
+.vol-icon{color:var(--white50);font-size:0.9rem;cursor:pointer;transition:color 0.2s;background:none;border:none;}
+.vol-icon:hover{color:var(--white)}
+.volume-slider{
+  width:80px;height:4px;background:var(--white15);border-radius:2px;
+  position:relative;cursor:pointer;
+}
+.volume-fill{height:100%;background:var(--white50);border-radius:2px;pointer-events:none}
+#vol-range{
+  position:absolute;inset:0;opacity:0;cursor:pointer;
+  width:100%;height:100%;margin:0;
+}
+
+/* Close button */
+.player-close{
+  background:transparent;border:none;cursor:pointer;
+  color:var(--white50);transition:color 0.2s,transform 0.2s;
+  padding:8px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.player-close:hover{color:var(--white);background:var(--white08);transform:scale(1.1)}
+
+/* body padding when player visible */
+body.player-open{padding-bottom:96px}
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
   .nav-links{display:none}
@@ -372,6 +495,9 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   .works-grid{grid-template-columns:1fr}
   .gallery-grid{grid-template-columns:1fr 1fr;grid-auto-rows:180px}
   .gallery-item:first-child{grid-column:span 2;grid-row:span 1}
+  .player-info{min-width:160px}
+  .player-title,.player-artist{max-width:120px}
+  .player-volume{display:none}
 }
 @media(max-width:580px){
   section{padding:70px 4%}
@@ -382,6 +508,8 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   .newsletter{flex-direction:column}
   .gallery-grid{grid-template-columns:1fr;grid-auto-rows:220px}
   .gallery-item:first-child{grid-column:span 1}
+  .player-info{min-width:120px}
+  .player-title,.player-artist{max-width:90px}
 }
 </style>
 </head>
@@ -503,73 +631,135 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   </div>
 </section>
 
-<!-- ПОРТФОЛИО — объединённый блок: релизы + каталог -->
+<!-- ПОРТФОЛИО -->
 <section id="works" style="background:var(--navy2)">
   <div class="section-inner">
     <div class="section-eyebrow">Дискография</div>
     <h2 class="section-title">Выпущенные релизы</h2>
     <div class="releases-grid" style="margin-bottom:60px">
 
-      <!-- Карточка 1 -->
       <div class="release-card">
-        <div class="release-cover release-play-wrap" onclick="playTrack(0)">
+        <div class="release-cover" onclick="playTrack(0)">
           <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=600&q=80" alt="">
-          <div class="release-play-btn"><svg width="20" height="24" viewBox="0 0 20 24"><polygon points="0,0 20,12 0,24" fill="white"/></svg></div>
+          <div class="release-cover-overlay">
+            <div class="release-cover-play-icon">
+              <svg width="18" height="22" viewBox="0 0 18 22"><polygon points="0,0 18,11 0,22"/></svg>
+            </div>
+          </div>
         </div>
         <div class="release-type">Альбом</div>
         <div class="release-title">Первая частота</div>
         <div class="release-sub">Echo — инди-поп, 12 треков</div>
-        <button class="btn-primary" style="width:100%;justify-content:center;margin-top:auto" onclick="playTrack(0)">▶ Play</button>
+        <button class="btn-primary" style="width:100%;justify-content:center;margin-top:auto" onclick="playTrack(0)">▶ Слушать</button>
       </div>
 
-      <!-- Карточка 2 -->
       <div class="release-card">
-        <div class="release-cover release-play-wrap" onclick="playTrack(1)">
+        <div class="release-cover" onclick="playTrack(1)">
           <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80" alt="">
-          <div class="release-play-btn"><svg width="20" height="24" viewBox="0 0 20 24"><polygon points="0,0 20,12 0,24" fill="white"/></svg></div>
+          <div class="release-cover-overlay">
+            <div class="release-cover-play-icon">
+              <svg width="18" height="22" viewBox="0 0 18 22"><polygon points="0,0 18,11 0,22"/></svg>
+            </div>
+          </div>
         </div>
         <div class="release-type">EP</div>
         <div class="release-title">Тихий Сигнал</div>
         <div class="release-sub">Алиса Кравцова — R&B, 5 треков</div>
-        <button class="btn-primary" style="width:100%;justify-content:center;margin-top:auto" onclick="playTrack(1)">▶ Play</button>
+        <button class="btn-primary" style="width:100%;justify-content:center;margin-top:auto" onclick="playTrack(1)">▶ Слушать</button>
       </div>
 
-      <!-- Карточка 3 -->
       <div class="release-card">
-        <div class="release-cover release-play-wrap" onclick="playTrack(2)">
+        <div class="release-cover" onclick="playTrack(2)">
           <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=600&q=80" alt="">
-          <div class="release-play-btn"><svg width="20" height="24" viewBox="0 0 20 24"><polygon points="0,0 20,12 0,24" fill="white"/></svg></div>
+          <div class="release-cover-overlay">
+            <div class="release-cover-play-icon">
+              <svg width="18" height="22" viewBox="0 0 18 22"><polygon points="0,0 18,11 0,22"/></svg>
+            </div>
+          </div>
         </div>
         <div class="release-type">Саундтрек</div>
         <div class="release-title">Нить</div>
         <div class="release-sub">OST сериала — оркестр, 18 треков</div>
-        <button class="btn-primary" style="width:100%;justify-content:center;margin-top:auto" onclick="playTrack(2)">▶ Play</button>
+        <button class="btn-primary" style="width:100%;justify-content:center;margin-top:auto" onclick="playTrack(2)">▶ Слушать</button>
       </div>
 
     </div>
 
-    <!-- разделитель -->
     <div style="border-top:1px solid var(--border);margin-bottom:50px"></div>
 
-    <div class="tabs-nav"><button class="tab-btn active" onclick="switchTab(this,'tab-all')">Все жанры</button><button class="tab-btn" onclick="switchTab(this,'tab-pop')">Поп / R&B</button><button class="tab-btn" onclick="switchTab(this,'tab-rock')">Рок / Металл</button><button class="tab-btn" onclick="switchTab(this,'tab-electro')">Электронная</button><button class="tab-btn" onclick="switchTab(this,'tab-film')">Кино / Реклама</button></div>
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab(this,'tab-all')">Все жанры</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-pop')">Поп / R&B</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-rock')">Рок / Металл</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-electro')">Электронная</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-film')">Кино / Реклама</button>
+    </div>
     <div>
       <div class="tab-panel active" id="tab-all"><div class="works-grid">
-        <div class="work-item" onclick="playTrack(0)"><div class="work-cover work-cover-play"><img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-play-icon"><svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg></div></div><div><div class="work-artist">Echo</div><div class="work-title">Первая частота</div><div class="work-desc">Запись, сведение, мастеринг · Альбом · 2025</div></div></div>
-        <div class="work-item" onclick="playTrack(1)"><div class="work-cover work-cover-play"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-play-icon"><svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg></div></div><div><div class="work-artist">Алиса Кравцова</div><div class="work-title">Тихий Сигнал</div><div class="work-desc">Запись, мастеринг · EP · 2025</div></div></div>
-        <div class="work-item" onclick="playTrack(2)"><div class="work-cover work-cover-play"><img src="https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-play-icon"><svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg></div></div><div><div class="work-artist">Сериал «Нить»</div><div class="work-title">Оригинальный саундтрек</div><div class="work-desc">Продюсирование, запись, сведение · 2024</div></div></div>
-        <div class="work-item" onclick="playTrack(3)"><div class="work-cover work-cover-play"><img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-play-icon"><svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg></div></div><div><div class="work-artist">Ноябрь</div><div class="work-title">Одиночество в сети</div><div class="work-desc">Сведение, мастеринг · Сингл · 2024</div></div></div>
+        <div class="work-item" onclick="playTrack(0)">
+          <div class="work-cover">
+            <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80" alt="">
+            <div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div>
+          </div>
+          <div><div class="work-artist">Echo</div><div class="work-title">Первая частота</div><div class="work-desc">Запись, сведение, мастеринг · Альбом · 2025</div></div>
+        </div>
+        <div class="work-item" onclick="playTrack(1)">
+          <div class="work-cover">
+            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80" alt="">
+            <div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div>
+          </div>
+          <div><div class="work-artist">Алиса Кравцова</div><div class="work-title">Тихий Сигнал</div><div class="work-desc">Запись, мастеринг · EP · 2025</div></div>
+        </div>
+        <div class="work-item" onclick="playTrack(2)">
+          <div class="work-cover">
+            <img src="https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&w=200&q=80" alt="">
+            <div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div>
+          </div>
+          <div><div class="work-artist">Сериал «Нить»</div><div class="work-title">Оригинальный саундтрек</div><div class="work-desc">Продюсирование, запись, сведение · 2024</div></div>
+        </div>
+        <div class="work-item" onclick="playTrack(3)">
+          <div class="work-cover">
+            <img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80" alt="">
+            <div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div>
+          </div>
+          <div><div class="work-artist">Ноябрь</div><div class="work-title">Одиночество в сети</div><div class="work-desc">Сведение, мастеринг · Сингл · 2024</div></div>
+        </div>
       </div></div>
       <div class="tab-panel" id="tab-pop"><div class="works-grid">
-        <div class="work-item" onclick="playTrack(1)"><div class="work-cover work-cover-play"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-play-icon"><svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg></div></div><div><div class="work-artist">Алиса Кравцова</div><div class="work-title">Тихий Сигнал</div><div class="work-desc">R&B · EP · 2025</div></div></div>
+        <div class="work-item" onclick="playTrack(1)">
+          <div class="work-cover">
+            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80" alt="">
+            <div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div>
+          </div>
+          <div><div class="work-artist">Алиса Кравцова</div><div class="work-title">Тихий Сигнал</div><div class="work-desc">R&B · EP · 2025</div></div>
+        </div>
       </div></div>
       <div class="tab-panel" id="tab-rock"><div class="works-grid">
-        <div class="work-item" onclick="playTrack(0)"><div class="work-cover work-cover-play"><img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-play-icon"><svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg></div></div><div><div class="work-artist">Echo</div><div class="work-title">Первая частота</div><div class="work-desc">Инди-рок · Альбом · 2025</div></div></div>
+        <div class="work-item" onclick="playTrack(0)">
+          <div class="work-cover">
+            <img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80" alt="">
+            <div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div>
+          </div>
+          <div><div class="work-artist">Echo</div><div class="work-title">Первая частота</div><div class="work-desc">Инди-рок · Альбом · 2025</div></div>
+        </div>
       </div></div>
       <div class="tab-panel" id="tab-electro"><div class="works-grid">
-        <div class="work-item" onclick="playTrack(3)"><div class="work-cover work-cover-play"><img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-play-icon"><svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg></div></div><div><div class="work-artist">DJ Pulse</div><div class="work-title">Deep Signal</div><div class="work-desc">Электроника · 2024</div></div></div>
+        <div class="work-item" onclick="playTrack(3)">
+          <div class="work-cover">
+            <img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80" alt="">
+            <div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div>
+          </div>
+          <div><div class="work-artist">DJ Pulse</div><div class="work-title">Deep Signal</div><div class="work-desc">Электроника · 2024</div></div>
+        </div>
       </div></div>
       <div class="tab-panel" id="tab-film"><div class="works-grid">
-        <div class="work-item" onclick="playTrack(2)"><div class="work-cover work-cover-play"><img src="https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-play-icon"><svg width="12" height="14" viewBox="0 0 12 14"><polygon points="0,0 12,7 0,14" fill="white"/></svg></div></div><div><div class="work-artist">Сериал «Нить»</div><div class="work-title">Оригинальный саундтрек</div><div class="work-desc">Саундтрек · 2024</div></div></div>
+        <div class="work-item" onclick="playTrack(2)">
+          <div class="work-cover">
+            <img src="https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&w=200&q=80" alt="">
+            <div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div>
+          </div>
+          <div><div class="work-artist">Сериал «Нить»</div><div class="work-title">Оригинальный саундтрек</div><div class="work-desc">Саундтрек · 2024</div></div>
+        </div>
       </div></div>
     </div>
   </div>
@@ -601,8 +791,6 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   </div>
 </div>
 
-
-
 <section>
   <div class="section-inner">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:0"><div><div class="section-eyebrow">Студия изнутри</div><h2 class="section-title">Визуальная атмосфера</h2></div></div>
@@ -616,35 +804,24 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   </div>
 </section>
 
-<!-- PRICING — с переключателем категорий -->
+<!-- PRICING -->
 <section id="pricing" style="background:var(--navy2)">
   <div class="section-inner">
     <div class="section-eyebrow">Пакеты и цены</div>
     <h2 class="section-title">Тарифы</h2>
     <p class="section-sub" style="margin-bottom:2rem">Выберите пакет для вашего проекта. Все цены включают работу инженера.</p>
-
-    <!-- Переключатель категорий -->
     <div class="pricing-tabs">
       <button class="ptab-btn active" onclick="switchPricing(this,'pricing-studio')">🎙 Студия звукозаписи</button>
       <button class="ptab-btn" onclick="switchPricing(this,'pricing-vocal')">🎤 Уроки вокала</button>
       <button class="ptab-btn" onclick="switchPricing(this,'pricing-guitar')">🎸 Уроки гитары</button>
     </div>
-
     <div class="pricing-panels-wrap">
-
-      <!-- Студия звукозаписи -->
       <div class="pricing-panel active" id="pricing-studio">
         <div class="pricing-card">
           <div class="pricing-name">Базовый</div>
           <div class="pricing-price">15 000 ₽</div>
           <div class="pricing-period">за сессию (до 8 часов)</div>
-          <ul class="pricing-list">
-            <li>Запись вокала или инструмента</li>
-            <li>Базовая обработка</li>
-            <li>2 правки</li>
-            <li>Файлы WAV / MP3</li>
-            <li>Поддержка 1 неделю</li>
-          </ul>
+          <ul class="pricing-list"><li>Запись вокала или инструмента</li><li>Базовая обработка</li><li>2 правки</li><li>Файлы WAV / MP3</li><li>Поддержка 1 неделю</li></ul>
           <a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Выбрать</a>
         </div>
         <div class="pricing-card featured">
@@ -652,43 +829,23 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
           <div class="pricing-name">Стандарт</div>
           <div class="pricing-price">45 000 ₽</div>
           <div class="pricing-period">за EP (до 5 треков)</div>
-          <ul class="pricing-list">
-            <li>Полная запись EP</li>
-            <li>Профессиональное сведение</li>
-            <li>Мастеринг для стриминга</li>
-            <li>Неограниченные правки</li>
-            <li>Поддержка 1 месяц</li>
-          </ul>
+          <ul class="pricing-list"><li>Полная запись EP</li><li>Профессиональное сведение</li><li>Мастеринг для стриминга</li><li>Неограниченные правки</li><li>Поддержка 1 месяц</li></ul>
           <a href="#contact" class="btn-primary" style="width:100%;justify-content:center">Выбрать</a>
         </div>
         <div class="pricing-card">
           <div class="pricing-name">Премиум</div>
           <div class="pricing-price">150 000 ₽</div>
           <div class="pricing-period">за альбом (до 12 треков)</div>
-          <ul class="pricing-list">
-            <li>Полное продюсирование</li>
-            <li>Запись, сведение, мастеринг</li>
-            <li>Персональный продюсер</li>
-            <li>Дистрибуция по платформам</li>
-            <li>VIP-поддержка 3 месяца</li>
-          </ul>
+          <ul class="pricing-list"><li>Полное продюсирование</li><li>Запись, сведение, мастеринг</li><li>Персональный продюсер</li><li>Дистрибуция по платформам</li><li>VIP-поддержка 3 месяца</li></ul>
           <a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Выбрать</a>
         </div>
       </div>
-
-      <!-- Уроки вокала -->
       <div class="pricing-panel" id="pricing-vocal">
         <div class="pricing-card">
           <div class="pricing-name">Разовый урок</div>
           <div class="pricing-price">3 500 ₽</div>
           <div class="pricing-period">60 минут · один урок</div>
-          <ul class="pricing-list">
-            <li>Диагностика голоса</li>
-            <li>Упражнения на дыхание</li>
-            <li>Работа над интонацией</li>
-            <li>Домашнее задание</li>
-            <li>Запись в удобное время</li>
-          </ul>
+          <ul class="pricing-list"><li>Диагностика голоса</li><li>Упражнения на дыхание</li><li>Работа над интонацией</li><li>Домашнее задание</li><li>Запись в удобное время</li></ul>
           <a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a>
         </div>
         <div class="pricing-card featured">
@@ -696,43 +853,23 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
           <div class="pricing-name">Курс «Старт»</div>
           <div class="pricing-price">24 000 ₽</div>
           <div class="pricing-period">8 занятий · 2 раза в неделю</div>
-          <ul class="pricing-list">
-            <li>Полный курс для начинающих</li>
-            <li>Постановка дыхания и голоса</li>
-            <li>Работа с репертуаром</li>
-            <li>Видеозапись прогресса</li>
-            <li>Чат с преподавателем</li>
-          </ul>
+          <ul class="pricing-list"><li>Полный курс для начинающих</li><li>Постановка дыхания и голоса</li><li>Работа с репертуаром</li><li>Видеозапись прогресса</li><li>Чат с преподавателем</li></ul>
           <a href="#contact" class="btn-primary" style="width:100%;justify-content:center">Записаться</a>
         </div>
         <div class="pricing-card">
           <div class="pricing-name">Профессионал</div>
           <div class="pricing-price">55 000 ₽</div>
           <div class="pricing-period">20 занятий · индивидуально</div>
-          <ul class="pricing-list">
-            <li>Профессиональная подготовка</li>
-            <li>Работа с педагогом-вокалистом</li>
-            <li>Запись демо-трека в студии</li>
-            <li>Подготовка к выступлениям</li>
-            <li>Консультации онлайн</li>
-          </ul>
+          <ul class="pricing-list"><li>Профессиональная подготовка</li><li>Работа с педагогом-вокалистом</li><li>Запись демо-трека в студии</li><li>Подготовка к выступлениям</li><li>Консультации онлайн</li></ul>
           <a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a>
         </div>
       </div>
-
-      <!-- Уроки гитары -->
       <div class="pricing-panel" id="pricing-guitar">
         <div class="pricing-card">
           <div class="pricing-name">Пробный урок</div>
           <div class="pricing-price">2 000 ₽</div>
           <div class="pricing-period">45 минут · первое знакомство</div>
-          <ul class="pricing-list">
-            <li>Оценка уровня игры</li>
-            <li>Первые аккорды / основы</li>
-            <li>Выбор репертуара</li>
-            <li>План обучения</li>
-            <li>Рекомендации по инструменту</li>
-          </ul>
+          <ul class="pricing-list"><li>Оценка уровня игры</li><li>Первые аккорды / основы</li><li>Выбор репертуара</li><li>План обучения</li><li>Рекомендации по инструменту</li></ul>
           <a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a>
         </div>
         <div class="pricing-card featured">
@@ -740,30 +877,17 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
           <div class="pricing-name">Курс «Акустика»</div>
           <div class="pricing-price">18 000 ₽</div>
           <div class="pricing-period">8 уроков · акустическая гитара</div>
-          <ul class="pricing-list">
-            <li>Техника боя и перебора</li>
-            <li>Базовые и баррэ-аккорды</li>
-            <li>10+ популярных песен</li>
-            <li>Теория музыки (базис)</li>
-            <li>Видеоматериалы для дома</li>
-          </ul>
+          <ul class="pricing-list"><li>Техника боя и перебора</li><li>Базовые и баррэ-аккорды</li><li>10+ популярных песен</li><li>Теория музыки (базис)</li><li>Видеоматериалы для дома</li></ul>
           <a href="#contact" class="btn-primary" style="width:100%;justify-content:center">Записаться</a>
         </div>
         <div class="pricing-card">
           <div class="pricing-name">Курс «Электро»</div>
           <div class="pricing-price">32 000 ₽</div>
           <div class="pricing-period">12 уроков · электрогитара</div>
-          <ul class="pricing-list">
-            <li>Электрогитара и усилитель</li>
-            <li>Риффы, соло, пентатоника</li>
-            <li>Работа с эффект-педалями</li>
-            <li>Разбор рок-классики</li>
-            <li>Запись риффов в студии</li>
-          </ul>
+          <ul class="pricing-list"><li>Электрогитара и усилитель</li><li>Риффы, соло, пентатоника</li><li>Работа с эффект-педалями</li><li>Разбор рок-классики</li><li>Запись риффов в студии</li></ul>
           <a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a>
         </div>
       </div>
-
     </div>
   </div>
 </section>
@@ -833,38 +957,98 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   <div class="footer-bottom"><div>© SPRING SOUND LAB, 2025. Все права защищены.</div><div style="display:flex;gap:1.5rem"><a href="#">Политика конфиденциальности</a><a href="#">Договор оферты</a></div></div>
 </footer>
 
+<!-- ═══════════════════════════════════ BOTTOM PLAYER ═══════════════════════════════════ -->
+<div id="bottom-player">
+  <!-- Track info -->
+  <div class="player-info">
+    <div class="player-cover"><img id="player-cover-img" src="" alt=""></div>
+    <div>
+      <div class="player-title" id="player-title">—</div>
+      <div class="player-artist" id="player-artist">—</div>
+    </div>
+  </div>
+
+  <!-- Controls + progress -->
+  <div class="player-controls">
+    <div class="player-btns">
+      <!-- Prev -->
+      <button class="p-btn" onclick="prevTrack()" title="Предыдущий трек">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+      </button>
+      <!-- Rewind 10s -->
+      <button class="p-btn" onclick="seekBy(-10)" title="-10 сек">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6 8.5 6V6l-8.5 6z"/></svg>
+      </button>
+      <!-- Play/Pause -->
+      <button class="p-btn-play" id="p-play-btn" onclick="togglePlay()">
+        <svg id="p-play-icon" width="18" height="20" viewBox="0 0 18 20" fill="white"><polygon points="0,0 18,10 0,20"/></svg>
+      </button>
+      <!-- Forward 10s -->
+      <button class="p-btn" onclick="seekBy(10)" title="+10 сек">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8.5-6L13 6zM4 18l8.5-6L4 6v12z"/></svg>
+      </button>
+      <!-- Next -->
+      <button class="p-btn" onclick="nextTrack()" title="Следующий трек">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-12v12l8.5-6L16 6h-8z"/></svg>
+      </button>
+    </div>
+    <!-- Progress -->
+    <div class="player-progress-wrap">
+      <span class="player-time" id="p-current">0:00</span>
+      <div class="player-progress" id="player-progress">
+        <div class="player-progress-fill" id="p-fill" style="width:0%"></div>
+        <div class="player-progress-thumb" id="p-thumb"></div>
+        <input type="range" id="player-range" min="0" max="100" value="0" step="0.1">
+      </div>
+      <span class="player-time" id="p-total">0:00</span>
+    </div>
+  </div>
+
+  <!-- Volume -->
+  <div class="player-volume">
+    <button class="vol-icon" onclick="toggleMute()" id="vol-icon-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" id="vol-svg">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+        <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77 0-4.28-2.99-7.86-7-8.77z"/>
+      </svg>
+    </button>
+    <div class="volume-slider">
+      <div class="volume-fill" id="vol-fill" style="width:80%"></div>
+      <input type="range" id="vol-range" min="0" max="100" value="80" step="1">
+    </div>
+  </div>
+
+  <!-- Close -->
+  <button class="player-close" onclick="closePlayer()" title="Закрыть плеер">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Hidden audio element -->
+<audio id="audio-el"></audio>
+
 <script>
+/* ══════════════ NAV & UI HELPERS ══════════════ */
 function toggleNav(){document.getElementById('mobileNav').classList.toggle('open')}
 function toggleFaq(btn){btn.parentElement.classList.toggle('open')}
 
-function switchTab(btn, id){
+function switchTab(btn,id){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById(id).classList.add('active');
 }
 
-function switchPricing(btn, id){
-  // Снимаем активный класс с кнопок
-  document.querySelectorAll('.ptab-btn').forEach(b => b.classList.remove('active'));
+function switchPricing(btn,id){
+  document.querySelectorAll('.ptab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-
-  // Текущая активная панель — скрываем с анимацией
-  const currentPanel = document.querySelector('.pricing-panel.active');
-  const nextPanel = document.getElementById(id);
-
-  if(currentPanel === nextPanel) return;
-
-  // Убираем активность с текущей (она уйдёт по CSS)
-  currentPanel.classList.remove('active');
-
-  // Небольшой timeout чтобы браузер применил начальное состояние (opacity:0, translateY)
-  // перед тем как добавить active и запустить transition
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      nextPanel.classList.add('active');
-    });
-  });
+  const cur=document.querySelector('.pricing-panel.active');
+  const nxt=document.getElementById(id);
+  if(cur===nxt)return;
+  cur.classList.remove('active');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>nxt.classList.add('active')));
 }
 
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
@@ -879,6 +1063,166 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 window.addEventListener('scroll',()=>{
   document.querySelector('nav').style.backdropFilter=window.scrollY>50?'blur(24px)':'blur(20px)';
 });
+
+/* ══════════════ PLAYER ══════════════ */
+const TRACKS = [
+  {
+    title:'Первая частота',
+    artist:'Echo',
+    cover:'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80',
+    src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+  },
+  {
+    title:'Тихий Сигнал',
+    artist:'Алиса Кравцова',
+    cover:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80',
+    src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
+  },
+  {
+    title:'Нить — OST',
+    artist:'Сериал «Нить»',
+    cover:'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=200&q=80',
+    src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
+  },
+  {
+    title:'Одиночество в сети',
+    artist:'Ноябрь',
+    cover:'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80',
+    src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
+  }
+];
+
+const audio = document.getElementById('audio-el');
+let currentIdx = -1;
+let isPlaying = false;
+let muted = false;
+let lastVol = 0.8;
+
+const player    = document.getElementById('bottom-player');
+const coverImg  = document.getElementById('player-cover-img');
+const titleEl   = document.getElementById('player-title');
+const artistEl  = document.getElementById('player-artist');
+const playIcon  = document.getElementById('p-play-icon');
+const pFill     = document.getElementById('p-fill');
+const pThumb    = document.getElementById('p-thumb');
+const pRange    = document.getElementById('player-range');
+const pCurrent  = document.getElementById('p-current');
+const pTotal    = document.getElementById('p-total');
+const volFill   = document.getElementById('vol-fill');
+const volRange  = document.getElementById('vol-range');
+
+function fmt(s){
+  s=Math.floor(s)||0;
+  return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;
+}
+
+function setPlayIcon(playing){
+  isPlaying=playing;
+  if(playing){
+    playIcon.innerHTML='<rect x="0" y="0" width="6" height="20" rx="1"/><rect x="10" y="0" width="6" height="20" rx="1"/>';
+  } else {
+    playIcon.innerHTML='<polygon points="0,0 18,10 0,20"/>';
+  }
+}
+
+function showPlayer(){
+  player.classList.add('visible');
+  document.body.classList.add('player-open');
+}
+
+function closePlayer(){
+  audio.pause();
+  audio.src='';
+  player.classList.remove('visible');
+  document.body.classList.remove('player-open');
+  setPlayIcon(false);
+  currentIdx=-1;
+  pFill.style.width='0%';
+  pRange.value=0;
+  pCurrent.textContent='0:00';
+  pTotal.textContent='0:00';
+}
+
+function playTrack(idx){
+  if(idx<0||idx>=TRACKS.length)return;
+  currentIdx=idx;
+  const t=TRACKS[idx];
+  coverImg.src=t.cover;
+  titleEl.textContent=t.title;
+  artistEl.textContent=t.artist;
+  audio.src=t.src;
+  audio.volume=lastVol;
+  audio.play().catch(()=>{});
+  setPlayIcon(true);
+  showPlayer();
+}
+
+function togglePlay(){
+  if(currentIdx===-1){playTrack(0);return;}
+  if(audio.paused){audio.play().catch(()=>{});setPlayIcon(true);}
+  else{audio.pause();setPlayIcon(false);}
+}
+
+function prevTrack(){
+  if(currentIdx<=0)playTrack(TRACKS.length-1);
+  else playTrack(currentIdx-1);
+}
+
+function nextTrack(){
+  if(currentIdx>=TRACKS.length-1)playTrack(0);
+  else playTrack(currentIdx+1);
+}
+
+function seekBy(sec){
+  if(!audio.duration)return;
+  audio.currentTime=Math.max(0,Math.min(audio.duration,audio.currentTime+sec));
+}
+
+function toggleMute(){
+  if(muted){audio.volume=lastVol;muted=false;volRange.value=lastVol*100;volFill.style.width=(lastVol*100)+'%';}
+  else{lastVol=audio.volume||lastVol;audio.volume=0;muted=true;volRange.value=0;volFill.style.width='0%';}
+}
+
+/* progress drag */
+pRange.addEventListener('input',()=>{
+  if(!audio.duration)return;
+  const pct=pRange.value/100;
+  audio.currentTime=pct*audio.duration;
+  pFill.style.width=pRange.value+'%';
+  pThumb.style.right=((100-pRange.value)/100*(document.getElementById('player-progress').offsetWidth-12))+'px';
+});
+
+/* volume drag */
+volRange.addEventListener('input',()=>{
+  const v=volRange.value/100;
+  audio.volume=v;
+  lastVol=v||lastVol;
+  muted=v===0;
+  volFill.style.width=volRange.value+'%';
+});
+
+/* timeupdate */
+audio.addEventListener('timeupdate',()=>{
+  if(!audio.duration)return;
+  const pct=(audio.currentTime/audio.duration)*100;
+  pFill.style.width=pct+'%';
+  pRange.value=pct;
+  pCurrent.textContent=fmt(audio.currentTime);
+});
+
+audio.addEventListener('loadedmetadata',()=>{
+  pTotal.textContent=fmt(audio.duration);
+});
+
+audio.addEventListener('ended',()=>{
+  nextTrack();
+});
+
+audio.addEventListener('play',()=>setPlayIcon(true));
+audio.addEventListener('pause',()=>setPlayIcon(false));
+
+/* init volume */
+audio.volume=0.8;
 </script>
 </body>
 </html>
