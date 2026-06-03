@@ -160,9 +160,23 @@ section{padding:100px 5%}
 .ptab-btn{padding:0.6rem 1.4rem;background:var(--white04);border:1px solid var(--border);border-radius:50px;color:var(--white50);font-family:var(--sans);font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.25s;white-space:nowrap;}
 .ptab-btn:hover{color:var(--white);border-color:var(--white15)}
 .ptab-btn.active{background:var(--blue);border-color:var(--blue);color:var(--white);box-shadow:0 0 20px rgba(26,111,255,0.35);}
-.pricing-panels-wrap{position:relative;}
-.pricing-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;opacity:0;transform:translateY(12px);position:absolute;top:0;left:0;width:100%;pointer-events:none;transition:opacity 0.4s ease,transform 0.4s ease;}
-.pricing-panel.active{opacity:1;transform:translateY(0);position:relative;pointer-events:auto;}
+.pricing-panels-wrap{position:relative;min-height:100px;}
+.pricing-panel{
+  display:none;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+.pricing-panel.active{
+  display:grid;
+}
+/* fade-in keyframe для входящей панели */
+@keyframes pricingFadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.pricing-panel.anim-in{
+  animation:pricingFadeIn 0.35s ease forwards;
+}
 .pricing-card{background:var(--white04);border:1px solid var(--border);border-radius:var(--r2);padding:2.5rem 2rem;position:relative;transition:all 0.3s;}
 .pricing-card:hover{transform:translateY(-3px)}
 .pricing-card.featured{background:linear-gradient(135deg,rgba(26,111,255,0.12),rgba(26,111,255,0.06));border-color:var(--blue)}
@@ -437,7 +451,7 @@ body.player-open{padding-bottom:72px}
   .team-grid{grid-template-columns:1fr 1fr}
   .blog-grid{grid-template-columns:1fr 1fr}
   .releases-grid{grid-template-columns:1fr 1fr}
-  .pricing-panel{grid-template-columns:1fr;gap:12px}
+  .pricing-panel.active{grid-template-columns:1fr;gap:12px}
   .stats-grid{grid-template-columns:1fr 1fr}
   .test-grid{grid-template-columns:1fr}
   .contact-grid{grid-template-columns:1fr;gap:40px}
@@ -795,14 +809,34 @@ function switchTab(btn,id){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');document.getElementById(id).classList.add('active');
 }
+let pricingSwitching = false;
 function switchPricing(btn,id){
+  if(pricingSwitching) return;
   document.querySelectorAll('.ptab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const cur=document.querySelector('.pricing-panel.active');
-  const nxt=document.getElementById(id);
-  if(cur===nxt)return;
-  cur.classList.remove('active');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>nxt.classList.add('active')));
+  const cur = document.querySelector('.pricing-panel.active');
+  const nxt = document.getElementById(id);
+  if(cur === nxt) return;
+  pricingSwitching = true;
+
+  // Fade out current panel
+  cur.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+  cur.style.opacity = '0';
+  cur.style.transform = 'translateY(-8px)';
+
+  setTimeout(() => {
+    cur.classList.remove('active');
+    cur.style.transition = '';
+    cur.style.opacity = '';
+    cur.style.transform = '';
+
+    // Show next panel with fade-in animation
+    nxt.classList.add('active', 'anim-in');
+    nxt.addEventListener('animationend', () => {
+      nxt.classList.remove('anim-in');
+      pricingSwitching = false;
+    }, {once: true});
+  }, 220);
 }
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
