@@ -207,24 +207,7 @@ section{padding:100px 5%}
 .release-cover{aspect-ratio:1;border-radius:var(--r);overflow:hidden;margin-bottom:1.25rem;background:var(--navy3);position:relative;cursor:pointer;}
 .release-cover img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
 .release-cover:hover img{transform:scale(1.04)}
-/* Always-visible play overlay on release covers */
-.release-cover-overlay{
-  position:absolute;inset:0;
-  background:rgba(6,13,31,0.35);
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.3s;
-}
-.release-cover:hover .release-cover-overlay{background:rgba(6,13,31,0.55)}
-.release-cover-play-icon{
-  width:56px;height:56px;border-radius:50%;
-  background:rgba(26,111,255,0.85);
-  border:2px solid rgba(255,255,255,0.3);
-  display:flex;align-items:center;justify-content:center;
-  transition:transform 0.3s,background 0.3s;
-  box-shadow:0 4px 20px rgba(26,111,255,0.5);
-}
-.release-cover:hover .release-cover-play-icon{transform:scale(1.12);background:var(--blue2)}
-.release-cover-play-icon svg{fill:white;margin-left:3px}
+/* No overlay on big release covers — play button is below */
 
 .release-type{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue2);font-weight:800;margin-bottom:0.4rem}
 .release-title{font-family:var(--display);font-size:1.2rem;font-weight:800;margin-bottom:0.3rem}
@@ -392,27 +375,27 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 
 /* ── BOTTOM PLAYER ── */
 #bottom-player{
-  position:fixed;bottom:-120px;left:0;right:0;z-index:200;
+  position:fixed;bottom:-80px;left:0;right:0;z-index:200;
   background:rgba(6,13,31,0.96);
   backdrop-filter:blur(24px);
   border-top:1px solid var(--border2);
-  padding:0 5%;height:96px;
-  display:flex;align-items:center;gap:1.5rem;
+  padding:0 3% 0 4%;height:68px;
+  display:flex;align-items:center;gap:1rem;
   transition:bottom 0.4s cubic-bezier(0.34,1.56,0.64,1);
   box-shadow:0 -8px 40px rgba(0,0,0,0.5);
 }
 #bottom-player.visible{bottom:0}
 
 /* Track info */
-.player-info{display:flex;align-items:center;gap:1rem;min-width:220px;flex:0 0 auto}
-.player-cover{width:56px;height:56px;border-radius:10px;overflow:hidden;background:var(--navy3);flex-shrink:0;border:1px solid var(--border)}
+.player-info{display:flex;align-items:center;gap:0.75rem;min-width:180px;flex:0 0 auto}
+.player-cover{width:42px;height:42px;border-radius:8px;overflow:hidden;background:var(--navy3);flex-shrink:0;border:1px solid var(--border)}
 .player-cover img{width:100%;height:100%;object-fit:cover}
-.player-title{font-size:0.9rem;font-weight:800;margin-bottom:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
-.player-artist{font-size:0.75rem;color:var(--blue2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.player-title{font-size:0.82rem;font-weight:800;margin-bottom:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.player-artist{font-size:0.7rem;color:var(--blue2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
 
 /* Controls */
-.player-controls{display:flex;align-items:center;gap:0;flex:1;flex-direction:column;gap:0.5rem;max-width:640px;margin:0 auto}
-.player-btns{display:flex;align-items:center;gap:0.75rem}
+.player-controls{display:flex;align-items:center;gap:0;flex:1;flex-direction:column;gap:4px;max-width:600px;margin:0 auto}
+.player-btns{display:flex;align-items:center;gap:0.5rem}
 .p-btn{
   background:transparent;border:none;cursor:pointer;
   color:var(--white50);transition:color 0.2s,transform 0.15s;
@@ -421,18 +404,18 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 }
 .p-btn:hover{color:var(--white);transform:scale(1.1)}
 .p-btn-play{
-  width:44px;height:44px;border-radius:50%;
+  width:36px;height:36px;border-radius:50%;
   background:var(--blue);color:var(--white);
   border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:all 0.2s;
-  box-shadow:0 0 20px rgba(26,111,255,0.4);
+  box-shadow:0 0 16px rgba(26,111,255,0.4);
 }
-.p-btn-play:hover{background:var(--blue2);transform:scale(1.08);box-shadow:0 0 30px rgba(26,111,255,0.6)}
+.p-btn-play:hover{background:var(--blue2);transform:scale(1.08);box-shadow:0 0 24px rgba(26,111,255,0.6)}
 
 /* Progress bar */
-.player-progress-wrap{width:100%;display:flex;align-items:center;gap:0.75rem}
-.player-time{font-size:0.72rem;color:var(--white50);font-weight:600;min-width:36px;text-align:center}
+.player-progress-wrap{width:100%;display:flex;align-items:center;gap:0.5rem}
+.player-time{font-size:0.68rem;color:var(--white50);font-weight:600;min-width:30px;text-align:center}
 .player-progress{
   flex:1;height:4px;background:var(--white15);border-radius:2px;
   cursor:pointer;position:relative;overflow:visible;
@@ -468,15 +451,15 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 /* Close button */
 .player-close{
   background:transparent;border:none;cursor:pointer;
-  color:var(--white50);transition:color 0.2s,transform 0.2s;
-  padding:8px;border-radius:50%;
+  color:#e05555;transition:color 0.2s,transform 0.2s,background 0.2s;
+  padding:7px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
+  flex-shrink:0;margin-left:0.5rem;
 }
-.player-close:hover{color:var(--white);background:var(--white08);transform:scale(1.1)}
+.player-close:hover{color:#ff3333;background:rgba(220,50,50,0.15);transform:scale(1.12)}
 
 /* body padding when player visible */
-body.player-open{padding-bottom:96px}
+body.player-open{padding-bottom:68px}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
@@ -641,11 +624,6 @@ body.player-open{padding-bottom:96px}
       <div class="release-card">
         <div class="release-cover" onclick="playTrack(0)">
           <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=600&q=80" alt="">
-          <div class="release-cover-overlay">
-            <div class="release-cover-play-icon">
-              <svg width="18" height="22" viewBox="0 0 18 22"><polygon points="0,0 18,11 0,22"/></svg>
-            </div>
-          </div>
         </div>
         <div class="release-type">Альбом</div>
         <div class="release-title">Первая частота</div>
@@ -656,11 +634,6 @@ body.player-open{padding-bottom:96px}
       <div class="release-card">
         <div class="release-cover" onclick="playTrack(1)">
           <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80" alt="">
-          <div class="release-cover-overlay">
-            <div class="release-cover-play-icon">
-              <svg width="18" height="22" viewBox="0 0 18 22"><polygon points="0,0 18,11 0,22"/></svg>
-            </div>
-          </div>
         </div>
         <div class="release-type">EP</div>
         <div class="release-title">Тихий Сигнал</div>
@@ -671,11 +644,6 @@ body.player-open{padding-bottom:96px}
       <div class="release-card">
         <div class="release-cover" onclick="playTrack(2)">
           <img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=600&q=80" alt="">
-          <div class="release-cover-overlay">
-            <div class="release-cover-play-icon">
-              <svg width="18" height="22" viewBox="0 0 18 22"><polygon points="0,0 18,11 0,22"/></svg>
-            </div>
-          </div>
         </div>
         <div class="release-type">Саундтрек</div>
         <div class="release-title">Нить</div>
@@ -973,23 +941,23 @@ body.player-open{padding-bottom:96px}
     <div class="player-btns">
       <!-- Prev -->
       <button class="p-btn" onclick="prevTrack()" title="Предыдущий трек">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
       </button>
       <!-- Rewind 10s -->
       <button class="p-btn" onclick="seekBy(-10)" title="-10 сек">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6 8.5 6V6l-8.5 6z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="8.5" y="15" font-size="6" font-weight="bold" fill="currentColor" font-family="Arial">10</text></svg>
       </button>
       <!-- Play/Pause -->
       <button class="p-btn-play" id="p-play-btn" onclick="togglePlay()">
-        <svg id="p-play-icon" width="18" height="20" viewBox="0 0 18 20" fill="white"><polygon points="0,0 18,10 0,20"/></svg>
+        <svg id="p-play-icon" width="14" height="16" viewBox="0 0 18 20" fill="white"><polygon points="0,0 18,10 0,20"/></svg>
       </button>
       <!-- Forward 10s -->
       <button class="p-btn" onclick="seekBy(10)" title="+10 сек">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13 6v12l8.5-6L13 6zM4 18l8.5-6L4 6v12z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="8.5" y="15" font-size="6" font-weight="bold" fill="currentColor" font-family="Arial">10</text></svg>
       </button>
       <!-- Next -->
       <button class="p-btn" onclick="nextTrack()" title="Следующий трек">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-12v12l8.5-6L16 6h-8z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2.5-6 8.5 6V6l-8.5 6z"/></svg>
       </button>
     </div>
     <!-- Progress -->
