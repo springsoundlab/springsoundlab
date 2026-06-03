@@ -341,85 +341,95 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 .footer-bottom a{color:var(--white50);text-decoration:none;transition:color 0.2s;font-weight:600}
 .footer-bottom a:hover{color:var(--blue2)}
 
-/* ══════════════ BOTTOM PLAYER ══════════════ */
+/* ══════════════ BOTTOM PLAYER (new) ══════════════ */
 #bottom-player{
   position:fixed;bottom:-80px;left:0;right:0;z-index:200;
-  background:rgba(6,13,31,0.96);
+  background:rgba(6,13,31,0.97);
   backdrop-filter:blur(24px);
   border-top:1px solid var(--border2);
-  height:68px;
-  display:flex;flex-direction:column;
   transition:bottom 0.4s cubic-bezier(0.34,1.56,0.64,1);
   box-shadow:0 -8px 40px rgba(0,0,0,0.5);
 }
 #bottom-player.visible{bottom:0}
 
-/* Progress bar — top strip */
+/* Progress bar */
 .player-progress-top{
-  position:relative;height:3px;background:var(--white15);cursor:pointer;
-  flex-shrink:0;transition:height .15s ease;
+  position:relative;height:4px;background:var(--white15);cursor:pointer;
+  transition:height .15s ease;
 }
-.player-progress-top:hover{height:5px}
-.player-progress-top:hover .player-progress-thumb{opacity:1}
-.player-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue2));pointer-events:none;transition:width .1s linear}
-.player-progress-thumb{
-  position:absolute;top:50%;transform:translateY(-50%);
-  width:12px;height:12px;border-radius:50%;background:var(--white);
-  box-shadow:0 0 6px rgba(26,111,255,0.5);pointer-events:none;
-  opacity:0;transition:opacity .2s;margin-left:-6px;
+.player-progress-top:hover{height:6px}
+.player-progress-top:hover .prog-thumb{opacity:1}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue2));pointer-events:none;transition:width .1s linear}
+.prog-thumb{
+  position:absolute;top:50%;transform:translateY(-50%) translateX(-50%);
+  width:14px;height:14px;border-radius:50%;background:var(--white);
+  box-shadow:0 0 6px rgba(26,111,255,0.6);pointer-events:none;
+  opacity:0;transition:opacity .2s;
 }
-#player-range{
-  position:absolute;inset:0;opacity:0;cursor:pointer;
-  width:100%;height:100%;margin:0;
-}
+#player-range{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;margin:0;}
 
 /* Main row */
 .player-main-row{
-  flex:1;display:flex;align-items:center;
-  padding:0 16px 0 20px;gap:0;overflow:hidden;
+  display:flex;align-items:center;
+  padding:10px 16px;gap:0;
 }
 
-/* Track info — fixed left */
+/* Track info — left */
 .player-info{
   display:flex;align-items:center;gap:10px;
-  width:200px;flex-shrink:0;min-width:0;overflow:hidden;
+  width:190px;flex-shrink:0;min-width:0;overflow:hidden;
 }
-.player-cover{width:38px;height:38px;border-radius:8px;overflow:hidden;background:var(--navy3);flex-shrink:0;border:1px solid var(--border)}
+.player-cover{width:40px;height:40px;border-radius:8px;overflow:hidden;background:var(--navy3);flex-shrink:0;border:1px solid var(--border)}
 .player-cover img{width:100%;height:100%;object-fit:cover}
-.player-title{font-size:12px;font-weight:800;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.player-title{font-size:12px;font-weight:800;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .player-artist{font-size:10px;color:var(--blue2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-/* Controls — always centered */
+/* Controls — center */
 .player-controls{
-  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:0 8px;
 }
+.player-btns{display:flex;align-items:center;justify-content:center;gap:4px;}
+.player-time-row{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--white50);font-weight:600;width:100%;}
+.tl-fill{height:100%;background:var(--white50);border-radius:1px;pointer-events:none}
+
 .p-btn{
   background:transparent;border:none;cursor:pointer;
-  color:var(--white50);transition:color .2s,transform .15s;
-  display:flex;align-items:center;justify-content:center;padding:6px;
+  color:var(--white50);transition:color .2s,background .2s,transform .15s;
+  display:flex;align-items:center;justify-content:center;
+  padding:5px;border-radius:50%;
 }
-.p-btn:hover{color:var(--white);transform:scale(1.1)}
+.p-btn:hover{color:var(--white);background:var(--white08);transform:scale(1.1)}
+.p-btn.active{color:var(--blue2)}
 .p-btn-play{
-  width:36px;height:36px;border-radius:50%;
+  width:40px;height:40px;border-radius:50%;
   background:var(--blue);color:var(--white);
   border:none;cursor:pointer;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  transition:all .2s;box-shadow:0 0 16px rgba(26,111,255,0.4);
+  transition:all .2s;box-shadow:0 0 18px rgba(26,111,255,0.5);
 }
-.p-btn-play:hover{background:var(--blue2);transform:scale(1.08);box-shadow:0 0 24px rgba(26,111,255,0.6)}
+.p-btn-play:hover{background:var(--blue2);transform:scale(1.08);box-shadow:0 0 26px rgba(26,111,255,0.65)}
 
-/* Right side — fixed right */
+/* Right side */
 .player-right{
   display:flex;align-items:center;gap:8px;
-  width:200px;flex-shrink:0;justify-content:flex-end;
+  width:190px;flex-shrink:0;justify-content:flex-end;
 }
-.player-time{font-size:10px;color:var(--white50);font-weight:600;white-space:nowrap}
 .player-volume{display:flex;align-items:center;gap:6px}
 .vol-icon{color:var(--white50);cursor:pointer;transition:color .2s;background:none;border:none;display:flex;align-items:center;padding:4px;}
 .vol-icon:hover{color:var(--white)}
-.volume-slider{width:56px;height:3px;background:var(--white15);border-radius:2px;position:relative;cursor:pointer;}
+.volume-slider{width:64px;height:4px;background:var(--white15);border-radius:2px;position:relative;cursor:pointer;}
 .volume-fill{height:100%;background:var(--white50);border-radius:2px;pointer-events:none}
 #vol-range{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;margin:0;}
+
+.queue-toggle-btn{
+  background:transparent;border:none;cursor:pointer;
+  color:var(--white50);transition:color .2s,background .2s;
+  padding:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+}
+.queue-toggle-btn:hover{color:var(--white);background:var(--white08)}
+.queue-toggle-btn.active{color:var(--blue2)}
+
 .player-close{
   background:transparent;border:none;cursor:pointer;
   color:#e05555;transition:color .2s,transform .2s,background .2s;
@@ -428,7 +438,28 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 }
 .player-close:hover{color:#ff3333;background:rgba(220,50,50,0.15);transform:scale(1.12)}
 
-/* body padding when player visible */
+/* Queue panel */
+.player-queue{
+  border-top:1px solid var(--border);
+  max-height:0;overflow:hidden;transition:max-height .4s ease;
+}
+.player-queue.open{max-height:260px;overflow-y:auto}
+.queue-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;cursor:pointer;
+  border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.queue-item:hover{background:var(--white04)}
+.queue-item.playing{background:var(--white08)}
+.q-num{width:18px;text-align:right;font-size:10px;color:var(--white50);font-weight:600;flex-shrink:0}
+.q-cover{width:34px;height:34px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--navy3)}
+.q-cover img{width:100%;height:100%;object-fit:cover}
+.q-info{flex:1;min-width:0}
+.q-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--white)}
+.q-artist{font-size:10px;color:var(--blue2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.q-dur{font-size:10px;color:var(--white50);font-weight:600;flex-shrink:0}
+
 body.player-open{padding-bottom:68px}
 
 /* ── RESPONSIVE ── */
@@ -448,8 +479,8 @@ body.player-open{padding-bottom:68px}
   .works-grid{grid-template-columns:1fr}
   .gallery-grid{grid-template-columns:1fr 1fr;grid-auto-rows:180px}
   .gallery-item:first-child{grid-column:span 2;grid-row:span 1}
-  .player-info{width:160px}
-  .player-right{width:160px}
+  .player-info{width:150px}
+  .player-right{width:150px}
 }
 @media(max-width:580px){
   section{padding:70px 4%}
@@ -461,7 +492,7 @@ body.player-open{padding-bottom:68px}
   .gallery-grid{grid-template-columns:1fr;grid-auto-rows:220px}
   .gallery-item:first-child{grid-column:span 1}
   .player-info{width:120px}
-  .player-right{width:120px}
+  .player-right{width:100px}
   .player-volume{display:none}
 }
 </style>
@@ -877,50 +908,56 @@ body.player-open{padding-bottom:68px}
 
   <!-- Progress bar — top strip -->
   <div class="player-progress-top" id="player-progress">
-    <div class="player-progress-fill" id="p-fill" style="width:0%"></div>
-    <div class="player-progress-thumb" id="p-thumb"></div>
+    <div class="prog-fill" id="p-fill" style="width:0%"></div>
+    <div class="prog-thumb" id="p-thumb"></div>
     <input type="range" id="player-range" min="0" max="100" value="0" step="0.1">
   </div>
 
   <!-- Main row -->
   <div class="player-main-row">
 
-    <!-- Track info — fixed left -->
+    <!-- Track info — left -->
     <div class="player-info">
       <div class="player-cover"><img id="player-cover-img" src="" alt=""></div>
-      <div style="min-width:0;overflow:hidden;">
+      <div style="min-width:0;flex:1;overflow:hidden;">
         <div class="player-title" id="player-title">—</div>
         <div class="player-artist" id="player-artist">—</div>
       </div>
     </div>
 
-    <!-- Controls — strictly centered -->
+    <!-- Controls — center -->
     <div class="player-controls">
-      <button class="p-btn" onclick="prevTrack()" title="Предыдущий трек">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
-      </button>
-      <button class="p-btn" onclick="seekBy(-10)" title="-10 сек">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="8.5" y="15" font-size="6" font-weight="bold" fill="currentColor" font-family="Arial">10</text></svg>
-      </button>
-      <button class="p-btn-play" id="p-play-btn" onclick="togglePlay()">
-        <svg id="p-play-icon" width="12" height="14" viewBox="0 0 18 20" fill="white"><polygon points="2,0 18,10 2,20"/></svg>
-      </button>
-      <button class="p-btn" onclick="seekBy(10)" title="+10 сек">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 19V23l5-5-5-5v4c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6h2c0-4.42-3.58-8-8-8s-8 3.58-8 8 3.58 8 8 8z"/><text x="8.5" y="13" font-size="6" font-weight="bold" fill="currentColor" font-family="Arial">10</text></svg>
-      </button>
-      <button class="p-btn" onclick="nextTrack()" title="Следующий трек">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 6h-2v12h2zm-11.5 6L15 18V6z"/></svg>
-      </button>
+      <div class="player-btns">
+        <button class="p-btn" id="shuf-btn" title="Перемешать" onclick="toggleShuffle()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17zm4.76-.08 3.65 3.91-3.65 3.91V14h-.02c-.91-.02-1.77-.35-2.45-.97l-1.42 1.43c1.05.98 2.43 1.53 3.87 1.54H17v2.5l3.5-3.5L17 11.42V14h-.01l-3.01-3.22 1.43-1.43c.68-.63 1.54-.96 2.42-.97H17V6.67l-3.5 3.5zm-7.08 7.08L4 19.59 5.41 21l4.17-4.17z"/></svg>
+        </button>
+        <button class="p-btn" onclick="prevTrack()" title="Предыдущий">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+        </button>
+        <button class="p-btn-play" id="p-play-btn" onclick="togglePlay()">
+          <svg id="p-play-icon" width="12" height="14" viewBox="0 0 18 20" fill="white"><polygon points="2,0 18,10 2,20"/></svg>
+        </button>
+        <button class="p-btn" onclick="nextTrack()" title="Следующий">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 6h-2v12h2zM6.5 18l8.5-6-8.5-6z"/></svg>
+        </button>
+        <button class="p-btn" id="rep-btn" title="Повтор" onclick="toggleRepeat()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg>
+        </button>
+      </div>
+      <div class="player-time-row">
+        <span id="p-current">0:00</span>
+        <div style="flex:1;height:2px;background:var(--white15);border-radius:1px;position:relative;overflow:hidden;">
+          <div id="tl-fill" style="height:100%;background:var(--white50);border-radius:1px;width:0%;pointer-events:none"></div>
+        </div>
+        <span id="p-total">0:00</span>
+      </div>
     </div>
 
-    <!-- Right side: time + volume + close -->
+    <!-- Right side: volume + queue + close -->
     <div class="player-right">
-      <span class="player-time" id="p-current">0:00</span>
-      <span style="font-size:10px;color:var(--white15);font-weight:600;">/</span>
-      <span class="player-time" id="p-total">0:00</span>
       <div class="player-volume">
         <button class="vol-icon" onclick="toggleMute()" id="vol-icon-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" id="vol-svg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" id="vol-svg">
             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
             <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77 0-4.28-2.99-7.86-7-8.77z"/>
           </svg>
@@ -930,17 +967,23 @@ body.player-open{padding-bottom:68px}
           <input type="range" id="vol-range" min="0" max="100" value="80" step="1">
         </div>
       </div>
-      <button class="player-close" onclick="closePlayer()" title="Закрыть плеер">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
+      <button class="queue-toggle-btn" id="queue-toggle-btn" title="Очередь" onclick="toggleQueue()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h13v-2H3zm0-5h10v-2H3zm0-7v2h13V6zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5z"/></svg>
+      </button>
+      <button class="player-close" onclick="closePlayer()" title="Закрыть">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
       </button>
     </div>
 
   </div>
+
+  <!-- Queue panel -->
+  <div class="player-queue" id="player-queue">
+    <div id="queue-list"></div>
+  </div>
+
 </div>
 
-<!-- Hidden audio element -->
 <audio id="audio-el"></audio>
 
 <script>
@@ -979,71 +1022,59 @@ window.addEventListener('scroll',()=>{
 });
 
 /* ══════════════ PLAYER ══════════════ */
-const TRACKS = [
-  {
-    title:'Первая частота',
-    artist:'Echo',
-    cover:'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80',
-    src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
-  },
-  {
-    title:'Тихий Сигнал',
-    artist:'Алиса Кравцова',
-    cover:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80',
-    src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
-  },
-  {
-    title:'Нить — OST',
-    artist:'Сериал «Нить»',
-    cover:'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=200&q=80',
-    src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
-  },
-  {
-    title:'Одиночество в сети',
-    artist:'Ноябрь',
-    cover:'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80',
-    src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
-  }
+const TRACKS=[
+  {title:'Первая частота',artist:'Echo',cover:'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',dur:'5:38'},
+  {title:'Тихий Сигнал',artist:'Алиса Кравцова',cover:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',dur:'4:25'},
+  {title:'Нить — OST',artist:'Сериал «Нить»',cover:'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',dur:'6:12'},
+  {title:'Одиночество в сети',artist:'Ноябрь',cover:'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',dur:'3:47'}
 ];
 
-const audio     = document.getElementById('audio-el');
-let currentIdx  = -1;
-let isPlaying   = false;
-let muted       = false;
-let lastVol     = 0.8;
+const audio=document.getElementById('audio-el');
+let currentIdx=-1,isPlaying=false,muted=false,lastVol=0.8,shuffle=false,repeat=false,queueOpen=false;
 
-const player    = document.getElementById('bottom-player');
-const coverImg  = document.getElementById('player-cover-img');
-const titleEl   = document.getElementById('player-title');
-const artistEl  = document.getElementById('player-artist');
-const playIcon  = document.getElementById('p-play-icon');
-const pFill     = document.getElementById('p-fill');
-const pThumb    = document.getElementById('p-thumb');
-const pRange    = document.getElementById('player-range');
-const pCurrent  = document.getElementById('p-current');
-const pTotal    = document.getElementById('p-total');
-const volFill   = document.getElementById('vol-fill');
-const volRange  = document.getElementById('vol-range');
-const progBar   = document.getElementById('player-progress');
+const player=document.getElementById('bottom-player');
+const coverImg=document.getElementById('player-cover-img');
+const titleEl=document.getElementById('player-title');
+const artistEl=document.getElementById('player-artist');
+const playIcon=document.getElementById('p-play-icon');
+const pFill=document.getElementById('p-fill');
+const pThumb=document.getElementById('p-thumb');
+const pRange=document.getElementById('player-range');
+const pCurrent=document.getElementById('p-current');
+const pTotal=document.getElementById('p-total');
+const tlFill=document.getElementById('tl-fill');
+const volFill=document.getElementById('vol-fill');
+const volRange=document.getElementById('vol-range');
+const progBar=document.getElementById('player-progress');
+const queuePanel=document.getElementById('player-queue');
+const queueList=document.getElementById('queue-list');
 
-function fmt(s){
-  s=Math.floor(s)||0;
-  return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;
+function fmt(s){s=Math.floor(s)||0;return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60}
+
+function setPlayIcon(p){
+  isPlaying=p;
+  playIcon.innerHTML=p
+    ?'<rect x="0" y="0" width="5" height="20" rx="1"/><rect x="10" y="0" width="5" height="20" rx="1"/>'
+    :'<polygon points="2,0 18,10 2,20"/>';
 }
 
-function setPlayIcon(playing){
-  isPlaying=playing;
-  if(playing){
-    playIcon.innerHTML='<rect x="0" y="0" width="6" height="20" rx="1"/><rect x="10" y="0" width="6" height="20" rx="1"/>';
-  } else {
-    playIcon.innerHTML='<polygon points="2,0 18,10 2,20"/>';
-  }
+function updateProgress(pct){
+  pFill.style.width=pct+'%';
+  tlFill.style.width=pct+'%';
+  pRange.value=pct;
+  const barW=progBar.offsetWidth;
+  pThumb.style.left=((pct/100)*barW)+'px';
 }
 
-function updateThumbPos(pct){
-  var barW = progBar.offsetWidth;
-  var pos = (pct/100)*barW;
-  pThumb.style.left = pos + 'px';
+function renderQueue(){
+  queueList.innerHTML=TRACKS.map((t,i)=>`
+    <div class="queue-item${i===currentIdx?' playing':''}" onclick="playTrack(${i})">
+      <div class="q-num">${i===currentIdx?'▶':i+1}</div>
+      <div class="q-cover"><img src="${t.cover}" alt=""></div>
+      <div class="q-info"><div class="q-title">${t.title}</div><div class="q-artist">${t.artist}</div></div>
+      <div class="q-dur">${t.dur}</div>
+    </div>
+  `).join('');
 }
 
 function showPlayer(){
@@ -1058,10 +1089,11 @@ function closePlayer(){
   document.body.classList.remove('player-open');
   setPlayIcon(false);
   currentIdx=-1;
-  pFill.style.width='0%';
-  pRange.value=0;
+  updateProgress(0);
   pCurrent.textContent='0:00';
   pTotal.textContent='0:00';
+  queuePanel.classList.remove('open');
+  queueOpen=false;
 }
 
 function playTrack(idx){
@@ -1076,6 +1108,7 @@ function playTrack(idx){
   audio.play().catch(()=>{});
   setPlayIcon(true);
   showPlayer();
+  renderQueue();
 }
 
 function togglePlay(){
@@ -1085,18 +1118,24 @@ function togglePlay(){
 }
 
 function prevTrack(){
-  if(currentIdx<=0)playTrack(TRACKS.length-1);
-  else playTrack(currentIdx-1);
+  if(audio.currentTime>3){audio.currentTime=0;return;}
+  const ni=currentIdx<=0?TRACKS.length-1:currentIdx-1;
+  playTrack(ni);
 }
 
 function nextTrack(){
-  if(currentIdx>=TRACKS.length-1)playTrack(0);
-  else playTrack(currentIdx+1);
+  const ni=shuffle?Math.floor(Math.random()*TRACKS.length):((currentIdx+1)%TRACKS.length);
+  playTrack(ni);
 }
 
-function seekBy(sec){
-  if(!audio.duration)return;
-  audio.currentTime=Math.max(0,Math.min(audio.duration,audio.currentTime+sec));
+function toggleShuffle(){
+  shuffle=!shuffle;
+  document.getElementById('shuf-btn').classList.toggle('active',shuffle);
+}
+
+function toggleRepeat(){
+  repeat=!repeat;
+  document.getElementById('rep-btn').classList.toggle('active',repeat);
 }
 
 function toggleMute(){
@@ -1104,20 +1143,24 @@ function toggleMute(){
   else{lastVol=audio.volume||lastVol;audio.volume=0;muted=true;volRange.value=0;volFill.style.width='0%';}
 }
 
-/* Progress bar — hover shows thumb */
-progBar.addEventListener('mouseenter',()=>{pThumb.style.opacity='1';});
-progBar.addEventListener('mouseleave',()=>{pThumb.style.opacity='0';});
+function toggleQueue(){
+  queueOpen=!queueOpen;
+  queuePanel.classList.toggle('open',queueOpen);
+  document.getElementById('queue-toggle-btn').classList.toggle('active',queueOpen);
+}
 
-/* progress drag */
+/* Progress drag */
+progBar.addEventListener('mouseenter',()=>{pThumb.style.opacity='1'});
+progBar.addEventListener('mouseleave',()=>{pThumb.style.opacity='0'});
+
 pRange.addEventListener('input',()=>{
   if(!audio.duration)return;
   const pct=parseFloat(pRange.value);
   audio.currentTime=(pct/100)*audio.duration;
-  pFill.style.width=pct+'%';
-  updateThumbPos(pct);
+  updateProgress(pct);
 });
 
-/* volume drag */
+/* Volume drag */
 volRange.addEventListener('input',()=>{
   const v=volRange.value/100;
   audio.volume=v;
@@ -1126,25 +1169,19 @@ volRange.addEventListener('input',()=>{
   volFill.style.width=volRange.value+'%';
 });
 
-/* timeupdate */
+/* Time update */
 audio.addEventListener('timeupdate',()=>{
   if(!audio.duration)return;
   const pct=(audio.currentTime/audio.duration)*100;
-  pFill.style.width=pct+'%';
-  pRange.value=pct;
-  updateThumbPos(pct);
+  updateProgress(pct);
   pCurrent.textContent=fmt(audio.currentTime);
 });
 
-audio.addEventListener('loadedmetadata',()=>{
-  pTotal.textContent=fmt(audio.duration);
-});
-
-audio.addEventListener('ended',()=>{nextTrack();});
+audio.addEventListener('loadedmetadata',()=>{pTotal.textContent=fmt(audio.duration)});
+audio.addEventListener('ended',()=>{if(repeat){audio.currentTime=0;audio.play();}else nextTrack();});
 audio.addEventListener('play',()=>setPlayIcon(true));
 audio.addEventListener('pause',()=>setPlayIcon(false));
 
-/* init volume */
 audio.volume=0.8;
 </script>
 </body>
