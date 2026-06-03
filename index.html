@@ -233,7 +233,10 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 .footer-bottom a{color:var(--white50);text-decoration:none;transition:color 0.2s;font-weight:600}
 .footer-bottom a:hover{color:var(--blue2)}
 
-/* ══════════════ BOTTOM PLAYER ══════════════ */
+/* ══════════════════════════════════════
+   BOTTOM PLAYER — полностью переработан
+   Layout: [info(fixed)] [time] [controls(centre)] [volume] [queue+close]
+   ══════════════════════════════════════ */
 #bottom-player{
   position:fixed;bottom:-90px;left:0;right:0;z-index:200;
   background:rgba(6,13,31,0.97);
@@ -241,10 +244,11 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   border-top:1px solid var(--border2);
   transition:bottom 0.4s cubic-bezier(0.34,1.56,0.64,1);
   box-shadow:0 -8px 40px rgba(0,0,0,0.5);
+  user-select:none;
 }
 #bottom-player.visible{bottom:0}
 
-/* ── Progress bar (top strip) ── */
+/* ── Progress bar strip ── */
 .player-progress-wrap{
   position:relative;
   height:4px;
@@ -253,15 +257,13 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   transition:height .15s ease;
 }
 .player-progress-wrap:hover{height:6px}
-.player-progress-wrap:hover .prog-thumb{opacity:1}
+.player-progress-wrap:hover .prog-thumb{opacity:1!important}
 .prog-fill{
   height:100%;
   background:linear-gradient(90deg,var(--blue),var(--blue2));
-  border-radius:0;
   pointer-events:none;
-  transition:width .1s linear;
+  will-change:width;
 }
-/* синий кружок как у Яндекс.Музыки */
 .prog-thumb{
   position:absolute;
   top:50%;
@@ -269,57 +271,77 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   width:14px;height:14px;
   border-radius:50%;
   background:var(--blue2);
-  box-shadow:0 0 8px rgba(61,139,255,0.7);
+  box-shadow:0 0 8px rgba(61,139,255,0.8);
   pointer-events:none;
   opacity:0;
-  transition:opacity .2s;
+  transition:opacity .15s;
 }
-.prog-range{
+/* invisible full-width hit area over the bar */
+.prog-hit{
   position:absolute;inset:0;
-  opacity:0;cursor:pointer;
-  width:100%;height:100%;margin:0;
-}
-/* expand hit area for easier dragging */
-.player-progress-wrap::after{
-  content:'';position:absolute;left:0;right:0;
-  top:-6px;bottom:-6px;cursor:pointer;
+  cursor:pointer;
+  /* expand grab area vertically */
+  top:-8px;bottom:-8px;
+  background:transparent;
+  -webkit-tap-highlight-color:transparent;
 }
 
 /* ── Main row ── */
 .player-main-row{
-  display:flex;align-items:center;
-  padding:10px 16px;gap:0;
+  display:flex;
+  align-items:center;
+  padding:8px 16px;
+  gap:12px;
+  height:64px;
 }
 
-/* track info — left */
+/* LEFT — fixed-width info block (cover + text), never pushes other elements */
 .player-info{
-  display:flex;align-items:center;gap:10px;
-  min-width:0;overflow:hidden;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:200px;       /* fixed — never grows/shrinks */
   flex-shrink:0;
-  /* no fixed width — shrinks to content */
+  overflow:hidden;
 }
-.player-cover{width:40px;height:40px;border-radius:8px;overflow:hidden;background:var(--navy3);flex-shrink:0;border:1px solid var(--border)}
+.player-cover{
+  width:40px;height:40px;
+  border-radius:8px;
+  overflow:hidden;
+  background:var(--navy3);
+  flex-shrink:0;
+  border:1px solid var(--border);
+}
 .player-cover img{width:100%;height:100%;object-fit:cover}
-.player-track-text{min-width:0;overflow:hidden;max-width:160px;}
-.player-title{font-size:12px;font-weight:800;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.player-artist{font-size:10px;color:var(--blue2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-/* metrics (time + volume) — left of centre */
-.player-metrics{
-  display:flex;align-items:center;gap:16px;
-  flex:1;padding-left:20px;
+.player-track-text{
+  flex:1;
+  min-width:0;
+  overflow:hidden;
 }
-.player-time{font-size:11px;color:var(--white50);font-weight:600;white-space:nowrap;}
-.player-volume{display:flex;align-items:center;gap:6px}
-.vol-icon{color:var(--white50);cursor:pointer;transition:color .2s;background:none;border:none;display:flex;align-items:center;padding:4px;}
-.vol-icon:hover{color:var(--white)}
-.volume-slider{width:64px;height:4px;background:var(--white15);border-radius:2px;position:relative;cursor:pointer;}
-.volume-fill{height:100%;background:var(--white50);border-radius:2px;pointer-events:none}
-#vol-range{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;margin:0;}
+.player-title{
+  font-size:12px;font-weight:800;
+  margin-bottom:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.player-artist{
+  font-size:10px;color:var(--blue2);font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
 
-/* controls — centre */
+/* TIME — left of centre */
+.player-time{
+  font-size:11px;color:var(--white50);font-weight:600;
+  white-space:nowrap;
+  flex-shrink:0;
+  min-width:80px;
+  text-align:center;
+}
+
+/* CONTROLS — absolute centre via flex:1 trick */
 .player-controls{
-  display:flex;flex-direction:column;align-items:center;gap:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   flex:1;
 }
 .player-btns{display:flex;align-items:center;justify-content:center;gap:4px;}
@@ -327,7 +349,8 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   background:transparent;border:none;cursor:pointer;
   color:var(--white50);transition:color .2s,background .2s,transform .15s;
   display:flex;align-items:center;justify-content:center;
-  padding:5px;border-radius:50%;
+  padding:6px;border-radius:50%;
+  flex-shrink:0;
 }
 .p-btn:hover{color:var(--white);background:var(--white08);transform:scale(1.1)}
 .p-btn.active{color:var(--blue2)}
@@ -336,26 +359,55 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   background:var(--blue);color:var(--white);
   border:none;cursor:pointer;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  transition:all .2s;box-shadow:0 0 18px rgba(26,111,255,0.5);
+  transition:all .2s;
+  box-shadow:0 0 18px rgba(26,111,255,0.5);
 }
 .p-btn-play:hover{background:var(--blue2);transform:scale(1.08);box-shadow:0 0 26px rgba(26,111,255,0.65)}
 
-/* right side */
+/* VOLUME — right of controls */
+.player-volume{
+  display:flex;align-items:center;gap:6px;
+  flex-shrink:0;
+}
+.vol-icon{
+  color:var(--white50);cursor:pointer;transition:color .2s;
+  background:none;border:none;
+  display:flex;align-items:center;
+  padding:4px;border-radius:50%;
+  flex-shrink:0;
+}
+.vol-icon:hover{color:var(--white)}
+.volume-slider{
+  width:72px;height:4px;
+  background:var(--white15);border-radius:2px;
+  position:relative;cursor:pointer;
+  flex-shrink:0;
+}
+.volume-fill{height:100%;background:var(--white50);border-radius:2px;pointer-events:none}
+#vol-range{
+  position:absolute;inset:0;opacity:0;cursor:pointer;
+  width:100%;height:100%;margin:0;
+  /* expand hit area */
+  top:-6px;bottom:-6px;height:calc(100% + 12px);
+}
+
+/* RIGHT — queue + close */
 .player-right{
-  display:flex;align-items:center;gap:8px;
-  flex:1;justify-content:flex-end;
+  display:flex;align-items:center;gap:4px;
+  flex-shrink:0;
 }
 .queue-toggle-btn{
   background:transparent;border:none;cursor:pointer;
   color:var(--white50);transition:color .2s,background .2s;
-  padding:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  padding:6px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
 }
 .queue-toggle-btn:hover{color:var(--white);background:var(--white08)}
 .queue-toggle-btn.active{color:var(--blue2)}
 .player-close{
   background:transparent;border:none;cursor:pointer;
   color:#e05555;transition:color .2s,transform .2s,background .2s;
-  padding:5px;border-radius:50%;
+  padding:6px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
 }
 .player-close:hover{color:#ff3333;background:rgba(220,50,50,0.15);transform:scale(1.12)}
@@ -393,7 +445,7 @@ body.player-open{padding-bottom:72px}
   .works-grid{grid-template-columns:1fr}
   .gallery-grid{grid-template-columns:1fr 1fr;grid-auto-rows:180px}
   .gallery-item:first-child{grid-column:span 2;grid-row:span 1}
-  .player-track-text{max-width:110px}
+  .player-info{width:160px}
 }
 @media(max-width:580px){
   section{padding:70px 4%}
@@ -403,8 +455,8 @@ body.player-open{padding-bottom:72px}
   .footer-grid{grid-template-columns:1fr}
   .gallery-grid{grid-template-columns:1fr;grid-auto-rows:220px}
   .gallery-item:first-child{grid-column:span 1}
-  .player-metrics{display:none}
-  .player-track-text{max-width:90px}
+  .player-time{display:none}
+  .player-info{width:130px}
 }
 </style>
 </head>
@@ -523,18 +575,7 @@ body.player-open{padding-bottom:72px}
   </div>
 </section>
 
-
-
-<div class="video-section">
-  <div class="video-bg"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&loop=1&playlist=dQw4w9WgXcQ&mute=1&controls=0&rel=0" allowfullscreen></iframe></div>
-  <div class="video-content">
-    <a href="https://youtube.com" class="play-btn" target="_blank"><svg width="18" height="22" viewBox="0 0 18 22"><polygon points="0,0 18,11 0,22"/></svg></a>
-    <div class="section-eyebrow" style="justify-content:center;margin-bottom:1rem">Студия изнутри</div>
-    <h2 style="font-family:var(--display);font-size:clamp(1.8rem,4vw,3rem);font-weight:800;margin-bottom:1rem;">Смотрите и слышите</h2>
-    <p style="color:var(--white50);max-width:480px;margin:0 auto;font-size:0.95rem">Узнайте, как рождается звук в студии SPRING SOUND LAB — от первого микрофона до финального мастера.</p>
-  </div>
-</div>
-
+<!-- GALLERY перемещена ВЫШЕ видео-секции -->
 <section>
   <div class="section-inner">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:0"><div><div class="section-eyebrow">Студия изнутри</div><h2 class="section-title">Визуальная атмосфера</h2></div></div>
@@ -547,6 +588,17 @@ body.player-open{padding-bottom:72px}
     </div>
   </div>
 </section>
+
+<!-- ВИДЕО идёт ПОСЛЕ галереи -->
+<div class="video-section">
+  <div class="video-bg"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&loop=1&playlist=dQw4w9WgXcQ&mute=1&controls=0&rel=0" allowfullscreen></iframe></div>
+  <div class="video-content">
+    <a href="https://youtube.com" class="play-btn" target="_blank"><svg width="18" height="22" viewBox="0 0 18 22"><polygon points="0,0 18,11 0,22"/></svg></a>
+    <div class="section-eyebrow" style="justify-content:center;margin-bottom:1rem">Студия изнутри</div>
+    <h2 style="font-family:var(--display);font-size:clamp(1.8rem,4vw,3rem);font-weight:800;margin-bottom:1rem;">Смотрите и слышите</h2>
+    <p style="color:var(--white50);max-width:480px;margin:0 auto;font-size:0.95rem">Узнайте, как рождается звук в студии SPRING SOUND LAB — от первого микрофона до финального мастера.</p>
+  </div>
+</div>
 
 <section id="pricing" style="background:var(--navy2)">
   <div class="section-inner">
@@ -648,20 +700,23 @@ body.player-open{padding-bottom:72px}
   <div class="footer-bottom"><div>© SPRING SOUND LAB, 2025. Все права защищены.</div><div style="display:flex;gap:1.5rem"><a href="#">Политика конфиденциальности</a><a href="#">Договор оферты</a></div></div>
 </footer>
 
-<!-- ═══════════════════════════════════ BOTTOM PLAYER ═══════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════
+     BOTTOM PLAYER
+     Layout: [INFO fixed 200px] [TIME] [CONTROLS flex:1] [VOLUME] [QUEUE+CLOSE]
+     ═══════════════════════════════════════════════════ -->
 <div id="bottom-player">
 
-  <!-- Progress bar — top strip с синим кружком -->
+  <!-- Progress bar — seekable strip -->
   <div class="player-progress-wrap" id="prog-wrap">
     <div class="prog-fill" id="prog-fill" style="width:0%"></div>
-    <div class="prog-thumb" id="prog-thumb"></div>
-    <input type="range" class="prog-range" id="prog-range" min="0" max="100" value="0" step="0.1">
+    <div class="prog-thumb" id="prog-thumb" style="left:0"></div>
+    <div class="prog-hit" id="prog-hit"></div>
   </div>
 
   <!-- Main row -->
   <div class="player-main-row">
 
-    <!-- Обложка + название -->
+    <!-- LEFT: fixed-width info (never affects layout) -->
     <div class="player-info">
       <div class="player-cover"><img id="player-cover-img" src="" alt=""></div>
       <div class="player-track-text">
@@ -670,26 +725,12 @@ body.player-open{padding-bottom:72px}
       </div>
     </div>
 
-    <!-- Время + громкость (левее центра) -->
-    <div class="player-metrics">
-      <div class="player-time">
-        <span id="p-current">0:00</span> / <span id="p-total">0:00</span>
-      </div>
-      <div class="player-volume">
-        <button class="vol-icon" onclick="toggleMute()" id="vol-icon-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" id="vol-svg">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
-            <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77 0-4.28-2.99-7.86-7-8.77z"/>
-          </svg>
-        </button>
-        <div class="volume-slider">
-          <div class="volume-fill" id="vol-fill" style="width:80%"></div>
-          <input type="range" id="vol-range" min="0" max="100" value="80" step="1">
-        </div>
-      </div>
+    <!-- TIME (left of controls) -->
+    <div class="player-time">
+      <span id="p-current">0:00</span> / <span id="p-total">0:00</span>
     </div>
 
-    <!-- Кнопки управления (центр) -->
+    <!-- CONTROLS (centre) -->
     <div class="player-controls">
       <div class="player-btns">
         <button class="p-btn" id="shuf-btn" title="Перемешать" onclick="toggleShuffle()">
@@ -710,7 +751,21 @@ body.player-open{padding-bottom:72px}
       </div>
     </div>
 
-    <!-- Правая сторона: очередь + закрыть -->
+    <!-- VOLUME (right of controls) -->
+    <div class="player-volume">
+      <button class="vol-icon" onclick="toggleMute()" id="vol-icon-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" id="vol-svg">
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+          <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77 0-4.28-2.99-7.86-7-8.77z"/>
+        </svg>
+      </button>
+      <div class="volume-slider">
+        <div class="volume-fill" id="vol-fill" style="width:80%"></div>
+        <input type="range" id="vol-range" min="0" max="100" value="80" step="1">
+      </div>
+    </div>
+
+    <!-- RIGHT: queue + close -->
     <div class="player-right">
       <button class="queue-toggle-btn" id="queue-toggle-btn" title="Очередь" onclick="toggleQueue()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h13v-2H3zm0-5h10v-2H3zm0-7v2h13V6zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5z"/></svg>
@@ -768,8 +823,9 @@ const TRACKS=[
   {title:'Одиночество в сети',artist:'Ноябрь',cover:'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',dur:'3:47'}
 ];
 
-const audio=document.getElementById('audio-el');
-let currentIdx=-1,isPlaying=false,muted=false,lastVol=0.8,shuffle=false,repeat=false,queueOpen=false;
+const audio     = document.getElementById('audio-el');
+let currentIdx  = -1, isPlaying = false, muted = false, lastVol = 0.8;
+let shuffle = false, repeat = false, queueOpen = false;
 
 const player    = document.getElementById('bottom-player');
 const coverImg  = document.getElementById('player-cover-img');
@@ -778,7 +834,7 @@ const artistEl  = document.getElementById('player-artist');
 const playIcon  = document.getElementById('p-play-icon');
 const progFill  = document.getElementById('prog-fill');
 const progThumb = document.getElementById('prog-thumb');
-const progRange = document.getElementById('prog-range');
+const progHit   = document.getElementById('prog-hit');
 const progWrap  = document.getElementById('prog-wrap');
 const pCurrent  = document.getElementById('p-current');
 const pTotal    = document.getElementById('p-total');
@@ -796,13 +852,55 @@ function setPlayIcon(p){
     :'<polygon points="2,0 18,10 2,20"/>';
 }
 
+/* ── Progress: position thumb and fill ── */
 function updateProgress(pct){
-  progFill.style.width=pct+'%';
-  progRange.value=pct;
-  // позиция кружка
-  const w=progWrap.offsetWidth;
-  progThumb.style.left=((pct/100)*w)+'px';
+  pct = Math.max(0, Math.min(100, pct));
+  progFill.style.width = pct + '%';
+  const w = progWrap.getBoundingClientRect().width;
+  progThumb.style.left = ((pct / 100) * w) + 'px';
 }
+
+/* ── Seek from pointer position ── */
+function seekToX(clientX){
+  if(!audio.duration) return;
+  const rect = progWrap.getBoundingClientRect();
+  const pct  = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  audio.currentTime = pct * audio.duration;
+  updateProgress(pct * 100);
+}
+
+/* Mouse events on progress bar */
+let seeking = false;
+
+progHit.addEventListener('mousedown', e => {
+  seeking = true;
+  seekToX(e.clientX);
+  progThumb.style.opacity = '1';
+});
+document.addEventListener('mousemove', e => {
+  if(!seeking) return;
+  seekToX(e.clientX);
+});
+document.addEventListener('mouseup', () => {
+  if(seeking){ seeking = false; progThumb.style.opacity = ''; }
+});
+
+/* Touch events on progress bar */
+progHit.addEventListener('touchstart', e => {
+  seeking = true;
+  seekToX(e.touches[0].clientX);
+  e.preventDefault();
+}, {passive:false});
+document.addEventListener('touchmove', e => {
+  if(!seeking) return;
+  seekToX(e.touches[0].clientX);
+  e.preventDefault();
+}, {passive:false});
+document.addEventListener('touchend', () => { seeking = false; });
+
+/* Show thumb on hover */
+progWrap.addEventListener('mouseenter', () => { if(!seeking) progThumb.style.opacity='1'; });
+progWrap.addEventListener('mouseleave', () => { if(!seeking) progThumb.style.opacity='0'; });
 
 function renderQueue(){
   queueList.innerHTML=TRACKS.map((t,i)=>`
@@ -834,9 +932,12 @@ function playTrack(idx){
   if(idx<0||idx>=TRACKS.length)return;
   currentIdx=idx;
   const t=TRACKS[idx];
-  coverImg.src=t.cover;titleEl.textContent=t.title;artistEl.textContent=t.artist;
+  coverImg.src=t.cover;
+  titleEl.textContent=t.title;
+  artistEl.textContent=t.artist;
   audio.src=t.src;audio.volume=lastVol;
-  audio.play().catch(()=>{});setPlayIcon(true);showPlayer();renderQueue();
+  audio.play().catch(()=>{});
+  setPlayIcon(true);showPlayer();renderQueue();
 }
 
 function togglePlay(){
@@ -864,28 +965,16 @@ function toggleQueue(){
   document.getElementById('queue-toggle-btn').classList.toggle('active',queueOpen);
 }
 
-/* показываем/скрываем кружок при наведении на полосу */
-progWrap.addEventListener('mouseenter',()=>{progThumb.style.opacity='1'});
-progWrap.addEventListener('mouseleave',()=>{progThumb.style.opacity='0'});
-
-/* перемотка через range-input */
-progRange.addEventListener('input',()=>{
-  if(!audio.duration)return;
-  const pct=parseFloat(progRange.value);
-  audio.currentTime=(pct/100)*audio.duration;
-  updateProgress(pct);
-});
-
-/* громкость */
+/* Volume slider */
 volRange.addEventListener('input',()=>{
   const v=volRange.value/100;
-  audio.volume=v;lastVol=v||lastVol;muted=v===0;
+  audio.volume=v;if(v>0)lastVol=v;muted=v===0;
   volFill.style.width=volRange.value+'%';
 });
 
-/* обновление времени */
+/* Time update */
 audio.addEventListener('timeupdate',()=>{
-  if(!audio.duration)return;
+  if(!audio.duration||seeking)return;
   const pct=(audio.currentTime/audio.duration)*100;
   updateProgress(pct);
   pCurrent.textContent=fmt(audio.currentTime);
