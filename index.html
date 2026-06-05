@@ -58,6 +58,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .hero-orb1{width:600px;height:600px;background:rgba(26,111,255,0.12);top:-100px;left:50%;transform:translateX(-50%)}
 .hero-orb2{width:400px;height:400px;background:rgba(26,111,255,0.07);bottom:0;right:10%}
 .hero-content{position:relative;z-index:1;max-width:1100px}
+.hero-logo{width:130px;height:auto;margin-bottom:1.5rem;display:block;margin-left:auto;margin-right:auto;}
 .hero h1{font-family:var(--display);font-size:clamp(2.5rem, 7vw, 7rem);font-weight:900;line-height:1.05;letter-spacing:-0.03em;margin-bottom:1.5rem;color:var(--white);white-space:nowrap;}
 .hero h1 span{color:var(--blue2);}
 .hero p{font-size:1.1rem;color:var(--white50);max-width:560px;margin:0 auto 2.5rem;font-weight:500;line-height:1.8}
@@ -170,7 +171,6 @@ section{padding:100px 5%}
 .pricing-panel.active{
   display:grid;
 }
-/* fade-in keyframe для входящей панели */
 @keyframes pricingFadeIn{
   from{opacity:0;transform:translateY(10px)}
   to{opacity:1;transform:translateY(0)}
@@ -248,10 +248,6 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 .footer-bottom a{color:var(--white50);text-decoration:none;transition:color 0.2s;font-weight:600}
 .footer-bottom a:hover{color:var(--blue2)}
 
-/* ══════════════════════════════════════
-   BOTTOM PLAYER — полностью переработан
-   Layout: [info(fixed)] [time] [controls(centre)] [volume] [queue+close]
-   ══════════════════════════════════════ */
 #bottom-player{
   position:fixed;bottom:-90px;left:0;right:0;z-index:200;
   background:rgba(6,13,31,0.97);
@@ -262,8 +258,6 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   user-select:none;
 }
 #bottom-player.visible{bottom:0}
-
-/* ── Progress bar strip ── */
 .player-progress-wrap{
   position:relative;
   height:4px;
@@ -291,17 +285,13 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   opacity:0;
   transition:opacity .15s;
 }
-/* invisible full-width hit area over the bar */
 .prog-hit{
   position:absolute;inset:0;
   cursor:pointer;
-  /* expand grab area vertically */
   top:-8px;bottom:-8px;
   background:transparent;
   -webkit-tap-highlight-color:transparent;
 }
-
-/* ── Main row ── */
 .player-main-row{
   display:flex;
   align-items:center;
@@ -309,13 +299,11 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   gap:12px;
   height:64px;
 }
-
-/* LEFT — fixed-width info block (cover + text), never pushes other elements */
 .player-info{
   display:flex;
   align-items:center;
   gap:10px;
-  width:200px;       /* fixed — never grows/shrinks */
+  width:200px;
   flex-shrink:0;
   overflow:hidden;
 }
@@ -342,8 +330,6 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   font-size:10px;color:var(--blue2);font-weight:700;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-
-/* TIME — left of centre */
 .player-time{
   font-size:11px;color:var(--white50);font-weight:600;
   white-space:nowrap;
@@ -351,8 +337,6 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   min-width:80px;
   text-align:center;
 }
-
-/* CONTROLS — absolute centre via flex:1 trick */
 .player-controls{
   display:flex;
   align-items:center;
@@ -378,8 +362,6 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   box-shadow:0 0 18px rgba(26,111,255,0.5);
 }
 .p-btn-play:hover{background:var(--blue2);transform:scale(1.08);box-shadow:0 0 26px rgba(26,111,255,0.65)}
-
-/* VOLUME — right of controls */
 .player-volume{
   display:flex;align-items:center;gap:6px;
   flex-shrink:0;
@@ -402,11 +384,8 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 #vol-range{
   position:absolute;inset:0;opacity:0;cursor:pointer;
   width:100%;height:100%;margin:0;
-  /* expand hit area */
   top:-6px;bottom:-6px;height:calc(100% + 12px);
 }
-
-/* RIGHT — queue + close */
 .player-right{
   display:flex;align-items:center;gap:4px;
   flex-shrink:0;
@@ -426,8 +405,6 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
   display:flex;align-items:center;justify-content:center;
 }
 .player-close:hover{color:#ff3333;background:rgba(220,50,50,0.15);transform:scale(1.12)}
-
-/* queue panel */
 .player-queue{border-top:1px solid var(--border);max-height:0;overflow:hidden;transition:max-height .4s ease;}
 .player-queue.open{max-height:260px;overflow-y:auto}
 .queue-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s;}
@@ -440,10 +417,8 @@ footer{background:var(--navy2);border-top:1px solid var(--border);padding:60px 5
 .q-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--white)}
 .q-artist{font-size:10px;color:var(--blue2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .q-dur{font-size:10px;color:var(--white50);font-weight:600;flex-shrink:0}
-
 body.player-open{padding-bottom:72px}
 
-/* ── RESPONSIVE ── */
 @media(max-width:900px){
   .hero h1{white-space:normal;font-size:clamp(2.5rem,10vw,4.5rem)}
   .nav-links{display:none}
@@ -462,6 +437,7 @@ body.player-open{padding-bottom:72px}
   .gallery-grid{grid-template-columns:1fr 1fr;grid-auto-rows:180px}
   .gallery-item:first-child{grid-column:span 2;grid-row:span 1}
   .player-info{width:160px}
+  .hero-logo{width:100px}
 }
 @media(max-width:580px){
   section{padding:70px 4%}
@@ -473,6 +449,7 @@ body.player-open{padding-bottom:72px}
   .gallery-item:first-child{grid-column:span 1}
   .player-time{display:none}
   .player-info{width:130px}
+  .hero-logo{width:80px}
 }
 </style>
 </head>
@@ -503,6 +480,7 @@ body.player-open{padding-bottom:72px}
   <div class="hero-orb1"></div>
   <div class="hero-orb2"></div>
   <div class="hero-content">
+    <img src="logo.png" alt="Spring Sound Lab" class="hero-logo">
     <h1>SPRING SOUND <span>LAB</span></h1>
     <p>Профессиональная архитектура звука.<br> Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов</p>
     <div class="hero-btns">
@@ -592,7 +570,6 @@ body.player-open{padding-bottom:72px}
   </div>
 </section>
 
-<!-- GALLERY перемещена ВЫШЕ видео-секции -->
 <section>
   <div class="section-inner">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:0"><div><div class="section-eyebrow">Студия изнутри</div><h2 class="section-title">Визуальная атмосфера</h2></div></div>
@@ -606,7 +583,6 @@ body.player-open{padding-bottom:72px}
   </div>
 </section>
 
-<!-- ВИДЕО идёт ПОСЛЕ галереи -->
 <div class="video-section">
   <div class="video-bg"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&loop=1&playlist=dQw4w9WgXcQ&mute=1&controls=0&rel=0" allowfullscreen></iframe></div>
   <div class="video-content">
@@ -717,23 +693,13 @@ body.player-open{padding-bottom:72px}
   <div class="footer-bottom"><div>© SPRING SOUND LAB, 2025. Все права защищены.</div><div style="display:flex;gap:1.5rem"><a href="#">Политика конфиденциальности</a><a href="#">Договор оферты</a></div></div>
 </footer>
 
-<!-- ═══════════════════════════════════════════════════
-     BOTTOM PLAYER
-     Layout: [INFO fixed 200px] [TIME] [CONTROLS flex:1] [VOLUME] [QUEUE+CLOSE]
-     ═══════════════════════════════════════════════════ -->
 <div id="bottom-player">
-
-  <!-- Progress bar — seekable strip -->
   <div class="player-progress-wrap" id="prog-wrap">
     <div class="prog-fill" id="prog-fill" style="width:0%"></div>
     <div class="prog-thumb" id="prog-thumb" style="left:0"></div>
     <div class="prog-hit" id="prog-hit"></div>
   </div>
-
-  <!-- Main row -->
   <div class="player-main-row">
-
-    <!-- LEFT: fixed-width info (never affects layout) -->
     <div class="player-info">
       <div class="player-cover"><img id="player-cover-img" src="" alt=""></div>
       <div class="player-track-text">
@@ -741,13 +707,9 @@ body.player-open{padding-bottom:72px}
         <div class="player-artist" id="player-artist">—</div>
       </div>
     </div>
-
-    <!-- TIME (left of controls) -->
     <div class="player-time">
       <span id="p-current">0:00</span> / <span id="p-total">0:00</span>
     </div>
-
-    <!-- CONTROLS (centre) -->
     <div class="player-controls">
       <div class="player-btns">
         <button class="p-btn" id="shuf-btn" title="Перемешать" onclick="toggleShuffle()">
@@ -767,8 +729,6 @@ body.player-open{padding-bottom:72px}
         </button>
       </div>
     </div>
-
-    <!-- VOLUME (right of controls) -->
     <div class="player-volume">
       <button class="vol-icon" onclick="toggleMute()" id="vol-icon-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" id="vol-svg">
@@ -781,8 +741,6 @@ body.player-open{padding-bottom:72px}
         <input type="range" id="vol-range" min="0" max="100" value="80" step="1">
       </div>
     </div>
-
-    <!-- RIGHT: queue + close -->
     <div class="player-right">
       <button class="queue-toggle-btn" id="queue-toggle-btn" title="Очередь" onclick="toggleQueue()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h13v-2H3zm0-5h10v-2H3zm0-7v2h13V6zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5z"/></svg>
@@ -791,20 +749,15 @@ body.player-open{padding-bottom:72px}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
       </button>
     </div>
-
   </div>
-
-  <!-- Queue panel -->
   <div class="player-queue" id="player-queue">
     <div id="queue-list"></div>
   </div>
-
 </div>
 
 <audio id="audio-el"></audio>
 
 <script>
-/* ══ NAV & UI ══ */
 function toggleNav(){document.getElementById('mobileNav').classList.toggle('open')}
 function toggleFaq(btn){btn.parentElement.classList.toggle('open')}
 function switchTab(btn,id){
@@ -821,19 +774,14 @@ function switchPricing(btn,id){
   const nxt = document.getElementById(id);
   if(cur === nxt) return;
   pricingSwitching = true;
-
-  // Fade out current panel
   cur.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
   cur.style.opacity = '0';
   cur.style.transform = 'translateY(-8px)';
-
   setTimeout(() => {
     cur.classList.remove('active');
     cur.style.transition = '';
     cur.style.opacity = '';
     cur.style.transform = '';
-
-    // Show next panel with fade-in animation
     nxt.classList.add('active', 'anim-in');
     nxt.addEventListener('animationend', () => {
       nxt.classList.remove('anim-in');
@@ -852,7 +800,6 @@ window.addEventListener('scroll',()=>{
   document.querySelector('nav').style.backdropFilter=window.scrollY>50?'blur(24px)':'blur(20px)';
 });
 
-/* ══ PLAYER ══ */
 const TRACKS=[
   {title:'Первая частота',artist:'Echo',cover:'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',dur:'5:38'},
   {title:'Тихий Сигнал',artist:'Алиса Кравцова',cover:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',dur:'4:25'},
@@ -860,84 +807,55 @@ const TRACKS=[
   {title:'Одиночество в сети',artist:'Ноябрь',cover:'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',dur:'3:47'}
 ];
 
-const audio     = document.getElementById('audio-el');
-let currentIdx  = -1, isPlaying = false, muted = false, lastVol = 0.8;
-let shuffle = false, repeat = false, queueOpen = false;
+const audio=document.getElementById('audio-el');
+let currentIdx=-1,isPlaying=false,muted=false,lastVol=0.8;
+let shuffle=false,repeat=false,queueOpen=false;
 
-const player    = document.getElementById('bottom-player');
-const coverImg  = document.getElementById('player-cover-img');
-const titleEl   = document.getElementById('player-title');
-const artistEl  = document.getElementById('player-artist');
-const playIcon  = document.getElementById('p-play-icon');
-const progFill  = document.getElementById('prog-fill');
-const progThumb = document.getElementById('prog-thumb');
-const progHit   = document.getElementById('prog-hit');
-const progWrap  = document.getElementById('prog-wrap');
-const pCurrent  = document.getElementById('p-current');
-const pTotal    = document.getElementById('p-total');
-const volFill   = document.getElementById('vol-fill');
-const volRange  = document.getElementById('vol-range');
-const queuePanel= document.getElementById('player-queue');
-const queueList = document.getElementById('queue-list');
+const player=document.getElementById('bottom-player');
+const coverImg=document.getElementById('player-cover-img');
+const titleEl=document.getElementById('player-title');
+const artistEl=document.getElementById('player-artist');
+const playIcon=document.getElementById('p-play-icon');
+const progFill=document.getElementById('prog-fill');
+const progThumb=document.getElementById('prog-thumb');
+const progHit=document.getElementById('prog-hit');
+const progWrap=document.getElementById('prog-wrap');
+const pCurrent=document.getElementById('p-current');
+const pTotal=document.getElementById('p-total');
+const volFill=document.getElementById('vol-fill');
+const volRange=document.getElementById('vol-range');
+const queuePanel=document.getElementById('player-queue');
+const queueList=document.getElementById('queue-list');
 
 function fmt(s){s=Math.floor(s)||0;return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60}
-
 function setPlayIcon(p){
   isPlaying=p;
   playIcon.innerHTML=p
     ?'<rect x="0" y="0" width="5" height="20" rx="1"/><rect x="10" y="0" width="5" height="20" rx="1"/>'
     :'<polygon points="2,0 18,10 2,20"/>';
 }
-
-/* ── Progress: position thumb and fill ── */
 function updateProgress(pct){
-  pct = Math.max(0, Math.min(100, pct));
-  progFill.style.width = pct + '%';
-  const w = progWrap.getBoundingClientRect().width;
-  progThumb.style.left = ((pct / 100) * w) + 'px';
+  pct=Math.max(0,Math.min(100,pct));
+  progFill.style.width=pct+'%';
+  const w=progWrap.getBoundingClientRect().width;
+  progThumb.style.left=((pct/100)*w)+'px';
 }
-
-/* ── Seek from pointer position ── */
 function seekToX(clientX){
-  if(!audio.duration) return;
-  const rect = progWrap.getBoundingClientRect();
-  const pct  = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-  audio.currentTime = pct * audio.duration;
-  updateProgress(pct * 100);
+  if(!audio.duration)return;
+  const rect=progWrap.getBoundingClientRect();
+  const pct=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
+  audio.currentTime=pct*audio.duration;
+  updateProgress(pct*100);
 }
-
-/* Mouse events on progress bar */
-let seeking = false;
-
-progHit.addEventListener('mousedown', e => {
-  seeking = true;
-  seekToX(e.clientX);
-  progThumb.style.opacity = '1';
-});
-document.addEventListener('mousemove', e => {
-  if(!seeking) return;
-  seekToX(e.clientX);
-});
-document.addEventListener('mouseup', () => {
-  if(seeking){ seeking = false; progThumb.style.opacity = ''; }
-});
-
-/* Touch events on progress bar */
-progHit.addEventListener('touchstart', e => {
-  seeking = true;
-  seekToX(e.touches[0].clientX);
-  e.preventDefault();
-}, {passive:false});
-document.addEventListener('touchmove', e => {
-  if(!seeking) return;
-  seekToX(e.touches[0].clientX);
-  e.preventDefault();
-}, {passive:false});
-document.addEventListener('touchend', () => { seeking = false; });
-
-/* Show thumb on hover */
-progWrap.addEventListener('mouseenter', () => { if(!seeking) progThumb.style.opacity='1'; });
-progWrap.addEventListener('mouseleave', () => { if(!seeking) progThumb.style.opacity='0'; });
+let seeking=false;
+progHit.addEventListener('mousedown',e=>{seeking=true;seekToX(e.clientX);progThumb.style.opacity='1';});
+document.addEventListener('mousemove',e=>{if(!seeking)return;seekToX(e.clientX);});
+document.addEventListener('mouseup',()=>{if(seeking){seeking=false;progThumb.style.opacity='';}});
+progHit.addEventListener('touchstart',e=>{seeking=true;seekToX(e.touches[0].clientX);e.preventDefault();},{passive:false});
+document.addEventListener('touchmove',e=>{if(!seeking)return;seekToX(e.touches[0].clientX);e.preventDefault();},{passive:false});
+document.addEventListener('touchend',()=>{seeking=false;});
+progWrap.addEventListener('mouseenter',()=>{if(!seeking)progThumb.style.opacity='1';});
+progWrap.addEventListener('mouseleave',()=>{if(!seeking)progThumb.style.opacity='0';});
 
 function renderQueue(){
   queueList.innerHTML=TRACKS.map((t,i)=>`
@@ -949,12 +867,7 @@ function renderQueue(){
     </div>
   `).join('');
 }
-
-function showPlayer(){
-  player.classList.add('visible');
-  document.body.classList.add('player-open');
-}
-
+function showPlayer(){player.classList.add('visible');document.body.classList.add('player-open');}
 function closePlayer(){
   audio.pause();audio.src='';
   player.classList.remove('visible');
@@ -964,7 +877,6 @@ function closePlayer(){
   pCurrent.textContent='0:00';pTotal.textContent='0:00';
   queuePanel.classList.remove('open');queueOpen=false;
 }
-
 function playTrack(idx){
   if(idx<0||idx>=TRACKS.length)return;
   currentIdx=idx;
@@ -976,13 +888,11 @@ function playTrack(idx){
   audio.play().catch(()=>{});
   setPlayIcon(true);showPlayer();renderQueue();
 }
-
 function togglePlay(){
   if(currentIdx===-1){playTrack(0);return;}
   if(audio.paused){audio.play().catch(()=>{});setPlayIcon(true);}
   else{audio.pause();setPlayIcon(false);}
 }
-
 function prevTrack(){
   if(audio.currentTime>3){audio.currentTime=0;return;}
   playTrack(currentIdx<=0?TRACKS.length-1:currentIdx-1);
@@ -1001,15 +911,11 @@ function toggleQueue(){
   queuePanel.classList.toggle('open',queueOpen);
   document.getElementById('queue-toggle-btn').classList.toggle('active',queueOpen);
 }
-
-/* Volume slider */
 volRange.addEventListener('input',()=>{
   const v=volRange.value/100;
   audio.volume=v;if(v>0)lastVol=v;muted=v===0;
   volFill.style.width=volRange.value+'%';
 });
-
-/* Time update */
 audio.addEventListener('timeupdate',()=>{
   if(!audio.duration||seeking)return;
   const pct=(audio.currentTime/audio.duration)*100;
@@ -1020,7 +926,6 @@ audio.addEventListener('loadedmetadata',()=>{pTotal.textContent=fmt(audio.durati
 audio.addEventListener('ended',()=>{if(repeat){audio.currentTime=0;audio.play();}else nextTrack();});
 audio.addEventListener('play',()=>setPlayIcon(true));
 audio.addEventListener('pause',()=>setPlayIcon(false));
-
 audio.volume=0.8;
 </script>
 </body>
