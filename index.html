@@ -782,9 +782,9 @@ body.player-open{padding-bottom:72px}
     <div class="releases-grid" style="margin-bottom:60px" id="site-releases-grid"></div>
     <div style="border-top:1px solid var(--border);margin-bottom:50px"></div>
     <div class="tabs-nav">
-      <button class="tab-btn active" onclick="switchTab(this,'tab-all')">Все треки</button>
+      <button class="tab-btn active" onclick="switchWorksTab(this,'tab-all')">Все треки</button>
     </div>
-    <div>
+    <div id="works-tabs-wrap">
       <div class="tab-panel active" id="tab-all"><div class="works-grid" id="site-works-grid"></div></div>
     </div>
   </div>
@@ -1137,18 +1137,18 @@ window.addEventListener('scroll',()=>{
 function renderSitePortfolio() {
   const siteTracks = _loadTracksForPlayer();
 
-  // --- Releases grid ---
+  // --- Releases grid (только 3 карточки) ---
   const relGrid = document.getElementById('site-releases-grid');
   if (relGrid) {
     if (!siteTracks.length) {
       relGrid.innerHTML = '<p style="color:var(--white50);font-size:0.9rem">Треков пока нет</p>';
     } else {
-      relGrid.innerHTML = siteTracks.slice(0, 6).map((t, i) => `
+      relGrid.innerHTML = siteTracks.slice(0, 3).map((t, i) => `
         <div class="release-card">
           <div class="release-cover" onclick="playTrack(${i})">
             ${t.cover ? `<img src="${t.cover}" alt="${t.title || ''}">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:3rem;background:var(--navy3)">🎵</div>'}
           </div>
-          <div class="release-type">${t.dur || ''}</div>
+          <div class="release-type">${t.genre || ''}</div>
           <div class="release-title">${t.title || 'Без названия'}</div>
           <div class="release-sub">${t.artist || ''}</div>
           <button class="btn-primary" style="width:100%;justify-content:center;margin-top:auto" onclick="playTrack(${i})">▶ Слушать</button>
@@ -1156,14 +1156,30 @@ function renderSitePortfolio() {
     }
   }
 
-  // --- Works grid ---
-  const worksGrid = document.getElementById('site-works-grid');
-  if (worksGrid) {
-    if (!siteTracks.length) {
-      worksGrid.innerHTML = '<p style="color:var(--white50);font-size:0.9rem">Треков пока нет</p>';
-    } else {
-      worksGrid.innerHTML = siteTracks.map((t, i) => `
-        <div class="work-item" onclick="playTrack(${i})">
+  // --- Works grid с вкладками по жанрам ---
+  const GENRE_TABS = [
+    { id: 'tab-all', label: 'Все треки', filter: () => true },
+    { id: 'tab-pop', label: 'Поп', filter: t => /поп|pop/i.test(t.genre || '') },
+    { id: 'tab-rock', label: 'Рок', filter: t => /рок|rock/i.test(t.genre || '') },
+    { id: 'tab-rap', label: 'Рэп', filter: t => /рэп|реп|rap|хип|hip/i.test(t.genre || '') },
+  ];
+
+  // Перерисовываем навигацию вкладок
+  const tabsNav = document.querySelector('.tabs-nav');
+  if (tabsNav) {
+    tabsNav.innerHTML = GENRE_TABS.map((tab, i) => `
+      <button class="tab-btn${i === 0 ? ' active' : ''}" onclick="switchWorksTab(this,'${tab.id}')">${tab.label}</button>
+    `).join('');
+  }
+
+  // Перерисовываем панели вкладок
+  const tabsWrap = document.getElementById('works-tabs-wrap');
+  if (tabsWrap) {
+    tabsWrap.innerHTML = GENRE_TABS.map((tab, i) => {
+      const filtered = siteTracks.filter(tab.filter);
+      const items = filtered.length ? filtered.map((t) => {
+        const idx = siteTracks.indexOf(t);
+        return `<div class="work-item" onclick="playTrack(${idx})">
           <div class="work-cover">
             ${t.cover ? `<img src="${t.cover}" alt="${t.title || ''}">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:var(--navy3)">🎵</div>'}
             <div class="work-cover-play-overlay">
@@ -1173,11 +1189,20 @@ function renderSitePortfolio() {
           <div>
             <div class="work-artist">${t.artist || ''}</div>
             <div class="work-title">${t.title || 'Без названия'}</div>
-            <div class="work-desc">${t.dur ? t.dur + ' · ' : ''}${t.type === 'yandex' ? 'Яндекс.Музыка' : 'MP3'}</div>
+            <div class="work-desc">${t.genre || ''}</div>
           </div>
-        </div>`).join('');
-    }
+        </div>`;
+      }).join('') : '<p style="color:var(--white50);font-size:0.85rem;padding:1rem 0">Нет треков в этом жанре</p>';
+      return `<div class="tab-panel${i === 0 ? ' active' : ''}" id="${tab.id}"><div class="works-grid">${items}</div></div>`;
+    }).join('');
   }
+}
+
+function switchWorksTab(btn, id) {
+  document.querySelectorAll('.tabs-nav .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#works-tabs-wrap .tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id)?.classList.add('active');
 }
 
 // Вызываем при загрузке страницы
@@ -1241,11 +1266,10 @@ document.addEventListener('touchmove',e=>{if(!seeking)return;seekToX(e.touches[0
 document.addEventListener('touchend',()=>{seeking=false;});
 progWrap.addEventListener('mouseenter',()=>{if(!seeking)progThumb.style.opacity='1';});
 progWrap.addEventListener('mouseleave',()=>{if(!seeking)progThumb.style.opacity='0';});
-function renderQueue(){queueList.innerHTML=TRACKS.map((t,i)=>`<div class="queue-item${i===currentIdx?' playing':''}" onclick="playTrack(${i})"><div class="q-num">${i===currentIdx?'▶':i+1}</div><div class="q-cover"><img src="${t.cover}" alt=""></div><div class="q-info"><div class="q-title">${t.title}</div><div class="q-artist">${t.artist}</div></div><div class="q-dur">${t.dur}</div></div>`).join('');}
 function showPlayer(){player.classList.add('visible');document.body.classList.add('player-open');}
 function closePlayer(){audio.pause();audio.src='';player.classList.remove('visible');document.body.classList.remove('player-open');setPlayIcon(false);currentIdx=-1;updateProgress(0);pCurrent.textContent='0:00';pTotal.textContent='0:00';queuePanel.classList.remove('open');queueOpen=false;}
-function playTrack(idx){if(idx<0||idx>=TRACKS.length)return;currentIdx=idx;const t=TRACKS[idx];coverImg.src=t.cover;titleEl.textContent=t.title;artistEl.textContent=t.artist;audio.src=t.src;audio.volume=lastVol;audio.play().catch(()=>{});setPlayIcon(true);showPlayer();renderQueue();}
-function togglePlay(){if(currentIdx===-1){playTrack(0);return;}if(audio.paused){audio.play().catch(()=>{});setPlayIcon(true);}else{audio.pause();setPlayIcon(false);}}
+function playTrack(idx){if(idx<0||idx>=TRACKS.length)return;currentIdx=idx;const t=TRACKS[idx];coverImg.src=t.cover||'';titleEl.textContent=t.title;artistEl.textContent=t.artist;audio.src=t.src;audio.volume=lastVol;pTotal.textContent='--:--';updateProgress(0);pCurrent.textContent='0:00';audio.play().catch(()=>{});setPlayIcon(true);showPlayer();renderQueue();}
+function renderQueue(){queueList.innerHTML=TRACKS.map((t,i)=>`<div class="queue-item${i===currentIdx?' playing':''}" onclick="playTrack(${i})"><div class="q-num">${i===currentIdx?'▶':i+1}</div><div class="q-cover"><img src="${t.cover||''}" alt=""></div><div class="q-info"><div class="q-title">${t.title}</div><div class="q-artist">${t.artist}</div></div></div>`).join('');}function togglePlay(){if(currentIdx===-1){playTrack(0);return;}if(audio.paused){audio.play().catch(()=>{});setPlayIcon(true);}else{audio.pause();setPlayIcon(false);}}
 function prevTrack(){if(audio.currentTime>3){audio.currentTime=0;return;}playTrack(currentIdx<=0?TRACKS.length-1:currentIdx-1);}
 function nextTrack(){playTrack(shuffle?Math.floor(Math.random()*TRACKS.length):((currentIdx+1)%TRACKS.length));}
 function toggleShuffle(){shuffle=!shuffle;document.getElementById('shuf-btn').classList.toggle('active',shuffle);}
@@ -1456,6 +1480,9 @@ function trackCardHTML(t, i) {
         </div>
         <div class="edit-row">
           <input type="text" class="edit-input" placeholder="Длительность (напр. 3:45)" value="${escHtml(t.dur || '')}" oninput="updateTrackField('${t.id}','dur',this.value)">
+          <input type="text" class="edit-input" placeholder="Жанр (Поп, Рок, Рэп...)" value="${escHtml(t.genre || '')}" oninput="updateTrackField('${t.id}','genre',this.value)">
+        </div>
+        <div class="edit-row" style="margin-top:8px">
           <select class="edit-select" onchange="updateTrackType('${t.id}',this.value)">
             <option value="mp3" ${t.type === 'mp3' ? 'selected' : ''}>🎵 MP3 / Прямая ссылка</option>
             <option value="yandex" ${t.type === 'yandex' ? 'selected' : ''}>🟡 Яндекс.Музыка</option>
