@@ -30,6 +30,7 @@
   --r3:12px;
   --sans:'Poppins', sans-serif;
   --display:'Poppins', sans-serif;
+  /* Добавленные переменные для панели редактирования */
   --green:#10b981;
   --green-glow:rgba(16,185,129,0.15);
   --red:#ef4444;
@@ -323,7 +324,8 @@ body.player-open{padding-bottom:72px}
 }
 
 /* =====================================================
-   CRM ADMIN ENTRY
+   CRM ADMIN ENTRY — функция входа в систему
+   Триггер: двойной клик по иконке в левом нижнем углу
    ===================================================== */
 #crm-trigger{
   display:inline-flex;
@@ -352,6 +354,7 @@ body.player-open{padding-bottom:72px}
   fill:rgba(255,255,255,0.5);
 }
 
+/* затемнение фона */
 .crm-overlay{
   display:none;
   position:fixed;
@@ -366,10 +369,12 @@ body.player-open{padding-bottom:72px}
 .crm-overlay.open{
   display:flex;
 }
+/* анимация появления панели */
 @keyframes crmIn{
   from{opacity:0;transform:translateY(16px) scale(0.97)}
   to{opacity:1;transform:translateY(0) scale(1)}
 }
+/* панель */
 .crm-panel{
   background:var(--navy2);
   border:1px solid rgba(26,111,255,0.3);
@@ -508,9 +513,12 @@ body.player-open{padding-bottom:72px}
   color:rgba(255,255,255,0.2);
   font-weight:500;
 }
+/* =====================================================
+   END CRM ADMIN ENTRY
+   ===================================================== */
 
 /* =====================================================
-   ADMIN PANEL STYLES
+   ADMIN PANEL STYLES (встроенные из Панель редактирования.txt)
    ===================================================== */
 #admin-app{display:none;position:fixed;inset:0;z-index:99999;background:var(--navy);overflow-y:auto;overflow-x:hidden;}
 #admin-app .topbar{
@@ -533,6 +541,7 @@ body.player-open{padding-bottom:72px}
 #admin-app .save-indicator.show{opacity:1}
 
 #admin-app .admin-main{max-width:1100px;margin:0 auto;padding:2.5rem 2rem 5rem}
+
 #admin-app .page-header{margin-bottom:2.5rem}
 #admin-app .page-eyebrow{font-size:0.7rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue2);display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem}
 #admin-app .page-eyebrow::before{content:'';width:16px;height:1px;background:var(--blue2)}
@@ -574,6 +583,10 @@ body.player-open{padding-bottom:72px}
 #admin-app .track-meta{flex:1;min-width:0}
 #admin-app .track-name{font-size:0.9rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #admin-app .track-artist-label{font-size:0.75rem;color:var(--blue2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#admin-app .track-status{font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.55rem;border-radius:50px;flex-shrink:0}
+#admin-app .track-status.has-audio{background:var(--green-glow);border:1px solid rgba(16,185,129,0.3);color:var(--green)}
+#admin-app .track-status.no-audio{background:var(--red-glow);border:1px solid rgba(239,68,68,0.3);color:var(--red)}
+#admin-app .track-status.yandex{background:rgba(255,204,0,0.1);border:1px solid rgba(255,204,0,0.3);color:#fbbf24}
 #admin-app .track-actions{display:flex;gap:4px;flex-shrink:0}
 #admin-app .track-action-btn{width:32px;height:32px;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--white50);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all 0.2s}
 #admin-app .track-action-btn:hover{border-color:var(--border2);color:var(--white);background:var(--white08)}
@@ -599,20 +612,57 @@ body.player-open{padding-bottom:72px}
 }
 #admin-app .edit-input:focus, #admin-app .edit-select:focus{border-color:var(--border2);background:rgba(26,111,255,0.04)}
 #admin-app .edit-input::placeholder{color:var(--white50)}
+#admin-app .edit-select{cursor:pointer}
+#admin-app .edit-select option{background:var(--navy2)}
+
+#admin-app .yandex-section{background:rgba(255,204,0,0.04);border:1px solid rgba(255,204,0,0.15);border-radius:12px;padding:1rem 1.25rem}
+#admin-app .yandex-section .edit-label{color:#fbbf24}
+#admin-app .yandex-help{font-size:0.72rem;color:var(--white50);margin-top:0.4rem;line-height:1.5}
+#admin-app .yandex-help a{color:var(--blue2);text-decoration:none}
+#admin-app .yandex-help a:hover{text-decoration:underline}
+#admin-app .yandex-preview{margin-top:0.75rem;border-radius:10px;overflow:hidden;display:none}
+#admin-app .yandex-preview.show{display:block}
+#admin-app .yandex-preview iframe{width:100%;border:none;border-radius:10px}
 
 #admin-app .cover-section{display:grid;grid-template-columns:80px 1fr;gap:1rem;align-items:start}
-#admin-app .cover-preview{width:80px;height:80px;border-radius:10px;overflow:hidden;background:var(--navy3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;position:relative;cursor:pointer;}
+#admin-app .cover-preview{width:80px;height:80px;border-radius:10px;overflow:hidden;background:var(--navy3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
 #admin-app .cover-preview img{width:100%;height:100%;object-fit:cover}
-#admin-app .cover-overlay-btn{position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;color:white;font-size:1.5rem;opacity:0;transition:opacity 0.2s;}
-#admin-app .cover-preview:hover .cover-overlay-btn{opacity:1;}
 #admin-app .cover-inputs{display:flex;flex-direction:column;gap:6px}
 #admin-app .cover-hint{font-size:0.7rem;color:var(--white50);margin-top:0.3rem;line-height:1.5}
+
+#admin-app .audio-section{background:rgba(26,111,255,0.04);border:1px solid rgba(26,111,255,0.15);border-radius:12px;padding:1rem 1.25rem}
+#admin-app .or-divider{display:flex;align-items:center;gap:0.75rem;margin:0.75rem 0;font-size:0.7rem;color:var(--white50);font-weight:700;letter-spacing:0.08em;text-transform:uppercase}
+#admin-app .or-divider::before,#admin-app .or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
 #admin-app .save-row{display:flex;align-items:center;justify-content:flex-end;gap:0.75rem;padding-top:1rem;border-top:1px solid var(--border);margin-top:0.5rem}
 #admin-app .btn-save{display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.25rem;background:var(--green);color:var(--white);border:none;border-radius:50px;font-family:var(--sans);font-size:0.78rem;font-weight:800;cursor:pointer;transition:all 0.2s;box-shadow:0 0 16px rgba(16,185,129,0.25)}
 #admin-app .btn-save:hover{background:#059669;transform:translateY(-1px);box-shadow:0 0 24px rgba(16,185,129,0.4)}
 #admin-app .btn-cancel{display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.25rem;background:transparent;color:var(--white50);border:1px solid var(--border);border-radius:50px;font-family:var(--sans);font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s}
 #admin-app .btn-cancel:hover{border-color:var(--white15);color:var(--white)}
+
+#admin-app .drag-handle{cursor:grab;color:var(--white50);padding:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;touch-action:none}
+#admin-app .drag-handle:active{cursor:grabbing}
+#admin-app .track-card.dragging{opacity:0.5;border:2px dashed var(--blue2)}
+
+#admin-app .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+#admin-app .settings-card{background:var(--white04);border:1px solid var(--border);border-radius:16px;padding:1.5rem}
+#admin-app .settings-card h3{font-size:0.95rem;font-weight:800;margin-bottom:0.3rem}
+#admin-app .settings-card p{font-size:0.8rem;color:var(--white50);margin-bottom:1rem;line-height:1.5}
+#admin-app .settings-field-label{font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--white50);margin-bottom:0.4rem;display:block}
+
+#admin-app .preview-info{font-size:0.85rem;color:var(--white50);margin-bottom:1.5rem;line-height:1.6;background:var(--white04);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
+#admin-app .preview-info strong{color:var(--white)}
+#admin-app .preview-track-list{display:flex;flex-direction:column;gap:8px}
+#admin-app .preview-track{display:flex;align-items:center;gap:1rem;background:var(--white04);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1.1rem}
+#admin-app .preview-cover{width:40px;height:40px;border-radius:7px;overflow:hidden;background:var(--navy3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+#admin-app .preview-cover img{width:100%;height:100%;object-fit:cover}
+#admin-app .preview-meta{flex:1;min-width:0}
+#admin-app .preview-title{font-size:0.88rem;font-weight:800;margin-bottom:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#admin-app .preview-artist{font-size:0.72rem;color:var(--blue2);font-weight:700}
+#admin-app .preview-type{font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.5rem;border-radius:50px;flex-shrink:0}
+#admin-app .preview-type.mp3{background:var(--blue-glow);border:1px solid rgba(26,111,255,0.25);color:var(--blue2)}
+#admin-app .preview-type.yandex{background:rgba(255,204,0,0.08);border:1px solid rgba(255,204,0,0.25);color:#fbbf24}
+#admin-app .preview-type.none{background:var(--red-glow);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
 
 .toast{
   position:fixed;bottom:2rem;right:2rem;z-index:100000;
@@ -632,9 +682,11 @@ body.player-open{padding-bottom:72px}
 
 @media(max-width:700px){
   #admin-app .edit-row{grid-template-columns:1fr}
+  #admin-app .settings-grid{grid-template-columns:1fr}
   #admin-app .cover-section{grid-template-columns:60px 1fr}
   #admin-app .topbar{padding:0 1rem}
   #admin-app .admin-main{padding:1.5rem 1rem 4rem}
+  #admin-app .track-status{display:none}
 }
 </style>
 </head>
@@ -665,6 +717,7 @@ body.player-open{padding-bottom:72px}
   <div class="hero-orb1"></div>
   <div class="hero-orb2"></div>
   <div class="hero-content">
+    <img src="logo.png" alt="Spring Sound Lab" class="hero-logo">
     <h1>SPRING SOUND <span>LAB</span></h1>
     <p>Профессиональная архитектура звука.<br> Мы не просто записываем вокал — мы создаем индустриальный стандарт звучания для артистов</p>
     <div class="hero-btns">
@@ -731,6 +784,26 @@ body.player-open{padding-bottom:72px}
       <div class="release-card"><div class="release-cover" onclick="playTrack(1)"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80" alt=""></div><div class="release-type">EP</div><div class="release-title">Тихий Сигнал</div><div class="release-sub">Алиса Кравцова — R&B, 5 треков</div><button class="btn-primary" style="width:100%;justify-content:center;margin-top:auto" onclick="playTrack(1)">▶ Слушать</button></div>
       <div class="release-card"><div class="release-cover" onclick="playTrack(2)"><img src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=600&q=80" alt=""></div><div class="release-type">Саундтрек</div><div class="release-title">Нить</div><div class="release-sub">OST сериала — оркестр, 18 треков</div><button class="btn-primary" style="width:100%;justify-content:center;margin-top:auto" onclick="playTrack(2)">▶ Слушать</button></div>
     </div>
+    <div style="border-top:1px solid var(--border);margin-bottom:50px"></div>
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab(this,'tab-all')">Все жанры</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-pop')">Поп / R&B</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-rock')">Рок / Металл</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-electro')">Электронная</button>
+      <button class="tab-btn" onclick="switchTab(this,'tab-film')">Кино / Реклама</button>
+    </div>
+    <div>
+      <div class="tab-panel active" id="tab-all"><div class="works-grid">
+        <div class="work-item" onclick="playTrack(0)"><div class="work-cover"><img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div></div><div><div class="work-artist">Echo</div><div class="work-title">Первая частота</div><div class="work-desc">Запись, сведение, мастеринг · Альбом · 2025</div></div></div>
+        <div class="work-item" onclick="playTrack(1)"><div class="work-cover"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div></div><div><div class="work-artist">Алиса Кравцова</div><div class="work-title">Тихий Сигнал</div><div class="work-desc">Запись, мастеринг · EP · 2025</div></div></div>
+        <div class="work-item" onclick="playTrack(2)"><div class="work-cover"><img src="https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div></div><div><div class="work-artist">Сериал «Нить»</div><div class="work-title">Оригинальный саундтрек</div><div class="work-desc">Продюсирование, запись, сведение · 2024</div></div></div>
+        <div class="work-item" onclick="playTrack(3)"><div class="work-cover"><img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div></div><div><div class="work-artist">Ноябрь</div><div class="work-title">Одиночество в сети</div><div class="work-desc">Сведение, мастеринг · Сингл · 2024</div></div></div>
+      </div></div>
+      <div class="tab-panel" id="tab-pop"><div class="works-grid"><div class="work-item" onclick="playTrack(1)"><div class="work-cover"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div></div><div><div class="work-artist">Алиса Кравцова</div><div class="work-title">Тихий Сигнал</div><div class="work-desc">R&B · EP · 2025</div></div></div></div></div>
+      <div class="tab-panel" id="tab-rock"><div class="works-grid"><div class="work-item" onclick="playTrack(0)"><div class="work-cover"><img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div></div><div><div class="work-artist">Echo</div><div class="work-title">Первая частота</div><div class="work-desc">Инди-рок · Альбом · 2025</div></div></div></div></div>
+      <div class="tab-panel" id="tab-electro"><div class="works-grid"><div class="work-item" onclick="playTrack(3)"><div class="work-cover"><img src="https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div></div><div><div class="work-artist">DJ Pulse</div><div class="work-title">Deep Signal</div><div class="work-desc">Электроника · 2024</div></div></div></div></div>
+      <div class="tab-panel" id="tab-film"><div class="works-grid"><div class="work-item" onclick="playTrack(2)"><div class="work-cover"><img src="https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&w=200&q=80" alt=""><div class="work-cover-play-overlay"><div class="work-cover-play-btn"><svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 10,6 0,12"/></svg></div></div></div><div><div class="work-artist">Сериал «Нить»</div><div class="work-title">Оригинальный саундтрек</div><div class="work-desc">Саундтрек · 2024</div></div></div></div></div>
+    </div>
   </div>
 </section>
 
@@ -746,6 +819,16 @@ body.player-open{padding-bottom:72px}
     </div>
   </div>
 </section>
+
+<div class="video-section">
+  <div class="video-bg"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&loop=1&playlist=dQw4w9WgXcQ&mute=1&controls=0&rel=0" allowfullscreen></iframe></div>
+  <div class="video-content">
+    <a href="https://youtube.com" class="play-btn" target="_blank"><svg width="18" height="22" viewBox="0 0 18 22"><polygon points="0,0 18,11 0,22"/></svg></a>
+    <div class="section-eyebrow" style="justify-content:center;margin-bottom:1rem">Студия изнутри</div>
+    <h2 style="font-family:var(--display);font-size:clamp(1.8rem,4vw,3rem);font-weight:800;margin-bottom:1rem;">Смотрите и слышите</h2>
+    <p style="color:var(--white50);max-width:480px;margin:0 auto;font-size:0.95rem">Узнайте, как рождается звук в студии SPRING SOUND LAB — от первого микрофона до финального мастера.</p>
+  </div>
+</div>
 
 <section id="pricing" style="background:var(--navy2)">
   <div class="section-inner">
@@ -764,7 +847,61 @@ body.player-open{padding-bottom:72px}
         <div class="pricing-card featured"><div class="pricing-badge">Популярный</div><div class="pricing-name">Стандарт</div><div class="pricing-price">45 000 ₽</div><div class="pricing-period">за EP (до 5 треков)</div><ul class="pricing-list"><li>Полная запись EP</li><li>Профессиональное сведение</li><li>Мастеринг для стриминга</li><li>Неограниченные правки</li><li>Поддержка 1 месяц</li></ul><a href="#contact" class="btn-primary" style="width:100%;justify-content:center">Выбрать</a></div>
         <div class="pricing-card"><div class="pricing-name">Премиум</div><div class="pricing-price">150 000 ₽</div><div class="pricing-period">за альбом (до 12 треков)</div><ul class="pricing-list"><li>Полное продюсирование</li><li>Запись, сведение, мастеринг</li><li>Персональный продюсер</li><li>Дистрибуция по платформам</li><li>VIP-поддержка 3 месяца</li></ul><a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Выбрать</a></div>
       </div>
+      <div class="pricing-panel" id="pricing-vocal">
+        <div class="pricing-card"><div class="pricing-name">Разовый урок</div><div class="pricing-price">3 500 ₽</div><div class="pricing-period">60 минут · один урок</div><ul class="pricing-list"><li>Диагностика голоса</li><li>Упражнения на дыхание</li><li>Работа над интонацией</li><li>Домашнее задание</li><li>Запись в удобное время</li></ul><a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a></div>
+        <div class="pricing-card featured"><div class="pricing-badge">Популярный</div><div class="pricing-name">Курс «Старт»</div><div class="pricing-price">24 000 ₽</div><div class="pricing-period">8 занятий · 2 раза в неделю</div><ul class="pricing-list"><li>Полный курс для начинающих</li><li>Постановка дыхания и голоса</li><li>Работа с репертуаром</li><li>Видеозапись прогресса</li><li>Чат с преподавателем</li></ul><a href="#contact" class="btn-primary" style="width:100%;justify-content:center">Записаться</a></div>
+        <div class="pricing-card"><div class="pricing-name">Профессионал</div><div class="pricing-price">55 000 ₽</div><div class="pricing-period">20 занятий · индивидуально</div><ul class="pricing-list"><li>Профессиональная подготовка</li><li>Работа с педагогом-вокалистом</li><li>Запись демо-трека в студии</li><li>Подготовка к выступлениям</li><li>Консультации онлайн</li></ul><a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a></div>
       </div>
+      <div class="pricing-panel" id="pricing-guitar">
+        <div class="pricing-card"><div class="pricing-name">Пробный урок</div><div class="pricing-price">2 000 ₽</div><div class="pricing-period">45 минут · первое знакомство</div><ul class="pricing-list"><li>Оценка уровня игры</li><li>Первые аккорды / основы</li><li>Выбор репертуара</li><li>План обучения</li><li>Рекомендации по инструменту</li></ul><a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a></div>
+        <div class="pricing-card featured"><div class="pricing-badge">Популярный</div><div class="pricing-name">Курс «Акустика»</div><div class="pricing-price">18 000 ₽</div><div class="pricing-period">8 уроков · акустическая гитара</div><ul class="pricing-list"><li>Техника боя и перебора</li><li>Базовые и баррэ-аккорды</li><li>10+ популярных песен</li><li>Теория музыки (базис)</li><li>Видеоматериалы для дома</li></ul><a href="#contact" class="btn-primary" style="width:100%;justify-content:center">Записаться</a></div>
+        <div class="pricing-card"><div class="pricing-name">Курс «Электро»</div><div class="pricing-price">32 000 ₽</div><div class="pricing-period">12 уроков · электрогитара</div><ul class="pricing-list"><li>Электрогитара и усилитель</li><li>Риффы, соло, пентатоника</li><li>Работа с эффект-педалями</li><li>Разбор рок-классики</li><li>Запись риффов в студии</li></ul><a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a></div>
+      </div>
+      <div class="pricing-panel" id="pricing-sound">
+        <div class="pricing-card"><div class="pricing-name">Пробный урок</div><div class="pricing-price">3 500 ₽</div><div class="pricing-period">60 минут · первое занятие</div><ul class="pricing-list"><li>Знакомство с DAW (Pro Tools / Logic)</li><li>Основы работы со звуком</li><li>Разбор вашего проекта</li><li>План дальнейшего обучения</li><li>Запись в удобное время</li></ul><a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a></div>
+        <div class="pricing-card featured"><div class="pricing-badge">Популярный</div><div class="pricing-name">Курс «Основы»</div><div class="pricing-price">28 000 ₽</div><div class="pricing-period">8 занятий · DAW + сведение</div><ul class="pricing-list"><li>Работа в Pro Tools / Logic / Ableton</li><li>Запись и редактирование треков</li><li>Основы сведения и обработки</li><li>Практика на реальных проектах</li><li>Чат с преподавателем</li></ul><a href="#contact" class="btn-primary" style="width:100%;justify-content:center">Записаться</a></div>
+        <div class="pricing-card"><div class="pricing-name">Профессионал</div><div class="pricing-price">65 000 ₽</div><div class="pricing-period">20 занятий · полный курс</div><ul class="pricing-list"><li>Профессиональное сведение и мастеринг</li><li>Аналоговый и цифровой тракт</li><li>Работа с живыми инструментами</li><li>Запись собственного трека в студии</li><li>Помощь с портфолио</li></ul><a href="#contact" class="btn-ghost" style="width:100%;justify-content:center">Записаться</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-inner">
+    <div class="section-eyebrow">Студия в цифрах</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num">500+</div><div class="stat-lbl">Выпущенных треков</div></div>
+      <div class="stat-card"><div class="stat-num">15</div><div class="stat-lbl">Лет на рынке</div></div>
+      <div class="stat-card"><div class="stat-num">200+</div><div class="stat-lbl">Довольных клиентов</div></div>
+      <div class="stat-card"><div class="stat-num">1</div><div class="stat-lbl">SPRING SOUND LAB</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--navy2)">
+  <div class="section-inner">
+    <div class="section-eyebrow">Отзывы</div>
+    <h2 class="section-title">Слова клиентов</h2>
+    <div class="test-grid">
+      <div class="test-card"><div class="test-quote">Записывались здесь с группой — ощущение нереальное. Звук получился именно таким, каким мы его слышали в голове. Профессионализм на высшем уровне!</div><div class="test-author"><div class="test-avatar"><img src="https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=100&q=80" alt=""></div><div><div class="test-name">Максим Орлов</div><div class="test-role">Вокалист, группа Echo</div></div></div></div>
+      <div class="test-card"><div class="test-quote">Никогда не думала, что мастеринг так кардинально меняет звук. После SPRING SOUND LAB мои треки звучат на уровне мировых релизов!</div><div class="test-author"><div class="test-avatar"><img src="https://images.unsplash.com/photo-1614270532523-e1978d1f3716?auto=format&fit=crop&w=100&q=80" alt=""></div><div><div class="test-name">Алиса Кравцова</div><div class="test-role">Певица, R&B</div></div></div></div>
+      <div class="test-card"><div class="test-quote">Для саундтрека к сериалу нам нужна была студия, которая понимает кино. SPRING SOUND LAB справились блестяще — каждая сцена зазвучала идеально.</div><div class="test-author"><div class="test-avatar"><img src="https://images.unsplash.com/photo-1662795854059-547d94855285?auto=format&fit=crop&w=100&q=80" alt=""></div><div><div class="test-name">Игорь Дьяченко</div><div class="test-role">Режиссёр сериала «Нить»</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-inner">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start">
+      <div><div class="section-eyebrow">FAQ</div><h2 class="section-title">Вопросы и ответы</h2><p class="section-sub" style="margin-bottom:2.5rem">Задавайте вопросы — мы всегда на связи и готовы помочь разобраться в деталях.</p><a href="#contact" class="btn-primary">Задать вопрос →</a></div>
+      <div class="faq-wrap">
+        <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Что взять с собой на сессию?<span class="faq-icon">+</span></button><div class="faq-a">Принесите инструмент (если нужен), треки-референсы и хорошее настроение. Оборудование, кабели, наушники — всё у нас есть.</div></div>
+        <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Сколько занимает сведение?<span class="faq-icon">+</span></button><div class="faq-a">Стандартный трек — 4–8 часов. Альбом — от 3 до 10 рабочих дней. Точные сроки согласуются индивидуально.</div></div>
+        <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Работаете с начинающими артистами?<span class="faq-icon">+</span></button><div class="faq-a">Да, мы рады работать с артистами любого уровня. Наши инженеры поддержат на каждом этапе.</div></div>
+        <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Можно ли оплатить частями?<span class="faq-icon">+</span></button><div class="faq-a">Для больших проектов — рассрочка: 50% предоплата, остаток после сдачи материала.</div></div>
+        <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Зачем нужен мастеринг?<span class="faq-icon">+</span></button><div class="faq-a">Мастеринг — финальная стадия, делающая звук конкурентоспособным на любой платформе и системе воспроизведения.</div></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -778,62 +915,160 @@ body.player-open{padding-bottom:72px}
   </div>
 </div>
 
+<section id="contact" style="background:var(--navy2)">
+  <div class="section-inner">
+    <div class="section-eyebrow">Свяжитесь с нами</div>
+    <h2 class="section-title">Начните проект</h2>
+    <div class="contact-grid">
+      <div><div class="contact-form"><div class="form-row"><input type="text" class="f-field f-top" placeholder="Ваше имя" style="border-radius:var(--r) 0 0 0"><input type="email" class="f-field f-top" placeholder="Email" style="border-radius:0 var(--r) 0 0"></div><input type="tel" class="f-field" placeholder="Телефон"><select class="f-field" style="cursor:pointer"><option value="" disabled selected>Тип услуги</option><option>Запись вокала / инструментов</option><option>Сведение / Мастеринг</option><option>Уроки звукорежиссуры</option><option>Уроки вокала</option><option>Уроки гитары</option><option>Продюсирование</option><option>Саундтрек / Реклама</option></select><textarea class="f-field" rows="5" placeholder="Расскажите о вашем проекте..."></textarea><button class="f-submit" onclick="alert('Спасибо! Мы свяжемся с вами в ближайшее время.')">Отправить запрос →</button></div></div>
+      <div class="contact-info"><div class="map-box"><iframe src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCt1265A4qvZy9HKUeA8J15AOC4SrCyZe4&q=Moscow+Russia" allowfullscreen></iframe></div><div class="info-row"><div class="info-lbl">Адрес</div><div class="info-val">Москва, ул. Тверская, 12, офис 301</div></div><div class="info-row"><div class="info-lbl">Телефон</div><div class="info-val">+7 (495) 123-45-67</div></div><div class="info-row"><div class="info-lbl">Email</div><div class="info-val">hello@springsoundlab.studio</div></div><div class="info-row"><div class="info-lbl">Режим работы</div><div class="info-val">Пн–Вс: 10:00 — 22:00</div></div><div class="social-row"><a href="#" class="soc-btn">VK</a><a href="#" class="soc-btn">TG</a><a href="#" class="soc-btn">YT</a><a href="#" class="soc-btn">IG</a></div></div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-grid">
-    <div><div class="footer-logo">SPRING SOUND <span>LAB</span></div><div class="footer-desc">Профессиональная студия звукозаписи. Запись, сведение, мастеринг и продюсирование с 2009 года.</div></div>
-    <div class="footer-col"><h4>Контакты</h4><ul class="footer-links"><li><a href="tel:+74951234567">+7 (495) 123-45-67</a></li><li><a href="mailto:hello@springsoundlab.studio">hello@springsoundlab.studio</a></li></ul></div>
+    <div><div class="footer-logo">SPRING SOUND <span>LAB</span></div><div class="footer-desc">Профессиональная студия звукозаписи в Москве. Запись, сведение, мастеринг и продюсирование с 2009 года.</div></div>
+    <div class="footer-col"><h4>Услуги</h4><ul class="footer-links"><li><a href="#services">Запись</a></li><li><a href="#services">Сведение / Мастеринг</a></li><li><a href="#services">Звукорежиссура</a></li><li><a href="#services">Продюсирование</a></li><li><a href="#services">Саундтреки</a></li></ul></div>
+    <div class="footer-col"><h4>Студия</h4><ul class="footer-links"><li><a href="#about">О нас</a></li><li><a href="#team">Команда</a></li><li><a href="#portfolio">Портфолио</a></li><li><a href="#pricing">Цены</a></li><li><a href="#contact">Контакты</a></li></ul></div>
+    <div class="footer-col"><h4>Контакты</h4><ul class="footer-links"><li><a href="tel:+74951234567">+7 (495) 123-45-67</a></li><li><a href="mailto:hello@springsoundlab.studio">hello@springsoundlab.studio</a></li><li><a href="#">ВКонтакте</a></li><li><a href="#">Telegram</a></li><li><a href="#">YouTube</a></li></ul></div>
   </div>
-  <div class="footer-bottom"><div style="display:flex;align-items:center;gap:10px;">© SPRING SOUND LAB, 2025. Все права защищены.<div id="crm-trigger" ondblclick="openCrmModal()" title=""><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div></div></div>
+  <div class="footer-bottom"><div style="display:flex;align-items:center;gap:10px;">© SPRING SOUND LAB, 2025. Все права защищены.<div id="crm-trigger" ondblclick="openCrmModal()" title=""><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg></div></div><div style="display:flex;gap:1.5rem"><a href="#">Политика конфиденциальности</a><a href="#">Договор оферты</a></div></div>
 </footer>
+
+
 
 <div class="crm-overlay" id="crm-overlay" onclick="crmOverlayClick(event)">
   <div class="crm-panel" id="crm-panel">
-    <button class="crm-close-btn" onclick="closeCrmModal()" title="Закрыть"><svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
-    <div class="crm-panel-logo"><span class="crm-name">SPRING SOUND <span>LAB</span></span><span class="crm-tag">CRM</span></div>
+    <button class="crm-close-btn" onclick="closeCrmModal()" title="Закрыть">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+    <div class="crm-panel-logo">
+      <span class="crm-name">SPRING SOUND <span>LAB</span></span>
+      <span class="crm-tag">CRM</span>
+    </div>
     <h2>Вход в систему</h2>
-    <p>Доступ только для сотрудников</p>
+    <p>Доступ только для сотрудников студии</p>
+    
     <div id="crm-auth-fields">
-      <div class="crm-field-wrap"><input type="text" id="crm-login-input" class="crm-input" placeholder="Логин (admin ssl)" autocomplete="off"></div>
-      <div class="crm-field-wrap"><input type="password" id="crm-pass-input" class="crm-input" placeholder="Пароль (080808)"></div>
+      <div class="crm-field-wrap">
+        <span class="crm-field-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        </span>
+        <input type="text" id="crm-login-input" class="crm-input" placeholder="Логин" autocomplete="off" onkeypress="if(event.key==='Enter')checkCrmAuth()">
+      </div>
+      <div class="crm-field-wrap">
+        <span class="crm-field-icon">
+          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        </span>
+        <input type="password" id="crm-pass-input" class="crm-input" placeholder="Пароль" onkeypress="if(event.key==='Enter')checkCrmAuth()">
+      </div>
       <div class="crm-error" id="crm-error">Неверный логин или пароль</div>
       <button class="crm-btn" id="crm-btn" onclick="checkCrmAuth()">Войти в систему →</button>
+      <div class="crm-hint" id="crm-hint">Защищённый доступ · Spring Sound Lab</div>
     </div>
+
     <div id="crm-choice-block" style="display:none; flex-direction:column; gap:10px; margin-top:10px;">
-      <button class="crm-btn" onclick="openAdminPanel()" style="background:var(--green); margin-top:0;">Панель редактирования сайта</button>
+      <button class="crm-btn" onclick="window.location.href='certificates.html'" style="margin-top:0;">Войти в CRM</button>
+      <button class="crm-btn" onclick="openAdminPanel()" style="background:var(--green); margin-top:0; box-shadow:0 0 22px rgba(16,185,129,0.35);">Панель редактирования</button>
     </div>
   </div>
 </div>
 
 <div id="admin-app">
   <div class="topbar">
-    <div class="topbar-left"><span class="topbar-logo">SPRING SOUND <span>LAB</span></span><span class="topbar-badge">Admin</span></div>
+    <div class="topbar-left">
+      <span class="topbar-logo">SPRING SOUND <span>LAB</span></span>
+      <span class="topbar-badge">Admin</span>
+    </div>
     <div class="topbar-right">
-      <span class="save-indicator" id="save-indicator"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Сохранено</span>
-      <a href="#" class="topbar-site-btn" onclick="closeAdminPanel(); return false;">Сайт</a>
-      <button class="topbar-logout" onclick="closeAdminPanel()">Выйти</button>
+      <span class="save-indicator" id="save-indicator">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        Сохранено
+      </span>
+      <a href="#" class="topbar-site-btn" onclick="closeAdminPanel(); return false;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+        Сайт
+      </a>
+      <button class="topbar-logout" onclick="closeAdminPanel()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        Выйти
+      </button>
     </div>
   </div>
 
   <div class="admin-main">
     <div class="page-header">
       <div class="page-eyebrow">Spring Sound Lab</div>
-      <div class="page-title">Управление Релизами и Плеером</div>
-      <div class="page-sub">Все добавленные релизы автоматически попадают в нижний аудиоплеер на сайте.</div>
+      <div class="page-title">Управление сайтом</div>
+      <div class="page-sub">Редактируйте треки, плеер и настройки — изменения сразу отображаются на сайте</div>
     </div>
 
     <div class="admin-tabs">
-      <button class="admin-tab active">💿 Управление Релизами</button>
+      <button class="admin-tab active" onclick="switchAdminTab(this,'panel-tracks')">🎵 Треки плеера</button>
+      <button class="admin-tab" onclick="switchAdminTab(this,'panel-releases')">💿 Релизы</button>
+      <button class="admin-tab" onclick="switchAdminTab(this,'panel-preview')">👁 Предпросмотр</button>
+      <button class="admin-tab" onclick="switchAdminTab(this,'panel-settings')">⚙️ Настройки</button>
     </div>
 
-    <div class="admin-panel active" id="panel-releases">
+    <div class="admin-panel active" id="panel-tracks">
       <div class="tracks-header">
         <div>
-          <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.2rem">Ваши Релизы</div>
-          <div style="font-size:0.75rem;color:var(--white50)">Добавляйте ссылки на аудио с Яндекс.Диска для плеера.</div>
+          <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.2rem">Треки нижнего плеера</div>
+          <div style="font-size:0.75rem;color:var(--white50)">Добавьте ссылку на MP3 или Яндекс.Музыку</div>
+        </div>
+        <button class="btn-add" onclick="addTrack()">+ Добавить трек</button>
+      </div>
+      <div class="tracks-list" id="tracks-list"></div>
+    </div>
+
+    <div class="admin-panel" id="panel-releases">
+      <div class="tracks-header">
+        <div>
+          <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.2rem">Релизы на сайте</div>
+          <div style="font-size:0.75rem;color:var(--white50)">Карточки релизов в разделе Портфолио</div>
         </div>
         <button class="btn-add" onclick="addRelease()">+ Добавить релиз</button>
       </div>
       <div class="tracks-list" id="releases-list"></div>
+    </div>
+
+    <div class="admin-panel" id="panel-preview">
+      <div class="preview-info">
+        <strong>Предпросмотр плеера</strong><br>
+        Так будут отображаться треки на сайте. Изменения сохраняются автоматически в браузере посетителя при следующем открытии страницы.
+      </div>
+      <div class="preview-track-list" id="preview-list"></div>
+    </div>
+
+    <div class="admin-panel" id="panel-settings">
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>Студия</h3>
+          <p>Основная информация, отображаемая на сайте</p>
+          <label class="settings-field-label">Телефон</label>
+          <input type="text" class="edit-input" id="set-phone" placeholder="+7 (495) 123-45-67" style="margin-bottom:8px" oninput="autoSaveSettings()">
+          <label class="settings-field-label">Email</label>
+          <input type="text" class="edit-input" id="set-email" placeholder="hello@springsoundlab.studio" style="margin-bottom:8px" oninput="autoSaveSettings()">
+          <label class="settings-field-label">Адрес</label>
+          <input type="text" class="edit-input" id="set-address" placeholder="Москва, ул. Тверская, 12" oninput="autoSaveSettings()">
+        </div>
+        <div class="settings-card">
+          <h3>Пароль от CRM</h3>
+          <p>Смените пароль доступа к CRM-системе (замочек на сайте)</p>
+          <label class="settings-field-label">Логин CRM</label>
+          <input type="text" class="edit-input" id="set-crm-login" placeholder="admin ssl" style="margin-bottom:8px" oninput="autoSaveSettings()">
+          <label class="settings-field-label">Пароль CRM</label>
+          <input type="password" class="edit-input" id="set-crm-pass" placeholder="••••••" oninput="autoSaveSettings()">
+          <div style="font-size:0.72rem;color:var(--white50);margin-top:0.5rem">Пока хранится в коде сайта. После смены — обновите index.html вручную.</div>
+        </div>
+        <div class="settings-card" style="grid-column:span 2">
+          <h3>Данные сохранены в</h3>
+          <p style="margin-bottom:0.75rem">Все изменения хранятся в <strong style="color:var(--white)">localStorage</strong> браузера. Чтобы данные подтянулись на сайт — он должен быть открыт в том же браузере. Для продакшна рекомендуем подключить сервер.</p>
+          <button class="btn-save" onclick="exportData()" style="margin-right:8px">📦 Экспортировать JSON</button>
+          <button class="auth-btn" style="width:auto;padding:0.55rem 1.1rem;font-size:0.78rem;background:var(--red);box-shadow:none;border-radius:50px" onclick="resetAllData()">🗑 Сбросить всё</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -857,13 +1092,15 @@ body.player-open{padding-bottom:72px}
     <div class="player-time"><span id="p-current">0:00</span> / <span id="p-total">0:00</span></div>
     <div class="player-controls">
       <div class="player-btns">
+        <button class="p-btn" id="shuf-btn" title="Перемешать" onclick="toggleShuffle()"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17zm4.76-.08 3.65 3.91-3.65 3.91V14h-.02c-.91-.02-1.77-.35-2.45-.97l-1.42 1.43c1.05.98 2.43 1.53 3.87 1.54H17v2.5l3.5-3.5L17 11.42V14h-.01l-3.01-3.22 1.43-1.43c.68-.63 1.54-.96 2.42-.97H17V6.67l-3.5 3.5zm-7.08 7.08L4 19.59 5.41 21l4.17-4.17z"/></svg></button>
         <button class="p-btn" onclick="prevTrack()" title="Предыдущий"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
         <button class="p-btn-play" id="p-play-btn" onclick="togglePlay()"><svg id="p-play-icon" width="12" height="14" viewBox="0 0 18 20" fill="white"><polygon points="2,0 18,10 2,20"/></svg></button>
         <button class="p-btn" onclick="nextTrack()" title="Следующий"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 6h-2v12h2zM6.5 18l8.5-6-8.5-6z"/></svg></button>
+        <button class="p-btn" id="rep-btn" title="Повтор" onclick="toggleRepeat()"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg></button>
       </div>
     </div>
     <div class="player-volume">
-      <button class="vol-icon" onclick="toggleMute()"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/><path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77 0-4.28-2.99-7.86-7-8.77z"/></svg></button>
+      <button class="vol-icon" onclick="toggleMute()" id="vol-icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" id="vol-svg"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/><path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77 0-4.28-2.99-7.86-7-8.77z"/></svg></button>
       <div class="volume-slider"><div class="volume-fill" id="vol-fill" style="width:80%"></div><input type="range" id="vol-range" min="0" max="100" value="80" step="1"></div>
     </div>
     <div class="player-right">
@@ -877,8 +1114,14 @@ body.player-open{padding-bottom:72px}
 <audio id="audio-el"></audio>
 
 <script>
-// Навигация и табы
+/* ---- Навигация ---- */
 function toggleNav(){document.getElementById('mobileNav').classList.toggle('open')}
+function toggleFaq(btn){btn.parentElement.classList.toggle('open')}
+function switchTab(btn,id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');document.getElementById(id).classList.add('active');
+}
 let pricingSwitching=false;
 function switchPricing(btn,id){
   if(pricingSwitching)return;
@@ -888,299 +1131,574 @@ function switchPricing(btn,id){
   const nxt=document.getElementById(id);
   if(cur===nxt)return;
   pricingSwitching=true;
-  cur.style.opacity='0';
+  cur.style.transition='opacity 0.2s ease, transform 0.2s ease';
+  cur.style.opacity='0';cur.style.transform='translateY(-8px)';
   setTimeout(()=>{
-    cur.classList.remove('active');cur.style.opacity='';
+    cur.classList.remove('active');cur.style.transition='';cur.style.opacity='';cur.style.transform='';
     nxt.classList.add('active','anim-in');
     nxt.addEventListener('animationend',()=>{nxt.classList.remove('anim-in');pricingSwitching=false;},{once:true});
-  },200);
+  },220);
 }
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const id=a.getAttribute('href');if(id==='#')return;
+    const el=document.querySelector(id);
+    if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'})}
+  });
+});
+window.addEventListener('scroll',()=>{
+  document.querySelector('nav').style.backdropFilter=window.scrollY>50?'blur(24px)':'blur(20px)';
+});
 
-// ==== ПЛЕЕР ====
-let TRACKS = []; // Динамический массив плеера из релизов
-const audio = document.getElementById('audio-el');
-let currentIdx = -1, isPlaying = false, muted = false, lastVol = 0.8, queueOpen = false;
-
+/* ---- Плеер ---- */
+const TRACKS=[
+  {title:'Первая частота',artist:'Echo',cover:'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',dur:'5:38'},
+  {title:'Тихий Сигнал',artist:'Алиса Кравцова',cover:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',dur:'4:25'},
+  {title:'Нить — OST',artist:'Сериал «Нить»',cover:'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',dur:'6:12'},
+  {title:'Одиночество в сети',artist:'Ноябрь',cover:'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',dur:'3:47'}
+];
+const audio=document.getElementById('audio-el');
+let currentIdx=-1,isPlaying=false,muted=false,lastVol=0.8;
+let shuffle=false,repeat=false,queueOpen=false;
+const player=document.getElementById('bottom-player');
+const coverImg=document.getElementById('player-cover-img');
+const titleEl=document.getElementById('player-title');
+const artistEl=document.getElementById('player-artist');
+const playIcon=document.getElementById('p-play-icon');
+const progFill=document.getElementById('prog-fill');
+const progThumb=document.getElementById('prog-thumb');
+const progHit=document.getElementById('prog-hit');
+const progWrap=document.getElementById('prog-wrap');
+const pCurrent=document.getElementById('p-current');
+const pTotal=document.getElementById('p-total');
+const volFill=document.getElementById('vol-fill');
+const volRange=document.getElementById('vol-range');
+const queuePanel=document.getElementById('player-queue');
+const queueList=document.getElementById('queue-list');
 function fmt(s){s=Math.floor(s)||0;return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60}
-function updateProgress(pct){
-  pct=Math.max(0,Math.min(100,pct));
-  document.getElementById('prog-fill').style.width=pct+'%';
-  const w=document.getElementById('prog-wrap').getBoundingClientRect().width;
-  document.getElementById('prog-thumb').style.left=((pct/100)*w)+'px';
-}
-function seekToX(clientX){
-  if(!audio.duration)return;
-  const rect=document.getElementById('prog-wrap').getBoundingClientRect();
-  const pct=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
-  audio.currentTime=pct*audio.duration;
-  updateProgress(pct*100);
-}
-
-let seeking = false;
-document.getElementById('prog-hit').addEventListener('mousedown',e=>{seeking=true;seekToX(e.clientX);});
+function setPlayIcon(p){isPlaying=p;playIcon.innerHTML=p?'<rect x="0" y="0" width="5" height="20" rx="1"/><rect x="10" y="0" width="5" height="20" rx="1"/>':'<polygon points="2,0 18,10 2,20"/>';}
+function updateProgress(pct){pct=Math.max(0,Math.min(100,pct));progFill.style.width=pct+'%';const w=progWrap.getBoundingClientRect().width;progThumb.style.left=((pct/100)*w)+'px';}
+function seekToX(clientX){if(!audio.duration)return;const rect=progWrap.getBoundingClientRect();const pct=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));audio.currentTime=pct*audio.duration;updateProgress(pct*100);}
+let seeking=false;
+progHit.addEventListener('mousedown',e=>{seeking=true;seekToX(e.clientX);progThumb.style.opacity='1';});
 document.addEventListener('mousemove',e=>{if(!seeking)return;seekToX(e.clientX);});
-document.addEventListener('mouseup',()=>{seeking=false;});
+document.addEventListener('mouseup',()=>{if(seeking){seeking=false;progThumb.style.opacity='';}});
+progHit.addEventListener('touchstart',e=>{seeking=true;seekToX(e.touches[0].clientX);e.preventDefault();},{passive:false});
+document.addEventListener('touchmove',e=>{if(!seeking)return;seekToX(e.touches[0].clientX);e.preventDefault();},{passive:false});
+document.addEventListener('touchend',()=>{seeking=false;});
+progWrap.addEventListener('mouseenter',()=>{if(!seeking)progThumb.style.opacity='1';});
+progWrap.addEventListener('mouseleave',()=>{if(!seeking)progThumb.style.opacity='0';});
+function renderQueue(){queueList.innerHTML=TRACKS.map((t,i)=>`<div class="queue-item${i===currentIdx?' playing':''}" onclick="playTrack(${i})"><div class="q-num">${i===currentIdx?'▶':i+1}</div><div class="q-cover"><img src="${t.cover}" alt=""></div><div class="q-info"><div class="q-title">${t.title}</div><div class="q-artist">${t.artist}</div></div><div class="q-dur">${t.dur}</div></div>`).join('');}
+function showPlayer(){player.classList.add('visible');document.body.classList.add('player-open');}
+function closePlayer(){audio.pause();audio.src='';player.classList.remove('visible');document.body.classList.remove('player-open');setPlayIcon(false);currentIdx=-1;updateProgress(0);pCurrent.textContent='0:00';pTotal.textContent='0:00';queuePanel.classList.remove('open');queueOpen=false;}
+function playTrack(idx){if(idx<0||idx>=TRACKS.length)return;currentIdx=idx;const t=TRACKS[idx];coverImg.src=t.cover;titleEl.textContent=t.title;artistEl.textContent=t.artist;audio.src=t.src;audio.volume=lastVol;audio.play().catch(()=>{});setPlayIcon(true);showPlayer();renderQueue();}
+function togglePlay(){if(currentIdx===-1){playTrack(0);return;}if(audio.paused){audio.play().catch(()=>{});setPlayIcon(true);}else{audio.pause();setPlayIcon(false);}}
+function prevTrack(){if(audio.currentTime>3){audio.currentTime=0;return;}playTrack(currentIdx<=0?TRACKS.length-1:currentIdx-1);}
+function nextTrack(){playTrack(shuffle?Math.floor(Math.random()*TRACKS.length):((currentIdx+1)%TRACKS.length));}
+function toggleShuffle(){shuffle=!shuffle;document.getElementById('shuf-btn').classList.toggle('active',shuffle);}
+function toggleRepeat(){repeat=!repeat;document.getElementById('rep-btn').classList.toggle('active',repeat);}
+function toggleMute(){if(muted){audio.volume=lastVol;muted=false;volRange.value=lastVol*100;volFill.style.width=(lastVol*100)+'%';}else{lastVol=audio.volume||lastVol;audio.volume=0;muted=true;volRange.value=0;volFill.style.width='0%';}}
+function toggleQueue(){queueOpen=!queueOpen;queuePanel.classList.toggle('open',queueOpen);document.getElementById('queue-toggle-btn').classList.toggle('active',queueOpen);}
+volRange.addEventListener('input',()=>{const v=volRange.value/100;audio.volume=v;if(v>0)lastVol=v;muted=v===0;volFill.style.width=volRange.value+'%';});
+audio.addEventListener('timeupdate',()=>{if(!audio.duration||seeking)return;const pct=(audio.currentTime/audio.duration)*100;updateProgress(pct);pCurrent.textContent=fmt(audio.currentTime);});
+audio.addEventListener('loadedmetadata',()=>{pTotal.textContent=fmt(audio.duration)});
+audio.addEventListener('ended',()=>{if(repeat){audio.currentTime=0;audio.play();}else nextTrack();});
+audio.addEventListener('play',()=>setPlayIcon(true));
+audio.addEventListener('pause',()=>setPlayIcon(false));
+audio.volume=0.8;
 
-function syncPlayerTracks() {
-  // Выбираем только релизы, у которых добавлена ссылка на аудиофайл
-  TRACKS = releases.filter(r => r.src && r.src.trim() !== '');
-  renderQueue();
+/* =====================================================
+   CRM ADMIN LOGIN & PANEL LOGIC
+   ===================================================== */
+(function(){
+  var trigger=document.getElementById('crm-trigger');
+  if(!trigger)return;
+  var lastTap=0;
+  trigger.addEventListener('touchend',function(e){
+    var now=Date.now();
+    if(now-lastTap<400){e.preventDefault();openCrmModal();}
+    lastTap=now;
+  });
+})();
+
+function openCrmModal(){
+  document.getElementById('crm-overlay').classList.add('open');
+  setTimeout(function(){
+    var el=document.getElementById('crm-login-input');
+    if(el)el.focus();
+  },150);
 }
 
-function renderQueue(){
-  const list = document.getElementById('queue-list');
-  if(!TRACKS.length) { list.innerHTML = '<div style="padding:10px 16px; font-size:12px; color:gray;">Плейлист пуст. Добавьте ссылки на аудио в релизах.</div>'; return; }
-  list.innerHTML = TRACKS.map((t,i)=>`
-    <div class="queue-item${i===currentIdx?' playing':''}" onclick="playTrack(${i})">
-      <div class="q-num">${i===currentIdx?'▶':i+1}</div>
-      <div class="q-cover"><img src="${t.cover || ''}" alt=""></div>
-      <div class="q-info"><div class="q-title">${t.title}</div><div class="q-artist">${t.artist}</div></div>
-      <div class="q-dur">${t.dur || '0:00'}</div>
-    </div>`).join('');
-}
-
-function showPlayer(){document.getElementById('bottom-player').classList.add('visible');document.body.classList.add('player-open');}
-function closePlayer(){audio.pause();audio.src='';document.getElementById('bottom-player').classList.remove('visible');document.body.classList.remove('player-open');setPlayIcon(false);currentIdx=-1;updateProgress(0);}
-
-function playTrack(idx){
-  if(idx<0||idx>=TRACKS.length)return;
-  currentIdx=idx; const t=TRACKS[idx];
-  document.getElementById('player-cover-img').src=t.cover || '';
-  document.getElementById('player-title').textContent=t.title;
-  document.getElementById('player-artist').textContent=t.artist;
-  audio.src=t.src; audio.volume=lastVol; audio.play().catch(()=>{});
-  setPlayIcon(true); showPlayer(); renderQueue();
-}
-
-function togglePlay(){
-  if(currentIdx===-1 && TRACKS.length > 0){playTrack(0);return;}
-  if(audio.paused){audio.play();setPlayIcon(true);}else{audio.pause();setPlayIcon(false);}
-}
-function setPlayIcon(p){isPlaying=p; document.getElementById('p-play-icon').innerHTML=p?'<rect x="0" y="0" width="5" height="20" rx="1"/><rect x="10" y="0" width="5" height="20" rx="1"/>':'<polygon points="2,0 18,10 2,20"/>';}
-function prevTrack(){playTrack(currentIdx<=0?TRACKS.length-1:currentIdx-1);}
-function nextTrack(){playTrack((currentIdx+1)%TRACKS.length);}
-function toggleMute(){
-  if(muted){audio.volume=lastVol;muted=false;document.getElementById('vol-range').value=lastVol*100;document.getElementById('vol-fill').style.width=(lastVol*100)+'%';}
-  else{lastVol=audio.volume||lastVol;audio.volume=0;muted=true;document.getElementById('vol-range').value=0;document.getElementById('vol-fill').style.width='0%';}
-}
-function toggleQueue(){
-  queueOpen=!queueOpen;
-  document.getElementById('player-queue').classList.toggle('open',queueOpen);
-  document.getElementById('queue-toggle-btn').classList.toggle('active',queueOpen);
-}
-
-document.getElementById('vol-range').addEventListener('input',(e)=>{
-  const v=e.target.value/100; audio.volume=v; if(v>0)lastVol=v; muted=v===0;
-  document.getElementById('vol-fill').style.width=e.target.value+'%';
-});
-
-audio.addEventListener('timeupdate',()=>{
-  if(!audio.duration||seeking)return;
-  updateProgress((audio.currentTime/audio.duration)*100);
-  document.getElementById('p-current').textContent=fmt(audio.currentTime);
-});
-audio.addEventListener('loadedmetadata',()=>{document.getElementById('p-total').textContent=fmt(audio.duration)});
-audio.addEventListener('ended',()=>nextTrack());
-
-// ==== ВХОД В CRM ====
-function openCrmModal(){document.getElementById('crm-overlay').classList.add('open');setTimeout(()=>document.getElementById('crm-login-input').focus(),150);}
 function closeCrmModal(){
   document.getElementById('crm-overlay').classList.remove('open');
   document.getElementById('crm-error').classList.remove('show');
-  document.getElementById('crm-auth-fields').style.display='block';
-  document.getElementById('crm-choice-block').style.display='none';
+  document.getElementById('crm-login-input').value='';
+  document.getElementById('crm-pass-input').value='';
+  
+  // Сбрасываем внешний вид окна к изначальному
+  var btn=document.getElementById('crm-btn');
+  btn.textContent='Войти в систему →';
+  btn.className='crm-btn';
+  btn.style.display='block';
+  
+  var authFields = document.getElementById('crm-auth-fields');
+  if(authFields) authFields.style.display = 'block';
+  
+  var choiceBlock = document.getElementById('crm-choice-block');
+  if(choiceBlock) choiceBlock.style.display = 'none';
 }
-function crmOverlayClick(e){if(e.target===document.getElementById('crm-overlay'))closeCrmModal();}
+
+function crmOverlayClick(e){
+  if(e.target===document.getElementById('crm-overlay'))closeCrmModal();
+}
+
 function checkCrmAuth(){
-  const login=document.getElementById('crm-login-input').value.trim();
-  const pass=document.getElementById('crm-pass-input').value;
+  var login=document.getElementById('crm-login-input').value.trim();
+  var pass=document.getElementById('crm-pass-input').value;
+  var btn=document.getElementById('crm-btn');
+  var err=document.getElementById('crm-error');
   if(login==='admin ssl'&&pass==='080808'){
-    document.getElementById('crm-btn').className='crm-btn granted';
-    document.getElementById('crm-error').classList.remove('show');
-    setTimeout(()=>{
-      document.getElementById('crm-auth-fields').style.display='none';
-      document.getElementById('crm-choice-block').style.display='flex';
+    btn.textContent='Доступ получен...';
+    btn.className='crm-btn granted';
+    err.classList.remove('show');
+    
+    // Вместо редиректа - скрываем инпуты и показываем выбор
+    setTimeout(function(){
+      var authFields = document.getElementById('crm-auth-fields');
+      if(authFields) authFields.style.display = 'none';
+      
+      var choiceBlock = document.getElementById('crm-choice-block');
+      if(choiceBlock) choiceBlock.style.display = 'flex';
     },700);
   } else {
-    document.getElementById('crm-error').classList.add('show');
-    document.getElementById('crm-btn').className='crm-btn denied';
-    setTimeout(()=>document.getElementById('crm-btn').className='crm-btn',1300);
+    btn.textContent='Отказано в доступе';
+    btn.className='crm-btn denied';
+    err.classList.add('show');
+    document.getElementById('crm-pass-input').value='';
+    setTimeout(function(){
+      btn.textContent='Войти в систему →';
+      btn.className='crm-btn';
+    },1300);
   }
 }
 
-// ==== АДМИН ПАНЕЛЬ ЛОГИКА ====
-function openAdminPanel() { closeCrmModal(); document.getElementById('admin-app').style.display = 'block'; document.body.style.overflow = 'hidden'; initAdmin(); }
-function closeAdminPanel() { document.getElementById('admin-app').style.display = 'none'; document.body.style.overflow = ''; }
+// Нажатие Escape закрывает окно CRM
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&document.getElementById('crm-overlay').classList.contains('open'))closeCrmModal();
+});
 
-const LS_KEY_RELEASES = 'ssl_releases_v2';
+// Открытие самой Панели Редактирования
+function openAdminPanel() {
+  closeCrmModal();
+  document.getElementById('admin-app').style.display = 'block';
+  document.body.style.overflow = 'hidden'; // Убираем скролл сайта под панелью
+  initAdmin();
+}
 
-const DEFAULT_RELEASES = [
-  { id: '_1a2b', title: 'Первая частота', artist: 'Echo', type: 'Альбом', genre: 'инди-поп, 12 треков', cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=600&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', dur: '5:38' },
-  { id: '_3c4d', title: 'Тихий Сигнал', artist: 'Алиса Кравцова', type: 'EP', genre: 'R&B, 5 треков', cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', dur: '4:25' }
+function closeAdminPanel() {
+  document.getElementById('admin-app').style.display = 'none';
+  document.body.style.overflow = ''; // Возвращаем скролл сайту
+}
+
+
+/* ============================================================
+   DATA MODEL AND ADMIN LOGIC 
+   ============================================================ */
+const LS_KEY_TRACKS = 'ssl_tracks';
+const LS_KEY_RELEASES = 'ssl_releases';
+const LS_KEY_SETTINGS = 'ssl_settings';
+
+const DEFAULT_TRACKS = [
+  { id: uid(), title: 'Первая частота', artist: 'Echo', cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', yandex: '', type: 'mp3', dur: '5:38' },
+  { id: uid(), title: 'Тихий Сигнал', artist: 'Алиса Кравцова', cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', yandex: '', type: 'mp3', dur: '4:25' },
+  { id: uid(), title: 'Нить — OST', artist: 'Сериал «Нить»', cover: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=200&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', yandex: '', type: 'mp3', dur: '6:12' },
+  { id: uid(), title: 'Одиночество в сети', artist: 'Ноябрь', cover: 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', yandex: '', type: 'mp3', dur: '3:47' }
 ];
-
-let releases = [];
+const DEFAULT_RELEASES = [
+  { id: uid(), title: 'Первая частота', artist: 'Echo', type: 'Альбом', genre: 'инди-поп, 12 треков', cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=600&q=80', trackIdx: 0 },
+  { id: uid(), title: 'Тихий Сигнал', artist: 'Алиса Кравцова', type: 'EP', genre: 'R&B, 5 треков', cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80', trackIdx: 1 },
+  { id: uid(), title: 'Нить', artist: 'OST сериала', type: 'Саундтрек', genre: 'оркестр, 18 треков', cover: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=600&q=80', trackIdx: 2 }
+];
 function uid() { return '_' + Math.random().toString(36).substr(2, 9); }
 
+function loadTracks() {
+  try { const d = localStorage.getItem(LS_KEY_TRACKS);
+  return d ? JSON.parse(d) : DEFAULT_TRACKS; } catch { return DEFAULT_TRACKS; }
+}
+function saveTracks(arr) {
+  localStorage.setItem(LS_KEY_TRACKS, JSON.stringify(arr));
+  showSaveIndicator();
+}
 function loadReleases() {
-  try { const d = localStorage.getItem(LS_KEY_RELEASES); return d ? JSON.parse(d) : DEFAULT_RELEASES; } catch { return DEFAULT_RELEASES; }
+  try { const d = localStorage.getItem(LS_KEY_RELEASES); return d ? JSON.parse(d) : DEFAULT_RELEASES;
+  } catch { return DEFAULT_RELEASES; }
+}
+function saveReleases(arr) {
+  localStorage.setItem(LS_KEY_RELEASES, JSON.stringify(arr));
+  showSaveIndicator();
+}
+function loadSettings() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY_SETTINGS) || '{}'); } catch { return {};
+  }
+}
+function saveSettings(obj) {
+  localStorage.setItem(LS_KEY_SETTINGS, JSON.stringify(obj));
+  showSaveIndicator();
 }
 
+let tracks = [], releases = [];
 function initAdmin() {
+  tracks = loadTracks();
   releases = loadReleases();
+  renderTracks();
   renderReleases();
-  syncPlayerTracks(); // Синхронизируем плеер при загрузке
+  renderPreview();
+  loadSettingsForm();
 }
 
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2500);
+function renderTracks() {
+  const list = document.getElementById('tracks-list');
+  if (!tracks.length) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">🎵</div><p>Нет треков. Нажмите «Добавить трек»</p></div>';
+    return;
+  }
+  list.innerHTML = tracks.map((t, i) => trackCardHTML(t, i)).join('');
 }
 
-// Рендер списка релизов в админке
-function renderReleases() {
-  const list = document.getElementById('releases-list');
-  if (!releases.length) { list.innerHTML = '<div class="empty-state"><p>Нет релизов. Нажмите «Добавить релиз»</p></div>'; return; }
-  list.innerHTML = releases.map((r, i) => releaseCardHTML(r, i)).join('');
-}
-
-// Карточка релиза
-function releaseCardHTML(r, i) {
+function trackCardHTML(t, i) {
+  const hasAudio = t.type === 'yandex' ? !!t.yandex : !!t.src;
+  const statusClass = t.type === 'yandex' ? 'yandex' : (hasAudio ? 'has-audio' : 'no-audio');
+  const statusText = t.type === 'yandex' ? 'Яндекс' : (hasAudio ? 'MP3' : 'Нет аудио');
+  const coverHTML = t.cover
+    ? `<img src="${escHtml(t.cover)}" alt="" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`
+    : '';
   return `
-  <div class="track-card" id="rc-${r.id}">
-    <div class="track-header" onclick="toggleReleaseEdit('${r.id}')">
-      <div class="track-num">${i + 1}</div>
-      <div class="track-cover-thumb">${r.cover ? `<img src="${r.cover}" alt="">` : '<div class="no-cover">💿</div>'}</div>
-      <div class="track-meta">
-        <div class="track-name">${r.title || 'Без названия'}</div>
-        <div class="track-artist-label">${r.artist || '—'} · ${r.type || ''}</div>
+  <div class="track-card" id="tc-${t.id}" data-id="${t.id}">
+    <div class="track-header" onclick="toggleTrackEdit('${t.id}')">
+      <div class="drag-handle" title="Перетащить">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="opacity:0.4"><path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
       </div>
+      <div class="track-num">${i + 1}</div>
+      <div class="track-cover-thumb">
+        ${coverHTML}
+        ${!t.cover ? '<div class="no-cover">🎵</div>' : '<div class="no-cover" style="display:none">🎵</div>'}
+      </div>
+      <div class="track-meta">
+        <div class="track-name">${escHtml(t.title || 'Без названия')}</div>
+        <div class="track-artist-label">${escHtml(t.artist || '—')}</div>
+      </div>
+      <span class="track-status ${statusClass}">${statusText}</span>
       <div class="track-actions" onclick="event.stopPropagation()">
-        <button class="track-action-btn del" title="Удалить" onclick="deleteRelease('${r.id}')">✕</button>
+        <button class="track-action-btn" title="Дублировать" onclick="duplicateTrack('${t.id}')">⧉</button>
+        <button class="track-action-btn del" title="Удалить" onclick="deleteTrack('${t.id}')">✕</button>
       </div>
       <div class="track-chevron">▼</div>
     </div>
-    
-    <div class="track-edit" id="re-${r.id}">
+    <div class="track-edit" id="te-${t.id}">
       <div class="edit-section">
         <label class="edit-label">Основное</label>
         <div class="edit-row" style="margin-bottom:8px">
-          <input type="text" class="edit-input" placeholder="Название" value="${r.title || ''}" oninput="updateReleaseField('${r.id}','title',this.value)">
-          <input type="text" class="edit-input" placeholder="Исполнитель" value="${r.artist || ''}" oninput="updateReleaseField('${r.id}','artist',this.value)">
+          <input type="text" class="edit-input" placeholder="Название трека" value="${escHtml(t.title || '')}" oninput="updateTrackField('${t.id}','title',this.value)">
+          <input type="text" class="edit-input" placeholder="Исполнитель" value="${escHtml(t.artist || '')}" oninput="updateTrackField('${t.id}','artist',this.value)">
         </div>
         <div class="edit-row">
-          <input type="text" class="edit-input" placeholder="Тип (Альбом, EP...)" value="${r.type || ''}" oninput="updateReleaseField('${r.id}','type',this.value)">
-          <input type="text" class="edit-input" placeholder="Жанр" value="${r.genre || ''}" oninput="updateReleaseField('${r.id}','genre',this.value)">
+          <input type="text" class="edit-input" placeholder="Длительность (напр. 3:45)" value="${escHtml(t.dur || '')}" oninput="updateTrackField('${t.id}','dur',this.value)">
+          <select class="edit-select" onchange="updateTrackType('${t.id}',this.value)">
+            <option value="mp3" ${t.type === 'mp3' ? 'selected' : ''}>🎵 MP3 / Прямая ссылка</option>
+            <option value="yandex" ${t.type === 'yandex' ? 'selected' : ''}>🟡 Яндекс.Музыка</option>
+          </select>
         </div>
       </div>
 
       <div class="edit-section">
         <label class="edit-label">Обложка</label>
         <div class="cover-section">
-          <div class="cover-preview" onclick="document.getElementById('file-${r.id}').click()" title="Загрузить с ПК">
-            ${r.cover ? `<img src="${r.cover}" id="img-prev-${r.id}">` : `<span id="img-prev-${r.id}">💿</span>`}
-            <div class="cover-overlay-btn">+</div>
+          <div class="cover-preview" id="cp-${t.id}">
+            ${t.cover ? `<img src="${escHtml(t.cover)}" alt="">` : '🎵'}
           </div>
-          <input type="file" id="file-${r.id}" style="display:none" accept="image/*" onchange="handleCoverUpload('${r.id}', this)">
-          
           <div class="cover-inputs">
-            <input type="url" class="edit-input" id="cover-url-${r.id}" placeholder="Или вставьте прямую ссылку (URL)" value="${r.cover || ''}" oninput="updateReleaseField('${r.id}','cover',this.value); updateCoverPreview('${r.id}', this.value);">
-            <div class="cover-hint">Нажмите на картинку слева, чтобы загрузить файл с ПК, либо вставьте прямую ссылку.</div>
+            <input type="url" class="edit-input" placeholder="URL обложки (https://...)" value="${escHtml(t.cover || '')}" oninput="updateTrackField('${t.id}','cover',this.value);updateCoverPreview('${t.id}',this.value)">
+            <div class="cover-hint">Вставьте URL изображения (JPG, PNG, WebP). Рекомендуемый размер: 500×500 px.</div>
           </div>
         </div>
       </div>
 
-      <div class="edit-section">
-        <label class="edit-label">🎵 Аудио (Прямая ссылка для плеера)</label>
-        <div style="display:flex; gap:8px;">
-            <input type="url" class="edit-input" placeholder="https://... ссылка на Яндекс.Диск" value="${r.src || ''}" oninput="updateReleaseField('${r.id}','src',this.value)" onblur="autoDetectDuration('${r.id}', this.value)" style="flex:1;">
-            <input type="text" class="edit-input dur-input" style="width:70px;" placeholder="М:СС" value="${r.dur || '0:00'}" oninput="updateReleaseField('${r.id}','dur',this.value)">
+      <div class="edit-section audio-section" id="audio-sec-${t.id}" style="${t.type === 'yandex' ? 'display:none' : ''}">
+        <label class="edit-label">🎵 Прямая ссылка на MP3</label>
+        <input type="url" class="edit-input" placeholder="https://example.com/track.mp3" value="${escHtml(t.src || '')}" oninput="updateTrackField('${t.id}','src',this.value)">
+        <div class="cover-hint" style="margin-top:0.4rem">Прямая ссылка на .mp3 файл. Можно загрузить на Яндекс.Диск, Dropbox, свой хостинг и взять прямую ссылку.</div>
+      </div>
+
+      <div class="edit-section yandex-section" id="yandex-sec-${t.id}" style="${t.type !== 'yandex' ? 'display:none' : ''}">
+        <label class="edit-label">🟡 Яндекс.Музыка — ссылка или embed-код</label>
+        <input type="text" class="edit-input" placeholder="https://music.yandex.ru/album/12345/track/67890" value="${escHtml(t.yandex || '')}" oninput="updateTrackField('${t.id}','yandex',this.value);updateYandexPreview('${t.id}',this.value)" style="margin-bottom:8px">
+        <div class="yandex-help">
+          Откройте трек на <a href="https://music.yandex.ru" target="_blank">music.yandex.ru</a> → три точки → «Поделиться» → скопируйте ссылку.<br>
+          <strong style="color:var(--white)">Важно:</strong> Яндекс.Музыка не разрешает прямое воспроизведение на сторонних сайтах. Ссылка откроется в новой вкладке Яндекса.
         </div>
-        <div class="cover-hint">Вставьте <b>прямую ссылку</b> на скачивание mp3 файла. Длительность определится автоматически.</div>
+        <div class="yandex-preview" id="yp-${t.id}"></div>
       </div>
 
       <div class="save-row">
-        <button class="btn-cancel" onclick="toggleReleaseEdit('${r.id}')">Закрыть</button>
-        <button class="btn-save" onclick="saveDataAndSync('${r.id}')">✓ Сохранить</button>
+        <button class="btn-cancel" onclick="cancelEdit('${t.id}')">Отмена</button>
+        <button class="btn-save" onclick="saveTrack('${t.id}')">✓ Сохранить</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleTrackEdit(id) {
+  const card = document.getElementById('tc-' + id);
+  if (card) card.classList.toggle('editing');
+}
+
+function cancelEdit(id) {
+  const card = document.getElementById('tc-' + id);
+  if (card) card.classList.remove('editing');
+}
+
+function updateTrackField(id, field, value) {
+  const t = tracks.find(x => x.id === id);
+  if (t) { t[field] = value; }
+}
+
+function updateTrackType(id, type) {
+  const t = tracks.find(x => x.id === id);
+  if (!t) return;
+  t.type = type;
+  const audioSec = document.getElementById('audio-sec-' + id);
+  const yandexSec = document.getElementById('yandex-sec-' + id);
+  if (audioSec) audioSec.style.display = type === 'yandex' ? 'none' : '';
+  if (yandexSec) yandexSec.style.display = type === 'yandex' ? '' : 'none';
+}
+
+function updateCoverPreview(id, url) {
+  const cp = document.getElementById('cp-' + id);
+  if (!cp) return;
+  if (url) {
+    cp.innerHTML = `<img src="${url}" alt="" onerror="this.parentElement.innerHTML='🎵'">`;
+  } else {
+    cp.innerHTML = '🎵';
+  }
+}
+
+function updateYandexPreview(id, val) {
+  const prev = document.getElementById('yp-' + id);
+  if (!prev) return;
+  if (val && val.includes('yandex')) {
+    prev.innerHTML = `<div style="font-size:0.75rem;color:#fbbf24;background:rgba(255,204,0,0.08);border:1px solid rgba(255,204,0,0.2);border-radius:8px;padding:0.6rem 0.85rem;margin-top:0.5rem">⚠️ При нажатии «Слушать» откроется Яндекс.Музыка в новой вкладке — это ограничение платформы.</div>`;
+    prev.classList.add('show');
+  } else {
+    prev.classList.remove('show');
+  }
+}
+
+function saveTrack(id) {
+  saveTracks(tracks);
+  const card = document.getElementById('tc-' + id);
+  if (card) card.classList.remove('editing');
+  renderTracks();
+  renderPreview();
+  showToast('Трек сохранён ✓');
+}
+
+function addTrack() {
+  const t = {
+    id: uid(), title: 'Новый трек', artist: 'Исполнитель',
+    cover: '', src: '', yandex: '', type: 'mp3', dur: '0:00'
+  };
+  tracks.push(t);
+  saveTracks(tracks);
+  renderTracks();
+  renderPreview();
+  setTimeout(() => {
+    const card = document.getElementById('tc-' + t.id);
+    if (card) { card.classList.add('editing'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }, 50);
+}
+
+function deleteTrack(id) {
+  if (!confirm('Удалить трек?')) return;
+  tracks = tracks.filter(t => t.id !== id);
+  saveTracks(tracks);
+  renderTracks();
+  renderPreview();
+  showToast('Трек удалён');
+}
+
+function duplicateTrack(id) {
+  const t = tracks.find(x => x.id === id);
+  if (!t) return;
+  const copy = { ...t, id: uid(), title: t.title + ' (копия)' };
+  const idx = tracks.findIndex(x => x.id === id);
+  tracks.splice(idx + 1, 0, copy);
+  saveTracks(tracks);
+  renderTracks();
+  renderPreview();
+  showToast('Трек продублирован');
+}
+
+function renderReleases() {
+  const list = document.getElementById('releases-list');
+  if (!releases.length) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">💿</div><p>Нет релизов. Нажмите «Добавить релиз»</p></div>';
+    return;
+  }
+  list.innerHTML = releases.map((r, i) => releaseCardHTML(r, i)).join('');
+}
+
+function releaseCardHTML(r, i) {
+  return `
+  <div class="track-card" id="rc-${r.id}" data-id="${r.id}">
+    <div class="track-header" onclick="toggleReleaseEdit('${r.id}')">
+      <div class="track-num">${i + 1}</div>
+      <div class="track-cover-thumb">
+        ${r.cover ? `<img src="${escHtml(r.cover)}" alt="">` : '<div class="no-cover">💿</div>'}
+      </div>
+      <div class="track-meta">
+        <div class="track-name">${escHtml(r.title || 'Без названия')}</div>
+        <div class="track-artist-label">${escHtml(r.artist || '—')} · ${escHtml(r.type || '')}</div>
+      </div>
+      <div class="track-actions" onclick="event.stopPropagation()">
+        <button class="track-action-btn del" title="Удалить" onclick="deleteRelease('${r.id}')">✕</button>
+      </div>
+      <div class="track-chevron">▼</div>
+    </div>
+    <div class="track-edit" id="re-${r.id}">
+      <div class="edit-section">
+        <label class="edit-label">Основное</label>
+        <div class="edit-row" style="margin-bottom:8px">
+          <input type="text" class="edit-input" placeholder="Название" value="${escHtml(r.title || '')}" oninput="updateReleaseField('${r.id}','title',this.value)">
+          <input type="text" class="edit-input" placeholder="Исполнитель" value="${escHtml(r.artist || '')}" oninput="updateReleaseField('${r.id}','artist',this.value)">
+        </div>
+        <div class="edit-row">
+          <input type="text" class="edit-input" placeholder="Тип (Альбом, EP, Сингл...)" value="${escHtml(r.type || '')}" oninput="updateReleaseField('${r.id}','type',this.value)">
+          <input type="text" class="edit-input" placeholder="Жанр / описание" value="${escHtml(r.genre || '')}" oninput="updateReleaseField('${r.id}','genre',this.value)">
+        </div>
+      </div>
+      <div class="edit-section">
+        <label class="edit-label">Обложка</label>
+        <input type="url" class="edit-input" placeholder="URL обложки" value="${escHtml(r.cover || '')}" oninput="updateReleaseField('${r.id}','cover',this.value)">
+      </div>
+      <div class="save-row">
+        <button class="btn-cancel" onclick="cancelReleaseEdit('${r.id}')">Отмена</button>
+        <button class="btn-save" onclick="saveRelease('${r.id}')">✓ Сохранить</button>
       </div>
     </div>
   </div>`;
 }
 
 function toggleReleaseEdit(id) { document.getElementById('rc-' + id)?.classList.toggle('editing'); }
+function cancelReleaseEdit(id) { document.getElementById('rc-' + id)?.classList.remove('editing'); }
 function updateReleaseField(id, field, value) { const r = releases.find(x => x.id === id); if (r) r[field] = value; }
-
-// Обновление превью картинки если ввели ссылку вручную
-function updateCoverPreview(id, url) {
-  const imgEl = document.getElementById(`img-prev-${id}`);
-  if (imgEl && imgEl.tagName === 'IMG') { imgEl.src = url; }
-  else if (imgEl && url) { imgEl.outerHTML = `<img src="${url}" id="img-prev-${id}">`; }
-}
-
-// Чтение файла локально (Base64) при нажатии на плюс
-function handleCoverUpload(id, input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const base64Data = e.target.result;
-      updateReleaseField(id, 'cover', base64Data);
-      updateCoverPreview(id, base64Data);
-      document.getElementById(`cover-url-${id}`).value = "Локальный файл";
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-// Авто-определение длительности
-function autoDetectDuration(id, url) {
-  if (!url) return;
-  const tempAudio = new Audio(url);
-  tempAudio.addEventListener('loadedmetadata', () => {
-    const duration = tempAudio.duration;
-    if(duration && !isNaN(duration)) {
-      const timeStr = fmt(duration);
-      updateReleaseField(id, 'dur', timeStr);
-      const row = document.getElementById('rc-' + id);
-      if(row) { const durInput = row.querySelector('.dur-input'); if(durInput) durInput.value = timeStr; }
-    }
-  });
-}
-
-function addRelease() {
-  const r = { id: uid(), title: 'Новый релиз', artist: '', type: 'Сингл', genre: '', cover: '', src: '', dur: '0:00' };
-  releases.push(r);
+function saveRelease(id) {
+  saveReleases(releases);
+  document.getElementById('rc-' + id)?.classList.remove('editing');
   renderReleases();
-  setTimeout(() => { const card = document.getElementById('rc-' + r.id); if (card) { card.classList.add('editing'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 50);
+  showToast('Релиз сохранён ✓');
 }
-
+function addRelease() {
+  const r = { id: uid(), title: 'Новый релиз', artist: '', type: 'Сингл', genre: '', cover: '' };
+  releases.push(r);
+  saveReleases(releases);
+  renderReleases();
+  setTimeout(() => {
+    const card = document.getElementById('rc-' + r.id);
+    if (card) { card.classList.add('editing'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }, 50);
+}
 function deleteRelease(id) {
   if (!confirm('Удалить релиз?')) return;
   releases = releases.filter(r => r.id !== id);
-  saveDataAndSync(); 
+  saveReleases(releases);
+  renderReleases();
+  showToast('Релиз удалён');
 }
 
-// Сохраняем в localStorage и сразу обновляем плеер
-function saveDataAndSync(idToClose = null) {
-  localStorage.setItem(LS_KEY_RELEASES, JSON.stringify(releases));
-  syncPlayerTracks(); 
-  
-  if (idToClose) {
-      const card = document.getElementById('rc-' + idToClose);
-      if (card) card.classList.remove('editing');
-  }
-  
-  renderReleases(); // Перерисовка для обновления картинок и текста в свернутом виде
-  showToast('Изменения сохранены и применены');
-  
+function renderPreview() {
+  const list = document.getElementById('preview-list');
+  if (!tracks.length) { list.innerHTML = '<div class="empty-state"><div class="es-icon">🎵</div><p>Треков нет</p></div>'; return; }
+  list.innerHTML = tracks.map(t => {
+    const typeClass = t.type === 'yandex' ? 'yandex' : (t.src ? 'mp3' : 'none');
+    const typeText = t.type === 'yandex' ? 'Яндекс' : (t.src ? 'MP3' : 'Нет аудио');
+    return `<div class="preview-track">
+      <div class="preview-cover">${t.cover ? `<img src="${escHtml(t.cover)}" alt="">` : '🎵'}</div>
+      <div class="preview-meta">
+        <div class="preview-title">${escHtml(t.title || 'Без названия')}</div>
+        <div class="preview-artist">${escHtml(t.artist || '—')}</div>
+      </div>
+      <span class="preview-type ${typeClass}">${typeText}</span>
+      <span style="font-size:0.72rem;color:var(--white50);margin-left:0.5rem">${escHtml(t.dur || '')}</span>
+    </div>`;
+  }).join('');
+}
+
+function loadSettingsForm() {
+  const s = loadSettings();
+  if (s.phone) document.getElementById('set-phone').value = s.phone;
+  if (s.email) document.getElementById('set-email').value = s.email;
+  if (s.address) document.getElementById('set-address').value = s.address;
+}
+function autoSaveSettings() {
+  const s = {
+    phone: document.getElementById('set-phone').value,
+    email: document.getElementById('set-email').value,
+    address: document.getElementById('set-address').value,
+  };
+  saveSettings(s);
+}
+function exportData() {
+  const data = { tracks, releases, settings: loadSettings(), exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ssl-admin-data.json';
+  a.click();
+  showToast('Данные экспортированы');
+}
+function resetAllData() {
+  if (!confirm('Сбросить ВСЕ данные? Это действие необратимо.')) return;
+  localStorage.removeItem(LS_KEY_TRACKS);
+  localStorage.removeItem(LS_KEY_RELEASES);
+  localStorage.removeItem(LS_KEY_SETTINGS);
+  tracks = loadTracks(); releases = loadReleases();
+  renderTracks(); renderReleases(); renderPreview(); loadSettingsForm();
+  showToast('Данные сброшены');
+}
+
+function switchAdminTab(btn, panelId) {
+  document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId)?.classList.add('active');
+  if (panelId === 'panel-preview') renderPreview();
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let saveIndicatorTimer;
+function showSaveIndicator() {
   const el = document.getElementById('save-indicator');
-  el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 2000);
+  el.classList.add('show');
+  clearTimeout(saveIndicatorTimer);
+  saveIndicatorTimer = setTimeout(() => el.classList.remove('show'), 2000);
 }
 
-// Первичная инициализация
-window.addEventListener('DOMContentLoaded', () => {
-   releases = loadReleases();
-   syncPlayerTracks();
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.track-card.editing').forEach(c => c.classList.remove('editing'));
+  }
 });
 
 </script>
