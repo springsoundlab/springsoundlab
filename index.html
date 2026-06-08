@@ -3,821 +3,800 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin — Spring Sound Lab</title>
+<title>Профессиональная Студия Звукозаписи | SPRING SOUND LAB</title>
+<meta name="description" content="SPRING SOUND LAB — профессиональная студия звукозаписи. Запись, сведение, мастеринг. Создайте звук мирового уровня.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#060d1f;
-  --navy2:#0a1428;
-  --navy3:#0f1d38;
-  --navy4:#152244;
-  --blue:#1a6fff;
-  --blue2:#3d8bff;
-  --blue-glow:rgba(26,111,255,0.18);
-  --green:#10b981;
-  --green-glow:rgba(16,185,129,0.15);
-  --red:#ef4444;
-  --red-glow:rgba(239,68,68,0.15);
-  --yellow:#f59e0b;
-  --white:#ffffff;
-  --white80:rgba(255,255,255,0.8);
-  --white50:rgba(255,255,255,0.5);
-  --white15:rgba(255,255,255,0.15);
-  --white08:rgba(255,255,255,0.08);
-  --white04:rgba(255,255,255,0.04);
-  --border:rgba(255,255,255,0.1);
-  --border2:rgba(26,111,255,0.4);
-  --sans:'Poppins', sans-serif;
+:root{\r
+  --navy:#060d1f;\r
+  --navy2:#0a1428;\r
+  --navy3:#0f1d38;\r
+  --navy4:#152244;\r
+  --blue:#1a6fff;\r
+  --blue2:#3d8bff;\r
+  --blue-glow:rgba(26,111,255,0.18);\r
+  --white:#ffffff;\r
+  --white80:rgba(255,255,255,0.8);\r
+  --white50:rgba(255,255,255,0.5);\r
+  --white10:rgba(255,255,255,0.1);\r
+  --white05:rgba(255,255,255,0.05);\r
+  --gold:#f59e0b;\r
+  --gold-dark:#b45309;\r
 }
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--navy);color:var(--white);line-height:1.6;min-height:100vh;overflow-x:hidden}
 
-/* BG noise */
-body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4}
-
-/* AUTH SCREEN */
-#auth-screen{
-  position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
-  background:var(--navy);
+body {
+  background-color: var(--navy);
+  color: var(--white);
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+  position: relative;
 }
-.auth-card{
-  background:var(--navy2);border:1px solid rgba(26,111,255,0.25);border-radius:24px;
-  padding:3rem 2.5rem 2.5rem;width:100%;max-width:380px;margin:1rem;
-  box-shadow:0 40px 80px rgba(0,0,0,0.6);text-align:center;
-  animation:fadeUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+
+/* Стили основного сайта */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  position: absolute;
+  width: 100%;
+  z-index: 10;
 }
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.auth-logo{font-size:1.1rem;font-weight:800;margin-bottom:0.4rem}
-.auth-logo span{color:var(--blue2)}
-.auth-badge{display:inline-block;font-size:0.6rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue2);background:rgba(26,111,255,0.1);border:1px solid rgba(26,111,255,0.25);border-radius:50px;padding:0.2rem 0.6rem;margin-bottom:1.5rem}
-.auth-card h2{font-size:1.5rem;font-weight:800;margin-bottom:0.3rem}
-.auth-card p{font-size:0.8rem;color:var(--white50);margin-bottom:1.8rem}
-.auth-field{position:relative;margin-bottom:10px}
-.auth-field svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:15px;height:15px;fill:var(--white50);pointer-events:none}
-.auth-input{width:100%;background:var(--white04);border:1px solid var(--border);border-radius:12px;color:var(--white);font-family:var(--sans);font-size:0.875rem;padding:0.85rem 1rem 0.85rem 2.5rem;outline:none;transition:border-color 0.2s,background 0.2s;-webkit-appearance:none}
-.auth-input:focus{border-color:var(--border2);background:var(--white08)}
-.auth-input::placeholder{color:var(--white50)}
-.auth-error{font-size:0.76rem;color:#f87171;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:0.45rem 0.7rem;margin-bottom:10px;font-weight:600;display:none}
-.auth-error.show{display:block}
-.auth-btn{width:100%;background:var(--blue);color:var(--white);border:none;border-radius:12px;font-family:var(--sans);font-size:0.9rem;font-weight:800;padding:0.9rem;cursor:pointer;transition:all 0.2s;box-shadow:0 0 24px rgba(26,111,255,0.3);margin-top:4px}
-.auth-btn:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:0 0 36px rgba(26,111,255,0.5)}
-.auth-hint{margin-top:1rem;font-size:0.65rem;color:rgba(255,255,255,0.18);font-weight:500}
-
-/* LAYOUT */
-#admin-app{display:none;min-height:100vh;position:relative;z-index:1}
-
-/* TOP BAR */
-.topbar{
-  position:sticky;top:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 2rem;height:64px;
-  background:rgba(6,13,31,0.92);backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
+.logo {
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: 1px;
+  color: var(--white);
 }
-.topbar-left{display:flex;align-items:center;gap:1rem}
-.topbar-logo{font-size:1rem;font-weight:800}
-.topbar-logo span{color:var(--blue2)}
-.topbar-badge{font-size:0.6rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue2);background:rgba(26,111,255,0.1);border:1px solid rgba(26,111,255,0.25);border-radius:50px;padding:0.2rem 0.55rem}
-.topbar-right{display:flex;align-items:center;gap:0.75rem}
-.topbar-site-btn{display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--white04);border:1px solid var(--border);border-radius:50px;color:var(--white50);font-family:var(--sans);font-size:0.78rem;font-weight:700;text-decoration:none;cursor:pointer;transition:all 0.2s}
-.topbar-site-btn:hover{border-color:var(--border2);color:var(--blue2)}
-.topbar-logout{display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:transparent;border:1px solid var(--border);border-radius:50px;color:var(--white50);font-family:var(--sans);font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s}
-.topbar-logout:hover{border-color:rgba(239,68,68,0.4);color:var(--red)}
-.save-indicator{font-size:0.72rem;color:var(--green);font-weight:700;display:flex;align-items:center;gap:0.3rem;opacity:0;transition:opacity 0.3s}
-.save-indicator.show{opacity:1}
-
-/* MAIN */
-.admin-main{max-width:1100px;margin:0 auto;padding:2.5rem 2rem 5rem}
-
-/* PAGE HEADER */
-.page-header{margin-bottom:2.5rem}
-.page-eyebrow{font-size:0.7rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue2);display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem}
-.page-eyebrow::before{content:'';width:16px;height:1px;background:var(--blue2)}
-.page-title{font-size:2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.4rem}
-.page-sub{font-size:0.85rem;color:var(--white50);font-weight:500}
-
-/* TABS */
-.admin-tabs{display:flex;gap:4px;margin-bottom:2rem;border-bottom:1px solid var(--border);padding-bottom:0}
-.admin-tab{padding:0.65rem 1.25rem;background:transparent;border:none;color:var(--white50);font-family:var(--sans);font-size:0.8rem;font-weight:700;letter-spacing:0.04em;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;white-space:nowrap}
-.admin-tab.active{color:var(--blue2);border-bottom-color:var(--blue2)}
-.admin-tab:hover:not(.active){color:var(--white)}
-.admin-panel{display:none}.admin-panel.active{display:block}
-
-/* TRACKS LIST */
-.tracks-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:1rem}
-.btn-add{display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.25rem;background:var(--blue);color:var(--white);border:none;border-radius:50px;font-family:var(--sans);font-size:0.8rem;font-weight:800;cursor:pointer;transition:all 0.2s;box-shadow:0 0 18px rgba(26,111,255,0.3)}
-.btn-add:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:0 0 28px rgba(26,111,255,0.45)}
-.tracks-list{display:flex;flex-direction:column;gap:8px}
-
-/* TRACK CARD */
-.track-card{
-  background:var(--white04);border:1px solid var(--border);border-radius:16px;
-  overflow:hidden;transition:border-color 0.2s;
+.logo span {
+  color: var(--blue);
 }
-.track-card:hover{border-color:rgba(255,255,255,0.15)}
-.track-card.editing{border-color:var(--border2);background:var(--white08)}
-.track-header{
-  display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;cursor:pointer;
-  user-select:none;-webkit-tap-highlight-color:transparent;
+nav a {
+  color: var(--white80);
+  text-decoration: none;
+  margin-left: 30px;
+  font-weight: 500;
+  transition: color 0.3s;
 }
-.track-num{width:22px;text-align:center;font-size:0.75rem;font-weight:700;color:var(--white50);flex-shrink:0}
-.track-cover-thumb{
-  width:44px;height:44px;border-radius:8px;overflow:hidden;background:var(--navy3);
-  flex-shrink:0;border:1px solid var(--border);position:relative;
+nav a:hover {
+  color: var(--blue);
 }
-.track-cover-thumb img{width:100%;height:100%;object-fit:cover}
-.track-cover-thumb .no-cover{
-  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  font-size:1.2rem;background:var(--navy3);
+
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: radial-gradient(circle at center, var(--navy2) 0%, var(--navy) 100%);
+  padding: 0 20px;
 }
-.track-meta{flex:1;min-width:0}
-.track-name{font-size:0.9rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.track-artist-label{font-size:0.75rem;color:var(--blue2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.track-status{font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.55rem;border-radius:50px;flex-shrink:0}
-.track-status.has-audio{background:var(--green-glow);border:1px solid rgba(16,185,129,0.3);color:var(--green)}
-.track-status.no-audio{background:var(--red-glow);border:1px solid rgba(239,68,68,0.3);color:var(--red)}
-.track-status.yandex{background:rgba(255,204,0,0.1);border:1px solid rgba(255,204,0,0.3);color:#fbbf24}
-.track-actions{display:flex;gap:4px;flex-shrink:0}
-.track-action-btn{width:32px;height:32px;border-radius:8px;background:transparent;border:1px solid var(--border);color:var(--white50);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all 0.2s}
-.track-action-btn:hover{border-color:var(--border2);color:var(--white);background:var(--white08)}
-.track-action-btn.del:hover{border-color:rgba(239,68,68,0.4);color:var(--red);background:var(--red-glow)}
-.track-chevron{color:var(--white50);font-size:0.7rem;transition:transform 0.25s;flex-shrink:0}
-.track-card.editing .track-chevron{transform:rotate(180deg)}
-
-/* TRACK EDIT FORM */
-.track-edit{
-  padding:0 1.25rem 1.25rem;
-  display:none;
-  flex-direction:column;gap:0;
+.hero h1 {
+  font-size: 64px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  text-transform: uppercase;
 }
-.track-card.editing .track-edit{display:flex}
-.edit-section{margin-bottom:1.25rem}
-.edit-section:last-child{margin-bottom:0}
-.edit-label{font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--white50);margin-bottom:0.5rem;display:block}
-.edit-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.edit-input, .edit-select{
-  width:100%;background:var(--navy);border:1px solid var(--border);border-radius:10px;
-  color:var(--white);font-family:var(--sans);font-size:0.875rem;font-weight:500;
-  padding:0.75rem 1rem;outline:none;transition:border-color 0.2s,background 0.2s;
-  -webkit-appearance:none;
+.hero p {
+  font-size: 20px;
+  color: var(--white80);
+  max-width: 600px;
+  margin-bottom: 40px;
 }
-.edit-input:focus, .edit-select:focus{border-color:var(--border2);background:rgba(26,111,255,0.04)}
-.edit-input::placeholder{color:var(--white50)}
-.edit-select{cursor:pointer}
-.edit-select option{background:var(--navy2)}
-
-/* YANDEX EMBED SECTION */
-.yandex-section{background:rgba(255,204,0,0.04);border:1px solid rgba(255,204,0,0.15);border-radius:12px;padding:1rem 1.25rem}
-.yandex-section .edit-label{color:#fbbf24}
-.yandex-help{font-size:0.72rem;color:var(--white50);margin-top:0.4rem;line-height:1.5}
-.yandex-help a{color:var(--blue2);text-decoration:none}
-.yandex-help a:hover{text-decoration:underline}
-.yandex-preview{margin-top:0.75rem;border-radius:10px;overflow:hidden;display:none}
-.yandex-preview.show{display:block}
-.yandex-preview iframe{width:100%;border:none;border-radius:10px}
-
-/* COVER SECTION */
-.cover-section{display:grid;grid-template-columns:80px 1fr;gap:1rem;align-items:start}
-.cover-preview{width:80px;height:80px;border-radius:10px;overflow:hidden;background:var(--navy3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0}
-.cover-preview img{width:100%;height:100%;object-fit:cover}
-.cover-inputs{display:flex;flex-direction:column;gap:6px}
-.cover-hint{font-size:0.7rem;color:var(--white50);margin-top:0.3rem;line-height:1.5}
-
-/* DIRECT AUDIO */
-.audio-section{background:rgba(26,111,255,0.04);border:1px solid rgba(26,111,255,0.15);border-radius:12px;padding:1rem 1.25rem}
-.or-divider{display:flex;align-items:center;gap:0.75rem;margin:0.75rem 0;font-size:0.7rem;color:var(--white50);font-weight:700;letter-spacing:0.08em;text-transform:uppercase}
-.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* SAVE ROW */
-.save-row{display:flex;align-items:center;justify-content:flex-end;gap:0.75rem;padding-top:1rem;border-top:1px solid var(--border);margin-top:0.5rem}
-.btn-save{display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.25rem;background:var(--green);color:var(--white);border:none;border-radius:50px;font-family:var(--sans);font-size:0.78rem;font-weight:800;cursor:pointer;transition:all 0.2s;box-shadow:0 0 16px rgba(16,185,129,0.25)}
-.btn-save:hover{background:#059669;transform:translateY(-1px);box-shadow:0 0 24px rgba(16,185,129,0.4)}
-.btn-cancel{display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.25rem;background:transparent;color:var(--white50);border:1px solid var(--border);border-radius:50px;font-family:var(--sans);font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s}
-.btn-cancel:hover{border-color:var(--white15);color:var(--white)}
-
-/* DRAG HANDLE */
-.drag-handle{cursor:grab;color:var(--white50);padding:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;touch-action:none}
-.drag-handle:active{cursor:grabbing}
-.track-card.dragging{opacity:0.5;border:2px dashed var(--blue2)}
-
-/* SETTINGS TAB */
-.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.settings-card{background:var(--white04);border:1px solid var(--border);border-radius:16px;padding:1.5rem}
-.settings-card h3{font-size:0.95rem;font-weight:800;margin-bottom:0.3rem}
-.settings-card p{font-size:0.8rem;color:var(--white50);margin-bottom:1rem;line-height:1.5}
-.settings-field-label{font-size:0.7rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--white50);margin-bottom:0.4rem;display:block}
-
-/* PREVIEW TAB */
-.preview-info{font-size:0.85rem;color:var(--white50);margin-bottom:1.5rem;line-height:1.6;background:var(--white04);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
-.preview-info strong{color:var(--white)}
-.preview-track-list{display:flex;flex-direction:column;gap:8px}
-.preview-track{display:flex;align-items:center;gap:1rem;background:var(--white04);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1.1rem}
-.preview-cover{width:40px;height:40px;border-radius:7px;overflow:hidden;background:var(--navy3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
-.preview-cover img{width:100%;height:100%;object-fit:cover}
-.preview-meta{flex:1;min-width:0}
-.preview-title{font-size:0.88rem;font-weight:800;margin-bottom:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.preview-artist{font-size:0.72rem;color:var(--blue2);font-weight:700}
-.preview-type{font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.15rem 0.5rem;border-radius:50px;flex-shrink:0}
-.preview-type.mp3{background:var(--blue-glow);border:1px solid rgba(26,111,255,0.25);color:var(--blue2)}
-.preview-type.yandex{background:rgba(255,204,0,0.08);border:1px solid rgba(255,204,0,0.25);color:#fbbf24}
-.preview-type.none{background:var(--red-glow);border:1px solid rgba(239,68,68,0.2);color:var(--red)}
-
-/* TOAST */
-.toast{
-  position:fixed;bottom:2rem;right:2rem;z-index:9999;
-  background:var(--navy2);border:1px solid var(--green);border-radius:12px;
-  padding:0.75rem 1.25rem;display:flex;align-items:center;gap:0.6rem;
-  font-size:0.82rem;font-weight:700;color:var(--white);
-  box-shadow:0 8px 30px rgba(0,0,0,0.5);
-  transform:translateY(20px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  pointer-events:none;
+.btn {
+  background: var(--blue);
+  color: var(--white);
+  padding: 15px 40px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: background 0.3s, transform 0.3s;
+  border: none;
+  cursor: pointer;
 }
-.toast.show{transform:translateY(0);opacity:1}
-.toast-icon{font-size:1rem}
+.btn:hover {
+  background: var(--blue2);
+  transform: translateY(-2px);
+}
 
-/* EMPTY STATE */
-.empty-state{text-align:center;padding:3rem 1rem;color:var(--white50)}
-.empty-state .es-icon{font-size:2.5rem;margin-bottom:0.75rem}
-.empty-state p{font-size:0.85rem}
+/* Стили СRM Окна Авторизации */
+.crm-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(4,9,31,0.85);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  z-index: 10000; transition: opacity 0.4s ease;
+}
+.crm-overlay.show { opacity: 1; pointer-events: auto; }
+.crm-modal {
+  background: var(--navy2);
+  border: 1px solid var(--white10);
+  padding: 40px; border-radius: 16px;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  position: relative; text-align: center;
+}
+.crm-modal h3 { font-size: 24px; margin-bottom: 25px; font-weight: 700; color: var(--white); }
+.crm-input {
+  width: 100%; padding: 14px 20px;
+  background: var(--navy3); border: 1px solid var(--white10);
+  border-radius: 8px; color: var(--white);
+  font-size: 16px; margin-bottom: 15px; outline: none;
+  transition: border-color 0.3s;
+}
+.crm-input:focus { border-color: var(--blue); }
+.crm-error {
+  color: #ef4444; font-size: 14px; margin-bottom: 15px;
+  display: none; text-align: left;
+}
+.crm-error.show { display: block; }
+.crm-btn {
+  width: 100%; padding: 14px; background: var(--blue);
+  border: none; border-radius: 8px; color: var(--white);
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+.crm-btn:hover { background: var(--blue2); }
+.crm-btn.granted { background: #10b981 !important; pointer-events: none; }
+.crm-btn.denied { background: #ef4444 !important; }
 
-@media(max-width:700px){
-  .edit-row{grid-template-columns:1fr}
-  .settings-grid{grid-template-columns:1fr}
-  .cover-section{grid-template-columns:60px 1fr}
-  .topbar{padding:0 1rem}
-  .admin-main{padding:1.5rem 1rem 4rem}
-  .track-status{display:none}
+/* Новый блок выбора после успешной авторизации */
+.crm-choice-container {
+  display: none;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+.crm-choice-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.crm-choice-btn.crm-panel-btn { background: var(--blue); }
+.crm-choice-btn.crm-panel-btn:hover { background: var(--blue2); }
+.crm-choice-btn.portfolio-panel-btn { background: #10b981; }
+.crm-choice-btn.portfolio-panel-btn:hover { background: #059669; }
+
+/* Специфичные изолированные стили для Панели Редактирования Портфолио */
+#portfolio-admin-screen {
+  --p-navy:#060d1f;
+  --p-navy2:#0a1428;
+  --p-navy3:#0f1d38;
+  --p-navy4:#152244;
+  --p-blue:#1a6fff;
+  --p-blue2:#3d8bff;
+  --p-blue-glow:rgba(26,111,255,0.18);
+  --p-green:#10b981;
+  --p-green-glow:rgba(16,185,129,0.15);
+  --p-red:#ef4444;
+  --p-red-glow:rgba(239,68,68,0.15);
+  --p-yellow:#f59e0b;
+  --p-white:#ffffff;
+  --p-white80:rgba(255,255,255,0.8);
+  --p-white50:rgba(255,255,255,0.5);
+  --p-white10:rgba(255,255,255,0.1);
+  --p-white05:rgba(255,255,255,0.05);
+}
+#portfolio-admin-screen .admin-body-content {
+  color: var(--p-white);
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--p-navy);
+  padding: 0; margin: 0;
+}
+#portfolio-admin-screen .admin-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+#portfolio-admin-screen .admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--p-navy2);
+  padding: 15px 30px;
+  border-bottom: 1px solid var(--p-white10);
+}
+#portfolio-admin-screen .admin-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+#portfolio-admin-screen .admin-title span {
+  color: var(--p-blue);
+}
+#portfolio-admin-screen .admin-tabs {
+  display: flex;
+  gap: 10px;
+}
+#portfolio-admin-screen .admin-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--p-white80);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+#portfolio-admin-screen .admin-tab:hover {
+  background: var(--p-white05);
+  color: var(--p-white);
+}
+#portfolio-admin-screen .admin-tab.active {
+  background: var(--p-blue-glow);
+  border-color: var(--p-blue);
+  color: var(--p-blue2);
+}
+#portfolio-admin-screen .admin-tab.exit-tab {
+  border-color: var(--p-red);
+  color: var(--p-red);
+}
+#portfolio-admin-screen .admin-tab.exit-tab:hover {
+  background: var(--p-red-glow);
+  color: var(--p-white);
+}
+#portfolio-admin-screen .admin-main {
+  flex: 1;
+  padding: 40px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+#portfolio-admin-screen .admin-panel {
+  display: none;
+}
+#portfolio-admin-screen .admin-panel.active {
+  display: block;
+}
+#portfolio-admin-screen .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+#portfolio-admin-screen .panel-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+}
+#portfolio-admin-screen .add-btn {
+  background: var(--p-blue);
+  color: var(--p-white);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+#portfolio-admin-screen .add-btn:hover {
+  background: var(--p-blue2);
+}
+#portfolio-admin-screen .tracks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+#portfolio-admin-screen .track-card {
+  background: var(--p-navy2);
+  border: 1px solid var(--p-white10);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+#portfolio-admin-screen .track-card:hover {
+  border-color: rgba(26,111,255,0.4);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+#portfolio-admin-screen .track-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+#portfolio-admin-screen .track-info h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+#portfolio-admin-screen .track-info p {
+  font-size: 14px;
+  color: var(--p-white50);
+}
+#portfolio-admin-screen .card-actions {
+  display: flex;
+  gap: 8px;
+}
+#portfolio-admin-screen .action-btn {
+  background: var(--p-navy3);
+  border: 1px solid var(--p-white10);
+  color: var(--p-white80);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+#portfolio-admin-screen .action-btn:hover {
+  color: var(--p-white);
+  border-color: var(--p-white50);
+}
+#portfolio-admin-screen .action-btn.edit:hover {
+  background: var(--p-blue-glow);
+  border-color: var(--p-blue);
+  color: var(--p-blue2);
+}
+#portfolio-admin-screen .action-btn.delete:hover {
+  background: var(--p-red-glow);
+  border-color: var(--p-red);
+  color: var(--p-red);
+}
+#portfolio-admin-screen .track-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--p-white80);
+  border-top: 1px solid var(--p-white05);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+#portfolio-admin-screen .meta-item {
+  display: flex;
+  justify-content: space-between;
+}
+#portfolio-admin-screen .meta-label {
+  color: var(--p-white50);
+}
+#portfolio-admin-screen .meta-val {
+  font-weight: 500;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#portfolio-admin-screen .editor-overlay {
+  display: none;
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(4,9,31,0.6);
+  backdrop-filter: blur(5px);
+  z-index: 20000;
+  align-items: center;
+  justify-content: center;
+}
+#portfolio-admin-screen .editor-overlay.active {
+  display: flex;
+}
+#portfolio-admin-screen .editor-modal {
+  background: var(--p-navy2);
+  border: 1px solid var(--p-white10);
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+#portfolio-admin-screen .editor-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--p-white10);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#portfolio-admin-screen .editor-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+}
+#portfolio-admin-screen .close-modal {
+  background: transparent;
+  border: none;
+  color: var(--p-white50);
+  font-size: 24px;
+  cursor: pointer;
+}
+#portfolio-admin-screen .close-modal:hover {
+  color: var(--p-white);
+}
+#portfolio-admin-screen .editor-form {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+#portfolio-admin-screen .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#portfolio-admin-screen .form-group label {
+  font-size: 13px;
+  color: var(--p-white80);
+  font-weight: 500;
+}
+#portfolio-admin-screen .form-control {
+  background: var(--p-navy3);
+  border: 1px solid var(--p-white10);
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: var(--p-white);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#portfolio-admin-screen .form-control:focus {
+  border-color: var(--p-blue);
+}
+#portfolio-admin-screen .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+#portfolio-admin-screen .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+#portfolio-admin-screen .btn-secondary {
+  background: transparent;
+  border: 1px solid var(--p-white10);
+  color: var(--p-white);
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+}
+#portfolio-admin-screen .btn-secondary:hover {
+  background: var(--p-white05);
+}
+#portfolio-admin-screen .btn-primary {
+  background: var(--p-blue);
+  border: none;
+  color: var(--p-white);
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+}
+#portfolio-admin-screen .btn-primary:hover {
+  background: var(--p-blue2);
+}
+#portfolio-admin-screen .indicator {
+  position: fixed;
+  bottom: 30px; right: 30px;
+  background: var(--p-green);
+  color: var(--p-white);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 10px 20px rgba(16,185,129,0.2);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 30000;
+}
+#portfolio-admin-screen .indicator.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+#portfolio-admin-screen .toast-notification {
+  position: fixed;
+  bottom: 30px; left: 30px;
+  background: var(--p-navy4);
+  border-left: 4px solid var(--p-blue);
+  color: var(--p-white);
+  padding: 14px 24px;
+  border-radius: 0 8px 8px 0;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  transform: translateX(-400px);
+  transition: transform 0.3s ease;
+  z-index: 30000;
+}
+#portfolio-admin-screen .toast-notification.show {
+  transform: translateX(0);
+}
+#portfolio-admin-screen .preview-container {
+  background: var(--p-navy2);
+  border: 1px solid var(--p-white10);
+  border-radius: 12px;
+  padding: 30px;
+}
+#portfolio-admin-screen .preview-title {
+  font-size: 16px;
+  color: var(--p-white50);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+#portfolio-admin-screen .preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#portfolio-admin-screen .preview-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--p-navy3);
+  border: 1px solid var(--p-white05);
+  padding: 14px 20px;
+  border-radius: 8px;
+}
+#portfolio-admin-screen .preview-track-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+#portfolio-admin-screen .preview-play-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--p-blue-glow);
+  border: 1px solid var(--p-blue);
+  color: var(--p-blue2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+#portfolio-admin-screen .preview-track-meta h5 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+#portfolio-admin-screen .preview-track-meta p {
+  font-size: 13px;
+  color: var(--p-white50);
+}
+#portfolio-admin-screen .preview-badge {
+  background: var(--p-white05);
+  border: 1px solid var(--p-white10);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--p-white80);
 }
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
-<div id="auth-screen">
-  <div class="auth-card">
-    <div class="auth-logo">SPRING SOUND <span>LAB</span></div>
-    <div class="auth-badge">Site Admin</div>
-    <h2>Вход в админку</h2>
-    <p>Управление контентом сайта</p>
-    <div class="auth-field">
-      <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-      <input type="text" id="auth-login" class="auth-input" placeholder="Логин" autocomplete="off" onkeypress="if(event.key==='Enter')doAuth()">
-    </div>
-    <div class="auth-field">
-      <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-      <input type="password" id="auth-pass" class="auth-input" placeholder="Пароль" onkeypress="if(event.key==='Enter')doAuth()">
-    </div>
-    <div class="auth-error" id="auth-error">Неверный логин или пароль</div>
-    <button class="auth-btn" id="auth-btn" onclick="doAuth()">Войти →</button>
-    <div class="auth-hint">Spring Sound Lab · Только для администратора</div>
-  </div>
-</div>
+<header>
+  <div class="logo">SPRING SOUND <span>LAB</span></div>
+  <nav>
+    <a href="#">Главная</a>
+    <a href="#">Услуги</a>
+    <a href="#">Портфолио</a>
+    <a href="#" onclick="openCrmModal(); return false;">Админ-панель</a>
+  </nav>
+</header>
 
-<!-- ADMIN APP -->
-<div id="admin-app">
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-left">
-      <span class="topbar-logo">SPRING SOUND <span>LAB</span></span>
-      <span class="topbar-badge">Admin</span>
-    </div>
-    <div class="topbar-right">
-      <span class="save-indicator" id="save-indicator">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-        Сохранено
-      </span>
-      <a href="index.html" class="topbar-site-btn" target="_blank">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-        Сайт
-      </a>
-      <button class="topbar-logout" onclick="doLogout()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-        Выйти
-      </button>
-    </div>
-  </div>
+<section class="hero">
+  <h1>Звук Мирового Уровня</h1>
+  <p>Профессиональная запись, высококлассное сведение и кристально чистый мастеринг от опытной команды инженеров.</p>
+  <button class="btn" onclick="openCrmModal()">Войти в систему →</button>
+</section>
 
-  <div class="admin-main">
-    <div class="page-header">
-      <div class="page-eyebrow">Spring Sound Lab</div>
-      <div class="page-title">Управление сайтом</div>
-      <div class="page-sub">Редактируйте треки, плеер и настройки — изменения сразу отображаются на сайте</div>
+<div id="crm-overlay" class="crm-overlay" onclick="crmOverlayClick(event)">
+  <div class="crm-modal">
+    <h3>Вход в систему</h3>
+    
+    <div id="crm-login-form">
+      <input type="text" id="crm-login-input" class="crm-input" placeholder="Логин">
+      <input type="password" id="crm-pass-input" class="crm-input" placeholder="Пароль">
+      <div id="crm-error" class="crm-error">Неверный логин или пароль</div>
+      <button id="crm-btn" class="crm-btn" onclick="checkCrmAuth()">Войти в систему →</button>
     </div>
 
-    <!-- TABS -->
-    <div class="admin-tabs">
-      <button class="admin-tab active" onclick="switchAdminTab(this,'panel-tracks')">🎵 Треки плеера</button>
-      <button class="admin-tab" onclick="switchAdminTab(this,'panel-releases')">💿 Релизы</button>
-      <button class="admin-tab" onclick="switchAdminTab(this,'panel-preview')">👁 Предпросмотр</button>
-      <button class="admin-tab" onclick="switchAdminTab(this,'panel-settings')">⚙️ Настройки</button>
-    </div>
-
-    <!-- TRACKS PANEL -->
-    <div class="admin-panel active" id="panel-tracks">
-      <div class="tracks-header">
-        <div>
-          <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.2rem">Треки нижнего плеера</div>
-          <div style="font-size:0.75rem;color:var(--white50)">Добавьте ссылку на MP3 или Яндекс.Музыку</div>
-        </div>
-        <button class="btn-add" onclick="addTrack()">+ Добавить трек</button>
-      </div>
-      <div class="tracks-list" id="tracks-list"></div>
-    </div>
-
-    <!-- RELEASES PANEL -->
-    <div class="admin-panel" id="panel-releases">
-      <div class="tracks-header">
-        <div>
-          <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.2rem">Релизы на сайте</div>
-          <div style="font-size:0.75rem;color:var(--white50)">Карточки релизов в разделе Портфолио</div>
-        </div>
-        <button class="btn-add" onclick="addRelease()">+ Добавить релиз</button>
-      </div>
-      <div class="tracks-list" id="releases-list"></div>
-    </div>
-
-    <!-- PREVIEW PANEL -->
-    <div class="admin-panel" id="panel-preview">
-      <div class="preview-info">
-        <strong>Предпросмотр плеера</strong><br>
-        Так будут отображаться треки на сайте. Изменения сохраняются автоматически в браузере посетителя при следующем открытии страницы.
-      </div>
-      <div class="preview-track-list" id="preview-list"></div>
-    </div>
-
-    <!-- SETTINGS PANEL -->
-    <div class="admin-panel" id="panel-settings">
-      <div class="settings-grid">
-        <div class="settings-card">
-          <h3>Студия</h3>
-          <p>Основная информация, отображаемая на сайте</p>
-          <label class="settings-field-label">Телефон</label>
-          <input type="text" class="edit-input" id="set-phone" placeholder="+7 (495) 123-45-67" style="margin-bottom:8px" oninput="autoSaveSettings()">
-          <label class="settings-field-label">Email</label>
-          <input type="text" class="edit-input" id="set-email" placeholder="hello@springsoundlab.studio" style="margin-bottom:8px" oninput="autoSaveSettings()">
-          <label class="settings-field-label">Адрес</label>
-          <input type="text" class="edit-input" id="set-address" placeholder="Москва, ул. Тверская, 12" oninput="autoSaveSettings()">
-        </div>
-        <div class="settings-card">
-          <h3>Пароль от CRM</h3>
-          <p>Смените пароль доступа к CRM-системе (замочек на сайте)</p>
-          <label class="settings-field-label">Логин CRM</label>
-          <input type="text" class="edit-input" id="set-crm-login" placeholder="admin ssl" style="margin-bottom:8px" oninput="autoSaveSettings()">
-          <label class="settings-field-label">Пароль CRM</label>
-          <input type="password" class="edit-input" id="set-crm-pass" placeholder="••••••" oninput="autoSaveSettings()">
-          <div style="font-size:0.72rem;color:var(--white50);margin-top:0.5rem">Пока хранится в коде сайта. После смены — обновите index.html вручную.</div>
-        </div>
-        <div class="settings-card" style="grid-column:span 2">
-          <h3>Данные сохранены в</h3>
-          <p style="margin-bottom:0.75rem">Все изменения хранятся в <strong style="color:var(--white)">localStorage</strong> браузера. Чтобы данные подтянулись на сайт — он должен быть открыт в том же браузере. Для продакшна рекомендуем подключить сервер.</p>
-          <button class="btn-save" onclick="exportData()" style="margin-right:8px">📦 Экспортировать JSON</button>
-          <button class="auth-btn" style="width:auto;padding:0.55rem 1.1rem;font-size:0.78rem;background:var(--red);box-shadow:none;border-radius:50px" onclick="resetAllData()">🗑 Сбросить всё</button>
-        </div>
-      </div>
+    <div id="crm-choice-block" class="crm-choice-container">
+      <button class="crm-choice-btn crm-panel-btn" onclick="navigateToCrm()">Войти в CRM</button>
+      <button class="crm-choice-btn portfolio-panel-btn" onclick="navigateToPortfolioEditor()">Панель редактирования</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toast-msg">Сохранено</span></div>
+<div id="portfolio-admin-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; overflow-y: auto;">
+  <div class="admin-body-content">
+    <div class="admin-container">
+      <header class="admin-header">
+        <div class="admin-title">Spring Sound <span>Lab</span> — Редактор</div>
+        <div class="admin-tabs">
+          <button class="admin-tab active" onclick="switchTab(this, 'panel-tracks')">Треки</button>
+          <button class="admin-tab" onclick="switchTab(this, 'panel-preview')">Предпросмотр сайта</button>
+          <button class="admin-tab exit-tab" onclick="exitPortfolioEditor()">Выйти на сайт</button>
+        </div>
+      </header>
+
+      <main class="admin-main">
+        <div id="panel-tracks" class="admin-panel active">
+          <div class="panel-header">
+            <h2>Управление портфолио</h2>
+            <button class="add-btn" onclick="openEditor(false)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Добавить трек
+            </button>
+          </div>
+          <div class="tracks-grid" id="tracks-container">
+            </div>
+        </div>
+
+        <div id="panel-preview" class="admin-panel">
+          <div class="panel-header">
+            <h2>Вид портфолио на сайте</h2>
+          </div>
+          <div class="preview-container">
+            <div class="preview-title">Плеер портфолио</div>
+            <div class="preview-list" id="preview-list-container">
+              </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="editor-overlay" id="editor-overlay" onclick="if(event.target===this)closeEditor()">
+      <div class="editor-modal">
+        <div class="editor-header">
+          <h3 id="modal-title">Добавить новый трек</h3>
+          <button class="close-modal" onclick="closeEditor()">&times;</button>
+        </div>
+        <div class="editor-form">
+          <input type="hidden" id="edit-idx">
+          <div class="form-group">
+            <label>Название трека</label>
+            <input type="text" id="track-title" class="form-control" placeholder="Например: Красивая">
+          </div>
+          <div class="form-group">
+            <label>Исполнитель / Артист</label>
+            <input type="text" id="track-artist" class="form-control" placeholder="Например: WEYTON">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Жанр</label>
+              <input type="text" id="track-genre" class="form-control" placeholder="Pop-Rock / Emo-Rock">
+            </div>
+            <div class="form-group">
+              <label>Тип работы</label>
+              <input type="text" id="track-type" class="form-control" placeholder="Сведение + Мастеринг">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Ссылка на аудиофайл (URL)</label>
+            <input type="text" id="track-audio" class="form-control" placeholder="https://domain.com/audio.mp3">
+          </div>
+          <div class="form-actions">
+            <button class="btn-secondary" onclick="closeEditor()">Отмена</button>
+            <button class="btn-primary" onclick="saveTrack()">Сохранить изменения</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="indicator" id="save-indicator">Изменения сохранены!</div>
+    <div class="toast-notification" id="toast">
+      <span id="toast-msg">Уведомление</span>
+    </div>
+  </div>
+</div>
 
 <script>
-/* ============================================================
-   AUTH
-   ============================================================ */
-const ADMIN_CREDS = { login: 'admin ssl', pass: '080808' };
+/* Логика авторизации основного сайта */
+function openCrmModal(){
+  document.getElementById('crm-overlay').classList.add('show');
+  document.getElementById('crm-login-form').style.display = 'block';
+  document.getElementById('crm-choice-block').style.display = 'none';
+  document.getElementById('crm-login-input').focus();
+}
 
-function doAuth() {
-  const login = document.getElementById('auth-login').value.trim();
-  const pass = document.getElementById('auth-pass').value;
-  const btn = document.getElementById('auth-btn');
-  const err = document.getElementById('auth-error');
-  if (login === ADMIN_CREDS.login && pass === ADMIN_CREDS.pass) {
-    btn.textContent = 'Входим...';
-    btn.style.background = '#10b981';
-    sessionStorage.setItem('ssl_admin_auth', '1');
-    setTimeout(() => {
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('admin-app').style.display = 'block';
-      initAdmin();
-    }, 500);
+function closeCrmModal(){
+  document.getElementById('crm-overlay').classList.remove('show');
+  setTimeout(resetCrmForm, 400);
+}
+
+function resetCrmForm(){
+  document.getElementById('crm-login-input').value='';
+  document.getElementById('crm-pass-input').value='';
+  var btn=document.getElementById('crm-btn');
+  btn.textContent='Войти в систему →';
+  btn.className='crm-btn';
+  document.getElementById('crm-error').classList.remove('show');
+}
+
+function crmOverlayClick(e){
+  if(e.target===document.getElementById('crm-overlay')) closeCrmModal();
+}
+
+function checkCrmAuth(){
+  var login=document.getElementById('crm-login-input').value.trim();
+  var pass=document.getElementById('crm-pass-input').value;
+  var btn=document.getElementById('crm-btn');
+  var err=document.getElementById('crm-error');
+  
+  if(login==='admin ssl'&&pass==='080808'){
+    btn.textContent='Доступ получен...';
+    btn.className='crm-btn granted';
+    err.classList.remove('show');
+    
+    // Переключаем окно на выбор вариантов
+    setTimeout(function(){
+      document.getElementById('crm-login-form').style.display = 'none';
+      document.getElementById('crm-choice-block').style.display = 'flex';
+    }, 700);
   } else {
-    err.style.display = 'block';
-    btn.textContent = 'Ошибка доступа';
-    btn.style.background = '#ef4444';
-    document.getElementById('auth-pass').value = '';
-    setTimeout(() => {
-      btn.textContent = 'Войти →';
-      btn.style.background = '';
+    btn.textContent='Отказано в доступе';
+    btn.className='crm-btn denied';
+    err.classList.add('show');
+    document.getElementById('crm-pass-input').value='';
+    setTimeout(function(){
+      btn.textContent='Войти в систему →';
+      btn.className='crm-btn';
     }, 1300);
   }
 }
 
-function doLogout() {
-  sessionStorage.removeItem('ssl_admin_auth');
-  location.reload();
+function navigateToCrm() {
+  window.location.href = 'certificates.html';
 }
 
-// Auto-login if session active
-if (sessionStorage.getItem('ssl_admin_auth') === '1') {
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('admin-app').style.display = 'block';
-  window.addEventListener('DOMContentLoaded', initAdmin);
+function navigateToPortfolioEditor() {
+  closeCrmModal();
+  document.body.style.overflow = 'hidden'; // Запрещаем скролл основного сайта
+  document.getElementById('portfolio-admin-screen').style.display = 'block';
+  renderTracks();
 }
 
-/* ============================================================
-   DATA MODEL
-   ============================================================ */
-const LS_KEY_TRACKS = 'ssl_tracks';
-const LS_KEY_RELEASES = 'ssl_releases';
-const LS_KEY_SETTINGS = 'ssl_settings';
+function exitPortfolioEditor() {
+  document.getElementById('portfolio-admin-screen').style.display = 'none';
+  document.body.style.overflow = 'auto'; // Возвращаем скролл сайта
+}
 
-const DEFAULT_TRACKS = [
-  { id: uid(), title: 'Первая частота', artist: 'Echo', cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', yandex: '', type: 'mp3', dur: '5:38' },
-  { id: uid(), title: 'Тихий Сигнал', artist: 'Алиса Кравцова', cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', yandex: '', type: 'mp3', dur: '4:25' },
-  { id: uid(), title: 'Нить — OST', artist: 'Сериал «Нить»', cover: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=200&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', yandex: '', type: 'mp3', dur: '6:12' },
-  { id: uid(), title: 'Одиночество в сети', artist: 'Ноябрь', cover: 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80', src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', yandex: '', type: 'mp3', dur: '3:47' }
+// Нажатие Escape закрывает окно входа
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape') {
+    closeCrmModal();
+  }
+});
+
+
+/* Логика встроенной панели редактирования портфолио */
+let tracksData = [
+  { title: "Красивая", artist: "WEYTON", genre: "Pop-Rock", type: "Сведение", audio: "#" },
+  { title: "Как ночь", artist: "WEYTON", genre: "Emo-Rock", type: "Сведение + Мастеринг", audio: "#" }
 ];
 
-const DEFAULT_RELEASES = [
-  { id: uid(), title: 'Первая частота', artist: 'Echo', type: 'Альбом', genre: 'инди-поп, 12 треков', cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=600&q=80', trackIdx: 0 },
-  { id: uid(), title: 'Тихий Сигнал', artist: 'Алиса Кравцова', type: 'EP', genre: 'R&B, 5 треков', cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=600&q=80', trackIdx: 1 },
-  { id: uid(), title: 'Нить', artist: 'OST сериала', type: 'Саундтрек', genre: 'оркестр, 18 треков', cover: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=600&q=80', trackIdx: 2 }
-];
-
-function uid() { return '_' + Math.random().toString(36).substr(2, 9); }
-
-function loadTracks() {
-  try { const d = localStorage.getItem(LS_KEY_TRACKS); return d ? JSON.parse(d) : DEFAULT_TRACKS; } catch { return DEFAULT_TRACKS; }
-}
-function saveTracks(arr) {
-  localStorage.setItem(LS_KEY_TRACKS, JSON.stringify(arr));
-  showSaveIndicator();
-}
-function loadReleases() {
-  try { const d = localStorage.getItem(LS_KEY_RELEASES); return d ? JSON.parse(d) : DEFAULT_RELEASES; } catch { return DEFAULT_RELEASES; }
-}
-function saveReleases(arr) {
-  localStorage.setItem(LS_KEY_RELEASES, JSON.stringify(arr));
-  showSaveIndicator();
-}
-function loadSettings() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY_SETTINGS) || '{}'); } catch { return {}; }
-}
-function saveSettings(obj) {
-  localStorage.setItem(LS_KEY_SETTINGS, JSON.stringify(obj));
-  showSaveIndicator();
-}
-
-/* ============================================================
-   INIT
-   ============================================================ */
-let tracks = [], releases = [];
-
-function initAdmin() {
-  tracks = loadTracks();
-  releases = loadReleases();
-  renderTracks();
-  renderReleases();
-  renderPreview();
-  loadSettingsForm();
-}
-
-/* ============================================================
-   TRACKS PANEL
-   ============================================================ */
-function renderTracks() {
-  const list = document.getElementById('tracks-list');
-  if (!tracks.length) {
-    list.innerHTML = '<div class="empty-state"><div class="es-icon">🎵</div><p>Нет треков. Нажмите «Добавить трек»</p></div>';
-    return;
-  }
-  list.innerHTML = tracks.map((t, i) => trackCardHTML(t, i)).join('');
-}
-
-function trackCardHTML(t, i) {
-  const hasAudio = t.type === 'yandex' ? !!t.yandex : !!t.src;
-  const statusClass = t.type === 'yandex' ? 'yandex' : (hasAudio ? 'has-audio' : 'no-audio');
-  const statusText = t.type === 'yandex' ? 'Яндекс' : (hasAudio ? 'MP3' : 'Нет аудио');
-  const coverHTML = t.cover
-    ? `<img src="${escHtml(t.cover)}" alt="" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`
-    : '';
-  return `
-  <div class="track-card" id="tc-${t.id}" data-id="${t.id}">
-    <div class="track-header" onclick="toggleTrackEdit('${t.id}')">
-      <div class="drag-handle" title="Перетащить">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="opacity:0.4"><path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-      </div>
-      <div class="track-num">${i + 1}</div>
-      <div class="track-cover-thumb">
-        ${coverHTML}
-        ${!t.cover ? '<div class="no-cover">🎵</div>' : '<div class="no-cover" style="display:none">🎵</div>'}
-      </div>
-      <div class="track-meta">
-        <div class="track-name">${escHtml(t.title || 'Без названия')}</div>
-        <div class="track-artist-label">${escHtml(t.artist || '—')}</div>
-      </div>
-      <span class="track-status ${statusClass}">${statusText}</span>
-      <div class="track-actions" onclick="event.stopPropagation()">
-        <button class="track-action-btn" title="Дублировать" onclick="duplicateTrack('${t.id}')">⧉</button>
-        <button class="track-action-btn del" title="Удалить" onclick="deleteTrack('${t.id}')">✕</button>
-      </div>
-      <div class="track-chevron">▼</div>
-    </div>
-    <div class="track-edit" id="te-${t.id}">
-      <div class="edit-section">
-        <label class="edit-label">Основное</label>
-        <div class="edit-row" style="margin-bottom:8px">
-          <input type="text" class="edit-input" placeholder="Название трека" value="${escHtml(t.title || '')}" oninput="updateTrackField('${t.id}','title',this.value)">
-          <input type="text" class="edit-input" placeholder="Исполнитель" value="${escHtml(t.artist || '')}" oninput="updateTrackField('${t.id}','artist',this.value)">
-        </div>
-        <div class="edit-row">
-          <input type="text" class="edit-input" placeholder="Длительность (напр. 3:45)" value="${escHtml(t.dur || '')}" oninput="updateTrackField('${t.id}','dur',this.value)">
-          <select class="edit-select" onchange="updateTrackType('${t.id}',this.value)">
-            <option value="mp3" ${t.type === 'mp3' ? 'selected' : ''}>🎵 MP3 / Прямая ссылка</option>
-            <option value="yandex" ${t.type === 'yandex' ? 'selected' : ''}>🟡 Яндекс.Музыка</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="edit-section">
-        <label class="edit-label">Обложка</label>
-        <div class="cover-section">
-          <div class="cover-preview" id="cp-${t.id}">
-            ${t.cover ? `<img src="${escHtml(t.cover)}" alt="">` : '🎵'}
-          </div>
-          <div class="cover-inputs">
-            <input type="url" class="edit-input" placeholder="URL обложки (https://...)" value="${escHtml(t.cover || '')}" oninput="updateTrackField('${t.id}','cover',this.value);updateCoverPreview('${t.id}',this.value)">
-            <div class="cover-hint">Вставьте URL изображения (JPG, PNG, WebP). Рекомендуемый размер: 500×500 px.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="edit-section audio-section" id="audio-sec-${t.id}" style="${t.type === 'yandex' ? 'display:none' : ''}">
-        <label class="edit-label">🎵 Прямая ссылка на MP3</label>
-        <input type="url" class="edit-input" placeholder="https://example.com/track.mp3" value="${escHtml(t.src || '')}" oninput="updateTrackField('${t.id}','src',this.value)">
-        <div class="cover-hint" style="margin-top:0.4rem">Прямая ссылка на .mp3 файл. Можно загрузить на Яндекс.Диск, Dropbox, свой хостинг и взять прямую ссылку.</div>
-      </div>
-
-      <div class="edit-section yandex-section" id="yandex-sec-${t.id}" style="${t.type !== 'yandex' ? 'display:none' : ''}">
-        <label class="edit-label">🟡 Яндекс.Музыка — ссылка или embed-код</label>
-        <input type="text" class="edit-input" placeholder="https://music.yandex.ru/album/12345/track/67890" value="${escHtml(t.yandex || '')}" oninput="updateTrackField('${t.id}','yandex',this.value);updateYandexPreview('${t.id}',this.value)" style="margin-bottom:8px">
-        <div class="yandex-help">
-          Откройте трек на <a href="https://music.yandex.ru" target="_blank">music.yandex.ru</a> → три точки → «Поделиться» → скопируйте ссылку.<br>
-          <strong style="color:var(--white)">Важно:</strong> Яндекс.Музыка не разрешает прямое воспроизведение на сторонних сайтах. Ссылка откроется в новой вкладке Яндекса.
-        </div>
-        <div class="yandex-preview" id="yp-${t.id}"></div>
-      </div>
-
-      <div class="save-row">
-        <button class="btn-cancel" onclick="cancelEdit('${t.id}')">Отмена</button>
-        <button class="btn-save" onclick="saveTrack('${t.id}')">✓ Сохранить</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-function toggleTrackEdit(id) {
-  const card = document.getElementById('tc-' + id);
-  if (card) card.classList.toggle('editing');
-}
-
-function cancelEdit(id) {
-  const card = document.getElementById('tc-' + id);
-  if (card) card.classList.remove('editing');
-}
-
-function updateTrackField(id, field, value) {
-  const t = tracks.find(x => x.id === id);
-  if (t) { t[field] = value; refreshTrackHeader(id); }
-}
-
-function updateTrackType(id, type) {
-  const t = tracks.find(x => x.id === id);
-  if (!t) return;
-  t.type = type;
-  const audioSec = document.getElementById('audio-sec-' + id);
-  const yandexSec = document.getElementById('yandex-sec-' + id);
-  if (audioSec) audioSec.style.display = type === 'yandex' ? 'none' : '';
-  if (yandexSec) yandexSec.style.display = type === 'yandex' ? '' : 'none';
-}
-
-function updateCoverPreview(id, url) {
-  const cp = document.getElementById('cp-' + id);
-  if (!cp) return;
-  if (url) {
-    cp.innerHTML = `<img src="${url}" alt="" onerror="this.parentElement.innerHTML='🎵'">`;
-  } else {
-    cp.innerHTML = '🎵';
-  }
-}
-
-function updateYandexPreview(id, val) {
-  // показываем инфо о том, как будет работать
-  const prev = document.getElementById('yp-' + id);
-  if (!prev) return;
-  if (val && val.includes('yandex')) {
-    prev.innerHTML = `<div style="font-size:0.75rem;color:#fbbf24;background:rgba(255,204,0,0.08);border:1px solid rgba(255,204,0,0.2);border-radius:8px;padding:0.6rem 0.85rem;margin-top:0.5rem">⚠️ При нажатии «Слушать» откроется Яндекс.Музыка в новой вкладке — это ограничение платформы.</div>`;
-    prev.classList.add('show');
-  } else {
-    prev.classList.remove('show');
-  }
-}
-
-function refreshTrackHeader(id) {
-  // just re-render the whole header
-}
-
-function saveTrack(id) {
-  saveTracks(tracks);
-  const card = document.getElementById('tc-' + id);
-  if (card) card.classList.remove('editing');
-  // Re-render to show updated header
-  renderTracks();
-  renderPreview();
-  showToast('Трек сохранён ✓');
-}
-
-function addTrack() {
-  const t = {
-    id: uid(), title: 'Новый трек', artist: 'Исполнитель',
-    cover: '', src: '', yandex: '', type: 'mp3', dur: '0:00'
-  };
-  tracks.push(t);
-  saveTracks(tracks);
-  renderTracks();
-  renderPreview();
-  // Open edit immediately
-  setTimeout(() => {
-    const card = document.getElementById('tc-' + t.id);
-    if (card) { card.classList.add('editing'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-  }, 50);
-}
-
-function deleteTrack(id) {
-  if (!confirm('Удалить трек?')) return;
-  tracks = tracks.filter(t => t.id !== id);
-  saveTracks(tracks);
-  renderTracks();
-  renderPreview();
-  showToast('Трек удалён');
-}
-
-function duplicateTrack(id) {
-  const t = tracks.find(x => x.id === id);
-  if (!t) return;
-  const copy = { ...t, id: uid(), title: t.title + ' (копия)' };
-  const idx = tracks.findIndex(x => x.id === id);
-  tracks.splice(idx + 1, 0, copy);
-  saveTracks(tracks);
-  renderTracks();
-  renderPreview();
-  showToast('Трек продублирован');
-}
-
-/* ============================================================
-   RELEASES PANEL
-   ============================================================ */
-function renderReleases() {
-  const list = document.getElementById('releases-list');
-  if (!releases.length) {
-    list.innerHTML = '<div class="empty-state"><div class="es-icon">💿</div><p>Нет релизов. Нажмите «Добавить релиз»</p></div>';
-    return;
-  }
-  list.innerHTML = releases.map((r, i) => releaseCardHTML(r, i)).join('');
-}
-
-function releaseCardHTML(r, i) {
-  return `
-  <div class="track-card" id="rc-${r.id}" data-id="${r.id}">
-    <div class="track-header" onclick="toggleReleaseEdit('${r.id}')">
-      <div class="track-num">${i + 1}</div>
-      <div class="track-cover-thumb">
-        ${r.cover ? `<img src="${escHtml(r.cover)}" alt="">` : '<div class="no-cover">💿</div>'}
-      </div>
-      <div class="track-meta">
-        <div class="track-name">${escHtml(r.title || 'Без названия')}</div>
-        <div class="track-artist-label">${escHtml(r.artist || '—')} · ${escHtml(r.type || '')}</div>
-      </div>
-      <div class="track-actions" onclick="event.stopPropagation()">
-        <button class="track-action-btn del" title="Удалить" onclick="deleteRelease('${r.id}')">✕</button>
-      </div>
-      <div class="track-chevron">▼</div>
-    </div>
-    <div class="track-edit" id="re-${r.id}">
-      <div class="edit-section">
-        <label class="edit-label">Основное</label>
-        <div class="edit-row" style="margin-bottom:8px">
-          <input type="text" class="edit-input" placeholder="Название" value="${escHtml(r.title || '')}" oninput="updateReleaseField('${r.id}','title',this.value)">
-          <input type="text" class="edit-input" placeholder="Исполнитель" value="${escHtml(r.artist || '')}" oninput="updateReleaseField('${r.id}','artist',this.value)">
-        </div>
-        <div class="edit-row">
-          <input type="text" class="edit-input" placeholder="Тип (Альбом, EP, Сингл...)" value="${escHtml(r.type || '')}" oninput="updateReleaseField('${r.id}','type',this.value)">
-          <input type="text" class="edit-input" placeholder="Жанр / описание" value="${escHtml(r.genre || '')}" oninput="updateReleaseField('${r.id}','genre',this.value)">
-        </div>
-      </div>
-      <div class="edit-section">
-        <label class="edit-label">Обложка</label>
-        <input type="url" class="edit-input" placeholder="URL обложки" value="${escHtml(r.cover || '')}" oninput="updateReleaseField('${r.id}','cover',this.value)">
-      </div>
-      <div class="save-row">
-        <button class="btn-cancel" onclick="cancelReleaseEdit('${r.id}')">Отмена</button>
-        <button class="btn-save" onclick="saveRelease('${r.id}')">✓ Сохранить</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-function toggleReleaseEdit(id) { document.getElementById('rc-' + id)?.classList.toggle('editing'); }
-function cancelReleaseEdit(id) { document.getElementById('rc-' + id)?.classList.remove('editing'); }
-function updateReleaseField(id, field, value) { const r = releases.find(x => x.id === id); if (r) r[field] = value; }
-function saveRelease(id) {
-  saveReleases(releases);
-  document.getElementById('rc-' + id)?.classList.remove('editing');
-  renderReleases();
-  showToast('Релиз сохранён ✓');
-}
-function addRelease() {
-  const r = { id: uid(), title: 'Новый релиз', artist: '', type: 'Сингл', genre: '', cover: '' };
-  releases.push(r);
-  saveReleases(releases);
-  renderReleases();
-  setTimeout(() => {
-    const card = document.getElementById('rc-' + r.id);
-    if (card) { card.classList.add('editing'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-  }, 50);
-}
-function deleteRelease(id) {
-  if (!confirm('Удалить релиз?')) return;
-  releases = releases.filter(r => r.id !== id);
-  saveReleases(releases);
-  renderReleases();
-  showToast('Релиз удалён');
-}
-
-/* ============================================================
-   PREVIEW
-   ============================================================ */
-function renderPreview() {
-  const list = document.getElementById('preview-list');
-  if (!tracks.length) { list.innerHTML = '<div class="empty-state"><div class="es-icon">🎵</div><p>Треков нет</p></div>'; return; }
-  list.innerHTML = tracks.map(t => {
-    const typeClass = t.type === 'yandex' ? 'yandex' : (t.src ? 'mp3' : 'none');
-    const typeText = t.type === 'yandex' ? 'Яндекс' : (t.src ? 'MP3' : 'Нет аудио');
-    return `<div class="preview-track">
-      <div class="preview-cover">${t.cover ? `<img src="${escHtml(t.cover)}" alt="">` : '🎵'}</div>
-      <div class="preview-meta">
-        <div class="preview-title">${escHtml(t.title || 'Без названия')}</div>
-        <div class="preview-artist">${escHtml(t.artist || '—')}</div>
-      </div>
-      <span class="preview-type ${typeClass}">${typeText}</span>
-      <span style="font-size:0.72rem;color:var(--white50);margin-left:0.5rem">${escHtml(t.dur || '')}</span>
-    </div>`;
-  }).join('');
-}
-
-/* ============================================================
-   SETTINGS
-   ============================================================ */
-function loadSettingsForm() {
-  const s = loadSettings();
-  if (s.phone) document.getElementById('set-phone').value = s.phone;
-  if (s.email) document.getElementById('set-email').value = s.email;
-  if (s.address) document.getElementById('set-address').value = s.address;
-}
-function autoSaveSettings() {
-  const s = {
-    phone: document.getElementById('set-phone').value,
-    email: document.getElementById('set-email').value,
-    address: document.getElementById('set-address').value,
-  };
-  saveSettings(s);
-}
-function exportData() {
-  const data = { tracks, releases, settings: loadSettings(), exportedAt: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'ssl-admin-data.json';
-  a.click();
-  showToast('Данные экспортированы');
-}
-function resetAllData() {
-  if (!confirm('Сбросить ВСЕ данные? Это действие необратимо.')) return;
-  localStorage.removeItem(LS_KEY_TRACKS);
-  localStorage.removeItem(LS_KEY_RELEASES);
-  localStorage.removeItem(LS_KEY_SETTINGS);
-  tracks = loadTracks(); releases = loadReleases();
-  renderTracks(); renderReleases(); renderPreview(); loadSettingsForm();
-  showToast('Данные сброшены');
-}
-
-/* ============================================================
-   UI HELPERS
-   ============================================================ */
-function switchAdminTab(btn, panelId) {
+function switchTab(btn, panelId) {
   document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
@@ -846,19 +825,144 @@ function showToast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
 }
 
-// Keyboard: Escape closes open editors
+function renderTracks() {
+  const container = document.getElementById('tracks-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  tracksData.forEach((track, idx) => {
+    const card = document.createElement('div');
+    card.className = 'track-card';
+    card.innerHTML = `
+      <div class="track-card-header">
+        <div class="track-info">
+          <h4>${escHtml(track.title)}</h4>
+          <p>${escHtml(track.artist)}</p>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn edit" onclick="openEditor(true, ${idx})" title="Редактировать">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          </button>
+          <button class="action-btn delete" onclick="deleteTrack(${idx})" title="Удалить">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+          </button>
+        </div>
+      </div>
+      <div class="track-meta">
+        <div class="meta-item"><span class="meta-label">Жанр</span><span class="meta-val">${escHtml(track.genre)}</span></div>
+        <div class="meta-item"><span class="meta-label">Работа</span><span class="meta-val">${escHtml(track.type)}</span></div>
+        <div class="meta-item"><span class="meta-label">Аудио URL</span><span class="meta-val" title="${escHtml(track.audio)}">${escHtml(track.audio)}</span></div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderPreview() {
+  const container = document.getElementById('preview-list-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (tracksData.length === 0) {
+    container.innerHTML = '<div style="color:var(--p-white50); text-align:center; padding:20px;">Список треков пуст</div>';
+    return;
+  }
+
+  tracksData.forEach(track => {
+    const item = document.createElement('div');
+    item.className = 'preview-item';
+    item.innerHTML = `
+      <div class="preview-track-info">
+        <button class="preview-play-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+        <div class="preview-track-meta">
+          <h5>${escHtml(track.title)}</h5>
+          <p>${escHtml(track.artist)}</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="preview-badge">${escHtml(track.genre)}</span>
+        <span class="preview-badge" style="border-color:var(--p-blue); color:var(--p-blue2);">${escHtml(track.type)}</span>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function openEditor(isEdit, idx = null) {
+  const overlay = document.getElementById('editor-overlay');
+  const mTitle = document.getElementById('modal-title');
+  
+  if (isEdit && idx !== null) {
+    mTitle.textContent = 'Редактировать трек';
+    const t = tracksData[idx];
+    document.getElementById('edit-idx').value = idx;
+    document.getElementById('track-title').value = t.title;
+    document.getElementById('track-artist').value = t.artist;
+    document.getElementById('track-genre').value = t.genre;
+    document.getElementById('track-type').value = t.type;
+    document.getElementById('track-audio').value = t.audio;
+  } else {
+    mTitle.textContent = 'Добавить новый трек';
+    document.getElementById('edit-idx').value = '';
+    document.getElementById('track-title').value = '';
+    document.getElementById('track-artist').value = '';
+    document.getElementById('track-genre').value = '';
+    document.getElementById('track-type').value = '';
+    document.getElementById('track-audio').value = '';
+  }
+  overlay.classList.add('active');
+}
+
+function closeEditor() {
+  document.getElementById('editor-overlay').classList.remove('active');
+}
+
+function saveTrack() {
+  const idxVal = document.getElementById('edit-idx').value;
+  const title = document.getElementById('track-title').value.trim();
+  const artist = document.getElementById('track-artist').value.trim();
+  const genre = document.getElementById('track-genre').value.trim();
+  const type = document.getElementById('track-type').value.trim();
+  const audio = document.getElementById('track-audio').value.trim();
+
+  if (!title || !artist) {
+    showToast('Название трека и Исполнитель обязательны!');
+    return;
+  }
+
+  const trackObj = { title, artist, genre, type, audio };
+
+  if (idxVal !== '') {
+    tracksData[parseInt(idxVal)] = trackObj;
+    showToast('Трек успешно обновлен');
+  } else {
+    tracksData.push(trackObj);
+    showToast('Новый трек добавлен в портфолио');
+  }
+
+  closeEditor();
+  renderTracks();
+  showSaveIndicator();
+}
+
+function deleteTrack(idx) {
+  if (confirm(`Вы уверены, что хотите удалить трек "${tracksData[idx].title}"?`)) {
+    tracksData.splice(idx, 1);
+    renderTracks();
+    showToast('Трек удален');
+    showSaveIndicator();
+  }
+}
+
+// Закрытие окон клавишей Escape из панели
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    document.querySelectorAll('.track-card.editing').forEach(c => c.classList.remove('editing'));
-  }
-});
-
-// Check auth on load
-document.addEventListener('DOMContentLoaded', () => {
-  if (sessionStorage.getItem('ssl_admin_auth') !== '1') {
-    setTimeout(() => document.getElementById('auth-login')?.focus(), 200);
+    closeEditor();
   }
 });
 </script>
+
 </body>
 </html>
