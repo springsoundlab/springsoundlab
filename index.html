@@ -1151,12 +1151,32 @@ window.addEventListener('scroll',()=>{
 });
 
 /* ---- Плеер ---- */
-const TRACKS=[
-  {title:'Первая частота',artist:'Echo',cover:'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',dur:'5:38'},
-  {title:'Тихий Сигнал',artist:'Алиса Кравцова',cover:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',dur:'4:25'},
-  {title:'Нить — OST',artist:'Сериал «Нить»',cover:'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',dur:'6:12'},
-  {title:'Одиночество в сети',artist:'Ноябрь',cover:'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',dur:'3:47'}
-];
+// Читаем треки из localStorage (той же базы, что использует панель редактирования)
+// Если там ничего нет - используем дефолтные треки
+function _loadTracksForPlayer() {
+  try {
+    const d = localStorage.getItem('ssl_tracks');
+    if (d) {
+      const arr = JSON.parse(d);
+      // Фильтруем только треки с аудио (mp3 ссылка или яндекс)
+      return arr.filter(t => (t.type === 'yandex' && t.yandex) || (t.type !== 'yandex' && t.src));
+    }
+  } catch(e) {}
+  return [
+    {title:'Первая частота',artist:'Echo',cover:'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',dur:'5:38'},
+    {title:'Тихий Сигнал',artist:'Алиса Кравцова',cover:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',dur:'4:25'},
+    {title:'Нить — OST',artist:'Сериал «Нить»',cover:'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',dur:'6:12'},
+    {title:'Одиночество в сети',artist:'Ноябрь',cover:'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=200&q=80',src:'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',dur:'3:47'}
+  ];
+}
+let TRACKS = _loadTracksForPlayer();
+// Функция перезагрузки плеера после сохранения в панели
+function reloadPlayerTracks() {
+  TRACKS = _loadTracksForPlayer();
+  renderQueue();
+  // Если плеер открыт - обновим очередь
+  if (currentIdx >= TRACKS.length) { currentIdx = 0; }
+}
 const audio=document.getElementById('audio-el');
 let currentIdx=-1,isPlaying=false,muted=false,lastVol=0.8;
 let shuffle=false,repeat=false,queueOpen=false;
@@ -1417,16 +1437,41 @@ function trackCardHTML(t, i) {
             ${t.cover ? `<img src="${escHtml(t.cover)}" alt="">` : '🎵'}
           </div>
           <div class="cover-inputs">
-            <input type="url" class="edit-input" placeholder="URL обложки (https://...)" value="${escHtml(t.cover || '')}" oninput="updateTrackField('${t.id}','cover',this.value);updateCoverPreview('${t.id}',this.value)">
-            <div class="cover-hint">Вставьте URL изображения (JPG, PNG, WebP). Рекомендуемый размер: 500×500 px.</div>
+            <input type="url" class="edit-input" placeholder="URL обложки (https://...)" value="${escHtml(t.cover && !t.cover.startsWith('data:') ? t.cover : '')}" oninput="updateTrackField('${t.id}','cover',this.value);updateCoverPreview('${t.id}',this.value)" id="cover-url-${t.id}">
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+              <label style="display:inline-flex;align-items:center;gap:6px;padding:0.45rem 1rem;background:var(--white08);border:1px solid var(--border);border-radius:50px;font-size:0.75rem;font-weight:700;color:var(--white80);cursor:pointer;transition:all 0.2s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(26,111,255,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+                📁 Загрузить с компьютера
+                <input type="file" accept="image/*" style="display:none" onchange="uploadCoverFile('${t.id}',this)">
+              </label>
+              ${t.cover && t.cover.startsWith('data:') ? '<span style="font-size:0.7rem;color:var(--green);font-weight:700">✓ Загружено</span>' : ''}
+            </div>
+            <div class="cover-hint">URL картинки (JPG, PNG) или загрузите файл с компьютера. Рекомендуемый размер: 500×500 px.</div>
           </div>
         </div>
       </div>
 
       <div class="edit-section audio-section" id="audio-sec-${t.id}" style="${t.type === 'yandex' ? 'display:none' : ''}">
-        <label class="edit-label">🎵 Прямая ссылка на MP3</label>
-        <input type="url" class="edit-input" placeholder="https://example.com/track.mp3" value="${escHtml(t.src || '')}" oninput="updateTrackField('${t.id}','src',this.value)">
-        <div class="cover-hint" style="margin-top:0.4rem">Прямая ссылка на .mp3 файл. Можно загрузить на Яндекс.Диск, Dropbox, свой хостинг и взять прямую ссылку.</div>
+        <label class="edit-label">🎵 Аудиофайл</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <label style="display:inline-flex;align-items:center;gap:6px;padding:0.5rem 1.1rem;background:rgba(26,111,255,0.08);border:1px solid rgba(26,111,255,0.25);border-radius:50px;font-size:0.78rem;font-weight:700;color:var(--blue2);cursor:pointer;transition:all 0.2s;white-space:nowrap" onmouseover="this.style.background='rgba(26,111,255,0.15)'" onmouseout="this.style.background='rgba(26,111,255,0.08)'">
+            📂 Загрузить MP3/WAV с компьютера
+            <input type="file" accept="audio/*" style="display:none" onchange="uploadAudioFile('${t.id}',this)">
+          </label>
+          <span id="audio-upload-status-${t.id}" style="font-size:0.72rem;font-weight:700;color:${t.src && t.src.startsWith('data:') ? 'var(--green)' : 'var(--white50)'}">
+            ${t.src && t.src.startsWith('data:') ? '✓ Файл загружен' : (t.src ? '✓ Ссылка задана' : 'Файл не выбран')}
+          </span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <span style="font-size:0.68rem;color:var(--white50);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">или ссылка</span>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+        </div>
+        <input type="url" class="edit-input" placeholder="https://example.com/track.mp3" value="${escHtml(t.src && !t.src.startsWith('data:') ? t.src : '')}" oninput="updateTrackField('${t.id}','src',this.value);updateAudioStatus('${t.id}',this.value)" id="audio-url-${t.id}">
+        <div class="cover-hint" style="margin-top:0.4rem">
+          <strong style="color:var(--white80)">Яндекс.Диск:</strong> загрузи файл → «Поделиться» → скопируй публичную ссылку → используй сервис
+          <a href="https://yadisk.expert" target="_blank" style="color:var(--blue2)">yadisk.expert</a> чтобы получить прямую ссылку на файл.<br>
+          <strong style="color:var(--white80)">GitHub:</strong> загрузи в репозиторий → открой файл → кнопка «Raw» → скопируй адрес из браузера.
+        </div>
       </div>
 
       <div class="edit-section yandex-section" id="yandex-sec-${t.id}" style="${t.type !== 'yandex' ? 'display:none' : ''}">
@@ -1472,6 +1517,62 @@ function updateTrackType(id, type) {
   if (yandexSec) yandexSec.style.display = type === 'yandex' ? '' : 'none';
 }
 
+function updateAudioStatus(id, val) {
+  const el = document.getElementById('audio-upload-status-' + id);
+  if (!el) return;
+  if (val) { el.textContent = '✓ Ссылка задана'; el.style.color = 'var(--green)'; }
+  else { el.textContent = 'Файл не выбран'; el.style.color = 'var(--white50)'; }
+}
+
+function uploadCoverFile(id, input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) {
+    showToast('⚠️ Обложка слишком большая (макс. 3 МБ). Используйте URL.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    updateTrackField(id, 'cover', dataUrl);
+    updateCoverPreview(id, dataUrl);
+    // Сбросим URL-поле чтобы не путало
+    const urlInput = document.getElementById('cover-url-' + id);
+    if (urlInput) urlInput.value = '';
+    showToast('Обложка загружена ✓');
+  };
+  reader.readAsDataURL(file);
+}
+
+function uploadAudioFile(id, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('audio-upload-status-' + id);
+  if (file.size > 12 * 1024 * 1024) {
+    showToast('⚠️ Файл слишком большой (макс. ~10 МБ для локальной загрузки). Используйте ссылку с Яндекс.Диска.');
+    return;
+  }
+  if (statusEl) { statusEl.textContent = 'Загружаю...'; statusEl.style.color = 'var(--yellow)'; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    updateTrackField(id, 'src', dataUrl);
+    // Обновим тип
+    const t = tracks.find(x => x.id === id);
+    if (t) t.type = 'mp3';
+    // Сбросим URL-поле
+    const urlInput = document.getElementById('audio-url-' + id);
+    if (urlInput) urlInput.value = '';
+    if (statusEl) { statusEl.textContent = `✓ Загружен: ${file.name}`; statusEl.style.color = 'var(--green)'; }
+    showToast('Аудиофайл загружен ✓');
+  };
+  reader.onerror = function() {
+    if (statusEl) { statusEl.textContent = '✗ Ошибка загрузки'; statusEl.style.color = 'var(--red)'; }
+    showToast('Ошибка при чтении файла');
+  };
+  reader.readAsDataURL(file);
+}
+
 function updateCoverPreview(id, url) {
   const cp = document.getElementById('cp-' + id);
   if (!cp) return;
@@ -1499,7 +1600,9 @@ function saveTrack(id) {
   if (card) card.classList.remove('editing');
   renderTracks();
   renderPreview();
-  showToast('Трек сохранён ✓');
+  // Обновляем плеер на сайте — изменения моментально видны посетителю
+  reloadPlayerTracks();
+  showToast('Трек сохранён ✓ — изменения на сайте обновлены');
 }
 
 function addTrack() {
