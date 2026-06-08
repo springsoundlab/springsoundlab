@@ -998,7 +998,7 @@ function crmOverlayClick(e){
   if(e.target===document.getElementById('crm-overlay')) closeCrmModal();
 }
 
-function checkCrmAuth() {
+window.checkCrmAuth = function() {
   var login = document.getElementById('crm-login-input').value.trim();
   var pass = document.getElementById('crm-pass-input').value;
   var btn = document.getElementById('crm-btn');
@@ -1011,13 +1011,16 @@ function checkCrmAuth() {
     
     // ВМЕСТО РЕДИРЕКТА ПОКАЗЫВАЕМ ПАНЕЛЬ
     setTimeout(function() {
-      // Прячем окно логина
-      document.getElementById('crm-overlay').style.display = 'none';
-      // Показываем контейнер админки
+      // 1. Прячем окно логина (CRM)
+      var overlay = document.getElementById('crm-overlay');
+      if (overlay) overlay.style.display = 'none';
+      
+      // 2. Показываем контейнер админки
       document.getElementById('admin-main-container').style.display = 'block';
     }, 700);
     
   } else {
+    // Логика ошибки остается прежней
     btn.textContent = 'Отказано в доступе';
     btn.className = 'crm-btn denied';
     err.classList.add('show');
@@ -1027,7 +1030,7 @@ function checkCrmAuth() {
       btn.className = 'crm-btn';
     }, 1300);
   }
-}
+};
 
 // Нажатие Escape закрывает окно
 document.addEventListener('keydown',function(e){
@@ -1037,9 +1040,13 @@ document.addEventListener('keydown',function(e){
    END CRM ADMIN LOGIN
    ===================================================== */
 </script>
+<!-- Контейнер для админки (изначально скрыт) -->
 <div id="admin-main-container" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; z-index: 9999; background: var(--navy); overflow-y: auto; padding: 20px;">
+    <!-- Кнопка закрытия -->
     <button onclick="document.getElementById('admin-main-container').style.display='none'" 
-            style="position:absolute; top:20px; right:20px; padding:10px; cursor:pointer;">Закрыть админку</button>
+            style="position:absolute; top:20px; right:20px; padding:10px; cursor:pointer; background:var(--blue); color:white; border:none; border-radius:5px;">Закрыть админку</button>
+    
+    <!-- Сюда вставьте содержимое <body> из кода админки -->
 </div>
 </body>
 </html>
