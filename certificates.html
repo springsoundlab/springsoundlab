@@ -442,12 +442,10 @@
                 <div class="auth-role-opt" data-role="Вокал" onclick="selectRole(this)">🎤 Вокал</div>
                 <div class="auth-role-opt" data-role="Гитара" onclick="selectRole(this)">🎸 Гитара</div>
             </div>
-            <label class="auth-field-label">Код-приглашение</label>
-            <input type="text" id="regInvite" class="auth-input" placeholder="Получите у администратора" onkeydown="if(event.key==='Enter') doRegister()" style="text-transform:uppercase;">
             <button class="auth-btn" id="registerBtn" onclick="doRegister()">Создать аккаунт</button>
         </div>
 
-        <div class="auth-hint">Доступ только по приглашению. Получите код-приглашение у администратора студии.</div>
+        <div class="auth-hint">Для регистрации обратитесь к администратору студии.</div>
     </div>
 </div>
 
@@ -630,25 +628,15 @@ window.doRegister=async function(){
     const phone=normalizePhone(document.getElementById('regPhone').value);
     const pass=document.getElementById('regPassword').value;
     const role=document.querySelector('#regRoleRow .auth-role-opt.selected')?.dataset.role||'Сотрудник';
-    const invite=document.getElementById('regInvite').value.trim().toUpperCase();
 
     if(!name){showAuthError('Введите имя');return;}
     if(phone.length<10){showAuthError('Введите корректный номер телефона');return;}
     if(pass.length<6){showAuthError('Пароль должен быть не менее 6 символов');return;}
-    if(!invite){showAuthError('Введите код-приглашение');return;}
 
     const btn=document.getElementById('registerBtn');btn.disabled=true;btn.textContent='Создаём...';
     try{
-        const inviteDoc=await invitesCollection.doc(invite).get();
-        if(!inviteDoc.exists){showAuthError('Код-приглашение не найден');return;}
-        const inviteData=inviteDoc.data();
-        if(inviteData.used && inviteData.singleUse!==false){showAuthError('Этот код-приглашение уже использован');return;}
-
         const cred=await auth.createUserWithEmailAndPassword(phoneToEmail(phone),pass);
         await usersCollection.doc(cred.user.uid).set({name:name,phone:phone,role:role,createdAt:Date.now()});
-        if(inviteData.singleUse!==false){
-            await invitesCollection.doc(invite).update({used:true,usedBy:cred.user.uid,usedAt:Date.now()});
-        }
     }catch(err){
         let msg='Не удалось зарегистрироваться.';
         if(err.code==='auth/email-already-in-use')msg='Пользователь с таким номером уже зарегистрирован.';
