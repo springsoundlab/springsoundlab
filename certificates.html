@@ -98,7 +98,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;displ
 .cal-event-price{font-family:'JetBrains Mono',monospace;font-size:9px;margin-top:2px;opacity:.9;}
 .cal-now-line{position:absolute;left:0;right:0;height:2px;background:var(--red);z-index:5;}
 .cal-now-dot{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--red);}
-/* No events placeholder */
 .cal-empty-day{display:flex;align-items:center;justify-content:center;height:60px;opacity:.3;}
 
 /* LEGEND */
@@ -289,50 +288,41 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 /* OFFLINE */
 #offBar{display:none;position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:6px;z-index:999999;}
 
-/* MOBILE — ОБНОВЛЕННАЯ СЕКЦИЯ */
+/* MOBILE ИСПРАВЛЕНО */
 @media(max-width:768px){
-  body {
-    flex-direction: row !important; /* Оставляем горизонтальную сетку ПК-версии */
-  }
-  
-  /* Прячем боковое меню (sidebar) за левый край экрана */
   .sidebar {
     position: fixed !important;
     top: 0;
-    left: -240px; /* Полностью скрыто за экраном */
-    width: 240px !important;
+    left: -280px; /* Прячем меню влево за экран */
+    width: 260px !important;
     height: 100vh !important;
     z-index: 99999 !important;
     transition: left 0.3s ease-in-out;
-    border-right: 1px solid var(--border);
-    flex-direction: column !important; /* Возвращаем вертикальный вид меню */
     box-shadow: 5px 0 25px rgba(0,0,0,0.5);
-  }
-  
-  /* Класс, который будет выдвигать меню */
-  .sidebar.mobile-open {
-    left: 0 !important;
-  }
-
-  /* Возвращаем элементам внутри меню их стандартный вид */
-  .sb-logo-t, .sb-logo-s, .sb-user {
-    display: flex !important; 
-  }
-  .sb-nav {
+    display: flex !important;
     flex-direction: column !important;
-    overflow-x: visible !important;
+    border-right: 1px solid var(--border);
   }
-  .nav-i {
-    white-space: nowrap !important;
+  .sidebar.mobile-open {
+    left: 0 !important; /* Выдвигаем меню */
   }
-
-  /* Основной контент (main) теперь растягивается на 100% ширины телефона */
+  body {
+    display: flex !important;
+    flex-direction: row !important;
+  }
   .main {
     width: 100vw !important;
+    margin-left: 0 !important;
     flex: 1 !important;
   }
-
-  /* Сохраняем твои оригинальные настройки адаптации таблиц и карточек */
+  .topbar {
+    padding-left: 10px !important;
+  }
+  .sb-logo-t, .sb-logo-s, .sb-user { display: flex !important; }
+  .sb-nav { flex-direction: column !important; overflow-x: visible !important; }
+  .nav-i { white-space: normal !important; }
+  
+  /* Оригинальные мобильные настройки карточек */
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
   .cl-grid{grid-template-columns:1fr 1fr;}
@@ -359,7 +349,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 <div id="offBar">📡 Офлайн — данные сохраняются локально</div>
 
-<!-- AUTH -->
 <div id="authScreen">
   <div class="auth-card">
     <div class="auth-logo-r">
@@ -399,7 +388,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   </div>
 </div>
 
-<!-- APP -->
 <div id="appRoot" style="display:none;flex:1;overflow:hidden;flex-direction:row;">
 <nav class="sidebar">
   <div class="sb-logo">
@@ -434,16 +422,13 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
   <div class="content" id="contentArea">
 
-    <!-- SESSIONS VIEW -->
     <div id="secSessions" class="view">
-      <!-- TOOLBAR -->
       <div class="toolbar">
         <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="srch" placeholder="Поиск по имени, телефону..." oninput="doFilter()"></div>
         <div class="tb-btn on" id="fAll" onclick="setFilt('all')">Все</div>
         <div class="tb-btn" id="fWork" onclick="setFilt('work')"><i class="fa-regular fa-clock"></i> В работе</div>
         <div class="tb-btn" id="fDone" onclick="setFilt('done')"><i class="fa-solid fa-check"></i> Готово</div>
         <button class="tb-btn green-btn" onclick="openNewForm()"><i class="fa-solid fa-plus"></i> Новая запись</button>
-        <!-- VIEW MODE -->
         <div class="view-mode">
           <div class="vm-btn active" id="vmCal" onclick="setViewMode('calendar')"><i class="fa-regular fa-calendar"></i> Календарь</div>
           <div class="vm-btn" id="vmList" onclick="setViewMode('list')"><i class="fa-solid fa-list"></i> Список</div>
@@ -455,17 +440,12 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         </div>
       </div>
 
-      <!-- CALENDAR VIEW -->
       <div id="calView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
-        <!-- LEGEND -->
         <div class="cal-legend" id="calLegend"></div>
-        <!-- WEEK HEADER -->
         <div class="cal-head" id="calHead"></div>
-        <!-- BODY -->
         <div class="cal-body" id="calBody"></div>
       </div>
 
-      <!-- LIST VIEW -->
       <div id="listView" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
         <div class="tbl-wrap">
           <table class="tbl">
@@ -485,7 +465,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       </div>
     </div>
 
-    <!-- CLIENTS VIEW -->
     <div id="secClients" class="view" style="display:none;">
       <div class="toolbar">
         <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="clSrch" placeholder="Поиск клиента..." oninput="doFilterCl()"></div>
@@ -494,7 +473,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="cl-grid" id="clGrid"></div>
     </div>
 
-    <!-- FINANCE VIEW -->
     <div id="secFinance" class="view" style="display:none;">
       <div class="fin-cards">
         <div class="fin-c inc"><div class="fin-l">Доход за месяц</div><div class="fin-v pv" id="finM">0 ₽</div><div class="fin-s" id="finMs">текущий месяц</div></div>
@@ -510,7 +488,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       </div>
     </div>
 
-    <!-- CERTS VIEW -->
     <div id="secCerts" class="view" style="display:none;">
       <div class="toolbar">
         <span style="font-size:11px;color:var(--text3);font-weight:700;">СЕРТИФИКАТЫ SSL (300 шт.)</span>
@@ -519,7 +496,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="certs-wrap"><div class="cert-grid" id="certGrid"></div></div>
     </div>
 
-    <!-- ANALYTICS VIEW -->
     <div id="secAnalytics" class="view" style="display:none;">
       <div class="ana-wrap">
         <div class="ana-hd">
@@ -543,7 +519,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 </div>
 </div>
 
-<!-- EVENT DETAIL POPUP -->
 <div class="ev-popup" id="evPopup">
   <div class="ev-pop-name" id="evPopName">—</div>
   <div class="ev-pop-row"><i class="fa-regular fa-clock" style="font-size:10px;"></i><span id="evPopTime">—</span></div>
@@ -559,7 +534,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   </div>
 </div>
 
-<!-- NEW / EDIT RECORD MODAL -->
 <div class="mo" id="moRecord">
   <div class="mb" id="mbRecord">
     <div class="mb-title" id="mbRecTitle">Новая запись</div>
@@ -586,7 +560,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         </div>
       </div>
 
-      <!-- COLOR PICKER for event -->
       <div class="color-pick-row">
         <span class="color-pick-label">Цвет</span>
         <div id="formColorPick"></div>
@@ -595,7 +568,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
       <hr class="f-sep">
 
-      <!-- SERVICE MODE -->
       <div id="svcModeWrap" style="display:none;margin-bottom:10px;">
         <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;">Добавить услуги</div>
         <div style="display:flex;gap:6px;margin-bottom:10px;">
@@ -604,7 +576,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         </div>
       </div>
 
-      <!-- PRESET PACKAGES -->
       <div id="presetSvcs" style="display:none;">
         <div class="prepaid-row">
           <div class="pr-lbl">50% предоплата</div>
@@ -622,7 +593,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         </div>
       </div>
 
-      <!-- MANUAL SERVICE -->
       <div id="manualSvcs">
         <div class="f-row">
           <div class="f-group"><div class="f-label">Название услуги</div><input type="text" id="mSvcName" class="f-inp" placeholder="Запись вокала, Урок гитары..."></div>
@@ -634,7 +604,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="added-svcs" id="addedSvcs"></div>
       <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val" id="formTotal">0 ₽</div></div>
 
-      <!-- CERT TOGGLE -->
       <div id="certToggleWrap" style="margin-bottom:10px;display:none;">
         <div class="prepaid-row">
           <div class="pr-lbl">🎁 Использовать сертификат</div>
@@ -659,7 +628,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   </div>
 </div>
 
-<!-- SIMPLE MODAL -->
 <div class="mo" id="moSimple">
   <div class="mb mb-sm">
     <div class="mb-title" id="msTitle">—</div>
@@ -978,7 +946,7 @@ function renderLegend(){
 /* ===== CALENDAR RENDER ===== */
 const HOURS_START=7; // 07:00
 const HOURS_END=24;  // midnight
-const HOUR_H=60;     // px per hour
+const HOUR_H=60; // px per hour
 
 function renderCalendar(){
   const days=getWeekDays();
@@ -1059,6 +1027,7 @@ function renderCalendar(){
 
     // Events
     const events=(byDate[ds]||[]).sort((a,b)=>a.time.localeCompare(b.time));
+    
     // Simple collision: group overlapping events and assign columns
     const placed=[];
     events.forEach(ev=>{
@@ -1075,6 +1044,7 @@ function renderCalendar(){
       let subcol=0;
       while(placed[subcol]&&placed[subcol]>startMin)subcol++;
       placed[subcol]=endMin;
+    
       const totalCols=Math.max(placed.filter(x=>x!==undefined).length,1);
 
       const colW=90/totalCols;
@@ -1097,7 +1067,6 @@ function renderCalendar(){
       const full=ev.fullTotal||ev.total||0;
       const paid=ev.total||0;
       const rest=Math.max(0,full-paid);
-
       evEl.innerHTML=`
         <div class="cal-event-name" style="color:${color}">${ev.client||ev.song||'—'}</div>
         <div class="cal-event-svc" style="color:${color}99">${ev.services||ev.type||''}</div>
@@ -1348,7 +1317,6 @@ window.saveRecord=async function(){
   const svcsLabel=details.length?details.map(i=>i.name).join(', '):type;
   const fullT=details.reduce((s,i)=>s+(i.basePrice||i.price),0)||0;
   const paid=details.reduce((s,i)=>s+i.price,0)||0;
-
   const useCert=document.getElementById('certToggle').checked;
   const certId=document.getElementById('certSelect').value;
 
@@ -1581,34 +1549,32 @@ function updateDate(){
 /* ===== OFFLINE ===== */
 function updOff(){document.getElementById('offBar').style.display=navigator.onLine?'none':'block';}
 window.addEventListener('online',updOff);window.addEventListener('offline',updOff);updOff();
-</script>
-  /* ЛОГИКА ДЛЯ МОБИЛЬНОГО МЕНЮ (СПРЯТАТЬ/ПОКАЗАТЬ) */
+
+/* ===== МОБИЛЬНОЕ МЕНЮ (ДОБАВЛЕНО) ===== */
 document.addEventListener('DOMContentLoaded', () => {
   const topbar = document.querySelector('.topbar');
   const sidebar = document.querySelector('.sidebar');
-  
   if (topbar && sidebar) {
-    // Создаем кнопку гамбургера
-    const toggleBtn = document.createElement('button');
+    const toggleBtn = document.createElement('div');
     toggleBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
-    toggleBtn.className = 'tb-btn'; // Используем твой готовый класс для стильных кнопок
-    toggleBtn.style.marginRight = '12px';
-    toggleBtn.style.padding = '6px 12px';
-    toggleBtn.style.fontSize = '14px';
-    
-    // Показываем кнопку только на мобильных (меньше 768px)
+    toggleBtn.className = 'tb-btn';
+    toggleBtn.style.marginRight = '10px';
+    toggleBtn.style.padding = '8px 12px';
     toggleBtn.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
     
-    // Вставляем кнопку в самое начало топбара (перед заголовком)
-    topbar.insertBefore(toggleBtn, topbar.firstChild);
-    
-    // Открытие/закрытие по клику на гамбургер
+    // Вставляем кнопку перед заголовком
+    const title = document.getElementById('topTitle');
+    if (title) {
+      topbar.insertBefore(toggleBtn, title);
+    } else {
+      topbar.insertBefore(toggleBtn, topbar.firstChild);
+    }
+
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       sidebar.classList.toggle('mobile-open');
     });
-    
-    // Закрываем меню, если кликнули в любую другую точку экрана
+
     document.addEventListener('click', (e) => {
       if (window.innerWidth <= 768 && sidebar.classList.contains('mobile-open')) {
         if (!sidebar.contains(e.target) && e.target !== toggleBtn) {
@@ -1616,8 +1582,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-    
-    // Следим за изменением размера экрана (например, перевернули телефон)
+
     window.addEventListener('resize', () => {
       toggleBtn.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
       if (window.innerWidth > 768) {
@@ -1626,5 +1591,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+</script>
 </body>
 </html>
