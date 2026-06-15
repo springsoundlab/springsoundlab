@@ -33,7 +33,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 
 /* SIDEBAR */
 .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
-.sb-logo{display:flex;align-items:center;gap:10px;padding:18px 14px 14px;border-bottom:1px solid var(--border);}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:18px 14px 14px;border-bottom:1px solid var(--border); cursor:pointer;}
 .sb-logo img{width:34px;height:34px;border-radius:9px;object-fit:cover;}
 .sb-logo-t{font-size:11px;font-weight:700;line-height:1.3;}
 .sb-logo-s{font-size:9px;color:var(--text3);margin-top:1px;}
@@ -62,9 +62,6 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .tb-btn.green-btn{color:var(--green);border-color:rgba(62,207,142,.3);}
 .tb-btn.green-btn:hover{background:var(--green-bg);}
 
-.status-select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;font-size:11px;font-weight:600;outline:none;cursor:pointer;}
-.status-select:focus{border-color:var(--accent);}
-
 .mnav{display:flex;align-items:center;gap:6px;margin-left:auto;}
 .mnav-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:.15s;}
 .mnav-btn:hover{color:var(--text);border-color:var(--border2);}
@@ -92,11 +89,6 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cal-event-price{font-family:'JetBrains Mono',monospace;font-size:9px;margin-top:2px;opacity:.9;}
 .cal-now-line{position:absolute;left:0;right:0;height:2px;background:var(--red);z-index:5;}
 .cal-now-dot{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--red);}
-
-/* LEGEND */
-.cal-legend{display:flex;align-items:center;gap:8px;padding:6px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;flex-wrap:wrap;}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--text2);}
-.legend-dot{width:8px;height:8px;border-radius:3px;}
 
 /* TABLE */
 .tbl-wrap{flex:1;overflow-y:auto;}
@@ -131,7 +123,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .ss-debt{background:var(--gold-bg);color:var(--gold);}
 .role-tag{font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--surface3);color:var(--text3);margin-left:4px;}
 
-/* CLIENTS */
+/* CLIENTS & EMPLOYEES */
 .cl-grid{flex:1;overflow-y:auto;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;align-content:start;}
 .cl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:.15s;}
 .cl-card:hover{border-color:var(--border2);background:var(--surface2);}
@@ -308,7 +300,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .view-mode { width: 100%; }
   .view-mode .vm-btn { flex: 1; justify-content: center; text-align: center;}
   .mnav { width: 100%; justify-content: space-between; }
-  #statusFilter { width: 100%; }
   .tb-btn { justify-content: center;}
 
   .tbl thead { display: none;}
@@ -392,7 +383,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 <div id="appRoot" style="display:none;flex:1;overflow:hidden;flex-direction:row;">
 <nav class="sidebar">
-  <div class="sb-logo">
+  <div class="sb-logo" onclick="togglePrivacy()" title="Нажмите для разблокировки финансов">
     <img src="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg" alt="SSL">
     <div><div class="sb-logo-t">SPRING SOUND LAB</div><div class="sb-logo-s">Studio CRM</div></div>
   </div>
@@ -402,6 +393,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     <div class="nav-i" onclick="goSec('finance')" id="nav-finance"><i class="fa-solid fa-wallet"></i> Финансы</div>
     <div class="nav-i" onclick="goSec('certs')" id="nav-certs"><i class="fa-solid fa-gift"></i> Сертификаты</div>
     <div class="nav-i" onclick="goSec('analytics')" id="nav-analytics"><i class="fa-solid fa-chart-simple"></i> Аналитика</div>
+    <div class="nav-i" onclick="goSec('employees')" id="nav-employees"><i class="fa-solid fa-users"></i> Сотрудники</div>
   </div>
  
   <div class="sb-user" onclick="doLogout()" title="Выйти">
@@ -422,12 +414,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
     <div id="secSessions" class="view">
       <div class="toolbar">
-        <select class="status-select" id="statusFilter" onchange="setFilt(this.value)">
-          <option value="all">Всё вместе</option>
-          <option value="work">⏳ В работе</option>
-          <option value="done">✓ Готово</option>
-        </select>
-        
         <button class="tb-btn green-btn" onclick="openNewForm()"><i class="fa-solid fa-plus"></i> Новая запись</button>
         <div class="view-mode">
           <div class="vm-btn active" id="vmCal" onclick="setViewMode('calendar')"><i class="fa-regular fa-calendar"></i> Календарь</div>
@@ -444,7 +430,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       </div>
 
       <div id="calView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
-        <div class="cal-legend" id="calLegend"></div>
         <div class="cal-head" id="calHead"></div>
         <div class="cal-body" id="calBody"></div>
       </div>
@@ -479,7 +464,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="fin-cards">
         <div class="fin-c inc"><div class="fin-l">Мой доход за месяц</div><div class="fin-v pv" id="finM">0 ₽</div><div class="fin-s" id="finMs">текущий месяц</div></div>
         <div class="fin-c inc"><div class="fin-l">Мой доход за год</div><div class="fin-v pv" id="finY">0 ₽</div><div class="fin-s" id="finYs">2026</div></div>
-        <div class="fin-c dbt"><div class="fin-l">Мои долги</div><div class="fin-v" id="finDbt">0 ₽</div><div class="fin-s">к получению</div></div>
+        <div class="fin-c dbt"><div class="fin-l">Остатки долгов</div><div class="fin-v pv" id="finDbt">0 ₽</div><div class="fin-s">к получению</div></div>
         <div class="fin-c"><div class="fin-l">Мой средний чек</div><div class="fin-v pv" id="finAvg">0 ₽</div><div class="fin-s" id="finAvgs">за все время</div></div>
       </div>
       <div class="tbl-wrap" style="margin-top:10px;">
@@ -516,6 +501,13 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         </div>
       </div>
     </div>
+    
+    <div id="secEmployees" class="view" style="display:none;">
+      <div class="toolbar">
+        <span style="font-size:11px;color:var(--text3);font-weight:700;">КОМАНДА СТУДИИ</span>
+      </div>
+      <div class="cl-grid" id="empGrid"></div>
+    </div>
 
   </div>
 </div>
@@ -526,7 +518,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   <div class="ev-pop-name" id="evPopName">—</div>
   <div class="ev-pop-row"><i class="fa-regular fa-clock" style="font-size:10px;"></i><span id="evPopTime">—</span></div>
   <div class="ev-pop-row"><i class="fa-solid fa-music" style="font-size:10px;"></i><span id="evPopSvc">—</span></div>
-  <div class="ev-pop-row"><i class="fa-solid fa-ruble-sign" style="font-size:10px;"></i><span id="evPopPrice">—</span></div>
+  <div class="ev-pop-row"><i class="fa-solid fa-ruble-sign" style="font-size:10px;"></i><span id="evPopPrice" class="pv">—</span></div>
   <div class="ev-pop-row" id="evPopPhoneRow"><i class="fa-solid fa-phone" style="font-size:10px;"></i><span id="evPopPhone">—</span></div>
   <div class="ev-pop-row" id="evPopComRow" style="display:none;"><i class="fa-regular fa-comment" style="font-size:10px;"></i><span id="evPopCom" style="font-style:italic;"></span></div>
   <div class="ev-pop-acts">
@@ -602,7 +594,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       </div>
 
       <div class="added-svcs" id="addedSvcs"></div>
-      <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val" id="formTotal">0 ₽</div></div>
+      <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val pv" id="formTotal">0 ₽</div></div>
 
       <div id="certToggleWrap" style="margin-bottom:10px;display:none;">
         <div class="prepaid-row">
@@ -681,7 +673,6 @@ window.PROFILE=null;
 window.ALL_USERS={};
 let calDate=new Date();
 let calWeekOffset=0;
-let filt='all';
 let privacyOn=false;
 let certs={};
 let editId=null;
@@ -711,11 +702,9 @@ function getMyData() {
   const isMaster = pPhone === MASTER_PHONE;
   
   return window.CRM.filter(r => {
-    // Если входит Мастер-аккаунт, он видит свои записи И все старые записи (в которых еще нет привязки к автору)
     if (isMaster) {
       return !r.authorPhone || r.authorPhone === MASTER_PHONE || r.authorName === window.PROFILE.name;
     }
-    // Для всех новых/других преподавателей - строго только их данные
     return r.authorPhone === pPhone;
   });
 }
@@ -823,7 +812,7 @@ function startApp(){
   UC.onSnapshot(snap=>{
     window.ALL_USERS={};
     snap.forEach(d=>{window.ALL_USERS[d.id]={...d.data(),uid:d.id};});
-    renderLegend();
+    if (viewMode==='employees') renderEmployees();
   });
   SC.orderBy('timestamp','desc').onSnapshot({includeMetadataChanges:false},snap=>{
     window.CRM=[];snap.forEach(d=>window.CRM.push({id:d.id,...d.data()}));
@@ -842,6 +831,7 @@ function renderAll(){
   if(sec==='clients')renderClients();
   if(sec==='finance')renderFinance();
   if(sec==='analytics')renderAnalytics();
+  if(sec==='employees')renderEmployees();
 }
 
 /* ===== VIEW MODE ===== */
@@ -859,7 +849,7 @@ function setViewMode(m){
 function goSec(s){
   document.querySelectorAll('.nav-i').forEach(n=>n.classList.remove('active'));
   document.getElementById('nav-'+s).classList.add('active');
-  const all=['sessions','clients','finance','certs','analytics'];
+  const all=['sessions','clients','finance','certs','analytics','employees'];
   all.forEach(id=>document.getElementById('sec'+id.charAt(0).toUpperCase()+id.slice(1)).style.display='none');
   document.getElementById('sec'+s.charAt(0).toUpperCase()+s.slice(1)).style.display='flex';
   renderAll();
@@ -934,33 +924,6 @@ function getWeekDays(){
 }
 function dateStr(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 
-/* ===== ФИЛЬТР (ЧЕРЕЗ ВЫПАДАЮЩЕЕ МЕНЮ) ===== */
-window.setFilt=function(f){
-  filt=f;
-  if(viewMode==='calendar')renderCalendar();
-  else renderSessions();
-}
-
-/* ===== LEGEND ===== */
-function renderLegend(){
-  const leg=document.getElementById('calLegend');
-  if(!leg)return;
-  leg.innerHTML='<span style="font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-right:4px;">Сотрудники:</span>';
-  const users=Object.values(window.ALL_USERS);
-  if(!users.length){
-    if(window.PROFILE){
-      const li=document.createElement('div');li.className='legend-item';
-      li.innerHTML=`<div class="legend-dot" style="background:${window.PROFILE.color||PALETTE[0].hex}"></div>${window.PROFILE.name}`;
-      leg.appendChild(li);
-    }
-    return;
-  }
-  users.forEach(u=>{
-    const li=document.createElement('div');li.className='legend-item';
-    li.innerHTML=`<div class="legend-dot" style="background:${u.color||PALETTE[0].hex}"></div>${u.name}<span style="font-size:8px;color:var(--text3);margin-left:2px;">(${u.role||''})</span>`;
-    leg.appendChild(li);
-  });
-}
 
 /* ===== CALENDAR RENDER ===== */
 const HOURS_START=7; // 07:00
@@ -996,11 +959,7 @@ function renderCalendar(){
   }
   body.appendChild(timeCol);
 
-  // Изоляция данных
   let data = getMyData();
-  
-  if(filt==='work')data=data.filter(r=>!r.completed);
-  if(filt==='done')data=data.filter(r=>r.completed);
 
   const byDate={};
   data.forEach(r=>{if(r.date&&r.time){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);}});
@@ -1070,7 +1029,7 @@ function renderCalendar(){
       const paid=ev.total||0;
       const rest=Math.max(0,full-paid);
       
-      const priceHTML = (paid>0) ? `<div class="cal-event-price" style="color:${color}bb">${paid.toLocaleString()}₽${rest>0?' · −'+rest.toLocaleString()+'₽':''}</div>` : '';
+      const priceHTML = (paid>0) ? `<div class="cal-event-price pv" style="color:${color}bb">${paid.toLocaleString()}₽${rest>0?' · −'+rest.toLocaleString()+'₽':''}</div>` : '';
       
       evEl.innerHTML=`
         <div class="cal-event-name" style="color:${color}">${ev.client||ev.song||'—'}</div>
@@ -1093,6 +1052,22 @@ function renderCalendar(){
     const scrollTo=(HOURS_START===7?0:HOURS_START)*HOUR_H;
     body.scrollTop=Math.max(0,scrollTo);
   },50);
+  if(!privacyOn)applyBlur();
+}
+
+/* ===== EMPLOYEES ===== */
+function renderEmployees() {
+  const grid = document.getElementById('empGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  const users = Object.values(window.ALL_USERS);
+  if(!users.length) { grid.innerHTML = '<div style="padding:20px; color:var(--text3);">Нет данных</div>'; return; }
+  users.forEach(u => {
+    const c = document.createElement('div');
+    c.className = 'cl-card';
+    c.innerHTML = `<div class="cl-top" style="margin:0;"><div class="cl-av" style="background:${u.color?palByHex(u.color).bg:'#333'};color:${u.color||'#fff'}">${u.name?u.name[0].toUpperCase():'?'}</div><div><div class="cl-nm">${u.name}</div><div class="cl-ph">${u.role||'Сотрудник'}</div></div></div>`;
+    grid.appendChild(c);
+  });
 }
 
 /* ===== EVENT POPUP ===== */
@@ -1140,6 +1115,7 @@ function showEvPopup(ev,e){
   pop.style.left=Math.min(x+8,window.innerWidth-pw-10)+'px';
   pop.style.top=Math.min(y+8,window.innerHeight-ph-10)+'px';
   pop.classList.add('open');
+  if(!privacyOn)applyBlur();
 }
 function closeEvPopup(){document.getElementById('evPopup').classList.remove('open');popupId=null;}
 document.addEventListener('click',e=>{
@@ -1200,7 +1176,7 @@ function openNewForm(){
   
   const modal = document.getElementById('moRecord');
   modal.classList.add('open');
-  modal.scrollTop = 0; // Принудительно открываем с самого верха окна
+  modal.scrollTop = 0; 
 }
 
 function setupFormColorPicker(){
@@ -1273,7 +1249,7 @@ window.openEdit=function(id){
   
   const modal = document.getElementById('moRecord');
   modal.classList.add('open');
-  modal.scrollTop = 0; // Принудительно открываем с самого верха окна
+  modal.scrollTop = 0; 
 };
 
 window.closeRecModal=function(){
@@ -1339,6 +1315,7 @@ function renderFormSvcs(){
     cont.appendChild(d);
   });
   document.getElementById('formTotal').textContent=formTotal.toLocaleString()+' ₽';
+  if(!privacyOn)applyBlur();
 }
 
 /* ===== CERT IN FORM ===== */
@@ -1380,7 +1357,6 @@ window.saveRecord=async function(){
   const useCert=document.getElementById('certToggle').checked;
   const certId=document.getElementById('certSelect').value;
 
-  // Высчитываем длительность
   let duration = 60;
   if(time && timeEnd){
      const [h1,m1] = time.split(':').map(Number);
@@ -1422,8 +1398,6 @@ function renderSessions(){
     return false;
   });
   
-  if(filt==='work')data=data.filter(r=>!r.completed);
-  if(filt==='done')data=data.filter(r=>r.completed);
   data.sort((a,b)=>{const pd=ds=>{const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d).getTime();};return pd(b.date)-pd(a.date);});
   
   body.innerHTML='';
@@ -1453,7 +1427,7 @@ function renderSessions(){
     actsHTML += isSound ? `<div class="act-ic go" title="Доплата" onclick="addPay('${row.id}')"><i class="fa-solid fa-wallet"></i></div>` : '';
     actsHTML += `<div class="act-ic r" title="Удалить" onclick="delRec('${row.id}')"><i class="fa-solid fa-trash"></i></div>`;
 
-    const priceHTML = `${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}`;
+    const priceHTML = `<div class="pv">${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}</div>`;
 
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${row.date||'—'}</div></td>
@@ -1504,12 +1478,13 @@ function renderClients(){
     card.innerHTML=`<div class="cl-top"><div class="cl-av" style="background:${pal.bg};color:${c.color}">${c.name[0]?.toUpperCase()||'?'}</div><div><div class="cl-nm">${c.name}</div><div class="cl-ph">${c.phone||'—'}</div></div></div>
     <div class="cl-stats">
       <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${c.color}">${c.visits}</div></div>
-      <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v" style="color:${c.color}">${c.total.toLocaleString()}</div></div>
+      <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${c.color}">${c.total.toLocaleString()}</div></div>
       <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${c.last||'—'}</div></div>
       ${topType?`<div class="cl-st"><div class="cl-st-l">Топ тип</div><div class="cl-st-v" style="font-size:10px;">${topType[0]}</div></div>`:''}
     </div>`;
     grid.appendChild(card);
   });
+  if(!privacyOn)applyBlur();
 }
 
 /* ===== FINANCE ===== */
@@ -1539,7 +1514,7 @@ function renderFinance(){
     const full=row.fullTotal||row.total||0;const paid=row.total||0;const rest=Math.max(0,full-paid);
     const color=row.eventColor||PALETTE[0].hex;
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td data-label="Дата" class="td-date">${row.date}</td><td data-label="Клиент"><div style="display:flex;align-items:center;gap:6px;"><div style="width:3px;height:16px;border-radius:2px;background:${color}"></div><span class="td-name">${row.client||row.song||'—'}</span></div></td><td data-label="Телефон" class="td-phone">${row.phone||'—'}</td><td data-label="Услуги" class="td-svc">${row.services||'—'}</td><td data-label="Внесено" style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;">${paid.toLocaleString()} ₽</td><td data-label="Долг" style="text-align:right;color:var(--gold);font-family:'JetBrains Mono',monospace;">${rest>0?'−'+rest.toLocaleString()+' ₽':'—'}</td>`;
+    tr.innerHTML=`<td data-label="Дата" class="td-date">${row.date}</td><td data-label="Клиент"><div style="display:flex;align-items:center;gap:6px;"><div style="width:3px;height:16px;border-radius:2px;background:${color}"></div><span class="td-name">${row.client||row.song||'—'}</span></div></td><td data-label="Телефон" class="td-phone">${row.phone||'—'}</td><td data-label="Услуги" class="td-svc">${row.services||'—'}</td><td data-label="Внесено" class="pv" style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;">${paid.toLocaleString()} ₽</td><td data-label="Долг" class="pv" style="text-align:right;color:var(--gold);font-family:'JetBrains Mono',monospace;">${rest>0?'−'+rest.toLocaleString()+' ₽':'—'}</td>`;
     body.appendChild(tr);
   });
   if(!privacyOn)applyBlur();
@@ -1592,7 +1567,7 @@ function renderAnalytics(){
     const pct=Math.round((v/maxV)*100);
     const isCur=i===now.getMonth();
     const col=document.createElement('div');col.className='bar-col';
-    col.innerHTML=`<div class="bar-val">${v>0?(v>=1000?Math.round(v/1000)+'к':''+v):''}</div><div class="bar" style="height:${pct}px;background:${isCur?'#3ecf8e':'#7c6fff'}"></div><div class="bar-lbl">${MNSh[i]}</div>`;
+    col.innerHTML=`<div class="bar-val pv">${v>0?(v>=1000?Math.round(v/1000)+'к':''+v):''}</div><div class="bar" style="height:${pct}px;background:${isCur?'#3ecf8e':'#7c6fff'}"></div><div class="bar-lbl">${MNSh[i]}</div>`;
     chart.appendChild(col);
   });
 
