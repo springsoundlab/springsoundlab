@@ -23,10 +23,8 @@
   --blue:#3b9eff;--blue-bg:rgba(59,158,255,0.1);
   --r:12px;--r-sm:8px;
 }
-/* ЖЕСТКИЙ ЗАПРЕТ ГОРИЗОНТАЛЬНОГО СКРОЛЛА */
 *{box-sizing:border-box;margin:0;padding:0;}
-html, body { width: 100vw; max-width: 100%; overflow-x: hidden; }
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;display:flex;height:100vh;overflow-y:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;display:flex;height:100vh;overflow:hidden;}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
@@ -49,8 +47,8 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .u-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .u-role{font-size:10px;color:var(--text3);}
 
-/* MAIN & TOPBAR */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden; max-width: 100%;}
+/* MAIN & TOPBAR (только для мобилок) */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .topbar{display:none; height:52px; background:var(--surface); border-bottom:1px solid var(--border); align-items:center; padding:0 18px; flex-shrink:0;}
 .content{flex:1;overflow:hidden;display:flex;}
 
@@ -111,7 +109,8 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .prog{height:3px;background:var(--border);border-radius:2px;margin-top:3px;overflow:hidden;}
 .prog-fill{height:100%;border-radius:2px;background:var(--accent);}
 .prog-fill.done{background:var(--green);}
-.td-acts{display:flex;align-items:center;gap:5px;transition:.15s;}
+.td-acts{display:flex;align-items:center;gap:5px;opacity:0;transition:.15s;}
+.tbl tr:hover .td-acts{opacity:1;}
 .act-ic{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:.15s;}
 .act-ic:hover{color:var(--text);border-color:var(--border2);}
 .act-ic.g:hover{color:var(--green);border-color:rgba(62,207,142,.3);}
@@ -125,7 +124,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .role-tag{font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--surface3);color:var(--text3);margin-left:4px;}
 
 /* CLIENTS & EMPLOYEES */
-.cl-grid{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%, 230px),1fr));gap:10px;align-content:start;}
+.cl-grid{flex:1;overflow-y:auto;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;align-content:start;}
 .cl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:.15s;}
 .cl-card:hover{border-color:var(--border2);background:var(--surface2);}
 .cl-top{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
@@ -148,7 +147,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 
 /* CERTS */
 .certs-wrap{flex:1;overflow-y:auto;padding:14px 18px;}
-.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;}
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-top:8px;}
 .cert-c{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px;cursor:pointer;transition:.15s;text-align:center;}
 .cert-c:hover{border-color:var(--border2);}
 .cert-c.used{border-color:rgba(62,207,142,.4);background:var(--green-bg);}
@@ -162,18 +161,11 @@ body.modal-open { overflow: hidden; touch-action: none; }
 
 /* ANALYTICS */
 .ana-wrap{flex:1;overflow-y:auto;padding:14px 18px;}
-.ana-hd{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px;}
+.ana-hd{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
 .ana-c{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;}
 .ana-l{font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:7px;}
 .ana-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;}
 .ana-s{font-size:10px;color:var(--text3);margin-top:3px;}
-
-/* Split Card CSS */
-.split-card { display: flex; padding: 0 !important; }
-.split-half { flex: 1; padding: 14px; text-align: center; display: flex; flex-direction: column; justify-content: center;}
-.split-divider { width: 1px; background: var(--border); }
-.stat-pending { color: var(--gold); }
-
 .chart-s{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
 .chart-ttl{font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:14px;}
 .bar-chart{display:flex;align-items:flex-end;gap:6px;height:110px;}
@@ -189,12 +181,10 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .svc-rf{height:100%;border-radius:3px;}
 .svc-rc{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;min-width:24px;text-align:right;}
 
-/* MODAL OVERLAY */
+/* MODAL OVERLAY - ИСПРАВЛЕННЫЙ СКРОЛЛ */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;overflow-y:auto;padding:20px 10px;-webkit-overflow-scrolling:touch;}
 .mo.open{display:block;}
-.mb{position:relative;background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:22px;width:440px;max-width:100%;margin:0 auto 40px auto;box-shadow:0 20px 60px rgba(0,0,0,.5);}
-.modal-close-red { position: absolute; top: 18px; right: 18px; background: none; border: none; color: var(--red); font-size: 24px; cursor: pointer; z-index: 10; transition: .15s; }
-.modal-close-red:hover { transform: scale(1.1); }
+.mb{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:22px;width:440px;max-width:100%;margin:0 auto 40px auto;box-shadow:0 20px 60px rgba(0,0,0,.5);}
 .mb-title{font-size:14px;font-weight:700;margin-bottom:16px;}
 .mb-sm{width:320px;margin:auto;margin-top:30vh;}
 .mb-num-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:11px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:22px;text-align:center;outline:none;margin-bottom:14px;transition:.15s;}
@@ -227,7 +217,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 .color-dot:hover{transform:scale(1.1);}
 
 /* SERVICES IN FORM */
-.services-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .svc-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
 .svc-chip{font-size:10px;font-weight:700;padding:5px 9px;border-radius:6px;border:1px solid;background:transparent;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:5px;}
 .svc-chip:hover{filter:brightness(1.2);}
@@ -286,11 +275,22 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 /* MOBILE АДАПТАЦИЯ */
 @media(max-width:768px){
-  body, html { max-width: 100vw; overflow-x: hidden; position: relative; } /* Жесткий запрет горизонтального скролла */
-  .sidebar { position: fixed !important; top: 0; left: -280px; width: 260px !important; height: 100vh !important; z-index: 99999 !important; transition: left 0.3s ease-in-out; box-shadow: 5px 0 25px rgba(0,0,0,0.5); display: flex !important; flex-direction: column !important; border-right: 1px solid var(--border); }
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: -280px; 
+    width: 260px !important;
+    height: 100vh !important;
+    z-index: 99999 !important;
+    transition: left 0.3s ease-in-out;
+    box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+    display: flex !important;
+    flex-direction: column !important;
+    border-right: 1px solid var(--border);
+  }
   .sidebar.mobile-open { left: 0 !important; }
   body { display: flex !important; flex-direction: row !important;}
-  .main { width: 100vw !important; margin-left: 0 !important; flex: 1 !important; overflow-x: hidden; }
+  .main { width: 100vw !important; margin-left: 0 !important; flex: 1 !important; }
   .topbar { display: flex; padding-left: 10px !important;}
   .sb-logo-t, .sb-logo-s, .sb-user { display: flex !important; }
   .sb-nav { flex-direction: column !important; overflow-x: visible !important;}
@@ -310,6 +310,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .td-acts { justify-content: flex-end; width: 100%;}
   
   .ana-hd{grid-template-columns:1fr 1fr;}
+  .fin-cards{flex-direction:column;}
   .cl-grid{grid-template-columns:1fr 1fr;}
   .cal-head{grid-template-columns:36px repeat(7,1fr);}
   .cal-body{grid-template-columns:36px repeat(7,1fr);}
@@ -317,11 +318,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   
   #moSimple .mb { width: 95vw !important; padding: 15px; }
   .mb-num-input { font-size: 18px; }
-
-  /* Фиксы для мобилки */
-  .time-row { display: flex !important; justify-content: flex-end; gap: 10px; }
-  .time-row .f-group { flex: 0 0 auto; width: 110px; }
-  .services-header { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
 
 /* EVENT DETAIL POPUP */
@@ -378,6 +374,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       </div>
       <div class="auth-lbl">Цвет в календаре</div>
       <div id="regColorPick" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"></div>
+      
       <button class="auth-btn" id="regBtn" onclick="doRegister()">Создать аккаунт</button>
     </div>
     <div class="auth-hint">Для регистрации обратитесь к администратору студии.</div>
@@ -464,6 +461,12 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     </div>
 
     <div id="secFinance" class="view" style="display:none;">
+      <div class="fin-cards">
+        <div class="fin-c inc"><div class="fin-l">Мой доход за месяц</div><div class="fin-v pv" id="finM">0 ₽</div><div class="fin-s" id="finMs">текущий месяц</div></div>
+        <div class="fin-c inc"><div class="fin-l">Мой доход за год</div><div class="fin-v pv" id="finY">0 ₽</div><div class="fin-s" id="finYs">2026</div></div>
+        <div class="fin-c dbt"><div class="fin-l">Остатки долгов</div><div class="fin-v pv" id="finDbt">0 ₽</div><div class="fin-s">к получению</div></div>
+        <div class="fin-c"><div class="fin-l">Мой средний чек</div><div class="fin-v pv" id="finAvg">0 ₽</div><div class="fin-s" id="finAvgs">за все время</div></div>
+      </div>
       <div class="tbl-wrap" style="margin-top:10px;">
         <table class="tbl">
           <thead><tr><th>Дата</th><th>Клиент</th><th>Телефон</th><th>Услуги</th><th style="text-align:right;">Внесено</th><th style="text-align:right;">Долг</th></tr></thead>
@@ -473,21 +476,20 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     </div>
 
     <div id="secCerts" class="view" style="display:none;">
+      <div class="toolbar">
+        <span style="font-size:11px;color:var(--text3);font-weight:700;">СЕРТИФИКАТЫ SSL (300 шт.)</span>
+        <button class="tb-btn" style="margin-left:auto;color:var(--red);" onclick="resetCerts()"><i class="fa-solid fa-rotate-left"></i> Сбросить все</button>
+      </div>
       <div class="certs-wrap"><div class="cert-grid" id="certGrid"></div></div>
     </div>
 
     <div id="secAnalytics" class="view" style="display:none;">
       <div class="ana-wrap">
         <div class="ana-hd">
-          <div class="ana-c split-card">
-            <div class="split-half"><div class="ana-l">Мои записи</div><div class="ana-v" id="anaTotal">0</div><div class="ana-s">в базе</div></div>
-            <div class="split-divider"></div>
-            <div class="split-half"><div class="ana-l">Завершено</div><div class="ana-v" id="anaDone">0</div><div class="ana-s">работ</div></div>
-          </div>
-          <div class="ana-c"><div class="ana-l">Ожидается</div><div class="ana-v stat-pending" id="anaPending">0</div><div class="ana-s">будущих записей</div></div>
-          <div class="ana-c"><div class="ana-l">Остатки долгов</div><div class="ana-v pv" id="anaDbt">0 ₽</div><div class="ana-s">к получению</div></div>
-          <div class="ana-c"><div class="ana-l">Средний чек</div><div class="ana-v pv" id="anaAvg">0 ₽</div><div class="ana-s" id="anaAvgS">за все время</div></div>
-          <div class="ana-c"><div class="ana-l">Доход за год</div><div class="ana-v pv" id="anaYear">0 ₽</div><div class="ana-s" id="anaChYTxt">2026</div></div>
+          <div class="ana-c"><div class="ana-l">Мой средний чек</div><div class="ana-v pv" id="anaAvg">0 ₽</div><div class="ana-s" id="anaAvgS">за все время</div></div>
+          <div class="ana-c"><div class="ana-l">Мои записи</div><div class="ana-v" id="anaTotal">0</div><div class="ana-s">в базе</div></div>
+          <div class="ana-c"><div class="ana-l">Мой доход за год</div><div class="ana-v pv" id="anaYear">0 ₽</div><div class="ana-s" id="anaYearS">2026</div></div>
+          <div class="ana-c"><div class="ana-l">Завершено</div><div class="ana-v" id="anaDone">0</div><div class="ana-s">работ</div></div>
         </div>
         <div class="chart-s">
           <div class="chart-ttl">Мой доход по месяцам — <span id="anaChY">2026</span></div>
@@ -529,19 +531,25 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 <div class="mo" id="moRecord">
   <div class="mb" id="mbRecord">
-    <button class="modal-close-red" onclick="closeRecModal()"><i class="fa-solid fa-xmark"></i></button>
     <div class="mb-title" id="mbRecTitle">Новая запись</div>
     <div id="classicForm">
       <div class="f-row full">
         <div class="f-group"><div class="f-label">Дата</div><input type="date" id="fDate" class="f-inp"></div>
       </div>
-      <div class="f-row time-row">
+      <div class="f-row">
         <div class="f-group"><div class="f-label">Время (с)</div><input type="time" id="fTime" class="f-inp mono"></div>
         <div class="f-group"><div class="f-label">Время (до)</div><input type="time" id="fTimeEnd" class="f-inp mono"></div>
       </div>
       <div class="f-row">
         <div class="f-group"><div class="f-label">Имя клиента</div><input type="text" id="fName" class="f-inp" placeholder="Иван Иванов"></div>
         <div class="f-group"><div class="f-label">Телефон</div><input type="tel" id="fPhone" class="f-inp" placeholder="+7 900 000-00-00" inputmode="tel"></div>
+      </div>
+      <div class="f-row">
+        <div class="f-group"><div class="f-label">Название песни / проекта</div><input type="text" id="fSong" class="f-inp" placeholder="Название - Песня"></div>
+        <div class="f-group"><div class="f-label">Тип записи</div>
+          <select id="fType" class="f-inp">
+            </select>
+        </div>
       </div>
 
       <div class="color-pick-row">
@@ -553,12 +561,10 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <hr class="f-sep">
 
       <div id="svcModeWrap" style="display:none;margin-bottom:10px;">
-        <div class="services-header">
-          <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Добавить услуги</div>
-          <div style="display:flex;gap:6px;">
-            <div class="tb-btn on" id="svcModePreset" onclick="setSvcMode('preset')"><i class="fa-solid fa-bolt"></i> Быстрые пакеты</div>
-            <div class="tb-btn" id="svcModeManual" onclick="setSvcMode('manual')"><i class="fa-solid fa-pen"></i> Вручную</div>
-          </div>
+        <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;">Добавить услуги</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <div class="tb-btn on" id="svcModePreset" onclick="setSvcMode('preset')"><i class="fa-solid fa-bolt"></i> Быстрые пакеты</div>
+          <div class="tb-btn" id="svcModeManual" onclick="setSvcMode('manual')"><i class="fa-solid fa-pen"></i> Вручную</div>
         </div>
       </div>
 
@@ -636,6 +642,7 @@ const auth=firebase.auth();
 db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
 const SC=db.collection("sessions");
 const UC=db.collection("users");
+
 /* ===== PALETTE ===== */
 const PALETTE=[
   {id:'purple', hex:'#a099ff', bg:'rgba(124,111,255,0.18)', label:'Фиолет'},
@@ -656,6 +663,9 @@ const MNS=['ЯНВАРЬ','ФЕВРАЛЬ','МАРТ','АПРЕЛЬ','МАЙ','�
 const MNSh=['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
 const MNL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const DAYS_RU=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+
+/* МАСТЕР АККАУНТ ДЛЯ ИЗОЛЯЦИИ */
+const MASTER_PHONE = '79178382017'; 
 
 /* ===== STATE ===== */
 window.CRM=[];
@@ -685,19 +695,18 @@ function inputToDate(s){if(!s)return '';const[y,m,d]=s.split('-');return d+'.'+m
 function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
 
-/* ПРОВЕРКА ПРАВ: Это моя запись? Строго сверяем автора по номеру. */
-function isMyRecord(r) {
-  if (!window.PROFILE) return false;
-  const myPhone = norm(window.PROFILE.phone || '');
-  const rPhone = norm(r.authorPhone || '');
-  if (rPhone && myPhone) return rPhone === myPhone;
-  // Фолбэк на старые записи, если номера не было
-  return r.authorName === window.PROFILE.name;
-}
-
-/* Фильтр: Мои личные данные для Аналитики, Клиентов и Финансов */
+/* Умный фильтр данных: Возвращает только записи текущего пользователя */
 function getMyData() {
-  return window.CRM.filter(r => isMyRecord(r));
+  if (!window.PROFILE) return [];
+  const pPhone = norm(window.PROFILE.phone || '');
+  const isMaster = pPhone === MASTER_PHONE;
+  
+  return window.CRM.filter(r => {
+    if (isMaster) {
+      return !r.authorPhone || r.authorPhone === MASTER_PHONE || r.authorName === window.PROFILE.name;
+    }
+    return r.authorPhone === pPhone;
+  });
 }
 
 /* ===== COLOR PICKER INIT ===== */
@@ -748,6 +757,7 @@ window.doLogin=async function(){
   catch(e){let m='Неверный номер или пароль.';if(e.code==='auth/too-many-requests')m='Слишком много попыток.';showErr(m);}
   finally{btn.disabled=false;btn.textContent='Войти';}
 };
+
 window.doRegister=async function(){
   document.getElementById('authErr').style.display='none';
   const name=document.getElementById('regName').value.trim();
@@ -767,6 +777,7 @@ window.doRegister=async function(){
 };
 
 window.doLogout=function(){if(confirm('Выйти?'))auth.signOut();};
+
 auth.onAuthStateChanged(async(user)=>{
   if(user){
     let p=null;
@@ -933,6 +944,7 @@ function renderCalendar(){
     const numEl=isToday?`<div class="cal-day-hd-num today">${d.getDate()}</div>`:`<div class="cal-day-hd-num">${d.getDate()}</div>`;
     head.innerHTML+=`<div class="cal-day-hd"><div class="cal-day-hd-name">${DAY_NAMES[i]}</div>${numEl}</div>`;
   });
+
   const body=document.getElementById('calBody');
   body.innerHTML='';
 
@@ -947,11 +959,11 @@ function renderCalendar(){
   }
   body.appendChild(timeCol);
 
-  // Календарь показывает ВСЕ записи (чтобы не было пересечений), но править можно только свои
-  let data = window.CRM;
+  let data = getMyData();
 
   const byDate={};
   data.forEach(r=>{if(r.date&&r.time){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);}});
+
   days.forEach(d=>{
     const ds=dateStr(d);
     const col=document.createElement('div');
@@ -1012,11 +1024,13 @@ function renderCalendar(){
       evEl.style.background=pal.bg;
       evEl.style.borderLeft='3px solid '+color;
       evEl.style.opacity=isDone?'0.55':'1';
+
       const full=ev.fullTotal||ev.total||0;
       const paid=ev.total||0;
       const rest=Math.max(0,full-paid);
       
       const priceHTML = (paid>0) ? `<div class="cal-event-price pv" style="color:${color}bb">${paid.toLocaleString()}₽${rest>0?' · −'+rest.toLocaleString()+'₽':''}</div>` : '';
+      
       evEl.innerHTML=`
         <div class="cal-event-name" style="color:${color}">${ev.client||ev.song||'—'}</div>
         <div class="cal-event-svc" style="color:${color}99">${ev.services||ev.type||''}</div>
@@ -1033,6 +1047,7 @@ function renderCalendar(){
 
     body.appendChild(col);
   });
+
   setTimeout(()=>{
     const scrollTo=(HOURS_START===7?0:HOURS_START)*HOUR_H;
     body.scrollTop=Math.max(0,scrollTo);
@@ -1061,6 +1076,7 @@ function showEvPopup(ev,e){
   popupId=ev.id;
   const pop=document.getElementById('evPopup');
   document.getElementById('evPopName').textContent=ev.client||ev.song||'—';
+  
   const timeStr = (ev.time?' с '+ev.time:'') + (ev.timeEnd?' до '+ev.timeEnd:'');
   document.getElementById('evPopTime').textContent=(ev.date||'') + timeStr;
   
@@ -1069,6 +1085,7 @@ function showEvPopup(ev,e){
   const full=ev.fullTotal||ev.total||0;
   const paid=ev.total||0;
   const rest=Math.max(0,full-paid);
+  
   document.getElementById('evPopPrice').textContent=paid.toLocaleString()+' ₽'+(rest>0?' (долг '+rest.toLocaleString()+' ₽)':'');
   document.getElementById('evPopPrice').parentElement.style.display = 'flex';
 
@@ -1079,26 +1096,19 @@ function showEvPopup(ev,e){
 
   const color=ev.eventColor||window.PROFILE?.color||PALETTE[0].hex;
   pop.style.borderTop='3px solid '+color;
-  
-  // ПРОВЕРКА ПРАВ: Это моя запись?
-  const isMine = isMyRecord(ev);
-  
-  const actsBlock = document.querySelector('.ev-pop-acts');
-  if(isMine) {
-    actsBlock.style.display = 'flex';
-    document.getElementById('evBtnDone').style.display = isSound ? 'block' : 'none';
-    document.getElementById('evBtnPay').style.display = isSound ? 'block' : 'none';
-    document.getElementById('evBtnEdit').style.display = 'block';
-    document.getElementById('evBtnDel').style.display = 'block';
 
-    document.getElementById('evBtnDone').onclick=()=>{markDone(ev.id);closeEvPopup();};
-    document.getElementById('evBtnEdit').onclick=()=>{closeEvPopup();openEdit(ev.id);};
-    document.getElementById('evBtnPay').onclick=()=>{closeEvPopup();addPay(ev.id);};
-    document.getElementById('evBtnDel').onclick=()=>{closeEvPopup();delRec(ev.id);};
-  } else {
-    // Чужая запись - строго ничего нельзя делать
-    actsBlock.style.display = 'none';
-  }
+  const actsBlock = document.querySelector('.ev-pop-acts');
+  actsBlock.style.display = 'flex';
+  
+  document.getElementById('evBtnDone').style.display = isSound ? 'block' : 'none';
+  document.getElementById('evBtnPay').style.display = isSound ? 'block' : 'none';
+  document.getElementById('evBtnEdit').style.display = 'block';
+  document.getElementById('evBtnDel').style.display = 'block';
+
+  document.getElementById('evBtnDone').onclick=()=>{markDone(ev.id);closeEvPopup();};
+  document.getElementById('evBtnEdit').onclick=()=>{closeEvPopup();openEdit(ev.id);};
+  document.getElementById('evBtnPay').onclick=()=>{closeEvPopup();addPay(ev.id);};
+  document.getElementById('evBtnDel').onclick=()=>{closeEvPopup();delRec(ev.id);};
 
   const x=e.clientX;const y=e.clientY;
   const pw=240;const ph=180;
@@ -1134,6 +1144,7 @@ window.addPay=function(id){
     if(!isNaN(a)&&a>0){SC.doc(id).update({total:(row.total||0)+a});closeSM();}
   },rem);
 };
+
 /* ===== NEW / EDIT FORM ===== */
 function openNewFormOnDate(ds){
   openNewForm();
@@ -1152,6 +1163,7 @@ function openNewForm(){
   document.getElementById('fTimeEnd').value='';
   document.getElementById('fName').value='';
   document.getElementById('fPhone').value='';
+  document.getElementById('fSong').value='';
   document.getElementById('fComment').value='';
   document.getElementById('preToggle').checked=false;
   document.getElementById('certToggle').checked=false;
@@ -1188,6 +1200,19 @@ function setupFormMode(){
     setSvcMode('manual');
     document.getElementById('presetSvcs').style.display='none';
   }
+  
+  const typeSel = document.getElementById('fType');
+  typeSel.innerHTML = '';
+  const r = window.PROFILE?.role;
+  if(r === 'Звукорежиссёр') {
+    typeSel.innerHTML = '<option value="Студийная запись">🎧 Студийная запись</option>';
+  } else if(r === 'Вокал') {
+    typeSel.innerHTML = '<option value="Вокал">🎤 Вокал</option>';
+  } else if(r === 'Гитара') {
+    typeSel.innerHTML = '<option value="Гитара">🎸 Гитара</option>';
+  } else {
+    typeSel.innerHTML = '<option value="Студийная запись">🎧 Студийная запись</option><option value="Вокал">🎤 Вокал</option><option value="Гитара">🎸 Гитара</option><option value="Аранжировка">🎹 Аранжировка</option><option value="Сведение/Мастеринг">🔊 Сведение/Мастеринг</option><option value="Другое">📝 Другое</option>';
+  }
 }
 
 window.setSvcMode=function(m){
@@ -1211,6 +1236,7 @@ window.openEdit=function(id){
   document.getElementById('fTimeEnd').value=row.timeEnd||'';
   document.getElementById('fName').value=row.client||row.song||'';
   document.getElementById('fPhone').value=row.phone||'';
+  document.getElementById('fSong').value=row.song||'';
   document.getElementById('fComment').value=row.comment||'';
   document.getElementById('preToggle').checked=false;
   document.getElementById('certToggle').checked=false;
@@ -1218,6 +1244,8 @@ window.openEdit=function(id){
   setupFormColorPicker();
   renderFormSvcs();
   setupFormMode();
+  
+  if (row.type) { document.getElementById('fType').value = row.type; }
   
   const modal = document.getElementById('moRecord');
   modal.classList.add('open');
@@ -1258,6 +1286,7 @@ window.openPriceM=function(name,color,def){
     if(!isNaN(p)&&p>0){addPreSvc(name,p,color);closeSM();}
   },def);
 };
+
 /* ===== MANUAL SERVICES ===== */
 window.addManualSvc=function(){
   const n=document.getElementById('mSvcName').value.trim();
@@ -1303,6 +1332,7 @@ window.toggleCertMode=function(){
   const on=document.getElementById('certToggle').checked;
   document.getElementById('certPicker').style.display=on?'block':'none';
 };
+
 /* ===== SAVE RECORD ===== */
 window.saveRecord=async function(){
   const name=document.getElementById('fName').value.trim();
@@ -1311,8 +1341,8 @@ window.saveRecord=async function(){
   const time=document.getElementById('fTime').value||'';
   const timeEnd=document.getElementById('fTimeEnd').value||'';
   const phone=document.getElementById('fPhone').value.trim();
-  const song=name; // Автоматически используем имя как основу
-  const type="Услуга"; // Универсальный тип
+  const song=document.getElementById('fSong').value.trim()||name;
+  const type=document.getElementById('fType').value;
   const comment=document.getElementById('fComment').value.trim();
   
   const author=window.PROFILE?.name || '—';
@@ -1326,12 +1356,13 @@ window.saveRecord=async function(){
   const paid=details.reduce((s,i)=>s+i.price,0)||0;
   const useCert=document.getElementById('certToggle').checked;
   const certId=document.getElementById('certSelect').value;
+
   let duration = 60;
   if(time && timeEnd){
      const [h1,m1] = time.split(':').map(Number);
      const [h2,m2] = timeEnd.split(':').map(Number);
      duration = (h2 * 60 + m2) - (h1 * 60 + m1);
-     if(duration <= 0) duration = 60;
+     if(duration <= 0) duration = 60; 
   }
 
   const data={
@@ -1341,6 +1372,7 @@ window.saveRecord=async function(){
     authorName:author, authorUid, authorPhone, 
     eventColor, timestamp:Date.now(), completed:false
   };
+
   try{
     if(editId){await SC.doc(editId).update(data);}
     else{
@@ -1360,12 +1392,12 @@ function renderSessions(){
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
   
-  // Список (Журнал) показывает тоже ВСЕ записи студии
-  let data = window.CRM.filter(r=>{
+  let data = getMyData().filter(r=>{
     if(r.date&&r.date.includes(mk))return true;
     if(!r.completed)return true;
     return false;
   });
+  
   data.sort((a,b)=>{const pd=ds=>{const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d).getTime();};return pd(b.date)-pd(a.date);});
   
   body.innerHTML='';
@@ -1386,20 +1418,14 @@ function renderSessions(){
     const color=row.eventColor||PALETTE[0].hex;
     const statusBadge=isDone?'<span class="ss-badge ss-done">Готово</span>':rest>0?'<span class="ss-badge ss-debt">Долг −'+rest.toLocaleString()+'₽</span>':'<span class="ss-badge ss-work">В работе</span>';
     const roleTag=row.authorName?`<span class="role-tag">${row.authorName}</span>`:'';
+    
     const timeDisplay = row.time ? `${row.time} ${row.timeEnd ? '- ' + row.timeEnd : ''}` : '—';
 
-    // ПРОВЕРКА ПРАВ ДЛЯ ТАБЛИЦЫ: Свои могу менять, чужие только вижу
-    const isMine = isMyRecord(row);
     let actsHTML = '';
-    
-    if (isMine) {
-      actsHTML += isSound ? `<div class="act-ic g" title="Готово" onclick="markDone('${row.id}')"><i class="fa-solid fa-check"></i></div>` : '';
-      actsHTML += `<div class="act-ic b" title="Редактировать" onclick="openEdit('${row.id}')"><i class="fa-solid fa-pen"></i></div>`;
-      actsHTML += isSound ? `<div class="act-ic go" title="Доплата" onclick="addPay('${row.id}')"><i class="fa-solid fa-wallet"></i></div>` : '';
-      actsHTML += `<div class="act-ic r" title="Удалить" onclick="delRec('${row.id}')"><i class="fa-solid fa-trash"></i></div>`;
-    } else {
-      actsHTML += `<span style="font-size:10px;color:var(--text3);">Только просмотр</span>`;
-    }
+    actsHTML += isSound ? `<div class="act-ic g" title="Готово" onclick="markDone('${row.id}')"><i class="fa-solid fa-check"></i></div>` : '';
+    actsHTML += `<div class="act-ic b" title="Редактировать" onclick="openEdit('${row.id}')"><i class="fa-solid fa-pen"></i></div>`;
+    actsHTML += isSound ? `<div class="act-ic go" title="Доплата" onclick="addPay('${row.id}')"><i class="fa-solid fa-wallet"></i></div>` : '';
+    actsHTML += `<div class="act-ic r" title="Удалить" onclick="delRec('${row.id}')"><i class="fa-solid fa-trash"></i></div>`;
 
     const priceHTML = `<div class="pv">${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}</div>`;
 
@@ -1431,7 +1457,6 @@ function renderSessions(){
 function renderClients(){
   const grid=document.getElementById('clGrid');
   const map={};
-  // Клиенты считаются ТОЛЬКО по своим записям
   getMyData().forEach(r=>{
     const key=(r.client||r.song||'').split('-')[0].trim();
     if(!key)return;
@@ -1464,8 +1489,22 @@ function renderClients(){
 
 /* ===== FINANCE ===== */
 function renderFinance(){
-  // Показывает только СВОИ финансы
+  const now=new Date();
+  const mk=mKey(now);
   const myData = getMyData();
+
+  const mInc=myData.filter(r=>r.date&&r.date.includes(mk)).reduce((a,b)=>a+Number(b.total||0),0);
+  const yInc=myData.filter(r=>r.date&&r.date.endsWith('.'+now.getFullYear())).reduce((a,b)=>a+Number(b.total||0),0);
+  const debt=myData.reduce((a,b)=>a+Math.max(0,(b.fullTotal||b.total||0)-(b.total||0)),0);
+  const allP=myData.map(r=>Number(r.total||0)).filter(v=>v>0);
+  const avg=allP.length?Math.round(allP.reduce((a,b)=>a+b,0)/allP.length):0;
+  
+  document.getElementById('finM').textContent=mInc.toLocaleString()+' ₽';
+  document.getElementById('finY').textContent=yInc.toLocaleString()+' ₽';
+  document.getElementById('finDbt').textContent=debt.toLocaleString()+' ₽';
+  document.getElementById('finAvg').textContent=avg.toLocaleString()+' ₽';
+  document.getElementById('finAvgs').textContent='за '+allP.length+' записей';
+  
   const body=document.getElementById('finBody');body.innerHTML='';
   const sorted=[...myData].sort((a,b)=>b.timestamp-a.timestamp).slice(0,60);
   
@@ -1495,29 +1534,29 @@ function renderCerts(){
     grid.appendChild(c);
   }
 }
+window.resetCerts=async function(){
+  if(!confirm('Сбросить ВСЕ сертификаты?'))return;
+  const snap=await db.collection('certificates').get();
+  const batch=db.batch();snap.forEach(d=>batch.delete(d.ref));
+  await batch.commit();certSelId=null;
+};
 
 /* ===== ANALYTICS ===== */
 function renderAnalytics(){
   const now=new Date(),year=now.getFullYear();
-  // Аналитика считается только по СВОИМ записям
   const myData = getMyData();
 
   const allP=myData.map(r=>Number(r.total||0)).filter(v=>v>0);
   const avg=allP.length?Math.round(allP.reduce((a,b)=>a+b,0)/allP.length):0;
-  
-  const done=myData.filter(r=>r.completed).length;
-  const pending=myData.length - done;
-  const debt=myData.reduce((a,b)=>a+Math.max(0,(b.fullTotal||b.total||0)-(b.total||0)),0);
   const yInc=myData.filter(r=>r.date&&r.date.endsWith('.'+year)).reduce((a,b)=>a+Number(b.total||0),0);
+  const done=myData.filter(r=>r.completed).length;
   
   document.getElementById('anaAvg').textContent=avg.toLocaleString()+' ₽';
   document.getElementById('anaAvgS').textContent='за '+allP.length+' записей';
   document.getElementById('anaTotal').textContent=myData.length;
-  document.getElementById('anaDone').textContent=done;
-  document.getElementById('anaPending').textContent=pending;
-  document.getElementById('anaDbt').textContent=debt.toLocaleString()+' ₽';
   document.getElementById('anaYear').textContent=yInc.toLocaleString()+' ₽';
-  document.getElementById('anaChYTxt').textContent=year+' год';
+  document.getElementById('anaYearS').textContent=year+' год';
+  document.getElementById('anaDone').textContent=done;
   document.getElementById('anaChY').textContent=year;
   
   const monthly=Array(12).fill(0);
@@ -1531,6 +1570,7 @@ function renderAnalytics(){
     col.innerHTML=`<div class="bar-val pv">${v>0?(v>=1000?Math.round(v/1000)+'к':''+v):''}</div><div class="bar" style="height:${pct}px;background:${isCur?'#3ecf8e':'#7c6fff'}"></div><div class="bar-lbl">${MNSh[i]}</div>`;
     chart.appendChild(col);
   });
+
   const svcC={};
   myData.forEach(r=>{
     if(r.details)r.details.forEach(d=>{const k=d.name.replace(' (50%)','').trim();svcC[k]=(svcC[k]||0)+1;});
