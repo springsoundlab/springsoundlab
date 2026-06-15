@@ -28,15 +28,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;displ
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
-/* Блокировка скролла при открытых модалках */
-body.modal-open .cal-body,
-body.modal-open .tbl-wrap,
-body.modal-open .cl-grid,
-body.modal-open .certs-wrap,
-body.modal-open .ana-wrap {
-    overflow: hidden !important;
-    touch-action: none;
-}
+/* Блокировка скролла фона */
+body.modal-open { overflow: hidden; touch-action: none; }
 
 /* SIDEBAR */
 .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
@@ -54,14 +47,9 @@ body.modal-open .ana-wrap {
 .u-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .u-role{font-size:10px;color:var(--text3);}
 
-/* MAIN */
+/* MAIN & TOPBAR (только для мобилок) */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;}
-.stat-chip{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:var(--r-sm);font-size:11px;font-weight:600;}
-.chip-a{background:var(--accent-bg);color:var(--accent2);border:1px solid rgba(124,111,255,.2);}
-.chip-g{background:var(--green-bg);color:var(--green);border:1px solid rgba(62,207,142,.2);}
-.chip-gold{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(245,166,35,.2);cursor:pointer;}
-.topbar-date{font-size:11px;color:var(--text3);margin-left:auto;}
+.topbar{display:none; height:52px; background:var(--surface); border-bottom:1px solid var(--border); align-items:center; padding:0 18px; flex-shrink:0;}
 .content{flex:1;overflow:hidden;display:flex;}
 
 /* VIEWS */
@@ -69,16 +57,11 @@ body.modal-open .ana-wrap {
 
 /* TOOLBAR */
 .toolbar{padding:10px 18px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
-.search-box{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;min-width:200px;}
-.search-box input{background:none;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;width:160px;}
-.search-box input::placeholder{color:var(--text3);}
-.search-box i{color:var(--text3);font-size:11px;}
 .tb-btn{padding:6px 11px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap;}
 .tb-btn:hover{color:var(--text);border-color:var(--border2);}
 .tb-btn.green-btn{color:var(--green);border-color:rgba(62,207,142,.3);}
 .tb-btn.green-btn:hover{background:var(--green-bg);}
 
-/* ВЫПАДАЮЩЕЕ МЕНЮ СТАТУСОВ */
 .status-select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;font-size:11px;font-weight:600;outline:none;cursor:pointer;}
 .status-select:focus{border-color:var(--accent);}
 
@@ -206,12 +189,12 @@ body.modal-open .ana-wrap {
 .svc-rf{height:100%;border-radius:3px;}
 .svc-rc{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;min-width:24px;text-align:right;}
 
-/* MODAL OVERLAY */
-.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;align-items:center;justify-content:center;}
-.mo.open{display:flex;}
-.mb{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:22px;width:440px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+/* MODAL OVERLAY - ИСПРАВЛЕННЫЙ СКРОЛЛ */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;overflow-y:auto;padding:20px 10px;-webkit-overflow-scrolling:touch;}
+.mo.open{display:block;}
+.mb{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:22px;width:440px;max-width:100%;margin:0 auto 40px auto;box-shadow:0 20px 60px rgba(0,0,0,.5);}
 .mb-title{font-size:14px;font-weight:700;margin-bottom:16px;}
-.mb-sm{width:320px;}
+.mb-sm{width:320px;margin:auto;margin-top:30vh;}
 .mb-num-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:11px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:22px;text-align:center;outline:none;margin-bottom:14px;transition:.15s;}
 .mb-num-input:focus{border-color:var(--accent);}
 .mb-btns{display:flex;gap:7px;}
@@ -313,19 +296,15 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     flex-direction: column !important;
     border-right: 1px solid var(--border);
   }
-  .sidebar.mobile-open {
-    left: 0 !important; 
-  }
+  .sidebar.mobile-open { left: 0 !important; }
   body { display: flex !important; flex-direction: row !important;}
   .main { width: 100vw !important; margin-left: 0 !important; flex: 1 !important; }
-  .topbar { padding-left: 10px !important;}
+  .topbar { display: flex; padding-left: 10px !important;}
   .sb-logo-t, .sb-logo-s, .sb-user { display: flex !important; }
   .sb-nav { flex-direction: column !important; overflow-x: visible !important;}
   .nav-i { white-space: normal !important; }
   
   .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
-  .search-box { width: 100%; }
-  .search-box input { width: 100%;}
   .view-mode { width: 100%; }
   .view-mode .vm-btn { flex: 1; justify-content: center; text-align: center;}
   .mnav { width: 100%; justify-content: space-between; }
@@ -434,21 +413,15 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 <div class="main">
   <div class="topbar">
-    <div class="stat-chip chip-a" id="chipWrapP"><i class="fa-solid fa-circle" style="font-size:5px;"></i> <span id="chipP">0</span> в работе</div>
-    <div class="stat-chip chip-g" id="chipWrapD"><i class="fa-solid fa-check" style="font-size:9px;"></i> <span id="chipD">0</span> готово</div>
-    <div class="stat-chip chip-gold" onclick="togglePrivacy()" id="chipWrapM">
-      <i class="fa-solid fa-lock" style="font-size:9px;" id="pvIcon"></i>
-      <span id="chipM" style="filter:blur(5px)">0 ₽</span>
+    <div class="tb-btn" onclick="document.querySelector('.sidebar').classList.toggle('mobile-open')">
+      <i class="fa-solid fa-bars"></i> Меню
     </div>
-    <div class="topbar-date" id="tDate" style="margin-left: auto;"></div>
   </div>
 
   <div class="content" id="contentArea">
 
     <div id="secSessions" class="view">
       <div class="toolbar">
-        <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="srch" placeholder="Поиск по имени, телефону..." oninput="doFilter()"></div>
-        
         <select class="status-select" id="statusFilter" onchange="setFilt(this.value)">
           <option value="all">Всё вместе</option>
           <option value="work">⏳ В работе</option>
@@ -481,7 +454,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <table class="tbl">
             <thead><tr>
               <th style="width:88px;">Дата</th>
-              <th style="width:48px;">Время</th>
+              <th style="width:100px;">Время</th>
               <th>Клиент</th>
               <th>Телефон</th>
               <th>Услуги</th>
@@ -497,8 +470,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
     <div id="secClients" class="view" style="display:none;">
       <div class="toolbar">
-        <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="clSrch" placeholder="Поиск клиента..." oninput="doFilterCl()"></div>
-        <div style="margin-left:auto;font-size:11px;color:var(--text3);" id="clCount">0 клиентов</div>
+        <div style="font-size:11px;color:var(--text3);" id="clCount">0 клиентов</div>
       </div>
       <div class="cl-grid" id="clGrid"></div>
     </div>
@@ -569,9 +541,12 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   <div class="mb" id="mbRecord">
     <div class="mb-title" id="mbRecTitle">Новая запись</div>
     <div id="classicForm">
-      <div class="f-row">
+      <div class="f-row full">
         <div class="f-group"><div class="f-label">Дата</div><input type="date" id="fDate" class="f-inp"></div>
-        <div class="f-group"><div class="f-label">Время</div><input type="time" id="fTime" class="f-inp mono"></div>
+      </div>
+      <div class="f-row">
+        <div class="f-group"><div class="f-label">Время (с)</div><input type="time" id="fTime" class="f-inp mono"></div>
+        <div class="f-group"><div class="f-label">Время (до)</div><input type="time" id="fTimeEnd" class="f-inp mono"></div>
       </div>
       <div class="f-row">
         <div class="f-group"><div class="f-label">Имя клиента</div><input type="text" id="fName" class="f-inp" placeholder="Иван Иванов"></div>
@@ -581,13 +556,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         <div class="f-group"><div class="f-label">Название песни / проекта</div><input type="text" id="fSong" class="f-inp" placeholder="Название - Песня"></div>
         <div class="f-group"><div class="f-label">Тип записи</div>
           <select id="fType" class="f-inp">
-            <option value="Студийная запись">🎧 Студийная запись</option>
-            <option value="Вокал">🎤 Вокал</option>
-            <option value="Гитара">🎸 Гитара</option>
-            <option value="Аранжировка">🎹 Аранжировка</option>
-            <option value="Сведение/Мастеринг">🔊 Сведение/Мастеринг</option>
-            <option value="Другое">📝 Другое</option>
-          </select>
+            </select>
         </div>
       </div>
 
@@ -682,7 +651,7 @@ db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
 const SC=db.collection("sessions");
 const UC=db.collection("users");
 
-/* ===== PALETTE for role colors ===== */
+/* ===== PALETTE ===== */
 const PALETTE=[
   {id:'purple', hex:'#a099ff', bg:'rgba(124,111,255,0.18)', label:'Фиолет'},
   {id:'blue',   hex:'#3b9eff', bg:'rgba(59,158,255,0.18)',  label:'Синий'},
@@ -703,14 +672,16 @@ const MNSh=['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВ
 const MNL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const DAYS_RU=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 
+/* МАСТЕР АККАУНТ ДЛЯ ИЗОЛЯЦИИ */
+const MASTER_PHONE = '79178382017'; 
+
 /* ===== STATE ===== */
 window.CRM=[];
 window.PROFILE=null;
-window.ALL_USERS={}; // uid -> {name, role, color}
+window.ALL_USERS={};
 let calDate=new Date();
 let calWeekOffset=0;
 let filt='all';
-let srch='';
 let privacyOn=false;
 let certs={};
 let editId=null;
@@ -732,6 +703,22 @@ function dateToInput(ds){if(!ds)return '';const[d,m,y]=ds.split('.');return y+'-
 function inputToDate(s){if(!s)return '';const[y,m,d]=s.split('-');return d+'.'+m+'.'+y;}
 function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
+
+/* Умный фильтр данных: Возвращает только записи текущего пользователя */
+function getMyData() {
+  if (!window.PROFILE) return [];
+  const pPhone = norm(window.PROFILE.phone || '');
+  const isMaster = pPhone === MASTER_PHONE;
+  
+  return window.CRM.filter(r => {
+    // Если входит Мастер-аккаунт, он видит свои записи И все старые записи (в которых еще нет привязки к автору)
+    if (isMaster) {
+      return !r.authorPhone || r.authorPhone === MASTER_PHONE || r.authorName === window.PROFILE.name;
+    }
+    // Для всех новых/других преподавателей - строго только их данные
+    return r.authorPhone === pPhone;
+  });
+}
 
 /* ===== COLOR PICKER INIT ===== */
 function buildColorPicker(containerId, currentHex, onChange){
@@ -811,13 +798,8 @@ auth.onAuthStateChanged(async(user)=>{
     if(!p.color)p.color=PALETTE[0].hex;
     window.PROFILE=p;
     
-    // ПРОВЕРКА РОЛИ. Если Звукорежиссёр - показываем пакеты услуг и сертификаты.
     isSound=p.role==='Звукорежиссёр';
     document.getElementById('nav-certs').style.display = isSound ? 'flex' : 'none';
-    
-    // Скрываем чипсы "в работе" и "готово" для всех кроме Звукорежиссёра
-    document.getElementById('chipWrapP').style.display = isSound ? 'flex' : 'none';
-    document.getElementById('chipWrapD').style.display = isSound ? 'flex' : 'none';
 
     selectedFormColor=p.color;
     document.getElementById('uAv').textContent=(p.name||'?').trim()[0].toUpperCase();
@@ -838,7 +820,6 @@ auth.onAuthStateChanged(async(user)=>{
 
 /* ===== APP ===== */
 function startApp(){
-  updateDate();
   UC.onSnapshot(snap=>{
     window.ALL_USERS={};
     snap.forEach(d=>{window.ALL_USERS[d.id]={...d.data(),uid:d.id};});
@@ -849,12 +830,10 @@ function startApp(){
     renderAll();
   });
   db.collection('certificates').onSnapshot(snap=>{certs={};snap.forEach(d=>certs[d.id]=d.data());renderCerts();});
-  setInterval(updateDate,60000);
   setInterval(()=>{if(viewMode==='calendar')renderCalendar();},60000);
 }
 
 function renderAll(){
-  updateStats();
   const sec=document.querySelector('.nav-i.active')?.id?.replace('nav-','');
   if(sec==='sessions'){
     if(viewMode==='calendar')renderCalendar();
@@ -886,31 +865,14 @@ function goSec(s){
   renderAll();
 }
 
-/* ===== STATS ===== */
-function updateStats(){
-  // Изолируем статистику по автору
-  const myEvents = window.CRM.filter(r => r.authorName === window.PROFILE?.name);
-  
-  const done=myEvents.filter(r=>r.completed).length;
-  const pend=myEvents.filter(r=>!r.completed).length;
-  document.getElementById('chipD').textContent=done;
-  document.getElementById('chipP').textContent=pend;
-  
-  const mk=mKey(calDate);
-  const mSum=myEvents.filter(r=>r.date&&r.date.includes(mk)).reduce((a,b)=>a+Number(b.total||0),0);
-  document.getElementById('chipM').textContent=mSum.toLocaleString()+' ₽';
-  
-  if(!privacyOn)applyBlur();
-}
-
 /* ===== PRIVACY ===== */
-function applyBlur(){document.querySelectorAll('.pv').forEach(el=>el.style.filter='blur(7px)');document.getElementById('chipM').style.filter='blur(5px)';}
-function removeBlur(){document.querySelectorAll('.pv').forEach(el=>el.style.filter='none');document.getElementById('chipM').style.filter='none';}
+function applyBlur(){document.querySelectorAll('.pv').forEach(el=>el.style.filter='blur(7px)');}
+function removeBlur(){document.querySelectorAll('.pv').forEach(el=>el.style.filter='none');}
 window.togglePrivacy=function(){
-  if(privacyOn){privacyOn=false;applyBlur();document.getElementById('pvIcon').className='fa-solid fa-lock';return;}
+  if(privacyOn){privacyOn=false;applyBlur();return;}
   openSM('Пароль администратора','text',()=>{
     const p=document.getElementById('msInput').value;
-    if(p==='123'){privacyOn=true;removeBlur();document.getElementById('pvIcon').className='fa-solid fa-lock-open';closeSM();}
+    if(p==='123'){privacyOn=true;removeBlur();closeSM();}
     else alert('Неверный пароль');
   });
 };
@@ -957,7 +919,6 @@ function updateMnavLabel(){
     document.getElementById('mnavLbl').textContent=MNL[calDate.getMonth()]+' '+calDate.getFullYear();
   }
 }
-updateMnavLabel();
 
 /* ===== WEEK HELPERS ===== */
 function getWeekDays(){
@@ -979,7 +940,6 @@ window.setFilt=function(f){
   if(viewMode==='calendar')renderCalendar();
   else renderSessions();
 }
-window.doFilter=function(){srch=document.getElementById('srch').value.toLowerCase();if(viewMode==='calendar')renderCalendar();else renderSessions();};
 
 /* ===== LEGEND ===== */
 function renderLegend(){
@@ -1036,10 +996,11 @@ function renderCalendar(){
   }
   body.appendChild(timeCol);
 
-  let data=window.CRM;
+  // Изоляция данных
+  let data = getMyData();
+  
   if(filt==='work')data=data.filter(r=>!r.completed);
   if(filt==='done')data=data.filter(r=>r.completed);
-  if(srch)data=data.filter(r=>(r.client||'').toLowerCase().includes(srch)||((r.phone||'').includes(srch)));
 
   const byDate={};
   data.forEach(r=>{if(r.date&&r.time){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);}});
@@ -1109,9 +1070,7 @@ function renderCalendar(){
       const paid=ev.total||0;
       const rest=Math.max(0,full-paid);
       
-      // Скрываем чужие суммы если запись принадлежит другому преподавателю
-      const isOwner = ev.authorName === window.PROFILE?.name;
-      const priceHTML = (paid>0 && isOwner) ? `<div class="cal-event-price" style="color:${color}bb">${paid.toLocaleString()}₽${rest>0?' · −'+rest.toLocaleString()+'₽':''}</div>` : '';
+      const priceHTML = (paid>0) ? `<div class="cal-event-price" style="color:${color}bb">${paid.toLocaleString()}₽${rest>0?' · −'+rest.toLocaleString()+'₽':''}</div>` : '';
       
       evEl.innerHTML=`
         <div class="cal-event-name" style="color:${color}">${ev.client||ev.song||'—'}</div>
@@ -1142,20 +1101,18 @@ function showEvPopup(ev,e){
   popupId=ev.id;
   const pop=document.getElementById('evPopup');
   document.getElementById('evPopName').textContent=ev.client||ev.song||'—';
-  document.getElementById('evPopTime').textContent=(ev.date||'')+(ev.time?' в '+ev.time:'');
+  
+  const timeStr = (ev.time?' с '+ev.time:'') + (ev.timeEnd?' до '+ev.timeEnd:'');
+  document.getElementById('evPopTime').textContent=(ev.date||'') + timeStr;
+  
   document.getElementById('evPopSvc').textContent=ev.services||ev.type||'—';
   
-  const isOwner = ev.authorName === window.PROFILE?.name;
   const full=ev.fullTotal||ev.total||0;
   const paid=ev.total||0;
   const rest=Math.max(0,full-paid);
   
-  if (isOwner) {
-    document.getElementById('evPopPrice').textContent=paid.toLocaleString()+' ₽'+(rest>0?' (долг '+rest.toLocaleString()+' ₽)':'');
-    document.getElementById('evPopPrice').parentElement.style.display = 'flex';
-  } else {
-    document.getElementById('evPopPrice').parentElement.style.display = 'none';
-  }
+  document.getElementById('evPopPrice').textContent=paid.toLocaleString()+' ₽'+(rest>0?' (долг '+rest.toLocaleString()+' ₽)':'');
+  document.getElementById('evPopPrice').parentElement.style.display = 'flex';
 
   document.getElementById('evPopPhone').textContent=ev.phone||'—';
   const hasCom=!!(ev.comment);
@@ -1166,17 +1123,12 @@ function showEvPopup(ev,e){
   pop.style.borderTop='3px solid '+color;
 
   const actsBlock = document.querySelector('.ev-pop-acts');
+  actsBlock.style.display = 'flex';
   
-  if (!isOwner) {
-      actsBlock.style.display = 'none';
-  } else {
-      actsBlock.style.display = 'flex';
-      // Если Звукорежиссёр - показываем всё, иначе только Редактировать и Удалить
-      document.getElementById('evBtnDone').style.display = isSound ? 'block' : 'none';
-      document.getElementById('evBtnPay').style.display = isSound ? 'block' : 'none';
-      document.getElementById('evBtnEdit').style.display = 'block';
-      document.getElementById('evBtnDel').style.display = 'block';
-  }
+  document.getElementById('evBtnDone').style.display = isSound ? 'block' : 'none';
+  document.getElementById('evBtnPay').style.display = isSound ? 'block' : 'none';
+  document.getElementById('evBtnEdit').style.display = 'block';
+  document.getElementById('evBtnDel').style.display = 'block';
 
   document.getElementById('evBtnDone').onclick=()=>{markDone(ev.id);closeEvPopup();};
   document.getElementById('evBtnEdit').onclick=()=>{closeEvPopup();openEdit(ev.id);};
@@ -1197,7 +1149,6 @@ document.addEventListener('click',e=>{
 /* ===== ACTIONS ===== */
 window.markDone=function(id){
   const row=window.CRM.find(r=>r.id===id);if(!row)return;
-  if(row.authorName !== window.PROFILE?.name) return;
   const isC=!row.completed;
   const upd={completed:isC};
   if(isC){const full=Number(row.fullTotal||row.total||0);const paid=Number(row.total||0);const rem=full-paid;upd.completedDate=todayStr();if(rem>0){upd.completionPayment=rem;upd.total=full;}}
@@ -1205,14 +1156,11 @@ window.markDone=function(id){
 };
 
 window.delRec=function(id){
-  const row=window.CRM.find(r=>r.id===id);if(!row)return;
-  if(row.authorName !== window.PROFILE?.name) return;
   openSM('Удалить запись?','delete',()=>{SC.doc(id).delete();closeSM();});
 };
 
 window.addPay=function(id){
   const row=window.CRM.find(r=>r.id===id);if(!row)return;
-  if(row.authorName !== window.PROFILE?.name) return;
   const full=row.fullTotal||row.total||0;const rem=full-(row.total||0);
   if(rem<=0){alert('Уже полностью оплачено');return;}
   openSM('Доплата (остаток '+rem.toLocaleString()+' ₽)','number',()=>{
@@ -1236,19 +1184,23 @@ function openNewForm(){
   document.getElementById('mbRecTitle').textContent='Новая запись';
   document.getElementById('fDate').value=dateToInput(todayStr());
   document.getElementById('fTime').value='';
+  document.getElementById('fTimeEnd').value='';
   document.getElementById('fName').value='';
   document.getElementById('fPhone').value='';
   document.getElementById('fSong').value='';
-  document.getElementById('fType').value='Студийная запись';
   document.getElementById('fComment').value='';
   document.getElementById('preToggle').checked=false;
   document.getElementById('certToggle').checked=false;
   document.getElementById('certPicker').style.display='none';
+  
   setupFormColorPicker();
   renderFormSvcs();
   setupFormMode();
   populateCertSelect();
-  document.getElementById('moRecord').classList.add('open');
+  
+  const modal = document.getElementById('moRecord');
+  modal.classList.add('open');
+  modal.scrollTop = 0; // Принудительно открываем с самого верха окна
 }
 
 function setupFormColorPicker(){
@@ -1272,6 +1224,19 @@ function setupFormMode(){
     setSvcMode('manual');
     document.getElementById('presetSvcs').style.display='none';
   }
+  
+  const typeSel = document.getElementById('fType');
+  typeSel.innerHTML = '';
+  const r = window.PROFILE?.role;
+  if(r === 'Звукорежиссёр') {
+    typeSel.innerHTML = '<option value="Студийная запись">🎧 Студийная запись</option>';
+  } else if(r === 'Вокал') {
+    typeSel.innerHTML = '<option value="Вокал">🎤 Вокал</option>';
+  } else if(r === 'Гитара') {
+    typeSel.innerHTML = '<option value="Гитара">🎸 Гитара</option>';
+  } else {
+    typeSel.innerHTML = '<option value="Студийная запись">🎧 Студийная запись</option><option value="Вокал">🎤 Вокал</option><option value="Гитара">🎸 Гитара</option><option value="Аранжировка">🎹 Аранжировка</option><option value="Сведение/Мастеринг">🔊 Сведение/Мастеринг</option><option value="Другое">📝 Другое</option>';
+  }
 }
 
 window.setSvcMode=function(m){
@@ -1284,7 +1249,6 @@ window.setSvcMode=function(m){
 
 window.openEdit=function(id){
   const row=window.CRM.find(r=>r.id===id);if(!row)return;
-  if(row.authorName !== window.PROFILE?.name) return;
   document.body.classList.add('modal-open');
   editId=id;
   formDetails=row.details?JSON.parse(JSON.stringify(row.details)):[];
@@ -1293,10 +1257,10 @@ window.openEdit=function(id){
   document.getElementById('mbRecTitle').textContent='Редактирование записи';
   document.getElementById('fDate').value=dateToInput(row.date||'');
   document.getElementById('fTime').value=row.time||'';
+  document.getElementById('fTimeEnd').value=row.timeEnd||'';
   document.getElementById('fName').value=row.client||row.song||'';
   document.getElementById('fPhone').value=row.phone||'';
   document.getElementById('fSong').value=row.song||'';
-  document.getElementById('fType').value=row.type||'Студийная запись';
   document.getElementById('fComment').value=row.comment||'';
   document.getElementById('preToggle').checked=false;
   document.getElementById('certToggle').checked=false;
@@ -1304,7 +1268,12 @@ window.openEdit=function(id){
   setupFormColorPicker();
   renderFormSvcs();
   setupFormMode();
-  document.getElementById('moRecord').classList.add('open');
+  
+  if (row.type) { document.getElementById('fType').value = row.type; }
+  
+  const modal = document.getElementById('moRecord');
+  modal.classList.add('open');
+  modal.scrollTop = 0; // Принудительно открываем с самого верха окна
 };
 
 window.closeRecModal=function(){
@@ -1393,11 +1362,16 @@ window.saveRecord=async function(){
   if(!name){alert('Введите имя клиента');return;}
   const date=inputToDate(document.getElementById('fDate').value)||todayStr();
   const time=document.getElementById('fTime').value||'';
+  const timeEnd=document.getElementById('fTimeEnd').value||'';
   const phone=document.getElementById('fPhone').value.trim();
   const song=document.getElementById('fSong').value.trim()||name;
   const type=document.getElementById('fType').value;
   const comment=document.getElementById('fComment').value.trim();
-  const author=(window.PROFILE&&window.PROFILE.name)||'—';
+  
+  const author=window.PROFILE?.name || '—';
+  const authorUid=window.PROFILE?.uid || '';
+  const authorPhone=window.PROFILE ? norm(window.PROFILE.phone) : '';
+  
   const eventColor=selectedFormColor||window.PROFILE?.color||PALETTE[0].hex;
   const details=JSON.parse(JSON.stringify(formDetails));
   const svcsLabel=details.length?details.map(i=>i.name).join(', '):type;
@@ -1406,7 +1380,22 @@ window.saveRecord=async function(){
   const useCert=document.getElementById('certToggle').checked;
   const certId=document.getElementById('certSelect').value;
 
-  const data={date,time,client:name,song,phone,type,services:svcsLabel,details,total:paid,fullTotal:fullT,comment,authorName:author,eventColor,timestamp:Date.now(),completed:false};
+  // Высчитываем длительность
+  let duration = 60;
+  if(time && timeEnd){
+     const [h1,m1] = time.split(':').map(Number);
+     const [h2,m2] = timeEnd.split(':').map(Number);
+     duration = (h2 * 60 + m2) - (h1 * 60 + m1);
+     if(duration <= 0) duration = 60; 
+  }
+
+  const data={
+    date, time, timeEnd, duration,
+    client:name, song, phone, type, services:svcsLabel, details, 
+    total:paid, fullTotal:fullT, comment, 
+    authorName:author, authorUid, authorPhone, 
+    eventColor, timestamp:Date.now(), completed:false
+  };
 
   try{
     if(editId){await SC.doc(editId).update(data);}
@@ -1426,15 +1415,17 @@ function renderSessions(){
   const now=new Date();now.setHours(0,0,0,0);
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
-  let data=window.CRM.filter(r=>{
+  
+  let data = getMyData().filter(r=>{
     if(r.date&&r.date.includes(mk))return true;
     if(!r.completed)return true;
     return false;
   });
+  
   if(filt==='work')data=data.filter(r=>!r.completed);
   if(filt==='done')data=data.filter(r=>r.completed);
-  if(srch)data=data.filter(r=>(r.client||r.song||'').toLowerCase().includes(srch)||((r.phone||'').includes(srch)));
   data.sort((a,b)=>{const pd=ds=>{const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d).getTime();};return pd(b.date)-pd(a.date);});
+  
   body.innerHTML='';
   if(!data.length){body.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
   data.forEach(row=>{
@@ -1443,32 +1434,30 @@ function renderSessions(){
     const rest=Math.max(0,full-paid);
     const perc=full>0?Math.min((paid/full)*100,100):0;
     const isDone=row.completed||perc>=100;
-    const isOwner = row.authorName === window.PROFILE?.name;
 
     let showT=true;
     if(row.time&&row.date===todS){const[h,m]=row.time.split(':').map(Number);if(curH>=h*60+m)showT=false;}
     else if(row.date!==todS){const[d,mo,y]=row.date.split('.').map(Number);if(new Date(y,mo-1,d)<now)showT=false;}
+    
     const tr=document.createElement('tr');
     if(isDone)tr.classList.add('done-row');
     const color=row.eventColor||PALETTE[0].hex;
     const statusBadge=isDone?'<span class="ss-badge ss-done">Готово</span>':rest>0?'<span class="ss-badge ss-debt">Долг −'+rest.toLocaleString()+'₽</span>':'<span class="ss-badge ss-work">В работе</span>';
     const roleTag=row.authorName?`<span class="role-tag">${row.authorName}</span>`:'';
+    
+    const timeDisplay = row.time ? `${row.time} ${row.timeEnd ? '- ' + row.timeEnd : ''}` : '—';
 
     let actsHTML = '';
-    if (isOwner) {
-        actsHTML += isSound ? `<div class="act-ic g" title="Готово" onclick="markDone('${row.id}')"><i class="fa-solid fa-check"></i></div>` : '';
-        actsHTML += `<div class="act-ic b" title="Редактировать" onclick="openEdit('${row.id}')"><i class="fa-solid fa-pen"></i></div>`;
-        actsHTML += isSound ? `<div class="act-ic go" title="Доплата" onclick="addPay('${row.id}')"><i class="fa-solid fa-wallet"></i></div>` : '';
-        actsHTML += `<div class="act-ic r" title="Удалить" onclick="delRec('${row.id}')"><i class="fa-solid fa-trash"></i></div>`;
-    } else {
-        actsHTML = `<span style="font-size:9px;color:var(--text3);">Нет доступа</span>`;
-    }
+    actsHTML += isSound ? `<div class="act-ic g" title="Готово" onclick="markDone('${row.id}')"><i class="fa-solid fa-check"></i></div>` : '';
+    actsHTML += `<div class="act-ic b" title="Редактировать" onclick="openEdit('${row.id}')"><i class="fa-solid fa-pen"></i></div>`;
+    actsHTML += isSound ? `<div class="act-ic go" title="Доплата" onclick="addPay('${row.id}')"><i class="fa-solid fa-wallet"></i></div>` : '';
+    actsHTML += `<div class="act-ic r" title="Удалить" onclick="delRec('${row.id}')"><i class="fa-solid fa-trash"></i></div>`;
 
-    const priceHTML = isOwner ? `${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}` : '—';
+    const priceHTML = `${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}`;
 
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${row.date||'—'}</div></td>
-      <td data-label="Время"><div class="td-time" style="color:${color}">${row.time&&showT?row.time:'—'}</div></td>
+      <td data-label="Время"><div class="td-time" style="color:${color}">${showT?timeDisplay:'—'}</div></td>
       <td data-label="Клиент">
         <div style="display:flex;align-items:center;gap:6px;">
           <div style="width:3px;height:28px;border-radius:2px;background:${color};flex-shrink:0;"></div>
@@ -1493,9 +1482,8 @@ function renderSessions(){
 /* ===== CLIENTS ===== */
 function renderClients(){
   const grid=document.getElementById('clGrid');
-  const s=(document.getElementById('clSrch')?.value||'').toLowerCase();
   const map={};
-  window.CRM.forEach(r=>{
+  getMyData().forEach(r=>{
     const key=(r.client||r.song||'').split('-')[0].trim();
     if(!key)return;
     if(!map[key])map[key]={name:key,phone:r.phone||'',visits:0,total:0,last:'',types:{},color:r.eventColor||PALETTE[0].hex};
@@ -1505,7 +1493,7 @@ function renderClients(){
     if(r.phone&&!map[key].phone)map[key].phone=r.phone;
     const t=r.type||'Другое';map[key].types[t]=(map[key].types[t]||0)+1;
   });
-  let cls=Object.values(map).filter(c=>!s||c.name.toLowerCase().includes(s)||c.phone.includes(s)).sort((a,b)=>b.visits-a.visits);
+  let cls=Object.values(map).sort((a,b)=>b.visits-a.visits);
   document.getElementById('clCount').textContent=cls.length+' клиентов';
   grid.innerHTML='';
   if(!cls.length){grid.innerHTML='<div style="color:var(--text3);font-size:12px;padding:18px;">Нет клиентов</div>';return;}
@@ -1523,14 +1511,12 @@ function renderClients(){
     grid.appendChild(card);
   });
 }
-window.doFilterCl=function(){renderClients();};
 
 /* ===== FINANCE ===== */
 function renderFinance(){
   const now=new Date();
   const mk=mKey(now);
-  // Строгая фильтрация по имени автора для финансов
-  const myData = window.CRM.filter(r => r.authorName === window.PROFILE?.name);
+  const myData = getMyData();
 
   const mInc=myData.filter(r=>r.date&&r.date.includes(mk)).reduce((a,b)=>a+Number(b.total||0),0);
   const yInc=myData.filter(r=>r.date&&r.date.endsWith('.'+now.getFullYear())).reduce((a,b)=>a+Number(b.total||0),0);
@@ -1583,8 +1569,7 @@ window.resetCerts=async function(){
 /* ===== ANALYTICS ===== */
 function renderAnalytics(){
   const now=new Date(),year=now.getFullYear();
-  // Фильтрация данных по автору
-  const myData = window.CRM.filter(r => r.authorName === window.PROFILE?.name);
+  const myData = getMyData();
 
   const allP=myData.map(r=>Number(r.total||0)).filter(v=>v>0);
   const avg=allP.length?Math.round(allP.reduce((a,b)=>a+b,0)/allP.length):0;
@@ -1653,52 +1638,14 @@ window.closeSM=closeSM;
 document.getElementById('moSimple').onclick=function(e){if(e.target===this)closeSM();};
 document.getElementById('moRecord').onclick=function(e){if(e.target===this)closeRecModal();};
 
-/* ===== DATE ===== */
-function updateDate(){
-  const d=new Date();
-  const days=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-  document.getElementById('tDate').textContent=days[d.getDay()]+', '+d.toLocaleDateString('ru-RU');
-}
-
 /* ===== OFFLINE ===== */
 function updOff(){document.getElementById('offBar').style.display=navigator.onLine?'none':'block';}
 window.addEventListener('online',updOff);window.addEventListener('offline',updOff);updOff();
 
 /* ===== МОБИЛЬНОЕ МЕНЮ И СВАЙПЫ ===== */
 document.addEventListener('DOMContentLoaded', () => {
-  const topbar = document.querySelector('.topbar');
   const sidebar = document.querySelector('.sidebar');
-  if (topbar && sidebar) {
-    const toggleBtn = document.createElement('div');
-    toggleBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
-    toggleBtn.className = 'tb-btn';
-    toggleBtn.style.marginRight = '10px';
-    toggleBtn.style.padding = '8px 12px';
-    toggleBtn.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
-    
-    topbar.insertBefore(toggleBtn, topbar.firstChild);
-
-    toggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      sidebar.classList.toggle('mobile-open');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (window.innerWidth <= 768 && sidebar.classList.contains('mobile-open')) {
-        if (!sidebar.contains(e.target) && e.target !== toggleBtn) {
-          sidebar.classList.remove('mobile-open');
-        }
-      }
-    });
-
-    window.addEventListener('resize', () => {
-      toggleBtn.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
-      if (window.innerWidth > 768) {
-        sidebar.classList.remove('mobile-open');
-      }
-    });
-    
-    // Свайп влево для закрытия
+  if (sidebar) {
     let touchstartX = 0;
     let touchendX = 0;
 
@@ -1708,7 +1655,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sidebar.addEventListener('touchend', e => {
         touchendX = e.changedTouches[0].screenX;
-        if (touchstartX - touchendX > 40) { // Свайп влево
+        if (touchstartX - touchendX > 40) { 
             sidebar.classList.remove('mobile-open');
         }
     }, {passive: true});
