@@ -289,15 +289,50 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 /* OFFLINE */
 #offBar{display:none;position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:6px;z-index:999999;}
 
-/* MOBILE */
+/* MOBILE — ОБНОВЛЕННАЯ СЕКЦИЯ */
 @media(max-width:768px){
-  body{flex-direction:column;}
-  .sidebar{width:100%;flex-direction:row;height:52px;border-right:none;border-bottom:1px solid var(--border);}
-  .sb-logo{border-bottom:none;border-right:1px solid var(--border);padding:10px 12px;}
-  .sb-logo-t,.sb-logo-s{display:none;}
-  .sb-nav{flex-direction:row;padding:6px;overflow-x:auto;}
-  .nav-i{padding:7px 10px;white-space:nowrap;}
-  .sb-user{display:none;}
+  body {
+    flex-direction: row !important; /* Оставляем горизонтальную сетку ПК-версии */
+  }
+  
+  /* Прячем боковое меню (sidebar) за левый край экрана */
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: -240px; /* Полностью скрыто за экраном */
+    width: 240px !important;
+    height: 100vh !important;
+    z-index: 99999 !important;
+    transition: left 0.3s ease-in-out;
+    border-right: 1px solid var(--border);
+    flex-direction: column !important; /* Возвращаем вертикальный вид меню */
+    box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+  }
+  
+  /* Класс, который будет выдвигать меню */
+  .sidebar.mobile-open {
+    left: 0 !important;
+  }
+
+  /* Возвращаем элементам внутри меню их стандартный вид */
+  .sb-logo-t, .sb-logo-s, .sb-user {
+    display: flex !important; 
+  }
+  .sb-nav {
+    flex-direction: column !important;
+    overflow-x: visible !important;
+  }
+  .nav-i {
+    white-space: nowrap !important;
+  }
+
+  /* Основной контент (main) теперь растягивается на 100% ширины телефона */
+  .main {
+    width: 100vw !important;
+    flex: 1 !important;
+  }
+
+  /* Сохраняем твои оригинальные настройки адаптации таблиц и карточек */
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
   .cl-grid{grid-template-columns:1fr 1fr;}
@@ -1547,5 +1582,49 @@ function updateDate(){
 function updOff(){document.getElementById('offBar').style.display=navigator.onLine?'none':'block';}
 window.addEventListener('online',updOff);window.addEventListener('offline',updOff);updOff();
 </script>
+  /* ЛОГИКА ДЛЯ МОБИЛЬНОГО МЕНЮ (СПРЯТАТЬ/ПОКАЗАТЬ) */
+document.addEventListener('DOMContentLoaded', () => {
+  const topbar = document.querySelector('.topbar');
+  const sidebar = document.querySelector('.sidebar');
+  
+  if (topbar && sidebar) {
+    // Создаем кнопку гамбургера
+    const toggleBtn = document.createElement('button');
+    toggleBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+    toggleBtn.className = 'tb-btn'; // Используем твой готовый класс для стильных кнопок
+    toggleBtn.style.marginRight = '12px';
+    toggleBtn.style.padding = '6px 12px';
+    toggleBtn.style.fontSize = '14px';
+    
+    // Показываем кнопку только на мобильных (меньше 768px)
+    toggleBtn.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+    
+    // Вставляем кнопку в самое начало топбара (перед заголовком)
+    topbar.insertBefore(toggleBtn, topbar.firstChild);
+    
+    // Открытие/закрытие по клику на гамбургер
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle('mobile-open');
+    });
+    
+    // Закрываем меню, если кликнули в любую другую точку экрана
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768 && sidebar.classList.contains('mobile-open')) {
+        if (!sidebar.contains(e.target) && e.target !== toggleBtn) {
+          sidebar.classList.remove('mobile-open');
+        }
+      }
+    });
+    
+    // Следим за изменением размера экрана (например, перевернули телефон)
+    window.addEventListener('resize', () => {
+      toggleBtn.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('mobile-open');
+      }
+    });
+  }
+});
 </body>
 </html>
