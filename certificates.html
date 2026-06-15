@@ -28,6 +28,16 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;displ
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
+/* Блокировка скролла при открытых модалках */
+body.modal-open .cal-body,
+body.modal-open .tbl-wrap,
+body.modal-open .cl-grid,
+body.modal-open .certs-wrap,
+body.modal-open .ana-wrap {
+    overflow: hidden !important;
+    touch-action: none;
+}
+
 /* SIDEBAR */
 .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
 .sb-logo{display:flex;align-items:center;gap:10px;padding:18px 14px 14px;border-bottom:1px solid var(--border);}
@@ -47,12 +57,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;displ
 /* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;}
-.topbar-title{font-size:14px;font-weight:600;flex:1;}
 .stat-chip{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:var(--r-sm);font-size:11px;font-weight:600;}
 .chip-a{background:var(--accent-bg);color:var(--accent2);border:1px solid rgba(124,111,255,.2);}
 .chip-g{background:var(--green-bg);color:var(--green);border:1px solid rgba(62,207,142,.2);}
 .chip-gold{background:var(--gold-bg);color:var(--gold);border:1px solid rgba(245,166,35,.2);cursor:pointer;}
-.topbar-date{font-size:11px;color:var(--text3);}
+.topbar-date{font-size:11px;color:var(--text3);margin-left:auto;}
 .content{flex:1;overflow:hidden;display:flex;}
 
 /* VIEWS */
@@ -78,9 +87,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;displ
 .mnav-btn:hover{color:var(--text);border-color:var(--border2);}
 .mnav-label{font-size:12px;font-weight:600;min-width:96px;text-align:center;}
 
-/* ============================================================
-   CALENDAR VIEW
-   ============================================================ */
+/* CALENDAR VIEW */
 .cal-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .cal-head{display:grid;grid-template-columns:56px repeat(7,1fr);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
 .cal-head-time{border-right:1px solid var(--border);}
@@ -108,7 +115,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;displ
 .legend-item{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--text2);}
 .legend-dot{width:8px;height:8px;border-radius:3px;}
 
-/* TABLE (classic list) */
+/* TABLE */
 .tbl-wrap{flex:1;overflow-y:auto;}
 .tbl{width:100%;border-collapse:collapse;font-size:12px;}
 .tbl th{padding:9px 14px;text-align:left;font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
@@ -282,7 +289,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 .auth-err{background:var(--red-bg);color:var(--red);font-size:11px;font-weight:600;padding:8px 10px;border-radius:var(--r-sm);margin-bottom:10px;display:none;border:1px solid rgba(255,92,106,.2);}
 .auth-hint{font-size:10px;color:var(--text3);text-align:center;margin-top:12px;}
 
-/* VIEW MODE SWITCH in toolbar */
+/* VIEW MODE SWITCH */
 .view-mode{display:flex;background:var(--surface2);border-radius:var(--r-sm);padding:2px;gap:2px;border:1px solid var(--border);}
 .vm-btn{padding:4px 9px;border-radius:5px;cursor:pointer;font-size:10px;font-weight:700;color:var(--text3);transition:.15s;display:flex;align-items:center;gap:4px;}
 .vm-btn.active{background:var(--surface3);color:var(--text);}
@@ -291,7 +298,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 /* OFFLINE */
 #offBar{display:none;position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:6px;z-index:999999;}
 
-/* MOBILE АДАПТАЦИЯ (Включая iPhone SE) */
+/* MOBILE АДАПТАЦИЯ */
 @media(max-width:768px){
   .sidebar {
     position: fixed !important;
@@ -309,30 +316,28 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .sidebar.mobile-open {
     left: 0 !important; 
   }
-  body { display: flex !important; flex-direction: row !important; }
+  body { display: flex !important; flex-direction: row !important;}
   .main { width: 100vw !important; margin-left: 0 !important; flex: 1 !important; }
-  .topbar { padding-left: 10px !important; }
+  .topbar { padding-left: 10px !important;}
   .sb-logo-t, .sb-logo-s, .sb-user { display: flex !important; }
-  .sb-nav { flex-direction: column !important; overflow-x: visible !important; }
+  .sb-nav { flex-direction: column !important; overflow-x: visible !important;}
   .nav-i { white-space: normal !important; }
   
-  /* Адаптация верхнего тулбара */
   .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
   .search-box { width: 100%; }
-  .search-box input { width: 100%; }
+  .search-box input { width: 100%;}
   .view-mode { width: 100%; }
-  .view-mode .vm-btn { flex: 1; justify-content: center; text-align: center; }
+  .view-mode .vm-btn { flex: 1; justify-content: center; text-align: center;}
   .mnav { width: 100%; justify-content: space-between; }
   #statusFilter { width: 100%; }
-  .tb-btn { justify-content: center; }
+  .tb-btn { justify-content: center;}
 
-  /* Карточный вид таблиц для телефона */
-  .tbl thead { display: none; }
+  .tbl thead { display: none;}
   .tbl tr { display: flex; flex-direction: column; background: var(--surface2); margin-bottom: 12px; border-radius: var(--r); padding: 12px; border: 1px solid var(--border); }
   .tbl td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); text-align: right; }
   .tbl td:last-child { border-bottom: none; }
   .tbl td::before { content: attr(data-label); color: var(--text3); font-weight: 700; font-size: 10px; text-transform: uppercase; margin-right: 10px; text-align: left; }
-  .td-acts { justify-content: flex-end; width: 100%; }
+  .td-acts { justify-content: flex-end; width: 100%;}
   
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
@@ -341,7 +346,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .cal-body{grid-template-columns:36px repeat(7,1fr);}
   .cal-event-svc,.cal-event-price{display:none;}
   
-  /* Окна пароля и форм */
   #moSimple .mb { width: 95vw !important; padding: 15px; }
   .mb-num-input { font-size: 18px; }
 }
@@ -377,6 +381,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">Регистрация</div>
     </div>
     <div class="auth-err" id="authErr"></div>
+    
     <div id="loginForm">
       <div class="auth-lbl">Номер телефона</div>
       <input type="tel" id="loginPhone" class="auth-inp" placeholder="+7 900 000-00-00" inputmode="tel">
@@ -399,6 +404,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       </div>
       <div class="auth-lbl">Цвет в календаре</div>
       <div id="regColorPick" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"></div>
+      
       <button class="auth-btn" id="regBtn" onclick="doRegister()">Создать аккаунт</button>
     </div>
     <div class="auth-hint">Для регистрации обратитесь к администратору студии.</div>
@@ -418,6 +424,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     <div class="nav-i" onclick="goSec('certs')" id="nav-certs"><i class="fa-solid fa-gift"></i> Сертификаты</div>
     <div class="nav-i" onclick="goSec('analytics')" id="nav-analytics"><i class="fa-solid fa-chart-simple"></i> Аналитика</div>
   </div>
+ 
   <div class="sb-user" onclick="doLogout()" title="Выйти">
     <div class="u-av" id="uAv">А</div>
     <div style="flex:1;min-width:0;"><div class="u-name" id="uName">—</div><div class="u-role" id="uRole">—</div></div>
@@ -427,14 +434,13 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title" id="topTitle">Журнал записей</div>
-    <div class="stat-chip chip-a"><i class="fa-solid fa-circle" style="font-size:5px;"></i> <span id="chipP">0</span> в работе</div>
-    <div class="stat-chip chip-g"><i class="fa-solid fa-check" style="font-size:9px;"></i> <span id="chipD">0</span> готово</div>
-    <div class="stat-chip chip-gold" onclick="togglePrivacy()" id="chipMW">
+    <div class="stat-chip chip-a" id="chipWrapP"><i class="fa-solid fa-circle" style="font-size:5px;"></i> <span id="chipP">0</span> в работе</div>
+    <div class="stat-chip chip-g" id="chipWrapD"><i class="fa-solid fa-check" style="font-size:9px;"></i> <span id="chipD">0</span> готово</div>
+    <div class="stat-chip chip-gold" onclick="togglePrivacy()" id="chipWrapM">
       <i class="fa-solid fa-lock" style="font-size:9px;" id="pvIcon"></i>
       <span id="chipM" style="filter:blur(5px)">0 ₽</span>
     </div>
-    <div class="topbar-date" id="tDate"></div>
+    <div class="topbar-date" id="tDate" style="margin-left: auto;"></div>
   </div>
 
   <div class="content" id="contentArea">
@@ -454,6 +460,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <div class="vm-btn active" id="vmCal" onclick="setViewMode('calendar')"><i class="fa-regular fa-calendar"></i> Календарь</div>
           <div class="vm-btn" id="vmList" onclick="setViewMode('list')"><i class="fa-solid fa-list"></i> Список</div>
         </div>
+       
         <div class="mnav">
           <div class="mnav-btn" onclick="changeDateScope('month', -1)" title="Месяц назад"><i class="fa-solid fa-angles-left"></i></div>
           <div class="mnav-btn" onclick="changeDateScope('week', -1)" title="Неделя назад"><i class="fa-solid fa-angle-left"></i></div>
@@ -498,10 +505,10 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
     <div id="secFinance" class="view" style="display:none;">
       <div class="fin-cards">
-        <div class="fin-c inc"><div class="fin-l">Доход за месяц</div><div class="fin-v pv" id="finM">0 ₽</div><div class="fin-s" id="finMs">текущий месяц</div></div>
-        <div class="fin-c inc"><div class="fin-l">Доход за год</div><div class="fin-v pv" id="finY">0 ₽</div><div class="fin-s" id="finYs">2026</div></div>
-        <div class="fin-c dbt"><div class="fin-l">Долги</div><div class="fin-v" id="finDbt">0 ₽</div><div class="fin-s">к получению</div></div>
-        <div class="fin-c"><div class="fin-l">Средний чек</div><div class="fin-v pv" id="finAvg">0 ₽</div><div class="fin-s" id="finAvgs">за все время</div></div>
+        <div class="fin-c inc"><div class="fin-l">Мой доход за месяц</div><div class="fin-v pv" id="finM">0 ₽</div><div class="fin-s" id="finMs">текущий месяц</div></div>
+        <div class="fin-c inc"><div class="fin-l">Мой доход за год</div><div class="fin-v pv" id="finY">0 ₽</div><div class="fin-s" id="finYs">2026</div></div>
+        <div class="fin-c dbt"><div class="fin-l">Мои долги</div><div class="fin-v" id="finDbt">0 ₽</div><div class="fin-s">к получению</div></div>
+        <div class="fin-c"><div class="fin-l">Мой средний чек</div><div class="fin-v pv" id="finAvg">0 ₽</div><div class="fin-s" id="finAvgs">за все время</div></div>
       </div>
       <div class="tbl-wrap" style="margin-top:10px;">
         <table class="tbl">
@@ -522,17 +529,17 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     <div id="secAnalytics" class="view" style="display:none;">
       <div class="ana-wrap">
         <div class="ana-hd">
-          <div class="ana-c"><div class="ana-l">Средний чек</div><div class="ana-v pv" id="anaAvg">0 ₽</div><div class="ana-s" id="anaAvgS">за все время</div></div>
-          <div class="ana-c"><div class="ana-l">Всего записей</div><div class="ana-v" id="anaTotal">0</div><div class="ana-s">в базе</div></div>
-          <div class="ana-c"><div class="ana-l">Доход за год</div><div class="ana-v pv" id="anaYear">0 ₽</div><div class="ana-s" id="anaYearS">2026</div></div>
+          <div class="ana-c"><div class="ana-l">Мой средний чек</div><div class="ana-v pv" id="anaAvg">0 ₽</div><div class="ana-s" id="anaAvgS">за все время</div></div>
+          <div class="ana-c"><div class="ana-l">Мои записи</div><div class="ana-v" id="anaTotal">0</div><div class="ana-s">в базе</div></div>
+          <div class="ana-c"><div class="ana-l">Мой доход за год</div><div class="ana-v pv" id="anaYear">0 ₽</div><div class="ana-s" id="anaYearS">2026</div></div>
           <div class="ana-c"><div class="ana-l">Завершено</div><div class="ana-v" id="anaDone">0</div><div class="ana-s">работ</div></div>
         </div>
         <div class="chart-s">
-          <div class="chart-ttl">Доход по месяцам — <span id="anaChY">2026</span></div>
+          <div class="chart-ttl">Мой доход по месяцам — <span id="anaChY">2026</span></div>
           <div class="bar-chart" id="anaChart"></div>
         </div>
         <div class="chart-s">
-          <div class="chart-ttl">Топ услуг</div>
+          <div class="chart-ttl">Топ моих услуг</div>
           <div class="svc-rnk" id="anaRnk"></div>
         </div>
       </div>
@@ -701,7 +708,7 @@ window.CRM=[];
 window.PROFILE=null;
 window.ALL_USERS={}; // uid -> {name, role, color}
 let calDate=new Date();
-let calWeekOffset=0; // 0 = current week
+let calWeekOffset=0;
 let filt='all';
 let srch='';
 let privacyOn=false;
@@ -714,7 +721,7 @@ let appStarted=false;
 let viewMode='calendar';
 let svcMode='preset';
 let isSound=false;
-let selectedFormColor=''; // hex chosen in form
+let selectedFormColor=''; 
 let regSelectedColor=PALETTE[0].hex;
 
 /* ===== UTILS ===== */
@@ -808,6 +815,10 @@ auth.onAuthStateChanged(async(user)=>{
     isSound=p.role==='Звукорежиссёр';
     document.getElementById('nav-certs').style.display = isSound ? 'flex' : 'none';
     
+    // Скрываем чипсы "в работе" и "готово" для всех кроме Звукорежиссёра
+    document.getElementById('chipWrapP').style.display = isSound ? 'flex' : 'none';
+    document.getElementById('chipWrapD').style.display = isSound ? 'flex' : 'none';
+
     selectedFormColor=p.color;
     document.getElementById('uAv').textContent=(p.name||'?').trim()[0].toUpperCase();
     document.getElementById('uAv').style.background=palByHex(p.color).bg;
@@ -815,6 +826,7 @@ auth.onAuthStateChanged(async(user)=>{
     document.getElementById('uAv').style.borderColor=p.color+'55';
     document.getElementById('uName').textContent=p.name;
     document.getElementById('uRole').textContent=p.role;
+
     document.getElementById('authScreen').style.display='none';
     document.getElementById('appRoot').style.display='flex';
     if(!appStarted){appStarted=true;startApp();}
@@ -871,20 +883,23 @@ function goSec(s){
   const all=['sessions','clients','finance','certs','analytics'];
   all.forEach(id=>document.getElementById('sec'+id.charAt(0).toUpperCase()+id.slice(1)).style.display='none');
   document.getElementById('sec'+s.charAt(0).toUpperCase()+s.slice(1)).style.display='flex';
-  const T={sessions:'Журнал записей',clients:'Клиенты',finance:'Финансы',certs:'Сертификаты',analytics:'Аналитика'};
-  document.getElementById('topTitle').textContent=T[s]||'';
   renderAll();
 }
 
 /* ===== STATS ===== */
 function updateStats(){
-  const done=window.CRM.filter(r=>r.completed).length;
-  const pend=window.CRM.filter(r=>!r.completed).length;
+  // Изолируем статистику по автору
+  const myEvents = window.CRM.filter(r => r.authorName === window.PROFILE?.name);
+  
+  const done=myEvents.filter(r=>r.completed).length;
+  const pend=myEvents.filter(r=>!r.completed).length;
   document.getElementById('chipD').textContent=done;
   document.getElementById('chipP').textContent=pend;
+  
   const mk=mKey(calDate);
-  const mSum=window.CRM.filter(r=>r.date&&r.date.includes(mk)).reduce((a,b)=>a+Number(b.total||0),0);
+  const mSum=myEvents.filter(r=>r.date&&r.date.includes(mk)).reduce((a,b)=>a+Number(b.total||0),0);
   document.getElementById('chipM').textContent=mSum.toLocaleString()+' ₽';
+  
   if(!privacyOn)applyBlur();
 }
 
@@ -906,23 +921,19 @@ function changeDateScope(type, d) {
     if (type === 'week') {
       calWeekOffset += d;
     } else if (type === 'month') {
-      // Вычисляем смещение недель при прыжке на месяц вперед/назад
       let currentMonday = getWeekDays()[0];
       currentMonday.setMonth(currentMonday.getMonth() + d);
-      
       let today = new Date();
       today.setHours(0,0,0,0);
       let dayOfWeek = today.getDay();
       let diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
       let origMonday = new Date(today);
       origMonday.setDate(today.getDate() + diffToMon);
-      
       let diffTime = currentMonday.getTime() - origMonday.getTime();
       calWeekOffset = Math.round(diffTime / (1000 * 3600 * 24 * 7));
     }
     renderCalendar();
   } else {
-    // В режиме списка
     if (type === 'week') {
       calDate.setDate(calDate.getDate() + (d * 7));
     } else {
@@ -994,7 +1005,7 @@ function renderLegend(){
 /* ===== CALENDAR RENDER ===== */
 const HOURS_START=7; // 07:00
 const HOURS_END=24;  // midnight
-const HOUR_H=60; // px per hour
+const HOUR_H=60;
 
 function renderCalendar(){
   const days=getWeekDays();
@@ -1002,7 +1013,6 @@ function renderCalendar(){
 
   updateMnavLabel();
 
-  // HEAD
   const head=document.getElementById('calHead');
   head.innerHTML='<div class="cal-head-time"></div>';
   const DAY_NAMES=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
@@ -1012,11 +1022,9 @@ function renderCalendar(){
     head.innerHTML+=`<div class="cal-day-hd"><div class="cal-day-hd-name">${DAY_NAMES[i]}</div>${numEl}</div>`;
   });
 
-  // BODY
   const body=document.getElementById('calBody');
   body.innerHTML='';
 
-  // Time column
   const timeCol=document.createElement('div');
   timeCol.className='cal-time-col';
   for(let h=HOURS_START;h<HOURS_END;h++){
@@ -1028,24 +1036,20 @@ function renderCalendar(){
   }
   body.appendChild(timeCol);
 
-  // Filter data
   let data=window.CRM;
   if(filt==='work')data=data.filter(r=>!r.completed);
   if(filt==='done')data=data.filter(r=>r.completed);
   if(srch)data=data.filter(r=>(r.client||'').toLowerCase().includes(srch)||((r.phone||'').includes(srch)));
 
-  // Index events by date string
   const byDate={};
   data.forEach(r=>{if(r.date&&r.time){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);}});
 
-  // Day columns
   days.forEach(d=>{
     const ds=dateStr(d);
     const col=document.createElement('div');
     col.className='cal-day-col';
     col.style.minHeight=((HOURS_END-HOURS_START)*HOUR_H)+'px';
 
-    // Hour lines
     for(let h=0;h<(HOURS_END-HOURS_START);h++){
       const line=document.createElement('div');
       line.className='cal-hour-line';
@@ -1053,7 +1057,6 @@ function renderCalendar(){
       col.appendChild(line);
     }
 
-    // "Now" line
     const nowD=new Date();
     if(d.getTime()===today.getTime()){
       const nowMins=nowD.getHours()*60+nowD.getMinutes();
@@ -1067,11 +1070,9 @@ function renderCalendar(){
       }
     }
 
-    // Events
     const events=(byDate[ds]||[]).sort((a,b)=>a.time.localeCompare(b.time));
-    
-    // Simple collision: group overlapping events and assign columns
     const placed=[];
+
     events.forEach(ev=>{
       const[hh,mm]=(ev.time||'00:00').split(':').map(Number);
       const startMin=hh*60+mm;
@@ -1107,16 +1108,20 @@ function renderCalendar(){
       const full=ev.fullTotal||ev.total||0;
       const paid=ev.total||0;
       const rest=Math.max(0,full-paid);
+      
+      // Скрываем чужие суммы если запись принадлежит другому преподавателю
+      const isOwner = ev.authorName === window.PROFILE?.name;
+      const priceHTML = (paid>0 && isOwner) ? `<div class="cal-event-price" style="color:${color}bb">${paid.toLocaleString()}₽${rest>0?' · −'+rest.toLocaleString()+'₽':''}</div>` : '';
+      
       evEl.innerHTML=`
         <div class="cal-event-name" style="color:${color}">${ev.client||ev.song||'—'}</div>
         <div class="cal-event-svc" style="color:${color}99">${ev.services||ev.type||''}</div>
-        ${paid>0?`<div class="cal-event-price" style="color:${color}bb">${paid.toLocaleString()}₽${rest>0?' · −'+rest.toLocaleString()+'₽':''}</div>`:''}
+        ${priceHTML}
       `;
       evEl.onclick=(e)=>{e.stopPropagation();showEvPopup(ev,e);};
       col.appendChild(evEl);
     });
 
-    // Блокировка случайного создания записи, если открыт Popup
     col.onclick=(e)=>{
       if(document.getElementById('evPopup').classList.contains('open')) return;
       openNewFormOnDate(ds);
@@ -1139,10 +1144,19 @@ function showEvPopup(ev,e){
   document.getElementById('evPopName').textContent=ev.client||ev.song||'—';
   document.getElementById('evPopTime').textContent=(ev.date||'')+(ev.time?' в '+ev.time:'');
   document.getElementById('evPopSvc').textContent=ev.services||ev.type||'—';
+  
+  const isOwner = ev.authorName === window.PROFILE?.name;
   const full=ev.fullTotal||ev.total||0;
   const paid=ev.total||0;
   const rest=Math.max(0,full-paid);
-  document.getElementById('evPopPrice').textContent=paid.toLocaleString()+' ₽'+(rest>0?' (долг '+rest.toLocaleString()+' ₽)':'');
+  
+  if (isOwner) {
+    document.getElementById('evPopPrice').textContent=paid.toLocaleString()+' ₽'+(rest>0?' (долг '+rest.toLocaleString()+' ₽)':'');
+    document.getElementById('evPopPrice').parentElement.style.display = 'flex';
+  } else {
+    document.getElementById('evPopPrice').parentElement.style.display = 'none';
+  }
+
   document.getElementById('evPopPhone').textContent=ev.phone||'—';
   const hasCom=!!(ev.comment);
   document.getElementById('evPopComRow').style.display=hasCom?'flex':'none';
@@ -1150,6 +1164,19 @@ function showEvPopup(ev,e){
 
   const color=ev.eventColor||window.PROFILE?.color||PALETTE[0].hex;
   pop.style.borderTop='3px solid '+color;
+
+  const actsBlock = document.querySelector('.ev-pop-acts');
+  
+  if (!isOwner) {
+      actsBlock.style.display = 'none';
+  } else {
+      actsBlock.style.display = 'flex';
+      // Если Звукорежиссёр - показываем всё, иначе только Редактировать и Удалить
+      document.getElementById('evBtnDone').style.display = isSound ? 'block' : 'none';
+      document.getElementById('evBtnPay').style.display = isSound ? 'block' : 'none';
+      document.getElementById('evBtnEdit').style.display = 'block';
+      document.getElementById('evBtnDel').style.display = 'block';
+  }
 
   document.getElementById('evBtnDone').onclick=()=>{markDone(ev.id);closeEvPopup();};
   document.getElementById('evBtnEdit').onclick=()=>{closeEvPopup();openEdit(ev.id);};
@@ -1170,16 +1197,22 @@ document.addEventListener('click',e=>{
 /* ===== ACTIONS ===== */
 window.markDone=function(id){
   const row=window.CRM.find(r=>r.id===id);if(!row)return;
+  if(row.authorName !== window.PROFILE?.name) return;
   const isC=!row.completed;
   const upd={completed:isC};
   if(isC){const full=Number(row.fullTotal||row.total||0);const paid=Number(row.total||0);const rem=full-paid;upd.completedDate=todayStr();if(rem>0){upd.completionPayment=rem;upd.total=full;}}
   SC.doc(id).update(upd);
 };
+
 window.delRec=function(id){
+  const row=window.CRM.find(r=>r.id===id);if(!row)return;
+  if(row.authorName !== window.PROFILE?.name) return;
   openSM('Удалить запись?','delete',()=>{SC.doc(id).delete();closeSM();});
 };
+
 window.addPay=function(id){
   const row=window.CRM.find(r=>r.id===id);if(!row)return;
+  if(row.authorName !== window.PROFILE?.name) return;
   const full=row.fullTotal||row.total||0;const rem=full-(row.total||0);
   if(rem<=0){alert('Уже полностью оплачено');return;}
   openSM('Доплата (остаток '+rem.toLocaleString()+' ₽)','number',()=>{
@@ -1195,6 +1228,7 @@ function openNewFormOnDate(ds){
 }
 
 function openNewForm(){
+  document.body.classList.add('modal-open');
   editId=null;
   formDetails=[];
   formTotal=0;
@@ -1229,7 +1263,6 @@ function setupFormColorPicker(){
 }
 
 function setupFormMode(){
-  // Блок сертификатов и пакетов показываем только Звукорежиссеру
   document.getElementById('certToggleWrap').style.display=isSound?'block':'none';
   document.getElementById('svcModeWrap').style.display=isSound?'flex':'none'; 
   
@@ -1237,7 +1270,7 @@ function setupFormMode(){
     setSvcMode('preset');
   }else{
     setSvcMode('manual');
-    document.getElementById('presetSvcs').style.display='none'; // Прячем пакеты от преподавателей навсегда
+    document.getElementById('presetSvcs').style.display='none';
   }
 }
 
@@ -1251,6 +1284,8 @@ window.setSvcMode=function(m){
 
 window.openEdit=function(id){
   const row=window.CRM.find(r=>r.id===id);if(!row)return;
+  if(row.authorName !== window.PROFILE?.name) return;
+  document.body.classList.add('modal-open');
   editId=id;
   formDetails=row.details?JSON.parse(JSON.stringify(row.details)):[];
   formTotal=formDetails.reduce((s,i)=>s+i.price,0);
@@ -1272,7 +1307,13 @@ window.openEdit=function(id){
   document.getElementById('moRecord').classList.add('open');
 };
 
-window.closeRecModal=function(){document.getElementById('moRecord').classList.remove('open');editId=null;formDetails=[];formTotal=0;};
+window.closeRecModal=function(){
+  document.body.classList.remove('modal-open');
+  document.getElementById('moRecord').classList.remove('open');
+  editId=null;
+  formDetails=[];
+  formTotal=0;
+};
 
 /* ===== PRESET SERVICES ===== */
 window.addPreSvc=function(name,price,color,forceFull=false){
@@ -1377,7 +1418,7 @@ window.saveRecord=async function(){
   }catch(e){alert('Ошибка: '+e.message);}
 };
 
-/* ===== SESSIONS LIST (ДОБАВЛЕНЫ DATA-LABEL ДЛЯ МОБИЛОК) ===== */
+/* ===== SESSIONS LIST ===== */
 function renderSessions(){
   const body=document.getElementById('sessBody');
   if(!body)return;
@@ -1402,6 +1443,8 @@ function renderSessions(){
     const rest=Math.max(0,full-paid);
     const perc=full>0?Math.min((paid/full)*100,100):0;
     const isDone=row.completed||perc>=100;
+    const isOwner = row.authorName === window.PROFILE?.name;
+
     let showT=true;
     if(row.time&&row.date===todS){const[h,m]=row.time.split(':').map(Number);if(curH>=h*60+m)showT=false;}
     else if(row.date!==todS){const[d,mo,y]=row.date.split('.').map(Number);if(new Date(y,mo-1,d)<now)showT=false;}
@@ -1410,6 +1453,19 @@ function renderSessions(){
     const color=row.eventColor||PALETTE[0].hex;
     const statusBadge=isDone?'<span class="ss-badge ss-done">Готово</span>':rest>0?'<span class="ss-badge ss-debt">Долг −'+rest.toLocaleString()+'₽</span>':'<span class="ss-badge ss-work">В работе</span>';
     const roleTag=row.authorName?`<span class="role-tag">${row.authorName}</span>`:'';
+
+    let actsHTML = '';
+    if (isOwner) {
+        actsHTML += isSound ? `<div class="act-ic g" title="Готово" onclick="markDone('${row.id}')"><i class="fa-solid fa-check"></i></div>` : '';
+        actsHTML += `<div class="act-ic b" title="Редактировать" onclick="openEdit('${row.id}')"><i class="fa-solid fa-pen"></i></div>`;
+        actsHTML += isSound ? `<div class="act-ic go" title="Доплата" onclick="addPay('${row.id}')"><i class="fa-solid fa-wallet"></i></div>` : '';
+        actsHTML += `<div class="act-ic r" title="Удалить" onclick="delRec('${row.id}')"><i class="fa-solid fa-trash"></i></div>`;
+    } else {
+        actsHTML = `<span style="font-size:9px;color:var(--text3);">Нет доступа</span>`;
+    }
+
+    const priceHTML = isOwner ? `${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}` : '—';
+
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${row.date||'—'}</div></td>
       <td data-label="Время"><div class="td-time" style="color:${color}">${row.time&&showT?row.time:'—'}</div></td>
@@ -1425,14 +1481,9 @@ function renderSessions(){
       </td>
       <td data-label="Телефон"><div class="td-phone">${row.phone||'—'}</div></td>
       <td data-label="Услуги"><div class="td-svc">${row.services||'—'}</div></td>
-      <td data-label="Сумма" style="text-align:right;"><div class="td-price">${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}</div></td>
+      <td data-label="Сумма" style="text-align:right;"><div class="td-price">${priceHTML}</div></td>
       <td data-label="Статус">${statusBadge}</td>
-      <td data-label="Действия"><div class="td-acts">
-        <div class="act-ic g" title="Готово" onclick="markDone('${row.id}')"><i class="fa-solid fa-check"></i></div>
-        <div class="act-ic b" title="Редактировать" onclick="openEdit('${row.id}')"><i class="fa-solid fa-pen"></i></div>
-        <div class="act-ic go" title="Доплата" onclick="addPay('${row.id}')"><i class="fa-solid fa-wallet"></i></div>
-        <div class="act-ic r" title="Удалить" onclick="delRec('${row.id}')"><i class="fa-solid fa-trash"></i></div>
-      </div></td>
+      <td data-label="Действия"><div class="td-acts">${actsHTML}</div></td>
     `;
     body.appendChild(tr);
   });
@@ -1474,22 +1525,30 @@ function renderClients(){
 }
 window.doFilterCl=function(){renderClients();};
 
-/* ===== FINANCE (ДОБАВЛЕНЫ DATA-LABEL ДЛЯ МОБИЛОК) ===== */
+/* ===== FINANCE ===== */
 function renderFinance(){
   const now=new Date();
   const mk=mKey(now);
-  const mInc=window.CRM.filter(r=>r.date&&r.date.includes(mk)).reduce((a,b)=>a+Number(b.total||0),0);
-  const yInc=window.CRM.filter(r=>r.date&&r.date.endsWith('.'+now.getFullYear())).reduce((a,b)=>a+Number(b.total||0),0);
-  const debt=window.CRM.reduce((a,b)=>a+Math.max(0,(b.fullTotal||b.total||0)-(b.total||0)),0);
-  const allP=window.CRM.map(r=>Number(r.total||0)).filter(v=>v>0);
+  // Строгая фильтрация по имени автора для финансов
+  const myData = window.CRM.filter(r => r.authorName === window.PROFILE?.name);
+
+  const mInc=myData.filter(r=>r.date&&r.date.includes(mk)).reduce((a,b)=>a+Number(b.total||0),0);
+  const yInc=myData.filter(r=>r.date&&r.date.endsWith('.'+now.getFullYear())).reduce((a,b)=>a+Number(b.total||0),0);
+  const debt=myData.reduce((a,b)=>a+Math.max(0,(b.fullTotal||b.total||0)-(b.total||0)),0);
+  const allP=myData.map(r=>Number(r.total||0)).filter(v=>v>0);
   const avg=allP.length?Math.round(allP.reduce((a,b)=>a+b,0)/allP.length):0;
+  
   document.getElementById('finM').textContent=mInc.toLocaleString()+' ₽';
   document.getElementById('finY').textContent=yInc.toLocaleString()+' ₽';
   document.getElementById('finDbt').textContent=debt.toLocaleString()+' ₽';
   document.getElementById('finAvg').textContent=avg.toLocaleString()+' ₽';
   document.getElementById('finAvgs').textContent='за '+allP.length+' записей';
+  
   const body=document.getElementById('finBody');body.innerHTML='';
-  const sorted=[...window.CRM].sort((a,b)=>b.timestamp-a.timestamp).slice(0,60);
+  const sorted=[...myData].sort((a,b)=>b.timestamp-a.timestamp).slice(0,60);
+  
+  if(!sorted.length){body.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:28px;">Нет ваших записей</td></tr>';return;}
+
   sorted.forEach(row=>{
     const full=row.fullTotal||row.total||0;const paid=row.total||0;const rest=Math.max(0,full-paid);
     const color=row.eventColor||PALETTE[0].hex;
@@ -1524,19 +1583,24 @@ window.resetCerts=async function(){
 /* ===== ANALYTICS ===== */
 function renderAnalytics(){
   const now=new Date(),year=now.getFullYear();
-  const allP=window.CRM.map(r=>Number(r.total||0)).filter(v=>v>0);
+  // Фильтрация данных по автору
+  const myData = window.CRM.filter(r => r.authorName === window.PROFILE?.name);
+
+  const allP=myData.map(r=>Number(r.total||0)).filter(v=>v>0);
   const avg=allP.length?Math.round(allP.reduce((a,b)=>a+b,0)/allP.length):0;
-  const yInc=window.CRM.filter(r=>r.date&&r.date.endsWith('.'+year)).reduce((a,b)=>a+Number(b.total||0),0);
-  const done=window.CRM.filter(r=>r.completed).length;
+  const yInc=myData.filter(r=>r.date&&r.date.endsWith('.'+year)).reduce((a,b)=>a+Number(b.total||0),0);
+  const done=myData.filter(r=>r.completed).length;
+  
   document.getElementById('anaAvg').textContent=avg.toLocaleString()+' ₽';
   document.getElementById('anaAvgS').textContent='за '+allP.length+' записей';
-  document.getElementById('anaTotal').textContent=window.CRM.length;
+  document.getElementById('anaTotal').textContent=myData.length;
   document.getElementById('anaYear').textContent=yInc.toLocaleString()+' ₽';
   document.getElementById('anaYearS').textContent=year+' год';
   document.getElementById('anaDone').textContent=done;
   document.getElementById('anaChY').textContent=year;
+  
   const monthly=Array(12).fill(0);
-  window.CRM.forEach(r=>{if(!r.date||!r.date.endsWith('.'+year))return;const mo=parseInt(r.date.split('.')[1])-1;if(mo>=0&&mo<12)monthly[mo]+=Number(r.total||0);});
+  myData.forEach(r=>{if(!r.date||!r.date.endsWith('.'+year))return;const mo=parseInt(r.date.split('.')[1])-1;if(mo>=0&&mo<12)monthly[mo]+=Number(r.total||0);});
   const maxV=Math.max(...monthly,1);
   const chart=document.getElementById('anaChart');chart.innerHTML='';
   monthly.forEach((v,i)=>{
@@ -1546,8 +1610,9 @@ function renderAnalytics(){
     col.innerHTML=`<div class="bar-val">${v>0?(v>=1000?Math.round(v/1000)+'к':''+v):''}</div><div class="bar" style="height:${pct}px;background:${isCur?'#3ecf8e':'#7c6fff'}"></div><div class="bar-lbl">${MNSh[i]}</div>`;
     chart.appendChild(col);
   });
+
   const svcC={};
-  window.CRM.forEach(r=>{
+  myData.forEach(r=>{
     if(r.details)r.details.forEach(d=>{const k=d.name.replace(' (50%)','').trim();svcC[k]=(svcC[k]||0)+1;});
     else if(r.type){svcC[r.type]=(svcC[r.type]||0)+1;}
   });
@@ -1567,6 +1632,7 @@ function renderAnalytics(){
 
 /* ===== SIMPLE MODAL ===== */
 function openSM(title,type,cb,def=''){
+  document.body.classList.add('modal-open');
   document.getElementById('msTitle').textContent=title;
   const inp=document.getElementById('msInput');
   inp.value=def;
@@ -1579,7 +1645,10 @@ function openSM(title,type,cb,def=''){
   document.getElementById('moSimple').classList.add('open');
   if(type!=='delete')setTimeout(()=>inp.focus(),50);
 }
-function closeSM(){document.getElementById('moSimple').classList.remove('open');}
+function closeSM(){
+  document.body.classList.remove('modal-open');
+  document.getElementById('moSimple').classList.remove('open');
+}
 window.closeSM=closeSM;
 document.getElementById('moSimple').onclick=function(e){if(e.target===this)closeSM();};
 document.getElementById('moRecord').onclick=function(e){if(e.target===this)closeRecModal();};
@@ -1595,7 +1664,7 @@ function updateDate(){
 function updOff(){document.getElementById('offBar').style.display=navigator.onLine?'none':'block';}
 window.addEventListener('online',updOff);window.addEventListener('offline',updOff);updOff();
 
-/* ===== МОБИЛЬНОЕ МЕНЮ ===== */
+/* ===== МОБИЛЬНОЕ МЕНЮ И СВАЙПЫ ===== */
 document.addEventListener('DOMContentLoaded', () => {
   const topbar = document.querySelector('.topbar');
   const sidebar = document.querySelector('.sidebar');
@@ -1607,9 +1676,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleBtn.style.padding = '8px 12px';
     toggleBtn.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
     
-    const title = document.getElementById('topTitle');
-    if (title) topbar.insertBefore(toggleBtn, title);
-    else topbar.insertBefore(toggleBtn, topbar.firstChild);
+    topbar.insertBefore(toggleBtn, topbar.firstChild);
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1630,6 +1697,21 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.classList.remove('mobile-open');
       }
     });
+    
+    // Свайп влево для закрытия
+    let touchstartX = 0;
+    let touchendX = 0;
+
+    sidebar.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    sidebar.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        if (touchstartX - touchendX > 40) { // Свайп влево
+            sidebar.classList.remove('mobile-open');
+        }
+    }, {passive: true});
   }
 });
 </script>
