@@ -112,6 +112,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .act-ic{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:.15s;}
 .act-ic:hover{color:var(--text);border-color:var(--border2);}
 .act-ic.g:hover{color:var(--green);border-color:rgba(62,207,142,.3);}
+.act-ic.g.active{background:var(--green-bg);color:var(--green);border-color:var(--green);}
 .act-ic.r:hover{color:var(--red);border-color:rgba(255,92,106,.3);}
 .act-ic.go:hover{color:var(--gold);border-color:rgba(245,166,35,.3);}
 .act-ic.b:hover{color:var(--blue);border-color:rgba(59,158,255,.3);}
@@ -167,7 +168,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .chart-s{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
 .chart-ttl{font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:14px;}
 .bar-chart{display:flex;align-items:flex-end;gap:6px;height:110px;}
-.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end; cursor:pointer;}
 .bar-val{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text2);}
 .bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:.5s;cursor:pointer;}
 .bar:hover{opacity:.8;}
@@ -190,6 +191,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .mb-sm{width:320px;margin:auto;margin-top:30vh;}
 .mb-num-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:11px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:22px;text-align:center;outline:none;margin-bottom:14px;transition:.15s;}
 .mb-num-input:focus{border-color:var(--accent);}
+.mb-info{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;text-align:center;color:var(--accent);padding:10px;word-break:break-word; margin-bottom:14px;}
 .mb-btns{display:flex;gap:7px; margin-top: 15px;}
 .mb-btn{flex:1;padding:10px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:12px;font-weight:700;transition:.15s;}
 .mb-cancel{background:var(--surface2);color:var(--text2);}
@@ -433,7 +435,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
               <th>Услуги</th>
               <th style="text-align:right;width:100px;">Сумма</th>
               <th style="width:80px;">Статус</th>
-              <th style="width:120px; text-align:right;">Действия</th>
             </tr></thead>
             <tbody id="sessBody"></tbody>
           </table>
@@ -514,12 +515,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   <div class="ev-pop-row"><i class="fa-solid fa-ruble-sign" style="font-size:10px;"></i><span id="evPopPrice" class="pv">—</span></div>
   <div class="ev-pop-row" id="evPopPhoneRow"><i class="fa-solid fa-phone" style="font-size:10px;"></i><span id="evPopPhone">—</span></div>
   <div class="ev-pop-row" id="evPopComRow" style="display:none;"><i class="fa-regular fa-comment" style="font-size:10px;"></i><span id="evPopCom" style="font-style:italic;"></span></div>
-  <div class="ev-pop-acts" style="display:none;">
-    <div class="ev-pop-btn g" id="evBtnDone">✓ Готово</div>
-    <div class="ev-pop-btn b" id="evBtnEdit">✏ Ред.</div>
-    <div class="ev-pop-btn go" id="evBtnPay">₽ Долг</div>
-    <div class="ev-pop-btn r" id="evBtnDel">✕ Удал.</div>
-  </div>
 </div>
 
 <div class="mo" id="moRecord">
@@ -616,6 +611,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 <div class="mo" id="moSimple">
   <div class="mb mb-sm">
     <div class="mb-title" id="msTitle">—</div>
+    <div class="mb-info" id="msInfo" style="display:none;"></div>
     <input type="number" class="mb-num-input" id="msInput" placeholder="0" onkeydown="if(event.key==='Enter')document.getElementById('msConfirm').click()">
     <div class="mb-btns">
       <button class="mb-btn mb-cancel" onclick="closeSM()">Отмена</button>
@@ -1082,19 +1078,8 @@ function showEvPopup(ev,e){
   const color=ev.eventColor||window.PROFILE?.color||PALETTE[0].hex;
   pop.style.borderTop='3px solid '+color;
   
-  const isAuthor = window.PROFILE && ((ev.authorPhone && norm(window.PROFILE.phone) === norm(ev.authorPhone)) || norm(window.PROFILE.phone) === MASTER_PHONE);
   const actsBlock = document.querySelector('.ev-pop-acts');
-  actsBlock.style.display = isAuthor ? 'flex' : 'none';
-  
-  document.getElementById('evBtnDone').style.display = (isSound && isAuthor) ? 'block' : 'none';
-  document.getElementById('evBtnPay').style.display = (isSound && isAuthor) ? 'block' : 'none';
-  document.getElementById('evBtnEdit').style.display = isAuthor ? 'block' : 'none';
-  document.getElementById('evBtnDel').style.display = isAuthor ? 'block' : 'none';
-
-  document.getElementById('evBtnDone').onclick=()=>{markDone(ev.id);closeEvPopup();};
-  document.getElementById('evBtnEdit').onclick=()=>{closeEvPopup();openEdit(ev.id);};
-  document.getElementById('evBtnPay').onclick=()=>{closeEvPopup();addPay(ev.id);};
-  document.getElementById('evBtnDel').onclick=()=>{closeEvPopup();delRec(ev.id);};
+  if(actsBlock) actsBlock.style.display = 'none';
   
   const x=e.clientX;const y=e.clientY;
   const pw=240;const ph=180;
@@ -1379,7 +1364,7 @@ function renderSessions(){
   data.sort((a,b)=>{const pd=ds=>{const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d).getTime();};return pd(b.date)-pd(a.date);});
   
   body.innerHTML='';
-  if(!data.length){body.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
+  if(!data.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
   data.forEach(row=>{
     const full=row.fullTotal||row.total||0;
     const paid=row.total||0;
@@ -1399,38 +1384,12 @@ function renderSessions(){
     const timeDisplay = row.time ? `${row.time} ${row.timeEnd ? '- ' + row.timeEnd : ''}` : '—';
     const isAuthor = window.PROFILE && ((row.authorPhone && norm(window.PROFILE.phone) === norm(row.authorPhone)) || norm(window.PROFILE.phone) === MASTER_PHONE);
 
-    // ПРОВЕРКА: ПРОШЛО ЛИ ВРЕМЯ ЗАПИСИ
-    let isPassed = false;
-    if(row.date) {
-       const [d, mo, y] = row.date.split('.').map(Number);
-       let evDate = new Date(y, mo-1, d);
-       if(row.timeEnd || row.time) {
-           const timeStr = row.timeEnd || row.time;
-           const [hh, mm] = timeStr.split(':').map(Number);
-           evDate.setHours(hh, mm, 0);
-       } else {
-           evDate.setHours(23, 59, 59);
-       }
-       if(evDate < new Date()) {
-           isPassed = true;
-       }
-    }
-
-    // В ЖУРНАЛЕ ОСТАВЛЯЕМ ТОЛЬКО РЕДАКТИРОВАНИЕ ДЛЯ БУДУЩИХ
-    let actsHTML = '';
-    if (isAuthor && !isPassed) {
-        actsHTML = `<div class="act-ic b" title="Редактировать" onclick="openEdit('${row.id}')"><i class="fa-solid fa-pen"></i></div>`;
-    }
-    
     const priceHTML = `<div class="pv">${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}</div>`;
     
-    // БЛОКИРУЕМ КЛИК И РЕДАКТИРОВАНИЕ ПО ПРОШЕДШИМ ЗАПИСЯМ
-    if(!isPassed && isAuthor) {
-        tr.style.cursor = 'pointer';
-        tr.onclick = (e) => {
-            if(!e.target.closest('.act-ic')) openEdit(row.id);
-        };
-    }
+    tr.style.cursor = 'pointer';
+    tr.onclick = (e) => {
+        if(!e.target.closest('.act-ic')) showEvPopup(row, e);
+    };
 
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${row.date||'—'}</div></td>
@@ -1449,7 +1408,6 @@ function renderSessions(){
       <td data-label="Услуги"><div class="td-svc">${row.services||'—'}</div></td>
       <td data-label="Сумма" style="text-align:right;"><div class="td-price">${priceHTML}</div></td>
       <td data-label="Статус">${statusBadge}</td>
-      <td data-label="Действия"><div class="td-acts" style="justify-content: flex-end;">${actsHTML}</div></td>
     `;
     body.appendChild(tr);
   });
@@ -1511,20 +1469,15 @@ function renderFinance(){
     const isDone=r.completed||perc>=100;
     const isAuthor = window.PROFILE && ((r.authorPhone && norm(window.PROFILE.phone) === norm(r.authorPhone)) || norm(window.PROFILE.phone) === MASTER_PHONE);
 
-    // ВСЕ КНОПКИ ТЕПЕРЬ ТУТ, ДЛЯ ВСЕХ РОЛЕЙ
     let actsHTML = '';
     if(isAuthor) {
-        actsHTML += `<div class="act-ic g" title="Готово" onclick="markDone('${r.id}')"><i class="fa-solid fa-check"></i></div>`;
+        actsHTML += `<div class="act-ic g ${r.completed?'active':''}" title="Готово" onclick="markDone('${r.id}')"><i class="fa-solid fa-check"></i></div>`;
         actsHTML += `<div class="act-ic b" title="Редактировать" onclick="openEdit('${r.id}')"><i class="fa-solid fa-pen"></i></div>`;
         actsHTML += `<div class="act-ic go" title="Доплата" onclick="addPay('${r.id}')"><i class="fa-solid fa-wallet"></i></div>`;
         actsHTML += `<div class="act-ic r" title="Удалить" onclick="delRec('${r.id}')"><i class="fa-solid fa-trash"></i></div>`;
     }
 
-    // ЗЕЛЕНЫЙ ЦВЕТ ИМЕНИ ТОЛЬКО ДЛЯ ЗВУКОРЕЖИССЕРОВ ПРИ СТАТУСЕ ГОТОВО
-    let nameStyle = "";
-    if (isSound && isDone) {
-        nameStyle = "color: var(--green); font-weight: 700;";
-    }
+    let nameStyle = r.completed ? "color: var(--green); font-weight: 700;" : "";
 
     const tr=document.createElement('tr');
     tr.innerHTML=`
@@ -1630,6 +1583,7 @@ function renderAnalytics(){
       <div class="bar" style="height:${Math.max(h,3)}%;background:var(--accent);" title="${v.toLocaleString()} ₽"></div>
       <div class="bar-lbl">${MNSh[i]}</div>
     `;
+    col.onclick = () => openMonthInfo(i, mRev[i]);
     chart.appendChild(col);
   });
   const rnk=document.getElementById('anaRnk');
@@ -1650,21 +1604,32 @@ function renderAnalytics(){
 }
 
 /* ===== SIMPLE MODAL ===== */
-window.openSM=function(title,type,onConfirm,defVal=''){
+window.openSM=function(title, type, onConfirm, defVal='', infoText=''){
   document.body.classList.add('modal-open');
   document.getElementById('msTitle').textContent=title;
   const inp=document.getElementById('msInput');
+  const infoDiv=document.getElementById('msInfo');
   const mo=document.getElementById('moSimple');
   const cf=document.getElementById('msConfirm');
+  const cancelBtn=mo.querySelector('.mb-cancel');
+  infoDiv.style.display='none';
+  inp.style.display='none';
+  cf.style.display='none';
+  cancelBtn.textContent='Отмена';
   if(type==='delete'){
-    inp.style.display='none';
     cf.className='mb-btn mb-delete';
     cf.textContent='Удалить';
+    cf.style.display='block';
+  }else if(type==='info'){
+    infoDiv.textContent=infoText;
+    infoDiv.style.display='block';
+    cancelBtn.textContent='Закрыть';
   }else{
-    inp.style.display='block';
     inp.value=defVal;
+    inp.style.display='block';
     cf.className='mb-btn mb-confirm';
     cf.textContent='Готово';
+    cf.style.display='block';
     setTimeout(()=>inp.focus(),100);
   }
   cf.onclick=onConfirm;
@@ -1674,6 +1639,12 @@ window.closeSM=function(){
   document.body.classList.remove('modal-open');
   document.getElementById('moSimple').classList.remove('open');
 };
+
+function openMonthInfo(idx, value) {
+  const monthName = MNL[idx];
+  const year = document.getElementById('anaChY').textContent || '2026';
+  openSM(`Доход за ${monthName} ${year}`, 'info', ()=>{ closeSM(); }, '', `${value.toLocaleString()} ₽`);
+}
 
 /* ===== NETWORK STATUS ===== */
 window.addEventListener('online',()=>document.getElementById('offBar').style.display='none');
