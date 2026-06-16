@@ -652,9 +652,6 @@ const MNS=['ЯНВАРЬ','ФЕВРАЛЬ','МАРТ','АПРЕЛЬ','МАЙ','�
 const MNSh=['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
 const MNL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const DAYS_RU=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-/* МАСТЕР АККАУНТ ДЛЯ ПОЛНОГО ДОСТУПА */
-const MASTER_PHONE = '79178382017'; 
-
 /* ===== STATE ===== */
 window.CRM=[];
 window.PROFILE=null;
@@ -686,14 +683,10 @@ function inputToDate(s){if(!s)return '';const[y,m,d]=s.split('-');return d+'.'+m
 function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
 
-/* ===== ДОСТУП К ДАННЫМ ===== */
+/* Умный фильтр данных: каждый пользователь видит только свои записи */
 function getMyData() {
   if (!window.PROFILE) return [];
   const currentPhone = norm(window.PROFILE.phone || '');
-  // Мастер видит все записи, остальные – только свои
-  if (currentPhone === MASTER_PHONE) {
-    return window.CRM;
-  }
   return window.CRM.filter(r => r.authorPhone === currentPhone);
 }
 
@@ -854,7 +847,7 @@ window.togglePrivacy=function(){
   else{privacyOn=true;removeBlur();}
 };
 
-/* ===== НАВИГАЦИЯ ДАТ ===== */
+/* ===== НОВАЯ НАВИГАЦИЯ ДАТ ===== */
 function changeDateScope(type, d) {
   if (viewMode === 'calendar') {
     if (type === 'week') {
@@ -946,7 +939,8 @@ function renderCalendar(){
     timeCol.appendChild(slot);
   }
   body.appendChild(timeCol);
-  let data = window.CRM;
+  // Используем только данные текущего пользователя
+  let data = getMyData();
 
   const byDate={};
   data.forEach(r=>{if(r.date&&r.time){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);}});
@@ -1101,12 +1095,14 @@ window.markDone=function(id){
   const isC=!row.completed;
   const upd={completed:isC};
   if(isC){
+    // Если помечаем как готовое, фиксируем дату завершения
     upd.completedDate=todayStr();
     const full=Number(row.fullTotal||row.total||0);
     const paid=Number(row.total||0);
     const rem=full-paid;
     if(rem>0){upd.completionPayment=rem;upd.total=full;}
   } else {
+    // При отмене готовности удаляем дату завершения
     upd.completedDate = firebase.firestore.FieldValue.delete();
   }
   SC.doc(id).update(upd);
@@ -1360,7 +1356,7 @@ window.saveRecord=async function(){
   }catch(e){alert('Ошибка: '+e.message);}
 };
 
-/* ===== SESSIONS LIST ===== */
+/* ===== SESSIONS LIST (исправленная фильтрация) ===== */
 function renderSessions(){
   const body=document.getElementById('sessBody');
   if(!body)return;
@@ -1369,7 +1365,8 @@ function renderSessions(){
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
   
-  let data = window.CRM.filter(r=>{
+  // Используем только свои записи
+  let data = getMyData().filter(r=>{
     if(r.date&&r.date.includes(mk))return true;
     if(!r.completed)return true;
     return false;
@@ -1566,9 +1563,8 @@ function renderAnalytics(){
     if(r.completed)done++;
     else work++;
     
-    // Доход засчитывается в месяц завершения, если запись завершена
+    // Доход засчитывается в месяц завершения, если запись завершена, иначе не учитывается
     if(r.completed) {
-      // Используем completedDate, если есть, иначе дату записи (для старых работ)
       const refDate = r.completedDate || r.date;
       if(refDate) {
         const [d,m,y] = refDate.split('.');
