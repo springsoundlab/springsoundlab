@@ -120,6 +120,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .ss-work{background:var(--accent-bg);color:var(--accent2);}
 .ss-done{background:var(--green-bg);color:var(--green);}
 .ss-debt{background:var(--gold-bg);color:var(--gold);}
+.ss-transfer{background:rgba(255,165,0,0.1);color:#ffa500;}
 .role-tag{font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--surface3);color:var(--text3);margin-left:4px;}
 
 /* CLIENTS & EMPLOYEES */
@@ -651,9 +652,6 @@ const MNS=['ЯНВАРЬ','ФЕВРАЛЬ','МАРТ','АПРЕЛЬ','МАЙ','�
 const MNSh=['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
 const MNL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const DAYS_RU=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-/* МАСТЕР АККАУНТ ДЛЯ ИЗОЛЯЦИИ */
-const MASTER_PHONE = '79178382017'; 
-
 /* ===== STATE ===== */
 window.CRM=[];
 window.PROFILE=null;
@@ -685,13 +683,10 @@ function inputToDate(s){if(!s)return '';const[y,m,d]=s.split('-');return d+'.'+m
 function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
 
-/* Умный фильтр данных: Возвращает только записи текущего пользователя (или все для мастера) */
+/* Умный фильтр данных: каждый пользователь видит только свои записи */
 function getMyData() {
   if (!window.PROFILE) return [];
   const currentPhone = norm(window.PROFILE.phone || '');
-  if (currentPhone === MASTER_PHONE) {
-    return window.CRM; // мастер видит всё
-  }
   return window.CRM.filter(r => r.authorPhone === currentPhone);
 }
 
@@ -1098,7 +1093,17 @@ window.markDone=function(id){
   const row=window.CRM.find(r=>r.id===id);if(!row)return;
   const isC=!row.completed;
   const upd={completed:isC};
-  if(isC){const full=Number(row.fullTotal||row.total||0);const paid=Number(row.total||0);const rem=full-paid;upd.completedDate=todayStr();if(rem>0){upd.completionPayment=rem;upd.total=full;}}
+  if(isC){
+    // Если помечаем как готовое, фиксируем дату завершения
+    upd.completedDate=todayStr();
+    const full=Number(row.fullTotal||row.total||0);
+    const paid=Number(row.total||0);
+    const rem=full-paid;
+    if(rem>0){upd.completionPayment=rem;upd.total=full;}
+  } else {
+    // При отмене готовности удаляем дату завершения
+    upd.completedDate = firebase.firestore.FieldValue.delete();
+  }
   SC.doc(id).update(upd);
   if(viewMode==='sessions') renderSessions();
   if(document.getElementById('secFinance').style.display==='flex') renderFinance();
@@ -1359,11 +1364,8 @@ function renderSessions(){
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
   
-  // Используем те же данные, что и в календаре – все записи в памяти
   let data = window.CRM.filter(r=>{
-    // Только за выбранный месяц (тот же фильтр, что и в календаре по дате)
     if(r.date&&r.date.includes(mk))return true;
-    // Если запись не завершена, покажем даже если она не в текущем месяце (чтобы не потерять)
     if(!r.completed)return true;
     return false;
   });
@@ -1388,7 +1390,6 @@ function renderSessions(){
     const statusBadge=isDone?'<span class="ss-badge ss-done">Готово</span>':rest>0?'<span class="ss-badge ss-debt">Долг −'+rest.toLocaleString()+'₽</span>':'<span class="ss-badge ss-work">В работе</span>';
     const roleTag=row.authorName?`<span class="role-tag">${row.authorName}</span>`:'';
     const timeDisplay = row.time ? `${row.time} ${row.timeEnd ? '- ' + row.timeEnd : ''}` : '—';
-    const isAuthor = window.PROFILE && ((row.authorPhone && norm(window.PROFILE.phone) === norm(row.authorPhone)) || norm(window.PROFILE.phone) === MASTER_PHONE);
 
     const priceHTML = `<div class="pv">${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}</div>`;
     
@@ -1464,18 +1465,28 @@ function renderClients(){
 function renderFinance(){
   const myData = getMyData();
   const body=document.getElementById('finBody');body.innerHTML='';
-  // Фильтруем только записи за текущий месяц
+  
   const currentMonthKey = mKey(new Date());
-  const sorted=[...myData].filter(r => r.date && r.date.includes(currentMonthKey)).sort((a,b)=>b.timestamp-a.timestamp).slice(0,60);
-  if(!sorted.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:28px;">Нет записей за текущий месяц</td></tr>';return;}
+  // Все незавершённые записи + записи текущего месяца
+  const filtered = myData.filter(r => {
+    if (!r.date) return false;
+    const inCurrentMonth = r.date.includes(currentMonthKey);
+    const isPending = !r.completed;
+    return inCurrentMonth || isPending;
+  });
+  
+  const sorted = filtered.sort((a,b) => b.timestamp - a.timestamp).slice(0, 60);
+  if(!sorted.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
 
   sorted.forEach(r=>{
     const full=r.fullTotal||r.total||0;
     const paid=r.total||0;
     const rest=Math.max(0,full-paid);
-    const perc=full>0?Math.min((paid/full)*100,100):0;
-    const isDone=r.completed||perc>=100;
-    const isAuthor = window.PROFILE && ((r.authorPhone && norm(window.PROFILE.phone) === norm(r.authorPhone)) || norm(window.PROFILE.phone) === MASTER_PHONE);
+    const isDone=r.completed;
+    const isAuthor = window.PROFILE && r.authorPhone === norm(window.PROFILE.phone);
+    const isPastMonth = !r.date.includes(currentMonthKey);
+    const statusText = isDone ? (isPastMonth ? 'Перенос ✓' : 'Готово') : (isPastMonth ? 'Перенос' : (rest>0 ? 'Долг' : 'В работе'));
+    const statusClass = isDone ? (isPastMonth ? 'ss-transfer' : 'ss-done') : (isPastMonth ? 'ss-transfer' : (rest>0 ? 'ss-debt' : 'ss-work'));
 
     let actsHTML = '';
     if(isAuthor) {
@@ -1495,7 +1506,7 @@ function renderFinance(){
       <td data-label="Услуги"><div class="td-svc">${r.services||'—'}</div></td>
       <td data-label="Внесено" style="text-align:right;"><div class="td-price pv" style="color:var(--green)">${paid.toLocaleString()} ₽</div></td>
       <td data-label="Долг" style="text-align:right;"><div class="td-price pv" style="color:var(--gold)">${rest>0?rest.toLocaleString()+' ₽':'0 ₽'}</div></td>
-      <td data-label="Действия"><div class="td-acts" style="justify-content: flex-end; opacity: 1;">${actsHTML}</div></td>
+      <td data-label="Действия"><div class="td-acts" style="justify-content: flex-end; opacity: 1;">${actsHTML} <span class="ss-badge ${statusClass}" style="margin-left:6px;">${statusText}</span></div></td>
     `;
     body.appendChild(tr);
   });
@@ -1551,12 +1562,16 @@ function renderAnalytics(){
     if(r.completed)done++;
     else work++;
     
-    if(r.date){
-      const[d,m,y]=r.date.split('.');
-      if(y===curY){
-        yearRev+=paid;
-        const mIdx=parseInt(m)-1;
-        if(mIdx>=0&&mIdx<12)mRev[mIdx]+=paid;
+    // Доход засчитывается в месяц завершения, если запись завершена, иначе не учитывается
+    if(r.completed) {
+      const refDate = r.completedDate || r.date;
+      if(refDate) {
+        const [d,m,y] = refDate.split('.');
+        if(y === curY) {
+          yearRev += paid;
+          const mIdx = parseInt(m)-1;
+          if(mIdx>=0&&mIdx<12) mRev[mIdx] += paid;
+        }
       }
     }
     
