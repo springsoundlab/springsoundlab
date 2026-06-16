@@ -74,8 +74,8 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cal-day-hd-num.today{background:var(--accent);color:#ffffff !important;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;}
 .cal-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:56px repeat(7,1fr);}
 .cal-time-col{border-right:1px solid var(--border);}
-.cal-time-slot{height:60px;display:flex;align-items:flex-start;padding-top:4px;padding-right:6px;justify-content:flex-end;}
-.cal-time-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);font-weight:700;}
+.cal-time-slot{position:relative;height:60px;}
+.cal-time-label{position:absolute;top:0;right:6px;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);font-weight:700;line-height:1;}
 .cal-day-col{border-right:1px solid var(--border);position:relative;min-height:1440px;}
 .cal-day-col:last-child{border-right:none;}
 .cal-hour-line{position:absolute;left:0;right:0;height:1px;background:var(--border);}
@@ -681,6 +681,9 @@ let isSound=false;
 let selectedFormColor=''; 
 let regSelectedColor=PALETTE[0].hex;
 
+let calScrollSaved = 0;
+let calInitialized = false;
+
 /* ===== UTILS ===== */
 function norm(r){let d=(r||'').replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
 function toEmail(p){return p+'@sslcrm.local';}
@@ -813,8 +816,9 @@ function startApp(){
 function renderAll(){
   const sec=document.querySelector('.nav-i.active')?.id?.replace('nav-','');
   if(sec==='sessions'){
-    if(viewMode==='calendar')renderCalendar();
-    else renderSessions();
+    // Рендерим и календарь и список сразу, чтобы не оставалось старых (удаленных) записей
+    renderCalendar();
+    renderSessions();
   }
   if(sec==='clients')renderClients();
   if(sec==='finance')renderFinance();
@@ -932,7 +936,13 @@ function renderCalendar(){
     const numEl=isToday?`<div class="cal-day-hd-num today">${d.getDate()}</div>`:`<div class="cal-day-hd-num">${d.getDate()}</div>`;
     head.innerHTML+=`<div class="cal-day-hd"><div class="cal-day-hd-name">${DAY_NAMES[i]}</div>${numEl}</div>`;
   });
+  
   const body=document.getElementById('calBody');
+  // Фиксируем скролл ПЕРЕД очисткой календаря (чтобы не прыгал наверх при обновлении данных/времени)
+  if (calInitialized && body.scrollTop > 0) {
+    calScrollSaved = body.scrollTop;
+  }
+
   body.innerHTML='';
 
   const timeCol=document.createElement('div');
@@ -940,7 +950,6 @@ function renderCalendar(){
   for(let h=HOURS_START;h<HOURS_END;h++){
     const slot=document.createElement('div');
     slot.className='cal-time-slot';
-    slot.style.height=HOUR_H+'px';
     slot.innerHTML=`<span class="cal-time-label">${String(h).padStart(2,'0')}:00</span>`;
     timeCol.appendChild(slot);
   }
@@ -1031,9 +1040,16 @@ function renderCalendar(){
 
     body.appendChild(col);
   });
+  
+  // Восстанавливаем скролл, чтобы не прыгало вверх
   setTimeout(()=>{
-    const scrollTo=(HOURS_START===7?0:HOURS_START)*HOUR_H;
-    body.scrollTop=Math.max(0,scrollTo);
+    if (!calInitialized) {
+      const scrollTo=(HOURS_START===7?0:HOURS_START)*HOUR_H;
+      body.scrollTop=Math.max(0,scrollTo);
+      calInitialized = true;
+    } else {
+      body.scrollTop = calScrollSaved;
+    }
   },50);
   if(!privacyOn)applyBlur();
 }
