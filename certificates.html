@@ -19,7 +19,7 @@
   --accent:#7c6fff;--accent2:#a099ff;--accent-bg:rgba(124,111,255,0.12);
   --green:#3ecf8e;--green-bg:rgba(62,207,142,0.1);
   --red:#ff5c6a;--red-bg:rgba(255,92,106,0.1);
-  --gold:#f5a623;--gold-bg:rgba(245,166,35,0.1);
+  --gold:#d4af37;--gold-bg:rgba(212,175,55,0.1);
   --blue:#3b9eff;--blue-bg:rgba(59,158,255,0.1);
   --r:12px;--r-sm:8px;
 }
@@ -73,8 +73,8 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cal-head-time{border-right:1px solid var(--border);}
 .cal-day-hd{padding:8px 6px;text-align:center;border-right:1px solid var(--border);}
 .cal-day-hd-name{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text3);}
-.cal-day-hd-num{font-size:16px;font-weight:700;margin-top:2px;color:var(--text);}
-.cal-day-hd-num.today{background:var(--accent);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;}
+.cal-day-hd-num{font-size:16px;font-weight:700;margin-top:2px;color:#ffffff !important;}
+.cal-day-hd-num.today{background:var(--accent);color:#ffffff !important;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;}
 .cal-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:56px repeat(7,1fr);}
 .cal-time-col{border-right:1px solid var(--border);}
 .cal-time-slot{height:60px;display:flex;align-items:flex-start;padding-top:4px;padding-right:6px;justify-content:flex-end;}
@@ -101,7 +101,8 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .td-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);}
 .td-time{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);}
 .td-name{font-weight:600;font-size:13px;}
-.td-phone{font-size:10px;color:var(--text3);}
+.td-phone{font-size:10px;color:var(--text3);transition:0.15s;cursor:pointer;}
+.td-phone:hover{color:var(--accent);}
 .td-svc{font-size:11px;color:var(--text2);max-width:200px;}
 .td-comment{font-size:10px;color:var(--text3);font-style:italic;margin-top:1px;}
 .td-price{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;white-space:nowrap;}
@@ -659,7 +660,7 @@ const PALETTE=[
   {id:'purple', hex:'#a099ff', bg:'rgba(124,111,255,0.18)', label:'Фиолет'},
   {id:'blue',   hex:'#3b9eff', bg:'rgba(59,158,255,0.18)',  label:'Синий'},
   {id:'green',  hex:'#3ecf8e', bg:'rgba(62,207,142,0.18)',  label:'Зелёный'},
-  {id:'gold',   hex:'#f5a623', bg:'rgba(245,166,35,0.18)',  label:'Золото'},
+  {id:'gold',   hex:'#d4af37', bg:'rgba(212,175,55,0.18)',  label:'Золото'},
   {id:'red',    hex:'#ff5c6a', bg:'rgba(255,92,106,0.18)',  label:'Красный'},
   {id:'teal',   hex:'#00d4c8', bg:'rgba(0,212,200,0.18)',   label:'Бирюза'},
   {id:'pink',   hex:'#ff79c6', bg:'rgba(255,121,198,0.18)', label:'Розовый'},
@@ -670,7 +671,7 @@ function palByHex(hex){return PALETTE.find(p=>p.hex===hex)||PALETTE[0];}
 function palById(id){return PALETTE.find(p=>p.id===id)||PALETTE[0];}
 
 /* ===== CONSTANTS ===== */
-const CM={white:'#9090a0',purple:'#a099ff',red:'#ff5c6a',green:'#3ecf8e',gold:'#f5a623',blue:'#3b9eff'};
+const CM={white:'#9090a0',purple:'#a099ff',red:'#ff5c6a',green:'#3ecf8e',gold:'#d4af37',blue:'#3b9eff'};
 const MNS=['ЯНВАРЬ','ФЕВРАЛЬ','МАРТ','АПРЕЛЬ','МАЙ','ИЮНЬ','ИЮЛЬ','АВГУСТ','СЕНТЯБРЬ','ОКТЯБРЬ','НОЯБРЬ','ДЕКАБРЬ'];
 const MNSh=['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
 const MNL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -1499,11 +1500,19 @@ function renderFinance(){
   
   if(!sorted.length){body.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:28px;">Нет ваших записей</td></tr>';return;}
 
-  sorted.forEach(row=>{
-    const full=row.fullTotal||row.total||0;const paid=row.total||0;const rest=Math.max(0,full-paid);
-    const color=row.eventColor||PALETTE[0].hex;
+  sorted.forEach(r=>{
+    const full=r.fullTotal||r.total||0;
+    const paid=r.total||0;
+    const rest=Math.max(0,full-paid);
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td data-label="Дата" class="td-date">${row.date}</td><td data-label="Клиент"><div style="display:flex;align-items:center;gap:6px;"><div style="width:3px;height:16px;border-radius:2px;background:${color}"></div><span class="td-name">${row.client||row.song||'—'}</span></div></td><td data-label="Телефон" class="td-phone">${row.phone||'—'}</td><td data-label="Услуги" class="td-svc">${row.services||'—'}</td><td data-label="Внесено" class="pv" style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;">${paid.toLocaleString()} ₽</td><td data-label="Долг" class="pv" style="text-align:right;color:var(--gold);font-family:'JetBrains Mono',monospace;">${rest>0?'−'+rest.toLocaleString()+' ₽':'—'}</td>`;
+    tr.innerHTML=`
+      <td data-label="Дата"><div class="td-date">${r.date||'—'}</div></td>
+      <td data-label="Клиент"><div class="td-name">${r.client||r.song||'—'}</div></td>
+      <td data-label="Телефон"><div class="td-phone">${r.phone||'—'}</div></td>
+      <td data-label="Услуги"><div class="td-svc">${r.services||'—'}</div></td>
+      <td data-label="Внесено" style="text-align:right;"><div class="td-price pv" style="color:var(--green)">${paid.toLocaleString()} ₽</div></td>
+      <td data-label="Долг" style="text-align:right;"><div class="td-price pv" style="color:var(--gold)">${rest>0?rest.toLocaleString()+' ₽':'0 ₽'}</div></td>
+    `;
     body.appendChild(tr);
   });
   if(!privacyOn)applyBlur();
@@ -1511,121 +1520,142 @@ function renderFinance(){
 
 /* ===== CERTS ===== */
 function renderCerts(){
-  const grid=document.getElementById('certGrid');if(!grid)return;
+  const grid=document.getElementById('certGrid');
+  if(!grid)return;
   grid.innerHTML='';
+  let arr=[];
   for(let i=1;i<=300;i++){
     const id='SSL-'+String(i).padStart(3,'0');
-    const d=certs[id]||{active:false,name:''};
-    const c=document.createElement('div');
-    c.className='cert-c'+(d.active?' used':'')+(certSelId===id?' sel':'');
-    if(!d.active)c.onclick=()=>{certSelId=certSelId===id?null:id;renderCerts();};
-    c.innerHTML=`<div class="cert-id">${id}</div>${d.active?`<div class="cert-nm">${d.name}</div><div class="cert-b cb-used">Использован</div>`:certSelId===id?`<div class="cert-b cb-sel">Выбран</div>`:`<div class="cert-b cb-free">Свободен</div>`}`;
-    grid.appendChild(c);
+    const d=certs[id];
+    arr.push({id,active:d?d.active:false,name:d?d.name:'',total:d?d.total:0,fullTotal:d?d.fullTotal:0});
   }
+  arr.forEach(c=>{
+    const el=document.createElement('div');
+    el.className='cert-c'+(c.active?' used':'');
+    el.innerHTML=`
+      <div class="cert-id">${c.id}</div>
+      <div class="cert-nm">${c.name||'—'}</div>
+      <div class="cert-b ${c.active?'cb-used':'cb-free'}">${c.active?'ИСПОЛЬЗОВАН':'СВОБОДЕН'}</div>
+    `;
+    el.onclick=()=>{
+      if(!c.active){
+         openSM('Активировать сертификат '+c.id+'?','number',()=>{
+           db.collection('certificates').doc(c.id).set({active:true,name:'Ручная активация',timestamp:Date.now()});
+           closeSM();
+         });
+      }
+    };
+    grid.appendChild(el);
+  });
 }
-window.resetCerts=async function(){
-  if(!confirm('Сбросить ВСЕ сертификаты?'))return;
-  const snap=await db.collection('certificates').get();
-  const batch=db.batch();snap.forEach(d=>batch.delete(d.ref));
-  await batch.commit();certSelId=null;
-};
 
 /* ===== ANALYTICS ===== */
 function renderAnalytics(){
-  const now=new Date(),year=now.getFullYear();
   const myData = getMyData();
-
-  const allP=myData.map(r=>Number(r.total||0)).filter(v=>v>0);
-  const avg=allP.length?Math.round(allP.reduce((a,b)=>a+b,0)/allP.length):0;
-  const yInc=myData.filter(r=>r.date&&r.date.endsWith('.'+year)).reduce((a,b)=>a+Number(b.total||0),0);
-  const done=myData.filter(r=>r.completed).length;
-  const debt=myData.reduce((a,b)=>a+Math.max(0,(b.fullTotal||b.total||0)-(b.total||0)),0);
+  let totalRev=0; let yearRev=0; let totalDbt=0; let done=0;
+  const tod=new Date(); const curY=String(tod.getFullYear());
+  const mRev=new Array(12).fill(0);
+  const svcMap={};
   
+  myData.forEach(r=>{
+    const paid=Number(r.total||0);
+    const full=Number(r.fullTotal||r.total||0);
+    const rem=Math.max(0,full-paid);
+    totalRev+=paid;
+    totalDbt+=rem;
+    if(r.completed)done++;
+    
+    if(r.date){
+      const[d,m,y]=r.date.split('.');
+      if(y===curY){
+        yearRev+=paid;
+        const mIdx=parseInt(m)-1;
+        if(mIdx>=0&&mIdx<12)mRev[mIdx]+=paid;
+      }
+    }
+    
+    if(r.details&&Array.isArray(r.details)){
+      r.details.forEach(det=>{
+        const sn=det.name.replace(' (50%)','');
+        if(!svcMap[sn])svcMap[sn]=0;
+        svcMap[sn]++;
+      });
+    }else if(r.type){
+      if(!svcMap[r.type])svcMap[r.type]=0;
+      svcMap[r.type]++;
+    }
+  });
+  
+  const avg=done>0?Math.round(totalRev/done):0;
   document.getElementById('anaAvg').textContent=avg.toLocaleString()+' ₽';
-  document.getElementById('anaAvgS').textContent='за '+allP.length+' записей';
   document.getElementById('anaTotal').textContent=myData.length;
-  document.getElementById('anaYear').textContent=yInc.toLocaleString()+' ₽';
-  document.getElementById('anaYearS').textContent=year+' год';
   document.getElementById('anaDone').textContent=done;
-  document.getElementById('anaDbt').textContent=debt.toLocaleString()+' ₽';
-  document.getElementById('anaChY').textContent=year;
+  document.getElementById('anaYear').textContent=yearRev.toLocaleString()+' ₽';
+  document.getElementById('anaDbt').textContent=totalDbt.toLocaleString()+' ₽';
+  document.getElementById('anaChY').textContent=curY;
   
-  const monthly=Array(12).fill(0);
-  myData.forEach(r=>{if(!r.date||!r.date.endsWith('.'+year))return;const mo=parseInt(r.date.split('.')[1])-1;if(mo>=0&&mo<12)monthly[mo]+=Number(r.total||0);});
-  const maxV=Math.max(...monthly,1);
-  const chart=document.getElementById('anaChart');chart.innerHTML='';
-  monthly.forEach((v,i)=>{
-    const pct=Math.round((v/maxV)*100);
-    const isCur=i===now.getMonth();
+  const chart=document.getElementById('anaChart');
+  chart.innerHTML='';
+  const maxM=Math.max(...mRev,1);
+  mRev.forEach((v,i)=>{
+    const h=(v/maxM)*100;
     const col=document.createElement('div');col.className='bar-col';
-    col.innerHTML=`<div class="bar-val pv">${v>0?(v>=1000?Math.round(v/1000)+'к':''+v):''}</div><div class="bar" style="height:${pct}px;background:${isCur?'#3ecf8e':'#7c6fff'}"></div><div class="bar-lbl">${MNSh[i]}</div>`;
+    col.innerHTML=`
+      <div class="bar-val pv" style="opacity:${v>0?1:0}">${(v/1000).toFixed(0)}k</div>
+      <div class="bar" style="height:${Math.max(h,3)}%;background:var(--accent);" title="${v.toLocaleString()} ₽"></div>
+      <div class="bar-lbl">${MNSh[i]}</div>
+    `;
     chart.appendChild(col);
   });
-  const svcC={};
-  myData.forEach(r=>{
-    if(r.details)r.details.forEach(d=>{const k=d.name.replace(' (50%)','').trim();svcC[k]=(svcC[k]||0)+1;});
-    else if(r.type){svcC[r.type]=(svcC[r.type]||0)+1;}
+  
+  const rnk=document.getElementById('anaRnk');
+  rnk.innerHTML='';
+  const topSvc=Object.entries(svcMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxS=Math.max(...topSvc.map(x=>x[1]),1);
+  topSvc.forEach(s=>{
+    const w=(s[1]/maxS)*100;
+    const d=document.createElement('div');d.className='svc-rr';
+    d.innerHTML=`
+      <div class="svc-rn">${s[0]}</div>
+      <div class="svc-rt"><div class="svc-rf" style="width:${w}%;background:var(--accent);"></div></div>
+      <div class="svc-rc">${s[1]}</div>
+    `;
+    rnk.appendChild(d);
   });
-  const sorted=Object.entries(svcC).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const maxC=sorted[0]?sorted[0][1]:1;
-  const sc=['#7c6fff','#ff5c6a','#3ecf8e','#f5a623','#3b9eff','#a099ff','#ff5c6a','#3ecf8e'];
-  const rnk=document.getElementById('anaRnk');rnk.innerHTML='';
-  if(!sorted.length){rnk.innerHTML='<div style="color:var(--text3);font-size:12px;">Нет данных</div>';return;}
-  sorted.forEach(([n,c],i)=>{
-    const pct=Math.round((c/maxC)*100);
-    const row=document.createElement('div');row.className='svc-rr';
-    row.innerHTML=`<div class="svc-rn">${n}</div><div class="svc-rt"><div class="svc-rf" style="width:${pct}%;background:${sc[i%sc.length]}"></div></div><div class="svc-rc">${c}</div>`;
-    rnk.appendChild(row);
-  });
+  
   if(!privacyOn)applyBlur();
 }
 
 /* ===== SIMPLE MODAL ===== */
-function openSM(title,type,cb,def=''){
+window.openSM=function(title,type,onConfirm,defVal=''){
   document.body.classList.add('modal-open');
   document.getElementById('msTitle').textContent=title;
   const inp=document.getElementById('msInput');
-  inp.value=def;
-  inp.style.display=type==='delete'?'none':'block';
-  inp.type=type==='text'?'text':'number';
-  const btn=document.getElementById('msConfirm');
-  btn.textContent=type==='delete'?'Удалить':'Готово';
-  btn.className='mb-btn '+(type==='delete'?'mb-delete':'mb-confirm');
-  btn.onclick=cb;
-  document.getElementById('moSimple').classList.add('open');
-  if(type!=='delete')setTimeout(()=>inp.focus(),50);
-}
-function closeSM(){
+  const mo=document.getElementById('moSimple');
+  const cf=document.getElementById('msConfirm');
+  
+  if(type==='delete'){
+    inp.style.display='none';
+    cf.className='mb-btn mb-delete';
+    cf.textContent='Удалить';
+  }else{
+    inp.style.display='block';
+    inp.value=defVal;
+    cf.className='mb-btn mb-confirm';
+    cf.textContent='Готово';
+    setTimeout(()=>inp.focus(),100);
+  }
+  cf.onclick=onConfirm;
+  mo.classList.add('open');
+};
+window.closeSM=function(){
   document.body.classList.remove('modal-open');
   document.getElementById('moSimple').classList.remove('open');
-}
-window.closeSM=closeSM;
-document.getElementById('moSimple').onclick=function(e){if(e.target===this)closeSM();};
-document.getElementById('moRecord').onclick=function(e){if(e.target===this)closeRecModal();};
+};
 
-/* ===== OFFLINE ===== */
-function updOff(){document.getElementById('offBar').style.display=navigator.onLine?'none':'block';}
-window.addEventListener('online',updOff);window.addEventListener('offline',updOff);updOff();
-/* ===== МОБИЛЬНОЕ МЕНЮ И СВАЙПЫ ===== */
-document.addEventListener('DOMContentLoaded', () => {
-  const sidebar = document.querySelector('.sidebar');
-  if (sidebar) {
-    let touchstartX = 0;
-    let touchendX = 0;
-
-    sidebar.addEventListener('touchstart', e => {
-        touchstartX = e.changedTouches[0].screenX;
-    }, {passive: true});
-
-    sidebar.addEventListener('touchend', e => {
-        touchendX = e.changedTouches[0].screenX;
-        if (touchstartX - touchendX > 40) { 
-            
-            sidebar.classList.remove('mobile-open');
-        }
-    }, {passive: true});
-  }
-});
+/* ===== NETWORK STATUS ===== */
+window.addEventListener('online',()=>document.getElementById('offBar').style.display='none');
+window.addEventListener('offline',()=>document.getElementById('offBar').style.display='block');
 </script>
 </body>
 </html>
