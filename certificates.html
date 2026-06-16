@@ -28,7 +28,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;displ
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
-/* Блокировка скролла фона */
 body.modal-open { overflow: hidden; touch-action: none; }
 
 /* SIDEBAR */
@@ -47,15 +46,13 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .u-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .u-role{font-size:10px;color:var(--text3);}
 
-/* MAIN & TOPBAR (только для мобилок) */
+/* MAIN & TOPBAR */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .topbar{display:none; height:52px; background:var(--surface); border-bottom:1px solid var(--border); align-items:center; padding:0 18px; flex-shrink:0;}
 .content{flex:1;overflow:hidden;display:flex;}
 
-/* VIEWS */
+/* VIEWS & TOOLBAR */
 .view{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-
-/* TOOLBAR */
 .toolbar{padding:10px 18px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
 .tb-btn{padding:6px 11px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap;}
 .tb-btn:hover{color:var(--text);border-color:var(--border2);}
@@ -859,7 +856,7 @@ window.togglePrivacy=function(){
   else{privacyOn=true;removeBlur();}
 };
 
-/* ===== НОВАЯ НАВИГАЦИЯ ДАТ (НЕДЕЛИ/МЕСЯЦА) ===== */
+/* ===== НОВАЯ НАВИГАЦИЯ ДАТ ===== */
 function changeDateScope(type, d) {
   if (viewMode === 'calendar') {
     if (type === 'week') {
@@ -1080,6 +1077,8 @@ function showEvPopup(ev,e){
 
   const color=ev.eventColor||window.PROFILE?.color||PALETTE[0].hex;
   pop.style.borderTop='3px solid '+color;
+  
+  // ПРОВЕРКА ПРАВ: только создатель или мастер
   const isAuthor = window.PROFILE && ((ev.authorPhone && norm(window.PROFILE.phone) === norm(ev.authorPhone)) || norm(window.PROFILE.phone) === MASTER_PHONE);
   const actsBlock = document.querySelector('.ev-pop-acts');
   actsBlock.style.display = isAuthor ? 'flex' : 'none';
@@ -1102,43 +1101,6 @@ function showEvPopup(ev,e){
   if(!privacyOn)applyBlur();
 }
 function closeEvPopup(){document.getElementById('evPopup').classList.remove('open');popupId=null;}
-document.addEventListener('click',e=>{
-  if(!document.getElementById('evPopup').contains(e.target))closeEvPopup();
-});
-
-/* ===== CLIENT RENAME FUNCTION ===== */
-window.renameClient = async function(oldName) {
-  const newName = prompt(`Переименовать клиента "${oldName}"?\nВведите новое имя:`, oldName);
-  if (!newName || newName.trim() === '' || newName === oldName) return;
-  
-  const isMaster = window.PROFILE.phone === MASTER_PHONE;
-  const pPhone = norm(window.PROFILE.phone);
-  
-  const records = window.CRM.filter(r => {
-    const rName = (r.client||r.song||'').split('-')[0].trim();
-    if (rName !== oldName) return false;
-    if (!isMaster && r.authorPhone !== pPhone) return false;
-    return true;
-  });
-  if (records.length === 0) {
-    alert('Не найдено записей для обновления.');
-    return;
-  }
-  
-  if (confirm(`Будет обновлено записей: ${records.length}. Продолжить?`)) {
-    const batch = db.batch();
-    records.forEach(r => {
-      const ref = SC.doc(r.id);
-      batch.update(ref, { client: newName.trim(), song: newName.trim() });
-    });
-    try {
-      await batch.commit();
-      alert('Имя клиента успешно обновлено!');
-    } catch(e) {
-      alert('Ошибка обновления: ' + e.message);
-    }
-  }
-};
 
 /* ===== ACTIONS ===== */
 window.markDone=function(id){
@@ -1335,7 +1297,7 @@ window.toggleCertMode=function(){
 /* ===== SAVE RECORD ===== */
 window.saveRecord=async function(){
   
-  // АВТО-ПЕРЕХВАТ ручной услуги (для тех, кто вписал цену, но забыл нажать плюсик)
+  // ПЕРЕХВАТ ДЛЯ ПРЕПОДАВАТЕЛЕЙ: Если заполнено вручную, но не нажат "+", добавляем автоматически
   const mName = document.getElementById('mSvcName').value.trim();
   const mPrice = parseInt(document.getElementById('mSvcPrice').value);
   if(mName && !isNaN(mPrice) && mPrice > 0){
@@ -1363,7 +1325,6 @@ window.saveRecord=async function(){
   const details=JSON.parse(JSON.stringify(formDetails));
   const svcsLabel=details.length?details.map(i=>i.name).join(', '):type;
   
-  // Теперь здесь будет актуальная сумма, даже если они не нажали плюс
   const fullT=details.reduce((s,i)=>s+(i.basePrice||i.price),0)||0;
   const paid=details.reduce((s,i)=>s+i.price,0)||0;
   const useCert=document.getElementById('certToggle').checked;
@@ -1491,7 +1452,6 @@ function renderClients(){
         <div class="cl-av" style="background:${pal.bg};color:${c.color}">${c.name[0]?.toUpperCase()||'?'}</div>
         <div><div class="cl-nm">${c.name}</div><div class="cl-ph">${c.phone||'—'}</div></div>
       </div>
-      <div style="color:var(--text3); cursor:pointer; padding:4px;" onclick="renameClient('${c.name}')" title="Редактировать клиента"><i class="fa-solid fa-pen"></i></div>
     </div>
     <div class="cl-stats">
       <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${c.color}">${c.visits}</div></div>
@@ -1506,6 +1466,7 @@ function renderClients(){
 
 /* ===== FINANCE ===== */
 function renderFinance(){
+  // Берем только свои данные
   const myData = getMyData();
   const body=document.getElementById('finBody');body.innerHTML='';
   const sorted=[...myData].sort((a,b)=>b.timestamp-a.timestamp).slice(0,60);
@@ -1562,6 +1523,7 @@ function renderCerts(){
 
 /* ===== ANALYTICS ===== */
 function renderAnalytics(){
+  // Берем только свои данные
   const myData = getMyData();
   let totalRev=0; let yearRev=0; let totalDbt=0; let done=0;
   let work=0;
@@ -1668,18 +1630,27 @@ window.addEventListener('offline',()=>document.getElementById('offBar').style.di
 
 /* ===== SWIPE & CLICK OUTSIDE SIDEBAR ===== */
 let touchStartX = 0;
+let touchStartY = 0;
+
 document.addEventListener('touchstart', e => {
   if (e.changedTouches.length > 0) {
-    touchStartX = e.changedTouches[0].screenX;
+    touchStartX = e.changedTouches[0].clientX;
+    touchStartY = e.changedTouches[0].clientY;
   }
 }, {passive: true});
 
 document.addEventListener('touchend', e => {
   if (e.changedTouches.length > 0) {
-    const touchEndX = e.changedTouches[0].screenX;
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const diffX = touchStartX - touchEndX;
+    const diffY = Math.abs(touchStartY - touchEndY);
     const sidebar = document.querySelector('.sidebar');
+    
     if (sidebar && sidebar.classList.contains('mobile-open')) {
-      if (touchStartX - touchEndX > 50) { // Свайп влево
+      // Свайп влево: смещение по горизонтали > 50px и движение было горизонтальным
+      if (diffX > 50 && diffX > diffY) {
         sidebar.classList.remove('mobile-open');
       }
     }
@@ -1689,8 +1660,15 @@ document.addEventListener('touchend', e => {
 document.addEventListener('click', e => {
   const sidebar = document.querySelector('.sidebar');
   const topbarBtn = document.querySelector('.topbar .tb-btn');
+  
   if (sidebar && sidebar.classList.contains('mobile-open')) {
-    // Если клик не по меню и не по кнопке открытия меню
+    // Закрываем меню, если кликнули по пункту меню или выходу
+    if (sidebar.contains(e.target) && (e.target.closest('.nav-i') || e.target.closest('.sb-user'))) {
+      sidebar.classList.remove('mobile-open');
+      return;
+    }
+    
+    // Закрываем меню, если кликнули мимо него (вне зоны сайдбара и кнопки бургера)
     if (!sidebar.contains(e.target) && (!topbarBtn || !topbarBtn.contains(e.target))) {
       sidebar.classList.remove('mobile-open');
     }
