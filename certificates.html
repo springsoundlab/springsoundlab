@@ -939,8 +939,7 @@ function renderCalendar(){
     timeCol.appendChild(slot);
   }
   body.appendChild(timeCol);
-  // Используем только данные текущего пользователя
-  let data = getMyData();
+  let data = window.CRM;
 
   const byDate={};
   data.forEach(r=>{if(r.date&&r.time){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);}});
@@ -1356,7 +1355,7 @@ window.saveRecord=async function(){
   }catch(e){alert('Ошибка: '+e.message);}
 };
 
-/* ===== SESSIONS LIST (исправленная фильтрация) ===== */
+/* ===== SESSIONS LIST ===== */
 function renderSessions(){
   const body=document.getElementById('sessBody');
   if(!body)return;
@@ -1365,8 +1364,7 @@ function renderSessions(){
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
   
-  // Используем только свои записи
-  let data = getMyData().filter(r=>{
+  let data = window.CRM.filter(r=>{
     if(r.date&&r.date.includes(mk))return true;
     if(!r.completed)return true;
     return false;
@@ -1469,6 +1467,7 @@ function renderFinance(){
   const body=document.getElementById('finBody');body.innerHTML='';
   
   const currentMonthKey = mKey(new Date());
+  // Все незавершённые записи + записи текущего месяца
   const filtered = myData.filter(r => {
     if (!r.date) return false;
     const inCurrentMonth = r.date.includes(currentMonthKey);
