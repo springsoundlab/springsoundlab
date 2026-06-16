@@ -182,15 +182,18 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .svc-rf{height:100%;border-radius:3px;}
 .svc-rc{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;min-width:24px;text-align:right;}
 
-/* MODAL OVERLAY - ИСПРАВЛЕННЫЙ СКРОЛЛ */
+/* MODAL OVERLAY */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;overflow-y:auto;padding:20px 10px;-webkit-overflow-scrolling:touch;}
 .mo.open{display:block;}
 .mb{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:22px;width:440px;max-width:100%;margin:0 auto 40px auto;box-shadow:0 20px 60px rgba(0,0,0,.5);}
-.mb-title{font-size:14px;font-weight:700;margin-bottom:16px;}
+.mb-title{font-size:14px;font-weight:700;}
+.mb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.mb-close { color: var(--red); cursor: pointer; font-size: 16px; font-weight: bold; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--red-bg); border-radius: 6px; transition: 0.15s; }
+.mb-close:hover { background: var(--red); color: #fff; }
 .mb-sm{width:320px;margin:auto;margin-top:30vh;}
 .mb-num-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:11px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:22px;text-align:center;outline:none;margin-bottom:14px;transition:.15s;}
 .mb-num-input:focus{border-color:var(--accent);}
-.mb-btns{display:flex;gap:7px;}
+.mb-btns{display:flex;gap:7px; margin-top: 15px;}
 .mb-btn{flex:1;padding:10px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:12px;font-weight:700;transition:.15s;}
 .mb-cancel{background:var(--surface2);color:var(--text2);}
 .mb-confirm{background:var(--accent);color:#fff;}
@@ -276,19 +279,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 /* MOBILE АДАПТАЦИЯ */
 @media(max-width:768px){
-  .sidebar {
-    position: fixed !important;
-    top: 0;
-    left: -280px; 
-    width: 260px !important;
-    height: 100vh !important;
-    z-index: 99999 !important;
-    transition: left 0.3s ease-in-out;
-    box-shadow: 5px 0 25px rgba(0,0,0,0.5);
-    display: flex !important;
-    flex-direction: column !important;
-    border-right: 1px solid var(--border);
-  }
+  .sidebar { position: fixed !important; top: 0; left: -280px; width: 260px !important; height: 100vh !important; z-index: 99999 !important; transition: left 0.3s ease-in-out; box-shadow: 5px 0 25px rgba(0,0,0,0.5); display: flex !important; flex-direction: column !important; border-right: 1px solid var(--border); }
   .sidebar.mobile-open { left: 0 !important; }
   body { display: flex !important; flex-direction: row !important;}
   .main { width: 100vw !important; margin-left: 0 !important; flex: 1 !important; }
@@ -415,7 +406,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
     <div id="secSessions" class="view">
       <div class="toolbar">
-    
         <button class="tb-btn green-btn" onclick="openNewForm()"><i class="fa-solid fa-plus"></i> Новая запись</button>
         <div class="view-mode">
           <div class="vm-btn active" id="vmCal" onclick="setViewMode('calendar')"><i class="fa-regular fa-calendar"></i> Календарь</div>
@@ -424,7 +414,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
        
         <div class="mnav">
           <div class="mnav-btn" onclick="changeDateScope('month', -1)" title="Месяц назад"><i class="fa-solid fa-angles-left"></i></div>
-      
           <div class="mnav-btn" onclick="changeDateScope('week', -1)" title="Неделя назад"><i class="fa-solid fa-angle-left"></i></div>
           <div class="mnav-label" id="mnavLbl">Июнь 2026</div>
           <div class="mnav-btn" onclick="changeDateScope('week', 1)" title="Неделя вперед"><i class="fa-solid fa-angle-right"></i></div>
@@ -444,7 +433,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
               <th style="width:88px;">Дата</th>
               <th style="width:100px;">Время</th>
               <th>Клиент</th>
-          
               <th>Телефон</th>
               <th>Услуги</th>
               <th style="text-align:right;width:100px;">Сумма</th>
@@ -453,7 +441,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
             </tr></thead>
             <tbody id="sessBody"></tbody>
           </table>
-  
         </div>
       </div>
     </div>
@@ -502,7 +489,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         </div>
         <div class="chart-s">
           <div class="chart-ttl">Топ моих услуг</div>
-   
           <div class="svc-rnk" id="anaRnk"></div>
         </div>
       </div>
@@ -528,7 +514,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   <div class="ev-pop-row"><i class="fa-solid fa-ruble-sign" style="font-size:10px;"></i><span id="evPopPrice" class="pv">—</span></div>
   <div class="ev-pop-row" id="evPopPhoneRow"><i class="fa-solid fa-phone" style="font-size:10px;"></i><span id="evPopPhone">—</span></div>
   <div class="ev-pop-row" id="evPopComRow" style="display:none;"><i class="fa-regular fa-comment" style="font-size:10px;"></i><span id="evPopCom" style="font-style:italic;"></span></div>
-  <div class="ev-pop-acts">
+  <div class="ev-pop-acts" style="display:none;">
     <div class="ev-pop-btn g" id="evBtnDone">✓ Готово</div>
     <div class="ev-pop-btn b" id="evBtnEdit">✏ Ред.</div>
     <div class="ev-pop-btn go" id="evBtnPay">₽ Долг</div>
@@ -538,32 +524,26 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 <div class="mo" id="moRecord">
   <div class="mb" id="mbRecord">
-    <div class="mb-title" id="mbRecTitle">Новая запись</div>
+    <div class="mb-header">
+      <div class="mb-title" id="mbRecTitle">Новая запись</div>
+      <div class="mb-close" onclick="closeRecModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
     <div id="classicForm">
-      <div class="f-row full">
-        <div class="f-group"><div class="f-label">Дата</div><input type="date" id="fDate" class="f-inp"></div>
-      </div>
-      <div class="f-row">
-        <div class="f-group"><div class="f-label">Время (с)</div><input type="time" id="fTime" class="f-inp mono"></div>
-        <div class="f-group"><div class="f-label">Время (до)</div><input type="time" id="fTimeEnd" class="f-inp mono"></div>
-      </div>
-      <div class="f-row">
-        <div class="f-group"><div class="f-label">Имя клиента</div><input type="text" id="fName" class="f-inp" placeholder="Иван Иванов"></div>
-        <div class="f-group"><div class="f-label">Телефон</div><input type="tel" id="fPhone" class="f-inp" placeholder="+7 900 000-00-00" inputmode="tel"></div>
-      </div>
-    
-      <div class="f-row">
-        <div class="f-group"><div class="f-label">Название песни / проекта</div><input type="text" id="fSong" class="f-inp" placeholder="Название - Песня"></div>
-        <div class="f-group"><div class="f-label">Тип записи</div>
-          <select id="fType" class="f-inp">
-            </select>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="f-group"><div class="f-label">Дата</div><input type="date" id="fDate" class="f-inp"></div>
+          <div class="f-group"><div class="f-label">Имя клиента</div><input type="text" id="fName" class="f-inp" placeholder="Иван Иванов"></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="f-group"><div class="f-label">Время (с)</div><input type="time" id="fTime" class="f-inp mono"></div>
+          <div class="f-group"><div class="f-label">Время (до)</div><input type="time" id="fTimeEnd" class="f-inp mono"></div>
+          <div class="f-group"><div class="f-label">Телефон</div><input type="tel" id="fPhone" class="f-inp" placeholder="+7 900 000-00-00" inputmode="tel"></div>
         </div>
       </div>
 
       <div class="color-pick-row">
         <span class="color-pick-label">Цвет</span>
         <div id="formColorPick"></div>
-    
         <span style="font-size:10px;color:var(--text3);margin-left:6px;" id="formColorNote">Ваш цвет по умолчанию</span>
       </div>
 
@@ -577,7 +557,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         </div>
       </div>
 
-   
       <div id="presetSvcs" style="display:none;">
         <div class="prepaid-row">
           <div class="pr-lbl">50% предоплата</div>
@@ -612,7 +591,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <label class="tgl"><input type="checkbox" id="certToggle" onchange="toggleCertMode()"><div class="tgl-s"></div></label>
         </div>
         <div id="certPicker" style="display:none;margin-top:6px;">
-       
           <select id="certSelect" class="f-inp">
             <option value="">— Выберите сертификат —</option>
           </select>
@@ -625,9 +603,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     </div>
 
     <div class="mb-btns">
-      <button class="mb-btn mb-cancel" onclick="closeRecModal()">Отмена</button>
-     
-      <button class="mb-btn mb-confirm" onclick="saveRecord()">Сохранить</button>
+      <button class="mb-btn mb-confirm" onclick="saveRecord()" style="width:100%;">Сохранить</button>
     </div>
   </div>
 </div>
@@ -666,7 +642,6 @@ const PALETTE=[
   {id:'pink',   hex:'#ff79c6', bg:'rgba(255,121,198,0.18)', label:'Розовый'},
   {id:'orange', hex:'#ff9f43', bg:'rgba(255,159,67,0.18)',  label:'Оранжев.'},
 ];
-
 function palByHex(hex){return PALETTE.find(p=>p.hex===hex)||PALETTE[0];}
 function palById(id){return PALETTE.find(p=>p.id===id)||PALETTE[0];}
 
@@ -676,7 +651,6 @@ const MNS=['ЯНВАРЬ','ФЕВРАЛЬ','МАРТ','АПРЕЛЬ','МАЙ','�
 const MNSh=['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
 const MNL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const DAYS_RU=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-
 /* МАСТЕР АККАУНТ ДЛЯ ИЗОЛЯЦИИ */
 const MASTER_PHONE = '79178382017'; 
 
@@ -708,7 +682,7 @@ function inputToDate(s){if(!s)return '';const[y,m,d]=s.split('-');return d+'.'+m
 function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
 
-/* Умный фильтр данных: Возвращает только записи текущего пользователя */
+/* Умный фильтр данных: Возвращает только записи текущего пользователя (или все для мастера) */
 function getMyData() {
   if (!window.PROFILE) return [];
   const pPhone = norm(window.PROFILE.phone || '');
@@ -769,7 +743,6 @@ window.doLogin=async function(){
   catch(e){let m='Неверный номер или пароль.';if(e.code==='auth/too-many-requests')m='Слишком много попыток.';showErr(m);}
   finally{btn.disabled=false;btn.textContent='Войти';}
 };
-
 window.doRegister=async function(){
   document.getElementById('authErr').style.display='none';
   const name=document.getElementById('regName').value.trim();
@@ -789,7 +762,6 @@ window.doRegister=async function(){
 };
 
 window.doLogout=function(){if(confirm('Выйти?'))auth.signOut();};
-
 auth.onAuthStateChanged(async(user)=>{
   if(user){
     let p=null;
@@ -934,8 +906,8 @@ function dateStr(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getM
 
 
 /* ===== CALENDAR RENDER ===== */
-const HOURS_START=7; // 07:00
-const HOURS_END=24;  // midnight
+const HOURS_START=7;
+const HOURS_END=24; 
 const HOUR_H=60;
 
 function renderCalendar(){
@@ -966,7 +938,7 @@ function renderCalendar(){
   }
   body.appendChild(timeCol);
 
-  let data = getMyData();
+  let data = window.CRM;
 
   const byDate={};
   data.forEach(r=>{if(r.date&&r.time){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);}});
@@ -990,7 +962,6 @@ function renderCalendar(){
       if(topPx>=0&&topPx<=(HOURS_END-HOURS_START)*HOUR_H){
         const nl=document.createElement('div');
         nl.className='cal-now-line';
- 
         nl.style.top=topPx+'px';
         nl.innerHTML='<div class="cal-now-dot"></div>';
         col.appendChild(nl);
@@ -1098,11 +1069,12 @@ function showEvPopup(ev,e){
 
   const color=ev.eventColor||window.PROFILE?.color||PALETTE[0].hex;
   pop.style.borderTop='3px solid '+color;
-  const actsBlock = document.querySelector('.ev-pop-acts');
-  actsBlock.style.display = 'flex';
   
   const isAuthor = window.PROFILE && ((ev.authorPhone && norm(window.PROFILE.phone) === norm(ev.authorPhone)) || norm(window.PROFILE.phone) === MASTER_PHONE);
-
+  const actsBlock = document.querySelector('.ev-pop-acts');
+  
+  actsBlock.style.display = isAuthor ? 'flex' : 'none';
+  
   document.getElementById('evBtnDone').style.display = (isSound && isAuthor) ? 'block' : 'none';
   document.getElementById('evBtnPay').style.display = (isSound && isAuthor) ? 'block' : 'none';
   document.getElementById('evBtnEdit').style.display = isAuthor ? 'block' : 'none';
@@ -1112,7 +1084,7 @@ function showEvPopup(ev,e){
   document.getElementById('evBtnEdit').onclick=()=>{closeEvPopup();openEdit(ev.id);};
   document.getElementById('evBtnPay').onclick=()=>{closeEvPopup();addPay(ev.id);};
   document.getElementById('evBtnDel').onclick=()=>{closeEvPopup();delRec(ev.id);};
-
+  
   const x=e.clientX;const y=e.clientY;
   const pw=240;const ph=180;
   pop.style.left=Math.min(x+8,window.innerWidth-pw-10)+'px';
@@ -1125,6 +1097,41 @@ document.addEventListener('click',e=>{
   if(!document.getElementById('evPopup').contains(e.target))closeEvPopup();
 });
 
+/* ===== CLIENT RENAME FUNCTION ===== */
+window.renameClient = async function(oldName) {
+  const newName = prompt(`Переименовать клиента "${oldName}"?\nВведите новое имя:`, oldName);
+  if (!newName || newName.trim() === '' || newName === oldName) return;
+  
+  const isMaster = window.PROFILE.phone === MASTER_PHONE;
+  const pPhone = norm(window.PROFILE.phone);
+  
+  const records = window.CRM.filter(r => {
+    const rName = (r.client||r.song||'').split('-')[0].trim();
+    if (rName !== oldName) return false;
+    if (!isMaster && r.authorPhone !== pPhone) return false;
+    return true;
+  });
+  
+  if (records.length === 0) {
+    alert('Не найдено записей для обновления.');
+    return;
+  }
+  
+  if (confirm(`Будет обновлено записей: ${records.length}. Продолжить?`)) {
+    const batch = db.batch();
+    records.forEach(r => {
+      const ref = SC.doc(r.id);
+      batch.update(ref, { client: newName.trim(), song: newName.trim() });
+    });
+    try {
+      await batch.commit();
+      alert('Имя клиента успешно обновлено!');
+    } catch(e) {
+      alert('Ошибка обновления: ' + e.message);
+    }
+  }
+};
+
 /* ===== ACTIONS ===== */
 window.markDone=function(id){
   const row=window.CRM.find(r=>r.id===id);if(!row)return;
@@ -1133,7 +1140,6 @@ window.markDone=function(id){
   if(isC){const full=Number(row.fullTotal||row.total||0);const paid=Number(row.total||0);const rem=full-paid;upd.completedDate=todayStr();if(rem>0){upd.completionPayment=rem;upd.total=full;}}
   SC.doc(id).update(upd);
 };
-
 window.delRec=function(id){
   openSM('Удалить запись?','delete',()=>{SC.doc(id).delete();closeSM();});
 };
@@ -1166,7 +1172,6 @@ function openNewForm(){
   document.getElementById('fTimeEnd').value='';
   document.getElementById('fName').value='';
   document.getElementById('fPhone').value='';
-  document.getElementById('fSong').value='';
   document.getElementById('fComment').value='';
   document.getElementById('preToggle').checked=false;
   document.getElementById('certToggle').checked=false;
@@ -1203,19 +1208,6 @@ function setupFormMode(){
     setSvcMode('manual');
     document.getElementById('presetSvcs').style.display='none';
   }
-  
-  const typeSel = document.getElementById('fType');
-  typeSel.innerHTML = '';
-  const r = window.PROFILE?.role;
-  if(r === 'Звукорежиссёр') {
-    typeSel.innerHTML = '<option value="Студийная запись">🎧 Студийная запись</option>';
-  } else if(r === 'Вокал') {
-    typeSel.innerHTML = '<option value="Вокал">🎤 Вокал</option>';
-  } else if(r === 'Гитара') {
-    typeSel.innerHTML = '<option value="Гитара">🎸 Гитара</option>';
-  } else {
-    typeSel.innerHTML = '<option value="Студийная запись">🎧 Студийная запись</option><option value="Вокал">🎤 Вокал</option><option value="Гитара">🎸 Гитара</option><option value="Аранжировка">🎹 Аранжировка</option><option value="Сведение/Мастеринг">🔊 Сведение/Мастеринг</option><option value="Другое">📝 Другое</option>';
-  }
 }
 
 window.setSvcMode=function(m){
@@ -1239,7 +1231,6 @@ window.openEdit=function(id){
   document.getElementById('fTimeEnd').value=row.timeEnd||'';
   document.getElementById('fName').value=row.client||row.song||'';
   document.getElementById('fPhone').value=row.phone||'';
-  document.getElementById('fSong').value=row.song||'';
   document.getElementById('fComment').value=row.comment||'';
   document.getElementById('preToggle').checked=false;
   document.getElementById('certToggle').checked=false;
@@ -1247,9 +1238,6 @@ window.openEdit=function(id){
   setupFormColorPicker();
   renderFormSvcs();
   setupFormMode();
-  
-  if (row.type) { document.getElementById('fType').value = row.type;
-  }
   
   const modal = document.getElementById('moRecord');
   modal.classList.add('open');
@@ -1345,9 +1333,10 @@ window.saveRecord=async function(){
   const time=document.getElementById('fTime').value||'';
   const timeEnd=document.getElementById('fTimeEnd').value||'';
   const phone=document.getElementById('fPhone').value.trim();
-  const song=document.getElementById('fSong').value.trim()||name;
-  const type=document.getElementById('fType').value;
   const comment=document.getElementById('fComment').value.trim();
+  
+  const song = name; 
+  const type = 'Услуга'; 
   
   const author=window.PROFILE?.name || '—';
   const authorUid=window.PROFILE?.uid || '';
@@ -1420,7 +1409,6 @@ function renderSessions(){
     const statusBadge=isDone?'<span class="ss-badge ss-done">Готово</span>':rest>0?'<span class="ss-badge ss-debt">Долг −'+rest.toLocaleString()+'₽</span>':'<span class="ss-badge ss-work">В работе</span>';
     const roleTag=row.authorName?`<span class="role-tag">${row.authorName}</span>`:'';
     const timeDisplay = row.time ? `${row.time} ${row.timeEnd ? '- ' + row.timeEnd : ''}` : '—';
-
     const isAuthor = window.PROFILE && ((row.authorPhone && norm(window.PROFILE.phone) === norm(row.authorPhone)) || norm(window.PROFILE.phone) === MASTER_PHONE);
 
     let actsHTML = '';
@@ -1432,7 +1420,6 @@ function renderSessions(){
     }
     
     const priceHTML = `<div class="pv">${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}</div>`;
-
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${row.date||'—'}</div></td>
       <td data-label="Время"><div class="td-time" style="color:${color}">${showT?timeDisplay:'—'}</div></td>
@@ -1442,8 +1429,7 @@ function renderSessions(){
           <div>
             <div class="td-name">${row.client||row.song||'—'}${roleTag}</div>
             ${row.comment?`<div class="td-comment">💬 ${row.comment}</div>`:''}
-           
-             <div class="prog"><div class="prog-fill ${isDone?'done':''}" style="width:${Math.round(perc)}%;background:${color}"></div></div>
+            <div class="prog"><div class="prog-fill ${isDone?'done':''}" style="width:${Math.round(perc)}%;background:${color}"></div></div>
           </div>
         </div>
       </td>
@@ -1480,7 +1466,14 @@ function renderClients(){
     const pal=palByHex(c.color);
     const topType=Object.entries(c.types).sort((a,b)=>b[1]-a[1])[0];
     const card=document.createElement('div');card.className='cl-card';
-    card.innerHTML=`<div class="cl-top"><div class="cl-av" style="background:${pal.bg};color:${c.color}">${c.name[0]?.toUpperCase()||'?'}</div><div><div class="cl-nm">${c.name}</div><div class="cl-ph">${c.phone||'—'}</div></div></div>
+    card.innerHTML=`
+    <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <div style="display:flex; gap:9px; align-items:center;">
+        <div class="cl-av" style="background:${pal.bg};color:${c.color}">${c.name[0]?.toUpperCase()||'?'}</div>
+        <div><div class="cl-nm">${c.name}</div><div class="cl-ph">${c.phone||'—'}</div></div>
+      </div>
+      <div style="color:var(--text3); cursor:pointer; padding:4px;" onclick="renameClient('${c.name}')" title="Редактировать клиента"><i class="fa-solid fa-pen"></i></div>
+    </div>
     <div class="cl-stats">
       <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${c.color}">${c.visits}</div></div>
       <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${c.color}">${c.total.toLocaleString()}</div></div>
@@ -1497,7 +1490,6 @@ function renderFinance(){
   const myData = getMyData();
   const body=document.getElementById('finBody');body.innerHTML='';
   const sorted=[...myData].sort((a,b)=>b.timestamp-a.timestamp).slice(0,60);
-  
   if(!sorted.length){body.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:28px;">Нет ваших записей</td></tr>';return;}
 
   sorted.forEach(r=>{
@@ -1543,7 +1535,7 @@ function renderCerts(){
            db.collection('certificates').doc(c.id).set({active:true,name:'Ручная активация',timestamp:Date.now()});
            closeSM();
          });
-      }
+       }
     };
     grid.appendChild(el);
   });
@@ -1556,7 +1548,6 @@ function renderAnalytics(){
   const tod=new Date(); const curY=String(tod.getFullYear());
   const mRev=new Array(12).fill(0);
   const svcMap={};
-  
   myData.forEach(r=>{
     const paid=Number(r.total||0);
     const full=Number(r.fullTotal||r.total||0);
@@ -1585,7 +1576,6 @@ function renderAnalytics(){
       svcMap[r.type]++;
     }
   });
-  
   const avg=done>0?Math.round(totalRev/done):0;
   document.getElementById('anaAvg').textContent=avg.toLocaleString()+' ₽';
   document.getElementById('anaTotal').textContent=myData.length;
@@ -1607,7 +1597,6 @@ function renderAnalytics(){
     `;
     chart.appendChild(col);
   });
-  
   const rnk=document.getElementById('anaRnk');
   rnk.innerHTML='';
   const topSvc=Object.entries(svcMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -1622,7 +1611,6 @@ function renderAnalytics(){
     `;
     rnk.appendChild(d);
   });
-  
   if(!privacyOn)applyBlur();
 }
 
@@ -1633,7 +1621,6 @@ window.openSM=function(title,type,onConfirm,defVal=''){
   const inp=document.getElementById('msInput');
   const mo=document.getElementById('moSimple');
   const cf=document.getElementById('msConfirm');
-  
   if(type==='delete'){
     inp.style.display='none';
     cf.className='mb-btn mb-delete';
