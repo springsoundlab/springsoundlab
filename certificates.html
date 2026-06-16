@@ -685,11 +685,14 @@ function inputToDate(s){if(!s)return '';const[y,m,d]=s.split('-');return d+'.'+m
 function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
 
-/* Умный фильтр данных: Возвращает только записи текущего пользователя */
+/* Умный фильтр данных: Возвращает только записи текущего пользователя (или все для мастера) */
 function getMyData() {
   if (!window.PROFILE) return [];
-  const pPhone = norm(window.PROFILE.phone || '');
-  return window.CRM.filter(r => r.authorPhone === pPhone);
+  const currentPhone = norm(window.PROFILE.phone || '');
+  if (currentPhone === MASTER_PHONE) {
+    return window.CRM; // мастер видит всё
+  }
+  return window.CRM.filter(r => r.authorPhone === currentPhone);
 }
 
 /* ===== COLOR PICKER INIT ===== */
@@ -1356,8 +1359,11 @@ function renderSessions(){
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
   
+  // Используем те же данные, что и в календаре – все записи в памяти
   let data = window.CRM.filter(r=>{
+    // Только за выбранный месяц (тот же фильтр, что и в календаре по дате)
     if(r.date&&r.date.includes(mk))return true;
+    // Если запись не завершена, покажем даже если она не в текущем месяце (чтобы не потерять)
     if(!r.completed)return true;
     return false;
   });
@@ -1458,8 +1464,10 @@ function renderClients(){
 function renderFinance(){
   const myData = getMyData();
   const body=document.getElementById('finBody');body.innerHTML='';
-  const sorted=[...myData].sort((a,b)=>b.timestamp-a.timestamp).slice(0,60);
-  if(!sorted.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:28px;">Нет ваших записей</td></tr>';return;}
+  // Фильтруем только записи за текущий месяц
+  const currentMonthKey = mKey(new Date());
+  const sorted=[...myData].filter(r => r.date && r.date.includes(currentMonthKey)).sort((a,b)=>b.timestamp-a.timestamp).slice(0,60);
+  if(!sorted.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:28px;">Нет записей за текущий месяц</td></tr>';return;}
 
   sorted.forEach(r=>{
     const full=r.fullTotal||r.total||0;
