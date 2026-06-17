@@ -312,17 +312,9 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   #listView .tbl td[data-label="Дата"] { order: 3; }
   #listView .tbl td[data-label="Время"] { order: 4; }
 
-  /* Мобильный порядок для финансов */
-  #secFinance .tbl td[data-label="Клиент"] { order: 0; }
-  #secFinance .tbl td[data-label="Услуги"] { display: none !important; }
-  #secFinance .tbl td[data-label="Внесено"] { display: none !important; }
-  #secFinance .tbl td[data-label="Долг"] { display: none !important; }
-  #secFinance .tbl td[data-label="Действия"] { order: 1; }
-  #secFinance .tbl td[data-label="Дата"] { display: none; }
-  #secFinance .tbl td[data-label="Время"] { display: none; }
-
-  /* Центрирование карточки в финансах */
-  #secFinance .tbl td[data-label="Клиент"] {
+  /* ===== МОБИЛЬНЫЙ РАЗДЕЛ ФИНАНСЫ ===== */
+  #secFinance .tbl td[data-label="Клиент"] { 
+    order: 0; 
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -337,11 +329,23 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   #secFinance .tbl td[data-label="Клиент"] .td-comment {
     display: none !important;
   }
-  #secFinance .tbl td[data-label="Клиент"] .prog {
-    width: 100% !important;
-    margin: 8px 0 !important;
+  #secFinance .tbl td[data-label="Клиент"] .td-name {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    margin-bottom: 8px !important;
   }
+  #secFinance .tbl td[data-label="Клиент"] .prog {
+    height: 8px !important;
+    margin: 8px 0 !important;
+    width: 100% !important;
+    border-radius: 4px;
+  }
+  #secFinance .tbl td[data-label="Клиент"] .prog .prog-fill {
+    border-radius: 4px;
+  }
+  
   #secFinance .tbl td[data-label="Действия"] {
+    order: 1;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -355,20 +359,52 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   #secFinance .tbl td[data-label="Действия"] .td-acts {
     opacity: 1 !important;
     justify-content: center !important;
-    gap: 10px !important;
+    gap: 12px !important;
+  }
+  #secFinance .tbl td[data-label="Действия"] .td-acts .act-ic {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 16px !important;
+  }
+  
+  /* Скрываем остальные колонки в финансах на мобильных */
+  #secFinance .tbl td[data-label="Услуги"],
+  #secFinance .tbl td[data-label="Внесено"],
+  #secFinance .tbl td[data-label="Долг"],
+  #secFinance .tbl td[data-label="Дата"],
+  #secFinance .tbl td[data-label="Время"] {
+    display: none !important;
   }
 
-  /* Аналитика - перестановка блоков на мобильных */
+  /* ===== МОБИЛЬНАЯ АНАЛИТИКА ===== */
   .ana-hd {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
-  .ana-hd > div:nth-child(1) { order: 1; } /* средний чек */
-  .ana-hd > div:nth-child(2) { order: 2; grid-column: span 2; } /* блок с записями/в работе/готово */
-  .ana-hd > div:nth-child(3) { order: 4; } /* anaYear - доход за год (справа) */
-  .ana-hd > div:nth-child(4) { order: 3; } /* anaDbt - долги (слева) */
+  .ana-hd > div:nth-child(1) { order: 1; grid-column: span 1; } /* средний чек */
+  .ana-hd > div:nth-child(2) { order: 2; grid-column: span 1; } /* блок с записями/в работе/готово */
+  .ana-hd > div:nth-child(3) { order: 4; grid-column: span 1; } /* доход */
+  .ana-hd > div:nth-child(4) { order: 3; grid-column: span 1; } /* долги */
   
-  .ana-hd{grid-template-columns:1fr 1fr;}
+  .ana-hd > div:nth-child(2) .ana-c {
+    /* делаем блок с тремя показателями компактным */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ana-hd > div:nth-child(2) .ana-c .ana-l {
+    font-size: 8px;
+    margin-bottom: 2px;
+  }
+  .ana-hd > div:nth-child(2) .ana-c .ana-v {
+    font-size: 16px;
+  }
+  .ana-hd > div:nth-child(2) .ana-c .ana-s {
+    font-size: 8px;
+  }
+  
   .fin-cards{flex-direction:column;}
   .cl-grid{grid-template-columns:1fr 1fr;}
   .cal-head{grid-template-columns:36px repeat(7,1fr);}
