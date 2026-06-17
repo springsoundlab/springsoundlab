@@ -372,18 +372,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     display: none; /* скрываем счётчик на мобильных для экономии места */
   }
   
-  /* Индикатор зума на мобильных */
-  #secSessions .toolbar .zoom-indicator {
-    font-size: 10px;
-    color: var(--text3);
-    background: var(--surface2);
-    padding: 2px 8px;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-    white-space: nowrap;
-    margin-left: auto;
-  }
-  
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
   .cl-grid{grid-template-columns:1fr 1fr;}
@@ -393,13 +381,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   
   #moSimple .mb { width: 95vw !important; padding: 15px; }
   .mb-num-input { font-size: 18px; }
-}
-
-/* На десктопе скрываем индикатор зума */
-@media(min-width:769px){
-  #secSessions .toolbar .zoom-indicator {
-    display: none;
-  }
 }
 
 /* EVENT DETAIL POPUP – больше не используется, скрываем */
@@ -496,9 +477,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <div class="mnav-btn" onclick="changeDateScope('week', 1)" title="Неделя вперед"><i class="fa-solid fa-angle-right"></i></div>
           <div class="mnav-btn" onclick="changeDateScope('month', 1)" title="Месяц вперед"><i class="fa-solid fa-angles-right"></i></div>
         </div>
-
-        <!-- Индикатор зума (показывается только на мобильных) -->
-        <span class="zoom-indicator" id="zoomLevel">1.0</span>
+        <!-- Индикатор удалён -->
       </div>
 
       <div id="calView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
@@ -757,6 +736,7 @@ const MAX_HOUR_HEIGHT = 120;
 let pinchStartDistance = 0;
 let pinchStartHeight = 60;
 let isPinching = false;
+let zoomTimeout = null; // для троттлинга
 // ===========================================
 
 const FC={apiKey:"AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",authDomain:"crm-a9450.firebaseapp.com",projectId:"crm-a9450",storageBucket:"crm-a9450.firebasestorage.app",messagingSenderId:"971140334464",appId:"1:971140334464:web:dde090a90bdcd5563cb765"};
@@ -857,16 +837,10 @@ function saveZoomToProfile() {
   }
 }
 
-/* ===== ОБНОВЛЕНИЕ ИНДИКАТОРА ЗУМА ===== */
-function updateZoomIndicator() {
-  const el = document.getElementById('zoomLevel');
-  if (el) el.textContent = (currentHourHeight / 60).toFixed(1);
-}
-
 /* ===== ОБРАБОТЧИКИ МУЛЬТИТАЧ ===== */
 function handleTouchStart(e) {
   if (e.touches.length === 2) {
-    e.preventDefault(); // предотвращаем системный жест
+    e.preventDefault();
     const touch1 = e.touches[0];
     const touch2 = e.touches[1];
     pinchStartDistance = Math.abs(touch1.clientY - touch2.clientY);
@@ -886,8 +860,14 @@ function handleTouchMove(e) {
     newHeight = Math.min(Math.max(newHeight, MIN_HOUR_HEIGHT), MAX_HOUR_HEIGHT);
     if (Math.abs(newHeight - currentHourHeight) > 1) {
       currentHourHeight = Math.round(newHeight);
-      updateZoomIndicator();
-      if (viewMode === 'calendar') renderCalendar();
+      // Троттлинг renderCalendar – не чаще чем раз в 30 мс
+      if (zoomTimeout) {
+        clearTimeout(zoomTimeout);
+      }
+      zoomTimeout = setTimeout(() => {
+        if (viewMode === 'calendar') renderCalendar();
+        zoomTimeout = null;
+      }, 30);
     }
   }
 }
@@ -895,7 +875,14 @@ function handleTouchMove(e) {
 function handleTouchEnd(e) {
   if (isPinching) {
     isPinching = false;
+    // Сохраняем итоговое значение в профиль
     saveZoomToProfile();
+    // Выполняем финальную перерисовку, если не было последней
+    if (zoomTimeout) {
+      clearTimeout(zoomTimeout);
+      zoomTimeout = null;
+    }
+    if (viewMode === 'calendar') renderCalendar();
   }
 }
 
@@ -997,7 +984,6 @@ auth.onAuthStateChanged(async(user)=>{
     } else {
       currentHourHeight = 60;
     }
-    updateZoomIndicator();
     window.PROFILE=p;
     
     isSound=p.role==='Звукорежиссёр';
