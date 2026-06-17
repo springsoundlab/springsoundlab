@@ -795,6 +795,15 @@ function getMyData() {
   });
 }
 
+/* ===== ВСПОМОГАТЕЛЬНАЯ ПРОВЕРКА АВТОРСТВА ===== */
+function isAuthorOf(row) {
+  if (!window.PROFILE) return false;
+  if (row.authorUid === window.PROFILE.uid) return true;
+  // Для старых записей – проверяем телефон
+  if (!row.authorUid && row.authorPhone && norm(row.authorPhone) === norm(window.PROFILE.phone || '')) return true;
+  return false;
+}
+
 /* ===== COLOR PICKER INIT ===== */
 function buildColorPicker(containerId, currentHex, onChange){
   const cont=document.getElementById(containerId);
@@ -860,7 +869,6 @@ window.doRegister=async function(){
   const role=document.querySelector('#regRoles .auth-role.sel')?.dataset.role||'Сотрудник';
   if(!name){showErr('Введите имя');return;}
   if(ph.length<10){showErr('Введите корректный номер');return;}
-  // НОВОЕ ТРЕБОВАНИЕ: минимум 8 символов
   if(pw.length<8){showErr('Пароль должен содержать минимум 8 символов');return;}
   const btn=document.getElementById('regBtn');
   lockButton(btn);
@@ -1229,17 +1237,23 @@ function closeEvPopup(){
   popupLocked=false;
 }
 
-/* ===== ACTIONS ===== */
+/* ===== ACTIONS С ПРОВЕРКОЙ АВТОРСТВА ===== */
 window.markDone = function(id) {
   const row = window.CRM.find(r => r.id === id);
-  if (!row) return;
+  if (!row) {
+    alert('Запись не найдена');
+    return;
+  }
+  // Проверяем авторство
+  if (!isAuthorOf(row)) {
+    alert('Вы не можете изменять эту запись');
+    return;
+  }
+
   const isCompleting = !row.completed;
-  
-  // Найдём кнопку, вызвавшую действие (передаём через event)
   const btn = document.querySelector(`.act-ic.g[onclick*="markDone('${id}')"]`);
   if (btn) lockButton(btn);
   
-  // Оптимистичное обновление класса на карточке
   const card = document.querySelector(`.fin-card[data-id="${id}"]`);
   if (card) {
     card.classList.remove('row-done', 'row-debt');
@@ -1269,16 +1283,23 @@ window.markDone = function(id) {
   SC.doc(id).update(updateData)
     .catch(err => {
       handleError(err, 'Ошибка при обновлении статуса готово.');
-      // Возвращаем состояние кнопки только в случае ошибки
       if (btn) unlockButton(btn);
     })
     .finally(() => {
-      // Разблокируем кнопку в любом случае, но с задержкой, чтобы избежать повторного клика
       setTimeout(() => { if (btn) unlockButton(btn); }, 500);
     });
 };
 
-window.delRec=function(id){
+window.delRec = function(id) {
+  const row = window.CRM.find(r => r.id === id);
+  if (!row) {
+    alert('Запись не найдена');
+    return;
+  }
+  if (!isAuthorOf(row)) {
+    alert('Вы не можете удалить эту запись');
+    return;
+  }
   const btn = document.querySelector(`.act-ic.r[onclick*="delRec('${id}')"]`);
   if (btn) lockButton(btn);
   openSM('Удалить запись?','delete',()=>{
@@ -1294,16 +1315,25 @@ window.delRec=function(id){
   });
 };
 
-window.addPay=function(id){
-  const row=window.CRM.find(r=>r.id===id);if(!row)return;
-  const full=row.fullTotal||row.total||0;const rem=full-(row.total||0);
-  if(rem<=0){alert('Уже полностью оплачено');return;}
+window.addPay = function(id) {
+  const row = window.CRM.find(r => r.id === id);
+  if (!row) {
+    alert('Запись не найдена');
+    return;
+  }
+  if (!isAuthorOf(row)) {
+    alert('Вы не можете изменять эту запись');
+    return;
+  }
+  const full = row.fullTotal || row.total || 0;
+  const rem = full - (row.total || 0);
+  if (rem <= 0) { alert('Уже полностью оплачено'); return; }
   const btn = document.querySelector(`.act-ic.go[onclick*="addPay('${id}')"]`);
   if (btn) lockButton(btn);
   openSM('Доплата (остаток '+rem.toLocaleString()+' ₽)','number',()=>{
-    const a=parseInt(document.getElementById('msInput').value);
-    if(!isNaN(a)&&a>0){
-      SC.doc(id).update({total:(row.total||0)+a})
+    const a = parseInt(document.getElementById('msInput').value);
+    if (!isNaN(a) && a > 0) {
+      SC.doc(id).update({total: (row.total || 0) + a})
         .catch(err => {
           handleError(err, 'Ошибка при добавлении оплаты.');
           if (btn) unlockButton(btn);
@@ -1316,7 +1346,7 @@ window.addPay=function(id){
       if (btn) unlockButton(btn);
       closeSM();
     }
-  },rem);
+  }, rem);
 };
 
 /* ===== NEW / EDIT FORM ===== */
@@ -1379,8 +1409,13 @@ window.setSvcMode=function(m){
   document.getElementById('manualSvcs').style.display=m==='manual'?'block':'none';
 };
 
-window.openEdit=function(id){
-  const row=window.CRM.find(r=>r.id===id);if(!row)return;
+window.openEdit = function(id) {
+  const row = window.CRM.find(r => r.id === id);
+  if (!row) { alert('Запись не найдена'); return; }
+  if (!isAuthorOf(row)) {
+    alert('Вы не можете редактировать эту запись');
+    return;
+  }
   document.body.classList.add('modal-open');
   editId=id;
   formDetails=row.details?JSON.parse(JSON.stringify(row.details)):[];
@@ -1522,8 +1557,18 @@ window.saveRecord=async function(){
       authorName:author, authorUid, authorPhone, 
       eventColor, timestamp:Date.now(), completed:false
     };
-    if(editId){await SC.doc(editId).update(data);}
-    else{ await SC.add(data); }
+    if(editId){
+      // При редактировании проверяем авторство
+      const existing = window.CRM.find(r => r.id === editId);
+      if (!existing || !isAuthorOf(existing)) {
+        alert('Вы не можете редактировать эту запись');
+        unlockButton(btn);
+        return;
+      }
+      await SC.doc(editId).update(data);
+    } else {
+      await SC.add(data);
+    }
     closeRecModal();
   } catch(e) {
     handleError(e, 'Ошибка при сохранении записи.');
