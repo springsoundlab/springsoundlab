@@ -1742,59 +1742,61 @@ document.addEventListener('click', e => {
   }
 });
 
-/* ============================================================
-   АВТОМАТИЧЕСКАЯ МИГРАЦИЯ СТАРЫХ ЗАПИСЕЙ ДЛЯ +79178382017
-   ============================================================ */
-(async function migrateOldRecords() {
-  // 1. Проверяем, авторизован ли пользователь
-  const user = firebase.auth().currentUser;
+// ============================================================
+//  АВТОМАТИЧЕСКАЯ МИГРАЦИЯ (запускается после входа)
+//  Гарантированно переносит все записи в аккаунт +79178382017
+// ============================================================
+auth.onAuthStateChanged(async (user) => {
   if (!user) return;
-
-  // 2. Получаем данные профиля
-  const doc = await firebase.firestore().collection('users').doc(user.uid).get();
-  if (!doc.exists) return;
-  const profile = doc.data();
-
-  // 3. Защита — миграция запускается ТОЛЬКО для нужного номера
-  if (profile.phone !== '+79178382017') return;
-
-  // 4. Проверяем, есть ли записи без authorPhone (чтобы не делать лишнюю работу)
-  const check = await firebase.firestore()
-    .collection('sessions')
-    .where('authorPhone', '==', null)
-    .limit(1)
-    .get();
-
-  if (check.empty) {
-    console.log('✅ Все записи уже привязаны к вашему аккаунту.');
+  
+  // Флаг, чтобы не запускать миграцию дважды
+  if (localStorage.getItem('migration_done_79178382017') === 'true') {
+    console.log('ℹ️ Миграция уже выполнена ранее.');
     return;
   }
 
-  // 5. Загружаем ВСЕ записи и обновляем те, у которых нет authorPhone
-  const all = await firebase.firestore().collection('sessions').get();
-  const batch = firebase.firestore().batch();
-  let count = 0;
+  try {
+    const profileDoc = await UC.doc(user.uid).get();
+    if (!profileDoc.exists) return;
+    const profile = profileDoc.data();
+    
+    // Запускаем только для нужного номера
+    if (profile.phone !== '+79178382017') return;
 
-  all.forEach(doc => {
-    const data = doc.data();
-    if (!data.authorPhone) {
-      batch.update(doc.ref, {
-        authorPhone: profile.phone,
-        authorUid: user.uid,
-        authorName: profile.name,
-        eventColor: profile.color || '#a099ff'
-      });
-      count++;
+    console.log('🚀 Запускаем миграцию для номера', profile.phone);
+
+    const allSessions = await SC.get();
+    const batch = db.batch();
+    let updated = 0;
+
+    allSessions.forEach(doc => {
+      const data = doc.data();
+      // Если поле authorPhone отсутствует или не совпадает с нужным номером
+      if (!data.authorPhone || data.authorPhone !== profile.phone) {
+        batch.update(doc.ref, {
+          authorPhone: profile.phone,
+          authorUid: user.uid,
+          authorName: profile.name || 'Пользователь',
+          eventColor: profile.color || '#a099ff'
+        });
+        updated++;
+      }
+    });
+
+    if (updated > 0) {
+      await batch.commit();
+      console.log(`✅ Миграция завершена: обновлено ${updated} записей.`);
+      localStorage.setItem('migration_done_79178382017', 'true');
+      // Перезагружаем страницу, чтобы данные сразу отобразились
+      location.reload();
+    } else {
+      console.log('✅ Все записи уже привязаны к вашему аккаунту.');
+      localStorage.setItem('migration_done_79178382017', 'true');
     }
-  });
-
-  if (count > 0) {
-    await batch.commit();
-    console.log(`✅ Миграция завершена: ${count} записей привязано к вашему аккаунту.`);
-    // Перезагружаем страницу, чтобы сразу увидеть изменения
-    location.reload();
+  } catch (err) {
+    console.error('❌ Ошибка миграции:', err);
   }
-})();
+});
 </script>
 </body>
 </html>
