@@ -728,7 +728,7 @@ function unlockButton(btn) {
 }
 
 // ===========================================
-//  ПЕРЕМЕННЫЕ ДЛЯ ПИНЧ-ЗУМА (исправлено)
+//  ПЕРЕМЕННЫЕ ДЛЯ ПИНЧ-ЗУМА (улучшенные)
 // ===========================================
 let currentHourHeight = 60;
 const MIN_HOUR_HEIGHT = 30;
@@ -736,7 +736,8 @@ const MAX_HOUR_HEIGHT = 120;
 let pinchStartDistance = 0;
 let pinchStartHeight = 60;
 let isPinching = false;
-let lastRenderTime = 0; // для троттлинга
+let animationFrameRequest = null; // для requestAnimationFrame
+const SENSITIVITY = 2.5; // повышаем чувствительность
 // ===========================================
 
 const FC={apiKey:"AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",authDomain:"crm-a9450.firebaseapp.com",projectId:"crm-a9450",storageBucket:"crm-a9450.firebasestorage.app",messagingSenderId:"971140334464",appId:"1:971140334464:web:dde090a90bdcd5563cb765"};
@@ -837,13 +838,13 @@ function saveZoomToProfile() {
   }
 }
 
-/* ===== ОБРАБОТЧИКИ МУЛЬТИТАЧ (исправлены) ===== */
+/* ===== ОБРАБОТЧИКИ МУЛЬТИТАЧ (улучшены для плавности) ===== */
 function handleTouchStart(e) {
   if (e.touches.length === 2) {
     e.preventDefault();
     const touch1 = e.touches[0];
     const touch2 = e.touches[1];
-    pinchStartDistance = Math.abs(touch1.clientY - touch2.clientY);
+    pinchStartDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
     pinchStartHeight = currentHourHeight;
     isPinching = true;
   }
@@ -854,17 +855,21 @@ function handleTouchMove(e) {
     e.preventDefault();
     const touch1 = e.touches[0];
     const touch2 = e.touches[1];
-    const currentDist = Math.abs(touch1.clientY - touch2.clientY);
+    const currentDist = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+    // Защита от деления на ноль
+    if (pinchStartDistance === 0) return;
     const ratio = currentDist / pinchStartDistance;
-    let newHeight = pinchStartHeight * ratio;
+    // Применяем чувствительность: изменение масштаба усиливается
+    let newHeight = pinchStartHeight * (1 + (ratio - 1) * SENSITIVITY);
     newHeight = Math.min(Math.max(newHeight, MIN_HOUR_HEIGHT), MAX_HOUR_HEIGHT);
-    if (Math.abs(newHeight - currentHourHeight) > 1) {
+    if (Math.abs(newHeight - currentHourHeight) > 0.5) {
       currentHourHeight = Math.round(newHeight);
-      // Троттлинг: обновляем не чаще раза в 50 мс
-      const now = Date.now();
-      if (now - lastRenderTime > 50) {
-        if (viewMode === 'calendar') renderCalendar();
-        lastRenderTime = now;
+      // Запрашиваем анимационный кадр для рендеринга
+      if (animationFrameRequest === null && viewMode === 'calendar') {
+        animationFrameRequest = requestAnimationFrame(() => {
+          animationFrameRequest = null;
+          renderCalendar();
+        });
       }
     }
   }
@@ -873,6 +878,10 @@ function handleTouchMove(e) {
 function handleTouchEnd(e) {
   if (isPinching) {
     isPinching = false;
+    if (animationFrameRequest !== null) {
+      cancelAnimationFrame(animationFrameRequest);
+      animationFrameRequest = null;
+    }
     saveZoomToProfile();
     if (viewMode === 'calendar') renderCalendar();
   }
