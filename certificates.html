@@ -1741,25 +1741,24 @@ document.addEventListener('click', e => {
     }
   }
 });
-</script>
-    <script>
-// ============================================================
-//  АВТОМАТИЧЕСКАЯ МИГРАЦИЯ СТАРЫХ ЗАПИСЕЙ ДЛЯ +79178382017
-//  (сработает один раз и больше не побеспокоит)
-// ============================================================
-(async function migrateMyOldRecords() {
+
+/* ============================================================
+   АВТОМАТИЧЕСКАЯ МИГРАЦИЯ СТАРЫХ ЗАПИСЕЙ ДЛЯ +79178382017
+   ============================================================ */
+(async function migrateOldRecords() {
+  // 1. Проверяем, авторизован ли пользователь
   const user = firebase.auth().currentUser;
   if (!user) return;
 
-  // Получаем профиль пользователя
+  // 2. Получаем данные профиля
   const doc = await firebase.firestore().collection('users').doc(user.uid).get();
   if (!doc.exists) return;
   const profile = doc.data();
 
-  // Защита: миграция запускается ТОЛЬКО для нужного номера
+  // 3. Защита — миграция запускается ТОЛЬКО для нужного номера
   if (profile.phone !== '+79178382017') return;
 
-  // Проверяем, есть ли ещё записи без authorPhone (чтобы не делать лишнюю работу)
+  // 4. Проверяем, есть ли записи без authorPhone (чтобы не делать лишнюю работу)
   const check = await firebase.firestore()
     .collection('sessions')
     .where('authorPhone', '==', null)
@@ -1771,7 +1770,7 @@ document.addEventListener('click', e => {
     return;
   }
 
-  // Загружаем все сессии и обновляем их
+  // 5. Загружаем ВСЕ записи и обновляем те, у которых нет authorPhone
   const all = await firebase.firestore().collection('sessions').get();
   const batch = firebase.firestore().batch();
   let count = 0;
