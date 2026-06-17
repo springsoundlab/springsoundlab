@@ -17,8 +17,8 @@
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
   --text:#f0f0f5;--text2:#9090a0;--text3:#5a5a6a;
   --accent:#7c6fff;--accent2:#a099ff;--accent-bg:rgba(124,111,255,0.12);
-  --green:#3ecf8e;--green-bg:rgba(62,207,142,0.15);
-  --red:#ff5c6a;--red-bg:rgba(255,92,106,0.15);
+  --green:#3ecf8e;--green-bg:rgba(62,207,142,0.08);
+  --red:#ff5c6a;--red-bg:rgba(255,92,106,0.08);
   --gold:#d4af37;--gold-bg:rgba(212,175,55,0.15);
   --blue:#3b9eff;--blue-bg:rgba(59,158,255,0.1);
   --yellow:#f5c542;--yellow-bg:rgba(245,197,66,0.2);
@@ -60,6 +60,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .tb-btn.green-btn{color:var(--green);border-color:rgba(62,207,142,.3);}
 .tb-btn.green-btn:hover{background:var(--green-bg);}
 .tb-btn.filter-btn.active{background:var(--surface3);color:var(--text);border-color:var(--border2);}
+.tb-btn.filter-btn.all-active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);}
 
 .mnav{display:flex;align-items:center;gap:6px;margin-left:auto;}
 .mnav-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:.15s;}
@@ -143,9 +144,9 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .fin-grid{flex:1;overflow-y:auto;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;align-content:start;}
 .fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:.15s;display:flex;flex-direction:column;gap:6px;}
 .fin-card:hover{border-color:var(--border2);background:var(--surface2);}
-/* Фоны карточек */
-.fin-card.row-done { background: var(--green-bg); border-color: var(--green); }
-.fin-card.row-debt { background: var(--red-bg); border-color: var(--red); }
+/* Фоны карточек – менее яркие */
+.fin-card.row-done { background: rgba(62, 207, 142, 0.06); border-color: rgba(62, 207, 142, 0.25); }
+.fin-card.row-debt { background: rgba(255, 92, 106, 0.06); border-color: rgba(255, 92, 106, 0.25); }
 /* Прозрачные – без класса */
 
 .fin-card .fin-header{display:flex;align-items:center;gap:8px;}
@@ -338,6 +339,39 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   /* Финансы – оставляем как на десктопе (сетка) */
   .fin-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
   
+  /* Перестановка в тулбаре финансов: календарь, кнопки фильтров в одну строку */
+  #secFinance .toolbar {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 8px 10px;
+  }
+  #secFinance .toolbar > * {
+    flex: 0 0 auto;
+  }
+  #secFinance .toolbar .fin-filters {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    margin-left: 4px;
+  }
+  #secFinance .toolbar .fin-filters .tb-btn {
+    font-size: 9px;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }
+  #secFinance .toolbar #finMonthPicker {
+    max-width: 120px;
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+  #secFinance .toolbar #finCount {
+    display: none; /* скрываем счётчик на мобильных для экономии места */
+  }
+  
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
   .cl-grid{grid-template-columns:1fr 1fr;}
@@ -349,20 +383,8 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .mb-num-input { font-size: 18px; }
 }
 
-/* EVENT DETAIL POPUP – для других разделов */
-.ev-popup{display:none;position:fixed;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:14px;width:240px;z-index:99998;box-shadow:0 12px 40px rgba(0,0,0,.5);}
-.ev-popup.open{display:block;}
-.ev-pop-close {position:absolute;top:10px;right:12px;cursor:pointer;font-size:16px;color:var(--text2);padding:5px;line-height:1;}
-.ev-pop-close:hover {color:#fff;}
-.ev-pop-name{font-size:13px;font-weight:700;margin-bottom:4px;padding-right:20px;}
-.ev-pop-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);margin-top:3px;}
-.ev-pop-acts{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
-.ev-pop-btn{flex:1;padding:6px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:10px;font-weight:700;cursor:pointer;text-align:center;transition:.15s;}
-.ev-pop-btn:hover{color:var(--text);}
-.ev-pop-btn.g:hover{color:var(--green);border-color:rgba(62,207,142,.3);}
-.ev-pop-btn.r:hover{color:var(--red);border-color:rgba(255,92,106,.3);}
-.ev-pop-btn.b:hover{color:var(--blue);border-color:rgba(59,158,255,.3);}
-.ev-pop-btn.go:hover{color:var(--gold);border-color:rgba(245,166,35,.3);}
+/* EVENT DETAIL POPUP – больше не используется, скрываем */
+.ev-popup{display:none !important;}
 </style>
 </head>
 <body>
@@ -492,6 +514,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <input type="month" id="finMonthPicker" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;">
           <!-- Кнопки фильтров -->
           <div class="fin-filters" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:4px;">
+            <button class="tb-btn filter-btn all-active" data-filter="all" onclick="toggleFilter('all')">Все</button>
             <button class="tb-btn filter-btn" data-filter="work" onclick="toggleFilter('work')">В работе</button>
             <button class="tb-btn filter-btn" data-filter="done" onclick="toggleFilter('done')">Готово</button>
             <button class="tb-btn filter-btn" data-filter="debt" onclick="toggleFilter('debt')">Долг</button>
@@ -553,15 +576,8 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 </div>
 </div>
 
-<div class="ev-popup" id="evPopup">
-  <div class="ev-pop-close" onclick="closeEvPopup()">✕</div>
-  <div class="ev-pop-name" id="evPopName">—</div>
-  <div class="ev-pop-row"><i class="fa-regular fa-clock" style="font-size:10px;"></i><span id="evPopTime">—</span></div>
-  <div class="ev-pop-row"><i class="fa-solid fa-music" style="font-size:10px;"></i><span id="evPopSvc">—</span></div>
- 
-  <div class="ev-pop-row" id="evPopPhoneRow"><i class="fa-solid fa-phone" style="font-size:10px;"></i><span id="evPopPhone">—</span></div>
-  <div class="ev-pop-row" id="evPopComRow" style="display:none;"><i class="fa-regular fa-comment" style="font-size:10px;"></i><span id="evPopCom" style="font-style:italic;"></span></div>
-</div>
+<!-- Попап больше не используется, скрыт через CSS -->
+<div class="ev-popup" id="evPopup"></div>
 
 <div class="mo" id="moRecord">
   <div class="mb" id="mbRecord">
@@ -764,7 +780,7 @@ let calScrollSaved = 0;
 let calInitialized = false;
 let popupLocked = false;
 let selectedMonth = ''; // для фильтрации финансов
-let currentStatusFilter = null; // 'work', 'done', 'debt', null
+let currentStatusFilter = null; // 'all', 'work', 'done', 'debt'
 
 /* ===== UTILS ===== */
 function norm(r){let d=(r||'').replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
@@ -787,9 +803,7 @@ function getMyData() {
   const currentUid = window.PROFILE.uid;
   const currentPhone = norm(window.PROFILE.phone || '');
   return window.CRM.filter(r => {
-    // Основной приоритет – authorUid
     if (r.authorUid === currentUid) return true;
-    // Для старых записей без authorUid проверяем authorPhone
     if (!r.authorUid && r.authorPhone && norm(r.authorPhone) === currentPhone) return true;
     return false;
   });
@@ -799,7 +813,6 @@ function getMyData() {
 function isAuthorOf(row) {
   if (!window.PROFILE) return false;
   if (row.authorUid === window.PROFILE.uid) return true;
-  // Для старых записей – проверяем телефон
   if (!row.authorUid && row.authorPhone && norm(row.authorPhone) === norm(window.PROFILE.phone || '')) return true;
   return false;
 }
@@ -1202,10 +1215,12 @@ function renderEmployees() {
   });
 }
 
-/* ===== EVENT POPUP – теперь только для календаря и списка ===== */
+/* ===== EVENT POPUP – теперь только для календаря и списка, но без ховера ===== */
 let popupId=null;
 function showEvPopup(ev,e,type='click'){
   if (document.getElementById('secFinance').style.display === 'flex') return;
+  // Не показываем при наведении, только по клику
+  if (type === 'hover') return;
   popupId=ev.id;
   popupLocked = (type === 'click');
   const pop=document.getElementById('evPopup');
@@ -1244,7 +1259,6 @@ window.markDone = function(id) {
     alert('Запись не найдена');
     return;
   }
-  // Проверяем авторство
   if (!isAuthorOf(row)) {
     alert('Вы не можете изменять эту запись');
     return;
@@ -1558,7 +1572,6 @@ window.saveRecord=async function(){
       eventColor, timestamp:Date.now(), completed:false
     };
     if(editId){
-      // При редактировании проверяем авторство
       const existing = window.CRM.find(r => r.id === editId);
       if (!existing || !isAuthorOf(existing)) {
         alert('Вы не можете редактировать эту запись');
@@ -1680,14 +1693,24 @@ function renderClients(){
 
 /* ===== ФИЛЬТР ПО СТАТУСУ ===== */
 window.toggleFilter = function(filter) {
-  const btn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
-  if (currentStatusFilter === filter) {
+  const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+  const workBtn = document.querySelector('.filter-btn[data-filter="work"]');
+  const doneBtn = document.querySelector('.filter-btn[data-filter="done"]');
+  const debtBtn = document.querySelector('.filter-btn[data-filter="debt"]');
+  
+  // Сброс всех активных классов
+  [allBtn, workBtn, doneBtn, debtBtn].forEach(b => b.classList.remove('active', 'all-active'));
+  
+  if (filter === 'all') {
     currentStatusFilter = null;
-    btn.classList.remove('active');
+    allBtn.classList.add('all-active');
   } else {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     currentStatusFilter = filter;
-    btn.classList.add('active');
+    // Активируем выбранную кнопку
+    const btn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
+    if (btn) btn.classList.add('active');
+    // Кнопка "Все" теряет активность
+    allBtn.classList.remove('all-active');
   }
   renderFinance();
 };
@@ -1717,6 +1740,7 @@ function renderFinance(){
   } else if (currentStatusFilter === 'debt') {
     filtered = filtered.filter(r => !r.completed && ((r.fullTotal || r.total || 0) - (r.total || 0) > 0));
   }
+  // 'all' или null – показываем всё
   
   grid.innerHTML = '';
   document.getElementById('finCount').textContent = filtered.length + ' записей';
