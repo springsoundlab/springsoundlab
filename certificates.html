@@ -1219,7 +1219,6 @@ function renderEmployees() {
 let popupId=null;
 function showEvPopup(ev,e,type='click'){
   if (document.getElementById('secFinance').style.display === 'flex') return;
-  // Не показываем при наведении, только по клику
   if (type === 'hover') return;
   popupId=ev.id;
   popupLocked = (type === 'click');
@@ -1698,7 +1697,6 @@ window.toggleFilter = function(filter) {
   const doneBtn = document.querySelector('.filter-btn[data-filter="done"]');
   const debtBtn = document.querySelector('.filter-btn[data-filter="debt"]');
   
-  // Сброс всех активных классов
   [allBtn, workBtn, doneBtn, debtBtn].forEach(b => b.classList.remove('active', 'all-active'));
   
   if (filter === 'all') {
@@ -1706,10 +1704,8 @@ window.toggleFilter = function(filter) {
     allBtn.classList.add('all-active');
   } else {
     currentStatusFilter = filter;
-    // Активируем выбранную кнопку
     const btn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
     if (btn) btn.classList.add('active');
-    // Кнопка "Все" теряет активность
     allBtn.classList.remove('all-active');
   }
   renderFinance();
@@ -1740,7 +1736,6 @@ function renderFinance(){
   } else if (currentStatusFilter === 'debt') {
     filtered = filtered.filter(r => !r.completed && ((r.fullTotal || r.total || 0) - (r.total || 0) > 0));
   }
-  // 'all' или null – показываем всё
   
   grid.innerHTML = '';
   document.getElementById('finCount').textContent = filtered.length + ' записей';
@@ -2058,32 +2053,49 @@ window.addEventListener('offline',()=>document.getElementById('offBar').style.di
 /* ===== SWIPE & CLICK OUTSIDE SIDEBAR ===== */
 let touchStartX = 0;
 let touchStartY = 0;
+
 document.addEventListener('touchstart', e => {
   if (e.changedTouches.length > 0) {
     touchStartX = e.changedTouches[0].clientX;
     touchStartY = e.changedTouches[0].clientY;
   }
 }, {passive: true});
+
 document.addEventListener('touchend', e => {
   if (e.changedTouches.length > 0) {
     const touchEndX = e.changedTouches[0].clientX;
     const touchEndY = e.changedTouches[0].clientY;
-    const diffX = touchStartX - touchEndX;
+    const diffX = touchStartX - touchEndX; // положительное – свайп влево
     const diffY = Math.abs(touchStartY - touchEndY);
     const sidebar = document.querySelector('.sidebar');
+    
+    // 1. Закрытие меню при свайпе влево
     if (sidebar && sidebar.classList.contains('mobile-open')) {
       if (diffX > 50 && diffX > diffY) {
-         sidebar.classList.remove('mobile-open');
+        sidebar.classList.remove('mobile-open');
+      }
+    }
+    
+    // 2. Открытие меню при свайпе от левого края вправо (на мобильных)
+    if (sidebar && !sidebar.classList.contains('mobile-open')) {
+      const startX = touchStartX;
+      const endX = touchEndX;
+      const swipeRight = endX - startX; // положительное – движение вправо
+      // Проверяем: начало касания было близко к левому краю (x < 30), движение вправо > 50px и доминирует по горизонтали
+      if (startX < 30 && swipeRight > 50 && swipeRight > diffY) {
+        sidebar.classList.add('mobile-open');
       }
     }
   }
 }, {passive: true});
+
+// Закрытие меню при клике вне его (на десктопе и мобильных)
 document.addEventListener('click', e => {
   const sidebar = document.querySelector('.sidebar');
   const topbarBtn = document.querySelector('.topbar .tb-btn');
   if (sidebar && sidebar.classList.contains('mobile-open')) {
     if (sidebar.contains(e.target) && (e.target.closest('.nav-i') || e.target.closest('.sb-user'))) {
-      sidebar.classList.remove('mobile-open');
+      // Если клик по пункту меню или аватару – не закрываем, пусть выполняет своё действие.
       return;
     }
     if (!sidebar.contains(e.target) && (!topbarBtn || !topbarBtn.contains(e.target))) {
