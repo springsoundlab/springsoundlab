@@ -59,6 +59,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .tb-btn:hover{color:var(--text);border-color:var(--border2);}
 .tb-btn.green-btn{color:var(--green);border-color:rgba(62,207,142,.3);}
 .tb-btn.green-btn:hover{background:var(--green-bg);}
+.tb-btn.filter-btn.active{background:var(--surface3);color:var(--text);border-color:var(--border2);}
 
 .mnav{display:flex;align-items:center;gap:6px;margin-left:auto;}
 .mnav-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:.15s;}
@@ -143,9 +144,9 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:.15s;display:flex;flex-direction:column;gap:6px;}
 .fin-card:hover{border-color:var(--border2);background:var(--surface2);}
 /* Фоны карточек */
-.fin-card.row-done { background: var(--yellow-bg); border-color: var(--yellow); }
-.fin-card.row-paid { background: var(--green-bg); border-color: var(--green); }
+.fin-card.row-done { background: var(--green-bg); border-color: var(--green); }
 .fin-card.row-debt { background: var(--red-bg); border-color: var(--red); }
+/* Прозрачные – без класса */
 
 .fin-card .fin-header{display:flex;align-items:center;gap:8px;}
 .fin-card .fin-color-bar{width:3px;height:28px;border-radius:2px;flex-shrink:0;}
@@ -489,7 +490,12 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <span style="font-size:11px;color:var(--text3);" id="finCount">0 записей</span>
           <input type="month" id="finMonthPicker" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;">
-          <button class="tb-btn" onclick="document.getElementById('finMonthPicker').value = ''; renderFinance();" style="font-size:10px;padding:4px 8px;">Сбросить</button>
+          <!-- Кнопки фильтров -->
+          <div class="fin-filters" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:4px;">
+            <button class="tb-btn filter-btn" data-filter="work" onclick="toggleFilter('work')">В работе</button>
+            <button class="tb-btn filter-btn" data-filter="done" onclick="toggleFilter('done')">Готово</button>
+            <button class="tb-btn filter-btn" data-filter="debt" onclick="toggleFilter('debt')">Долг</button>
+          </div>
         </div>
       </div>
       <div class="fin-grid" id="finGrid"></div>
@@ -723,6 +729,7 @@ let calScrollSaved = 0;
 let calInitialized = false;
 let popupLocked = false;
 let selectedMonth = ''; // для фильтрации финансов
+let currentStatusFilter = null; // 'work', 'done', 'debt', null
 
 /* ===== UTILS ===== */
 function norm(r){let d=(r||'').replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
@@ -1160,15 +1167,15 @@ window.markDone = function(id) {
   // Оптимистичное обновление класса на карточке
   const card = document.querySelector(`.fin-card[data-id="${id}"]`);
   if (card) {
-    card.classList.remove('row-paid', 'row-debt', 'row-done');
+    card.classList.remove('row-done', 'row-debt');
     if (isCompleting) {
       card.classList.add('row-done');
     } else {
       const full = row.fullTotal || row.total || 0;
       const paid = row.total || 0;
       const rest = Math.max(0, full - paid);
-      if (rest === 0) card.classList.add('row-paid');
-      else card.classList.add('row-debt');
+      if (rest > 0) card.classList.add('row-debt');
+      // если rest===0 – прозрачный, без классов
     }
   }
   
@@ -1506,7 +1513,22 @@ function renderClients(){
   if(!privacyOn)applyBlur();
 }
 
-/* ===== FINANCE – НОВЫЙ РЕНДЕР (КАРТОЧКИ) С ФИЛЬТРОМ ПО МЕСЯЦУ ===== */
+/* ===== ФИЛЬТР ПО СТАТУСУ ===== */
+window.toggleFilter = function(filter) {
+  const btn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
+  if (currentStatusFilter === filter) {
+    currentStatusFilter = null;
+    btn.classList.remove('active');
+  } else {
+    // Снимаем активность со всех кнопок
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    currentStatusFilter = filter;
+    btn.classList.add('active');
+  }
+  renderFinance();
+};
+
+/* ===== FINANCE – НОВЫЙ РЕНДЕР (КАРТОЧКИ) С ФИЛЬТРОМ ПО МЕСЯЦУ И СТАТУСУ ===== */
 function renderFinance(){
   const myData = getMyData();
   const grid = document.getElementById('finGrid');
@@ -1524,6 +1546,15 @@ function renderFinance(){
     const now = new Date();
     const currentMonthKey = getMonthKeyFromDate(now);
     filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === currentMonthKey);
+  }
+  
+  // Фильтр по статусу
+  if (currentStatusFilter === 'work') {
+    filtered = filtered.filter(r => !r.completed && (r.total || 0) === (r.fullTotal || r.total || 0));
+  } else if (currentStatusFilter === 'done') {
+    filtered = filtered.filter(r => r.completed);
+  } else if (currentStatusFilter === 'debt') {
+    filtered = filtered.filter(r => !r.completed && ((r.fullTotal || r.total || 0) - (r.total || 0) > 0));
   }
   
   grid.innerHTML = '';
@@ -1560,11 +1591,10 @@ function renderFinance(){
     // Определяем класс фона
     if (isDone) {
       card.classList.add('row-done');
-    } else if (rest === 0) {
-      card.classList.add('row-paid');
-    } else {
+    } else if (rest > 0) {
       card.classList.add('row-debt');
     }
+    // Если rest===0 и не done – прозрачный, без классов
 
     // Заголовок: полоска + имя + статус
     const header = document.createElement('div');
@@ -1584,13 +1614,13 @@ function renderFinance(){
     `;
     card.appendChild(progWrap);
 
-    // Блок деталей: дата, время, услуги
+    // Блок деталей: дата, время, услуги – всегда три строки
     const detailsDiv = document.createElement('div');
     detailsDiv.className = 'fin-details';
-    const timeStr = r.time ? 'в ' + r.time + (r.timeEnd ? ' — ' + r.timeEnd : '') : '';
+    const timeStr = r.time ? 'в ' + r.time + (r.timeEnd ? ' — ' + r.timeEnd : '') : '—';
     detailsDiv.innerHTML = `
       <div class="detail-row"><span class="detail-label">Дата:</span> <span>${r.date || '—'}</span></div>
-      ${timeStr ? `<div class="detail-row"><span class="detail-label">Время:</span> <span>${timeStr}</span></div>` : ''}
+      <div class="detail-row"><span class="detail-label">Время:</span> <span>${timeStr}</span></div>
       <div class="detail-row"><span class="detail-label">Услуги:</span> <span>${r.services || 'Услуги не указаны'}</span></div>
     `;
     card.appendChild(detailsDiv);
@@ -1612,7 +1642,7 @@ function renderFinance(){
       card.appendChild(comm);
     }
 
-    // Действия – увеличенные кнопки
+    // Действия
     const actions = document.createElement('div');
     actions.className = 'fin-actions';
     actions.innerHTML = `
