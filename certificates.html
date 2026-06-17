@@ -372,6 +372,18 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     display: none; /* скрываем счётчик на мобильных для экономии места */
   }
   
+  /* Индикатор зума на мобильных */
+  #secSessions .toolbar .zoom-indicator {
+    font-size: 10px;
+    color: var(--text3);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    margin-left: auto;
+  }
+  
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
   .cl-grid{grid-template-columns:1fr 1fr;}
@@ -381,6 +393,13 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   
   #moSimple .mb { width: 95vw !important; padding: 15px; }
   .mb-num-input { font-size: 18px; }
+}
+
+/* На десктопе скрываем индикатор зума */
+@media(min-width:769px){
+  #secSessions .toolbar .zoom-indicator {
+    display: none;
+  }
 }
 
 /* EVENT DETAIL POPUP – больше не используется, скрываем */
@@ -477,6 +496,9 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <div class="mnav-btn" onclick="changeDateScope('week', 1)" title="Неделя вперед"><i class="fa-solid fa-angle-right"></i></div>
           <div class="mnav-btn" onclick="changeDateScope('month', 1)" title="Месяц вперед"><i class="fa-solid fa-angles-right"></i></div>
         </div>
+
+        <!-- Индикатор зума (показывается только на мобильных) -->
+        <span class="zoom-indicator" id="zoomLevel">1.0</span>
       </div>
 
       <div id="calView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
@@ -725,6 +747,16 @@ function unlockButton(btn) {
     btn.style.cursor = '';
   }
 }
+
+// ===========================================
+//  ПЕРЕМЕННЫЕ ДЛЯ ПИНЧ-ЗУМА
+// ===========================================
+let currentHourHeight = 60;
+const MIN_HOUR_HEIGHT = 30;
+const MAX_HOUR_HEIGHT = 120;
+let pinchStartDistance = 0;
+let pinchStartHeight = 60;
+let isPinching = false;
 // ===========================================
 
 const FC={apiKey:"AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",authDomain:"crm-a9450.firebaseapp.com",projectId:"crm-a9450",storageBucket:"crm-a9450.firebasestorage.app",messagingSenderId:"971140334464",appId:"1:971140334464:web:dde090a90bdcd5563cb765"};
@@ -815,6 +847,56 @@ function isAuthorOf(row) {
   if (row.authorUid === window.PROFILE.uid) return true;
   if (!row.authorUid && row.authorPhone && norm(row.authorPhone) === norm(window.PROFILE.phone || '')) return true;
   return false;
+}
+
+/* ===== ФУНКЦИЯ СОХРАНЕНИЯ ЗУМА ===== */
+function saveZoomToProfile() {
+  if (window.PROFILE && window.PROFILE.uid) {
+    UC.doc(window.PROFILE.uid).update({ hourHeight: currentHourHeight })
+      .catch(err => console.error('❌ Ошибка сохранения зума:', err));
+  }
+}
+
+/* ===== ОБНОВЛЕНИЕ ИНДИКАТОРА ЗУМА ===== */
+function updateZoomIndicator() {
+  const el = document.getElementById('zoomLevel');
+  if (el) el.textContent = (currentHourHeight / 60).toFixed(1);
+}
+
+/* ===== ОБРАБОТЧИКИ МУЛЬТИТАЧ ===== */
+function handleTouchStart(e) {
+  if (e.touches.length === 2) {
+    e.preventDefault(); // предотвращаем системный жест
+    const touch1 = e.touches[0];
+    const touch2 = e.touches[1];
+    pinchStartDistance = Math.abs(touch1.clientY - touch2.clientY);
+    pinchStartHeight = currentHourHeight;
+    isPinching = true;
+  }
+}
+
+function handleTouchMove(e) {
+  if (isPinching && e.touches.length === 2) {
+    e.preventDefault();
+    const touch1 = e.touches[0];
+    const touch2 = e.touches[1];
+    const currentDist = Math.abs(touch1.clientY - touch2.clientY);
+    const ratio = currentDist / pinchStartDistance;
+    let newHeight = pinchStartHeight * ratio;
+    newHeight = Math.min(Math.max(newHeight, MIN_HOUR_HEIGHT), MAX_HOUR_HEIGHT);
+    if (Math.abs(newHeight - currentHourHeight) > 1) {
+      currentHourHeight = Math.round(newHeight);
+      updateZoomIndicator();
+      if (viewMode === 'calendar') renderCalendar();
+    }
+  }
+}
+
+function handleTouchEnd(e) {
+  if (isPinching) {
+    isPinching = false;
+    saveZoomToProfile();
+  }
 }
 
 /* ===== COLOR PICKER INIT ===== */
@@ -909,6 +991,13 @@ auth.onAuthStateChanged(async(user)=>{
     if(!p){const ph=(user.email||'').split('@')[0];p={name:ph,phone:ph,role:'Сотрудник',color:PALETTE[0].hex};}
     p.uid=user.uid;
     if(!p.color)p.color=PALETTE[0].hex;
+    // Загружаем сохранённую высоту строки
+    if (p.hourHeight) {
+      currentHourHeight = Math.min(Math.max(p.hourHeight, MIN_HOUR_HEIGHT), MAX_HOUR_HEIGHT);
+    } else {
+      currentHourHeight = 60;
+    }
+    updateZoomIndicator();
     window.PROFILE=p;
     
     isSound=p.role==='Звукорежиссёр';
@@ -960,6 +1049,14 @@ function startApp(){
       selectedMonth = this.value;
       renderFinance();
     });
+  }
+
+  // Подключаем обработчики мультитач для зума
+  const calView = document.getElementById('calView');
+  if (calView) {
+    calView.addEventListener('touchstart', handleTouchStart, { passive: false });
+    calView.addEventListener('touchmove', handleTouchMove, { passive: false });
+    calView.addEventListener('touchend', handleTouchEnd, { passive: false });
   }
 }
 
@@ -1066,10 +1163,9 @@ function getWeekDays(){
 }
 function dateStr(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 
-/* ===== CALENDAR RENDER (ВСЕ ЗАПИСИ) ===== */
+/* ===== CALENDAR RENDER (ВСЕ ЗАПИСИ) С ДИНАМИЧЕСКОЙ ВЫСОТОЙ ===== */
 const HOURS_START=7;
 const HOURS_END=24;
-const HOUR_H=60;
 
 function renderCalendar(){
   const days=getWeekDays();
@@ -1097,6 +1193,7 @@ function renderCalendar(){
   for(let h=HOURS_START;h<HOURS_END;h++){
     const slot=document.createElement('div');
     slot.className='cal-time-slot';
+    slot.style.height = currentHourHeight + 'px';
     slot.innerHTML=`<span class="cal-time-label">${String(h).padStart(2,'0')}:00</span>`;
     timeCol.appendChild(slot);
   }
@@ -1109,20 +1206,20 @@ function renderCalendar(){
     const ds=dateStr(d);
     const col=document.createElement('div');
     col.className='cal-day-col';
-    col.style.minHeight=((HOURS_END-HOURS_START)*HOUR_H)+'px';
+    col.style.minHeight=((HOURS_END-HOURS_START)*currentHourHeight)+'px';
 
     for(let h=0;h<(HOURS_END-HOURS_START);h++){
       const line=document.createElement('div');
       line.className='cal-hour-line';
-      line.style.top=(h*HOUR_H)+'px';
+      line.style.top=(h*currentHourHeight)+'px';
       col.appendChild(line);
     }
 
     const nowD=new Date();
     if(d.getTime()===today.getTime()){
       const nowMins=nowD.getHours()*60+nowD.getMinutes();
-      const topPx=((nowMins/60)-HOURS_START)*HOUR_H;
-      if(topPx>=0&&topPx<=(HOURS_END-HOURS_START)*HOUR_H){
+      const topPx=((nowMins/60)-HOURS_START)*currentHourHeight;
+      if(topPx>=0&&topPx<=(HOURS_END-HOURS_START)*currentHourHeight){
         const nl=document.createElement('div');
         nl.className='cal-now-line';
         nl.style.top=topPx+'px';
@@ -1139,10 +1236,10 @@ function renderCalendar(){
       const startMin=hh*60+mm;
       const dur=ev.duration||60; 
       const endMin=startMin+dur;
-      const top=((startMin/60)-HOURS_START)*HOUR_H;
-      const height=Math.max((dur/60)*HOUR_H-4,20);
+      const top=((startMin/60)-HOURS_START)*currentHourHeight;
+      const height=Math.max((dur/60)*currentHourHeight-4,20);
       if(top<0&&top+height<0)return; 
-      if(top>(HOURS_END-HOURS_START)*HOUR_H)return; 
+      if(top>(HOURS_END-HOURS_START)*currentHourHeight)return; 
 
       let subcol=0;
       while(placed[subcol]&&placed[subcol]>startMin)subcol++;
@@ -1186,7 +1283,7 @@ function renderCalendar(){
   });
   setTimeout(()=>{
     if (!calInitialized) {
-      const scrollTo=(HOURS_START===7?0:HOURS_START)*HOUR_H;
+      const scrollTo=(HOURS_START===7?0:HOURS_START)*currentHourHeight;
       body.scrollTop=Math.max(0,scrollTo);
       calInitialized = true;
     } else {
