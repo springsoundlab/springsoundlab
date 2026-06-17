@@ -94,6 +94,11 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .tbl tr:hover td{background:var(--surface);}
 .tbl tr.done-row td{opacity:.55;}
 .tbl tr.done-row .ss-badge{opacity:1;}
+
+/* Подсветка строк в финансах */
+.tbl tr.row-paid { background: rgba(62, 207, 142, 0.08); }
+.tbl tr.row-debt { background: rgba(255, 92, 106, 0.08); }
+
 .td-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);}
 .td-time{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--accent2);}
 .td-name{font-weight:600;font-size:13px;}
@@ -428,11 +433,11 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         <div class="tbl-wrap">
           <table class="tbl">
             <thead><tr>
+              <th style="width:auto;">Услуги</th>
+              <th style="width:80px;">Статус</th>
               <th style="width:88px;">Дата</th>
               <th style="width:100px;">Время</th>
               <th>Клиент</th>
-              <th>Услуги</th>
-              <th style="width:80px;">Статус</th>
             </tr></thead>
             <tbody id="sessBody"></tbody>
           </table>
@@ -451,13 +456,13 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="tbl-wrap" style="margin-top:10px;">
         <table class="tbl">
           <thead><tr>
+            <th style="width:auto;">Услуги</th>
+            <th style="width:100px; text-align:right;">Внесено</th>
+            <th style="width:100px; text-align:right;">Долг</th>
+            <th style="width:140px; text-align:right;">Действия</th>
             <th style="width:88px;">Дата</th>
             <th style="width:100px;">Время</th>
             <th>Клиент</th>
-            <th>Услуги</th>
-            <th style="text-align:right;">Внесено</th>
-            <th style="text-align:right;">Долг</th>
-            <th style="width:140px; text-align:right;">Действия</th>
           </tr></thead>
           <tbody id="finBody"></tbody>
         </table>
@@ -498,7 +503,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <div class="chart-ttl">Топ моих услуг</div>
           <div class="svc-rnk" id="anaRnk"></div>
         </div>
-        <!-- Кнопка ручной миграции -->
+        <!-- Кнопка ручной миграции (если вдруг не сработала автоматическая) -->
         <button class="tb-btn green-btn" style="margin-top:12px;width:100%;justify-content:center;" onclick="forceMigrate()">
           <i class="fa-solid fa-link"></i> Привязать мои старые записи
         </button>
@@ -1380,7 +1385,10 @@ function renderSessions(){
         if(!e.target.closest('.act-ic')) showEvPopup(row, e);
     };
 
+    // Новый порядок: Услуги, Статус, Дата, Время, Клиент
     tr.innerHTML=`
+      <td data-label="Услуги"><div class="td-svc">${row.services||'—'}</div></td>
+      <td data-label="Статус">${statusBadge}</td>
       <td data-label="Дата"><div class="td-date">${row.date||'—'}</div></td>
       <td data-label="Время"><div class="td-time" style="color:${color}">${showT?timeDisplay:'—'}</div></td>
       <td data-label="Клиент">
@@ -1392,8 +1400,6 @@ function renderSessions(){
           </div>
         </div>
       </td>
-      <td data-label="Услуги"><div class="td-svc">${row.services||'—'}</div></td>
-      <td data-label="Статус">${statusBadge}</td>
     `;
     body.appendChild(tr);
   });
@@ -1439,7 +1445,7 @@ function renderClients(){
   if(!privacyOn)applyBlur();
 }
 
-/* ===== FINANCE (ЗЕЛЁНЫЙ/КРАСНЫЙ ПРОГРЕСС-БАР) ===== */
+/* ===== FINANCE (НОВЫЙ ПОРЯДОК + ПОДСВЕТКА) ===== */
 function renderFinance(){
   const myData = getMyData();
   const body=document.getElementById('finBody');body.innerHTML='';
@@ -1481,8 +1487,21 @@ function renderFinance(){
     let nameStyle = r.completed ? "color: var(--green); font-weight: 700;" : "";
     const progressHtml = isSound ? `<div class="prog" style="width:100%;"><div class="prog-fill" style="width:${Math.round(perc)}%;background:${progressColor};"></div></div>` : '';
 
+    // Определяем класс для подсветки строки
+    let rowClass = '';
+    if (rest === 0 || r.completed) {
+      rowClass = 'row-paid';
+    } else {
+      rowClass = 'row-debt';
+    }
+
     const tr=document.createElement('tr');
+    tr.className = rowClass;
     tr.innerHTML=`
+      <td data-label="Услуги"><div class="td-svc">${r.services||'—'}</div></td>
+      <td data-label="Внесено" style="text-align:right;"><div class="td-price pv" style="color:var(--green)">${paid.toLocaleString()} ₽</div></td>
+      <td data-label="Долг" style="text-align:right;"><div class="td-price pv" style="color:var(--gold)">${rest>0?rest.toLocaleString()+' ₽':'0 ₽'}</div></td>
+      <td data-label="Действия"><div class="td-acts" style="justify-content: flex-end; opacity: 1;">${actsHTML} <span class="ss-badge ${statusClass}" style="margin-left:6px;">${statusText}</span></div></td>
       <td data-label="Дата"><div class="td-date">${r.date||'—'}</div></td>
       <td data-label="Время"><div class="td-time" style="color:${color}">${timeDisplay}</div></td>
       <td data-label="Клиент" style="min-width:200px;">
@@ -1495,10 +1514,6 @@ function renderFinance(){
           </div>
         </div>
       </td>
-      <td data-label="Услуги"><div class="td-svc">${r.services||'—'}</div></td>
-      <td data-label="Внесено" style="text-align:right;"><div class="td-price pv" style="color:var(--green)">${paid.toLocaleString()} ₽</div></td>
-      <td data-label="Долг" style="text-align:right;"><div class="td-price pv" style="color:var(--gold)">${rest>0?rest.toLocaleString()+' ₽':'0 ₽'}</div></td>
-      <td data-label="Действия"><div class="td-acts" style="justify-content: flex-end; opacity: 1;">${actsHTML} <span class="ss-badge ${statusClass}" style="margin-left:6px;">${statusText}</span></div></td>
     `;
     body.appendChild(tr);
   });
