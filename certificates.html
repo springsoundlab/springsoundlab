@@ -686,6 +686,7 @@ let regSelectedColor=PALETTE[0].hex;
 
 let calScrollSaved = 0;
 let calInitialized = false;
+let popupLocked = false;
 
 /* ===== UTILS ===== */
 function norm(r){let d=(r||'').replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
@@ -695,6 +696,11 @@ function dateToInput(ds){if(!ds)return '';const[d,m,y]=ds.split('.');return y+'-
 function inputToDate(s){if(!s)return '';const[y,m,d]=s.split('-');return d+'.'+m+'.'+y;}
 function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
+function monthKeyFromDateStr(ds) {
+  if(!ds) return '';
+  const [d,m,y] = ds.split('.');
+  return '.'+m+'.'+y;
+}
 
 function getMyData() {
   if (!window.PROFILE) return [];
@@ -841,6 +847,7 @@ function setViewMode(m){
 
 /* ===== NAV ===== */
 function goSec(s){
+  closeEvPopup();
   document.querySelectorAll('.nav-i').forEach(n=>n.classList.remove('active'));
   document.getElementById('nav-'+s).classList.add('active');
   const all=['sessions','clients','finance','certs','analytics','employees'];
@@ -952,7 +959,6 @@ function renderCalendar(){
     timeCol.appendChild(slot);
   }
   body.appendChild(timeCol);
-  // Все записи для общего обзора
   let data = window.CRM;
 
   const byDate={};
@@ -1021,7 +1027,9 @@ function renderCalendar(){
         <div class="cal-event-name" style="color:${color}">${ev.client||ev.song||'—'}</div>
         <div class="cal-event-svc" style="color:${color}99">${ev.services||ev.type||''}</div>
       `;
-      evEl.onclick=(e)=>{e.stopPropagation();showEvPopup(ev,e);};
+      evEl.onclick=(e)=>{e.stopPropagation();showEvPopup(ev,e,'click');};
+      evEl.onmouseenter=(e)=>{showEvPopup(ev,e,'hover');};
+      evEl.onmouseleave=()=>{if(!popupLocked)closeEvPopup();};
       col.appendChild(evEl);
     });
 
@@ -1060,8 +1068,9 @@ function renderEmployees() {
 
 /* ===== EVENT POPUP ===== */
 let popupId=null;
-function showEvPopup(ev,e){
+function showEvPopup(ev,e,type='click'){
   popupId=ev.id;
+  popupLocked = (type === 'click');
   const pop=document.getElementById('evPopup');
   document.getElementById('evPopName').textContent=ev.client||ev.song||'—';
   const timeStr = (ev.time?' с '+ev.time:'') + (ev.timeEnd?' до '+ev.timeEnd:'');
@@ -1086,7 +1095,11 @@ function showEvPopup(ev,e){
   pop.style.top=Math.min(y+8,window.innerHeight-ph-10)+'px';
   pop.classList.add('open');
 }
-function closeEvPopup(){document.getElementById('evPopup').classList.remove('open');popupId=null;}
+function closeEvPopup(){
+  document.getElementById('evPopup').classList.remove('open');
+  popupId=null;
+  popupLocked=false;
+}
 
 /* ===== ACTIONS ===== */
 window.markDone=function(id){
@@ -1327,7 +1340,7 @@ window.saveRecord=async function(){
   }catch(e){alert('Ошибка: '+e.message);}
 };
 
-/* ===== SESSIONS LIST (ВСЕ ЗАПИСИ, БЕЗ ДЕНЕГ) ===== */
+/* ===== SESSIONS LIST (ФИЛЬТР ПО МЕСЯЦУ: ТЕКУЩИЙ И БУДУЩИЕ) ===== */
 function renderSessions(){
   const body=document.getElementById('sessBody');
   if(!body)return;
@@ -1336,11 +1349,10 @@ function renderSessions(){
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
   
-  // Все записи для общего списка
+  // Все записи, у которых месяц >= выбранного
   let data = window.CRM.filter(r=>{
-    if(r.date&&r.date.includes(mk))return true;
-    if(!r.completed)return true;
-    return false;
+    if(!r.date) return false;
+    return monthKeyFromDateStr(r.date) >= mk;
   });
   data.sort((a,b)=>{const pd=ds=>{const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d).getTime();};return pd(b.date)-pd(a.date);});
   
@@ -1423,7 +1435,7 @@ function renderClients(){
   if(!privacyOn)applyBlur();
 }
 
-/* ===== FINANCE (ДЛИННЫЙ ПРОГРЕСС-БАР, БЕЗ ТЕЛЕФОНА) ===== */
+/* ===== FINANCE (ЗЕЛЁНЫЙ/КРАСНЫЙ ПРОГРЕСС-БАР) ===== */
 function renderFinance(){
   const myData = getMyData();
   const body=document.getElementById('finBody');body.innerHTML='';
@@ -1452,6 +1464,7 @@ function renderFinance(){
 
     const color = r.eventColor || PALETTE[0].hex;
     const timeDisplay = r.time ? `${r.time} ${r.timeEnd ? '- ' + r.timeEnd : ''}` : '—';
+    const progressColor = rest > 0 ? 'var(--red)' : 'var(--green)';
 
     let actsHTML = '';
     if(isAuthor) {
@@ -1462,7 +1475,7 @@ function renderFinance(){
     }
 
     let nameStyle = r.completed ? "color: var(--green); font-weight: 700;" : "";
-    const progressHtml = isSound ? `<div class="prog" style="width:100%;"><div class="prog-fill ${isDone?'done':''}" style="width:${Math.round(perc)}%;background:${color};"></div></div>` : '';
+    const progressHtml = isSound ? `<div class="prog" style="width:100%;"><div class="prog-fill" style="width:${Math.round(perc)}%;background:${progressColor};"></div></div>` : '';
 
     const tr=document.createElement('tr');
     tr.innerHTML=`
