@@ -87,8 +87,8 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cal-now-dot{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--red);}
 
 /* TABLE */
-.tbl-wrap{flex:1;overflow-y:auto;}
-.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl-wrap{flex:1;overflow-y:auto;overflow-x:auto;}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:600px;}
 .tbl th{padding:9px 14px;text-align:left;font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
 .tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .tbl tr:hover td{background:var(--surface);}
@@ -298,30 +298,12 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .mnav { width: 100%; justify-content: space-between; }
   .tb-btn { justify-content: center;}
 
-  .tbl thead { display: none;}
-  .tbl tr { display: flex; flex-direction: column; background: var(--surface2); margin-bottom: 12px; border-radius: var(--r); padding: 12px; border: 1px solid var(--border); }
-  .tbl td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); text-align: right; }
-  .tbl td:last-child { border-bottom: none; }
-  .tbl td::before { content: attr(data-label); color: var(--text3); font-weight: 700; font-size: 10px; text-transform: uppercase; margin-right: 10px; text-align: left; }
-  .td-acts { justify-content: flex-end; width: 100%;}
-  
-  /* Мобильный порядок для списка (журнал) */
-  #listView .tbl td[data-label="Клиент"] { order: 0; }
-  #listView .tbl td[data-label="Услуги"] { order: 1; }
-  #listView .tbl td[data-label="Статус"] { order: 2; }
-  #listView .tbl td[data-label="Дата"] { order: 3; }
-  #listView .tbl td[data-label="Время"] { order: 4; }
+  /* Таблицы на мобильных — оставляем как есть (с прокруткой) */
+  .tbl-wrap { overflow-x: auto; }
+  .tbl { min-width: 600px; font-size: 11px; }
+  .tbl th, .tbl td { padding: 6px 8px; }
+  .td-acts { opacity: 1; } /* всегда показываем действия на мобильных */
 
-  /* Мобильный порядок для финансов */
-  #secFinance .tbl td[data-label="Клиент"] { order: 0; }
-  #secFinance .tbl td[data-label="Услуги"] { order: 1; }
-  #secFinance .tbl td[data-label="Внесено"] { order: 2; }
-  #secFinance .tbl td[data-label="Долг"] { order: 3; }
-  #secFinance .tbl td[data-label="Действия"] { order: 4; }
-  /* Скрываем дату и время на мобильной версии в финансах (чтобы не мешали) */
-  #secFinance .tbl td[data-label="Дата"] { display: none; }
-  #secFinance .tbl td[data-label="Время"] { display: none; }
-  
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
   .cl-grid{grid-template-columns:1fr 1fr;}
@@ -470,7 +452,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     </div>
 
     <div id="secFinance" class="view" style="display:none;">
-      <div class="tbl-wrap" style="margin-top:10px;">
+      <div class="tbl-wrap">
         <table class="tbl">
           <thead><tr>
             <th style="width:88px;">Дата</th>
@@ -493,24 +475,25 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     <div id="secAnalytics" class="view" style="display:none;">
       <div class="ana-wrap">
         <div class="ana-hd">
-          <div class="ana-c"><div class="ana-l">Мой средний чек</div><div class="ana-v pv" id="anaAvg">0 ₽</div><div class="ana-s" id="anaAvgS">за все время</div></div>
+          <div class="ana-c"><div class="ana-l">Средний чек</div><div class="ana-v pv" id="aAvg">0 ₽</div><div class="ana-s" id="aAvgSub">за все время</div></div>
           
           <div class="ana-c" style="display:flex; gap:10px;">
             <div style="flex:1;">
-              <div class="ana-l">Записи</div><div class="ana-v" id="anaTotal">0</div><div class="ana-s">в базе</div>
+              <div class="ana-l">Записи</div><div class="ana-v" id="aTotal">0</div><div class="ana-s">в базе</div>
             </div>
             <div style="width:1px; background:var(--border); margin:4px 0;"></div>
             <div style="flex:1;">
-              <div class="ana-l">В работе</div><div class="ana-v" id="anaWork" style="color:var(--gold);">0</div><div class="ana-s">сейчас</div>
+              <div class="ana-l">В работе</div><div class="ana-v" id="aWork" style="color:var(--gold);">0</div><div class="ana-s">сейчас</div>
             </div>
             <div style="width:1px; background:var(--border); margin:4px 0;"></div>
             <div style="flex:1;">
-              <div class="ana-l">Готово</div><div class="ana-v" id="anaDone" style="color:var(--green);">0</div><div class="ana-s">работ</div>
+              <div class="ana-l">Готово</div><div class="ana-v" id="aDone" style="color:var(--green);">0</div><div class="ana-s">работ</div>
             </div>
           </div>
 
-          <div class="ana-c"><div class="ana-l">Мой доход за год</div><div class="ana-v pv" id="anaYear">0 ₽</div><div class="ana-s" id="anaYearS">2026</div></div>
+          <!-- Блок "Мой доход за год" и "Остатки долгов" поменяны местами -->
           <div class="ana-c dbt"><div class="ana-l">Остатки долгов</div><div class="ana-v pv" id="anaDbt" style="color:var(--gold);">0 ₽</div><div class="ana-s">к получению</div></div>
+          <div class="ana-c"><div class="ana-l">Мой доход за год</div><div class="ana-v pv" id="anaYear">0 ₽</div><div class="ana-s" id="anaYearS">2026</div></div>
         </div>
         <div class="chart-s">
           <div class="chart-ttl">Мой доход по месяцам — <span id="anaChY">2026</span></div>
@@ -520,7 +503,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <div class="chart-ttl">Топ моих услуг</div>
           <div class="svc-rnk" id="anaRnk"></div>
         </div>
-        <!-- Кнопка ручной миграции (если вдруг не сработала автоматическая) -->
+        <!-- Кнопка ручной миграции -->
         <button class="tb-btn green-btn" style="margin-top:12px;width:100%;justify-content:center;" onclick="forceMigrate()">
           <i class="fa-solid fa-link"></i> Привязать мои старые записи
         </button>
@@ -1402,7 +1385,6 @@ function renderSessions(){
         if(!e.target.closest('.act-ic')) showEvPopup(row, e);
     };
 
-    // Десктопный порядок: Дата, Время, Клиент, Услуги, Статус
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${row.date||'—'}</div></td>
       <td data-label="Время"><div class="td-time" style="color:${color}">${showT?timeDisplay:'—'}</div></td>
@@ -1462,7 +1444,7 @@ function renderClients(){
   if(!privacyOn)applyBlur();
 }
 
-/* ===== FINANCE (десктопный порядок + подсветка) ===== */
+/* ===== FINANCE ===== */
 function renderFinance(){
   const myData = getMyData();
   const body=document.getElementById('finBody');body.innerHTML='';
