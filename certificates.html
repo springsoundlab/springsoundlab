@@ -318,7 +318,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    text-align: center !important;
     width: 100% !important;
     border-bottom: none !important;
     padding-bottom: 0 !important;
@@ -332,16 +331,40 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   #secFinance .tbl td[data-label="Клиент"] .td-name {
     font-size: 22px !important;
     font-weight: 700 !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 0 !important;
+    text-align: center !important;
+  }
+  /* Контейнер для полоски и имени */
+  #secFinance .tbl td[data-label="Клиент"] > div {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+  }
+  /* Полоска */
+  #secFinance .tbl td[data-label="Клиент"] > div > div:first-child {
+    flex-shrink: 0 !important;
+    height: 28px !important;
+    width: 3px !important;
+    border-radius: 2px !important;
+  }
+  /* Блок с именем и прогрессом */
+  #secFinance .tbl td[data-label="Клиент"] > div > div:last-child {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
   }
   #secFinance .tbl td[data-label="Клиент"] .prog {
     height: 8px !important;
-    margin: 8px 0 !important;
+    margin: 8px 0 4px 0 !important;
     width: 100% !important;
-    border-radius: 4px;
+    border-radius: 4px !important;
   }
   #secFinance .tbl td[data-label="Клиент"] .prog .prog-fill {
-    border-radius: 4px;
+    border-radius: 4px !important;
   }
   
   #secFinance .tbl td[data-label="Действия"] {
@@ -360,11 +383,24 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     opacity: 1 !important;
     justify-content: center !important;
     gap: 12px !important;
+    flex-wrap: wrap !important;
   }
   #secFinance .tbl td[data-label="Действия"] .td-acts .act-ic {
     width: 38px !important;
     height: 38px !important;
     font-size: 16px !important;
+  }
+  /* Статус – делаем такой же высоты, как кнопки */
+  #secFinance .tbl td[data-label="Действия"] .td-acts .ss-badge {
+    font-size: 11px !important;
+    padding: 8px 12px !important;
+    height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    border-radius: 6px !important;
+    font-weight: 700 !important;
   }
   
   /* Скрываем остальные колонки в финансах на мобильных */
@@ -388,7 +424,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .ana-hd > div:nth-child(4) { order: 3; grid-column: span 1; } /* долги */
   
   .ana-hd > div:nth-child(2) .ana-c {
-    /* делаем блок с тремя показателями компактным */
     padding: 10px;
     display: flex;
     flex-direction: column;
@@ -1596,6 +1631,8 @@ function renderFinance(){
 
     const tr=document.createElement('tr');
     tr.className = rowClass;
+    tr.setAttribute('data-id', r.id); // для обработки двойного клика
+
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${r.date||'—'}</div></td>
       <td data-label="Время"><div class="td-time" style="color:${color}">${timeDisplay}</div></td>
@@ -1945,6 +1982,20 @@ window.forceMigrate = async function() {
     localStorage.setItem('migration_done_universal', 'true');
   }
 };
+
+// Двойной клик для детализации на мобильных (в финансах)
+document.addEventListener('dblclick', function(e) {
+  if (window.innerWidth > 768) return; // только на мобильных
+  const row = e.target.closest('.tbl tr');
+  if (!row) return;
+  const rowId = row.getAttribute('data-id');
+  if (!rowId) return;
+  // Находим запись в CRM
+  const record = window.CRM.find(r => r.id === rowId);
+  if (!record) return;
+  // Показываем попап с детализацией
+  showEvPopup(record, { clientX: e.clientX, clientY: e.clientY }, 'click');
+});
 </script>
 </body>
 </html>
