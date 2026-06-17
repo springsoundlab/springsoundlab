@@ -136,9 +136,9 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cl-st-l{font-size:8px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
 .cl-st-v{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin-top:1px;}
 
-/* FINANCE – теперь карточки (как клиенты) */
-.fin-grid{flex:1;overflow-y:auto;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;align-content:start;}
-.fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:.15s;cursor:pointer;display:flex;flex-direction:column;gap:6px;}
+/* FINANCE – карточки (как клиенты) */
+.fin-grid{flex:1;overflow-y:auto;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;align-content:start;}
+.fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:.15s;display:flex;flex-direction:column;gap:6px;}
 .fin-card:hover{border-color:var(--border2);background:var(--surface2);}
 .fin-card.row-paid { background: rgba(62, 207, 142, 0.08); border-color: rgba(62, 207, 142, 0.3); }
 .fin-card.row-debt { background: rgba(255, 92, 106, 0.08); border-color: rgba(255, 92, 106, 0.3); }
@@ -146,10 +146,13 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .fin-card .fin-color-bar{width:3px;height:28px;border-radius:2px;flex-shrink:0;}
 .fin-card .fin-name{font-size:16px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .fin-card .fin-status{margin-left:auto;}
-.fin-card .fin-prog{margin:4px 0 6px 0;}
+.fin-card .fin-prog{margin:2px 0 6px 0;}
 .fin-card .fin-prog .prog{height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
 .fin-card .fin-prog .prog-fill{height:100%;border-radius:3px;}
-.fin-card .fin-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;}
+.fin-card .fin-details{font-size:11px;color:var(--text2);line-height:1.4;padding:4px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:2px 0;}
+.fin-card .fin-details .detail-row{display:flex;justify-content:space-between;gap:8px;}
+.fin-card .fin-details .detail-label{color:var(--text3);font-weight:600;}
+.fin-card .fin-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;}
 .fin-card .fin-stat{background:var(--surface2);border-radius:6px;padding:4px 6px;text-align:center;}
 .fin-card .fin-stat-l{font-size:8px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
 .fin-card .fin-stat-v{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;}
@@ -295,7 +298,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 /* OFFLINE */
 #offBar{display:none;position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:6px;z-index:999999;}
 
-/* MOBILE АДАПТАЦИЯ */
+/* MOBILE АДАПТАЦИЯ – теперь только для меню и календаря, финансы остаются как на десктопе */
 @media(max-width:768px){
   .sidebar { position: fixed !important; top: 0; left: -280px; width: 260px !important; height: 100vh !important; z-index: 99999 !important; transition: left 0.3s ease-in-out; box-shadow: 5px 0 25px rgba(0,0,0,0.5); display: flex !important; flex-direction: column !important; border-right: 1px solid var(--border); }
   .sidebar.mobile-open { left: 0 !important; }
@@ -312,6 +315,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .mnav { width: 100%; justify-content: space-between; }
   .tb-btn { justify-content: center;}
 
+  /* Список (журнал) остаётся как таблица-карточки */
   .tbl thead { display: none;}
   .tbl tr { display: flex; flex-direction: column; background: var(--surface2); margin-bottom: 12px; border-radius: var(--r); padding: 12px; border: 1px solid var(--border); }
   .tbl td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); text-align: right; }
@@ -319,15 +323,14 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .tbl td::before { content: attr(data-label); color: var(--text3); font-weight: 700; font-size: 10px; text-transform: uppercase; margin-right: 10px; text-align: left; }
   .td-acts { justify-content: flex-end; width: 100%;}
   
-  /* Мобильный порядок для списка (журнал) – оставляем как есть */
   #listView .tbl td[data-label="Клиент"] { order: 0; }
   #listView .tbl td[data-label="Услуги"] { order: 1; }
   #listView .tbl td[data-label="Статус"] { order: 2; }
   #listView .tbl td[data-label="Дата"] { order: 3; }
   #listView .tbl td[data-label="Время"] { order: 4; }
 
-  /* Финансы – карточки уже адаптивны, сетка сама подстроится */
-  .fin-grid { grid-template-columns: 1fr; } /* на мобильных одна колонка */
+  /* Финансы – оставляем как на десктопе (сетка) */
+  .fin-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
   
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
@@ -340,7 +343,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .mb-num-input { font-size: 18px; }
 }
 
-/* EVENT DETAIL POPUP */
+/* EVENT DETAIL POPUP – больше не используется для финансов, но оставим для других разделов */
 .ev-popup{display:none;position:fixed;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:14px;width:240px;z-index:99998;box-shadow:0 12px 40px rgba(0,0,0,.5);}
 .ev-popup.open{display:block;}
 .ev-pop-close {position:absolute;top:10px;right:12px;cursor:pointer;font-size:16px;color:var(--text2);padding:5px;line-height:1;}
@@ -1089,9 +1092,11 @@ function renderEmployees() {
   });
 }
 
-/* ===== EVENT POPUP ===== */
+/* ===== EVENT POPUP – теперь только для календаря и списка ===== */
 let popupId=null;
 function showEvPopup(ev,e,type='click'){
+  // Не показываем попап для финансов (там информация уже внутри)
+  if (document.getElementById('secFinance').style.display === 'flex') return;
   popupId=ev.id;
   popupLocked = (type === 'click');
   const pop=document.getElementById('evPopup');
@@ -1513,11 +1518,6 @@ function renderFinance(){
     if (rest === 0 || isDone) card.classList.add('row-paid');
     else card.classList.add('row-debt');
 
-    // Двойной клик для попапа
-    card.addEventListener('dblclick', function(e) {
-      showEvPopup(r, { clientX: e.clientX, clientY: e.clientY }, 'click');
-    });
-
     // Заголовок: полоска + имя + статус
     const header = document.createElement('div');
     header.className = 'fin-header';
@@ -1535,6 +1535,17 @@ function renderFinance(){
       <div class="prog"><div class="prog-fill" style="width:${perc}%;background:${rest > 0 ? 'var(--red)' : 'var(--green)'};"></div></div>
     `;
     card.appendChild(progWrap);
+
+    // Блок деталей: дата, время, услуги
+    const detailsDiv = document.createElement('div');
+    detailsDiv.className = 'fin-details';
+    const timeStr = r.time ? 'в ' + r.time + (r.timeEnd ? ' — ' + r.timeEnd : '') : '';
+    detailsDiv.innerHTML = `
+      <div class="detail-row"><span class="detail-label">Дата:</span> <span>${r.date || '—'}</span></div>
+      ${timeStr ? `<div class="detail-row"><span class="detail-label">Время:</span> <span>${timeStr}</span></div>` : ''}
+      <div class="detail-row"><span class="detail-label">Услуги:</span> <span>${r.services || 'Услуги не указаны'}</span></div>
+    `;
+    card.appendChild(detailsDiv);
 
     // Финансовая статистика
     const stats = document.createElement('div');
