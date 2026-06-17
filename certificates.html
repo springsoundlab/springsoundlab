@@ -728,7 +728,7 @@ function unlockButton(btn) {
 }
 
 // ===========================================
-//  ПЕРЕМЕННЫЕ ДЛЯ ПИНЧ-ЗУМА
+//  ПЕРЕМЕННЫЕ ДЛЯ ПИНЧ-ЗУМА (исправлено)
 // ===========================================
 let currentHourHeight = 60;
 const MIN_HOUR_HEIGHT = 30;
@@ -736,7 +736,7 @@ const MAX_HOUR_HEIGHT = 120;
 let pinchStartDistance = 0;
 let pinchStartHeight = 60;
 let isPinching = false;
-let zoomTimeout = null; // для троттлинга
+let lastRenderTime = 0; // для троттлинга
 // ===========================================
 
 const FC={apiKey:"AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",authDomain:"crm-a9450.firebaseapp.com",projectId:"crm-a9450",storageBucket:"crm-a9450.firebasestorage.app",messagingSenderId:"971140334464",appId:"1:971140334464:web:dde090a90bdcd5563cb765"};
@@ -837,7 +837,7 @@ function saveZoomToProfile() {
   }
 }
 
-/* ===== ОБРАБОТЧИКИ МУЛЬТИТАЧ ===== */
+/* ===== ОБРАБОТЧИКИ МУЛЬТИТАЧ (исправлены) ===== */
 function handleTouchStart(e) {
   if (e.touches.length === 2) {
     e.preventDefault();
@@ -860,14 +860,12 @@ function handleTouchMove(e) {
     newHeight = Math.min(Math.max(newHeight, MIN_HOUR_HEIGHT), MAX_HOUR_HEIGHT);
     if (Math.abs(newHeight - currentHourHeight) > 1) {
       currentHourHeight = Math.round(newHeight);
-      // Троттлинг renderCalendar – не чаще чем раз в 30 мс
-      if (zoomTimeout) {
-        clearTimeout(zoomTimeout);
-      }
-      zoomTimeout = setTimeout(() => {
+      // Троттлинг: обновляем не чаще раза в 50 мс
+      const now = Date.now();
+      if (now - lastRenderTime > 50) {
         if (viewMode === 'calendar') renderCalendar();
-        zoomTimeout = null;
-      }, 30);
+        lastRenderTime = now;
+      }
     }
   }
 }
@@ -875,13 +873,7 @@ function handleTouchMove(e) {
 function handleTouchEnd(e) {
   if (isPinching) {
     isPinching = false;
-    // Сохраняем итоговое значение в профиль
     saveZoomToProfile();
-    // Выполняем финальную перерисовку, если не было последней
-    if (zoomTimeout) {
-      clearTimeout(zoomTimeout);
-      zoomTimeout = null;
-    }
     if (viewMode === 'calendar') renderCalendar();
   }
 }
