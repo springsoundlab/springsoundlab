@@ -83,7 +83,6 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cal-event:hover{filter:brightness(1.15);z-index:10;}
 .cal-event-name{font-size:10px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cal-event-svc{font-size:9px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cal-event-price{font-family:'JetBrains Mono',monospace;font-size:9px;margin-top:2px;opacity:.9;}
 .cal-now-line{position:absolute;left:0;right:0;height:2px;background:var(--red);z-index:5;}
 .cal-now-dot{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--red);}
 
@@ -432,9 +431,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
               <th style="width:88px;">Дата</th>
               <th style="width:100px;">Время</th>
               <th>Клиент</th>
-              <th>Телефон</th>
               <th>Услуги</th>
-              <th style="text-align:right;width:100px;">Сумма</th>
               <th style="width:80px;">Статус</th>
             </tr></thead>
             <tbody id="sessBody"></tbody>
@@ -457,7 +454,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
             <th style="width:88px;">Дата</th>
             <th style="width:100px;">Время</th>
             <th>Клиент</th>
-            <th>Телефон</th>
             <th>Услуги</th>
             <th style="text-align:right;">Внесено</th>
             <th style="text-align:right;">Долг</th>
@@ -522,7 +518,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   <div class="ev-pop-row"><i class="fa-regular fa-clock" style="font-size:10px;"></i><span id="evPopTime">—</span></div>
   <div class="ev-pop-row"><i class="fa-solid fa-music" style="font-size:10px;"></i><span id="evPopSvc">—</span></div>
  
-  <div class="ev-pop-row"><i class="fa-solid fa-ruble-sign" style="font-size:10px;"></i><span id="evPopPrice" class="pv">—</span></div>
   <div class="ev-pop-row" id="evPopPhoneRow"><i class="fa-solid fa-phone" style="font-size:10px;"></i><span id="evPopPhone">—</span></div>
   <div class="ev-pop-row" id="evPopComRow" style="display:none;"><i class="fa-regular fa-comment" style="font-size:10px;"></i><span id="evPopCom" style="font-style:italic;"></span></div>
 </div>
@@ -922,7 +917,7 @@ function getWeekDays(){
 }
 function dateStr(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 
-/* ===== CALENDAR RENDER ===== */
+/* ===== CALENDAR RENDER (ВСЕ ЗАПИСИ) ===== */
 const HOURS_START=7;
 const HOURS_END=24;
 const HOUR_H=60;
@@ -957,7 +952,8 @@ function renderCalendar(){
     timeCol.appendChild(slot);
   }
   body.appendChild(timeCol);
-  let data = getMyData();
+  // Все записи для общего обзора
+  let data = window.CRM;
 
   const byDate={};
   data.forEach(r=>{if(r.date&&r.time){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);}});
@@ -1021,15 +1017,9 @@ function renderCalendar(){
       evEl.style.background=pal.bg;
       evEl.style.borderLeft='3px solid '+color;
       evEl.style.opacity=isDone?'0.55':'1';
-      const full=ev.fullTotal||ev.total||0;
-      const paid=ev.total||0;
-      const rest=Math.max(0,full-paid);
-      
-      const priceHTML = (paid>0) ? `<div class="cal-event-price pv" style="color:${color}bb">${paid.toLocaleString()}₽${rest>0?' · −'+rest.toLocaleString()+'₽':''}</div>` : '';
       evEl.innerHTML=`
         <div class="cal-event-name" style="color:${color}">${ev.client||ev.song||'—'}</div>
         <div class="cal-event-svc" style="color:${color}99">${ev.services||ev.type||''}</div>
-        ${priceHTML}
       `;
       evEl.onclick=(e)=>{e.stopPropagation();showEvPopup(ev,e);};
       col.appendChild(evEl);
@@ -1051,7 +1041,6 @@ function renderCalendar(){
       body.scrollTop = calScrollSaved;
     }
   },50);
-  if(!privacyOn)applyBlur();
 }
 
 /* ===== EMPLOYEES ===== */
@@ -1080,12 +1069,6 @@ function showEvPopup(ev,e){
   
   document.getElementById('evPopSvc').textContent=ev.services||ev.type||'—';
   
-  const full=ev.fullTotal||ev.total||0;
-  const paid=ev.total||0;
-  const rest=Math.max(0,full-paid);
-  document.getElementById('evPopPrice').textContent=paid.toLocaleString()+' ₽'+(rest>0?' (долг '+rest.toLocaleString()+' ₽)':'');
-  document.getElementById('evPopPrice').parentElement.style.display = 'flex';
-
   document.getElementById('evPopPhone').textContent=ev.phone||'—';
   const hasCom=!!(ev.comment);
   document.getElementById('evPopComRow').style.display=hasCom?'flex':'none';
@@ -1102,7 +1085,6 @@ function showEvPopup(ev,e){
   pop.style.left=Math.min(x+8,window.innerWidth-pw-10)+'px';
   pop.style.top=Math.min(y+8,window.innerHeight-ph-10)+'px';
   pop.classList.add('open');
-  if(!privacyOn)applyBlur();
 }
 function closeEvPopup(){document.getElementById('evPopup').classList.remove('open');popupId=null;}
 
@@ -1345,7 +1327,7 @@ window.saveRecord=async function(){
   }catch(e){alert('Ошибка: '+e.message);}
 };
 
-/* ===== SESSIONS LIST ===== */
+/* ===== SESSIONS LIST (ВСЕ ЗАПИСИ, БЕЗ ДЕНЕГ) ===== */
 function renderSessions(){
   const body=document.getElementById('sessBody');
   if(!body)return;
@@ -1354,7 +1336,8 @@ function renderSessions(){
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
   
-  let data = getMyData().filter(r=>{
+  // Все записи для общего списка
+  let data = window.CRM.filter(r=>{
     if(r.date&&r.date.includes(mk))return true;
     if(!r.completed)return true;
     return false;
@@ -1362,14 +1345,9 @@ function renderSessions(){
   data.sort((a,b)=>{const pd=ds=>{const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d).getTime();};return pd(b.date)-pd(a.date);});
   
   body.innerHTML='';
-  if(!data.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
+  if(!data.length){body.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
   data.forEach(row=>{
-    const full=row.fullTotal||row.total||0;
-    const paid=row.total||0;
-    const rest=Math.max(0,full-paid);
-    const perc=full>0?Math.min((paid/full)*100,100):0;
-    const isDone=row.completed||perc>=100;
-
+    const isDone=row.completed;
     let showT=true;
     if(row.time&&row.date===todS){const[h,m]=row.time.split(':').map(Number);if(curH>=h*60+m)showT=false;}
     else if(row.date!==todS){const[d,mo,y]=row.date.split('.').map(Number);if(new Date(y,mo-1,d)<now)showT=false;}
@@ -1377,12 +1355,10 @@ function renderSessions(){
     const tr=document.createElement('tr');
     if(isDone)tr.classList.add('done-row');
     const color=row.eventColor||PALETTE[0].hex;
-    const statusBadge=isDone?'<span class="ss-badge ss-done">Готово</span>':rest>0?'<span class="ss-badge ss-debt">Долг −'+rest.toLocaleString()+'₽</span>':'<span class="ss-badge ss-work">В работе</span>';
+    const statusBadge=isDone?'<span class="ss-badge ss-done">Готово</span>':'<span class="ss-badge ss-work">В работе</span>';
     const roleTag=row.authorName?`<span class="role-tag">${row.authorName}</span>`:'';
     const timeDisplay = row.time ? `${row.time} ${row.timeEnd ? '- ' + row.timeEnd : ''}` : '—';
 
-    const priceHTML = `<div class="pv">${paid.toLocaleString()} ₽${rest>0?`<span class="td-rest">−${rest.toLocaleString()} ₽</span>`:''}</div>`;
-    
     tr.style.cursor = 'pointer';
     tr.onclick = (e) => {
         if(!e.target.closest('.act-ic')) showEvPopup(row, e);
@@ -1397,18 +1373,14 @@ function renderSessions(){
           <div>
             <div class="td-name">${row.client||row.song||'—'}${roleTag}</div>
             ${row.comment?`<div class="td-comment">💬 ${row.comment}</div>`:''}
-            <div class="prog"><div class="prog-fill ${isDone?'done':''}" style="width:${Math.round(perc)}%;background:${color}"></div></div>
           </div>
         </div>
       </td>
-      <td data-label="Телефон"><div class="td-phone">${row.phone||'—'}</div></td>
       <td data-label="Услуги"><div class="td-svc">${row.services||'—'}</div></td>
-      <td data-label="Сумма" style="text-align:right;"><div class="td-price">${priceHTML}</div></td>
       <td data-label="Статус">${statusBadge}</td>
     `;
     body.appendChild(tr);
   });
-  if(!privacyOn)applyBlur();
 }
 
 /* ===== CLIENTS ===== */
@@ -1451,7 +1423,7 @@ function renderClients(){
   if(!privacyOn)applyBlur();
 }
 
-/* ===== FINANCE ===== */
+/* ===== FINANCE (ДЛИННЫЙ ПРОГРЕСС-БАР, БЕЗ ТЕЛЕФОНА) ===== */
 function renderFinance(){
   const myData = getMyData();
   const body=document.getElementById('finBody');body.innerHTML='';
@@ -1465,7 +1437,7 @@ function renderFinance(){
   });
   
   const sorted = filtered.sort((a,b) => b.timestamp - a.timestamp).slice(0, 60);
-  if(!sorted.length){body.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
+  if(!sorted.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
 
   sorted.forEach(r=>{
     const full=r.fullTotal||r.total||0;
@@ -1490,22 +1462,22 @@ function renderFinance(){
     }
 
     let nameStyle = r.completed ? "color: var(--green); font-weight: 700;" : "";
+    const progressHtml = isSound ? `<div class="prog" style="width:100%;"><div class="prog-fill ${isDone?'done':''}" style="width:${Math.round(perc)}%;background:${color};"></div></div>` : '';
 
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${r.date||'—'}</div></td>
       <td data-label="Время"><div class="td-time" style="color:${color}">${timeDisplay}</div></td>
-      <td data-label="Клиент">
+      <td data-label="Клиент" style="min-width:200px;">
         <div style="display:flex;align-items:center;gap:6px;">
           <div style="width:3px;height:28px;border-radius:2px;background:${color};flex-shrink:0;"></div>
-          <div>
+          <div style="flex:1;">
             <div class="td-name" style="${nameStyle}">${r.client||r.song||'—'}</div>
             ${r.comment?`<div class="td-comment">💬 ${r.comment}</div>`:''}
-            <div class="prog"><div class="prog-fill ${isDone?'done':''}" style="width:${Math.round(perc)}%;background:${color}"></div></div>
+            ${progressHtml}
           </div>
         </div>
       </td>
-      <td data-label="Телефон"><div class="td-phone">${r.phone||'—'}</div></td>
       <td data-label="Услуги"><div class="td-svc">${r.services||'—'}</div></td>
       <td data-label="Внесено" style="text-align:right;"><div class="td-price pv" style="color:var(--green)">${paid.toLocaleString()} ₽</div></td>
       <td data-label="Долг" style="text-align:right;"><div class="td-price pv" style="color:var(--gold)">${rest>0?rest.toLocaleString()+' ₽':'0 ₽'}</div></td>
