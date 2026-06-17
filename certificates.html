@@ -394,7 +394,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="auth-lbl">Номер телефона</div>
       <input type="tel" id="regPhone" class="auth-inp" placeholder="+7 900 000-00-00" inputmode="tel">
       <div class="auth-lbl">Пароль</div>
-      <input type="password" id="regPass" class="auth-inp" placeholder="Минимум 6 символов">
+      <input type="password" id="regPass" class="auth-inp" placeholder="Минимум 8 символов">
       <div class="auth-lbl">Роль</div>
       <div class="auth-roles" id="regRoles">
         <div class="auth-role sel" data-role="Звукорежиссёр" onclick="selRole(this)">🎧 Звук</div>
@@ -678,11 +678,46 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script>
+// ===== ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ЗАЩИТЫ ОТ XSS =====
+function escapeHTML(text) {
+  if (text === null || text === undefined) return '';
+  const div = document.createElement('div');
+  div.textContent = String(text);
+  return div.innerHTML;
+}
+
+// ===== УЛУЧШЕННАЯ ОБРАБОТКА ОШИБОК =====
+function handleError(error, userMessage = null) {
+  console.error('❌ Ошибка:', error);
+  if (userMessage) {
+    alert(userMessage);
+  }
+}
+
+// ===== ЗАЩИТА ОТ ДВОЙНОГО НАЖАТИЯ =====
+function lockButton(btn) {
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'default';
+  }
+}
+function unlockButton(btn) {
+  if (btn) {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+  }
+}
+// ===========================================
+
 const FC={apiKey:"AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",authDomain:"crm-a9450.firebaseapp.com",projectId:"crm-a9450",storageBucket:"crm-a9450.firebasestorage.app",messagingSenderId:"971140334464",appId:"1:971140334464:web:dde090a90bdcd5563cb765"};
 if(!firebase.apps.length)firebase.initializeApp(FC);
 const db=firebase.firestore();
 const auth=firebase.auth();
-db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+db.enablePersistence({synchronizeTabs:true}).catch(err=>{
+  console.warn('⚠️ Не удалось включить офлайн-режим:', err);
+});
 const SC=db.collection("sessions");
 const UC=db.collection("users");
 const CERTC=db.collection("certificates");
@@ -746,10 +781,18 @@ function monthKeyFromDateStr(ds) {
 }
 function getMonthKeyFromDate(d){ return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear(); }
 
+/* ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ getMyData – фильтрация по UID с fallback на телефон ===== */
 function getMyData() {
   if (!window.PROFILE) return [];
+  const currentUid = window.PROFILE.uid;
   const currentPhone = norm(window.PROFILE.phone || '');
-  return window.CRM.filter(r => norm(r.authorPhone || '') === currentPhone);
+  return window.CRM.filter(r => {
+    // Основной приоритет – authorUid
+    if (r.authorUid === currentUid) return true;
+    // Для старых записей без authorUid проверяем authorPhone
+    if (!r.authorUid && r.authorPhone && norm(r.authorPhone) === currentPhone) return true;
+    return false;
+  });
 }
 
 /* ===== COLOR PICKER INIT ===== */
@@ -795,10 +838,18 @@ window.doLogin=async function(){
   const pw=document.getElementById('loginPass').value;
   if(ph.length<10){showErr('Введите корректный номер');return;}
   if(!pw){showErr('Введите пароль');return;}
-  const btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent='Входим...';
-  try{await auth.signInWithEmailAndPassword(toEmail(ph),pw);}
-  catch(e){let m='Неверный номер или пароль.';if(e.code==='auth/too-many-requests')m='Слишком много попыток.';showErr(m);}
-  finally{btn.disabled=false;btn.textContent='Войти';}
+  const btn=document.getElementById('loginBtn');
+  lockButton(btn);
+  try{
+    await auth.signInWithEmailAndPassword(toEmail(ph),pw);
+  }catch(e){
+    let m='Неверный номер или пароль.';
+    if(e.code==='auth/too-many-requests') m='Слишком много попыток.';
+    showErr(m);
+    console.error('❌ Ошибка входа:', e);
+  }finally{
+    unlockButton(btn);
+  }
 };
 
 window.doRegister=async function(){
@@ -809,14 +860,21 @@ window.doRegister=async function(){
   const role=document.querySelector('#regRoles .auth-role.sel')?.dataset.role||'Сотрудник';
   if(!name){showErr('Введите имя');return;}
   if(ph.length<10){showErr('Введите корректный номер');return;}
-  if(pw.length<6){showErr('Пароль мин. 6 символов');return;}
-  const btn=document.getElementById('regBtn');btn.disabled=true;btn.textContent='Создаём...';
+  // НОВОЕ ТРЕБОВАНИЕ: минимум 8 символов
+  if(pw.length<8){showErr('Пароль должен содержать минимум 8 символов');return;}
+  const btn=document.getElementById('regBtn');
+  lockButton(btn);
   try{
     const c=await auth.createUserWithEmailAndPassword(toEmail(ph),pw);
     await UC.doc(c.user.uid).set({name,phone:ph,role,color:regSelectedColor,createdAt:Date.now()});
+  }catch(e){
+    let m='Ошибка регистрации.';
+    if(e.code==='auth/email-already-in-use') m='Номер уже зарегистрирован.';
+    showErr(m);
+    console.error('❌ Ошибка регистрации:', e);
+  }finally{
+    unlockButton(btn);
   }
-  catch(e){let m='Ошибка.';if(e.code==='auth/email-already-in-use')m='Номер уже зарегистрирован.';showErr(m);}
-  finally{btn.disabled=false;btn.textContent='Создать аккаунт';}
 };
 
 window.doLogout=function(){if(confirm('Выйти?'))auth.signOut();};
@@ -824,7 +882,9 @@ window.doLogout=function(){if(confirm('Выйти?'))auth.signOut();};
 auth.onAuthStateChanged(async(user)=>{
   if(user){
     let p=null;
-    try{const s=await UC.doc(user.uid).get();if(s.exists)p=s.data();}catch(e){}
+    try{const s=await UC.doc(user.uid).get();if(s.exists)p=s.data();}catch(e){
+      console.error('❌ Ошибка получения профиля:', e);
+    }
     if(!p){const ph=(user.email||'').split('@')[0];p={name:ph,phone:ph,role:'Сотрудник',color:PALETTE[0].hex};}
     p.uid=user.uid;
     if(!p.color)p.color=PALETTE[0].hex;
@@ -856,12 +916,18 @@ function startApp(){
     window.ALL_USERS={};
     snap.forEach(d=>{window.ALL_USERS[d.id]={...d.data(),uid:d.id};});
     if (viewMode==='employees') renderEmployees();
+  }, err=>{
+    console.error('❌ Ошибка при загрузке пользователей:', err);
   });
   SC.orderBy('timestamp','desc').onSnapshot({includeMetadataChanges:false},snap=>{
     window.CRM=[];snap.forEach(d=>window.CRM.push({id:d.id,...d.data()}));
     renderAll();
+  }, err=>{
+    console.error('❌ Ошибка при загрузке сессий:', err);
   });
-  CERTC.onSnapshot(snap=>{certs={};snap.forEach(d=>certs[d.id]=d.data());renderCerts();});
+  CERTC.onSnapshot(snap=>{certs={};snap.forEach(d=>certs[d.id]=d.data());renderCerts();}, err=>{
+    console.error('❌ Ошибка при загрузке сертификатов:', err);
+  });
   setInterval(()=>{if(viewMode==='calendar')renderCalendar();},60000);
   
   // Инициализация выбора месяца в финансах
@@ -1068,6 +1134,8 @@ function renderCalendar(){
       const color=ev.eventColor||window.PROFILE?.color||PALETTE[0].hex;
       const pal=palByHex(color);
       const isDone=ev.completed;
+      const evName = escapeHTML(ev.client||ev.song||'—');
+      const evSvc = escapeHTML(ev.services||ev.type||'');
 
       const evEl=document.createElement('div');
       evEl.className='cal-event';
@@ -1079,8 +1147,8 @@ function renderCalendar(){
       evEl.style.borderLeft='3px solid '+color;
       evEl.style.opacity=isDone?'0.55':'1';
       evEl.innerHTML=`
-        <div class="cal-event-name" style="color:${color}">${ev.client||ev.song||'—'}</div>
-        <div class="cal-event-svc" style="color:${color}99">${ev.services||ev.type||''}</div>
+        <div class="cal-event-name" style="color:${color}">${evName}</div>
+        <div class="cal-event-svc" style="color:${color}99">${evSvc}</div>
       `;
       evEl.onclick=(e)=>{e.stopPropagation();showEvPopup(ev,e,'click');};
       evEl.onmouseenter=(e)=>{showEvPopup(ev,e,'hover');};
@@ -1116,7 +1184,12 @@ function renderEmployees() {
   users.forEach(u => {
     const c = document.createElement('div');
     c.className = 'cl-card';
-    c.innerHTML = `<div class="cl-top" style="margin:0;"><div class="cl-av" style="background:${u.color?palByHex(u.color).bg:'#333'};color:${u.color||'#fff'}">${u.name?u.name[0].toUpperCase():'?'}</div><div><div class="cl-nm">${u.name}</div><div class="cl-ph">${u.role||'Сотрудник'}</div></div></div>`;
+    const av = escapeHTML(u.name?u.name[0].toUpperCase():'?');
+    const bg = u.color ? palByHex(u.color).bg : '#333';
+    const clr = u.color || '#fff';
+    const name = escapeHTML(u.name);
+    const role = escapeHTML(u.role || 'Сотрудник');
+    c.innerHTML = `<div class="cl-top" style="margin:0;"><div class="cl-av" style="background:${bg};color:${clr}">${av}</div><div><div class="cl-nm">${name}</div><div class="cl-ph">${role}</div></div></div>`;
     grid.appendChild(c);
   });
 }
@@ -1124,7 +1197,6 @@ function renderEmployees() {
 /* ===== EVENT POPUP – теперь только для календаря и списка ===== */
 let popupId=null;
 function showEvPopup(ev,e,type='click'){
-  // Не показываем попап для финансов (там информация уже внутри)
   if (document.getElementById('secFinance').style.display === 'flex') return;
   popupId=ev.id;
   popupLocked = (type === 'click');
@@ -1134,7 +1206,6 @@ function showEvPopup(ev,e,type='click'){
   document.getElementById('evPopTime').textContent=(ev.date||'') + timeStr;
   
   document.getElementById('evPopSvc').textContent=ev.services||ev.type||'—';
-  
   document.getElementById('evPopPhone').textContent=ev.phone||'—';
   const hasCom=!!(ev.comment);
   document.getElementById('evPopComRow').style.display=hasCom?'flex':'none';
@@ -1164,6 +1235,10 @@ window.markDone = function(id) {
   if (!row) return;
   const isCompleting = !row.completed;
   
+  // Найдём кнопку, вызвавшую действие (передаём через event)
+  const btn = document.querySelector(`.act-ic.g[onclick*="markDone('${id}')"]`);
+  if (btn) lockButton(btn);
+  
   // Оптимистичное обновление класса на карточке
   const card = document.querySelector(`.fin-card[data-id="${id}"]`);
   if (card) {
@@ -1175,11 +1250,9 @@ window.markDone = function(id) {
       const paid = row.total || 0;
       const rest = Math.max(0, full - paid);
       if (rest > 0) card.classList.add('row-debt');
-      // если rest===0 – прозрачный, без классов
     }
   }
   
-  // Обновляем Firestore
   const updateData = { completed: isCompleting };
   if (isCompleting) {
     updateData.completedDate = todayStr();
@@ -1194,21 +1267,53 @@ window.markDone = function(id) {
     updateData.completedDate = firebase.firestore.FieldValue.delete();
   }
   SC.doc(id).update(updateData)
-    .catch(err => console.error('Ошибка обновления:', err));
+    .catch(err => {
+      handleError(err, 'Ошибка при обновлении статуса готово.');
+      // Возвращаем состояние кнопки только в случае ошибки
+      if (btn) unlockButton(btn);
+    })
+    .finally(() => {
+      // Разблокируем кнопку в любом случае, но с задержкой, чтобы избежать повторного клика
+      setTimeout(() => { if (btn) unlockButton(btn); }, 500);
+    });
 };
 
 window.delRec=function(id){
-  openSM('Удалить запись?','delete',()=>{SC.doc(id).delete();closeSM();});
+  const btn = document.querySelector(`.act-ic.r[onclick*="delRec('${id}')"]`);
+  if (btn) lockButton(btn);
+  openSM('Удалить запись?','delete',()=>{
+    SC.doc(id).delete()
+      .catch(err => {
+        handleError(err, 'Ошибка при удалении записи.');
+        if (btn) unlockButton(btn);
+      })
+      .finally(() => {
+        setTimeout(() => { if (btn) unlockButton(btn); }, 500);
+        closeSM();
+      });
+  });
 };
 
 window.addPay=function(id){
   const row=window.CRM.find(r=>r.id===id);if(!row)return;
   const full=row.fullTotal||row.total||0;const rem=full-(row.total||0);
   if(rem<=0){alert('Уже полностью оплачено');return;}
+  const btn = document.querySelector(`.act-ic.go[onclick*="addPay('${id}')"]`);
+  if (btn) lockButton(btn);
   openSM('Доплата (остаток '+rem.toLocaleString()+' ₽)','number',()=>{
     const a=parseInt(document.getElementById('msInput').value);
     if(!isNaN(a)&&a>0){
-      SC.doc(id).update({total:(row.total||0)+a});
+      SC.doc(id).update({total:(row.total||0)+a})
+        .catch(err => {
+          handleError(err, 'Ошибка при добавлении оплаты.');
+          if (btn) unlockButton(btn);
+        })
+        .finally(() => {
+          setTimeout(() => { if (btn) unlockButton(btn); }, 500);
+          closeSM();
+        });
+    } else {
+      if (btn) unlockButton(btn);
       closeSM();
     }
   },rem);
@@ -1357,7 +1462,10 @@ function renderFormSvcs(){
   cont.innerHTML='';
   formDetails.forEach((item,i)=>{
     const d=document.createElement('div');d.className='added-svc-row';
-    d.innerHTML=`<div class="asvc-dot" style="background:${CM[item.originalColor]||'#9090a0'}"></div><div class="asvc-name">${item.name}</div><div class="asvc-price">${item.price.toLocaleString()} ₽</div><div class="asvc-rm" onclick="removeFormSvc(${i})"><i class="fa-solid fa-xmark"></i></div>`;
+    const dotColor = CM[item.originalColor]||'#9090a0';
+    const svcName = escapeHTML(item.name);
+    const price = escapeHTML(item.price.toLocaleString());
+    d.innerHTML=`<div class="asvc-dot" style="background:${dotColor}"></div><div class="asvc-name">${svcName}</div><div class="asvc-price">${price} ₽</div><div class="asvc-rm" onclick="removeFormSvc(${i})"><i class="fa-solid fa-xmark"></i></div>`;
     cont.appendChild(d);
   });
   document.getElementById('formTotal').textContent=formTotal.toLocaleString()+' ₽';
@@ -1366,55 +1474,62 @@ function renderFormSvcs(){
 
 /* ===== SAVE RECORD ===== */
 window.saveRecord=async function(){
-  const mName = document.getElementById('mSvcName').value.trim();
-  const mPrice = parseInt(document.getElementById('mSvcPrice').value);
-  if(mName && !isNaN(mPrice) && mPrice > 0){
-    formDetails.push({name: mName, price: mPrice, basePrice: mPrice, originalColor: 'white'});
-    document.getElementById('mSvcName').value = '';
-    document.getElementById('mSvcPrice').value = '';
-  }
+  const btn = document.querySelector('#moRecord .mb-confirm');
+  if (btn) lockButton(btn);
 
-  const name=document.getElementById('fName').value.trim();
-  if(!name){alert('Введите имя клиента');return;}
-  const date=inputToDate(document.getElementById('fDate').value)||todayStr();
-  const time=document.getElementById('fTime').value||'';
-  const timeEnd=document.getElementById('fTimeEnd').value||'';
-  const phone=document.getElementById('fPhone').value.trim();
-  const comment=document.getElementById('fComment').value.trim();
-  
-  const song = name; 
-  const type = 'Услуга'; 
-  
-  const author=window.PROFILE?.name || '—';
-  const authorUid=window.PROFILE?.uid || '';
-  const authorPhone=window.PROFILE ? norm(window.PROFILE.phone) : '';
-  
-  const eventColor=selectedFormColor||window.PROFILE?.color||PALETTE[0].hex;
-  const details=JSON.parse(JSON.stringify(formDetails));
-  const svcsLabel=details.length?details.map(i=>i.name).join(', '):type;
-  
-  const fullT=details.reduce((s,i)=>s+(i.basePrice||i.price),0)||0;
-  const paid=details.reduce((s,i)=>s+i.price,0)||0;
-  let duration = 60;
-  if(time && timeEnd){
-     const [h1,m1] = time.split(':').map(Number);
-     const [h2,m2] = timeEnd.split(':').map(Number);
-     duration = (h2 * 60 + m2) - (h1 * 60 + m1);
-     if(duration <= 0) duration = 60;
-  }
+  try {
+    const mName = document.getElementById('mSvcName').value.trim();
+    const mPrice = parseInt(document.getElementById('mSvcPrice').value);
+    if(mName && !isNaN(mPrice) && mPrice > 0){
+      formDetails.push({name: mName, price: mPrice, basePrice: mPrice, originalColor: 'white'});
+      document.getElementById('mSvcName').value = '';
+      document.getElementById('mSvcPrice').value = '';
+    }
 
-  const data={
-    date, time, timeEnd, duration,
-    client:name, song, phone, type, services:svcsLabel, details, 
-    total:paid, fullTotal:fullT, comment, 
-    authorName:author, authorUid, authorPhone, 
-    eventColor, timestamp:Date.now(), completed:false
-  };
-  try{
+    const name=document.getElementById('fName').value.trim();
+    if(!name){alert('Введите имя клиента'); unlockButton(btn); return;}
+    const date=inputToDate(document.getElementById('fDate').value)||todayStr();
+    const time=document.getElementById('fTime').value||'';
+    const timeEnd=document.getElementById('fTimeEnd').value||'';
+    const phone=document.getElementById('fPhone').value.trim();
+    const comment=document.getElementById('fComment').value.trim();
+    
+    const song = name; 
+    const type = 'Услуга'; 
+    
+    const author=window.PROFILE?.name || '—';
+    const authorUid=window.PROFILE?.uid || '';
+    const authorPhone=window.PROFILE ? norm(window.PROFILE.phone) : '';
+    
+    const eventColor=selectedFormColor||window.PROFILE?.color||PALETTE[0].hex;
+    const details=JSON.parse(JSON.stringify(formDetails));
+    const svcsLabel=details.length?details.map(i=>i.name).join(', '):type;
+    
+    const fullT=details.reduce((s,i)=>s+(i.basePrice||i.price),0)||0;
+    const paid=details.reduce((s,i)=>s+i.price,0)||0;
+    let duration = 60;
+    if(time && timeEnd){
+       const [h1,m1] = time.split(':').map(Number);
+       const [h2,m2] = timeEnd.split(':').map(Number);
+       duration = (h2 * 60 + m2) - (h1 * 60 + m1);
+       if(duration <= 0) duration = 60;
+    }
+
+    const data={
+      date, time, timeEnd, duration,
+      client:name, song, phone, type, services:svcsLabel, details, 
+      total:paid, fullTotal:fullT, comment, 
+      authorName:author, authorUid, authorPhone, 
+      eventColor, timestamp:Date.now(), completed:false
+    };
     if(editId){await SC.doc(editId).update(data);}
     else{ await SC.add(data); }
     closeRecModal();
-  }catch(e){alert('Ошибка: '+e.message);}
+  } catch(e) {
+    handleError(e, 'Ошибка при сохранении записи.');
+  } finally {
+    if (btn) unlockButton(btn);
+  }
 };
 
 /* ===== SESSIONS LIST (ФИЛЬТР ПО МЕСЯЦУ: ТЕКУЩИЙ И БУДУЩИЕ) ===== */
@@ -1426,7 +1541,6 @@ function renderSessions(){
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
   
-  // Все записи, у которых месяц >= выбранного
   let data = window.CRM.filter(r=>{
     if(!r.date) return false;
     return monthKeyFromDateStr(r.date) >= mk;
@@ -1444,29 +1558,30 @@ function renderSessions(){
     const tr=document.createElement('tr');
     if(isDone)tr.classList.add('done-row');
     const color=row.eventColor||PALETTE[0].hex;
-    const statusBadge=isDone?'<span class="ss-badge ss-done">Готово</span>':'<span class="ss-badge ss-work">В работе</span>';
-    const roleTag=row.authorName?`<span class="role-tag">${row.authorName}</span>`:'';
-    const timeDisplay = row.time ? `${row.time} ${row.timeEnd ? '- ' + row.timeEnd : ''}` : '—';
+    const statusBadge = isDone ? 
+      '<span class="ss-badge ss-done">Готово</span>' : 
+      '<span class="ss-badge ss-work">В работе</span>';
+    const roleTag = row.authorName ? `<span class="role-tag">${escapeHTML(row.authorName)}</span>` : '';
+    const timeDisplay = row.time ? `${escapeHTML(row.time)} ${row.timeEnd ? '- ' + escapeHTML(row.timeEnd) : ''}` : '—';
 
     tr.style.cursor = 'pointer';
     tr.onclick = (e) => {
         if(!e.target.closest('.act-ic')) showEvPopup(row, e);
     };
 
-    // Десктопный порядок: Дата, Время, Клиент, Услуги, Статус
     tr.innerHTML=`
-      <td data-label="Дата"><div class="td-date">${row.date||'—'}</div></td>
+      <td data-label="Дата"><div class="td-date">${escapeHTML(row.date||'—')}</div></td>
       <td data-label="Время"><div class="td-time" style="color:${color}">${showT?timeDisplay:'—'}</div></td>
       <td data-label="Клиент">
         <div style="display:flex;align-items:center;gap:6px;">
           <div style="width:3px;height:28px;border-radius:2px;background:${color};flex-shrink:0;"></div>
           <div>
-            <div class="td-name">${row.client||row.song||'—'}${roleTag}</div>
-            ${row.comment?`<div class="td-comment">💬 ${row.comment}</div>`:''}
+            <div class="td-name">${escapeHTML(row.client||row.song||'—')}${roleTag}</div>
+            ${row.comment?`<div class="td-comment">💬 ${escapeHTML(row.comment)}</div>`:''}
           </div>
         </div>
       </td>
-      <td data-label="Услуги"><div class="td-svc">${row.services||'—'}</div></td>
+      <td data-label="Услуги"><div class="td-svc">${escapeHTML(row.services||'—')}</div></td>
       <td data-label="Статус">${statusBadge}</td>
     `;
     body.appendChild(tr);
@@ -1495,18 +1610,23 @@ function renderClients(){
     const pal=palByHex(c.color);
     const topType=Object.entries(c.types).sort((a,b)=>b[1]-a[1])[0];
     const card=document.createElement('div');card.className='cl-card';
+    const name = escapeHTML(c.name);
+    const phone = escapeHTML(c.phone||'—');
+    const total = c.total.toLocaleString();
+    const last = escapeHTML(c.last||'—');
+    const topTypeName = topType ? escapeHTML(topType[0]) : '';
     card.innerHTML=`
     <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start;">
       <div style="display:flex; gap:9px; align-items:center;">
-        <div class="cl-av" style="background:${pal.bg};color:${c.color}">${c.name[0]?.toUpperCase()||'?'}</div>
-        <div><div class="cl-nm">${c.name}</div><div class="cl-ph">${c.phone||'—'}</div></div>
+        <div class="cl-av" style="background:${pal.bg};color:${c.color}">${name[0]?.toUpperCase()||'?'}</div>
+        <div><div class="cl-nm">${name}</div><div class="cl-ph">${phone}</div></div>
       </div>
     </div>
     <div class="cl-stats">
       <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${c.color}">${c.visits}</div></div>
-      <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${c.color}">${c.total.toLocaleString()}</div></div>
-      <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${c.last||'—'}</div></div>
-      ${topType?`<div class="cl-st"><div class="cl-st-l">Топ тип</div><div class="cl-st-v" style="font-size:10px;">${topType[0]}</div></div>`:''}
+      <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${c.color}">${total}</div></div>
+      <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
+      ${topType?`<div class="cl-st"><div class="cl-st-l">Топ тип</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>`:''}
     </div>`;
     grid.appendChild(card);
   });
@@ -1520,7 +1640,6 @@ window.toggleFilter = function(filter) {
     currentStatusFilter = null;
     btn.classList.remove('active');
   } else {
-    // Снимаем активность со всех кнопок
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     currentStatusFilter = filter;
     btn.classList.add('active');
@@ -1534,7 +1653,6 @@ function renderFinance(){
   const grid = document.getElementById('finGrid');
   if (!grid) return;
   
-  // Фильтр по месяцу
   let filtered = myData;
   const monthPicker = document.getElementById('finMonthPicker');
   if (monthPicker && monthPicker.value) {
@@ -1542,13 +1660,11 @@ function renderFinance(){
     const monthKey = '.' + month + '.' + year;
     filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === monthKey);
   } else {
-    // По умолчанию показываем текущий месяц
     const now = new Date();
     const currentMonthKey = getMonthKeyFromDate(now);
     filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === currentMonthKey);
   }
   
-  // Фильтр по статусу
   if (currentStatusFilter === 'work') {
     filtered = filtered.filter(r => !r.completed && (r.total || 0) === (r.fullTotal || r.total || 0));
   } else if (currentStatusFilter === 'done') {
@@ -1588,25 +1704,22 @@ function renderFinance(){
     const card = document.createElement('div');
     card.className = 'fin-card';
     card.setAttribute('data-id', r.id);
-    // Определяем класс фона
     if (isDone) {
       card.classList.add('row-done');
     } else if (rest > 0) {
       card.classList.add('row-debt');
     }
-    // Если rest===0 и не done – прозрачный, без классов
 
-    // Заголовок: полоска + имя + статус
     const header = document.createElement('div');
     header.className = 'fin-header';
+    const clientName = escapeHTML(r.client || r.song || '—');
     header.innerHTML = `
       <div class="fin-color-bar" style="background:${color};"></div>
-      <div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${r.client || r.song || '—'}</div>
+      <div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div>
       <span class="ss-badge ${statusClass} fin-status">${statusText}</span>
     `;
     card.appendChild(header);
 
-    // Прогресс-бар
     const progWrap = document.createElement('div');
     progWrap.className = 'fin-prog';
     progWrap.innerHTML = `
@@ -1614,35 +1727,35 @@ function renderFinance(){
     `;
     card.appendChild(progWrap);
 
-    // Блок деталей: дата, время, услуги – всегда три строки
     const detailsDiv = document.createElement('div');
     detailsDiv.className = 'fin-details';
-    const timeStr = r.time ? 'в ' + r.time + (r.timeEnd ? ' — ' + r.timeEnd : '') : '—';
+    const timeStr = r.time ? 'в ' + escapeHTML(r.time) + (r.timeEnd ? ' — ' + escapeHTML(r.timeEnd) : '') : '—';
+    const servicesStr = escapeHTML(r.services || 'Услуги не указаны');
+    const dateStr = escapeHTML(r.date || '—');
     detailsDiv.innerHTML = `
-      <div class="detail-row"><span class="detail-label">Дата:</span> <span>${r.date || '—'}</span></div>
+      <div class="detail-row"><span class="detail-label">Дата:</span> <span>${dateStr}</span></div>
       <div class="detail-row"><span class="detail-label">Время:</span> <span>${timeStr}</span></div>
-      <div class="detail-row"><span class="detail-label">Услуги:</span> <span>${r.services || 'Услуги не указаны'}</span></div>
+      <div class="detail-row"><span class="detail-label">Услуги:</span> <span>${servicesStr}</span></div>
     `;
     card.appendChild(detailsDiv);
 
-    // Финансовая статистика
     const stats = document.createElement('div');
     stats.className = 'fin-stats';
+    const paidStr = paid.toLocaleString();
+    const restStr = rest.toLocaleString();
     stats.innerHTML = `
-      <div class="fin-stat"><div class="fin-stat-l">Внесено</div><div class="fin-stat-v pv">${paid.toLocaleString()} ₽</div></div>
-      <div class="fin-stat"><div class="fin-stat-l">Долг</div><div class="fin-stat-v pv" style="color:var(--gold);">${rest.toLocaleString()} ₽</div></div>
+      <div class="fin-stat"><div class="fin-stat-l">Внесено</div><div class="fin-stat-v pv">${paidStr} ₽</div></div>
+      <div class="fin-stat"><div class="fin-stat-l">Долг</div><div class="fin-stat-v pv" style="color:var(--gold);">${restStr} ₽</div></div>
     `;
     card.appendChild(stats);
 
-    // Комментарий (если есть)
     if (r.comment) {
       const comm = document.createElement('div');
       comm.className = 'fin-comment';
-      comm.textContent = '💬 ' + r.comment;
+      comm.textContent = '💬 ' + escapeHTML(r.comment);
       card.appendChild(comm);
     }
 
-    // Действия
     const actions = document.createElement('div');
     actions.className = 'fin-actions';
     actions.innerHTML = `
@@ -1673,11 +1786,17 @@ function renderCerts(){
   arr.forEach(c=>{
     const el=document.createElement('div');
     el.className='cert-c'+(c.active?' used':'');
+    const certId = escapeHTML(c.id);
+    const certName = escapeHTML(c.name||'—');
+    const status = c.active ? 'ИСПОЛЬЗОВАН' : 'СВОБОДЕН';
+    const statusClass = c.active ? 'cb-used' : 'cb-free';
+    const firstName = escapeHTML(c.firstName||'');
+    const lastName = escapeHTML(c.lastName||'');
     el.innerHTML=`
-      <div class="cert-id">${c.id}</div>
-      <div class="cert-nm">${c.name||'—'}</div>
-      <div class="cert-b ${c.active?'cb-used':'cb-free'}">${c.active?'ИСПОЛЬЗОВАН':'СВОБОДЕН'}</div>
-      ${c.active ? `<div style="font-size:9px;color:var(--text3);margin-top:4px;">${c.firstName||''} ${c.lastName||''}</div>` : ''}
+      <div class="cert-id">${certId}</div>
+      <div class="cert-nm">${certName}</div>
+      <div class="cert-b ${statusClass}">${status}</div>
+      ${c.active ? `<div style="font-size:9px;color:var(--text3);margin-top:4px;">${firstName} ${lastName}</div>` : ''}
     `;
     el.onclick=()=>{
       if(!c.active){
@@ -1717,7 +1836,8 @@ window.activateCert = async function(){
     alert('Заполните все поля');
     return;
   }
-  
+  const btn = document.querySelector('#moCert .mb-confirm');
+  if (btn) lockButton(btn);
   try{
     await CERTC.doc(currentCertId).set({
       active: true,
@@ -1730,8 +1850,10 @@ window.activateCert = async function(){
       timestamp: Date.now()
     });
     closeCertModal();
-  }catch(e){
-    alert('Ошибка: '+e.message);
+  } catch(e) {
+    handleError(e, 'Ошибка при активации сертификата.');
+  } finally {
+    if (btn) unlockButton(btn);
   }
 };
 
@@ -1806,8 +1928,9 @@ function renderAnalytics(){
   topSvc.forEach(s=>{
     const w=(s[1]/maxS)*100;
     const d=document.createElement('div');d.className='svc-rr';
+    const svcName = escapeHTML(s[0]);
     d.innerHTML=`
-      <div class="svc-rn">${s[0]}</div>
+      <div class="svc-rn">${svcName}</div>
       <div class="svc-rt"><div class="svc-rf" style="width:${w}%;background:var(--accent);"></div></div>
       <div class="svc-rc">${s[1]}</div>
     `;
@@ -1916,7 +2039,7 @@ async function performMigration(profile, user) {
     const docPhone = norm(data.authorPhone || '');
     if (docPhone !== targetPhone) {
       batch.update(doc.ref, {
-        authorPhone: profile.phone,   // сохраняем как есть (с +7 или без)
+        authorPhone: profile.phone,
         authorUid: user.uid,
         authorName: profile.name || 'Пользователь',
         eventColor: profile.color || '#a099ff'
@@ -1948,14 +2071,12 @@ auth.onAuthStateChanged(async (user) => {
     if (!pDoc.exists) return;
     const profile = pDoc.data();
 
-    // Проверяем, что номер начинается с 7 или 8, чтобы не трогать чужие
     const rawPhone = profile.phone || '';
     if (!rawPhone.match(/^[78]/)) {
       console.log('⏭️ Пропускаем миграцию – номер не начинается с 7 или 8');
       return;
     }
 
-    // Запускаем миграцию
     const updated = await performMigration(profile, user);
     if (updated > 0) {
       localStorage.setItem('migration_done_universal', 'true');
@@ -1975,14 +2096,22 @@ window.forceMigrate = async function() {
   const pDoc = await UC.doc(user.uid).get();
   if (!pDoc.exists) return alert('Профиль не найден.');
   const profile = pDoc.data();
-  const updated = await performMigration(profile, user);
-  if (updated > 0) {
-    alert(`✅ Обновлено ${updated} записей. Страница перезагрузится.`);
-    localStorage.setItem('migration_done_universal', 'true');
-    location.reload();
-  } else {
-    alert('✅ Все записи уже привязаны к вашему аккаунту.');
-    localStorage.setItem('migration_done_universal', 'true');
+  const btn = document.querySelector('#secAnalytics .green-btn');
+  if (btn) lockButton(btn);
+  try {
+    const updated = await performMigration(profile, user);
+    if (updated > 0) {
+      alert(`✅ Обновлено ${updated} записей. Страница перезагрузится.`);
+      localStorage.setItem('migration_done_universal', 'true');
+      location.reload();
+    } else {
+      alert('✅ Все записи уже привязаны к вашему аккаунту.');
+      localStorage.setItem('migration_done_universal', 'true');
+    }
+  } catch(e) {
+    handleError(e, 'Ошибка при миграции.');
+  } finally {
+    if (btn) unlockButton(btn);
   }
 };
 </script>
