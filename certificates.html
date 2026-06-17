@@ -281,7 +281,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 /* OFFLINE */
 #offBar{display:none;position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:6px;z-index:999999;}
 
-/* МОБИЛЬНАЯ АДАПТАЦИЯ (КАРТОЧКИ КАК В СТАРОЙ CRM) */
+/* MOBILE АДАПТАЦИЯ */
 @media(max-width:768px){
   .sidebar { position: fixed !important; top: 0; left: -280px; width: 260px !important; height: 100vh !important; z-index: 99999 !important; transition: left 0.3s ease-in-out; box-shadow: 5px 0 25px rgba(0,0,0,0.5); display: flex !important; flex-direction: column !important; border-right: 1px solid var(--border); }
   .sidebar.mobile-open { left: 0 !important; }
@@ -298,125 +298,11 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .mnav { width: 100%; justify-content: space-between; }
   .tb-btn { justify-content: center;}
 
-  /* ПРЕВРАЩАЕМ ТАБЛИЦЫ В КАРТОЧКИ (как в старой CRM) */
-  .tbl-wrap { overflow-x: visible; }
-  .tbl, .tbl thead, .tbl tbody, .tbl th, .tbl td, .tbl tr { 
-    display: block; 
-    width: 100% !important; 
-    box-sizing: border-box;
-  }
-  .tbl thead tr { position: absolute; top: -9999px; left: -9999px; }
-  .tbl tr { 
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    margin-bottom: 15px;
-    border-radius: var(--r);
-    padding: 15px;
-    position: relative;
-    overflow: hidden;
-    margin-left: auto;
-    margin-right: auto;
-    width: calc(100% - 20px) !important;
-  }
-  .tbl td { 
-    border: none !important;
-    padding: 0 !important;
-    text-align: left !important;
-    min-height: auto !important;
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0 !important;
-    border-bottom: 1px solid var(--border);
-  }
-  .tbl td:last-child { border-bottom: none; }
-  .tbl td::before { 
-    content: attr(data-label); 
-    color: var(--text3); 
-    font-weight: 700; 
-    font-size: 10px; 
-    text-transform: uppercase; 
-    margin-right: 10px; 
-    text-align: left; 
-    flex-shrink: 0;
-  }
-  .td-acts { justify-content: flex-end; opacity: 1; } /* всегда видно на мобильных */
-  .tbl tr .td-acts { opacity: 1; }
-
-  /* Детализация по двойному клику (как в старой CRM) */
-  .mobile-details-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--surface);
-    z-index: 50;
-    padding: 20px;
-    display: none;
-    box-sizing: border-box;
-    flex-direction: column;
-    border: 1px solid var(--accent);
-    border-radius: var(--r);
-    box-shadow: inset 0 0 20px rgba(124,111,255,0.2);
-  }
-  .mobile-details-overlay.active { display: flex; }
-  .mobile-details-close {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 26px;
-    height: 26px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 14px;
-    cursor: pointer;
-    z-index: 60;
-  }
-  .mobile-details-header {
-    color: var(--text3);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 9px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 5px;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-  }
-  .mobile-summary-section {
-    margin-top: 0;
-    border-top: none;
-    padding-top: 0;
-    font-size: 18px;
-  }
-  .mobile-summary-line {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 12px;
-    font-size: 18px;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700;
-  }
-  .mobile-summary-line span:last-child { font-family: 'Inter', sans-serif; }
-
-  /* Порядок полей в карточках: Клиент → Услуги → Статус (для списка) */
-  #listView .tbl td[data-label="Клиент"] { order: 0; }
-  #listView .tbl td[data-label="Услуги"] { order: 1; }
-  #listView .tbl td[data-label="Статус"] { order: 2; }
-  #listView .tbl td[data-label="Дата"] { order: 3; }
-  #listView .tbl td[data-label="Время"] { order: 4; }
-
-  /* Порядок в финансах: Клиент → Услуги → Внесено → Долг → Действия */
-  #secFinance .tbl td[data-label="Клиент"] { order: 0; }
-  #secFinance .tbl td[data-label="Услуги"] { order: 1; }
-  #secFinance .tbl td[data-label="Внесено"] { order: 2; }
-  #secFinance .tbl td[data-label="Долг"] { order: 3; }
-  #secFinance .tbl td[data-label="Действия"] { order: 4; }
-  #secFinance .tbl td[data-label="Дата"] { display: none; }
-  #secFinance .tbl td[data-label="Время"] { display: none; }
+  /* Таблицы на мобильных — оставляем как есть (с прокруткой) */
+  .tbl-wrap { overflow-x: auto; }
+  .tbl { min-width: 600px; font-size: 11px; }
+  .tbl th, .tbl td { padding: 6px 8px; }
+  .td-acts { opacity: 1; } /* всегда показываем действия на мобильных */
 
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
@@ -605,7 +491,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
             </div>
           </div>
 
-          <!-- Блоки "Остатки долгов" и "Мой доход за год" поменяны местами -->
+          <!-- Блок "Мой доход за год" и "Остатки долгов" поменяны местами -->
           <div class="ana-c dbt"><div class="ana-l">Остатки долгов</div><div class="ana-v pv" id="anaDbt" style="color:var(--gold);">0 ₽</div><div class="ana-s">к получению</div></div>
           <div class="ana-c"><div class="ana-l">Мой доход за год</div><div class="ana-v pv" id="anaYear">0 ₽</div><div class="ana-s" id="anaYearS">2026</div></div>
         </div>
@@ -1959,17 +1845,6 @@ window.forceMigrate = async function() {
     localStorage.setItem('migration_done_universal', 'true');
   }
 };
-
-// Двойной клик для детализации на мобильных (как в старой CRM)
-document.addEventListener('dblclick', function(e) {
-  if (window.innerWidth > 768) return; // только на мобильных
-  const row = e.target.closest('.tbl tr');
-  if (!row) return;
-  const overlay = row.querySelector('.mobile-details-overlay');
-  if (overlay) {
-    overlay.classList.toggle('active');
-  }
-});
 </script>
 </body>
 </html>
