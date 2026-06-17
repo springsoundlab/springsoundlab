@@ -498,6 +498,10 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <div class="chart-ttl">Топ моих услуг</div>
           <div class="svc-rnk" id="anaRnk"></div>
         </div>
+        <!-- Кнопка ручной миграции -->
+        <button class="tb-btn green-btn" style="margin-top:12px;width:100%;justify-content:center;" onclick="forceMigrate()">
+          <i class="fa-solid fa-link"></i> Привязать мои старые записи
+        </button>
       </div>
     </div>
     
@@ -705,7 +709,7 @@ function monthKeyFromDateStr(ds) {
 function getMyData() {
   if (!window.PROFILE) return [];
   const currentPhone = norm(window.PROFILE.phone || '');
-  return window.CRM.filter(r => r.authorPhone === currentPhone);
+  return window.CRM.filter(r => norm(r.authorPhone || '') === currentPhone);
 }
 
 /* ===== COLOR PICKER INIT ===== */
@@ -1457,7 +1461,7 @@ function renderFinance(){
     const rest=Math.max(0,full-paid);
     const perc=full>0?Math.min((paid/full)*100,100):0;
     const isDone=r.completed;
-    const isAuthor = window.PROFILE && r.authorPhone === norm(window.PROFILE.phone);
+    const isAuthor = window.PROFILE && norm(r.authorPhone || '') === norm(window.PROFILE.phone);
     const isPastMonth = !r.date.includes(currentMonthKey);
     const statusText = isDone ? (isPastMonth ? 'Перенос ✓' : 'Готово') : (isPastMonth ? 'Перенос' : (rest>0 ? 'Долг' : 'В работе'));
     const statusClass = isDone ? (isPastMonth ? 'ss-transfer' : 'ss-done') : (isPastMonth ? 'ss-transfer' : (rest>0 ? 'ss-debt' : 'ss-work'));
@@ -1743,60 +1747,90 @@ document.addEventListener('click', e => {
 });
 
 // ============================================================
-//  АВТОМАТИЧЕСКАЯ МИГРАЦИЯ (запускается после входа)
-//  Гарантированно переносит все записи в аккаунт +79178382017
+//  УНИВЕРСАЛЬНАЯ МИГРАЦИЯ (нормализует номера)
 // ============================================================
+async function performMigration(profile, user) {
+  const targetPhone = norm(profile.phone);
+  console.log('🔄 Миграция для номера (нормализован):', targetPhone);
+  
+  const all = await SC.get();
+  const batch = db.batch();
+  let count = 0;
+  
+  all.forEach(doc => {
+    const data = doc.data();
+    const docPhone = norm(data.authorPhone || '');
+    if (docPhone !== targetPhone) {
+      batch.update(doc.ref, {
+        authorPhone: profile.phone,   // сохраняем как есть (с +7 или без)
+        authorUid: user.uid,
+        authorName: profile.name || 'Пользователь',
+        eventColor: profile.color || '#a099ff'
+      });
+      count++;
+    }
+  });
+  
+  if (count > 0) {
+    await batch.commit();
+    console.log(`✅ Обновлено ${count} записей.`);
+    return count;
+  } else {
+    console.log('✅ Все записи уже привязаны.');
+    return 0;
+  }
+}
+
+// Запускаем автоматически при входе, но с нормализацией
 auth.onAuthStateChanged(async (user) => {
   if (!user) return;
-  
-  // Флаг, чтобы не запускать миграцию дважды
-  if (localStorage.getItem('migration_done_79178382017') === 'true') {
-    console.log('ℹ️ Миграция уже выполнена ранее.');
+  if (localStorage.getItem('migration_done_universal') === 'true') {
+    console.log('ℹ️ Миграция уже выполнена.');
     return;
   }
 
   try {
-    const profileDoc = await UC.doc(user.uid).get();
-    if (!profileDoc.exists) return;
-    const profile = profileDoc.data();
-    
-    // Запускаем только для нужного номера
-    if (profile.phone !== '+79178382017') return;
+    const pDoc = await UC.doc(user.uid).get();
+    if (!pDoc.exists) return;
+    const profile = pDoc.data();
 
-    console.log('🚀 Запускаем миграцию для номера', profile.phone);
+    // Проверяем, что номер начинается с 7 или 8, чтобы не трогать чужие
+    const rawPhone = profile.phone || '';
+    if (!rawPhone.match(/^[78]/)) {
+      console.log('⏭️ Пропускаем миграцию – номер не начинается с 7 или 8');
+      return;
+    }
 
-    const allSessions = await SC.get();
-    const batch = db.batch();
-    let updated = 0;
-
-    allSessions.forEach(doc => {
-      const data = doc.data();
-      // Если поле authorPhone отсутствует или не совпадает с нужным номером
-      if (!data.authorPhone || data.authorPhone !== profile.phone) {
-        batch.update(doc.ref, {
-          authorPhone: profile.phone,
-          authorUid: user.uid,
-          authorName: profile.name || 'Пользователь',
-          eventColor: profile.color || '#a099ff'
-        });
-        updated++;
-      }
-    });
-
+    // Запускаем миграцию
+    const updated = await performMigration(profile, user);
     if (updated > 0) {
-      await batch.commit();
-      console.log(`✅ Миграция завершена: обновлено ${updated} записей.`);
-      localStorage.setItem('migration_done_79178382017', 'true');
-      // Перезагружаем страницу, чтобы данные сразу отобразились
+      localStorage.setItem('migration_done_universal', 'true');
       location.reload();
     } else {
-      console.log('✅ Все записи уже привязаны к вашему аккаунту.');
-      localStorage.setItem('migration_done_79178382017', 'true');
+      localStorage.setItem('migration_done_universal', 'true');
     }
   } catch (err) {
     console.error('❌ Ошибка миграции:', err);
   }
 });
+
+// Ручная кнопка в аналитике
+window.forceMigrate = async function() {
+  const user = firebase.auth().currentUser;
+  if (!user) return alert('Вы не авторизованы.');
+  const pDoc = await UC.doc(user.uid).get();
+  if (!pDoc.exists) return alert('Профиль не найден.');
+  const profile = pDoc.data();
+  const updated = await performMigration(profile, user);
+  if (updated > 0) {
+    alert(`✅ Обновлено ${updated} записей. Страница перезагрузится.`);
+    localStorage.setItem('migration_done_universal', 'true');
+    location.reload();
+  } else {
+    alert('✅ Все записи уже привязаны к вашему аккаунту.');
+    localStorage.setItem('migration_done_universal', 'true');
+  }
+};
 </script>
 </body>
 </html>
