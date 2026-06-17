@@ -453,7 +453,16 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     <div id="secFinance" class="view" style="display:none;">
       <div class="tbl-wrap" style="margin-top:10px;">
         <table class="tbl">
-          <thead><tr><th>Дата</th><th>Клиент</th><th>Телефон</th><th>Услуги</th><th style="text-align:right;">Внесено</th><th style="text-align:right;">Долг</th><th style="width:140px; text-align:right;">Действия</th></tr></thead>
+          <thead><tr>
+            <th style="width:88px;">Дата</th>
+            <th style="width:100px;">Время</th>
+            <th>Клиент</th>
+            <th>Телефон</th>
+            <th>Услуги</th>
+            <th style="text-align:right;">Внесено</th>
+            <th style="text-align:right;">Долг</th>
+            <th style="width:140px; text-align:right;">Действия</th>
+          </tr></thead>
           <tbody id="finBody"></tbody>
         </table>
       </div>
@@ -586,18 +595,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="added-svcs" id="addedSvcs"></div>
       <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val pv" id="formTotal">0 ₽</div></div>
 
-      <div id="certToggleWrap" style="margin-bottom:10px;display:none;">
-        <div class="prepaid-row">
-          <div class="pr-lbl">🎁 Использовать сертификат</div>
-          <label class="tgl"><input type="checkbox" id="certToggle" onchange="toggleCertMode()"><div class="tgl-s"></div></label>
-        </div>
-        <div id="certPicker" style="display:none;margin-top:6px;">
-          <select id="certSelect" class="f-inp">
-            <option value="">— Выберите сертификат —</option>
-          </select>
-        </div>
-      </div>
-
       <div class="f-row full">
         <div class="f-group"><div class="f-label">Комментарий / Заметка</div><textarea id="fComment" class="f-inp" placeholder="Детали записи, пожелания клиента..."></textarea></div>
       </div>
@@ -605,6 +602,26 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
     <div class="mb-btns">
       <button class="mb-btn mb-confirm" onclick="saveRecord()" style="width:100%;">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="moCert">
+  <div class="mb">
+    <div class="mb-header">
+      <div class="mb-title">Активация сертификата</div>
+      <div class="mb-close" onclick="closeCertModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="f-group"><div class="f-label">Имя</div><input type="text" id="certFirstName" class="f-inp" placeholder="Имя"></div>
+    <div class="f-group"><div class="f-label">Фамилия</div><input type="text" id="certLastName" class="f-inp" placeholder="Фамилия"></div>
+    <div class="f-group"><div class="f-label">Услуга</div><input type="text" id="certService" class="f-inp" placeholder="Например, запись вокала"></div>
+    <div class="f-row">
+      <div class="f-group"><div class="f-label">Дата активации</div><input type="date" id="certDate" class="f-inp"></div>
+      <div class="f-group"><div class="f-label">Срок действия</div><input type="date" id="certExpiry" class="f-inp"></div>
+    </div>
+    <div class="mb-btns">
+      <button class="mb-btn mb-cancel" onclick="closeCertModal()">Отмена</button>
+      <button class="mb-btn mb-confirm" onclick="activateCert()">Активировать</button>
     </div>
   </div>
 </div>
@@ -632,6 +649,7 @@ const auth=firebase.auth();
 db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
 const SC=db.collection("sessions");
 const UC=db.collection("users");
+const CERTC=db.collection("certificates");
 /* ===== PALETTE ===== */
 const PALETTE=[
   {id:'purple', hex:'#a099ff', bg:'rgba(124,111,255,0.18)', label:'Фиолет'},
@@ -663,7 +681,7 @@ let certs={};
 let editId=null;
 let formDetails=[];
 let formTotal=0;
-let certSelId=null;
+let currentCertId=null;
 let appStarted=false;
 let viewMode='calendar';
 let svcMode='preset';
@@ -683,7 +701,6 @@ function inputToDate(s){if(!s)return '';const[y,m,d]=s.split('-');return d+'.'+m
 function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
 
-/* Умный фильтр данных: каждый пользователь видит только свои записи */
 function getMyData() {
   if (!window.PROFILE) return [];
   const currentPhone = norm(window.PROFILE.phone || '');
@@ -799,7 +816,7 @@ function startApp(){
     window.CRM=[];snap.forEach(d=>window.CRM.push({id:d.id,...d.data()}));
     renderAll();
   });
-  db.collection('certificates').onSnapshot(snap=>{certs={};snap.forEach(d=>certs[d.id]=d.data());renderCerts();});
+  CERTC.onSnapshot(snap=>{certs={};snap.forEach(d=>certs[d.id]=d.data());renderCerts();});
   setInterval(()=>{if(viewMode==='calendar')renderCalendar();},60000);
 }
 
@@ -813,6 +830,7 @@ function renderAll(){
   if(sec==='finance')renderFinance();
   if(sec==='analytics')renderAnalytics();
   if(sec==='employees')renderEmployees();
+  if(sec==='certs')renderCerts();
 }
 
 /* ===== VIEW MODE ===== */
@@ -847,7 +865,7 @@ window.togglePrivacy=function(){
   else{privacyOn=true;removeBlur();}
 };
 
-/* ===== НОВАЯ НАВИГАЦИЯ ДАТ ===== */
+/* ===== НАВИГАЦИЯ ДАТ ===== */
 function changeDateScope(type, d) {
   if (viewMode === 'calendar') {
     if (type === 'week') {
@@ -939,7 +957,7 @@ function renderCalendar(){
     timeCol.appendChild(slot);
   }
   body.appendChild(timeCol);
-  let data = window.CRM;
+  let data = getMyData();
 
   const byDate={};
   data.forEach(r=>{if(r.date&&r.time){if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);}});
@@ -1094,14 +1112,12 @@ window.markDone=function(id){
   const isC=!row.completed;
   const upd={completed:isC};
   if(isC){
-    // Если помечаем как готовое, фиксируем дату завершения
     upd.completedDate=todayStr();
     const full=Number(row.fullTotal||row.total||0);
     const paid=Number(row.total||0);
     const rem=full-paid;
     if(rem>0){upd.completionPayment=rem;upd.total=full;}
   } else {
-    // При отмене готовности удаляем дату завершения
     upd.completedDate = firebase.firestore.FieldValue.delete();
   }
   SC.doc(id).update(upd);
@@ -1146,13 +1162,10 @@ function openNewForm(){
   document.getElementById('fPhone').value='';
   document.getElementById('fComment').value='';
   document.getElementById('preToggle').checked=false;
-  document.getElementById('certToggle').checked=false;
-  document.getElementById('certPicker').style.display='none';
   
   setupFormColorPicker();
   renderFormSvcs();
   setupFormMode();
-  populateCertSelect();
   
   const modal = document.getElementById('moRecord');
   modal.classList.add('open');
@@ -1171,7 +1184,6 @@ function setupFormColorPicker(){
 }
 
 function setupFormMode(){
-  document.getElementById('certToggleWrap').style.display=isSound?'block':'none';
   document.getElementById('svcModeWrap').style.display=isSound?'flex':'none'; 
   
   if(isSound){
@@ -1205,8 +1217,6 @@ window.openEdit=function(id){
   document.getElementById('fPhone').value=row.phone||'';
   document.getElementById('fComment').value=row.comment||'';
   document.getElementById('preToggle').checked=false;
-  document.getElementById('certToggle').checked=false;
-  document.getElementById('certPicker').style.display='none';
   setupFormColorPicker();
   renderFormSvcs();
   setupFormMode();
@@ -1282,21 +1292,6 @@ function renderFormSvcs(){
   if(!privacyOn)applyBlur();
 }
 
-/* ===== CERT IN FORM ===== */
-function populateCertSelect(){
-  const sel=document.getElementById('certSelect');
-  sel.innerHTML='<option value="">— Выберите сертификат —</option>';
-  for(let i=1;i<=300;i++){
-    const id='SSL-'+String(i).padStart(3,'0');
-    const d=certs[id];
-    if(!d||!d.active){const opt=document.createElement('option');opt.value=id;opt.textContent=id+(d&&d.name?' ('+d.name+')':'');sel.appendChild(opt);}
-  }
-}
-window.toggleCertMode=function(){
-  const on=document.getElementById('certToggle').checked;
-  document.getElementById('certPicker').style.display=on?'block':'none';
-};
-
 /* ===== SAVE RECORD ===== */
 window.saveRecord=async function(){
   const mName = document.getElementById('mSvcName').value.trim();
@@ -1328,8 +1323,6 @@ window.saveRecord=async function(){
   
   const fullT=details.reduce((s,i)=>s+(i.basePrice||i.price),0)||0;
   const paid=details.reduce((s,i)=>s+i.price,0)||0;
-  const useCert=document.getElementById('certToggle').checked;
-  const certId=document.getElementById('certSelect').value;
   let duration = 60;
   if(time && timeEnd){
      const [h1,m1] = time.split(':').map(Number);
@@ -1347,10 +1340,7 @@ window.saveRecord=async function(){
   };
   try{
     if(editId){await SC.doc(editId).update(data);}
-    else{
-      const ref=await SC.add(data);
-      if(useCert&&certId){await db.collection('certificates').doc(certId).set({active:true,name,details,total:paid,fullTotal:fullT});}
-    }
+    else{ await SC.add(data); }
     closeRecModal();
   }catch(e){alert('Ошибка: '+e.message);}
 };
@@ -1364,7 +1354,7 @@ function renderSessions(){
   const curH=new Date().getHours()*60+new Date().getMinutes();
   const todS=todayStr();
   
-  let data = window.CRM.filter(r=>{
+  let data = getMyData().filter(r=>{
     if(r.date&&r.date.includes(mk))return true;
     if(!r.completed)return true;
     return false;
@@ -1467,7 +1457,6 @@ function renderFinance(){
   const body=document.getElementById('finBody');body.innerHTML='';
   
   const currentMonthKey = mKey(new Date());
-  // Все незавершённые записи + записи текущего месяца
   const filtered = myData.filter(r => {
     if (!r.date) return false;
     const inCurrentMonth = r.date.includes(currentMonthKey);
@@ -1476,17 +1465,21 @@ function renderFinance(){
   });
   
   const sorted = filtered.sort((a,b) => b.timestamp - a.timestamp).slice(0, 60);
-  if(!sorted.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
+  if(!sorted.length){body.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:28px;">Нет записей</td></tr>';return;}
 
   sorted.forEach(r=>{
     const full=r.fullTotal||r.total||0;
     const paid=r.total||0;
     const rest=Math.max(0,full-paid);
+    const perc=full>0?Math.min((paid/full)*100,100):0;
     const isDone=r.completed;
     const isAuthor = window.PROFILE && r.authorPhone === norm(window.PROFILE.phone);
     const isPastMonth = !r.date.includes(currentMonthKey);
     const statusText = isDone ? (isPastMonth ? 'Перенос ✓' : 'Готово') : (isPastMonth ? 'Перенос' : (rest>0 ? 'Долг' : 'В работе'));
     const statusClass = isDone ? (isPastMonth ? 'ss-transfer' : 'ss-done') : (isPastMonth ? 'ss-transfer' : (rest>0 ? 'ss-debt' : 'ss-work'));
+
+    const color = r.eventColor || PALETTE[0].hex;
+    const timeDisplay = r.time ? `${r.time} ${r.timeEnd ? '- ' + r.timeEnd : ''}` : '—';
 
     let actsHTML = '';
     if(isAuthor) {
@@ -1501,7 +1494,17 @@ function renderFinance(){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${r.date||'—'}</div></td>
-      <td data-label="Клиент"><div class="td-name" style="${nameStyle} transition: color 0.3s ease;">${r.client||r.song||'—'}</div></td>
+      <td data-label="Время"><div class="td-time" style="color:${color}">${timeDisplay}</div></td>
+      <td data-label="Клиент">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:3px;height:28px;border-radius:2px;background:${color};flex-shrink:0;"></div>
+          <div>
+            <div class="td-name" style="${nameStyle}">${r.client||r.song||'—'}</div>
+            ${r.comment?`<div class="td-comment">💬 ${r.comment}</div>`:''}
+            <div class="prog"><div class="prog-fill ${isDone?'done':''}" style="width:${Math.round(perc)}%;background:${color}"></div></div>
+          </div>
+        </div>
+      </td>
       <td data-label="Телефон"><div class="td-phone">${r.phone||'—'}</div></td>
       <td data-label="Услуги"><div class="td-svc">${r.services||'—'}</div></td>
       <td data-label="Внесено" style="text-align:right;"><div class="td-price pv" style="color:var(--green)">${paid.toLocaleString()} ₽</div></td>
@@ -1522,7 +1525,7 @@ function renderCerts(){
   for(let i=1;i<=300;i++){
     const id='SSL-'+String(i).padStart(3,'0');
     const d=certs[id];
-    arr.push({id,active:d?d.active:false,name:d?d.name:'',total:d?d.total:0,fullTotal:d?d.fullTotal:0});
+    arr.push({id,active:d?d.active:false,name:d?d.name:'',firstName:d?d.firstName:'',lastName:d?d.lastName:'',service:d?d.service:'',date:d?d.date:'',expiry:d?d.expiry:''});
   }
   arr.forEach(c=>{
     const el=document.createElement('div');
@@ -1531,18 +1534,63 @@ function renderCerts(){
       <div class="cert-id">${c.id}</div>
       <div class="cert-nm">${c.name||'—'}</div>
       <div class="cert-b ${c.active?'cb-used':'cb-free'}">${c.active?'ИСПОЛЬЗОВАН':'СВОБОДЕН'}</div>
+      ${c.active ? `<div style="font-size:9px;color:var(--text3);margin-top:4px;">${c.firstName||''} ${c.lastName||''}</div>` : ''}
     `;
     el.onclick=()=>{
       if(!c.active){
-         openSM('Активировать сертификат '+c.id+'?','number',()=>{
-           db.collection('certificates').doc(c.id).set({active:true,name:'Ручная активация',timestamp:Date.now()});
-           closeSM();
-         });
-         }
+         currentCertId = c.id;
+         openCertModal();
+      }
     };
     grid.appendChild(el);
   });
 }
+
+function openCertModal(){
+  document.body.classList.add('modal-open');
+  document.getElementById('certFirstName').value = '';
+  document.getElementById('certLastName').value = '';
+  document.getElementById('certService').value = '';
+  document.getElementById('certDate').value = dateToInput(todayStr());
+  document.getElementById('certExpiry').value = '';
+  document.getElementById('moCert').classList.add('open');
+}
+
+function closeCertModal(){
+  document.body.classList.remove('modal-open');
+  document.getElementById('moCert').classList.remove('open');
+  currentCertId = null;
+}
+
+window.activateCert = async function(){
+  if(!currentCertId) return;
+  const firstName = document.getElementById('certFirstName').value.trim();
+  const lastName = document.getElementById('certLastName').value.trim();
+  const service = document.getElementById('certService').value.trim();
+  const date = inputToDate(document.getElementById('certDate').value) || todayStr();
+  const expiry = inputToDate(document.getElementById('certExpiry').value);
+  
+  if(!firstName || !lastName || !service || !expiry) {
+    alert('Заполните все поля');
+    return;
+  }
+  
+  try{
+    await CERTC.doc(currentCertId).set({
+      active: true,
+      name: `${firstName} ${lastName}`,
+      firstName,
+      lastName,
+      service,
+      date,
+      expiry,
+      timestamp: Date.now()
+    });
+    closeCertModal();
+  }catch(e){
+    alert('Ошибка: '+e.message);
+  }
+};
 
 /* ===== ANALYTICS ===== */
 function renderAnalytics(){
@@ -1562,7 +1610,6 @@ function renderAnalytics(){
     if(r.completed)done++;
     else work++;
     
-    // Доход засчитывается в месяц завершения, если запись завершена, иначе не учитывается
     if(r.completed) {
       const refDate = r.completedDate || r.date;
       if(refDate) {
