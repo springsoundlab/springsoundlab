@@ -17,10 +17,11 @@
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
   --text:#f0f0f5;--text2:#9090a0;--text3:#5a5a6a;
   --accent:#7c6fff;--accent2:#a099ff;--accent-bg:rgba(124,111,255,0.12);
-  --green:#3ecf8e;--green-bg:rgba(62,207,142,0.1);
-  --red:#ff5c6a;--red-bg:rgba(255,92,106,0.1);
-  --gold:#d4af37;--gold-bg:rgba(212,175,55,0.1);
+  --green:#3ecf8e;--green-bg:rgba(62,207,142,0.15);
+  --red:#ff5c6a;--red-bg:rgba(255,92,106,0.15);
+  --gold:#d4af37;--gold-bg:rgba(212,175,55,0.15);
   --blue:#3b9eff;--blue-bg:rgba(59,158,255,0.1);
+  --yellow:#f5c542;--yellow-bg:rgba(245,197,66,0.2);
   --r:12px;--r-sm:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -117,9 +118,10 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .act-ic.go:hover{color:var(--gold);border-color:rgba(245,166,35,.3);}
 .act-ic.b:hover{color:var(--blue);border-color:rgba(59,158,255,.3);}
 .ss-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;white-space:nowrap;}
-.ss-work{background:var(--accent-bg);color:var(--accent2);}
-.ss-done{background:var(--green-bg);color:var(--green);}
-.ss-debt{background:var(--gold-bg);color:var(--gold);}
+/* Новые цвета статусов */
+.ss-work{background:transparent;color:var(--red);border:1px solid var(--red);}
+.ss-done{background:var(--green-bg);color:var(--green);border:1px solid var(--green);}
+.ss-debt{background:var(--red);color:var(--gold);border:1px solid var(--red);}
 .ss-transfer{background:rgba(255,165,0,0.1);color:#ffa500;}
 .role-tag{font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--surface3);color:var(--text3);margin-left:4px;}
 
@@ -140,8 +142,11 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .fin-grid{flex:1;overflow-y:auto;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;align-content:start;}
 .fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;transition:.15s;display:flex;flex-direction:column;gap:6px;}
 .fin-card:hover{border-color:var(--border2);background:var(--surface2);}
-.fin-card.row-paid { background: rgba(62, 207, 142, 0.08); border-color: rgba(62, 207, 142, 0.3); }
-.fin-card.row-debt { background: rgba(255, 92, 106, 0.08); border-color: rgba(255, 92, 106, 0.3); }
+/* Фоны карточек */
+.fin-card.row-done { background: var(--yellow-bg); border-color: var(--yellow); }
+.fin-card.row-paid { background: var(--green-bg); border-color: var(--green); }
+.fin-card.row-debt { background: var(--red-bg); border-color: var(--red); }
+
 .fin-card .fin-header{display:flex;align-items:center;gap:8px;}
 .fin-card .fin-color-bar{width:3px;height:28px;border-radius:2px;flex-shrink:0;}
 .fin-card .fin-name{font-size:16px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -156,8 +161,8 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .fin-card .fin-stat{background:var(--surface2);border-radius:6px;padding:4px 6px;text-align:center;}
 .fin-card .fin-stat-l{font-size:8px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
 .fin-card .fin-stat-v{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;}
-.fin-card .fin-actions{display:flex;justify-content:center;gap:8px;margin-top:4px;flex-wrap:wrap;}
-.fin-card .fin-actions .act-ic{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:.15s;}
+.fin-card .fin-actions{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.fin-card .fin-actions .act-ic{flex:1;height:42px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:.15s;min-width:0;}
 .fin-card .fin-actions .act-ic:hover{color:var(--text);border-color:var(--border2);}
 .fin-card .fin-actions .act-ic.g:hover{color:var(--green);border-color:rgba(62,207,142,.3);}
 .fin-card .fin-actions .act-ic.g.active{background:var(--green-bg);color:var(--green);border-color:var(--green);}
@@ -298,7 +303,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 /* OFFLINE */
 #offBar{display:none;position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:6px;z-index:999999;}
 
-/* MOBILE АДАПТАЦИЯ – теперь только для меню и календаря, финансы остаются как на десктопе */
+/* MOBILE АДАПТАЦИЯ – только для меню и календаря, финансы остаются как на десктопе */
 @media(max-width:768px){
   .sidebar { position: fixed !important; top: 0; left: -280px; width: 260px !important; height: 100vh !important; z-index: 99999 !important; transition: left 0.3s ease-in-out; box-shadow: 5px 0 25px rgba(0,0,0,0.5); display: flex !important; flex-direction: column !important; border-right: 1px solid var(--border); }
   .sidebar.mobile-open { left: 0 !important; }
@@ -343,7 +348,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .mb-num-input { font-size: 18px; }
 }
 
-/* EVENT DETAIL POPUP – больше не используется для финансов, но оставим для других разделов */
+/* EVENT DETAIL POPUP – для других разделов */
 .ev-popup{display:none;position:fixed;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:14px;width:240px;z-index:99998;box-shadow:0 12px 40px rgba(0,0,0,.5);}
 .ev-popup.open{display:block;}
 .ev-pop-close {position:absolute;top:10px;right:12px;cursor:pointer;font-size:16px;color:var(--text2);padding:5px;line-height:1;}
@@ -481,7 +486,11 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
     <div id="secFinance" class="view" style="display:none;">
       <div class="toolbar">
-        <div style="font-size:11px;color:var(--text3);" id="finCount">0 записей</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:11px;color:var(--text3);" id="finCount">0 записей</span>
+          <input type="month" id="finMonthPicker" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;">
+          <button class="tb-btn" onclick="document.getElementById('finMonthPicker').value = ''; renderFinance();" style="font-size:10px;padding:4px 8px;">Сбросить</button>
+        </div>
       </div>
       <div class="fin-grid" id="finGrid"></div>
     </div>
@@ -713,6 +722,7 @@ let regSelectedColor=PALETTE[0].hex;
 let calScrollSaved = 0;
 let calInitialized = false;
 let popupLocked = false;
+let selectedMonth = ''; // для фильтрации финансов
 
 /* ===== UTILS ===== */
 function norm(r){let d=(r||'').replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
@@ -727,6 +737,7 @@ function monthKeyFromDateStr(ds) {
   const [d,m,y] = ds.split('.');
   return '.'+m+'.'+y;
 }
+function getMonthKeyFromDate(d){ return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear(); }
 
 function getMyData() {
   if (!window.PROFILE) return [];
@@ -845,6 +856,17 @@ function startApp(){
   });
   CERTC.onSnapshot(snap=>{certs={};snap.forEach(d=>certs[d.id]=d.data());renderCerts();});
   setInterval(()=>{if(viewMode==='calendar')renderCalendar();},60000);
+  
+  // Инициализация выбора месяца в финансах
+  const monthPicker = document.getElementById('finMonthPicker');
+  if (monthPicker) {
+    const now = new Date();
+    monthPicker.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+    monthPicker.addEventListener('change', function(){
+      selectedMonth = this.value;
+      renderFinance();
+    });
+  }
 }
 
 function renderAll(){
@@ -1138,19 +1160,15 @@ window.markDone = function(id) {
   // Оптимистичное обновление класса на карточке
   const card = document.querySelector(`.fin-card[data-id="${id}"]`);
   if (card) {
+    card.classList.remove('row-paid', 'row-debt', 'row-done');
     if (isCompleting) {
-      card.classList.remove('row-debt');
-      card.classList.add('row-paid');
+      card.classList.add('row-done');
     } else {
-      card.classList.remove('row-paid');
       const full = row.fullTotal || row.total || 0;
       const paid = row.total || 0;
       const rest = Math.max(0, full - paid);
-      if (rest > 0) {
-        card.classList.add('row-debt');
-      } else {
-        card.classList.remove('row-debt');
-      }
+      if (rest === 0) card.classList.add('row-paid');
+      else card.classList.add('row-debt');
     }
   }
   
@@ -1488,20 +1506,35 @@ function renderClients(){
   if(!privacyOn)applyBlur();
 }
 
-/* ===== FINANCE – НОВЫЙ РЕНДЕР (КАРТОЧКИ) ===== */
+/* ===== FINANCE – НОВЫЙ РЕНДЕР (КАРТОЧКИ) С ФИЛЬТРОМ ПО МЕСЯЦУ ===== */
 function renderFinance(){
   const myData = getMyData();
   const grid = document.getElementById('finGrid');
   if (!grid) return;
+  
+  // Фильтр по месяцу
+  let filtered = myData;
+  const monthPicker = document.getElementById('finMonthPicker');
+  if (monthPicker && monthPicker.value) {
+    const [year, month] = monthPicker.value.split('-');
+    const monthKey = '.' + month + '.' + year;
+    filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === monthKey);
+  } else {
+    // По умолчанию показываем текущий месяц
+    const now = new Date();
+    const currentMonthKey = getMonthKeyFromDate(now);
+    filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === currentMonthKey);
+  }
+  
   grid.innerHTML = '';
-  document.getElementById('finCount').textContent = myData.length + ' записей';
+  document.getElementById('finCount').textContent = filtered.length + ' записей';
 
-  if (!myData.length) {
-    grid.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">Нет записей</div>';
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">Нет записей за выбранный месяц</div>';
     return;
   }
 
-  myData.forEach(r => {
+  filtered.forEach(r => {
     const full = r.fullTotal || r.total || 0;
     const paid = r.total || 0;
     const rest = Math.max(0, full - paid);
@@ -1509,14 +1542,29 @@ function renderFinance(){
     const isDone = r.completed;
     const color = r.eventColor || PALETTE[0].hex;
 
-    const statusText = isDone ? 'Готово' : (rest > 0 ? 'Долг' : 'В работе');
-    const statusClass = isDone ? 'ss-done' : (rest > 0 ? 'ss-debt' : 'ss-work');
+    let statusText, statusClass;
+    if (isDone) {
+      statusText = 'Готово';
+      statusClass = 'ss-done';
+    } else if (rest > 0) {
+      statusText = 'Долг';
+      statusClass = 'ss-debt';
+    } else {
+      statusText = 'В работе';
+      statusClass = 'ss-work';
+    }
 
     const card = document.createElement('div');
     card.className = 'fin-card';
     card.setAttribute('data-id', r.id);
-    if (rest === 0 || isDone) card.classList.add('row-paid');
-    else card.classList.add('row-debt');
+    // Определяем класс фона
+    if (isDone) {
+      card.classList.add('row-done');
+    } else if (rest === 0) {
+      card.classList.add('row-paid');
+    } else {
+      card.classList.add('row-debt');
+    }
 
     // Заголовок: полоска + имя + статус
     const header = document.createElement('div');
@@ -1564,7 +1612,7 @@ function renderFinance(){
       card.appendChild(comm);
     }
 
-    // Действия
+    // Действия – увеличенные кнопки
     const actions = document.createElement('div');
     actions.className = 'fin-actions';
     actions.innerHTML = `
