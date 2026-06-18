@@ -334,14 +334,11 @@ select.f-inp{cursor:pointer;}
 textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 .f-sep{border:none;border-top:1px solid var(--border);margin:14px 0;}
 
-.color-pick-row{display:flex;align-items:center;gap:6px;margin-bottom:12px;}
+.color-pick-row{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
 .color-pick-label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-right:4px;}
-.color-dot{width:22px;height:22px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:.15s;flex-shrink:0;position:relative;}
-.color-dot.sel{border-color:#fff;transform:scale(1.15);}
-.color-dot:hover{transform:scale(1.1);}
-.color-dot .color-lock{position:absolute;top:-4px;right:-4px;font-size:10px;color:var(--red);background:var(--bg);border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);}
-.color-dot.taken{cursor:not-allowed;opacity:0.5;filter:grayscale(0.5);}
-.color-dot.taken:hover{transform:none;}
+.color-pick-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 10px;color:var(--text2);font-size:11px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:6px;}
+.color-pick-btn:hover{color:var(--text);border-color:var(--border2);}
+.color-pick-btn .color-preview{width:18px;height:18px;border-radius:4px;border:1px solid var(--border);flex-shrink:0;}
 
 /* Пакеты услуг — сетка 2×4 */
 .preset-grid {
@@ -536,15 +533,48 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     grid-template-columns: 1fr 1fr;
     gap: 6px;
   }
+  /* Мобильная адаптация модальных окон */
+  .mo .mb {
+    padding: 16px !important;
+    width: 95vw !important;
+    max-height: 95vh !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    overflow-y: auto !important;
+  }
+  #moRecord .mb, #moClientEdit .mb {
+    width: 95vw !important;
+  }
+  #moAddPackage .mb {
+    width: 95vw !important;
+  }
+  .pkg-card {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+  }
+  .pkg-card .pkg-price {
+    font-size: 11px !important;
+  }
+  .client-sessions-grid {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 2px !important;
+    font-size: 10px !important;
+  }
+  .client-sessions-grid .header { display: none !important; }
+  .color-pick-row .color-pick-label { font-size: 9px; }
+  .color-pick-btn { padding: 3px 8px; font-size: 10px; }
+  .color-pick-btn .color-preview { width: 14px; height: 14px; }
 }
 
 .ev-popup{display:none !important;}
 
 /* Стили для карточек услуг в модалке */
 .pkg-card {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 30px;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid var(--border);
@@ -553,10 +583,58 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   transition: .15s;
 }
 .pkg-card:hover { border-color: var(--border2); background: var(--surface); }
-.pkg-card .pkg-name { font-size: 12px; font-weight: 600; color: var(--text); }
-.pkg-card .pkg-price { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text2); }
-.pkg-card .pkg-del { color: var(--text3); cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: .15s; }
+.pkg-card .pkg-name { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pkg-card .pkg-price { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text2); text-align: right; }
+.pkg-card .pkg-del { color: var(--text3); cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: .15s; text-align: center; }
 .pkg-card .pkg-del:hover { color: var(--red); background: var(--red-bg); }
+.pkg-header {
+  display: grid;
+  grid-template-columns: 1fr auto 30px;
+  gap: 8px;
+  padding: 4px 12px 8px 12px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.pkg-header span:last-child { text-align: center; }
+
+/* Цветовая палитра в модалке */
+.color-palette-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0;
+}
+.color-palette-grid .color-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: .15s;
+  position: relative;
+}
+.color-palette-grid .color-dot.sel { border-color: #fff; transform: scale(1.1); }
+.color-palette-grid .color-dot.taken { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
+.color-palette-grid .color-dot .color-lock {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 10px;
+  color: var(--red);
+  background: var(--bg);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+}
 </style>
 </head>
 <body>
@@ -677,10 +755,10 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <span style="font-size:11px;color:var(--text3);" id="clCount">0 клиентов</span>
           <select id="clientSortSelect" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;cursor:pointer;">
-            <option value="date_desc">По дате (сначала новые)</option>
-            <option value="date_asc">По дате (сначала старые)</option>
-            <option value="total_desc">По сумме (сначала большие)</option>
-            <option value="total_asc">По сумме (сначала маленькие)</option>
+            <option value="date_desc">Сортировать: по дате (сначала новые)</option>
+            <option value="date_asc">Сортировать: по дате (сначала старые)</option>
+            <option value="total_desc">Сортировать: по сумме (сначала большие)</option>
+            <option value="total_asc">Сортировать: по сумме (сначала маленькие)</option>
           </select>
           <select id="clientPeriodSelect" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;cursor:pointer;">
             <option value="all">Все</option>
@@ -780,9 +858,11 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       </div>
       <div class="color-pick-row">
         <span class="color-pick-label">Цвет</span>
-        <div id="formColorPick"></div>
+        <button class="color-pick-btn" id="colorPickBtn" onclick="openColorPickerModal()">
+          <span class="color-preview" id="colorPreview" style="background:var(--accent);"></span>
+          Выбрать цвет
+        </button>
         <span style="font-size:10px;color:var(--text3);margin-left:6px;" id="formColorNote">Ваш цвет по умолчанию</span>
-        <button class="tb-btn green-btn" onclick="confirmColor()" style="margin-left:auto;padding:4px 10px;font-size:10px;">Закрепить цвет</button>
       </div>
       <hr class="f-sep">
       <div id="svcModeWrap" style="display:block;margin-bottom:10px;">
@@ -830,6 +910,25 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     <div class="mb-btns">
       <button class="mb-btn mb-confirm" onclick="saveRecord()" style="width:100%;">Сохранить</button>
     </div>
+  </div>
+</div>
+
+<!-- Модальное окно для выбора цвета -->
+<div class="mo" id="moColorPicker">
+  <div class="mb mb-sm" style="max-width:420px;">
+    <div class="mb-header">
+      <div class="mb-title">Выбор цвета</div>
+      <div class="mb-close" onclick="closeColorPickerModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Выберите цвет</div>
+      <div id="colorPaletteGrid" class="color-palette-grid"></div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+        <button class="tb-btn green-btn" onclick="confirmColorFromPicker()" style="flex:1;justify-content:center;">Закрепить цвет</button>
+        <span style="font-size:10px;color:var(--text3);" id="colorPickerNote">Выберите цвет и нажмите "Закрепить"</span>
+      </div>
+    </div>
+    <div class="mb-btns" style="margin-top:0;"><button class="mb-btn mb-cancel" onclick="closeColorPickerModal()">Отмена</button></div>
   </div>
 </div>
 
@@ -906,7 +1005,9 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     </div>
     <hr class="f-sep">
     <div style="font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Мои услуги</div>
-    <div id="pkgListContainer" style="max-height:220px;overflow-y:auto;"></div>
+    <div id="pkgListContainer" style="max-height:220px;overflow-y:auto;">
+      <div class="pkg-header"><span>Название</span><span>Цена</span><span></span></div>
+    </div>
     <div class="mb-btns" style="margin-top:12px;"><button class="mb-btn mb-cancel" onclick="closeAddPackageModal()">Закрыть</button></div>
   </div>
 </div>
@@ -1105,9 +1206,22 @@ function renderPresetChips() {
 function renderPackageListInModal() {
   const container = document.getElementById('pkgListContainer');
   if (!container) return;
+  // Оставляем только тело списка, заголовок уже есть в HTML
+  // Удаляем всё кроме заголовка
+  const header = container.querySelector('.pkg-header');
   container.innerHTML = '';
+  if (header) container.appendChild(header);
+  else {
+    const h = document.createElement('div');
+    h.className = 'pkg-header';
+    h.innerHTML = '<span>Название</span><span>Цена</span><span></span>';
+    container.appendChild(h);
+  }
   if (userPackages.length === 0) {
-    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px;">У вас пока нет добавленных услуг</div>';
+    const empty = document.createElement('div');
+    empty.style.cssText = 'color:var(--text3);font-size:12px;padding:8px;text-align:center;';
+    empty.textContent = 'У вас пока нет добавленных услуг';
+    container.appendChild(empty);
     return;
   }
   userPackages.forEach((pkg, index) => {
@@ -1138,7 +1252,7 @@ function openAddPackageModal() {
   document.getElementById('pkgName').value = '';
   document.getElementById('pkgPrice').value = '';
   pkgSelectedColor = PALETTE[0].hex;
-  buildColorPicker('pkgColorPick', pkgSelectedColor, hex => pkgSelectedColor = hex);
+  buildColorPickerForPkg();
   renderPackageListInModal();
   document.getElementById('moAddPackage').classList.add('open');
 }
@@ -1146,6 +1260,27 @@ function openAddPackageModal() {
 function closeAddPackageModal() {
   document.body.classList.remove('modal-open');
   document.getElementById('moAddPackage').classList.remove('open');
+}
+
+function buildColorPickerForPkg() {
+  const cont = document.getElementById('pkgColorPick');
+  if (!cont) return;
+  cont.innerHTML = '';
+  cont.style.display = 'flex';
+  cont.style.gap = '6px';
+  cont.style.flexWrap = 'wrap';
+  PALETTE.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'color-dot' + (pkgSelectedColor === p.hex ? ' sel' : '');
+    d.style.background = p.hex;
+    d.title = p.label;
+    d.onclick = () => {
+      cont.querySelectorAll('.color-dot').forEach(x => x.classList.remove('sel'));
+      d.classList.add('sel');
+      pkgSelectedColor = p.hex;
+    };
+    cont.appendChild(d);
+  });
 }
 
 function savePackage() {
@@ -1172,18 +1307,16 @@ async function loadUsedColors() {
   } catch(e) { console.error('Ошибка загрузки цветов:', e); }
 }
 
-// Переопределяем buildColorPicker для учёта занятых цветов и кнопки подтверждения
-function buildColorPicker(containerId, currentHex, onChange, withLock = false) {
-  const cont = document.getElementById(containerId);
-  if (!cont) return;
-  cont.innerHTML = '';
-  cont.style.display = 'flex';
-  cont.style.gap = '6px';
-  cont.style.flexWrap = 'wrap';
+// Построение палитры для модального окна выбора цвета
+function buildColorPaletteModal() {
+  const grid = document.getElementById('colorPaletteGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const currentColor = selectedFormColor || window.PROFILE?.color || PALETTE[0].hex;
   PALETTE.forEach(p => {
-    const d = document.createElement('div');
     const isTaken = usedColors.includes(p.hex) && p.hex !== window.PROFILE?.color;
-    d.className = 'color-dot' + (currentHex === p.hex ? ' sel' : '') + (isTaken ? ' taken' : '');
+    const d = document.createElement('div');
+    d.className = 'color-dot' + (currentColor === p.hex ? ' sel' : '') + (isTaken ? ' taken' : '');
     d.style.background = p.hex;
     d.title = isTaken ? p.label + ' (занят)' : p.label;
     if (isTaken) {
@@ -1193,46 +1326,61 @@ function buildColorPicker(containerId, currentHex, onChange, withLock = false) {
       d.appendChild(lock);
     } else {
       d.onclick = () => {
-        if (isTaken) return;
-        cont.querySelectorAll('.color-dot').forEach(x => x.classList.remove('sel'));
+        grid.querySelectorAll('.color-dot').forEach(x => x.classList.remove('sel'));
         d.classList.add('sel');
-        onChange(p.hex);
+        // Временно сохраняем выбранный цвет
+        document.getElementById('colorPickerNote').textContent = 'Выберите цвет и нажмите "Закрепить"';
+        // Сохраняем в переменную для подтверждения
+        window._selectedColorFromPicker = p.hex;
       };
     }
-    cont.appendChild(d);
+    grid.appendChild(d);
   });
 }
 
-// ===== ПОДТВЕРЖДЕНИЕ ЦВЕТА =====
-window.confirmColor = async function() {
-  if (!window.PROFILE) return;
-  const color = selectedFormColor || window.PROFILE.color;
-  // Проверяем, не занят ли цвет другим пользователем
-  await loadUsedColors();
-  if (usedColors.includes(color) && color !== window.PROFILE.color) {
+// Открыть модальное окно выбора цвета
+function openColorPickerModal() {
+  document.body.classList.add('modal-open');
+  loadUsedColors().then(() => {
+    buildColorPaletteModal();
+    document.getElementById('moColorPicker').classList.add('open');
+  });
+}
+
+function closeColorPickerModal() {
+  document.body.classList.remove('modal-open');
+  document.getElementById('moColorPicker').classList.remove('open');
+  window._selectedColorFromPicker = null;
+}
+
+function confirmColorFromPicker() {
+  const color = window._selectedColorFromPicker;
+  if (!color) {
+    alert('Пожалуйста, выберите цвет.');
+    return;
+  }
+  // Проверяем, не занят ли цвет
+  if (usedColors.includes(color) && color !== window.PROFILE?.color) {
     alert('Этот цвет уже занят другим пользователем. Выберите другой.');
     return;
   }
-  try {
-    await UC.doc(window.PROFILE.uid).update({ color: color });
-    window.PROFILE.color = color;
-    // Обновляем аватар
-    document.getElementById('uAv').style.background = palByHex(color).bg;
-    document.getElementById('uAv').style.color = color;
-    document.getElementById('uAv').style.borderColor = color + '55';
-    // Обновляем подсказку
-    document.getElementById('formColorNote').textContent = 'Цвет подтверждён';
-    // Перестраиваем палитру с учётом занятых цветов
-    await loadUsedColors();
-    buildColorPicker('formColorPick', color, hex => {
-      selectedFormColor = hex;
-      document.getElementById('formColorNote').textContent = 'Выберите цвет и нажмите "Закрепить"';
-    });
-    alert('Цвет успешно закреплён!');
-  } catch(e) {
-    handleError(e, 'Ошибка при сохранении цвета');
-  }
-};
+  // Сохраняем цвет в профиль
+  UC.doc(window.PROFILE.uid).update({ color: color })
+    .then(() => {
+      window.PROFILE.color = color;
+      selectedFormColor = color;
+      // Обновляем аватар
+      document.getElementById('uAv').style.background = palByHex(color).bg;
+      document.getElementById('uAv').style.color = color;
+      document.getElementById('uAv').style.borderColor = color + '55';
+      // Обновляем превью в кнопке
+      document.getElementById('colorPreview').style.background = color;
+      document.getElementById('formColorNote').textContent = 'Цвет подтверждён';
+      closeColorPickerModal();
+      alert('Цвет успешно закреплён!');
+    })
+    .catch(err => handleError(err, 'Ошибка при сохранении цвета'));
+}
 
 // ===== ДЛЯ АБОНЕМЕНТОВ =====
 async function updateSubscriptionUsage(clientName) {
@@ -1294,7 +1442,25 @@ function handleTouchEnd(e) {
 
 // ===== AUTH =====
 function initRegColorPicker(){
-  buildColorPicker('regColorPick', regSelectedColor, hex=>{regSelectedColor=hex;});
+  // Простая палитра на регистрации
+  const cont = document.getElementById('regColorPick');
+  if (!cont) return;
+  cont.innerHTML = '';
+  cont.style.display = 'flex';
+  cont.style.gap = '6px';
+  cont.style.flexWrap = 'wrap';
+  PALETTE.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'color-dot' + (regSelectedColor === p.hex ? ' sel' : '');
+    d.style.background = p.hex;
+    d.title = p.label;
+    d.onclick = () => {
+      cont.querySelectorAll('.color-dot').forEach(x => x.classList.remove('sel'));
+      d.classList.add('sel');
+      regSelectedColor = p.hex;
+    };
+    cont.appendChild(d);
+  });
 }
 function switchTab(t){
   document.getElementById('tabLogin').classList.toggle('active',t==='login');
@@ -1387,6 +1553,9 @@ auth.onAuthStateChanged(async(user)=>{
     document.getElementById('uAv').style.borderColor=p.color+'55';
     document.getElementById('uName').textContent=p.name;
     document.getElementById('uRole').textContent=p.role;
+    // Обновляем превью цвета в кнопке
+    document.getElementById('colorPreview').style.background = p.color;
+    document.getElementById('formColorNote').textContent = 'Ваш цвет';
     document.getElementById('authScreen').style.display='none';
     document.getElementById('appRoot').style.display='flex';
     if(!appStarted){appStarted=true;startApp();}
@@ -1785,22 +1954,14 @@ function openNewForm(){
   document.getElementById('fPhone').value='';
   document.getElementById('fComment').value='';
   document.getElementById('preToggle').checked=false;
-  setupFormColorPicker();
+  // Обновляем превью цвета
+  document.getElementById('colorPreview').style.background = selectedFormColor;
+  document.getElementById('formColorNote').textContent = 'Ваш цвет';
   renderFormSvcs();
   setupFormMode();
   const modal = document.getElementById('moRecord');
   modal.classList.add('open');
   modal.scrollTop = 0; 
-}
-
-function setupFormColorPicker(){
-  buildColorPicker('formColorPick', selectedFormColor, hex=>{
-    selectedFormColor=hex;
-    const note=document.getElementById('formColorNote');
-    const isDefault=hex===(window.PROFILE?.color||PALETTE[0].hex);
-    note.textContent=isDefault?'Ваш цвет по умолчанию':'Кастомный цвет';
-  });
-  document.getElementById('formColorNote').textContent= selectedFormColor===(window.PROFILE?.color||PALETTE[0].hex)?'Ваш цвет по умолчанию':'Кастомный цвет';
 }
 
 function setupFormMode(){
@@ -1835,7 +1996,8 @@ window.openEdit = function(id) {
   document.getElementById('fPhone').value=row.phone||'';
   document.getElementById('fComment').value=row.comment||'';
   document.getElementById('preToggle').checked=false;
-  setupFormColorPicker();
+  document.getElementById('colorPreview').style.background = selectedFormColor;
+  document.getElementById('formColorNote').textContent = 'Ваш цвет';
   renderFormSvcs();
   setupFormMode();
   const modal = document.getElementById('moRecord');
