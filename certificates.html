@@ -130,13 +130,13 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .tb-btn:hover{color:var(--text);border-color:var(--border2);}
 .tb-btn.green-btn{color:var(--green);border-color:rgba(62,207,142,.3);}
 .tb-btn.green-btn:hover{background:var(--green-bg);}
-.tb-btn.filter-btn.active{background:var(--surface3);color:var(--text);border-color:var(--border2);}
-.tb-btn.filter-btn.all-active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);}
+.tb-btn.filter-btn.active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);}
+.tb-btn.filter-btn.all-active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);} /* теперь одинаково */
 
 /* Кнопки зума (ПК) */
 .zoom-controls { display: flex; gap: 4px; margin-right: 8px; }
 
-/* Новая навигация календаря */
+/* Навигация календаря */
 .cal-nav { display:flex; align-items:center; gap:8px; margin-left:auto; }
 .cal-nav input[type="month"] {
   background:var(--surface2);
@@ -293,7 +293,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 /* MODAL OVERLAY */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99999;overflow-y:auto;padding:20px 10px;-webkit-overflow-scrolling:touch;}
 .mo.open{display:block;}
-.mb{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:22px;width:440px;max-width:100%;margin:0 auto 40px auto;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.mb{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:22px;width:440px;max-width:100%;margin:0 auto;box-shadow:0 20px 60px rgba(0,0,0,.5);}
 .mb-title{font-size:14px;font-weight:700;}
 .mb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .mb-close { color: var(--red); cursor: pointer; font-size: 16px; font-weight: bold; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--red-bg); border-radius: 6px; transition: 0.15s; }
@@ -381,6 +381,57 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 #offBar{display:none;position:fixed;top:0;left:0;right:0;background:var(--red);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:6px;z-index:999999;}
 
+/* ===== ПК – увеличенные и отцентрированные модальные окна ===== */
+@media(min-width:769px){
+  .mo .mb {
+    width: 600px !important;
+    max-width: 95vw;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 0;
+  }
+  /* Для окна редактирования клиента тоже */
+  #moClientEdit .mb {
+    width: 600px !important;
+    max-width: 95vw;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 0;
+  }
+  /* Отступы в форме редактирования клиента */
+  #moClientEdit .f-group {
+    margin-bottom: 10px;
+  }
+  /* Список записей в клиенте — колонки */
+  .client-sessions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr 1fr;
+    gap: 8px;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .client-sessions-grid .header {
+    font-weight: 700;
+    color: var(--text3);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .client-sessions-grid .cell {
+    padding: 4px 0;
+    color: var(--text2);
+  }
+}
+
 /* MOBILE */
 @media(max-width:768px){
   .sidebar { position: fixed !important; top: 0; left: -280px; width: 260px !important; height: 100vh !important; z-index: 99999 !important; transition: left 0.3s ease-in-out; box-shadow: 5px 0 25px rgba(0,0,0,0.5); display: flex !important; flex-direction: column !important; border-right: 1px solid var(--border); }
@@ -419,28 +470,11 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     overflow-x: auto;
     padding: 8px 10px;
   }
-  #secFinance .toolbar > * {
-    flex: 0 0 auto;
-  }
-  #secFinance .toolbar .fin-filters {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 4px;
-    margin-left: 4px;
-  }
-  #secFinance .toolbar .fin-filters .tb-btn {
-    font-size: 9px;
-    padding: 4px 8px;
-    white-space: nowrap;
-  }
-  #secFinance .toolbar #finMonthPicker {
-    max-width: 120px;
-    font-size: 11px;
-    padding: 3px 6px;
-  }
-  #secFinance .toolbar #finCount {
-    display: none;
-  }
+  #secFinance .toolbar > * { flex: 0 0 auto; }
+  #secFinance .toolbar .fin-filters { display: flex; flex-wrap: nowrap; gap: 4px; margin-left: 4px; }
+  #secFinance .toolbar .fin-filters .tb-btn { font-size: 9px; padding: 4px 8px; white-space: nowrap; }
+  #secFinance .toolbar #finMonthPicker { max-width: 120px; font-size: 11px; padding: 3px 6px; }
+  #secFinance .toolbar #finCount { display: none; }
   .ana-hd{grid-template-columns:1fr 1fr;}
   .fin-cards{flex-direction:column;}
   .cl-grid{grid-template-columns:1fr 1fr;}
@@ -450,6 +484,17 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   #moSimple .mb { width: 95vw !important; padding: 15px; }
   .mb-num-input { font-size: 18px; }
   #moClientEdit .mb { width: 95vw !important; }
+  /* На мобильных оставляем компактный список записей клиента */
+  .client-sessions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    font-size: 11px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .client-sessions-grid .header { display: none; }
+  .client-sessions-grid .cell { padding: 2px 0; }
 }
 
 .ev-popup{display:none !important;}
@@ -549,7 +594,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <button class="tb-btn" onclick="zoomCalendar(1)" title="Увеличить масштаб"><i class="fa-solid fa-plus"></i></button>
           <button class="tb-btn" onclick="zoomCalendar(-1)" title="Уменьшить масштаб"><i class="fa-solid fa-minus"></i></button>
         </div>
-        <!-- Новая навигация календаря -->
         <div class="cal-nav">
           <input type="month" id="calMonthPicker">
           <button class="tb-btn" onclick="resetCalendarView()" title="Вернуться к текущей дате"><i class="fa-solid fa-rotate-left"></i> Сбросить</button>
@@ -582,7 +626,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <span style="font-size:11px;color:var(--text3);" id="finCount">0 записей</span>
           <input type="month" id="finMonthPicker" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;">
           <div class="fin-filters" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:4px;">
-            <button class="tb-btn filter-btn all-active" data-filter="all" onclick="toggleFilter('all')">Все</button>
+            <button class="tb-btn filter-btn active" data-filter="all" onclick="toggleFilter('all')">Все</button>
             <button class="tb-btn filter-btn" data-filter="work" onclick="toggleFilter('work')">В работе</button>
             <button class="tb-btn filter-btn" data-filter="done" onclick="toggleFilter('done')">Готово</button>
             <button class="tb-btn filter-btn" data-filter="debt" onclick="toggleFilter('debt')">Долг</button>
@@ -618,7 +662,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <div class="chart-ttl">Топ моих услуг</div>
           <div class="svc-rnk" id="anaRnk"></div>
         </div>
-        <!-- Кнопка ручной миграции (если вдруг не сработала автоматическая) -->
         <button class="tb-btn green-btn" style="margin-top:12px;width:100%;justify-content:center;" onclick="forceMigrate()">
           <i class="fa-solid fa-link"></i> Привязать мои старые записи
         </button>
@@ -751,8 +794,14 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="mb-title">Редактирование клиента</div>
       <div class="mb-close" onclick="closeClientEdit()"><i class="fa-solid fa-xmark"></i></div>
     </div>
-    <div class="f-group"><div class="f-label">Имя</div><input type="text" id="clientEditName" class="f-inp" placeholder="Имя клиента"></div>
-    <div class="f-group"><div class="f-label">Телефон</div><input type="tel" id="clientEditPhone" class="f-inp" placeholder="+7 900 000-00-00"></div>
+    <div class="f-group" style="margin-bottom:12px;">
+      <div class="f-label">Имя</div>
+      <input type="text" id="clientEditName" class="f-inp" placeholder="Имя клиента">
+    </div>
+    <div class="f-group" style="margin-bottom:12px;">
+      <div class="f-label">Телефон</div>
+      <input type="tel" id="clientEditPhone" class="f-inp" placeholder="+7 900 000-00-00">
+    </div>
     <div style="margin:12px 0;border-top:1px solid var(--border);padding-top:12px;">
       <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
       <div id="clientEditSessions" style="max-height:200px;overflow-y:auto;font-size:12px;color:var(--text2);"></div>
@@ -841,6 +890,7 @@ const PRESET_SERVICES = [
   { name: 'ПОЛНЫЙ ПРОДАКШН', price: 10000, color: 'gold' },
   { name: 'ПЛАТ. ДОРОЖКА', price: 300, color: 'gold' }
 ];
+const PRESET_NAMES = PRESET_SERVICES.map(s => s.name.toLowerCase());
 
 // ===== STATE =====
 window.CRM=[];
@@ -864,7 +914,7 @@ let calScrollSaved = 0;
 let calInitialized = false;
 let popupLocked = false;
 let selectedMonth = '';
-let currentStatusFilter = null;
+let currentStatusFilter = 'all'; // 'all', 'work', 'done', 'debt'
 
 // Для редактирования клиента
 let clientEditIds = [];
@@ -1076,7 +1126,6 @@ function startApp(){
   CERTC.onSnapshot(snap=>{certs={};snap.forEach(d=>certs[d.id]=d.data());renderCerts();}, err=>console.error('❌ Ошибка загрузки сертификатов:', err));
   setInterval(()=>{if(viewMode==='calendar')renderCalendar();},60000);
   
-  // Инициализация month picker для календаря
   const calMonthPicker = document.getElementById('calMonthPicker');
   if (calMonthPicker) {
     const now = new Date();
@@ -1086,12 +1135,10 @@ function startApp(){
       if (!val) return;
       const [year, month] = val.split('-').map(Number);
       const firstDay = new Date(year, month-1, 1);
-      // находим понедельник недели, содержащей первое число
       const dayOfWeek = firstDay.getDay();
       const diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
       const monday = new Date(firstDay);
       monday.setDate(firstDay.getDate() + diffToMon);
-      // вычисляем смещение в неделях от текущей даты
       const today = new Date();
       const todayDayOfWeek = today.getDay();
       const todayDiffToMon = (todayDayOfWeek === 0) ? -6 : 1 - todayDayOfWeek;
@@ -1105,7 +1152,6 @@ function startApp(){
     });
   }
 
-  // Инициализация выбора месяца в финансах
   const monthPicker = document.getElementById('finMonthPicker');
   if (monthPicker) {
     const now = new Date();
@@ -1296,14 +1342,12 @@ function renderCalendar(){
       evEl.onmouseleave=()=>{if(!popupLocked)closeEvPopup();};
       col.appendChild(evEl);
     });
-    // Клик по колонке для создания новой записи с автоматическим подставлением времени
     col.onclick = function(e) {
       if(document.getElementById('evPopup').classList.contains('open')) return;
       const rect = this.getBoundingClientRect();
       const y = e.clientY - rect.top;
       const totalHeight = (HOURS_END - HOURS_START) * currentHourHeight;
       let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
-      // Ограничиваем, чтобы не выйти за пределы
       hour = Math.min(Math.max(hour, HOURS_START), HOURS_END-1);
       const hourStr = String(hour).padStart(2,'0') + ':00';
       openNewFormOnDate(ds, hourStr);
@@ -1537,12 +1581,10 @@ window.addManualSvc=function(){
   let n = document.getElementById('mSvcName').value.trim();
   let p = parseInt(document.getElementById('mSvcPrice').value);
   if(!n){alert('Введите название услуги');return;}
-  // Ищем совпадение с пресетом (регистронезависимо)
   const found = PRESET_SERVICES.find(s => s.name.toLowerCase() === n.toLowerCase());
   let basePrice = p;
   let color = 'white';
   if (found) {
-    // Если цена не указана, подставляем из пресета
     if (isNaN(p) || p <= 0) {
       p = found.price;
     }
@@ -1681,7 +1723,7 @@ function renderSessions(){
   });
 }
 
-// ===== CLIENTS (ОСНОВНАЯ ЛОГИКА С ГРУППИРОВКОЙ И РЕДАКТИРОВАНИЕМ) =====
+// ===== CLIENTS =====
 function renderClients(){
   const grid=document.getElementById('clGrid');
   const map={};
@@ -1689,7 +1731,6 @@ function renderClients(){
   myData.forEach(r=>{
     let fullName = r.client || r.song || '';
     if(!fullName.trim()) return;
-    // если в имени нет пробела, считаем его уникальным, добавляем суффикс _id
     let key = fullName.trim();
     if(!key.includes(' ')){
       key = key + '_' + r.id;
@@ -1767,18 +1808,21 @@ function openClientEdit(idsStr) {
   const listDiv = document.getElementById('clientEditSessions');
   listDiv.innerHTML = '';
   records.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  // Заголовки
+  const header = document.createElement('div');
+  header.className = 'client-sessions-grid header';
+  header.innerHTML = `<span class="cell">Дата</span><span class="cell">Время</span><span class="cell">Услуга</span><span class="cell">Сумма</span>`;
+  listDiv.appendChild(header);
   records.forEach(r => {
-    const line = document.createElement('div');
-    line.style.display = 'flex';
-    line.style.justifyContent = 'space-between';
-    line.style.padding = '4px 0';
-    line.style.borderBottom = '1px solid var(--border)';
-    line.innerHTML = `
-      <span>${escapeHTML(r.date||'—')} ${escapeHTML(r.time||'')}</span>
-      <span>${escapeHTML(r.services||'—')}</span>
-      <span style="font-weight:600;">${Number(r.total||0).toLocaleString()} ₽</span>
+    const row = document.createElement('div');
+    row.className = 'client-sessions-grid';
+    row.innerHTML = `
+      <span class="cell">${escapeHTML(r.date||'—')}</span>
+      <span class="cell">${escapeHTML(r.time||'—')}</span>
+      <span class="cell">${escapeHTML(r.services||'—')}</span>
+      <span class="cell" style="font-weight:600;">${Number(r.total||0).toLocaleString()} ₽</span>
     `;
-    listDiv.appendChild(line);
+    listDiv.appendChild(row);
   });
   document.body.classList.add('modal-open');
   document.getElementById('moClientEdit').classList.add('open');
@@ -1818,21 +1862,22 @@ async function saveClientEdit() {
   }
 }
 
-// ===== ФИЛЬТР ПО СТАТУСУ =====
+// ===== ФИЛЬТР ПО СТАТУСУ (все кнопки теперь фиолетовые) =====
 window.toggleFilter = function(filter) {
   const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
   const workBtn = document.querySelector('.filter-btn[data-filter="work"]');
   const doneBtn = document.querySelector('.filter-btn[data-filter="done"]');
   const debtBtn = document.querySelector('.filter-btn[data-filter="debt"]');
-  [allBtn, workBtn, doneBtn, debtBtn].forEach(b => b.classList.remove('active', 'all-active'));
+  // Убираем активный класс со всех
+  [allBtn, workBtn, doneBtn, debtBtn].forEach(b => b.classList.remove('active'));
+  // Активируем нужную
   if (filter === 'all') {
+    if (allBtn) allBtn.classList.add('active');
     currentStatusFilter = null;
-    allBtn.classList.add('all-active');
   } else {
-    currentStatusFilter = filter;
     const btn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
     if (btn) btn.classList.add('active');
-    allBtn.classList.remove('all-active');
+    currentStatusFilter = filter;
   }
   renderFinance();
 };
@@ -1977,7 +2022,7 @@ window.activateCert = async function(){
   } catch(e) { handleError(e, 'Ошибка при активации сертификата.'); } finally { if (btn) unlockButton(btn); }
 };
 
-// ===== ANALYTICS =====
+// ===== ANALYTICS (фильтр услуг только по пресетам) =====
 function renderAnalytics(){
   const myData = getMyData();
   let totalRev=0, yearRev=0, totalDbt=0, done=0, work=0;
@@ -2001,9 +2046,23 @@ function renderAnalytics(){
         }
       }
     }
-    if(r.details&&Array.isArray(r.details)){
-      r.details.forEach(det=>{ const sn=det.name.replace(' (50%)',''); if(!svcMap[sn])svcMap[sn]=0; svcMap[sn]++; });
-    }else if(r.type){ if(!svcMap[r.type])svcMap[r.type]=0; svcMap[r.type]++; }
+    // Сбор услуг только из деталей, если они есть и имя входит в пресеты
+    if(r.details && Array.isArray(r.details)){
+      r.details.forEach(det => {
+        const sn = det.name.replace(' (50%)','').trim();
+        // Проверяем, есть ли такая услуга в пресетах (регистронезависимо)
+        if (PRESET_NAMES.includes(sn.toLowerCase())) {
+          if(!svcMap[sn]) svcMap[sn]=0;
+          svcMap[sn]++;
+        }
+      });
+    } else if(r.type) {
+      const tn = r.type.replace(' (50%)','').trim();
+      if (PRESET_NAMES.includes(tn.toLowerCase())) {
+        if(!svcMap[tn]) svcMap[tn]=0;
+        svcMap[tn]++;
+      }
+    }
   });
   const avg=done>0?Math.round(totalRev/done):0;
   document.getElementById('anaAvg').textContent=avg.toLocaleString()+' ₽';
