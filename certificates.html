@@ -630,7 +630,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   </div>
 
   <div class="content" id="contentArea">
-    <div id="secSessions" class="view">
+    <div id="secSessions" class="view" style="display:flex;">
       <div class="toolbar">
         <button class="tb-btn green-btn" onclick="openNewForm()"><i class="fa-solid fa-plus"></i> Новая запись</button>
         <div class="view-mode">
@@ -1304,6 +1304,11 @@ function startApp(){
     calView.addEventListener('touchmove', handleTouchMove, { passive: false });
     calView.addEventListener('touchend', handleTouchEnd, { passive: false });
   }
+
+  // Принудительно открываем первую вкладку после загрузки
+  setTimeout(() => {
+    goSec('sessions');
+  }, 300);
 }
 
 function getCurrentSection() {
@@ -1312,21 +1317,47 @@ function getCurrentSection() {
   return active.id.replace('nav-','');
 }
 
-function renderAll(){
-  const sec = getCurrentSection();
-  // Сначала скрываем все секции, потом показываем нужную
+// ===== НОВАЯ ФУНКЦИЯ goSec (явное управление) =====
+function goSec(s) {
+  closeEvPopup();
+  // Удаляем активный класс у всех
+  document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('active'));
+  // Добавляем активный класс выбранному
+  const navItem = document.getElementById('nav-'+s);
+  if (navItem) navItem.classList.add('active');
+  
+  // Скрываем все секции
   const allIds = ['sessions','clients','finance','certs','analytics','employees'];
   allIds.forEach(id => {
     const el = document.getElementById('sec' + id.charAt(0).toUpperCase() + id.slice(1));
-    if (el) el.style.display = (id === sec) ? 'flex' : 'none';
+    if (el) el.style.display = (id === s) ? 'flex' : 'none';
   });
-  // Затем рендерим данные для активной секции
-  if(sec==='sessions'){ renderCalendar(); renderSessions(); }
-  else if(sec==='clients') renderClients();
-  else if(sec==='finance') renderFinance();
-  else if(sec==='analytics') renderAnalytics();
-  else if(sec==='employees') renderEmployees();
-  else if(sec==='certs') renderCerts();
+  
+  // Закрываем мобильное меню
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) sidebar.classList.remove('mobile-open');
+  
+  // Рендерим данные для выбранной секции
+  if (s === 'sessions') { 
+    renderCalendar(); 
+    renderSessions(); 
+  } else if (s === 'clients') { 
+    renderClients(); 
+  } else if (s === 'finance') { 
+    renderFinance(); 
+  } else if (s === 'analytics') { 
+    renderAnalytics(); 
+  } else if (s === 'employees') { 
+    renderEmployees(); 
+  } else if (s === 'certs') { 
+    renderCerts(); 
+  }
+}
+
+// ===== renderAll оставляем для совместимости (переиспользует goSec) =====
+function renderAll() {
+  const sec = getCurrentSection();
+  goSec(sec);
 }
 
 // ===== VIEW MODE =====
@@ -1338,17 +1369,6 @@ function setViewMode(m){
   document.getElementById('listView').style.display=m==='list'?'flex':'none';
   if(m==='calendar')renderCalendar();
   else renderSessions();
-}
-
-// ===== NAV =====
-function goSec(s){
-  closeEvPopup();
-  document.querySelectorAll('.nav-i').forEach(n=>n.classList.remove('active'));
-  document.getElementById('nav-'+s).classList.add('active');
-  const sidebar = document.querySelector('.sidebar');
-  if(sidebar) sidebar.classList.remove('mobile-open');
-  // Обновляем видимость секций и рендерим
-  renderAll(); // теперь renderAll сама определит активную секцию
 }
 
 // ===== PRIVACY =====
