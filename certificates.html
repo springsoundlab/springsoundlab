@@ -31,6 +31,78 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;displ
 
 body.modal-open { overflow: hidden; touch-action: none; }
 
+/* ===== ЗАГРУЗОЧНЫЙ ЭКРАН ===== */
+#loadingScreen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+  opacity: 1;
+  visibility: visible;
+}
+#loadingScreen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.loader-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 18px;
+  object-fit: cover;
+  animation: logoEntrance 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+  box-shadow: 0 0 40px rgba(124,111,255,0.2);
+}
+@keyframes logoEntrance {
+  0% { transform: scale(0.6) rotate(-8deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.loader-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 1px;
+}
+.loader-title span { color: var(--blue); }
+.loader-sub {
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+.loader-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 4px solid var(--border);
+  border-top-color: var(--accent);
+  border-right-color: var(--blue);
+  border-bottom-color: var(--green);
+  animation: spin 1.2s linear infinite;
+  margin-top: 8px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loader-text {
+  font-size: 11px;
+  color: var(--text3);
+  font-weight: 500;
+  margin-top: 4px;
+  animation: pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ===== ОСТАЛЬНЫЕ СТИЛИ (без изменений) ===== */
 /* SIDEBAR */
 .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:left 0.3s ease-in-out;}
 .sb-logo{display:flex;align-items:center;gap:10px;padding:18px 14px 14px;border-bottom:1px solid var(--border); cursor:pointer;}
@@ -397,7 +469,17 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 <div id="offBar">📡 Офлайн — данные сохраняются локально</div>
 
-<div id="authScreen">
+<!-- ===== НОВЫЙ ЗАГРУЗОЧНЫЙ ЭКРАН ===== -->
+<div id="loadingScreen">
+  <img class="loader-logo" src="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg" alt="SSL">
+  <div class="loader-title">SPRING SOUND <span>LAB</span></div>
+  <div class="loader-sub">Recording Studio</div>
+  <div class="loader-spinner"></div>
+  <div class="loader-text">Загрузка CRM...</div>
+</div>
+
+<!-- Экран входа (изначально скрыт) -->
+<div id="authScreen" style="display:none;">
   <div class="auth-card">
     <div class="auth-logo-r">
       <img src="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg" alt="SSL">
@@ -437,6 +519,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   </div>
 </div>
 
+<!-- Приложение (изначально скрыто) -->
 <div id="appRoot" style="display:none;flex:1;overflow:hidden;flex-direction:row;">
 <nav class="sidebar">
   <div class="sb-logo" onclick="togglePrivacy()" title="Нажмите для разблокировки финансов">
@@ -982,6 +1065,11 @@ window.doRegister=async function(){
 window.doLogout=function(){if(confirm('Выйти?'))auth.signOut();};
 
 auth.onAuthStateChanged(async(user)=>{
+  // Скрываем загрузочный экран в любом случае, когда статус стал известен
+  const loader = document.getElementById('loadingScreen');
+  loader.classList.add('hidden');
+  setTimeout(() => { loader.style.display = 'none'; }, 800); // после анимации скрываем совсем
+
   if(user){
     let p=null;
     try{const s=await UC.doc(user.uid).get();if(s.exists)p=s.data();}catch(e){
