@@ -384,7 +384,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 /* ===== ПК – увеличенные и отцентрированные модальные окна ===== */
 @media(min-width:769px){
   .mo .mb {
-    width: 600px !important;
+    width: 500px !important;
     max-width: 95vw;
     position: fixed;
     top: 50%;
@@ -393,10 +393,11 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     max-height: 90vh;
     overflow-y: auto;
     margin: 0;
+    padding: 22px 28px;
   }
   /* Для окна редактирования клиента тоже */
   #moClientEdit .mb {
-    width: 600px !important;
+    width: 500px !important;
     max-width: 95vw;
     position: fixed;
     top: 50%;
@@ -429,6 +430,28 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .client-sessions-grid .cell {
     padding: 4px 0;
     color: var(--text2);
+  }
+
+  /* Прижимаем кнопки "Быстрые пакеты" и "Вручную" вправо */
+  .svc-mode-switcher {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  /* Убираем лишнюю высоту у полей времени */
+  .time-inputs {
+    display: flex;
+    gap: 6px;
+  }
+  .time-inputs input[type="time"] {
+    height: 38px; /* такая же высота, как у других полей */
+    padding: 6px 5px;
+    font-size: 14px;
+  }
+  /* Убираем скобки "С" и "ДО" */
+  .time-label-hidden {
+    display: none;
   }
 }
 
@@ -495,6 +518,23 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   }
   .client-sessions-grid .header { display: none; }
   .client-sessions-grid .cell { padding: 2px 0; }
+  /* На мобильных кнопки переключения режима не прижимаем вправо */
+  .svc-mode-switcher {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .time-inputs {
+    display: flex;
+    gap: 6px;
+  }
+  .time-inputs input[type="time"] {
+    height: auto; /* стандартная высота */
+    padding: 9px 5px;
+  }
+  .time-label-hidden {
+    display: none; /* скрываем "С" и "ДО" и на мобильных тоже */
+  }
 }
 
 .ev-popup{display:none !important;}
@@ -693,10 +733,10 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="f-group"><div class="f-label">Дата</div><input type="date" id="fDate" class="f-inp"></div>
           <div class="f-group">
-            <div class="f-label">Время (С - ДО)</div>
-            <div style="display: flex; gap: 6px;">
-              <input type="time" id="fTime" class="f-inp mono" style="flex:1; padding:9px 5px;">
-              <input type="time" id="fTimeEnd" class="f-inp mono" style="flex:1; padding:9px 5px;">
+            <div class="f-label">Время</div>
+            <div class="time-inputs">
+              <input type="time" id="fTime" class="f-inp mono" style="flex:1; padding:6px 5px;">
+              <input type="time" id="fTimeEnd" class="f-inp mono" style="flex:1; padding:6px 5px;">
             </div>
           </div>
         </div>
@@ -713,7 +753,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <hr class="f-sep">
       <div id="svcModeWrap" style="display:none;margin-bottom:10px;">
         <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;">Добавить услуги</div>
-        <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <div class="svc-mode-switcher">
           <div class="tb-btn on" id="svcModePreset" onclick="setSvcMode('preset')"><i class="fa-solid fa-bolt"></i> Быстрые пакеты</div>
           <div class="tb-btn" id="svcModeManual" onclick="setSvcMode('manual')"><i class="fa-solid fa-pen"></i> Вручную</div>
         </div>
