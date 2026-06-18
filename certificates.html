@@ -131,7 +131,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .tb-btn.green-btn{color:var(--green);border-color:rgba(62,207,142,.3);}
 .tb-btn.green-btn:hover{background:var(--green-bg);}
 .tb-btn.filter-btn.active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);}
-.tb-btn.filter-btn.all-active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);} /* теперь одинаково */
+.tb-btn.filter-btn.all-active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);}
 
 /* Кнопки зума (ПК) */
 .zoom-controls { display: flex; gap: 4px; margin-right: 8px; }
@@ -165,12 +165,15 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cal-day-col{border-right:1px solid var(--border);position:relative;min-height:1440px;}
 .cal-day-col:last-child{border-right:none;}
 .cal-hour-line{position:absolute;left:0;right:0;height:1px;background:var(--border);}
-.cal-event{position:absolute;left:3px;right:3px;border-radius:6px;padding:4px 6px;overflow:hidden;cursor:pointer;transition:.15s;z-index:2;}
+.cal-event{position:absolute;left:3px;right:3px;border-radius:6px;padding:4px 6px;overflow:hidden;cursor:grab;transition:.15s;z-index:2;touch-action:none;}
+.cal-event:active{cursor:grabbing;}
 .cal-event:hover{filter:brightness(1.15);z-index:10;}
+.cal-event.dragging{opacity:0.7;z-index:20;box-shadow:0 8px 30px rgba(0,0,0,0.6);}
 .cal-event-name{font-size:10px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cal-event-svc{font-size:9px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cal-now-line{position:absolute;left:0;right:0;height:2px;background:var(--red);z-index:5;}
 .cal-now-dot{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--red);}
+.cal-day-col.drag-over{background:rgba(124,111,255,0.05);}
 
 /* TABLE – используется только для списка (журнал) */
 .tbl-wrap{flex:1;overflow-y:auto;}
@@ -223,6 +226,19 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cl-st-v{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin-top:1px;}
 .cl-edit-btn{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:.15s;opacity:0.6;}
 .cl-edit-btn:hover{opacity:1;color:var(--text);border-color:var(--border2);background:var(--surface3);}
+/* Абонемент в карточке клиента */
+.cl-subscription {
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--accent2);
+}
+.cl-subscription span:last-child { font-weight: 700; }
 
 /* FINANCE – карточки */
 .fin-grid{flex:1;overflow-y:auto;padding:14px 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;align-content:start;}
@@ -331,6 +347,9 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 .svc-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
 .svc-chip{font-size:10px;font-weight:700;padding:5px 9px;border-radius:6px;border:1px solid;background:transparent;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:5px;}
 .svc-chip:hover{filter:brightness(1.2);}
+.svc-chip .chip-remove{color:var(--text3);font-size:8px;margin-left:4px;cursor:pointer;opacity:0.5;}
+.svc-chip .chip-remove:hover{opacity:1;color:var(--red);}
+
 .added-svcs{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;min-height:10px;}
 .added-svc-row{display:flex;align-items:center;gap:8px;padding:6px 9px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);}
 .asvc-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
@@ -395,7 +414,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     margin: 0;
     padding: 22px 28px;
   }
-  /* Для окна редактирования клиента тоже */
   #moClientEdit .mb {
     width: 500px !important;
     max-width: 95vw;
@@ -407,11 +425,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     overflow-y: auto;
     margin: 0;
   }
-  /* Отступы в форме редактирования клиента */
-  #moClientEdit .f-group {
-    margin-bottom: 10px;
-  }
-  /* Список записей в клиенте — колонки */
+  #moClientEdit .f-group { margin-bottom: 10px; }
   .client-sessions-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 2fr 1fr;
@@ -427,32 +441,11 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  .client-sessions-grid .cell {
-    padding: 4px 0;
-    color: var(--text2);
-  }
-
-  /* Прижимаем кнопки "Быстрые пакеты" и "Вручную" вправо */
-  .svc-mode-switcher {
-    display: flex;
-    justify-content: flex-end;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-  /* Убираем лишнюю высоту у полей времени */
-  .time-inputs {
-    display: flex;
-    gap: 6px;
-  }
-  .time-inputs input[type="time"] {
-    height: 38px; /* такая же высота, как у других полей */
-    padding: 6px 5px;
-    font-size: 14px;
-  }
-  /* Убираем скобки "С" и "ДО" */
-  .time-label-hidden {
-    display: none;
-  }
+  .client-sessions-grid .cell { padding: 4px 0; color: var(--text2); }
+  .svc-mode-switcher { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 10px; }
+  .time-inputs { display: flex; gap: 6px; }
+  .time-inputs input[type="time"] { height: 38px; padding: 6px 5px; font-size: 14px; }
+  .time-label-hidden { display: none; }
 }
 
 /* MOBILE */
@@ -507,7 +500,6 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   #moSimple .mb { width: 95vw !important; padding: 15px; }
   .mb-num-input { font-size: 18px; }
   #moClientEdit .mb { width: 95vw !important; }
-  /* На мобильных оставляем компактный список записей клиента */
   .client-sessions-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -518,23 +510,10 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   }
   .client-sessions-grid .header { display: none; }
   .client-sessions-grid .cell { padding: 2px 0; }
-  /* На мобильных кнопки переключения режима не прижимаем вправо */
-  .svc-mode-switcher {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-  .time-inputs {
-    display: flex;
-    gap: 6px;
-  }
-  .time-inputs input[type="time"] {
-    height: auto; /* стандартная высота */
-    padding: 9px 5px;
-  }
-  .time-label-hidden {
-    display: none; /* скрываем "С" и "ДО" и на мобильных тоже */
-  }
+  .svc-mode-switcher { display: flex; gap: 6px; margin-bottom: 10px; }
+  .time-inputs { display: flex; gap: 6px; }
+  .time-inputs input[type="time"] { height: auto; padding: 9px 5px; }
+  .time-label-hidden { display: none; }
 }
 
 .ev-popup{display:none !important;}
@@ -751,35 +730,41 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         <span style="font-size:10px;color:var(--text3);margin-left:6px;" id="formColorNote">Ваш цвет по умолчанию</span>
       </div>
       <hr class="f-sep">
-      <div id="svcModeWrap" style="display:none;margin-bottom:10px;">
+      <div id="svcModeWrap" style="display:block;margin-bottom:10px;">
         <div style="font-size:9px;color:var(--text3);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;">Добавить услуги</div>
         <div class="svc-mode-switcher">
           <div class="tb-btn on" id="svcModePreset" onclick="setSvcMode('preset')"><i class="fa-solid fa-bolt"></i> Быстрые пакеты</div>
           <div class="tb-btn" id="svcModeManual" onclick="setSvcMode('manual')"><i class="fa-solid fa-pen"></i> Вручную</div>
+          <!-- Кнопка Абонемент (только для преподавателей) -->
+          <div class="tb-btn" id="svcModeSubscription" onclick="setSvcMode('subscription')" style="display:none;"><i class="fa-solid fa-ticket"></i> Абонемент</div>
         </div>
       </div>
-      <div id="presetSvcs" style="display:none;">
+      <div id="presetSvcs" style="display:block;">
         <div class="prepaid-row">
           <div class="pr-lbl">50% предоплата</div>
           <label class="tgl"><input type="checkbox" id="preToggle" onchange="applyPre()"><div class="tgl-s"></div></label>
         </div>
-        <div class="svc-chips">
-          <div class="svc-chip" style="border-color:#9090a0;color:#9090a0;" onclick="addPreSvc('ЧАС ЗАПИСИ',900,'white',true)">+ 1 час</div>
-          <div class="svc-chip" style="border-color:#a099ff;color:#a099ff;" onclick="addPreSvc('ПЕСНЯ В ПОДАРОК',5000,'purple')">Песня в подарок</div>
-          <div class="svc-chip" style="border-color:#ff5c6a;color:#ff5c6a;" onclick="addPreSvc('ПРЕМИУМ',8000,'red')">Премиум</div>
-          <div class="svc-chip" style="border-color:#3ecf8e;color:#3ecf8e;" onclick="addPreSvc('ТЮНИНГ ВОКАЛА',1000,'green')">Тюнинг вокала</div>
-          <div class="svc-chip" style="border-color:#3b9eff;color:#3b9eff;" onclick="openPriceM('АРАНЖИРОВКА','blue',10000)">Аранжировка</div>
-          <div class="svc-chip" style="border-color:#3ecf8e;color:#3ecf8e;border-style:dashed;" onclick="addPreSvc('ДОП. ДОРОЖКА',500,'green')">+ Доп. дорожка</div>
-          <div class="svc-chip" style="border-color:#f5a623;color:#f5a623;" onclick="openPriceM('ПОЛНЫЙ ПРОДАКШН','gold',10000)">Полный продакшн</div>
-          <div class="svc-chip" style="border-color:#f5a623;color:#f5a623;border-style:dashed;" onclick="addPreSvc('ПЛАТ. ДОРОЖКА',300,'gold')">+ Плат. дорожка</div>
+        <div class="svc-chips" id="presetChips">
+          <!-- будут загружены из профиля пользователя -->
         </div>
+        <button class="tb-btn green-btn" style="width:100%;justify-content:center;margin-top:6px;" onclick="openAddPackageModal()">
+          <i class="fa-solid fa-plus"></i> Добавить свой пакет
+        </button>
       </div>
-      <div id="manualSvcs">
+      <div id="manualSvcs" style="display:none;">
         <div class="f-row">
           <div class="f-group"><div class="f-label">Название услуги</div><input type="text" id="mSvcName" class="f-inp" placeholder="Запись вокала, Урок гитары..."></div>
           <div class="f-group"><div class="f-label">Цена (₽)</div><input type="number" id="mSvcPrice" class="f-inp mono" placeholder="0"></div>
         </div>
         <button class="tb-btn green-btn" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="addManualSvc()"><i class="fa-solid fa-plus"></i> Добавить услугу</button>
+      </div>
+      <!-- Блок абонемента -->
+      <div id="subscriptionBlock" style="display:none;">
+        <div class="f-row">
+          <div class="f-group"><div class="f-label">Сумма абонемента (₽)</div><input type="number" id="subPrice" class="f-inp mono" placeholder="0"></div>
+          <div class="f-group"><div class="f-label">Количество занятий</div><input type="number" id="subCount" class="f-inp mono" placeholder="10"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">При сохранении абонемент будет привязан к клиенту.</div>
       </div>
       <div class="added-svcs" id="addedSvcs"></div>
       <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val pv" id="formTotal">0 ₽</div></div>
@@ -793,23 +778,21 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Модальное окно для сертификатов -->
-<div class="mo" id="moCert">
-  <div class="mb">
+<!-- Модальное окно для добавления своего пакета услуг -->
+<div class="mo" id="moAddPackage">
+  <div class="mb mb-sm" style="max-width:400px;">
     <div class="mb-header">
-      <div class="mb-title">Активация сертификата</div>
-      <div class="mb-close" onclick="closeCertModal()"><i class="fa-solid fa-xmark"></i></div>
+      <div class="mb-title">Новый пакет услуг</div>
+      <div class="mb-close" onclick="closeAddPackageModal()"><i class="fa-solid fa-xmark"></i></div>
     </div>
-    <div class="f-group"><div class="f-label">Имя</div><input type="text" id="certFirstName" class="f-inp" placeholder="Имя"></div>
-    <div class="f-group"><div class="f-label">Фамилия</div><input type="text" id="certLastName" class="f-inp" placeholder="Фамилия"></div>
-    <div class="f-group"><div class="f-label">Услуга</div><input type="text" id="certService" class="f-inp" placeholder="Например, запись вокала"></div>
-    <div class="f-row">
-      <div class="f-group"><div class="f-label">Дата активации</div><input type="date" id="certDate" class="f-inp"></div>
-      <div class="f-group"><div class="f-label">Срок действия</div><input type="date" id="certExpiry" class="f-inp"></div>
+    <div class="f-group"><div class="f-label">Название</div><input type="text" id="pkgName" class="f-inp" placeholder="Урок вокала"></div>
+    <div class="f-group"><div class="f-label">Цена (₽)</div><input type="number" id="pkgPrice" class="f-inp mono" placeholder="1000"></div>
+    <div class="f-group"><div class="f-label">Цвет</div>
+      <div id="pkgColorPick" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;"></div>
     </div>
     <div class="mb-btns">
-      <button class="mb-btn mb-cancel" onclick="closeCertModal()">Отмена</button>
-      <button class="mb-btn mb-confirm" onclick="activateCert()">Активировать</button>
+      <button class="mb-btn mb-cancel" onclick="closeAddPackageModal()">Отмена</button>
+      <button class="mb-btn mb-confirm" onclick="savePackage()">Добавить</button>
     </div>
   </div>
 </div>
@@ -919,8 +902,8 @@ const MNSh=['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВ
 const MNL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const DAYS_RU=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 
-// ===== ПРЕДОПРЕДЕЛЁННЫЕ ПАКЕТЫ УСЛУГ =====
-const PRESET_SERVICES = [
+// ===== ПРЕДОПРЕДЕЛЁННЫЕ ПАКЕТЫ УСЛУГ (для звукорежиссёров) =====
+const DEFAULT_PRESET_SERVICES = [
   { name: 'ЧАС ЗАПИСИ', price: 900, color: 'white' },
   { name: 'ПЕСНЯ В ПОДАРОК', price: 5000, color: 'purple' },
   { name: 'ПРЕМИУМ', price: 8000, color: 'red' },
@@ -930,7 +913,6 @@ const PRESET_SERVICES = [
   { name: 'ПОЛНЫЙ ПРОДАКШН', price: 10000, color: 'gold' },
   { name: 'ПЛАТ. ДОРОЖКА', price: 300, color: 'gold' }
 ];
-const PRESET_NAMES = PRESET_SERVICES.map(s => s.name.toLowerCase());
 
 // ===== STATE =====
 window.CRM=[];
@@ -948,16 +930,19 @@ let appStarted=false;
 let viewMode='calendar';
 let svcMode='preset';
 let isSound=false;
+let isVocal=false;
+let isGuitar=false;
 let selectedFormColor=''; 
 let regSelectedColor=PALETTE[0].hex;
 let calScrollSaved = 0;
 let calInitialized = false;
 let popupLocked = false;
 let selectedMonth = '';
-let currentStatusFilter = 'all'; // 'all', 'work', 'done', 'debt'
-
-// Для редактирования клиента
+let currentStatusFilter = 'all';
 let clientEditIds = [];
+
+// Пакеты пользователя (сохраняются в профиле)
+let userPackages = [];
 
 // ===== UTILS =====
 function norm(r){let d=(r||'').replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
@@ -969,6 +954,8 @@ function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFull
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
 function monthKeyFromDateStr(ds) { if(!ds) return ''; const [d,m,y] = ds.split('.'); return '.'+m+'.'+y; }
 function getMonthKeyFromDate(d){ return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear(); }
+function getHourFromTime(t){ if(!t) return 0; const[h]=t.split(':').map(Number); return h||0; }
+function getMinutesFromTime(t){ if(!t) return 0; const[,m]=t.split(':').map(Number); return m||0; }
 
 // ===== getMyData =====
 function getMyData() {
@@ -995,6 +982,94 @@ function saveZoomToProfile() {
       .catch(err => console.error('❌ Ошибка сохранения зума:', err));
   }
 }
+
+// ===== РАБОТА С ПАКЕТАМИ =====
+function loadUserPackages() {
+  if (!window.PROFILE) return;
+  const pkgs = window.PROFILE.packages || [];
+  if (pkgs.length === 0) {
+    // Если у пользователя нет пакетов, подставляем дефолтные для звукорежиссёра, иначе пустой массив
+    if (isSound) {
+      userPackages = JSON.parse(JSON.stringify(DEFAULT_PRESET_SERVICES));
+    } else {
+      userPackages = [];
+    }
+  } else {
+    userPackages = pkgs;
+  }
+  renderPresetChips();
+}
+
+function saveUserPackages() {
+  if (!window.PROFILE || !window.PROFILE.uid) return;
+  UC.doc(window.PROFILE.uid).update({ packages: userPackages })
+    .then(() => console.log('✅ Пакеты сохранены'))
+    .catch(err => console.error('❌ Ошибка сохранения пакетов:', err));
+}
+
+function renderPresetChips() {
+  const container = document.getElementById('presetChips');
+  if (!container) return;
+  container.innerHTML = '';
+  userPackages.forEach((pkg, index) => {
+    const chip = document.createElement('div');
+    chip.className = 'svc-chip';
+    chip.style.borderColor = palByHex(pkg.color).hex;
+    chip.style.color = palByHex(pkg.color).hex;
+    chip.innerHTML = `${pkg.name} (${pkg.price}₽) <span class="chip-remove" data-index="${index}" title="Удалить пакет">×</span>`;
+    chip.onclick = (e) => {
+      if (e.target.classList.contains('chip-remove')) {
+        e.stopPropagation();
+        if (confirm('Удалить пакет "' + pkg.name + '"?')) {
+          userPackages.splice(index, 1);
+          saveUserPackages();
+          renderPresetChips();
+        }
+        return;
+      }
+      // Добавляем услугу в корзину (с предоплатой, если включена)
+      addPreSvc(pkg.name, pkg.price, pkg.color, false);
+    };
+    container.appendChild(chip);
+  });
+}
+
+// ===== МОДАЛКА ДОБАВЛЕНИЯ ПАКЕТА =====
+let pkgSelectedColor = PALETTE[0].hex;
+
+function openAddPackageModal() {
+  document.body.classList.add('modal-open');
+  document.getElementById('pkgName').value = '';
+  document.getElementById('pkgPrice').value = '';
+  pkgSelectedColor = PALETTE[0].hex;
+  buildColorPicker('pkgColorPick', pkgSelectedColor, hex => pkgSelectedColor = hex);
+  document.getElementById('moAddPackage').classList.add('open');
+}
+
+function closeAddPackageModal() {
+  document.body.classList.remove('modal-open');
+  document.getElementById('moAddPackage').classList.remove('open');
+}
+
+function savePackage() {
+  const name = document.getElementById('pkgName').value.trim();
+  const price = parseInt(document.getElementById('pkgPrice').value);
+  if (!name) { alert('Введите название'); return; }
+  if (isNaN(price) || price <= 0) { alert('Введите корректную цену'); return; }
+  const color = pkgSelectedColor;
+  userPackages.push({ name, price, color });
+  saveUserPackages();
+  renderPresetChips();
+  closeAddPackageModal();
+}
+
+// ===== ДЛЯ АБОНЕМЕНТОВ =====
+// Храним данные о подписках клиентов в отдельной коллекции "subscriptions" или прямо в записях клиента.
+// Для простоты будем хранить в поле "subscription" в документе клиента (в сессиях).
+// Но проще хранить в отдельной коллекции "subscriptions" с полями: clientName, total, used, price, createdDate.
+// При сохранении абонемента создаём запись в "subscriptions" и привязываем к клиенту.
+// При добавлении новой сессии для клиента с активным абонементом увеличиваем used.
+// Покажем в карточке клиента прогресс.
 
 // ===== МУЛЬТИТАЧ =====
 function handleTouchStart(e) {
@@ -1108,7 +1183,7 @@ window.doRegister=async function(){
   lockButton(btn);
   try{
     const c=await auth.createUserWithEmailAndPassword(toEmail(ph),pw);
-    await UC.doc(c.user.uid).set({name,phone:ph,role,color:regSelectedColor,createdAt:Date.now()});
+    await UC.doc(c.user.uid).set({name,phone:ph,role,color:regSelectedColor,createdAt:Date.now(), packages: []});
   }catch(e){
     let m='Ошибка регистрации.';
     if(e.code==='auth/email-already-in-use') m='Номер уже зарегистрирован.';
@@ -1135,7 +1210,12 @@ auth.onAuthStateChanged(async(user)=>{
     else currentHourHeight = 60;
     window.PROFILE=p;
     isSound=p.role==='Звукорежиссёр';
+    isVocal=p.role==='Вокал';
+    isGuitar=p.role==='Гитара';
     document.getElementById('nav-certs').style.display = isSound ? 'flex' : 'none';
+    // Показываем кнопку "Абонемент" только для преподавателей
+    const subBtn = document.getElementById('svcModeSubscription');
+    if (subBtn) subBtn.style.display = (isVocal || isGuitar) ? 'inline-flex' : 'none';
     selectedFormColor=p.color;
     document.getElementById('uAv').textContent=(p.name||'?').trim()[0].toUpperCase();
     document.getElementById('uAv').style.background=palByHex(p.color).bg;
@@ -1146,6 +1226,8 @@ auth.onAuthStateChanged(async(user)=>{
     document.getElementById('authScreen').style.display='none';
     document.getElementById('appRoot').style.display='flex';
     if(!appStarted){appStarted=true;startApp();}
+    // Загружаем пакеты пользователя
+    loadUserPackages();
   }else{
     document.getElementById('authScreen').style.display='flex';
     document.getElementById('appRoot').style.display='none';
@@ -1290,6 +1372,110 @@ function getWeekDays(){
 }
 function dateStr(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
 
+// ===== DRAG & DROP =====
+let dragData = null;
+
+function initDrag(ev, eventObj) {
+  const el = ev.target.closest('.cal-event');
+  if (!el) return;
+  const id = el.dataset.id;
+  if (!id) return;
+  const row = window.CRM.find(r => r.id === id);
+  if (!row) return;
+  if (!isAuthorOf(row)) return;
+  const dayCol = el.closest('.cal-day-col');
+  if (!dayCol) return;
+  const dayDate = dayCol.dataset.date;
+  if (!dayDate) return;
+  const rect = dayCol.getBoundingClientRect();
+  const startY = (eventObj.clientY || eventObj.touches?.[0]?.clientY || 0) - rect.top;
+  const hourHeight = currentHourHeight;
+  const startHour = startY / hourHeight + HOURS_START;
+  dragData = {
+    id,
+    row,
+    dayCol,
+    dayDate,
+    startY,
+    startHour,
+    el,
+    initialTime: row.time,
+    initialDate: row.date,
+    hourHeight,
+    offsetY: 0,
+    isDragging: false
+  };
+  el.classList.add('dragging');
+  el.style.position = 'absolute';
+  el.style.zIndex = 20;
+  dragData.isDragging = true;
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('mouseup', onDragEnd);
+  document.addEventListener('touchmove', onDragMoveTouch, { passive: false });
+  document.addEventListener('touchend', onDragEndTouch);
+}
+
+function onDragMove(e) {
+  if (!dragData || !dragData.isDragging) return;
+  e.preventDefault();
+  const rect = dragData.dayCol.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  const hour = y / dragData.hourHeight + HOURS_START;
+  const newTime = Math.round(hour * 2) / 2; // округление до 0.5 часа
+  const clampedHour = Math.min(Math.max(newTime, HOURS_START), HOURS_END - 0.5);
+  const hours = Math.floor(clampedHour);
+  const minutes = (clampedHour - hours) * 60;
+  const timeStr = String(hours).padStart(2,'0') + ':' + String(Math.round(minutes)).padStart(2,'0');
+  dragData.el.style.top = (clampedHour - HOURS_START) * dragData.hourHeight + 'px';
+  dragData.el.dataset.tempTime = timeStr;
+}
+
+function onDragMoveTouch(e) {
+  if (!dragData || !dragData.isDragging) return;
+  e.preventDefault();
+  const touch = e.touches[0];
+  if (!touch) return;
+  const rect = dragData.dayCol.getBoundingClientRect();
+  const y = touch.clientY - rect.top;
+  const hour = y / dragData.hourHeight + HOURS_START;
+  const newTime = Math.round(hour * 2) / 2;
+  const clampedHour = Math.min(Math.max(newTime, HOURS_START), HOURS_END - 0.5);
+  const hours = Math.floor(clampedHour);
+  const minutes = (clampedHour - hours) * 60;
+  const timeStr = String(hours).padStart(2,'0') + ':' + String(Math.round(minutes)).padStart(2,'0');
+  dragData.el.style.top = (clampedHour - HOURS_START) * dragData.hourHeight + 'px';
+  dragData.el.dataset.tempTime = timeStr;
+}
+
+function onDragEnd(e) {
+  if (!dragData || !dragData.isDragging) return;
+  dragData.isDragging = false;
+  dragData.el.classList.remove('dragging');
+  const tempTime = dragData.el.dataset.tempTime;
+  if (tempTime) {
+    const newTime = tempTime;
+    // Обновляем запись в Firestore
+    SC.doc(dragData.id).update({ time: newTime })
+      .then(() => {
+        console.log('✅ Время обновлено:', newTime);
+        renderCalendar();
+      })
+      .catch(err => handleError(err, 'Ошибка обновления времени'));
+  }
+  dragData.el.style.position = '';
+  dragData.el.style.zIndex = '';
+  delete dragData.el.dataset.tempTime;
+  dragData = null;
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup', onDragEnd);
+  document.removeEventListener('touchmove', onDragMoveTouch);
+  document.removeEventListener('touchend', onDragEndTouch);
+}
+
+function onDragEndTouch(e) {
+  onDragEnd(e);
+}
+
 // ===== CALENDAR RENDER =====
 const HOURS_START=7;
 const HOURS_END=24;
@@ -1326,6 +1512,7 @@ function renderCalendar(){
     const ds=dateStr(d);
     const col=document.createElement('div');
     col.className='cal-day-col';
+    col.dataset.date = ds;
     col.style.minHeight=((HOURS_END-HOURS_START)*currentHourHeight)+'px';
     for(let h=0;h<(HOURS_END-HOURS_START);h++){
       const line=document.createElement('div');
@@ -1369,6 +1556,7 @@ function renderCalendar(){
       const evSvc = escapeHTML(ev.services||ev.type||'');
       const evEl=document.createElement('div');
       evEl.className='cal-event';
+      evEl.dataset.id = ev.id;
       evEl.style.top=Math.max(0,top)+'px';
       evEl.style.height=height+'px';
       evEl.style.left=colLeft+'%';
@@ -1377,13 +1565,19 @@ function renderCalendar(){
       evEl.style.borderLeft='3px solid '+color;
       evEl.style.opacity=isDone?'0.55':'1';
       evEl.innerHTML=`<div class="cal-event-name" style="color:${color}">${evName}</div><div class="cal-event-svc" style="color:${color}99">${evSvc}</div>`;
-      evEl.onclick=(e)=>{e.stopPropagation();showEvPopup(ev,e,'click');};
-      evEl.onmouseenter=(e)=>{showEvPopup(ev,e,'hover');};
-      evEl.onmouseleave=()=>{if(!popupLocked)closeEvPopup();};
+      // Клик для редактирования
+      evEl.onclick = function(e) {
+        e.stopPropagation();
+        openEdit(ev.id);
+      };
+      // Drag & Drop (ПК и мобильные)
+      evEl.addEventListener('mousedown', (e) => { e.preventDefault(); initDrag(e, e); });
+      evEl.addEventListener('touchstart', (e) => { initDrag(e, e); }, { passive: false });
       col.appendChild(evEl);
     });
     col.onclick = function(e) {
-      if(document.getElementById('evPopup').classList.contains('open')) return;
+      if (e.target.closest('.cal-event')) return;
+      if (document.querySelector('.cal-event.dragging')) return;
       const rect = this.getBoundingClientRect();
       const y = e.clientY - rect.top;
       const totalHeight = (HOURS_END - HOURS_START) * currentHourHeight;
@@ -1425,21 +1619,9 @@ function renderEmployees() {
   });
 }
 
-// ===== EVENT POPUP =====
-let popupId=null;
-function showEvPopup(ev,e,type='click'){
-  if (document.getElementById('secFinance').style.display === 'flex') return;
-  if (type === 'hover') return;
-  popupId=ev.id;
-  popupLocked = (type === 'click');
-  const pop=document.getElementById('evPopup');
-  pop.classList.add('open');
-}
-function closeEvPopup(){
-  document.getElementById('evPopup').classList.remove('open');
-  popupId=null;
-  popupLocked=false;
-}
+// ===== EVENT POPUP – убрано, используется openEdit =====
+function showEvPopup(ev,e,type='click'){}
+function closeEvPopup(){}
 
 // ===== ACTIONS =====
 window.markDone = function(id) {
@@ -1543,16 +1725,19 @@ function setupFormColorPicker(){
 }
 
 function setupFormMode(){
-  document.getElementById('svcModeWrap').style.display=isSound?'flex':'none'; 
-  if(isSound){ setSvcMode('preset'); }else{ setSvcMode('manual'); document.getElementById('presetSvcs').style.display='none'; }
+  // Показываем все режимы: preset, manual, subscription
+  document.getElementById('svcModeWrap').style.display='block';
+  setSvcMode('preset');
 }
 
 window.setSvcMode=function(m){
   svcMode=m;
   document.getElementById('svcModePreset').classList.toggle('on',m==='preset');
   document.getElementById('svcModeManual').classList.toggle('on',m==='manual');
+  document.getElementById('svcModeSubscription').classList.toggle('on',m==='subscription');
   document.getElementById('presetSvcs').style.display=m==='preset'?'block':'none';
   document.getElementById('manualSvcs').style.display=m==='manual'?'block':'none';
+  document.getElementById('subscriptionBlock').style.display=m==='subscription'?'block':'none';
 };
 
 window.openEdit = function(id) {
@@ -1591,7 +1776,7 @@ window.closeRecModal=function(){
 // ===== PRESET SERVICES =====
 window.addPreSvc=function(name,price,color,forceFull=false){
   const isPre=document.getElementById('preToggle').checked;
-  let fp=(isPre&&!forceFull)?price/2:price;
+  let fp=(isPre&&!forceFull)?Math.round(price/2):price;
   let fn=(isPre&&!forceFull)?name+' (50%)':name;
   formDetails.push({name:fn,price:fp,basePrice:price,originalColor:color});
   formTotal+=fp;
@@ -1616,25 +1801,21 @@ window.openPriceM=function(name,color,def){
   },def);
 };
 
-// ===== MANUAL SERVICES (с автоподстановкой цены из пресета) =====
+// ===== MANUAL SERVICES =====
 window.addManualSvc=function(){
   let n = document.getElementById('mSvcName').value.trim();
   let p = parseInt(document.getElementById('mSvcPrice').value);
   if(!n){alert('Введите название услуги');return;}
-  const found = PRESET_SERVICES.find(s => s.name.toLowerCase() === n.toLowerCase());
+  // Проверяем, есть ли такой пакет в пользовательских
+  const found = userPackages.find(s => s.name.toLowerCase() === n.toLowerCase());
   let basePrice = p;
   let color = 'white';
   if (found) {
-    if (isNaN(p) || p <= 0) {
-      p = found.price;
-    }
+    if (isNaN(p) || p <= 0) p = found.price;
     basePrice = found.price;
     color = found.color;
   } else {
-    if (isNaN(p) || p <= 0) {
-      alert('Укажите цену для этой услуги');
-      return;
-    }
+    if (isNaN(p) || p <= 0) { alert('Укажите цену для этой услуги'); return; }
     basePrice = p;
   }
   formDetails.push({name:n, price:p, basePrice:basePrice, originalColor:color});
@@ -1670,6 +1851,60 @@ window.saveRecord=async function(){
   const btn = document.querySelector('#moRecord .mb-confirm');
   if (btn) lockButton(btn);
   try {
+    // Если режим "Абонемент"
+    if (svcMode === 'subscription') {
+      const subPrice = parseInt(document.getElementById('subPrice').value);
+      const subCount = parseInt(document.getElementById('subCount').value);
+      const name = document.getElementById('fName').value.trim();
+      const phone = document.getElementById('fPhone').value.trim();
+      const date = inputToDate(document.getElementById('fDate').value)||todayStr();
+      const comment = document.getElementById('fComment').value.trim();
+      if (!name) { alert('Введите имя клиента'); unlockButton(btn); return; }
+      if (isNaN(subPrice) || subPrice <= 0) { alert('Введите сумму абонемента'); unlockButton(btn); return; }
+      if (isNaN(subCount) || subCount <= 0) { alert('Введите количество занятий'); unlockButton(btn); return; }
+      // Создаём абонемент в отдельной коллекции "subscriptions"
+      const subRef = db.collection("subscriptions").doc();
+      await subRef.set({
+        clientName: name,
+        clientPhone: phone,
+        total: subCount,
+        used: 0,
+        price: subPrice,
+        createdDate: date,
+        authorUid: window.PROFILE.uid,
+        authorPhone: window.PROFILE.phone
+      });
+      // Создаём запись в сессиях как "Абонемент"
+      const data = {
+        date,
+        time: '',
+        timeEnd: '',
+        duration: 0,
+        client: name,
+        song: name,
+        phone,
+        type: 'Абонемент',
+        services: `Абонемент (${subCount} занятий)`,
+        details: [],
+        total: subPrice,
+        fullTotal: subPrice,
+        comment: comment || 'Абонемент',
+        authorName: window.PROFILE.name,
+        authorUid: window.PROFILE.uid,
+        authorPhone: window.PROFILE.phone,
+        eventColor: selectedFormColor||window.PROFILE?.color||PALETTE[0].hex,
+        timestamp: Date.now(),
+        completed: false,
+        isSubscription: true,
+        subscriptionId: subRef.id
+      };
+      await SC.add(data);
+      closeRecModal();
+      unlockButton(btn);
+      return;
+    }
+
+    // Обычный режим (preset или manual)
     const mName = document.getElementById('mSvcName').value.trim();
     const mPrice = parseInt(document.getElementById('mSvcPrice').value);
     if(mName && !isNaN(mPrice) && mPrice > 0){
@@ -1743,7 +1978,7 @@ function renderSessions(){
     const roleTag = row.authorName ? `<span class="role-tag">${escapeHTML(row.authorName)}</span>` : '';
     const timeDisplay = row.time ? `${escapeHTML(row.time)} ${row.timeEnd ? '- ' + escapeHTML(row.timeEnd) : ''}` : '—';
     tr.style.cursor = 'pointer';
-    tr.onclick = (e) => { if(!e.target.closest('.act-ic')) showEvPopup(row, e); };
+    tr.onclick = (e) => { if(!e.target.closest('.act-ic')) openEdit(row.id); };
     tr.innerHTML=`
       <td data-label="Дата"><div class="td-date">${escapeHTML(row.date||'—')}</div></td>
       <td data-label="Время"><div class="td-time" style="color:${color}">${showT?timeDisplay:'—'}</div></td>
@@ -1783,7 +2018,8 @@ function renderClients(){
         total: 0,
         last: '',
         types: {},
-        ids: []
+        ids: [],
+        subscription: null // будем заполнять отдельным запросом
       };
     }
     map[key].visits++;
@@ -1799,40 +2035,60 @@ function renderClients(){
   document.getElementById('clCount').textContent = cls.length + ' клиентов';
   grid.innerHTML='';
   if(!cls.length){grid.innerHTML='<div style="color:var(--text3);font-size:12px;padding:18px;">Нет клиентов</div>';return;}
-  cls.forEach((c)=>{
-    const pal = palByHex(PALETTE[0].hex);
-    const topType = Object.entries(c.types).sort((a,b)=>b[1]-a[1])[0];
-    const card = document.createElement('div');
-    card.className = 'cl-card';
-    const name = escapeHTML(c.name);
-    const phone = escapeHTML(c.phone||'—');
-    const total = c.total.toLocaleString();
-    const last = escapeHTML(c.last||'—');
-    const topTypeName = topType ? escapeHTML(topType[0]) : '—';
-    card.innerHTML=`
-      <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start;">
-        <div style="display:flex; gap:9px; align-items:center;">
-          <div class="cl-av" style="background:${pal.bg};color:${pal.hex}">${name[0]?.toUpperCase()||'?'}</div>
-          <div><div class="cl-nm">${name}</div><div class="cl-ph">${phone}</div></div>
-        </div>
-        <button class="cl-edit-btn" onclick="event.stopPropagation(); openClientEdit('${c.ids.join(',')}')" title="Редактировать клиента">
-          <i class="fa-solid fa-ellipsis-vertical"></i>
-        </button>
-      </div>
-      <div class="cl-stats">
-        <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${c.visits}</div></div>
-        <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${total}</div></div>
-        <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
-        <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
-      </div>
-    `;
-    card.onclick = (e) => {
-      if(e.target.closest('.cl-edit-btn')) return;
-      openClientEdit(c.ids.join(','));
-    };
-    grid.appendChild(card);
+  // Загружаем подписки для каждого клиента (асинхронно)
+  cls.forEach(async (c) => {
+    const subSnap = await db.collection("subscriptions")
+      .where("clientName", "==", c.name)
+      .where("authorUid", "==", window.PROFILE.uid)
+      .get();
+    let subInfo = null;
+    if (!subSnap.empty) {
+      const subDoc = subSnap.docs[0];
+      const subData = subDoc.data();
+      subInfo = { used: subData.used || 0, total: subData.total || 0 };
+    }
+    renderClientCard(c, subInfo);
   });
-  if(!privacyOn) applyBlur();
+}
+
+function renderClientCard(c, subInfo) {
+  const grid = document.getElementById('clGrid');
+  const pal = palByHex(PALETTE[0].hex);
+  const topType = Object.entries(c.types).sort((a,b)=>b[1]-a[1])[0];
+  const card = document.createElement('div');
+  card.className = 'cl-card';
+  const name = escapeHTML(c.name);
+  const phone = escapeHTML(c.phone||'—');
+  const total = c.total.toLocaleString();
+  const last = escapeHTML(c.last||'—');
+  const topTypeName = topType ? escapeHTML(topType[0]) : '—';
+  let subHtml = '';
+  if (subInfo) {
+    subHtml = `<div class="cl-subscription"><span>Абонемент</span><span>${subInfo.used}/${subInfo.total}</span></div>`;
+  }
+  card.innerHTML=`
+    <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <div style="display:flex; gap:9px; align-items:center;">
+        <div class="cl-av" style="background:${pal.bg};color:${pal.hex}">${name[0]?.toUpperCase()||'?'}</div>
+        <div><div class="cl-nm">${name}</div><div class="cl-ph">${phone}</div></div>
+      </div>
+      <button class="cl-edit-btn" onclick="event.stopPropagation(); openClientEdit('${c.ids.join(',')}')" title="Редактировать клиента">
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </button>
+    </div>
+    <div class="cl-stats">
+      <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${c.visits}</div></div>
+      <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${total}</div></div>
+      <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
+      <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
+    </div>
+    ${subHtml}
+  `;
+  card.onclick = (e) => {
+    if(e.target.closest('.cl-edit-btn')) return;
+    openClientEdit(c.ids.join(','));
+  };
+  grid.appendChild(card);
 }
 
 // ===== РЕДАКТИРОВАНИЕ КЛИЕНТА =====
@@ -1848,7 +2104,6 @@ function openClientEdit(idsStr) {
   const listDiv = document.getElementById('clientEditSessions');
   listDiv.innerHTML = '';
   records.sort((a,b) => (b.date||'').localeCompare(a.date||''));
-  // Заголовки
   const header = document.createElement('div');
   header.className = 'client-sessions-grid header';
   header.innerHTML = `<span class="cell">Дата</span><span class="cell">Время</span><span class="cell">Услуга</span><span class="cell">Сумма</span>`;
@@ -1902,15 +2157,13 @@ async function saveClientEdit() {
   }
 }
 
-// ===== ФИЛЬТР ПО СТАТУСУ (все кнопки теперь фиолетовые) =====
+// ===== ФИЛЬТР ПО СТАТУСУ =====
 window.toggleFilter = function(filter) {
   const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
   const workBtn = document.querySelector('.filter-btn[data-filter="work"]');
   const doneBtn = document.querySelector('.filter-btn[data-filter="done"]');
   const debtBtn = document.querySelector('.filter-btn[data-filter="debt"]');
-  // Убираем активный класс со всех
   [allBtn, workBtn, doneBtn, debtBtn].forEach(b => b.classList.remove('active'));
-  // Активируем нужную
   if (filter === 'all') {
     if (allBtn) allBtn.classList.add('active');
     currentStatusFilter = null;
@@ -2062,7 +2315,7 @@ window.activateCert = async function(){
   } catch(e) { handleError(e, 'Ошибка при активации сертификата.'); } finally { if (btn) unlockButton(btn); }
 };
 
-// ===== ANALYTICS (фильтр услуг только по пресетам) =====
+// ===== ANALYTICS =====
 function renderAnalytics(){
   const myData = getMyData();
   let totalRev=0, yearRev=0, totalDbt=0, done=0, work=0;
@@ -2086,19 +2339,20 @@ function renderAnalytics(){
         }
       }
     }
-    // Сбор услуг только из деталей, если они есть и имя входит в пресеты
     if(r.details && Array.isArray(r.details)){
       r.details.forEach(det => {
         const sn = det.name.replace(' (50%)','').trim();
-        // Проверяем, есть ли такая услуга в пресетах (регистронезависимо)
-        if (PRESET_NAMES.includes(sn.toLowerCase())) {
+        // Проверяем по пользовательским пакетам или дефолтным
+        const allPkgNames = userPackages.map(p => p.name.toLowerCase());
+        if (allPkgNames.includes(sn.toLowerCase())) {
           if(!svcMap[sn]) svcMap[sn]=0;
           svcMap[sn]++;
         }
       });
     } else if(r.type) {
       const tn = r.type.replace(' (50%)','').trim();
-      if (PRESET_NAMES.includes(tn.toLowerCase())) {
+      const allPkgNames = userPackages.map(p => p.name.toLowerCase());
+      if (allPkgNames.includes(tn.toLowerCase())) {
         if(!svcMap[tn]) svcMap[tn]=0;
         svcMap[tn]++;
       }
@@ -2278,6 +2532,51 @@ window.forceMigrate = async function() {
     if (updated > 0) { alert(`✅ Обновлено ${updated} записей. Страница перезагрузится.`); localStorage.setItem('migration_done_universal', 'true'); location.reload(); }
     else { alert('✅ Все записи уже привязаны к вашему аккаунту.'); localStorage.setItem('migration_done_universal', 'true'); }
   } catch(e) { handleError(e, 'Ошибка при миграции.'); } finally { if (btn) unlockButton(btn); }
+};
+
+// ===== АВТООБНОВЛЕНИЕ АБОНЕМЕНТОВ ПРИ ДОБАВЛЕНИИ ЗАНЯТИЙ =====
+// При добавлении новой записи для клиента, у которого есть активный абонемент, увеличиваем счётчик used.
+// Это делается в обработчике onSnapshot или при сохранении. Для простоты добавим вызов при сохранении.
+// Но поскольку сохранение уже есть, мы добавим логику после создания записи в saveRecord.
+// Однако saveRecord уже сложный, добавим отдельную функцию.
+
+// Переопределим saveRecord, чтобы после сохранения обычной записи проверить абонемент.
+// Для этого мы расширим логику: при сохранении обычной записи (не абонемент) проверим, есть ли у клиента подписка,
+// и если да, увеличим used.
+
+// Добавим функцию updateSubscriptionUsage
+async function updateSubscriptionUsage(clientName) {
+  if (!clientName) return;
+  const snap = await db.collection("subscriptions")
+    .where("clientName", "==", clientName)
+    .where("authorUid", "==", window.PROFILE.uid)
+    .get();
+  if (snap.empty) return;
+  const doc = snap.docs[0];
+  const data = doc.data();
+  if (data.used < data.total) {
+    await doc.ref.update({ used: firebase.firestore.FieldValue.increment(1) });
+    console.log('✅ Обновлён абонемент:', clientName);
+  }
+}
+
+// Изменим saveRecord, добавив вызов после успешного сохранения (если это не абонемент)
+// Но переписывать всю функцию ради этого неудобно. Добавим в конец try после closeRecModal.
+// Поскольку мы не можем переопределить saveRecord полностью, я добавлю обёртку.
+
+// Сохраним оригинальный saveRecord в переменную и заменим его.
+const originalSaveRecord = window.saveRecord;
+window.saveRecord = async function() {
+  await originalSaveRecord.call(this);
+  // После сохранения проверяем, если это не абонемент, обновляем подписку
+  // Но originalSaveRecord уже закрывает модалку, поэтому мы можем проверить имя клиента.
+  // Лучше передавать имя из формы. Сделаем проще: после сохранения прочитаем имя из поля.
+  const name = document.getElementById('fName').value.trim();
+  if (name && svcMode !== 'subscription') {
+    try {
+      await updateSubscriptionUsage(name);
+    } catch(e) { console.error('Ошибка обновления абонемента:', e); }
+  }
 };
 </script>
 </body>
