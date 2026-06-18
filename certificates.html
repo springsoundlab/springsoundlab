@@ -161,7 +161,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cal-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:56px repeat(7,1fr);}
 .cal-time-col{border-right:1px solid var(--border);}
 .cal-time-slot{position:relative;height:60px;}
-.cal-time-label{position:absolute;top:0;right:6px;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);font-weight:700;line-height:1;}
+.cal-time-label{position:absolute;top:0;right:6px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);font-weight:700;line-height:1;padding-top:2px;} /* изменено */
 .cal-day-col{border-right:1px solid var(--border);position:relative;min-height:1440px;}
 .cal-day-col:last-child{border-right:none;}
 .cal-hour-line{position:absolute;left:0;right:0;height:1px;background:var(--border);}
@@ -655,10 +655,12 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
       <div class="toolbar">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <span style="font-size:11px;color:var(--text3);" id="clCount">0 клиентов</span>
-          <div style="display:flex;gap:4px;">
-            <button class="tb-btn" id="sortByDate" onclick="sortClients('date')" style="font-size:10px;padding:4px 8px;">По дате</button>
-            <button class="tb-btn" id="sortByTotal" onclick="sortClients('total')" style="font-size:10px;padding:4px 8px;">По сумме</button>
-          </div>
+          <select id="clientSortSelect" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;cursor:pointer;">
+            <option value="date_desc">По дате (сначала новые)</option>
+            <option value="date_asc">По дате (сначала старые)</option>
+            <option value="total_desc">По сумме (сначала большие)</option>
+            <option value="total_asc">По сумме (сначала маленькие)</option>
+          </select>
         </div>
       </div>
       <div class="cl-grid" id="clGrid"></div>
@@ -989,7 +991,8 @@ let clientEditIds = [];
 
 // Пакеты пользователя (сохраняются в профиле)
 let userPackages = [];
-let currentSort = 'visits'; // сортировка клиентов: visits, date, total
+// Сортировка клиентов (хранится в профиле)
+let clientSort = 'date_desc';
 
 // ===== UTILS =====
 function norm(r){let d=(r||'').replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
@@ -1254,7 +1257,7 @@ window.doRegister=async function(){
   lockButton(btn);
   try{
     const c=await auth.createUserWithEmailAndPassword(toEmail(ph),pw);
-    await UC.doc(c.user.uid).set({name,phone:ph,role,color:regSelectedColor,createdAt:Date.now(), packages: []});
+    await UC.doc(c.user.uid).set({name,phone:ph,role,color:regSelectedColor,createdAt:Date.now(), packages: [], clientSort: 'date_desc'});
   }catch(e){
     let m='Ошибка регистрации.';
     if(e.code==='auth/email-already-in-use') m='Номер уже зарегистрирован.';
@@ -1279,6 +1282,11 @@ auth.onAuthStateChanged(async(user)=>{
     if(!p.color)p.color=PALETTE[0].hex;
     if (p.hourHeight) currentHourHeight = Math.min(Math.max(p.hourHeight, MIN_HOUR_HEIGHT), MAX_HOUR_HEIGHT);
     else currentHourHeight = 60;
+    // Загружаем настройку сортировки
+    clientSort = p.clientSort || 'date_desc';
+    const sortSelect = document.getElementById('clientSortSelect');
+    if (sortSelect) sortSelect.value = clientSort;
+    
     window.PROFILE=p;
     isSound=p.role==='Звукорежиссёр';
     isVocal=p.role==='Вокал';
@@ -1355,6 +1363,20 @@ function startApp(){
     calView.addEventListener('touchstart', handleTouchStart, { passive: false });
     calView.addEventListener('touchmove', handleTouchMove, { passive: false });
     calView.addEventListener('touchend', handleTouchEnd, { passive: false });
+  }
+  
+  // Слушатель изменения сортировки клиентов
+  const sortSelect = document.getElementById('clientSortSelect');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function() {
+      clientSort = this.value;
+      // Сохраняем в профиль
+      if (window.PROFILE && window.PROFILE.uid) {
+        UC.doc(window.PROFILE.uid).update({ clientSort: clientSort })
+          .catch(err => console.error('Ошибка сохранения сортировки:', err));
+      }
+      renderClients();
+    });
   }
 }
 
@@ -1957,16 +1979,9 @@ function renderSessions(){
   });
 }
 
-// ===== СОРТИРОВКА КЛИЕНТОВ =====
-function sortClients(mode) {
-  currentSort = mode;
-  renderClients();
-}
-
-// ===== CLIENTS (без "Загрузка...") =====
+// ===== CLIENTS (с сортировкой) =====
 function renderClients() {
   const grid = document.getElementById('clGrid');
-  // Очищаем сетку, сразу показываем карточки или сообщение
   grid.innerHTML = '';
 
   const myData = getMyData();
@@ -1999,14 +2014,17 @@ function renderClients() {
   });
 
   let cls = Object.values(map);
-  // Сортировка
-  if (currentSort === 'date') {
+  // Сортировка согласно clientSort
+  if (clientSort === 'date_desc') {
     cls.sort((a, b) => b.last.localeCompare(a.last) || b.visits - a.visits);
-  } else if (currentSort === 'total') {
+  } else if (clientSort === 'date_asc') {
+    cls.sort((a, b) => a.last.localeCompare(b.last) || b.visits - a.visits);
+  } else if (clientSort === 'total_desc') {
     cls.sort((a, b) => b.total - a.total);
-  } else {
-    cls.sort((a, b) => b.visits - a.visits);
+  } else if (clientSort === 'total_asc') {
+    cls.sort((a, b) => a.total - b.total);
   }
+
   document.getElementById('clCount').textContent = cls.length + ' клиентов';
 
   if (!cls.length) {
