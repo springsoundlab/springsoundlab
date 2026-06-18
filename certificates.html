@@ -161,7 +161,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cal-body{flex:1;overflow-y:auto;display:grid;grid-template-columns:56px repeat(7,1fr);}
 .cal-time-col{border-right:1px solid var(--border);}
 .cal-time-slot{position:relative;height:60px;}
-.cal-time-label{position:absolute;top:0;right:6px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);font-weight:700;line-height:1;padding-top:2px;} /* изменено */
+.cal-time-label{position:absolute;top:0;right:6px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);font-weight:700;line-height:1;padding-top:2px;}
 .cal-day-col{border-right:1px solid var(--border);position:relative;min-height:1440px;}
 .cal-day-col:last-child{border-right:none;}
 .cal-hour-line{position:absolute;left:0;right:0;height:1px;background:var(--border);}
@@ -336,9 +336,12 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 
 .color-pick-row{display:flex;align-items:center;gap:6px;margin-bottom:12px;}
 .color-pick-label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-right:4px;}
-.color-dot{width:22px;height:22px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:.15s;flex-shrink:0;}
+.color-dot{width:22px;height:22px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:.15s;flex-shrink:0;position:relative;}
 .color-dot.sel{border-color:#fff;transform:scale(1.15);}
 .color-dot:hover{transform:scale(1.1);}
+.color-dot .color-lock{position:absolute;top:-4px;right:-4px;font-size:10px;color:var(--red);background:var(--bg);border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);}
+.color-dot.taken{cursor:not-allowed;opacity:0.5;filter:grayscale(0.5);}
+.color-dot.taken:hover{transform:none;}
 
 /* Пакеты услуг — сетка 2×4 */
 .preset-grid {
@@ -536,6 +539,24 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
 }
 
 .ev-popup{display:none !important;}
+
+/* Стили для карточек услуг в модалке */
+.pkg-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  margin-bottom: 6px;
+  transition: .15s;
+}
+.pkg-card:hover { border-color: var(--border2); background: var(--surface); }
+.pkg-card .pkg-name { font-size: 12px; font-weight: 600; color: var(--text); }
+.pkg-card .pkg-price { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text2); }
+.pkg-card .pkg-del { color: var(--text3); cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: .15s; }
+.pkg-card .pkg-del:hover { color: var(--red); background: var(--red-bg); }
 </style>
 </head>
 <body>
@@ -661,6 +682,12 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
             <option value="total_desc">По сумме (сначала большие)</option>
             <option value="total_asc">По сумме (сначала маленькие)</option>
           </select>
+          <select id="clientPeriodSelect" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;cursor:pointer;">
+            <option value="all">Все</option>
+            <option value="week">За неделю</option>
+            <option value="month">За месяц</option>
+            <option value="year">За год</option>
+          </select>
         </div>
       </div>
       <div class="cl-grid" id="clGrid"></div>
@@ -755,6 +782,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
         <span class="color-pick-label">Цвет</span>
         <div id="formColorPick"></div>
         <span style="font-size:10px;color:var(--text3);margin-left:6px;" id="formColorNote">Ваш цвет по умолчанию</span>
+        <button class="tb-btn green-btn" onclick="confirmColor()" style="margin-left:auto;padding:4px 10px;font-size:10px;">Закрепить цвет</button>
       </div>
       <hr class="f-sep">
       <div id="svcModeWrap" style="display:block;margin-bottom:10px;">
@@ -878,7 +906,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
     </div>
     <hr class="f-sep">
     <div style="font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Мои услуги</div>
-    <div id="pkgListContainer" style="max-height:200px;overflow-y:auto;"></div>
+    <div id="pkgListContainer" style="max-height:220px;overflow-y:auto;"></div>
     <div class="mb-btns" style="margin-top:12px;"><button class="mb-btn mb-cancel" onclick="closeAddPackageModal()">Закрыть</button></div>
   </div>
 </div>
@@ -918,6 +946,7 @@ let pinchStartHeight = 60;
 let isPinching = false;
 let animationFrameRequest = null;
 const SENSITIVITY = 2.5;
+let usedColors = []; // занятые цвета
 
 // ===== FIREBASE =====
 const FC={apiKey:"AIzaSyCW2q-IhIUw8Tcgvgcg02BiLEMkoZHbIu0",authDomain:"crm-a9450.firebaseapp.com",projectId:"crm-a9450",storageBucket:"crm-a9450.firebasestorage.app",messagingSenderId:"971140334464",appId:"1:971140334464:web:dde090a90bdcd5563cb765"};
@@ -993,6 +1022,7 @@ let clientEditIds = [];
 let userPackages = [];
 // Сортировка клиентов (хранится в профиле)
 let clientSort = 'date_desc';
+let clientPeriod = 'all';
 
 // ===== UTILS =====
 function norm(r){let d=(r||'').replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d;}
@@ -1071,7 +1101,7 @@ function renderPresetChips() {
   });
 }
 
-// Рендерим список в модалке с крестиками
+// Рендерим список в модалке в виде карточек
 function renderPackageListInModal() {
   const container = document.getElementById('pkgListContainer');
   if (!container) return;
@@ -1081,21 +1111,22 @@ function renderPackageListInModal() {
     return;
   }
   userPackages.forEach((pkg, index) => {
-    const row = document.createElement('div');
-    row.className = 'pkg-list-item';
-    row.innerHTML = `
-      <span class="pkg-name">${escapeHTML(pkg.name)}</span>
+    const card = document.createElement('div');
+    card.className = 'pkg-card';
+    const color = palByHex(pkg.color).hex;
+    card.innerHTML = `
+      <span class="pkg-name" style="color:${color}">${escapeHTML(pkg.name)}</span>
       <span class="pkg-price">${pkg.price} ₽</span>
       <span class="pkg-del" data-index="${index}" title="Удалить услугу"><i class="fa-solid fa-trash"></i></span>
     `;
-    row.querySelector('.pkg-del').onclick = function(e) {
+    card.querySelector('.pkg-del').onclick = function(e) {
       e.stopPropagation();
       if (confirm('Удалить пакет "' + pkg.name + '"?')) {
         userPackages.splice(index, 1);
         saveUserPackages();
       }
     };
-    container.appendChild(row);
+    container.appendChild(card);
   });
 }
 
@@ -1128,6 +1159,80 @@ function savePackage() {
   document.getElementById('pkgName').value = '';
   document.getElementById('pkgPrice').value = '';
 }
+
+// ===== ЦВЕТА: занятые цвета =====
+async function loadUsedColors() {
+  try {
+    const snap = await UC.get();
+    usedColors = [];
+    snap.forEach(doc => {
+      const data = doc.data();
+      if (data.color) usedColors.push(data.color);
+    });
+  } catch(e) { console.error('Ошибка загрузки цветов:', e); }
+}
+
+// Переопределяем buildColorPicker для учёта занятых цветов и кнопки подтверждения
+function buildColorPicker(containerId, currentHex, onChange, withLock = false) {
+  const cont = document.getElementById(containerId);
+  if (!cont) return;
+  cont.innerHTML = '';
+  cont.style.display = 'flex';
+  cont.style.gap = '6px';
+  cont.style.flexWrap = 'wrap';
+  PALETTE.forEach(p => {
+    const d = document.createElement('div');
+    const isTaken = usedColors.includes(p.hex) && p.hex !== window.PROFILE?.color;
+    d.className = 'color-dot' + (currentHex === p.hex ? ' sel' : '') + (isTaken ? ' taken' : '');
+    d.style.background = p.hex;
+    d.title = isTaken ? p.label + ' (занят)' : p.label;
+    if (isTaken) {
+      const lock = document.createElement('span');
+      lock.className = 'color-lock';
+      lock.innerHTML = '<i class="fa-solid fa-lock"></i>';
+      d.appendChild(lock);
+    } else {
+      d.onclick = () => {
+        if (isTaken) return;
+        cont.querySelectorAll('.color-dot').forEach(x => x.classList.remove('sel'));
+        d.classList.add('sel');
+        onChange(p.hex);
+      };
+    }
+    cont.appendChild(d);
+  });
+}
+
+// ===== ПОДТВЕРЖДЕНИЕ ЦВЕТА =====
+window.confirmColor = async function() {
+  if (!window.PROFILE) return;
+  const color = selectedFormColor || window.PROFILE.color;
+  // Проверяем, не занят ли цвет другим пользователем
+  await loadUsedColors();
+  if (usedColors.includes(color) && color !== window.PROFILE.color) {
+    alert('Этот цвет уже занят другим пользователем. Выберите другой.');
+    return;
+  }
+  try {
+    await UC.doc(window.PROFILE.uid).update({ color: color });
+    window.PROFILE.color = color;
+    // Обновляем аватар
+    document.getElementById('uAv').style.background = palByHex(color).bg;
+    document.getElementById('uAv').style.color = color;
+    document.getElementById('uAv').style.borderColor = color + '55';
+    // Обновляем подсказку
+    document.getElementById('formColorNote').textContent = 'Цвет подтверждён';
+    // Перестраиваем палитру с учётом занятых цветов
+    await loadUsedColors();
+    buildColorPicker('formColorPick', color, hex => {
+      selectedFormColor = hex;
+      document.getElementById('formColorNote').textContent = 'Выберите цвет и нажмите "Закрепить"';
+    });
+    alert('Цвет успешно закреплён!');
+  } catch(e) {
+    handleError(e, 'Ошибка при сохранении цвета');
+  }
+};
 
 // ===== ДЛЯ АБОНЕМЕНТОВ =====
 async function updateSubscriptionUsage(clientName) {
@@ -1187,28 +1292,6 @@ function handleTouchEnd(e) {
   }
 }
 
-// ===== COLOR PICKER =====
-function buildColorPicker(containerId, currentHex, onChange){
-  const cont=document.getElementById(containerId);
-  if(!cont)return;
-  cont.innerHTML='';
-  cont.style.display='flex';
-  cont.style.gap='6px';
-  cont.style.flexWrap='wrap';
-  PALETTE.forEach(p=>{
-    const d=document.createElement('div');
-    d.className='color-dot'+(currentHex===p.hex?' sel':'');
-    d.style.background=p.hex;
-    d.title=p.label;
-    d.onclick=()=>{
-      cont.querySelectorAll('.color-dot').forEach(x=>x.classList.remove('sel'));
-      d.classList.add('sel');
-      onChange(p.hex);
-    };
-    cont.appendChild(d);
-  });
-}
-
 // ===== AUTH =====
 function initRegColorPicker(){
   buildColorPicker('regColorPick', regSelectedColor, hex=>{regSelectedColor=hex;});
@@ -1257,7 +1340,7 @@ window.doRegister=async function(){
   lockButton(btn);
   try{
     const c=await auth.createUserWithEmailAndPassword(toEmail(ph),pw);
-    await UC.doc(c.user.uid).set({name,phone:ph,role,color:regSelectedColor,createdAt:Date.now(), packages: [], clientSort: 'date_desc'});
+    await UC.doc(c.user.uid).set({name,phone:ph,role,color:regSelectedColor,createdAt:Date.now(), packages: [], clientSort: 'date_desc', clientPeriod: 'all'});
   }catch(e){
     let m='Ошибка регистрации.';
     if(e.code==='auth/email-already-in-use') m='Номер уже зарегистрирован.';
@@ -1282,10 +1365,13 @@ auth.onAuthStateChanged(async(user)=>{
     if(!p.color)p.color=PALETTE[0].hex;
     if (p.hourHeight) currentHourHeight = Math.min(Math.max(p.hourHeight, MIN_HOUR_HEIGHT), MAX_HOUR_HEIGHT);
     else currentHourHeight = 60;
-    // Загружаем настройку сортировки
+    // Загружаем настройки сортировки и периода
     clientSort = p.clientSort || 'date_desc';
+    clientPeriod = p.clientPeriod || 'all';
     const sortSelect = document.getElementById('clientSortSelect');
     if (sortSelect) sortSelect.value = clientSort;
+    const periodSelect = document.getElementById('clientPeriodSelect');
+    if (periodSelect) periodSelect.value = clientPeriod;
     
     window.PROFILE=p;
     isSound=p.role==='Звукорежиссёр';
@@ -1305,6 +1391,7 @@ auth.onAuthStateChanged(async(user)=>{
     document.getElementById('appRoot').style.display='flex';
     if(!appStarted){appStarted=true;startApp();}
     loadUserPackages();
+    loadUsedColors(); // загружаем занятые цвета
   }else{
     document.getElementById('authScreen').style.display='flex';
     document.getElementById('appRoot').style.display='none';
@@ -1370,7 +1457,6 @@ function startApp(){
   if (sortSelect) {
     sortSelect.addEventListener('change', function() {
       clientSort = this.value;
-      // Сохраняем в профиль
       if (window.PROFILE && window.PROFILE.uid) {
         UC.doc(window.PROFILE.uid).update({ clientSort: clientSort })
           .catch(err => console.error('Ошибка сохранения сортировки:', err));
@@ -1378,9 +1464,21 @@ function startApp(){
       renderClients();
     });
   }
+  // Слушатель изменения периода
+  const periodSelect = document.getElementById('clientPeriodSelect');
+  if (periodSelect) {
+    periodSelect.addEventListener('change', function() {
+      clientPeriod = this.value;
+      if (window.PROFILE && window.PROFILE.uid) {
+        UC.doc(window.PROFILE.uid).update({ clientPeriod: clientPeriod })
+          .catch(err => console.error('Ошибка сохранения периода:', err));
+      }
+      renderClients();
+    });
+  }
 }
 
-// ===== ОСНОВНАЯ ФУНКЦИЯ РЕНДЕРИНГА (РАБОЧАЯ ВЕРСИЯ ИЗ СТАРОГО КОДА) =====
+// ===== ОСНОВНАЯ ФУНКЦИЯ РЕНДЕРИНГА =====
 function renderAll(){
   const sec = document.querySelector('.nav-i.active')?.id?.replace('nav-','');
   if(sec==='sessions'){ renderCalendar(); renderSessions(); }
@@ -1979,7 +2077,7 @@ function renderSessions(){
   });
 }
 
-// ===== CLIENTS (с сортировкой) =====
+// ===== CLIENTS (с сортировкой и фильтром по периоду) =====
 function renderClients() {
   const grid = document.getElementById('clGrid');
   grid.innerHTML = '';
@@ -2013,8 +2111,23 @@ function renderClients() {
     map[key].ids.push(r.id);
   });
 
+  // Фильтр по периоду
   let cls = Object.values(map);
-  // Сортировка согласно clientSort
+  if (clientPeriod !== 'all') {
+    const now = new Date();
+    let startDate = new Date();
+    if (clientPeriod === 'week') {
+      startDate.setDate(now.getDate() - 7);
+    } else if (clientPeriod === 'month') {
+      startDate.setMonth(now.getMonth() - 1);
+    } else if (clientPeriod === 'year') {
+      startDate.setFullYear(now.getFullYear() - 1);
+    }
+    const startStr = startDate.toLocaleDateString('ru-RU');
+    cls = cls.filter(c => c.last >= startStr);
+  }
+
+  // Сортировка
   if (clientSort === 'date_desc') {
     cls.sort((a, b) => b.last.localeCompare(a.last) || b.visits - a.visits);
   } else if (clientSort === 'date_asc') {
@@ -2032,7 +2145,8 @@ function renderClients() {
     return;
   }
 
-  cls.forEach(async (c) => {
+  // Загружаем подписки для всех клиентов
+  const promises = cls.map(async (c) => {
     try {
       const subSnap = await db.collection("subscriptions")
         .where("clientName", "==", c.name)
@@ -2044,11 +2158,17 @@ function renderClients() {
         const subData = subDoc.data();
         subInfo = { used: subData.used || 0, total: subData.total || 0 };
       }
-      renderClientCard(c, subInfo);
-    } catch (e) {
+      return { client: c, subInfo };
+    } catch(e) {
       console.error('Ошибка загрузки подписки:', e);
-      renderClientCard(c, null);
+      return { client: c, subInfo: null };
     }
+  });
+
+  Promise.all(promises).then(results => {
+    results.forEach(({ client, subInfo }) => {
+      renderClientCard(client, subInfo);
+    });
   });
 }
 
@@ -2316,7 +2436,7 @@ window.activateCert = async function(){
   } catch(e) { handleError(e, 'Ошибка при активации сертификата.'); } finally { if (btn) unlockButton(btn); }
 };
 
-// ===== ANALYTICS (фильтр услуг только по пресетам) =====
+// ===== ANALYTICS =====
 function renderAnalytics(){
   const myData = getMyData();
   let totalRev=0, yearRev=0, totalDbt=0, done=0, work=0;
@@ -2343,7 +2463,6 @@ function renderAnalytics(){
     if(r.details && Array.isArray(r.details)){
       r.details.forEach(det => {
         const sn = det.name.replace(' (50%)','').trim();
-        // Проверяем по пользовательским пакетам
         const allPkgNames = userPackages.map(p => p.name.toLowerCase());
         if (allPkgNames.includes(sn.toLowerCase())) {
           if(!svcMap[sn]) svcMap[sn]=0;
