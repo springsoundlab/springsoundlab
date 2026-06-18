@@ -1314,6 +1314,13 @@ function getCurrentSection() {
 
 function renderAll(){
   const sec = getCurrentSection();
+  // Сначала скрываем все секции, потом показываем нужную
+  const allIds = ['sessions','clients','finance','certs','analytics','employees'];
+  allIds.forEach(id => {
+    const el = document.getElementById('sec' + id.charAt(0).toUpperCase() + id.slice(1));
+    if (el) el.style.display = (id === sec) ? 'flex' : 'none';
+  });
+  // Затем рендерим данные для активной секции
   if(sec==='sessions'){ renderCalendar(); renderSessions(); }
   else if(sec==='clients') renderClients();
   else if(sec==='finance') renderFinance();
@@ -1338,14 +1345,10 @@ function goSec(s){
   closeEvPopup();
   document.querySelectorAll('.nav-i').forEach(n=>n.classList.remove('active'));
   document.getElementById('nav-'+s).classList.add('active');
-  const all=['sessions','clients','finance','certs','analytics','employees'];
-  all.forEach(id=>{
-    const el = document.getElementById('sec'+id.charAt(0).toUpperCase()+id.slice(1));
-    if(el) el.style.display = (id === s) ? 'flex' : 'none';
-  });
   const sidebar = document.querySelector('.sidebar');
   if(sidebar) sidebar.classList.remove('mobile-open');
-  renderAll();
+  // Обновляем видимость секций и рендерим
+  renderAll(); // теперь renderAll сама определит активную секцию
 }
 
 // ===== PRIVACY =====
