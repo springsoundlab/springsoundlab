@@ -279,9 +279,6 @@ body.modal-open {
   gap: 8px;
   flex-shrink: 0;
   flex-wrap: wrap;
-  position: relative;
-  z-index: 200;
-  overflow: visible; 
 }
 .tb-btn {
   padding: 6px 11px;
@@ -675,6 +672,7 @@ body.modal-open {
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 10px;
   align-content: start;
+  overflow-x: hidden;
 }
 .cl-card {
   background: var(--surface);
@@ -783,6 +781,7 @@ body.modal-open {
 .sort-dropdown-wrapper {
   position: relative;
   display: inline-block;
+  z-index: 99999; /* поверх всех карточек */
 }
 .sort-dropdown-menu {
   display: none;
@@ -794,7 +793,7 @@ body.modal-open {
   border-radius: var(--r-sm);
   padding: 8px;
   min-width: 320px;
-  z-index: 99999 !important; /* поверх всех карточек */
+  z-index: 99999;
   box-shadow: 0 8px 30px rgba(0,0,0,0.5);
   margin-top: 4px;
   grid-template-columns: 1fr 1fr;
@@ -1402,18 +1401,18 @@ textarea.f-inp {
   margin-left: 2px;
 }
 
-/* Пакеты услуг — сетка 2×4, уменьшенные кнопки */
+/* Пакеты услуг — увеличенные кнопки */
 .preset-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 8px;
   margin-bottom: 12px;
 }
 .svc-chip {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 6px 4px;
-  border-radius: 5px;
+  padding: 10px 6px; /* увеличено по высоте */
+  border-radius: 8px;
   border: 1px solid;
   background: transparent;
   cursor: pointer;
@@ -1421,7 +1420,7 @@ textarea.f-inp {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
   text-align: center;
   white-space: nowrap;
 }
@@ -1901,8 +1900,6 @@ textarea.f-inp {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
-    overflow: visible;
-    z-index: 100;
   }
   .view-mode {
     width: 100%;
@@ -2076,11 +2073,12 @@ textarea.f-inp {
   }
   .preset-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 4px;
+    gap: 6px;
   }
+  /* на мобильных тоже увеличиваем кнопки, но чуть меньше */
   .svc-chip {
-    font-size: 8px;
-    padding: 4px 2px;
+    font-size: 10px;
+    padding: 8px 4px;
   }
 
   /* Мобильные модалки — центрированные с закруглениями, только вертикальная прокрутка */
@@ -2188,7 +2186,7 @@ textarea.f-inp {
     font-size: 10px;
   }
   .cl-grid {
-    overflow-x: clip !important;
+    overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch;
   }
   .cl-card {
@@ -2614,8 +2612,8 @@ textarea.f-inp {
       </div>
       <div id="subscriptionBlock" style="display:none;">
         <div class="f-row">
-          <div class="f-group"><div class="f-label">Сумма абонемента (₽)</div><input type="number" id="subPrice" class="f-inp mono" placeholder="0"></div>
-          <div class="f-group"><div class="f-label">Количество занятий</div><input type="number" id="subCount" class="f-inp mono" placeholder="10"></div>
+          <div class="f-group"><div class="f-label">Сумма абонемента (₽)</div><input type="number" id="subPrice" class="f-inp mono" placeholder="0" oninput="updateSubscriptionTotal()"></div>
+          <div class="f-group"><div class="f-label">Количество занятий</div><input type="number" id="subCount" class="f-inp mono" placeholder="10" oninput="updateSubscriptionTotal()"></div>
         </div>
         <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">При сохранении абонемент будет привязан к клиенту.</div>
       </div>
@@ -3174,6 +3172,17 @@ async function updateSubscriptionUsage(clientName) {
   if (data.used < data.total) {
     await doc.ref.update({ used: firebase.firestore.FieldValue.increment(1) });
     console.log('✅ Обновлён абонемент:', clientName);
+  }
+}
+
+// Функция для обновления итоговой суммы при вводе абонемента
+function updateSubscriptionTotal() {
+  const price = parseInt(document.getElementById('subPrice').value) || 0;
+  const count = parseInt(document.getElementById('subCount').value) || 0;
+  if (price > 0 && count > 0) {
+    document.getElementById('formTotal').textContent = (price * count).toLocaleString() + ' ₽';
+  } else {
+    document.getElementById('formTotal').textContent = '0 ₽';
   }
 }
 
@@ -3804,6 +3813,11 @@ window.setSvcMode=function(m){
   document.getElementById('presetSvcs').style.display=m==='preset'?'block':'none';
   document.getElementById('manualSvcs').style.display=m==='manual'?'block':'none';
   document.getElementById('subscriptionBlock').style.display=m==='subscription'?'block':'none';
+  if (m === 'subscription') {
+    updateSubscriptionTotal();
+  } else {
+    document.getElementById('formTotal').textContent = formTotal.toLocaleString() + ' ₽';
+  }
 };
 
 window.openEdit = function(id) {
@@ -3845,13 +3859,12 @@ window.addPreSvc=function(name,price,color,forceFull=false){
   const isPre=document.getElementById('preToggle').checked;
   let fp=(isPre&&!forceFull)?Math.round(price/2):price;
   let fn=(isPre&&!forceFull)?name+' (50%)':name;
-  // Для предустановленных услуг сохраняем полную цену
   formDetails.push({
     name:fn,
-    price:fp, // оплаченная сумма
-    fullPrice:price, // полная стоимость
+    price:fp,
+    fullPrice:price,
     originalColor:color,
-    basePrice:price // для совместимости
+    basePrice:price
   });
   formTotal+=fp;
   renderFormSvcs();
@@ -3898,7 +3911,7 @@ window.addManualSvc=function(){
   }
   formDetails.push({
     name:n,
-    price:p, // оплаченная сумма
+    price:p,
     fullPrice:fullPrice,
     originalColor:color,
     basePrice:fullPrice
@@ -3953,6 +3966,7 @@ window.saveRecord=async function(){
       if (!name) { alert('Введите имя клиента'); unlockButton(btn); return; }
       if (isNaN(subPrice) || subPrice <= 0) { alert('Введите сумму абонемента'); unlockButton(btn); return; }
       if (isNaN(subCount) || subCount <= 0) { alert('Введите количество занятий'); unlockButton(btn); return; }
+      // Создаём абонемент
       const subRef = db.collection("subscriptions").doc();
       await subRef.set({
         clientName: name,
@@ -3964,6 +3978,7 @@ window.saveRecord=async function(){
         authorUid: window.PROFILE.uid,
         authorPhone: window.PROFILE.phone
       });
+      // Создаём запись в сессиях
       const data = {
         date,
         time: '',
@@ -3975,8 +3990,8 @@ window.saveRecord=async function(){
         type: 'Абонемент',
         services: `Абонемент (${subCount} занятий)`,
         details: [],
-        total: subPrice,
-        fullTotal: subPrice,
+        total: subPrice * subCount, // общая стоимость
+        fullTotal: subPrice * subCount,
         comment: comment || 'Абонемент',
         authorName: window.PROFILE.name,
         authorUid: window.PROFILE.uid,
@@ -4021,7 +4036,6 @@ window.saveRecord=async function(){
     const eventColor=selectedFormColor||window.PROFILE?.color||PALETTE[0].hex;
     const details=JSON.parse(JSON.stringify(formDetails));
     const svcsLabel=details.length?details.map(i=>i.name).join(', '):type;
-    // fullTotal - сумма полных стоимостей, total - сумма оплаченных
     const fullT=details.reduce((s,i)=>s+(i.fullPrice||i.price),0)||0;
     const paid=details.reduce((s,i)=>s+i.price,0)||0;
     let duration = 60;
@@ -4051,7 +4065,10 @@ window.saveRecord=async function(){
       } catch(e) { console.error('Ошибка обновления абонемента:', e); }
     }
     closeRecModal();
-  } catch(e) { handleError(e, 'Ошибка при сохранении записи.'); } finally { if (btn) unlockButton(btn); }
+  } catch(e) { 
+    handleError(e, 'Ошибка при сохранении записи: ' + e.message); 
+    if (btn) unlockButton(btn);
+  } finally { if (btn) unlockButton(btn); }
 };
 
 // ===== SESSIONS LIST =====
