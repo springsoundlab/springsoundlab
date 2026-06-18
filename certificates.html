@@ -131,7 +131,7 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .tb-btn.green-btn{color:var(--green);border-color:rgba(62,207,142,.3);}
 .tb-btn.green-btn:hover{background:var(--green-bg);}
 .tb-btn.filter-btn.active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);}
-.tb-btn.filter-btn.all-active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);}
+.tb-btn.filter-btn.all-active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);} 
 
 /* Кнопки зума (ПК) */
 .zoom-controls { display: flex; gap: 4px; margin-right: 8px; }
@@ -223,7 +223,6 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .cl-st-v{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;margin-top:1px;}
 .cl-edit-btn{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:.15s;opacity:0.6;}
 .cl-edit-btn:hover{opacity:1;color:var(--text);border-color:var(--border2);background:var(--surface3);}
-/* Абонемент в карточке клиента */
 .cl-subscription {
   margin-top: 8px;
   padding: 4px 8px;
@@ -630,7 +629,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   </div>
 
   <div class="content" id="contentArea">
-    <div id="secSessions" class="view" style="display:flex;">
+    <div id="secSessions" class="view">
       <div class="toolbar">
         <button class="tb-btn green-btn" onclick="openNewForm()"><i class="fa-solid fa-plus"></i> Новая запись</button>
         <div class="view-mode">
@@ -806,21 +805,23 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   </div>
 </div>
 
-<!-- Модальное окно для добавления своего пакета услуг -->
-<div class="mo" id="moAddPackage">
-  <div class="mb mb-sm" style="max-width:400px;">
+<!-- Модальное окно для сертификатов -->
+<div class="mo" id="moCert">
+  <div class="mb">
     <div class="mb-header">
-      <div class="mb-title">Новая услуга</div>
-      <div class="mb-close" onclick="closeAddPackageModal()"><i class="fa-solid fa-xmark"></i></div>
+      <div class="mb-title">Активация сертификата</div>
+      <div class="mb-close" onclick="closeCertModal()"><i class="fa-solid fa-xmark"></i></div>
     </div>
-    <div class="f-group"><div class="f-label">Название</div><input type="text" id="pkgName" class="f-inp" placeholder="Урок вокала"></div>
-    <div class="f-group"><div class="f-label">Цена (₽)</div><input type="number" id="pkgPrice" class="f-inp mono" placeholder="1000"></div>
-    <div class="f-group"><div class="f-label">Цвет</div>
-      <div id="pkgColorPick" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;"></div>
+    <div class="f-group"><div class="f-label">Имя</div><input type="text" id="certFirstName" class="f-inp" placeholder="Имя"></div>
+    <div class="f-group"><div class="f-label">Фамилия</div><input type="text" id="certLastName" class="f-inp" placeholder="Фамилия"></div>
+    <div class="f-group"><div class="f-label">Услуга</div><input type="text" id="certService" class="f-inp" placeholder="Например, запись вокала"></div>
+    <div class="f-row">
+      <div class="f-group"><div class="f-label">Дата активации</div><input type="date" id="certDate" class="f-inp"></div>
+      <div class="f-group"><div class="f-label">Срок действия</div><input type="date" id="certExpiry" class="f-inp"></div>
     </div>
     <div class="mb-btns">
-      <button class="mb-btn mb-cancel" onclick="closeAddPackageModal()">Отмена</button>
-      <button class="mb-btn mb-confirm" onclick="savePackage()">Добавить</button>
+      <button class="mb-btn mb-cancel" onclick="closeCertModal()">Отмена</button>
+      <button class="mb-btn mb-confirm" onclick="activateCert()">Активировать</button>
     </div>
   </div>
 </div>
@@ -941,6 +942,7 @@ const DEFAULT_PRESET_SERVICES = [
   { name: 'ПОЛНЫЙ ПРОДАКШН', price: 10000, color: 'gold' },
   { name: 'ПЛАТ. ДОРОЖКА', price: 300, color: 'gold' }
 ];
+const PRESET_NAMES = DEFAULT_PRESET_SERVICES.map(s => s.name.toLowerCase());
 
 // ===== STATE =====
 window.CRM=[];
@@ -982,8 +984,6 @@ function mKey(d){return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFull
 function parseDate(ds){if(!ds)return null;const[d,m,y]=ds.split('.').map(Number);return new Date(y,m-1,d);}
 function monthKeyFromDateStr(ds) { if(!ds) return ''; const [d,m,y] = ds.split('.'); return '.'+m+'.'+y; }
 function getMonthKeyFromDate(d){ return '.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear(); }
-function getHourFromTime(t){ if(!t) return 0; const[h]=t.split(':').map(Number); return h||0; }
-function getMinutesFromTime(t){ if(!t) return 0; const[,m]=t.split(':').map(Number); return m||0; }
 
 // ===== getMyData =====
 function getMyData() {
@@ -1088,6 +1088,22 @@ function savePackage() {
   saveUserPackages();
   renderPresetChips();
   closeAddPackageModal();
+}
+
+// ===== ДЛЯ АБОНЕМЕНТОВ =====
+async function updateSubscriptionUsage(clientName) {
+  if (!clientName) return;
+  const snap = await db.collection("subscriptions")
+    .where("clientName", "==", clientName)
+    .where("authorUid", "==", window.PROFILE.uid)
+    .get();
+  if (snap.empty) return;
+  const doc = snap.docs[0];
+  const data = doc.data();
+  if (data.used < data.total) {
+    await doc.ref.update({ used: firebase.firestore.FieldValue.increment(1) });
+    console.log('✅ Обновлён абонемент:', clientName);
+  }
 }
 
 // ===== МУЛЬТИТАЧ =====
@@ -1256,7 +1272,7 @@ function startApp(){
   UC.onSnapshot(snap=>{
     window.ALL_USERS={};
     snap.forEach(d=>{window.ALL_USERS[d.id]={...d.data(),uid:d.id};});
-    if (getCurrentSection() === 'employees') renderEmployees();
+    if (viewMode==='employees') renderEmployees();
   }, err=>console.error('❌ Ошибка загрузки пользователей:', err));
   SC.orderBy('timestamp','desc').onSnapshot({includeMetadataChanges:false},snap=>{
     window.CRM=[];snap.forEach(d=>window.CRM.push({id:d.id,...d.data()}));
@@ -1304,60 +1320,30 @@ function startApp(){
     calView.addEventListener('touchmove', handleTouchMove, { passive: false });
     calView.addEventListener('touchend', handleTouchEnd, { passive: false });
   }
-
-  // Принудительно открываем первую вкладку после загрузки
-  setTimeout(() => {
-    goSec('sessions');
-  }, 300);
 }
 
-function getCurrentSection() {
-  const active = document.querySelector('.nav-i.active');
-  if (!active) return 'sessions';
-  return active.id.replace('nav-','');
+// ===== ОСНОВНАЯ ФУНКЦИЯ РЕНДЕРИНГА (РАБОЧАЯ ВЕРСИЯ ИЗ СТАРОГО КОДА) =====
+function renderAll(){
+  const sec = document.querySelector('.nav-i.active')?.id?.replace('nav-','');
+  if(sec==='sessions'){ renderCalendar(); renderSessions(); }
+  else if(sec==='clients') renderClients();
+  else if(sec==='finance') renderFinance();
+  else if(sec==='analytics') renderAnalytics();
+  else if(sec==='employees') renderEmployees();
+  else if(sec==='certs') renderCerts();
 }
 
-// ===== НОВАЯ ФУНКЦИЯ goSec (явное управление) =====
-function goSec(s) {
+// ===== NAVIGATION (РАБОЧАЯ ВЕРСИЯ ИЗ СТАРОГО КОДА) =====
+function goSec(s){
   closeEvPopup();
-  // Удаляем активный класс у всех
-  document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('active'));
-  // Добавляем активный класс выбранному
-  const navItem = document.getElementById('nav-'+s);
-  if (navItem) navItem.classList.add('active');
-  
-  // Скрываем все секции
-  const allIds = ['sessions','clients','finance','certs','analytics','employees'];
-  allIds.forEach(id => {
-    const el = document.getElementById('sec' + id.charAt(0).toUpperCase() + id.slice(1));
-    if (el) el.style.display = (id === s) ? 'flex' : 'none';
-  });
-  
-  // Закрываем мобильное меню
+  document.querySelectorAll('.nav-i').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-'+s).classList.add('active');
+  const all=['sessions','clients','finance','certs','analytics','employees'];
+  all.forEach(id=>document.getElementById('sec'+id.charAt(0).toUpperCase()+id.slice(1)).style.display='none');
+  document.getElementById('sec'+s.charAt(0).toUpperCase()+s.slice(1)).style.display='flex';
   const sidebar = document.querySelector('.sidebar');
-  if (sidebar) sidebar.classList.remove('mobile-open');
-  
-  // Рендерим данные для выбранной секции
-  if (s === 'sessions') { 
-    renderCalendar(); 
-    renderSessions(); 
-  } else if (s === 'clients') { 
-    renderClients(); 
-  } else if (s === 'finance') { 
-    renderFinance(); 
-  } else if (s === 'analytics') { 
-    renderAnalytics(); 
-  } else if (s === 'employees') { 
-    renderEmployees(); 
-  } else if (s === 'certs') { 
-    renderCerts(); 
-  }
-}
-
-// ===== renderAll оставляем для совместимости (переиспользует goSec) =====
-function renderAll() {
-  const sec = getCurrentSection();
-  goSec(sec);
+  if(sidebar) sidebar.classList.remove('mobile-open');
+  renderAll();
 }
 
 // ===== VIEW MODE =====
@@ -1456,7 +1442,6 @@ function renderCalendar(){
     const ds=dateStr(d);
     const col=document.createElement('div');
     col.className='cal-day-col';
-    col.dataset.date = ds;
     col.style.minHeight=((HOURS_END-HOURS_START)*currentHourHeight)+'px';
     for(let h=0;h<(HOURS_END-HOURS_START);h++){
       const line=document.createElement('div');
@@ -1500,7 +1485,6 @@ function renderCalendar(){
       const evSvc = escapeHTML(ev.services||ev.type||'');
       const evEl=document.createElement('div');
       evEl.className='cal-event';
-      evEl.dataset.id = ev.id;
       evEl.style.top=Math.max(0,top)+'px';
       evEl.style.height=height+'px';
       evEl.style.left=colLeft+'%';
@@ -1878,6 +1862,12 @@ window.saveRecord=async function(){
       await SC.doc(editId).update(data);
     } else {
       await SC.add(data);
+    }
+    // Обновляем абонемент, если это не абонемент
+    if (svcMode !== 'subscription') {
+      try {
+        await updateSubscriptionUsage(name);
+      } catch(e) { console.error('Ошибка обновления абонемента:', e); }
     }
     closeRecModal();
   } catch(e) { handleError(e, 'Ошибка при сохранении записи.'); } finally { if (btn) unlockButton(btn); }
@@ -2258,7 +2248,7 @@ window.activateCert = async function(){
   } catch(e) { handleError(e, 'Ошибка при активации сертификата.'); } finally { if (btn) unlockButton(btn); }
 };
 
-// ===== ANALYTICS =====
+// ===== ANALYTICS (фильтр услуг только по пресетам) =====
 function renderAnalytics(){
   const myData = getMyData();
   let totalRev=0, yearRev=0, totalDbt=0, done=0, work=0;
@@ -2285,6 +2275,7 @@ function renderAnalytics(){
     if(r.details && Array.isArray(r.details)){
       r.details.forEach(det => {
         const sn = det.name.replace(' (50%)','').trim();
+        // Проверяем по пользовательским пакетам
         const allPkgNames = userPackages.map(p => p.name.toLowerCase());
         if (allPkgNames.includes(sn.toLowerCase())) {
           if(!svcMap[sn]) svcMap[sn]=0;
@@ -2474,33 +2465,6 @@ window.forceMigrate = async function() {
     if (updated > 0) { alert(`✅ Обновлено ${updated} записей. Страница перезагрузится.`); localStorage.setItem('migration_done_universal', 'true'); location.reload(); }
     else { alert('✅ Все записи уже привязаны к вашему аккаунту.'); localStorage.setItem('migration_done_universal', 'true'); }
   } catch(e) { handleError(e, 'Ошибка при миграции.'); } finally { if (btn) unlockButton(btn); }
-};
-
-// ===== АВТООБНОВЛЕНИЕ АБОНЕМЕНТОВ =====
-async function updateSubscriptionUsage(clientName) {
-  if (!clientName) return;
-  const snap = await db.collection("subscriptions")
-    .where("clientName", "==", clientName)
-    .where("authorUid", "==", window.PROFILE.uid)
-    .get();
-  if (snap.empty) return;
-  const doc = snap.docs[0];
-  const data = doc.data();
-  if (data.used < data.total) {
-    await doc.ref.update({ used: firebase.firestore.FieldValue.increment(1) });
-    console.log('✅ Обновлён абонемент:', clientName);
-  }
-}
-
-const originalSaveRecord = window.saveRecord;
-window.saveRecord = async function() {
-  await originalSaveRecord.call(this);
-  const name = document.getElementById('fName').value.trim();
-  if (name && svcMode !== 'subscription') {
-    try {
-      await updateSubscriptionUsage(name);
-    } catch(e) { console.error('Ошибка обновления абонемента:', e); }
-  }
 };
 </script>
 </body>
