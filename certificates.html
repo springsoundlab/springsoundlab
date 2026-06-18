@@ -1038,7 +1038,6 @@ function renderPresetChips() {
   const container = document.getElementById('presetChips');
   if (!container) return;
   container.innerHTML = '';
-  // Отображаем максимум 8, но можем сделать сетку 2×4
   const displayPackages = userPackages.slice(0, 8);
   displayPackages.forEach((pkg, index) => {
     const chip = document.createElement('div');
@@ -1056,7 +1055,6 @@ function renderPresetChips() {
         }
         return;
       }
-      // Добавляем услугу в корзину (с предоплатой, если включена)
       addPreSvc(pkg.name, pkg.price, pkg.color, false);
     };
     container.appendChild(chip);
@@ -1091,14 +1089,6 @@ function savePackage() {
   renderPresetChips();
   closeAddPackageModal();
 }
-
-// ===== ДЛЯ АБОНЕМЕНТОВ =====
-// Храним данные о подписках клиентов в отдельной коллекции "subscriptions" или прямо в записях клиента.
-// Для простоты будем хранить в поле "subscription" в документе клиента (в сессиях).
-// Но проще хранить в отдельной коллекции "subscriptions" с полями: clientName, total, used, price, createdDate.
-// При сохранении абонемента создаём запись в "subscriptions" и привязываем к клиенту.
-// При добавлении новой сессии для клиента с активным абонементом увеличиваем used.
-// Покажем в карточке клиента прогресс.
 
 // ===== МУЛЬТИТАЧ =====
 function handleTouchStart(e) {
@@ -1242,7 +1232,6 @@ auth.onAuthStateChanged(async(user)=>{
     isVocal=p.role==='Вокал';
     isGuitar=p.role==='Гитара';
     document.getElementById('nav-certs').style.display = isSound ? 'flex' : 'none';
-    // Показываем кнопку "Абонемент" только для преподавателей
     const subBtn = document.getElementById('svcModeSubscription');
     if (subBtn) subBtn.style.display = (isVocal || isGuitar) ? 'inline-flex' : 'none';
     selectedFormColor=p.color;
@@ -1255,7 +1244,6 @@ auth.onAuthStateChanged(async(user)=>{
     document.getElementById('authScreen').style.display='none';
     document.getElementById('appRoot').style.display='flex';
     if(!appStarted){appStarted=true;startApp();}
-    // Загружаем пакеты пользователя
     loadUserPackages();
   }else{
     document.getElementById('authScreen').style.display='flex';
@@ -1268,7 +1256,7 @@ function startApp(){
   UC.onSnapshot(snap=>{
     window.ALL_USERS={};
     snap.forEach(d=>{window.ALL_USERS[d.id]={...d.data(),uid:d.id};});
-    if (viewMode==='employees') renderEmployees();
+    if (getCurrentSection() === 'employees') renderEmployees();
   }, err=>console.error('❌ Ошибка загрузки пользователей:', err));
   SC.orderBy('timestamp','desc').onSnapshot({includeMetadataChanges:false},snap=>{
     window.CRM=[];snap.forEach(d=>window.CRM.push({id:d.id,...d.data()}));
@@ -1318,14 +1306,20 @@ function startApp(){
   }
 }
 
+function getCurrentSection() {
+  const active = document.querySelector('.nav-i.active');
+  if (!active) return 'sessions';
+  return active.id.replace('nav-','');
+}
+
 function renderAll(){
-  const sec=document.querySelector('.nav-i.active')?.id?.replace('nav-','');
+  const sec = getCurrentSection();
   if(sec==='sessions'){ renderCalendar(); renderSessions(); }
-  if(sec==='clients')renderClients();
-  if(sec==='finance')renderFinance();
-  if(sec==='analytics')renderAnalytics();
-  if(sec==='employees')renderEmployees();
-  if(sec==='certs')renderCerts();
+  else if(sec==='clients') renderClients();
+  else if(sec==='finance') renderFinance();
+  else if(sec==='analytics') renderAnalytics();
+  else if(sec==='employees') renderEmployees();
+  else if(sec==='certs') renderCerts();
 }
 
 // ===== VIEW MODE =====
@@ -1345,8 +1339,10 @@ function goSec(s){
   document.querySelectorAll('.nav-i').forEach(n=>n.classList.remove('active'));
   document.getElementById('nav-'+s).classList.add('active');
   const all=['sessions','clients','finance','certs','analytics','employees'];
-  all.forEach(id=>document.getElementById('sec'+id.charAt(0).toUpperCase()+id.slice(1)).style.display='none');
-  document.getElementById('sec'+s.charAt(0).toUpperCase()+s.slice(1)).style.display='flex';
+  all.forEach(id=>{
+    const el = document.getElementById('sec'+id.charAt(0).toUpperCase()+id.slice(1));
+    if(el) el.style.display = (id === s) ? 'flex' : 'none';
+  });
   const sidebar = document.querySelector('.sidebar');
   if(sidebar) sidebar.classList.remove('mobile-open');
   renderAll();
@@ -1490,7 +1486,6 @@ function renderCalendar(){
       evEl.style.borderLeft='3px solid '+color;
       evEl.style.opacity=isDone?'0.55':'1';
       evEl.innerHTML=`<div class="cal-event-name" style="color:${color}">${evName}</div><div class="cal-event-svc" style="color:${color}99">${evSvc}</div>`;
-      // Клик для редактирования
       evEl.onclick = function(e) {
         e.stopPropagation();
         openEdit(ev.id);
@@ -1642,7 +1637,6 @@ function setupFormColorPicker(){
 }
 
 function setupFormMode(){
-  // Показываем все режимы: preset, manual, subscription
   document.getElementById('svcModeWrap').style.display='block';
   setSvcMode('preset');
 }
@@ -1723,7 +1717,6 @@ window.addManualSvc=function(){
   let n = document.getElementById('mSvcName').value.trim();
   let p = parseInt(document.getElementById('mSvcPrice').value);
   if(!n){alert('Введите название услуги');return;}
-  // Проверяем, есть ли такой пакет в пользовательских
   const found = userPackages.find(s => s.name.toLowerCase() === n.toLowerCase());
   let basePrice = p;
   let color = 'white';
@@ -1768,7 +1761,6 @@ window.saveRecord=async function(){
   const btn = document.querySelector('#moRecord .mb-confirm');
   if (btn) lockButton(btn);
   try {
-    // Если режим "Абонемент"
     if (svcMode === 'subscription') {
       const subPrice = parseInt(document.getElementById('subPrice').value);
       const subCount = parseInt(document.getElementById('subCount').value);
@@ -1779,7 +1771,6 @@ window.saveRecord=async function(){
       if (!name) { alert('Введите имя клиента'); unlockButton(btn); return; }
       if (isNaN(subPrice) || subPrice <= 0) { alert('Введите сумму абонемента'); unlockButton(btn); return; }
       if (isNaN(subCount) || subCount <= 0) { alert('Введите количество занятий'); unlockButton(btn); return; }
-      // Создаём абонемент в отдельной коллекции "subscriptions"
       const subRef = db.collection("subscriptions").doc();
       await subRef.set({
         clientName: name,
@@ -1791,7 +1782,6 @@ window.saveRecord=async function(){
         authorUid: window.PROFILE.uid,
         authorPhone: window.PROFILE.phone
       });
-      // Создаём запись в сессиях как "Абонемент"
       const data = {
         date,
         time: '',
@@ -1821,7 +1811,6 @@ window.saveRecord=async function(){
       return;
     }
 
-    // Обычный режим (preset или manual)
     const mName = document.getElementById('mSvcName').value.trim();
     const mPrice = parseInt(document.getElementById('mSvcPrice').value);
     if(mName && !isNaN(mPrice) && mPrice > 0){
@@ -1916,9 +1905,8 @@ function renderSessions(){
 }
 
 // ===== CLIENTS =====
-function renderClients(){
+function renderClients() {
   const grid = document.getElementById('clGrid');
-  // Очищаем сетку, но показываем индикатор загрузки или сообщение
   grid.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Загрузка...</div>';
 
   const myData = getMyData();
@@ -1959,7 +1947,6 @@ function renderClients(){
     return;
   }
 
-  // Для каждого клиента загружаем подписки и рендерим
   cls.forEach(async (c) => {
     try {
       const subSnap = await db.collection("subscriptions")
@@ -1972,7 +1959,6 @@ function renderClients(){
         const subData = subDoc.data();
         subInfo = { used: subData.used || 0, total: subData.total || 0 };
       }
-      // Удаляем "Загрузка..." если она есть
       const loadingEl = grid.querySelector('div[style*="Загрузка"]');
       if (loadingEl) loadingEl.remove();
       renderClientCard(c, subInfo);
@@ -2276,7 +2262,6 @@ function renderAnalytics(){
     if(r.details && Array.isArray(r.details)){
       r.details.forEach(det => {
         const sn = det.name.replace(' (50%)','').trim();
-        // Проверяем по пользовательским пакетам или дефолтным
         const allPkgNames = userPackages.map(p => p.name.toLowerCase());
         if (allPkgNames.includes(sn.toLowerCase())) {
           if(!svcMap[sn]) svcMap[sn]=0;
@@ -2468,7 +2453,7 @@ window.forceMigrate = async function() {
   } catch(e) { handleError(e, 'Ошибка при миграции.'); } finally { if (btn) unlockButton(btn); }
 };
 
-// ===== АВТООБНОВЛЕНИЕ АБОНЕМЕНТОВ ПРИ ДОБАВЛЕНИИ ЗАНЯТИЙ =====
+// ===== АВТООБНОВЛЕНИЕ АБОНЕМЕНТОВ =====
 async function updateSubscriptionUsage(clientName) {
   if (!clientName) return;
   const snap = await db.collection("subscriptions")
@@ -2484,7 +2469,6 @@ async function updateSubscriptionUsage(clientName) {
   }
 }
 
-// Обёртка для saveRecord
 const originalSaveRecord = window.saveRecord;
 window.saveRecord = async function() {
   await originalSaveRecord.call(this);
