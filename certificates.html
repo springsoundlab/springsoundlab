@@ -62,6 +62,9 @@ body.modal-open { overflow: hidden; touch-action: none; }
 .tb-btn.filter-btn.active{background:var(--surface3);color:var(--text);border-color:var(--border2);}
 .tb-btn.filter-btn.all-active{background:var(--accent-bg);color:var(--accent);border-color:rgba(124,111,255,.3);}
 
+/* Кнопки зума (ПК) */
+.zoom-controls { display: flex; gap: 4px; margin-right: 8px; }
+
 .mnav{display:flex;align-items:center;gap:6px;margin-left:auto;}
 .mnav-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:.15s;}
 .mnav-btn:hover{color:var(--text);border-color:var(--border2);}
@@ -322,6 +325,9 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .mnav { width: 100%; justify-content: space-between; }
   .tb-btn { justify-content: center;}
 
+  /* Скрываем кнопки зума на мобильных */
+  .zoom-controls { display: none !important; }
+
   /* Список (журнал) остаётся как таблица-карточки */
   .tbl thead { display: none;}
   .tbl tr { display: flex; flex-direction: column; background: var(--surface2); margin-bottom: 12px; border-radius: var(--r); padding: 12px; border: 1px solid var(--border); }
@@ -469,7 +475,12 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <div class="vm-btn active" id="vmCal" onclick="setViewMode('calendar')"><i class="fa-regular fa-calendar"></i> Календарь</div>
           <div class="vm-btn" id="vmList" onclick="setViewMode('list')"><i class="fa-solid fa-list"></i> Список</div>
         </div>
-       
+        <!-- БЛОК КНОПОК ЗУМА (ПК) -->
+        <div class="zoom-controls">
+          <button class="tb-btn" onclick="zoomCalendar(1)" title="Увеличить масштаб"><i class="fa-solid fa-plus"></i></button>
+          <button class="tb-btn" onclick="zoomCalendar(-1)" title="Уменьшить масштаб"><i class="fa-solid fa-minus"></i></button>
+        </div>
+        <!-- КОНЕЦ БЛОКА ЗУМА -->
         <div class="mnav">
           <div class="mnav-btn" onclick="changeDateScope('month', -1)" title="Месяц назад"><i class="fa-solid fa-angles-left"></i></div>
           <div class="mnav-btn" onclick="changeDateScope('week', -1)" title="Неделя назад"><i class="fa-solid fa-angle-left"></i></div>
@@ -2129,6 +2140,19 @@ function openMonthInfo(idx, value) {
   const year = document.getElementById('anaChY').textContent || '2026';
   openSM(`Доход за ${monthName} ${year}`, 'info', ()=>{ closeSM(); }, '', `${value.toLocaleString()} ₽`);
 }
+
+/* ===== ФУНКЦИЯ УПРАВЛЕНИЯ ЗУМОМ (ПК) ===== */
+window.zoomCalendar = function(delta) {
+  const step = 8;
+  let newHeight = currentHourHeight + delta * step;
+  newHeight = Math.min(Math.max(newHeight, MIN_HOUR_HEIGHT), MAX_HOUR_HEIGHT);
+  if (newHeight === currentHourHeight) return;
+  currentHourHeight = newHeight;
+  if (viewMode === 'calendar') {
+    renderCalendar();
+  }
+  saveZoomToProfile();
+};
 
 /* ===== NETWORK STATUS ===== */
 window.addEventListener('online',()=>document.getElementById('offBar').style.display='none');
