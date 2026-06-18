@@ -136,10 +136,19 @@ body.modal-open { overflow: hidden; touch-action: none; }
 /* Кнопки зума (ПК) */
 .zoom-controls { display: flex; gap: 4px; margin-right: 8px; }
 
-.mnav{display:flex;align-items:center;gap:6px;margin-left:auto;}
-.mnav-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:.15s;}
-.mnav-btn:hover{color:var(--text);border-color:var(--border2);}
-.mnav-label{font-size:12px;font-weight:600;min-width:96px;text-align:center;}
+/* Новая навигация календаря */
+.cal-nav { display:flex; align-items:center; gap:8px; margin-left:auto; }
+.cal-nav input[type="month"] {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--r-sm);
+  padding:4px 8px;
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  font-size:12px;
+  outline:none;
+}
+.cal-nav input[type="month"]:focus { border-color:var(--accent); }
 
 /* CALENDAR VIEW */
 .cal-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
@@ -385,9 +394,10 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
   .view-mode { width: 100%; }
   .view-mode .vm-btn { flex: 1; justify-content: center; text-align: center;}
-  .mnav { width: 100%; justify-content: space-between; }
   .tb-btn { justify-content: center;}
   .zoom-controls { display: none !important; }
+  .cal-nav { width: 100%; justify-content: space-between; }
+  .cal-nav input[type="month"] { flex: 1; }
   .tbl thead { display: none;}
   .tbl tr { display: flex; flex-direction: column; background: var(--surface2); margin-bottom: 12px; border-radius: var(--r); padding: 12px; border: 1px solid var(--border); }
   .tbl td { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); text-align: right; }
@@ -539,12 +549,10 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
           <button class="tb-btn" onclick="zoomCalendar(1)" title="Увеличить масштаб"><i class="fa-solid fa-plus"></i></button>
           <button class="tb-btn" onclick="zoomCalendar(-1)" title="Уменьшить масштаб"><i class="fa-solid fa-minus"></i></button>
         </div>
-        <div class="mnav">
-          <div class="mnav-btn" onclick="changeDateScope('month', -1)" title="Месяц назад"><i class="fa-solid fa-angles-left"></i></div>
-          <div class="mnav-btn" onclick="changeDateScope('week', -1)" title="Неделя назад"><i class="fa-solid fa-angle-left"></i></div>
-          <div class="mnav-label" id="mnavLbl">Июнь 2026</div>
-          <div class="mnav-btn" onclick="changeDateScope('week', 1)" title="Неделя вперед"><i class="fa-solid fa-angle-right"></i></div>
-          <div class="mnav-btn" onclick="changeDateScope('month', 1)" title="Месяц вперед"><i class="fa-solid fa-angles-right"></i></div>
+        <!-- Новая навигация календаря -->
+        <div class="cal-nav">
+          <input type="month" id="calMonthPicker">
+          <button class="tb-btn" onclick="resetCalendarView()" title="Вернуться к текущей дате"><i class="fa-solid fa-rotate-left"></i> Сбросить</button>
         </div>
       </div>
       <div id="calView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
@@ -736,7 +744,7 @@ textarea.f-inp{resize:vertical;min-height:60px;line-height:1.5;}
   </div>
 </div>
 
-<!-- НОВОЕ МОДАЛЬНОЕ ОКНО ДЛЯ РЕДАКТИРОВАНИЯ КЛИЕНТА -->
+<!-- Модальное окно для редактирования клиента -->
 <div class="mo" id="moClientEdit">
   <div class="mb" style="width:520px;max-width:95vw;">
     <div class="mb-header">
@@ -821,6 +829,18 @@ const MNS=['ЯНВАРЬ','ФЕВРАЛЬ','МАРТ','АПРЕЛЬ','МАЙ','�
 const MNSh=['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'];
 const MNL=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const DAYS_RU=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+
+// ===== ПРЕДОПРЕДЕЛЁННЫЕ ПАКЕТЫ УСЛУГ =====
+const PRESET_SERVICES = [
+  { name: 'ЧАС ЗАПИСИ', price: 900, color: 'white' },
+  { name: 'ПЕСНЯ В ПОДАРОК', price: 5000, color: 'purple' },
+  { name: 'ПРЕМИУМ', price: 8000, color: 'red' },
+  { name: 'ТЮНИНГ ВОКАЛА', price: 1000, color: 'green' },
+  { name: 'АРАНЖИРОВКА', price: 10000, color: 'blue' },
+  { name: 'ДОП. ДОРОЖКА', price: 500, color: 'green' },
+  { name: 'ПОЛНЫЙ ПРОДАКШН', price: 10000, color: 'gold' },
+  { name: 'ПЛАТ. ДОРОЖКА', price: 300, color: 'gold' }
+];
 
 // ===== STATE =====
 window.CRM=[];
@@ -1055,12 +1075,44 @@ function startApp(){
   }, err=>console.error('❌ Ошибка загрузки сессий:', err));
   CERTC.onSnapshot(snap=>{certs={};snap.forEach(d=>certs[d.id]=d.data());renderCerts();}, err=>console.error('❌ Ошибка загрузки сертификатов:', err));
   setInterval(()=>{if(viewMode==='calendar')renderCalendar();},60000);
+  
+  // Инициализация month picker для календаря
+  const calMonthPicker = document.getElementById('calMonthPicker');
+  if (calMonthPicker) {
+    const now = new Date();
+    calMonthPicker.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+    calMonthPicker.addEventListener('change', function() {
+      const val = this.value;
+      if (!val) return;
+      const [year, month] = val.split('-').map(Number);
+      const firstDay = new Date(year, month-1, 1);
+      // находим понедельник недели, содержащей первое число
+      const dayOfWeek = firstDay.getDay();
+      const diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
+      const monday = new Date(firstDay);
+      monday.setDate(firstDay.getDate() + diffToMon);
+      // вычисляем смещение в неделях от текущей даты
+      const today = new Date();
+      const todayDayOfWeek = today.getDay();
+      const todayDiffToMon = (todayDayOfWeek === 0) ? -6 : 1 - todayDayOfWeek;
+      const todayMonday = new Date(today);
+      todayMonday.setDate(today.getDate() + todayDiffToMon);
+      const diffTime = monday.getTime() - todayMonday.getTime();
+      calWeekOffset = Math.round(diffTime / (1000 * 3600 * 24 * 7));
+      calDate = new Date(year, month-1, 1);
+      renderCalendar();
+      updateMnavLabel();
+    });
+  }
+
+  // Инициализация выбора месяца в финансах
   const monthPicker = document.getElementById('finMonthPicker');
   if (monthPicker) {
     const now = new Date();
     monthPicker.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
     monthPicker.addEventListener('change', function(){ selectedMonth = this.value; renderFinance(); });
   }
+
   const calView = document.getElementById('calView');
   if (calView) {
     calView.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -1112,42 +1164,31 @@ window.togglePrivacy=function(){
 };
 
 // ===== НАВИГАЦИЯ ДАТ =====
-function changeDateScope(type, d) {
-  if (viewMode === 'calendar') {
-    if (type === 'week') { calWeekOffset += d; }
-    else if (type === 'month') {
-      let currentMonday = getWeekDays()[0];
-      currentMonday.setMonth(currentMonday.getMonth() + d);
-      let today = new Date(); today.setHours(0,0,0,0);
-      let dayOfWeek = today.getDay();
-      let diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
-      let origMonday = new Date(today);
-      origMonday.setDate(today.getDate() + diffToMon);
-      let diffTime = currentMonday.getTime() - origMonday.getTime();
-      calWeekOffset = Math.round(diffTime / (1000 * 3600 * 24 * 7));
-    }
-    renderCalendar();
-  } else {
-    if (type === 'week') calDate.setDate(calDate.getDate() + (d * 7));
-    else calDate.setMonth(calDate.getMonth() + d);
-    updateMnavLabel();
-    renderSessions();
-  }
-}
-
 function updateMnavLabel(){
   if(viewMode === 'calendar'){
     const wd=getWeekDays();
     const first=wd[0];const last=wd[6];
     if(first.getMonth()===last.getMonth()){
-      document.getElementById('mnavLbl').textContent=MNL[first.getMonth()]+' '+first.getFullYear();
+      document.getElementById('mnavLbl')?.textContent && (document.getElementById('mnavLbl').textContent = MNL[first.getMonth()]+' '+first.getFullYear());
     }else{
-      document.getElementById('mnavLbl').textContent=MNSh[first.getMonth()]+' – '+MNSh[last.getMonth()]+' '+last.getFullYear();
+      document.getElementById('mnavLbl')?.textContent && (document.getElementById('mnavLbl').textContent = MNSh[first.getMonth()]+' – '+MNSh[last.getMonth()]+' '+last.getFullYear());
     }
   } else {
-    document.getElementById('mnavLbl').textContent=MNL[calDate.getMonth()]+' '+calDate.getFullYear();
+    document.getElementById('mnavLbl')?.textContent && (document.getElementById('mnavLbl').textContent = MNL[calDate.getMonth()]+' '+calDate.getFullYear());
   }
 }
+
+// ===== СБРОС КАЛЕНДАРЯ =====
+window.resetCalendarView = function() {
+  const now = new Date();
+  calDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  calWeekOffset = 0;
+  const monthPicker = document.getElementById('calMonthPicker');
+  if (monthPicker) {
+    monthPicker.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  }
+  renderCalendar();
+};
 
 // ===== WEEK HELPERS =====
 function getWeekDays(){
@@ -1255,7 +1296,18 @@ function renderCalendar(){
       evEl.onmouseleave=()=>{if(!popupLocked)closeEvPopup();};
       col.appendChild(evEl);
     });
-    col.onclick=(e)=>{ if(document.getElementById('evPopup').classList.contains('open')) return; openNewFormOnDate(ds); };
+    // Клик по колонке для создания новой записи с автоматическим подставлением времени
+    col.onclick = function(e) {
+      if(document.getElementById('evPopup').classList.contains('open')) return;
+      const rect = this.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      const totalHeight = (HOURS_END - HOURS_START) * currentHourHeight;
+      let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
+      // Ограничиваем, чтобы не выйти за пределы
+      hour = Math.min(Math.max(hour, HOURS_START), HOURS_END-1);
+      const hourStr = String(hour).padStart(2,'0') + ':00';
+      openNewFormOnDate(ds, hourStr);
+    };
     body.appendChild(col);
   });
   setTimeout(()=>{
@@ -1297,7 +1349,6 @@ function showEvPopup(ev,e,type='click'){
   popupId=ev.id;
   popupLocked = (type === 'click');
   const pop=document.getElementById('evPopup');
-  // заглушка, т.к. popup скрыт
   pop.classList.add('open');
 }
 function closeEvPopup(){
@@ -1367,9 +1418,12 @@ window.addPay = function(id) {
 };
 
 // ===== NEW / EDIT FORM =====
-function openNewFormOnDate(ds){
+function openNewFormOnDate(ds, timeStart){
   openNewForm();
   document.getElementById('fDate').value=dateToInput(ds)||dateToInput(todayStr());
+  if (timeStart) {
+    document.getElementById('fTime').value = timeStart;
+  }
 }
 
 function openNewForm(){
@@ -1478,14 +1532,31 @@ window.openPriceM=function(name,color,def){
   },def);
 };
 
-// ===== MANUAL SERVICES =====
+// ===== MANUAL SERVICES (с автоподстановкой цены из пресета) =====
 window.addManualSvc=function(){
-  const n=document.getElementById('mSvcName').value.trim();
-  const p=parseInt(document.getElementById('mSvcPrice').value);
+  let n = document.getElementById('mSvcName').value.trim();
+  let p = parseInt(document.getElementById('mSvcPrice').value);
   if(!n){alert('Введите название услуги');return;}
-  if(isNaN(p)||p<=0){alert('Введите корректную цену');return;}
-  formDetails.push({name:n,price:p,basePrice:p,originalColor:'white'});
-  formTotal+=p;
+  // Ищем совпадение с пресетом (регистронезависимо)
+  const found = PRESET_SERVICES.find(s => s.name.toLowerCase() === n.toLowerCase());
+  let basePrice = p;
+  let color = 'white';
+  if (found) {
+    // Если цена не указана, подставляем из пресета
+    if (isNaN(p) || p <= 0) {
+      p = found.price;
+    }
+    basePrice = found.price;
+    color = found.color;
+  } else {
+    if (isNaN(p) || p <= 0) {
+      alert('Укажите цену для этой услуги');
+      return;
+    }
+    basePrice = p;
+  }
+  formDetails.push({name:n, price:p, basePrice:basePrice, originalColor:color});
+  formTotal += p;
   document.getElementById('mSvcName').value='';
   document.getElementById('mSvcPrice').value='';
   renderFormSvcs();
@@ -1648,7 +1719,7 @@ function renderClients(){
   grid.innerHTML='';
   if(!cls.length){grid.innerHTML='<div style="color:var(--text3);font-size:12px;padding:18px;">Нет клиентов</div>';return;}
   cls.forEach((c)=>{
-    const pal = palByHex(PALETTE[0].hex); // используем фиолетовый
+    const pal = palByHex(PALETTE[0].hex);
     const topType = Object.entries(c.types).sort((a,b)=>b[1]-a[1])[0];
     const card = document.createElement('div');
     card.className = 'cl-card';
@@ -1657,7 +1728,6 @@ function renderClients(){
     const total = c.total.toLocaleString();
     const last = escapeHTML(c.last||'—');
     const topTypeName = topType ? escapeHTML(topType[0]) : '—';
-    // добавляем кнопку с тремя точками
     card.innerHTML=`
       <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start;">
         <div style="display:flex; gap:9px; align-items:center;">
@@ -1675,7 +1745,6 @@ function renderClients(){
         <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
       </div>
     `;
-    // при клике на карточку (кроме кнопки) открываем редактирование
     card.onclick = (e) => {
       if(e.target.closest('.cl-edit-btn')) return;
       openClientEdit(c.ids.join(','));
@@ -1690,14 +1759,11 @@ function openClientEdit(idsStr) {
   const ids = idsStr.split(',').filter(id => id.trim());
   if(!ids.length) return;
   clientEditIds = ids;
-  // Находим записи
   const records = window.CRM.filter(r => ids.includes(r.id));
   if(!records.length) return;
-  // Заполняем поля
   const first = records[0];
   document.getElementById('clientEditName').value = first.client || first.song || '';
   document.getElementById('clientEditPhone').value = first.phone || '';
-  // Список записей
   const listDiv = document.getElementById('clientEditSessions');
   listDiv.innerHTML = '';
   records.sort((a,b) => (b.date||'').localeCompare(a.date||''));
@@ -1714,7 +1780,6 @@ function openClientEdit(idsStr) {
     `;
     listDiv.appendChild(line);
   });
-  // Открываем модалку
   document.body.classList.add('modal-open');
   document.getElementById('moClientEdit').classList.add('open');
 }
@@ -1745,7 +1810,6 @@ async function saveClientEdit() {
     });
     await batch.commit();
     closeClientEdit();
-    // Перерисовываем клиентов
     renderClients();
   } catch(e) {
     handleError(e, 'Ошибка при сохранении изменений клиента');
