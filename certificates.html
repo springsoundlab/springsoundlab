@@ -255,7 +255,7 @@ body.modal-open {
   flex-shrink: 0;
 }
 .topbar .tb-btn {
-  margin-left: 4px; /* сдвигаем чуть правее для выравнивания */
+  margin-left: 4px;
 }
 .content {
   flex: 1;
@@ -792,7 +792,7 @@ body.modal-open {
   border-radius: var(--r-sm);
   padding: 8px;
   min-width: 320px;
-  z-index: 9999; /* выше всех карточек */
+  z-index: 9999;
   box-shadow: 0 8px 30px rgba(0,0,0,0.5);
   margin-top: 4px;
   grid-template-columns: 1fr 1fr;
@@ -829,18 +829,6 @@ body.modal-open {
 .period-column .sort-option.active {
   background: var(--accent-bg);
   color: var(--accent2);
-}
-/* На мобильных меню должно быть шире */
-@media (max-width: 768px) {
-  .sort-dropdown-menu {
-    min-width: 280px;
-    right: 0;
-    left: auto;
-  }
-  .sort-option {
-    font-size: 10px;
-    padding: 5px 8px;
-  }
 }
 
 /* FINANCE – карточки */
@@ -1439,6 +1427,7 @@ textarea.f-inp {
   filter: brightness(1.2);
 }
 
+/* Добавленные услуги – увеличили высоту, добавили карандаш */
 .added-svcs {
   display: flex;
   flex-direction: column;
@@ -1450,7 +1439,7 @@ textarea.f-inp {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 9px;
+  padding: 10px 12px; /* увеличено по высоте */
   background: var(--surface2);
   border-radius: 6px;
   border: 1px solid var(--border);
@@ -1471,15 +1460,53 @@ textarea.f-inp {
   font-size: 11px;
   color: var(--text2);
 }
-.asvc-rm {
+.asvc-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.asvc-edit, .asvc-rm {
   color: var(--text3);
   cursor: pointer;
-  font-size: 10px;
-  padding: 2px 4px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.asvc-edit:hover {
+  color: var(--blue);
+  background: var(--blue-bg);
 }
 .asvc-rm:hover {
   color: var(--red);
+  background: var(--red-bg);
 }
+.pkg-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.pkg-edit, .pkg-del {
+  color: var(--text3);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pkg-edit:hover {
+  color: var(--blue);
+  background: var(--blue-bg);
+}
+.pkg-del:hover {
+  color: var(--red);
+  background: var(--red-bg);
+}
+
 .total-row {
   display: flex;
   justify-content: space-between;
@@ -1806,6 +1833,20 @@ textarea.f-inp {
   .time-label-hidden {
     display: none;
   }
+
+  /* На ПК делаем "Добавить услуги" в одной строке с кнопками */
+  #svcModeWrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #svcModeWrap > div:first-child {
+    margin-bottom: 0;
+    font-size: 11px;
+  }
+  .svc-mode-switcher {
+    margin-left: auto;
+  }
 }
 
 /* ===== MOBILE ===== */
@@ -1837,10 +1878,10 @@ textarea.f-inp {
   }
   .topbar {
     display: flex;
-    padding-left: 18px !important; /* выравниваем с toolbar */
+    padding-left: 18px !important;
   }
   .topbar .tb-btn {
-    margin-left: 0; /* убираем лишний отступ */
+    margin-left: 0;
   }
   .sb-logo-t,
   .sb-logo-s,
@@ -2034,7 +2075,7 @@ textarea.f-inp {
     gap: 6px;
   }
 
-  /* ===== МОБИЛЬНЫЕ МОДАЛКИ — центрированные с закруглениями ===== */
+  /* Мобильные модалки — центрированные с закруглениями, только вертикальная прокрутка */
   .mo {
     padding: 20px 10px !important;
     align-items: center !important;
@@ -2054,10 +2095,12 @@ textarea.f-inp {
     transform: none !important;
     height: auto !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important; /* отключаем горизонтальный скролл */
   }
   #moRecord .mb,
   #moClientEdit .mb,
-  #moAddPackage .mb {
+  #moAddPackage .mb,
+  #moEditSvc .mb {
     width: 95% !important;
     max-width: 500px !important;
     border-radius: 16px !important;
@@ -2066,6 +2109,7 @@ textarea.f-inp {
     margin: 0 auto !important;
     height: auto !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
   #moRecord .mb .mb-btns {
     margin-top: 15px;
@@ -2081,17 +2125,14 @@ textarea.f-inp {
     grid-template-columns: 1fr 1fr;
   }
 
-  /* Управление услугами – увеличенные отступы между полями */
+  /* Управление услугами – убран заголовок, увеличены отступы */
   #moAddPackage .f-group {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
   #moAddPackage .f-group .f-label {
     margin-bottom: 2px;
   }
-  /* Убираем выбор цвета */
-  #pkgColorPick {
-    display: none !important;
-  }
+  /* Убираем выбор цвета (он уже скрыт) */
 
   .pkg-card {
     padding: 6px 10px !important;
@@ -2164,17 +2205,30 @@ textarea.f-inp {
     font-size: 12px;
   }
 
-  /* Сортировка – меню поверх всего */
+  /* Сортировка – меню поверх всего, центрировано */
   .sort-dropdown-menu {
     z-index: 99999 !important;
-    min-width: 260px;
-    right: 0;
-    left: auto;
+    min-width: 280px;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
   }
   .sort-option {
     font-size: 10px;
     padding: 5px 8px;
   }
+
+  /* Увеличиваем кнопку сохранить на мобильных */
+  #moRecord .mb-confirm {
+    padding: 14px 10px;
+    font-size: 15px;
+  }
+}
+
+/* Увеличенная кнопка сохранить на всех устройствах */
+#moRecord .mb-confirm {
+  padding: 12px 10px;
+  font-size: 14px;
 }
 
 .ev-popup {
@@ -2184,7 +2238,7 @@ textarea.f-inp {
 /* Стили для карточек услуг в модалке */
 .pkg-card {
   display: grid;
-  grid-template-columns: 1fr auto 30px;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
@@ -2212,21 +2266,28 @@ textarea.f-inp {
   color: var(--text2);
   text-align: right;
 }
-.pkg-card .pkg-del {
+.pkg-actions {
+  display: flex;
+  gap: 4px;
+}
+.pkg-edit, .pkg-del {
   color: var(--text3);
   cursor: pointer;
   padding: 4px 6px;
   border-radius: 4px;
   transition: .15s;
-  text-align: center;
 }
-.pkg-card .pkg-del:hover {
+.pkg-edit:hover {
+  color: var(--blue);
+  background: var(--blue-bg);
+}
+.pkg-del:hover {
   color: var(--red);
   background: var(--red-bg);
 }
 .pkg-header {
   display: grid;
-  grid-template-columns: 1fr auto 30px;
+  grid-template-columns: 1fr auto auto;
   gap: 8px;
   padding: 4px 12px 8px 12px;
   font-size: 9px;
@@ -2241,7 +2302,7 @@ textarea.f-inp {
   text-align: center;
 }
 
-/* Цветовая палитра в модалке (для выбора цвета, используется в модалке цвета) */
+/* Цветовая палитра в модалке (для выбора цвета) */
 .color-palette-grid {
   display: flex;
   flex-wrap: wrap;
@@ -2647,7 +2708,7 @@ textarea.f-inp {
   <div class="mb mb-sm" style="max-width:450px;">
     <div class="mb-header"><div class="mb-title">Управление услугами</div><div class="mb-close" onclick="closeAddPackageModal()"><i class="fa-solid fa-xmark"></i></div></div>
     <div style="margin-bottom:12px;">
-      <div style="font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Добавить новую услугу</div>
+      <!-- Заголовок "Добавить новую услугу" убран -->
       <div class="f-group" style="margin-bottom:14px;">
         <div class="f-label">Название</div>
         <input type="text" id="pkgName" class="f-inp" placeholder="Урок вокала">
@@ -2665,6 +2726,28 @@ textarea.f-inp {
       <div class="pkg-header"><span>Название</span><span>Цена</span><span></span></div>
     </div>
     <div class="mb-btns" style="margin-top:12px;"><button class="mb-btn mb-cancel" onclick="closeAddPackageModal()">Закрыть</button></div>
+  </div>
+</div>
+
+<!-- Модальное окно для редактирования услуги (новая) -->
+<div class="mo" id="moEditSvc">
+  <div class="mb mb-sm" style="max-width:400px;">
+    <div class="mb-header">
+      <div class="mb-title">Редактирование услуги</div>
+      <div class="mb-close" onclick="closeEditSvcModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="f-group" style="margin-bottom:12px;">
+      <div class="f-label">Название</div>
+      <input type="text" id="editSvcName" class="f-inp" placeholder="Название услуги">
+    </div>
+    <div class="f-group" style="margin-bottom:12px;">
+      <div class="f-label">Цена (₽)</div>
+      <input type="number" id="editSvcPrice" class="f-inp mono" placeholder="0">
+    </div>
+    <div class="mb-btns">
+      <button class="mb-btn mb-cancel" onclick="closeEditSvcModal()">Отмена</button>
+      <button class="mb-btn mb-confirm" id="editSvcConfirm" onclick="saveEditSvc()">Сохранить</button>
+    </div>
   </div>
 </div>
 
@@ -2892,27 +2975,83 @@ function renderPackageListInModal() {
     card.innerHTML = `
       <span class="pkg-name" style="color:${color}">${escapeHTML(pkg.name)}</span>
       <span class="pkg-price">${pkg.price} ₽</span>
-      <span class="pkg-del" data-index="${index}" title="Удалить услугу"><i class="fa-solid fa-trash"></i></span>
+      <span class="pkg-actions">
+        <span class="pkg-edit" onclick="editPackage(${index})"><i class="fa-solid fa-pen"></i></span>
+        <span class="pkg-del" onclick="removePackage(${index})"><i class="fa-solid fa-trash"></i></span>
+      </span>
     `;
-    card.querySelector('.pkg-del').onclick = function(e) {
-      e.stopPropagation();
-      if (confirm('Удалить пакет "' + pkg.name + '"?')) {
-        userPackages.splice(index, 1);
-        saveUserPackages();
-      }
-    };
     container.appendChild(card);
   });
 }
 
+function removePackage(index) {
+  if (confirm('Удалить пакет "' + userPackages[index].name + '"?')) {
+    userPackages.splice(index, 1);
+    saveUserPackages();
+  }
+}
+
+// ===== РЕДАКТИРОВАНИЕ УСЛУГ (новая модалка) =====
+let _editSvcIndex = null;
+let _editSvcMode = null; // 'form' или 'package'
+
+function editFormSvc(index) {
+  _editSvcIndex = index;
+  _editSvcMode = 'form';
+  const item = formDetails[index];
+  document.getElementById('editSvcName').value = item.name;
+  document.getElementById('editSvcPrice').value = item.price;
+  document.getElementById('moEditSvc').classList.add('open');
+  document.body.classList.add('modal-open');
+}
+
+function editPackage(index) {
+  _editSvcIndex = index;
+  _editSvcMode = 'package';
+  const pkg = userPackages[index];
+  document.getElementById('editSvcName').value = pkg.name;
+  document.getElementById('editSvcPrice').value = pkg.price;
+  document.getElementById('moEditSvc').classList.add('open');
+  document.body.classList.add('modal-open');
+}
+
+function closeEditSvcModal() {
+  document.getElementById('moEditSvc').classList.remove('open');
+  document.body.classList.remove('modal-open');
+  _editSvcIndex = null;
+  _editSvcMode = null;
+}
+
+function saveEditSvc() {
+  const name = document.getElementById('editSvcName').value.trim();
+  const price = parseInt(document.getElementById('editSvcPrice').value);
+  if (!name) { alert('Введите название'); return; }
+  if (isNaN(price) || price <= 0) { alert('Введите корректную цену'); return; }
+  if (_editSvcMode === 'form') {
+    if (_editSvcIndex !== null && _editSvcIndex < formDetails.length) {
+      formDetails[_editSvcIndex].name = name;
+      formDetails[_editSvcIndex].price = price;
+      formDetails[_editSvcIndex].basePrice = price;
+      formTotal = formDetails.reduce((s,i) => s + i.price, 0);
+      renderFormSvcs();
+    }
+  } else if (_editSvcMode === 'package') {
+    if (_editSvcIndex !== null && _editSvcIndex < userPackages.length) {
+      userPackages[_editSvcIndex].name = name;
+      userPackages[_editSvcIndex].price = price;
+      saveUserPackages();
+    }
+  }
+  closeEditSvcModal();
+}
+
 // ===== МОДАЛКА ДОБАВЛЕНИЯ ПАКЕТА =====
-let pkgSelectedColor = PALETTE[0].hex; // не используется, но оставлено
+let pkgSelectedColor = PALETTE[0].hex; // не используется
 
 function openAddPackageModal() {
   document.body.classList.add('modal-open');
   document.getElementById('pkgName').value = '';
   document.getElementById('pkgPrice').value = '';
-  // больше не используем цвет
   renderPackageListInModal();
   document.getElementById('moAddPackage').classList.add('open');
 }
@@ -2927,7 +3066,6 @@ function savePackage() {
   const price = parseInt(document.getElementById('pkgPrice').value);
   if (!name) { alert('Введите название'); return; }
   if (isNaN(price) || price <= 0) { alert('Введите корректную цену'); return; }
-  // цвет по умолчанию white
   userPackages.push({ name, price, color: 'white' });
   saveUserPackages();
   document.getElementById('pkgName').value = '';
@@ -3187,6 +3325,20 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// ===== ЗАКРЫТИЕ МОДАЛОК ПО КЛИКУ НА ОВЕРЛЕЙ (только ПК) =====
+document.addEventListener('click', function(e) {
+  if (window.innerWidth > 768) {
+    const modal = e.target.closest('.mo');
+    if (modal && modal.classList.contains('open')) {
+      if (e.target === modal) {
+        modal.classList.remove('open');
+        const anyOpen = document.querySelector('.mo.open');
+        if (!anyOpen) document.body.classList.remove('modal-open');
+      }
+    }
+  }
+});
+
 auth.onAuthStateChanged(async(user)=>{
   const loader = document.getElementById('loadingScreen');
   loader.classList.add('hidden');
@@ -3210,7 +3362,6 @@ auth.onAuthStateChanged(async(user)=>{
     clientSort = p.clientSort || 'date_desc';
     clientPeriod = p.clientPeriod || 'all';
 
-    // Обновляем активные состояния в меню
     document.querySelectorAll('.sort-option[data-sort]').forEach(el => {
       el.classList.toggle('active', el.dataset.sort === clientSort);
     });
@@ -3744,7 +3895,15 @@ function renderFormSvcs(){
     const dotColor = CM[item.originalColor]||'#9090a0';
     const svcName = escapeHTML(item.name);
     const price = escapeHTML(item.price.toLocaleString());
-    d.innerHTML=`<div class="asvc-dot" style="background:${dotColor}"></div><div class="asvc-name">${svcName}</div><div class="asvc-price">${price} ₽</div><div class="asvc-rm" onclick="removeFormSvc(${i})"><i class="fa-solid fa-xmark"></i></div>`;
+    d.innerHTML=`
+      <div class="asvc-dot" style="background:${dotColor}"></div>
+      <div class="asvc-name">${svcName}</div>
+      <div class="asvc-price">${price} ₽</div>
+      <div class="asvc-actions">
+        <span class="asvc-edit" onclick="editFormSvc(${i})"><i class="fa-solid fa-pen"></i></span>
+        <span class="asvc-rm" onclick="removeFormSvc(${i})"><i class="fa-solid fa-xmark"></i></span>
+      </div>
+    `;
     cont.appendChild(d);
   });
   document.getElementById('formTotal').textContent=formTotal.toLocaleString()+' ₽';
