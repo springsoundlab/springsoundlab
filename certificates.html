@@ -2324,8 +2324,6 @@ textarea.f-inp {
 </head>
 <body>
 
-<div id="offBar">📡 Офлайн — данные сохраняются локально</div>
-
 <!-- ЗАГРУЗОЧНЫЙ ЭКРАН -->
 <div id="loadingScreen">
   <img class="loader-logo" src="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg" alt="SSL">
@@ -4651,9 +4649,8 @@ window.zoomCalendar = function(delta) {
   saveZoomToProfile();
 };
 
-// ===== NETWORK =====
-window.addEventListener('online',()=>document.getElementById('offBar').style.display='none');
-window.addEventListener('offline',()=>document.getElementById('offBar').style.display='block');
+// ===== СЕТЬ — УДАЛЯЕМ ОФЛАЙН-БАР =====
+// больше не нужны обработчики online/offline
 
 // ===== SWIPE & CLICK OUTSIDE SIDEBAR =====
 let touchStartX = 0, touchStartY = 0;
@@ -4770,25 +4767,22 @@ window.confirmSubscription = async function() {
     if (isNaN(price) || price <= 0) { alert('Введите корректную стоимость занятия'); unlockButton(btn); return; }
     if (isNaN(sessions) || sessions <= 0) { alert('Введите корректное количество занятий'); unlockButton(btn); return; }
 
-    // Проверяем существующий абонемент
     const existing = await getSubscriptionForClient(name);
     let isNew = false;
     let msg = '';
 
     if (existing) {
-      // Пополнение существующего
       const oldTotal = existing.total || 0;
       const oldUsed = existing.used || 0;
       const newTotal = oldTotal + sessions;
       await SUBC.doc(existing.id).update({
         total: newTotal,
-        price: price, // обновляем цену за занятие (может быть изменена)
+        price: price,
         clientPhone: phone || existing.clientPhone
       });
       msg = `Абонемент для "${name}" пополнен: +${sessions} занятий. Теперь ${oldUsed}/${newTotal}.`;
       isNew = false;
     } else {
-      // Создание нового
       const date = todayStr();
       const subRef = SUBC.doc();
       await subRef.set({
@@ -4802,7 +4796,6 @@ window.confirmSubscription = async function() {
         authorPhone: window.PROFILE.phone,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      // Создаём сессию-заглушку, чтобы клиент появился в списке
       await SC.add({
         date: date,
         time: '',
@@ -4830,13 +4823,11 @@ window.confirmSubscription = async function() {
       isNew = true;
     }
 
-    // Показываем сообщение
     const msgDiv = document.getElementById('subCreatedMsg');
     const detail = document.getElementById('subCreatedDetail');
     detail.textContent = msg;
     msgDiv.classList.add('show');
 
-    // Очищаем поля
     document.getElementById('subClientName').value = '';
     document.getElementById('subClientPhone').value = '';
     document.getElementById('subTotalPrice').value = '';
