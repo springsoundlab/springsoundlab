@@ -246,7 +246,7 @@ body.modal-open {
   overflow: hidden;
 }
 .topbar {
-  display: flex; /* теперь всегда показываем */
+  display: flex;
   height: 52px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -254,11 +254,8 @@ body.modal-open {
   padding: 0 18px;
   flex-shrink: 0;
 }
-.topbar .tb-btn {
-  margin-left: 0;
-}
 .topbar .view-mode {
-  margin-left: 10px;
+  margin-left: auto;
   display: flex;
   background: var(--surface2);
   border-radius: var(--r-sm);
@@ -285,6 +282,12 @@ body.modal-open {
 .topbar .view-mode .vm-btn i {
   font-size: 11px;
 }
+/* На десктопе скрываем кнопку меню */
+@media(min-width:769px) {
+  .topbar .menu-btn {
+    display: none !important;
+  }
+}
 .content {
   flex: 1;
   overflow: hidden;
@@ -309,7 +312,7 @@ body.modal-open {
   flex-wrap: wrap;
 }
 .toolbar .view-mode {
-  display: none; /* скрываем, так как перенесли в topbar */
+  display: none; /* скрываем старый переключатель, т.к. он в topbar */
 }
 .tb-btn {
   padding: 6px 11px;
@@ -1787,11 +1790,6 @@ textarea.f-inp {
   margin-top: 12px;
 }
 
-/* Убираем старый view-mode в toolbar */
-.toolbar .view-mode {
-  display: none !important;
-}
-
 /* ===== МОБИЛЬНЫЕ АДАПТАЦИИ ===== */
 @media(max-width:768px) {
   .sidebar {
@@ -1823,8 +1821,8 @@ textarea.f-inp {
     display: flex;
     padding-left: 18px !important;
   }
-  .topbar .tb-btn {
-    margin-left: 0;
+  .topbar .menu-btn {
+    display: flex !important; /* на мобильных показываем кнопку меню */
   }
   .sb-logo-t,
   .sb-logo-s,
@@ -2402,7 +2400,7 @@ textarea.f-inp {
 
 <div class="main">
   <div class="topbar">
-    <div class="tb-btn" onclick="document.querySelector('.sidebar').classList.toggle('mobile-open')">
+    <div class="tb-btn menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('mobile-open')">
       <i class="fa-solid fa-bars"></i> Меню
     </div>
     <div class="view-mode">
@@ -2414,6 +2412,7 @@ textarea.f-inp {
   <div class="content" id="contentArea">
     <div id="secSessions" class="view">
       <div class="toolbar">
+        <!-- убрана кнопка "Новая запись" -->
         <div class="zoom-controls">
           <button class="tb-btn" onclick="zoomCalendar(1)" title="Увеличить масштаб"><i class="fa-solid fa-plus"></i></button>
           <button class="tb-btn" onclick="zoomCalendar(-1)" title="Уменьшить масштаб"><i class="fa-solid fa-minus"></i></button>
@@ -4684,7 +4683,7 @@ document.addEventListener('touchend', e => {
 }, {passive: true});
 document.addEventListener('click', e => {
   const sidebar = document.querySelector('.sidebar');
-  const topbarBtn = document.querySelector('.topbar .tb-btn');
+  const topbarBtn = document.querySelector('.topbar .menu-btn');
   if (sidebar && sidebar.classList.contains('mobile-open')) {
     if (sidebar.contains(e.target) && (e.target.closest('.nav-i') || e.target.closest('.sb-user'))) return;
     if (!sidebar.contains(e.target) && (!topbarBtn || !topbarBtn.contains(e.target))) {
