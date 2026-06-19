@@ -2491,6 +2491,7 @@ textarea.f-inp {
     <div class="nav-i active" onclick="goSec('sessions')" id="nav-sessions"><i class="fa-regular fa-calendar-check"></i> Журнал</div>
     <div class="nav-i" onclick="goSec('clients')" id="nav-clients"><i class="fa-regular fa-user"></i> Клиенты</div>
     <div class="nav-i" onclick="goSec('finance')" id="nav-finance"><i class="fa-solid fa-wallet"></i> Финансы</div>
+    <div class="nav-i" onclick="openSubscriptionModal()" id="nav-subscription"><i class="fa-solid fa-ticket"></i> Абонемент</div>
     <div class="nav-i" onclick="goSec('certs')" id="nav-certs"><i class="fa-solid fa-gift"></i> Сертификаты</div>
     <div class="nav-i" onclick="goSec('analytics')" id="nav-analytics"><i class="fa-solid fa-chart-simple"></i> Аналитика</div>
     <div class="nav-i" onclick="goSec('employees')" id="nav-employees"><i class="fa-solid fa-users"></i> Сотрудники</div>
@@ -2512,8 +2513,7 @@ textarea.f-inp {
   <div class="content" id="contentArea">
     <div id="secSessions" class="view">
       <div class="toolbar">
-        <button class="tb-btn green-btn" onclick="openNewForm()"><i class="fa-solid fa-plus"></i> Новая запись</button>
-        <button class="tb-btn sub-btn" onclick="openSubscriptionModal()"><i class="fa-solid fa-ticket"></i> Абонемент</button>
+        <!-- Убраны кнопки "Новая запись" и "Абонемент" -->
         <div class="view-mode">
           <div class="vm-btn active" id="vmCal" onclick="setViewMode('calendar')"><i class="fa-regular fa-calendar"></i> Календарь</div>
           <div class="vm-btn" id="vmList" onclick="setViewMode('list')"><i class="fa-solid fa-list"></i> Список</div>
@@ -4333,6 +4333,22 @@ function renderClients() {
     if (!key.includes(' ')) {
       key = key + '_' + r.id;
     }
+    // Если это запись-абонемент, то не считаем её как визит, но добавляем клиента
+    if (r.isSubscription) {
+      if (!map[key]) {
+        map[key] = {
+          name: fullName.trim(),
+          phone: r.phone || '',
+          visits: 0,
+          total: 0,
+          last: '',
+          types: {},
+          ids: []
+        };
+      }
+      // Не обновляем статистику
+      return;
+    }
     if (!map[key]) {
       map[key] = {
         name: fullName.trim(),
@@ -4929,7 +4945,7 @@ window.confirmSubscription = async function() {
     const price = parseInt(document.getElementById('subTotalPrice').value);
     const sessions = parseInt(document.getElementById('subTotalSessions').value);
     if (!name) { alert('Введите имя клиента'); unlockButton(btn); return; }
-    if (isNaN(price) || price <= 0) { alert('Введите корректную стоимость'); unlockButton(btn); return; }
+    if (isNaN(price) || price <= 0) { alert('Введите корректную стоимость занятия'); unlockButton(btn); return; }
     if (isNaN(sessions) || sessions <= 0) { alert('Введите корректное количество занятий'); unlockButton(btn); return; }
 
     // Проверяем, есть ли уже абонемент у этого клиента
@@ -4954,7 +4970,7 @@ window.confirmSubscription = async function() {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Создаём сессию для клиента, чтобы он появился в клиентах
+    // Создаём сессию-заглушку, чтобы клиент появился в списке (но без визита)
     await SC.add({
       date,
       time: '',
@@ -4966,15 +4982,15 @@ window.confirmSubscription = async function() {
       type: 'Абонемент',
       services: `Абонемент (${sessions} занятий)`,
       details: [],
-      total: price * sessions,
-      fullTotal: price * sessions,
+      total: 0,
+      fullTotal: 0,
       comment: `Абонемент создан: ${sessions} занятий`,
       authorName: window.PROFILE.name,
       authorUid: window.PROFILE.uid,
       authorPhone: window.PROFILE.phone,
       eventColor: window.PROFILE?.color || PALETTE[0].hex,
       timestamp: Date.now(),
-      completed: false,
+      completed: true,
       isSubscription: true,
       subscriptionId: subRef.id
     });
@@ -4982,10 +4998,10 @@ window.confirmSubscription = async function() {
     // Показываем сообщение об успехе
     const msg = document.getElementById('subCreatedMsg');
     const detail = document.getElementById('subCreatedDetail');
-    detail.textContent = `Клиент "${name}" добавлен в раздел «Клиенты». Абонемент: ${sessions} занятий, ${price} ₽.`;
+    detail.textContent = `Клиент "${name}" добавлен в раздел «Клиенты». Абонемент: ${sessions} занятий, ${price} ₽ за занятие.`;
     msg.classList.add('show');
 
-    // Очищаем поля, но оставляем кнопку Подтвердить активной
+    // Очищаем поля
     document.getElementById('subClientName').value = '';
     document.getElementById('subClientPhone').value = '';
     document.getElementById('subTotalPrice').value = '';
@@ -4993,7 +5009,6 @@ window.confirmSubscription = async function() {
 
     setTimeout(() => {
       closeSubscriptionModal();
-      // Переходим в клиенты
       goSec('clients');
     }, 1500);
 
@@ -5003,9 +5018,6 @@ window.confirmSubscription = async function() {
     if (btn) unlockButton(btn);
   }
 };
-
-// ===== ПЕРЕХВАТ НАЖАТИЯ НА КНОПКУ АБОНЕМЕНТ В ТУЛБАРЕ =====
-// Кнопка уже добавлена в toolbar, функция openSubscriptionModal готова
 
 // ===== ПОДПИСКА НА ИЗМЕНЕНИЕ ИМЕНИ В ФОРМЕ =====
 document.addEventListener('DOMContentLoaded', function() {
