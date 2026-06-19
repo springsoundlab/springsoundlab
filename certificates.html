@@ -316,6 +316,13 @@ body.modal-open {
   color: var(--accent);
   border-color: rgba(124,111,255,.3);
 }
+.tb-btn.sub-btn {
+  color: var(--gold);
+  border-color: rgba(212,175,55,0.3);
+}
+.tb-btn.sub-btn:hover {
+  background: var(--gold-bg);
+}
 
 /* Кнопки зума (ПК) */
 .zoom-controls {
@@ -776,12 +783,23 @@ body.modal-open {
 .cl-subscription span:last-child {
   font-weight: 700;
 }
+.sub-badge {
+  background: var(--gold-bg);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-block;
+  margin-top: 4px;
+}
 
 /* ===== ВЫПАДАЮЩЕЕ МЕНЮ СОРТИРОВКИ (две колонки) ===== */
 .sort-dropdown-wrapper {
   position: relative;
   display: inline-block;
-  z-index: 300; /* выше карточек, но не перекрывает всё */
+  z-index: 300;
 }
 .sort-dropdown-menu {
   display: none;
@@ -1301,6 +1319,13 @@ body.modal-open {
   background: var(--red);
   color: #fff;
 }
+.mb-confirm.gold-btn {
+  background: var(--gold);
+  color: #000;
+}
+.mb-confirm.gold-btn:hover {
+  background: #c9a032;
+}
 
 /* FORM FIELDS */
 .f-row {
@@ -1526,6 +1551,10 @@ textarea.f-inp {
   font-family: 'JetBrains Mono', monospace;
   font-size: 20px;
   font-weight: 700;
+}
+.total-val.sub-usage {
+  color: var(--gold);
+  font-size: 22px;
 }
 
 .prepaid-row {
@@ -2111,7 +2140,8 @@ textarea.f-inp {
   #moRecord .mb,
   #moClientEdit .mb,
   #moAddPackage .mb,
-  #moEditSvc .mb {
+  #moEditSvc .mb,
+  #moSubscription .mb {
     width: 95% !important;
     max-width: 500px !important;
     border-radius: 16px !important;
@@ -2358,6 +2388,43 @@ textarea.f-inp {
   justify-content: center;
   border: 1px solid var(--border);
 }
+
+/* ===== МОДАЛКА ДЛЯ АБОНЕМЕНТА ===== */
+#moSubscription .mb {
+  max-width: 420px;
+}
+#moSubscription .mb .mb-title {
+  font-size: 15px;
+}
+#moSubscription .mb .f-group {
+  margin-bottom: 14px;
+}
+#moSubscription .mb .f-label {
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.sub-created-msg {
+  background: var(--green-bg);
+  border: 1px solid var(--green);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  margin-top: 12px;
+  display: none;
+}
+.sub-created-msg.show {
+  display: block;
+}
+.sub-created-msg .msg-title {
+  font-weight: 700;
+  color: var(--green);
+  font-size: 13px;
+}
+.sub-created-msg .msg-detail {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 4px;
+}
 </style>
 </head>
 <body>
@@ -2446,6 +2513,7 @@ textarea.f-inp {
     <div id="secSessions" class="view">
       <div class="toolbar">
         <button class="tb-btn green-btn" onclick="openNewForm()"><i class="fa-solid fa-plus"></i> Новая запись</button>
+        <button class="tb-btn sub-btn" onclick="openSubscriptionModal()"><i class="fa-solid fa-ticket"></i> Абонемент</button>
         <div class="view-mode">
           <div class="vm-btn active" id="vmCal" onclick="setViewMode('calendar')"><i class="fa-regular fa-calendar"></i> Календарь</div>
           <div class="vm-btn" id="vmList" onclick="setViewMode('list')"><i class="fa-solid fa-list"></i> Список</div>
@@ -2584,7 +2652,7 @@ textarea.f-inp {
           </div>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="f-group"><div class="f-label">Имя клиента</div><input type="text" id="fName" class="f-inp" placeholder="Иван Иванов"></div>
+          <div class="f-group"><div class="f-label">Имя клиента</div><input type="text" id="fName" class="f-inp" placeholder="Иван Иванов" oninput="checkSubscriptionForClient()"></div>
           <div class="f-group"><div class="f-label">Телефон</div><input type="tel" id="fPhone" class="f-inp" placeholder="+7 900 000-00-00" inputmode="tel"></div>
         </div>
       </div>
@@ -2724,7 +2792,6 @@ textarea.f-inp {
   <div class="mb mb-sm" style="max-width:450px;">
     <div class="mb-header"><div class="mb-title">Управление услугами</div><div class="mb-close" onclick="closeAddPackageModal()"><i class="fa-solid fa-xmark"></i></div></div>
     <div style="margin-bottom:12px;">
-      <!-- Заголовок "Добавить новую услугу" убран -->
       <div class="f-group" style="margin-bottom:14px;">
         <div class="f-label">Название</div>
         <input type="text" id="pkgName" class="f-inp" placeholder="Урок вокала">
@@ -2733,7 +2800,6 @@ textarea.f-inp {
         <div class="f-label">Цена (₽)</div>
         <input type="number" id="pkgPrice" class="f-inp mono" placeholder="1000">
       </div>
-      <!-- блок цвета убран -->
       <button class="tb-btn green-btn" style="width:100%;justify-content:center;margin-top:8px;" onclick="savePackage()">Добавить</button>
     </div>
     <hr class="f-sep">
@@ -2763,6 +2829,40 @@ textarea.f-inp {
     <div class="mb-btns">
       <button class="mb-btn mb-cancel" onclick="closeEditSvcModal()">Отмена</button>
       <button class="mb-btn mb-confirm" id="editSvcConfirm" onclick="saveEditSvc()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== НОВАЯ МОДАЛКА ДЛЯ АБОНЕМЕНТА ===== -->
+<div class="mo" id="moSubscription">
+  <div class="mb mb-sm">
+    <div class="mb-header">
+      <div class="mb-title"><i class="fa-solid fa-ticket" style="color:var(--gold);margin-right:6px;"></i> Новый абонемент</div>
+      <div class="mb-close" onclick="closeSubscriptionModal()"><i class="fa-solid fa-xmark"></i></div>
+    </div>
+    <div class="f-group">
+      <div class="f-label">Имя клиента</div>
+      <input type="text" id="subClientName" class="f-inp" placeholder="Иван Иванов">
+    </div>
+    <div class="f-group">
+      <div class="f-label">Телефон</div>
+      <input type="tel" id="subClientPhone" class="f-inp" placeholder="+7 900 000-00-00" inputmode="tel">
+    </div>
+    <div class="f-group">
+      <div class="f-label">Стоимость абонемента (₽)</div>
+      <input type="number" id="subTotalPrice" class="f-inp mono" placeholder="5000">
+    </div>
+    <div class="f-group">
+      <div class="f-label">Количество занятий</div>
+      <input type="number" id="subTotalSessions" class="f-inp mono" placeholder="10">
+    </div>
+    <div class="sub-created-msg" id="subCreatedMsg">
+      <div class="msg-title">✅ Абонемент создан!</div>
+      <div class="msg-detail" id="subCreatedDetail">Клиент добавлен в раздел «Клиенты»</div>
+    </div>
+    <div class="mb-btns">
+      <button class="mb-btn mb-cancel" onclick="closeSubscriptionModal()">Отмена</button>
+      <button class="mb-btn mb-confirm gold-btn" onclick="confirmSubscription()">Подтвердить</button>
     </div>
   </div>
 </div>
@@ -2814,6 +2914,7 @@ db.enablePersistence({synchronizeTabs:true}).catch(err=>console.warn('⚠️ Off
 const SC=db.collection("sessions");
 const UC=db.collection("users");
 const CERTC=db.collection("certificates");
+const SUBC=db.collection("subscriptions");
 
 // ===== PALETTE =====
 const PALETTE=[
@@ -2878,6 +2979,9 @@ let userPackages=[];
 let clientSort='date_desc';
 let clientPeriod='all';
 let isMobileDevice=false;
+let _subClientHasSubscription = false;
+let _subClientSubData = null;
+let _lastCheckedClientName = '';
 
 // ===== DETECT MOBILE =====
 function detectMobile() {
@@ -3009,7 +3113,7 @@ function removePackage(index) {
 
 // ===== РЕДАКТИРОВАНИЕ УСЛУГ (новая модалка) =====
 let _editSvcIndex = null;
-let _editSvcMode = null; // 'form' или 'package'
+let _editSvcMode = null;
 
 function editFormSvc(index) {
   _editSvcIndex = index;
@@ -3168,29 +3272,93 @@ function confirmColorFromPicker() {
 }
 
 // ===== ДЛЯ АБОНЕМЕНТОВ =====
-async function updateSubscriptionUsage(clientName) {
-  if (!clientName) return;
-  const snap = await db.collection("subscriptions")
-    .where("clientName", "==", clientName)
-    .where("authorUid", "==", window.PROFILE.uid)
-    .get();
-  if (snap.empty) return;
-  const doc = snap.docs[0];
-  const data = doc.data();
-  if (data.used < data.total) {
-    await doc.ref.update({ used: firebase.firestore.FieldValue.increment(1) });
-    console.log('✅ Обновлён абонемент:', clientName);
+async function getSubscriptionForClient(clientName) {
+  if (!clientName || !window.PROFILE) return null;
+  try {
+    const snap = await SUBC
+      .where("clientName", "==", clientName.trim())
+      .where("authorUid", "==", window.PROFILE.uid)
+      .get();
+    if (snap.empty) return null;
+    const doc = snap.docs[0];
+    return { id: doc.id, ...doc.data() };
+  } catch(e) {
+    console.error('Ошибка поиска абонемента:', e);
+    return null;
   }
 }
 
-function updateSubscriptionTotal() {
-  const price = parseInt(document.getElementById('subPrice').value) || 0;
-  const count = parseInt(document.getElementById('subCount').value) || 0;
-  if (price > 0 && count > 0) {
-    document.getElementById('formTotal').textContent = (price * count).toLocaleString() + ' ₽';
-  } else {
-    document.getElementById('formTotal').textContent = '0 ₽';
+async function updateSubscriptionUsage(clientName, hours = 1) {
+  if (!clientName || !window.PROFILE) return null;
+  try {
+    const snap = await SUBC
+      .where("clientName", "==", clientName.trim())
+      .where("authorUid", "==", window.PROFILE.uid)
+      .get();
+    if (snap.empty) return null;
+    const doc = snap.docs[0];
+    const data = doc.data();
+    const used = data.used || 0;
+    const total = data.total || 0;
+    const newUsed = Math.min(used + hours, total);
+    if (newUsed > total) {
+      alert(`⚠️ У клиента осталось только ${total - used} занятий, а вы ставите на ${hours} час(ов). Будет списано ${total - used} занятий.`);
+    }
+    await doc.ref.update({ used: newUsed });
+    console.log(`✅ Списано ${hours} занятий для ${clientName}. Использовано: ${newUsed}/${total}`);
+    return { used: newUsed, total };
+  } catch(e) {
+    console.error('Ошибка обновления абонемента:', e);
+    return null;
   }
+}
+
+async function checkSubscriptionForClient() {
+  const nameInput = document.getElementById('fName');
+  const name = nameInput.value.trim();
+  if (!name) {
+    _subClientHasSubscription = false;
+    _subClientSubData = null;
+    _lastCheckedClientName = '';
+    updateTotalDisplay();
+    return;
+  }
+  if (name === _lastCheckedClientName && _subClientSubData !== null) {
+    updateTotalDisplay();
+    return;
+  }
+  _lastCheckedClientName = name;
+  const sub = await getSubscriptionForClient(name);
+  if (sub) {
+    _subClientHasSubscription = true;
+    _subClientSubData = sub;
+    // Автозаполняем телефон если есть
+    if (sub.clientPhone && !document.getElementById('fPhone').value) {
+      document.getElementById('fPhone').value = sub.clientPhone;
+    }
+  } else {
+    _subClientHasSubscription = false;
+    _subClientSubData = null;
+  }
+  updateTotalDisplay();
+}
+
+function updateTotalDisplay() {
+  const totalEl = document.getElementById('formTotal');
+  if (_subClientHasSubscription && _subClientSubData) {
+    const used = _subClientSubData.used || 0;
+    const total = _subClientSubData.total || 0;
+    const next = Math.min(used + 1, total);
+    const label = `${next}/${total}`;
+    totalEl.textContent = label;
+    totalEl.className = 'total-val sub-usage';
+    totalEl.title = `Занятие ${next} из ${total}`;
+  } else {
+    totalEl.textContent = formTotal.toLocaleString() + ' ₽';
+    totalEl.className = 'total-val pv';
+    totalEl.title = '';
+  }
+  if (!privacyOn && !_subClientHasSubscription) applyBlur();
 }
 
 // ===== МУЛЬТИТАЧ =====
@@ -3788,6 +3956,9 @@ function openNewForm(){
   formDetails=[];
   formTotal=0;
   selectedFormColor=window.PROFILE?.color||PALETTE[0].hex;
+  _subClientHasSubscription = false;
+  _subClientSubData = null;
+  _lastCheckedClientName = '';
   document.getElementById('mbRecTitle').textContent='Новая запись';
   document.getElementById('fDate').value=dateToInput(todayStr());
   document.getElementById('fTime').value='';
@@ -3821,7 +3992,7 @@ window.setSvcMode=function(m){
   if (m === 'subscription') {
     updateSubscriptionTotal();
   } else {
-    document.getElementById('formTotal').textContent = formTotal.toLocaleString() + ' ₽';
+    updateTotalDisplay();
   }
 };
 
@@ -3834,6 +4005,9 @@ window.openEdit = function(id) {
   formDetails=row.details?JSON.parse(JSON.stringify(row.details)):[];
   formTotal=formDetails.reduce((s,i)=>s+i.price,0);
   selectedFormColor=row.eventColor||window.PROFILE?.color||PALETTE[0].hex;
+  _subClientHasSubscription = false;
+  _subClientSubData = null;
+  _lastCheckedClientName = '';
   document.getElementById('mbRecTitle').textContent='Редактирование записи';
   document.getElementById('fDate').value=dateToInput(row.date||'');
   document.getElementById('fTime').value=row.time||'';
@@ -3846,6 +4020,18 @@ window.openEdit = function(id) {
   document.getElementById('formColorNote').textContent = 'Ваш цвет';
   renderFormSvcs();
   setupFormMode();
+  // Проверяем абонемент для редактируемого клиента
+  const name = row.client || row.song || '';
+  if (name) {
+    getSubscriptionForClient(name).then(sub => {
+      if (sub) {
+        _subClientHasSubscription = true;
+        _subClientSubData = sub;
+        _lastCheckedClientName = name;
+        updateTotalDisplay();
+      }
+    });
+  }
   const modal = document.getElementById('moRecord');
   modal.classList.add('open');
   modal.scrollTop = 0; 
@@ -3857,6 +4043,9 @@ window.closeRecModal=function(){
   editId=null;
   formDetails=[];
   formTotal=0;
+  _subClientHasSubscription = false;
+  _subClientSubData = null;
+  _lastCheckedClientName = '';
 };
 
 // ===== PRESET SERVICES =====
@@ -3952,7 +4141,7 @@ function renderFormSvcs(){
     `;
     cont.appendChild(d);
   });
-  document.getElementById('formTotal').textContent=formTotal.toLocaleString()+' ₽';
+  updateTotalDisplay();
   if(!privacyOn)applyBlur();
 }
 
@@ -3971,7 +4160,7 @@ window.saveRecord=async function(){
       if (!name) { alert('Введите имя клиента'); unlockButton(btn); return; }
       if (isNaN(subPrice) || subPrice <= 0) { alert('Введите сумму абонемента'); unlockButton(btn); return; }
       if (isNaN(subCount) || subCount <= 0) { alert('Введите количество занятий'); unlockButton(btn); return; }
-      const subRef = db.collection("subscriptions").doc();
+      const subRef = SUBC.doc();
       await subRef.set({
         clientName: name,
         clientPhone: phone,
@@ -3980,8 +4169,10 @@ window.saveRecord=async function(){
         price: subPrice,
         createdDate: date,
         authorUid: window.PROFILE.uid,
-        authorPhone: window.PROFILE.phone
+        authorPhone: window.PROFILE.phone,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+      // Создаем сессию для клиента, чтобы он появился в клиентах
       const data = {
         date,
         time: '',
@@ -3995,7 +4186,7 @@ window.saveRecord=async function(){
         details: [],
         total: subPrice * subCount,
         fullTotal: subPrice * subCount,
-        comment: comment || 'Абонемент',
+        comment: comment || 'Абонемент создан',
         authorName: window.PROFILE.name,
         authorUid: window.PROFILE.uid,
         authorPhone: window.PROFILE.phone,
@@ -4008,6 +4199,7 @@ window.saveRecord=async function(){
       await SC.add(data);
       closeRecModal();
       unlockButton(btn);
+      alert(`✅ Абонемент для "${name}" создан! Клиент появился в разделе "Клиенты".`);
       return;
     }
 
@@ -4048,6 +4240,7 @@ window.saveRecord=async function(){
        duration = (h2 * 60 + m2) - (h1 * 60 + m1);
        if(duration <= 0) duration = 60;
     }
+    const hours = Math.ceil(duration / 60);
     const data={
       date, time, timeEnd, duration,
       client:name, song, phone, type, services:svcsLabel, details, 
@@ -4062,10 +4255,18 @@ window.saveRecord=async function(){
     } else {
       await SC.add(data);
     }
-    if (svcMode !== 'subscription') {
-      try {
-        await updateSubscriptionUsage(name);
-      } catch(e) { console.error('Ошибка обновления абонемента:', e); }
+    // Если есть абонемент — списываем занятия
+    if (!editId) {
+      const sub = await getSubscriptionForClient(name);
+      if (sub) {
+        const hoursToDeduct = Math.max(1, hours);
+        await updateSubscriptionUsage(name, hoursToDeduct);
+        // Обновляем локальное состояние для отображения
+        _subClientHasSubscription = true;
+        _subClientSubData = await getSubscriptionForClient(name);
+        _lastCheckedClientName = name;
+        updateTotalDisplay();
+      }
     }
     closeRecModal();
   } catch(e) { 
@@ -4186,7 +4387,7 @@ function renderClients() {
 
   const promises = cls.map(async (c) => {
     try {
-      const subSnap = await db.collection("subscriptions")
+      const subSnap = await SUBC
         .where("clientName", "==", c.name)
         .where("authorUid", "==", window.PROFILE.uid)
         .get();
@@ -4222,8 +4423,16 @@ function renderClientCard(c, subInfo) {
   const last = escapeHTML(c.last || '—');
   const topTypeName = topType ? escapeHTML(topType[0]) : '—';
   let subHtml = '';
+  let subBadge = '';
   if (subInfo) {
-    subHtml = `<div class="cl-subscription"><span>Абонемент</span><span>${subInfo.used}/${subInfo.total}</span></div>`;
+    const used = subInfo.used || 0;
+    const totalSessions = subInfo.total || 0;
+    subHtml = `<div class="cl-subscription"><span>Абонемент</span><span>${used}/${totalSessions}</span></div>`;
+    if (used < totalSessions) {
+      subBadge = `<div class="sub-badge">${totalSessions - used} занятий осталось</div>`;
+    } else {
+      subBadge = `<div class="sub-badge" style="border-color:var(--red);color:var(--red);background:var(--red-bg);">Абонемент использован</div>`;
+    }
   }
   card.innerHTML = `
     <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -4235,6 +4444,7 @@ function renderClientCard(c, subInfo) {
         <i class="fa-solid fa-ellipsis-vertical"></i>
       </button>
     </div>
+    ${subBadge}
     <div class="cl-stats">
       <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${c.visits}</div></div>
       <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${total}</div></div>
@@ -4692,6 +4902,125 @@ window.forceMigrate = async function() {
     else { alert('✅ Все записи уже привязаны к вашему аккаунту.'); localStorage.setItem('migration_done_universal', 'true'); }
   } catch(e) { handleError(e, 'Ошибка при миграции.'); } finally { if (btn) unlockButton(btn); }
 };
+
+// ===== НОВЫЙ АБОНЕМЕНТ — МОДАЛКА =====
+function openSubscriptionModal() {
+  document.body.classList.add('modal-open');
+  document.getElementById('subClientName').value = '';
+  document.getElementById('subClientPhone').value = '';
+  document.getElementById('subTotalPrice').value = '';
+  document.getElementById('subTotalSessions').value = '';
+  document.getElementById('subCreatedMsg').classList.remove('show');
+  document.getElementById('moSubscription').classList.add('open');
+}
+
+function closeSubscriptionModal() {
+  document.body.classList.remove('modal-open');
+  document.getElementById('moSubscription').classList.remove('open');
+  document.getElementById('subCreatedMsg').classList.remove('show');
+}
+
+window.confirmSubscription = async function() {
+  const btn = document.querySelector('#moSubscription .mb-confirm');
+  if (btn) lockButton(btn);
+  try {
+    const name = document.getElementById('subClientName').value.trim();
+    const phone = document.getElementById('subClientPhone').value.trim();
+    const price = parseInt(document.getElementById('subTotalPrice').value);
+    const sessions = parseInt(document.getElementById('subTotalSessions').value);
+    if (!name) { alert('Введите имя клиента'); unlockButton(btn); return; }
+    if (isNaN(price) || price <= 0) { alert('Введите корректную стоимость'); unlockButton(btn); return; }
+    if (isNaN(sessions) || sessions <= 0) { alert('Введите корректное количество занятий'); unlockButton(btn); return; }
+
+    // Проверяем, есть ли уже абонемент у этого клиента
+    const existing = await getSubscriptionForClient(name);
+    if (existing) {
+      alert(`У клиента "${name}" уже есть абонемент (${existing.used}/${existing.total}). Создайте нового клиента с другим именем.`);
+      unlockButton(btn);
+      return;
+    }
+
+    const date = todayStr();
+    const subRef = SUBC.doc();
+    await subRef.set({
+      clientName: name,
+      clientPhone: phone,
+      total: sessions,
+      used: 0,
+      price: price,
+      createdDate: date,
+      authorUid: window.PROFILE.uid,
+      authorPhone: window.PROFILE.phone,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Создаём сессию для клиента, чтобы он появился в клиентах
+    await SC.add({
+      date,
+      time: '',
+      timeEnd: '',
+      duration: 0,
+      client: name,
+      song: name,
+      phone: phone,
+      type: 'Абонемент',
+      services: `Абонемент (${sessions} занятий)`,
+      details: [],
+      total: price * sessions,
+      fullTotal: price * sessions,
+      comment: `Абонемент создан: ${sessions} занятий`,
+      authorName: window.PROFILE.name,
+      authorUid: window.PROFILE.uid,
+      authorPhone: window.PROFILE.phone,
+      eventColor: window.PROFILE?.color || PALETTE[0].hex,
+      timestamp: Date.now(),
+      completed: false,
+      isSubscription: true,
+      subscriptionId: subRef.id
+    });
+
+    // Показываем сообщение об успехе
+    const msg = document.getElementById('subCreatedMsg');
+    const detail = document.getElementById('subCreatedDetail');
+    detail.textContent = `Клиент "${name}" добавлен в раздел «Клиенты». Абонемент: ${sessions} занятий, ${price} ₽.`;
+    msg.classList.add('show');
+
+    // Очищаем поля, но оставляем кнопку Подтвердить активной
+    document.getElementById('subClientName').value = '';
+    document.getElementById('subClientPhone').value = '';
+    document.getElementById('subTotalPrice').value = '';
+    document.getElementById('subTotalSessions').value = '';
+
+    setTimeout(() => {
+      closeSubscriptionModal();
+      // Переходим в клиенты
+      goSec('clients');
+    }, 1500);
+
+  } catch(e) {
+    handleError(e, 'Ошибка при создании абонемента: ' + e.message);
+  } finally {
+    if (btn) unlockButton(btn);
+  }
+};
+
+// ===== ПЕРЕХВАТ НАЖАТИЯ НА КНОПКУ АБОНЕМЕНТ В ТУЛБАРЕ =====
+// Кнопка уже добавлена в toolbar, функция openSubscriptionModal готова
+
+// ===== ПОДПИСКА НА ИЗМЕНЕНИЕ ИМЕНИ В ФОРМЕ =====
+document.addEventListener('DOMContentLoaded', function() {
+  const nameInput = document.getElementById('fName');
+  if (nameInput) {
+    nameInput.addEventListener('input', function() {
+      checkSubscriptionForClient();
+    });
+    nameInput.addEventListener('blur', function() {
+      checkSubscriptionForClient();
+    });
+  }
+});
+
+console.log('✅ CRM v3 — Абонементы полностью интегрированы!');
 </script>
 </body>
 </html>
