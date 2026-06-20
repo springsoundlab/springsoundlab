@@ -145,7 +145,7 @@
             flex-direction: column;
             flex-shrink: 0;
             transition: left 0.3s ease-in-out;
-            z-index: 9999999 !important; /* выше всех выпадашек */
+            z-index: 9999999 !important;
         }
         .sb-logo {
             display: flex;
@@ -287,12 +287,22 @@
             padding: 4px 10px;
             font-size: 11px;
         }
-        /* Кнопка сброса — по умолчанию скрыта, показывается только в журнале */
-        #resetCalBtn {
+        /* По умолчанию скрываем календарь и кнопку сброса */
+        .topbar .topbar-right .cal-controls {
             display: none;
         }
-        #secSessions.active #resetCalBtn {
-            display: inline-flex;
+        /* Показываем только когда активен журнал */
+        .topbar .topbar-right .cal-controls.active {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ПК – иконка календаря белая */
+        @media(min-width:769px) {
+            input[type="month"]::-webkit-calendar-picker-indicator {
+                filter: invert(1);
+            }
         }
 
         .content {
@@ -367,18 +377,6 @@
             display: flex;
             gap: 4px;
             margin-right: 8px;
-        }
-        /* Иконка календаря рядом с month picker (только ПК) */
-        .cal-icon-desktop {
-            display: none;
-            color: #fff;
-            font-size: 16px;
-            margin-right: 2px;
-        }
-        @media(min-width:769px) {
-            .cal-icon-desktop {
-                display: inline-block;
-            }
         }
 
         /* CALENDAR VIEW */
@@ -648,7 +646,7 @@
         .sort-dropdown-wrapper {
             position: relative;
             display: inline-block;
-            z-index: 9999; /* ниже сайдбара */
+            z-index: 9999;
         }
         .sort-dropdown-menu {
             display: none;
@@ -697,6 +695,90 @@
         .period-column .sort-option.active {
             background: var(--accent-bg);
             color: var(--accent2);
+        }
+
+        /* На ПК скрываем крестик и кнопки сортировки */
+        @media(min-width:769px) {
+            .sort-dropdown-menu .sort-close,
+            .sort-dropdown-menu .sort-actions {
+                display: none !important;
+            }
+            /* На ПК меню сортировки остается как есть, без дополнительных элементов */
+            .sort-dropdown-menu {
+                padding: 8px;
+            }
+        }
+
+        /* На мобильных показываем крестик и кнопки, увеличиваем текст */
+        @media(max-width:768px) {
+            .sort-dropdown-menu {
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                min-width: 90vw !important;
+                max-width: 400px !important;
+                width: auto !important;
+                background: var(--surface2) !important;
+                border: 1px solid var(--border2) !important;
+                border-radius: 12px !important;
+                padding: 16px !important;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.8) !important;
+                margin: 0 !important;
+                grid-template-columns: 1fr !important;
+                gap: 6px !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
+            }
+            .sort-dropdown-menu.open {
+                display: grid !important;
+            }
+            .sort-option {
+                padding: 8px 12px !important;
+                font-size: 14px !important; /* увеличен шрифт */
+                white-space: normal !important;
+            }
+            .sort-close {
+                display: flex !important;
+                justify-content: flex-end;
+                margin-bottom: 0;
+                padding: 0;
+            }
+            .sort-close .mb-close {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
+            .sort-actions {
+                display: flex !important;
+                gap: 6px;
+                margin-top: 10px;
+                padding-top: 8px;
+                border-top: 1px solid var(--border);
+            }
+            .sort-actions .mb-btn {
+                flex: 1;
+                padding: 10px;
+                border-radius: var(--r-sm);
+                border: none;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 700;
+            }
+            .sort-actions .mb-btn.ok-btn {
+                background: var(--accent);
+                color: #fff;
+            }
+            .sort-actions .mb-btn.ok-btn:hover {
+                background: #6a5ee0;
+            }
+            .sort-actions .mb-btn.cancel-btn {
+                background: var(--surface2);
+                color: var(--text2);
+            }
+            .sort-actions .mb-btn.cancel-btn:hover {
+                background: var(--surface3);
+            }
         }
 
         /* FINANCE – карточки */
@@ -2057,39 +2139,6 @@
                 font-size: 12px;
             }
 
-            /* ===== ФИКС: ВЫПАДАЮЩЕЕ МЕНЮ СОРТИРОВКИ ПОВЕРХ КАРТОЧЕК, НО НИЖЕ САЙДБАРА ===== */
-            .sort-dropdown-wrapper {
-                z-index: 9999 !important;
-            }
-            .sort-dropdown-menu {
-                position: fixed !important;
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                z-index: 9999 !important;
-                min-width: 90vw !important;
-                max-width: 400px !important;
-                width: auto !important;
-                background: var(--surface2) !important;
-                border: 1px solid var(--border2) !important;
-                border-radius: 12px !important;
-                padding: 16px !important;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.8) !important;
-                margin: 0 !important;
-                grid-template-columns: 1fr !important;
-                gap: 6px !important;
-                max-height: 80vh !important;
-                overflow-y: auto !important;
-            }
-            .sort-dropdown-menu.open {
-                display: grid !important;
-            }
-            .sort-option {
-                padding: 8px 12px !important;
-                font-size: 12px !important;
-                white-space: normal !important;
-            }
-
             /* Увеличиваем кнопку сохранить на мобильных */
             #moRecord .mb-confirm {
                 padding: 14px 10px;
@@ -2257,89 +2306,24 @@
             margin-top: 4px;
         }
 
-        /* В модалке записи новые кнопки */
-        .mb-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 12px;
-            flex-wrap: wrap;
+        /* В модалке записи — только кнопка Сохранить */
+        .mb-save-wrap {
+            margin-top: 16px;
         }
-        .mb-actions .mb-btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: var(--r-sm);
+        .mb-save-wrap .mb-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
             border: none;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 700;
-            transition: .15s;
-            text-align: center;
-        }
-        .mb-actions .mb-btn.reset-btn {
-            background: var(--surface2);
-            color: var(--text2);
-        }
-        .mb-actions .mb-btn.reset-btn:hover {
-            background: var(--surface3);
-            color: var(--text);
-        }
-        .mb-actions .mb-btn.clear-btn {
-            background: var(--red-bg);
-            color: var(--red);
-            border: 1px solid var(--red);
-        }
-        .mb-actions .mb-btn.clear-btn:hover {
-            background: var(--red);
-            color: #fff;
-        }
-        .mb-actions .mb-btn.green-btn {
-            background: var(--green);
-            color: #000;
-        }
-        .mb-actions .mb-btn.green-btn:hover {
-            background: #2db87a;
-        }
-
-        /* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ СОРТИРОВКИ ===== */
-        .sort-dropdown-menu .sort-close {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 6px;
-        }
-        .sort-dropdown-menu .sort-close .mb-close {
-            width: 26px;
-            height: 26px;
-            font-size: 14px;
-        }
-        .sort-dropdown-menu .sort-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px solid var(--border);
-        }
-        .sort-dropdown-menu .sort-actions .mb-btn {
-            flex: 1;
-            padding: 8px;
             border-radius: var(--r-sm);
-            border: none;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 700;
-        }
-        .sort-dropdown-menu .sort-actions .mb-btn.ok-btn {
             background: var(--accent);
             color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .15s;
         }
-        .sort-dropdown-menu .sort-actions .mb-btn.ok-btn:hover {
+        .mb-save-wrap .mb-btn:hover {
             background: #6a5ee0;
-        }
-        .sort-dropdown-menu .sort-actions .mb-btn.cancel-btn {
-            background: var(--surface2);
-            color: var(--text2);
-        }
-        .sort-dropdown-menu .sort-actions .mb-btn.cancel-btn:hover {
-            background: var(--surface3);
         }
     </style>
 </head>
@@ -2428,9 +2412,11 @@
                     </div>
                 </div>
                 <div class="topbar-right">
-                    <span class="cal-icon-desktop"><i class="fa-regular fa-calendar"></i></span>
-                    <input type="month" id="calMonthPickerTop">
-                    <button class="tb-btn" id="resetCalBtn" onclick="resetCalendarView()" title="Вернуться к текущей дате"><i class="fa-solid fa-rotate-left"></i> Сбросить</button>
+                    <!-- Элементы управления календарём (скрыты по умолчанию) -->
+                    <div class="cal-controls" id="calControls">
+                        <input type="month" id="calMonthPickerTop">
+                        <button class="tb-btn" id="resetCalBtn" onclick="resetCalendarView()" title="Вернуться к текущей дате"><i class="fa-solid fa-rotate-left"></i> Сбросить</button>
+                    </div>
                 </div>
             </div>
 
@@ -2460,7 +2446,7 @@
                                     <i class="fa-solid fa-arrow-up-wide-short"></i> Сортировать
                                 </button>
                                 <div class="sort-dropdown-menu" id="sortDropdownMenu">
-                                    <!-- Крестик -->
+                                    <!-- Крестик (только на мобильных) -->
                                     <div class="sort-close">
                                         <div class="mb-close" onclick="closeSortDropdown()"><i class="fa-solid fa-xmark"></i></div>
                                     </div>
@@ -2476,7 +2462,7 @@
                                         <div class="sort-option" data-period="month">Месяц</div>
                                         <div class="sort-option" data-period="year">Год</div>
                                     </div>
-                                    <!-- Кнопки -->
+                                    <!-- Кнопки (только на мобильных) -->
                                     <div class="sort-actions">
                                         <button class="mb-btn cancel-btn" onclick="closeSortDropdown()">Отмена</button>
                                         <button class="mb-btn ok-btn" onclick="applySort()">Окей</button>
@@ -2621,11 +2607,9 @@
                 <div class="f-row full">
                     <div class="f-group"><div class="f-label">Комментарий / Заметка</div><textarea id="fComment" class="f-inp" placeholder="Детали записи, пожелания клиента..."></textarea></div>
                 </div>
-                <!-- Кнопки: Очистить, Сбросить, Готово -->
-                <div class="mb-actions">
-                    <button class="mb-btn clear-btn" onclick="clearForm()">Очистить</button>
-                    <button class="mb-btn reset-btn" onclick="resetForm()">Сбросить</button>
-                    <button class="mb-btn green-btn" onclick="saveRecord()">Готово</button>
+                <!-- Одна кнопка Сохранить -->
+                <div class="mb-save-wrap">
+                    <button class="mb-btn mb-confirm" onclick="saveRecord()">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -3432,20 +3416,44 @@
             isSortDropdownOpen = false;
         }
 
-        // Временный выбор в меню (только визуально)
+        // Обработчик кликов по опциям сортировки (работает на всех устройствах)
         document.addEventListener('click', function(e) {
             const option = e.target.closest('.sort-option');
             if (!option) return;
             const menu = document.getElementById('sortDropdownMenu');
             if (!menu.contains(option)) return;
-            if (option.dataset.sort) {
-                tempClientSort = option.dataset.sort;
-                document.querySelectorAll('.sort-option[data-sort]').forEach(el => el.classList.remove('active'));
-                option.classList.add('active');
-            } else if (option.dataset.period) {
-                tempClientPeriod = option.dataset.period;
-                document.querySelectorAll('.sort-option[data-period]').forEach(el => el.classList.remove('active'));
-                option.classList.add('active');
+            // Определяем, мобильное устройство или ПК
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) {
+                // На ПК применяем сразу
+                const sortVal = option.dataset.sort;
+                const periodVal = option.dataset.period;
+                if (sortVal) {
+                    clientSort = sortVal;
+                    if (window.PROFILE && window.PROFILE.uid) {
+                        UC.doc(window.PROFILE.uid).update({ clientSort: clientSort })
+                            .catch(err => console.error('Ошибка сохранения сортировки:', err));
+                    }
+                } else if (periodVal) {
+                    clientPeriod = periodVal;
+                    if (window.PROFILE && window.PROFILE.uid) {
+                        UC.doc(window.PROFILE.uid).update({ clientPeriod: clientPeriod })
+                            .catch(err => console.error('Ошибка сохранения периода:', err));
+                    }
+                }
+                closeSortDropdown();
+                renderClients();
+            } else {
+                // На мобильных только визуальное выделение
+                if (option.dataset.sort) {
+                    tempClientSort = option.dataset.sort;
+                    document.querySelectorAll('.sort-option[data-sort]').forEach(el => el.classList.remove('active'));
+                    option.classList.add('active');
+                } else if (option.dataset.period) {
+                    tempClientPeriod = option.dataset.period;
+                    document.querySelectorAll('.sort-option[data-period]').forEach(el => el.classList.remove('active'));
+                    option.classList.add('active');
+                }
             }
         });
 
@@ -3460,13 +3468,9 @@
             renderClients();
         }
 
-        // Переопределяем старые функции selectSort и setClientPeriod, чтобы они не применялись сразу
-        window.selectSort = function(value) {
-            // теперь только визуально через клик на .sort-option
-        };
-        window.setClientPeriod = function(period) {
-            // теперь только визуально
-        };
+        // Переопределяем старые функции, чтобы они не мешали
+        window.selectSort = function() {};
+        window.setClientPeriod = function() {};
 
         document.addEventListener('click', function(e) {
             const wrapper = document.querySelector('.sort-dropdown-wrapper');
@@ -3579,7 +3583,6 @@
                     calWeekOffset = Math.round(diffTime / (1000 * 3600 * 24 * 7));
                     calDate = new Date(year, month-1, 1);
                     renderCalendar();
-                    updateMnavLabel();
                 });
             }
 
@@ -3638,6 +3641,15 @@
             // Добавляем класс active для показа кнопки сброса только в журнале
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             currentSec.classList.add('active');
+
+            // Управление видимостью элементов календаря в топбаре
+            const calControls = document.getElementById('calControls');
+            if (s === 'sessions') {
+                calControls.classList.add('active');
+            } else {
+                calControls.classList.remove('active');
+            }
+
             const sidebar = document.getElementById('sidebar');
             if(sidebar) sidebar.classList.remove('mobile-open');
             renderAll();
@@ -4081,43 +4093,12 @@
             if(!privacyOn)applyBlur();
         }
 
-        // ===== ОЧИСТКА И СБРОС ФОРМЫ =====
-        window.clearForm = function() {
-            if (!confirm('Очистить все поля формы?')) return;
-            document.getElementById('fName').value = '';
-            document.getElementById('fPhone').value = '';
-            document.getElementById('fComment').value = '';
-            document.getElementById('mSvcName').value = '';
-            document.getElementById('mSvcPrice').value = '';
-            formDetails = [];
-            formTotal = 0;
-            renderFormSvcs();
-            document.getElementById('preToggle').checked = false;
-            _subClientHasSubscription = false;
-            _subClientSubData = null;
-            _lastCheckedClientName = '';
-            updateTotalDisplay();
-        };
-
-        window.resetForm = function() {
-            // Сброс даты и времени на текущие
-            const now = new Date();
-            const dateStr = dateToInput(todayStr());
-            document.getElementById('fDate').value = dateStr;
-            const hours = String(now.getHours()).padStart(2,'0');
-            const mins = String(now.getMinutes()).padStart(2,'0');
-            document.getElementById('fTime').value = hours + ':' + mins;
-            document.getElementById('fTimeEnd').value = '';
-            // Цвет сбрасываем на профильный
-            selectedFormColor = window.PROFILE?.color || PALETTE[0].hex;
-            document.getElementById('colorPreview').style.background = selectedFormColor;
-            document.getElementById('formColorNote').textContent = 'Ваш цвет';
-            // Остальное не трогаем
-        };
+        // ===== ОЧИСТКА И СБРОС ФОРМЫ (удалены, так как кнопок нет) =====
+        // Функции clearForm и resetForm удалены, так как больше не используются
 
         // ===== SAVE RECORD =====
         window.saveRecord = async function(){
-            const btn = document.querySelector('#moRecord .green-btn');
+            const btn = document.querySelector('#moRecord .mb-confirm');
             if (btn) lockButton(btn);
             try {
                 if (svcMode === 'subscription') {
@@ -4974,16 +4955,15 @@
 
         // ===== ДОПОЛНИТЕЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ПОСЛЕ ЗАГРУЗКИ =====
         document.addEventListener('DOMContentLoaded', function() {
-            // Убеждаемся, что кнопка сброса скрыта в неактивных разделах
-            const resetBtn = document.getElementById('resetCalBtn');
-            if (resetBtn) {
-                // По умолчанию показываем только в журнале
-                const isSessionsActive = document.getElementById('secSessions').style.display !== 'none';
-                resetBtn.style.display = isSessionsActive ? 'inline-flex' : 'none';
-            }
+            // Убеждаемся, что календарь скрыт по умолчанию
+            const calControls = document.getElementById('calControls');
+            if (calControls) calControls.classList.remove('active');
+            // Показываем только если активен журнал
+            const isSessionsActive = document.getElementById('secSessions').style.display !== 'none';
+            if (isSessionsActive) calControls.classList.add('active');
         });
 
-        console.log('✅ CRM v3 — обновлён: кнопка сброса только в журнале, иконка календаря белая, меню абонемента сворачивается, сортировка с кнопкой Окей.');
+        console.log('✅ CRM v3 — исправлена сортировка (ПК без кнопок, мобильные с кнопкой Окей), убраны лишние кнопки в форме записи, календарь и сброс только в журнале, иконка календаря белая на ПК.');
     </script>
 </body>
 </html>
