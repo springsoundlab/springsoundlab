@@ -1349,6 +1349,10 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .cal-week-nav {
+            padding: 4px 8px !important;
+            flex-shrink: 0;
+        }
         .cal-picker-year-row {
             display: flex;
             align-items: center;
@@ -1381,87 +1385,54 @@
             min-width: 56px;
             text-align: center;
         }
-        .cal-picker-months {
+        .cal-picker-weekdays {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 6px;
         }
-        .cal-picker-month {
-            padding: 12px 6px;
-            border-radius: var(--r-sm);
-            border: 1px solid var(--border);
-            background: var(--surface2);
+        .cal-picker-weekdays span {
             text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text3);
+            padding-bottom: 4px;
+        }
+        .cal-picker-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .cal-picker-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--r-sm);
             font-size: 12px;
             font-weight: 600;
-            color: var(--text2);
-            cursor: pointer;
-            transition: .15s;
-        }
-        .cal-picker-month:hover {
-            background: var(--accent-bg);
-            color: var(--accent2);
-            border-color: rgba(124, 111, 255, .3);
-        }
-        .cal-picker-month.current {
-            border-color: var(--accent);
-            color: var(--accent2);
-        }
-        .cal-picker-month.selected {
-            background: var(--accent-bg);
-            color: var(--accent2);
-            border-color: var(--accent);
-        }
-        .cal-picker-weeks-back {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            color: var(--text3);
-            cursor: pointer;
-            margin-bottom: 12px;
-            transition: .15s;
-        }
-        .cal-picker-weeks-back:hover {
-            color: var(--accent2);
-        }
-        .cal-picker-weeks-title {
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .cal-picker-weeks-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .cal-picker-week {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 11px 14px;
-            border-radius: var(--r-sm);
-            border: 1px solid var(--border);
-            background: var(--surface2);
-            cursor: pointer;
-            transition: .15s;
-        }
-        .cal-picker-week:hover {
-            background: var(--accent-bg);
-            border-color: rgba(124, 111, 255, .3);
-        }
-        .cal-picker-week.current {
-            border-color: var(--accent);
-        }
-        .cal-picker-week-num {
-            font-size: 12px;
-            font-weight: 700;
             color: var(--text);
+            cursor: pointer;
+            transition: .15s;
         }
-        .cal-picker-week-range {
-            font-size: 11px;
+        .cal-picker-day:hover {
+            background: var(--accent-bg);
+            color: var(--accent2);
+        }
+        .cal-picker-day.other-month {
             color: var(--text3);
+            opacity: .5;
+        }
+        .cal-picker-day.today {
+            border: 1px solid var(--accent);
+            color: var(--accent2);
+        }
+        .cal-picker-day.in-selected-week {
+            background: var(--accent-bg);
+        }
+        .cal-picker-day.in-selected-week:hover {
+            background: var(--accent);
+            color: #fff;
         }
         .mb-num-input {
             width: 100%;
@@ -2133,6 +2104,9 @@
                 font-size: 12px;
             }
             .topbar .zoom-controls-top {
+                display: none !important;
+            }
+            .cal-week-nav {
                 display: none !important;
             }
             .topbar .topbar-left > .tb-btn:first-child {
@@ -2860,9 +2834,11 @@
                 </div>
                 <div class="topbar-right">
                     <div class="cal-controls" id="calControls">
+                        <button class="tb-btn cal-week-nav" onclick="shiftCalWeek(-1)" title="Предыдущая неделя"><i class="fa-solid fa-chevron-left"></i></button>
                         <button class="tb-btn cal-period-btn" id="calMonthPickerTop" onclick="openCalPicker()" title="Выбрать период">
                             <i class="fa-solid fa-calendar-days"></i> <span id="calPeriodLabel">—</span>
                         </button>
+                        <button class="tb-btn cal-week-nav" onclick="shiftCalWeek(1)" title="Следующая неделя"><i class="fa-solid fa-chevron-right"></i></button>
                         <button class="tb-btn" id="resetCalBtn" onclick="resetCalendarView()" title="Вернуться к текущей дате"><i class="fa-solid fa-rotate-left"></i> Сбросить</button>
                     </div>
                 </div>
@@ -2872,20 +2848,18 @@
             <div class="mo" id="moCalPicker">
                 <div class="mb mb-sm cal-picker-mb">
                     <div class="mb-header">
-                        <div class="mb-title"><i class="fa-solid fa-calendar-days"></i> Выбрать период</div>
+                        <div class="mb-title"><i class="fa-solid fa-calendar-days"></i> Выбрать дату</div>
                         <div class="mb-close" onclick="closeCalPicker()"><i class="fa-solid fa-xmark"></i></div>
                     </div>
                     <div class="cal-picker-year-row">
-                        <button class="cal-picker-year-nav" onclick="calPickerShiftYear(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                        <div class="cal-picker-year" id="calPickerYear">2026</div>
-                        <button class="cal-picker-year-nav" onclick="calPickerShiftYear(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                        <button class="cal-picker-year-nav" onclick="calPickerShiftMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div class="cal-picker-year" id="calPickerMonthYearLabel">—</div>
+                        <button class="cal-picker-year-nav" onclick="calPickerShiftMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
-                    <div class="cal-picker-months" id="calPickerMonths"></div>
-                    <div class="cal-picker-weeks" id="calPickerWeeks" style="display:none;">
-                        <div class="cal-picker-weeks-back" onclick="calPickerBackToMonths()"><i class="fa-solid fa-arrow-left"></i> Назад к месяцам</div>
-                        <div class="cal-picker-weeks-title" id="calPickerWeeksTitle">—</div>
-                        <div class="cal-picker-weeks-list" id="calPickerWeeksList"></div>
+                    <div class="cal-picker-weekdays">
+                        <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
                     </div>
+                    <div class="cal-picker-days" id="calPickerDays"></div>
                 </div>
             </div>
 
@@ -3874,6 +3848,13 @@
         }
 
         // ===== МУЛЬТИТАЧ =====
+        let swipeStartX = 0,
+            swipeStartY = 0,
+            swipeActive = false,
+            swipeHandled = false;
+        const SWIPE_MIN_DISTANCE = 60; // минимальная дистанция по горизонтали, чтобы засчитать свайп
+        const SWIPE_MAX_VERTICAL = 45; // максимальное отклонение по вертикали, иначе это скролл, а не свайп
+
         function handleTouchStart(e) {
             if (e.touches.length === 2) {
                 e.preventDefault();
@@ -3882,6 +3863,14 @@
                 pinchStartDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
                 pinchStartHeight = getEffectiveZoom();
                 isPinching = true;
+                swipeActive = false;
+                return;
+            }
+            if (e.touches.length === 1 && !isPinching) {
+                swipeStartX = e.touches[0].clientX;
+                swipeStartY = e.touches[0].clientY;
+                swipeActive = true;
+                swipeHandled = false;
             }
         }
 
@@ -3904,6 +3893,19 @@
                         });
                     }
                 }
+                return;
+            }
+            if (swipeActive && !swipeHandled && e.touches.length === 1) {
+                const dx = e.touches[0].clientX - swipeStartX;
+                const dy = e.touches[0].clientY - swipeStartY;
+                if (Math.abs(dx) > SWIPE_MIN_DISTANCE && Math.abs(dy) < SWIPE_MAX_VERTICAL) {
+                    swipeHandled = true;
+                    if (dx > 0) {
+                        shiftCalWeek(-1); // свайп вправо -> предыдущая неделя
+                    } else {
+                        shiftCalWeek(1); // свайп влево -> следующая неделя
+                    }
+                }
             }
         }
 
@@ -3917,6 +3919,8 @@
                 saveZoomToProfile();
                 if (viewMode === 'calendar') renderCalendar();
             }
+            swipeActive = false;
+            swipeHandled = false;
         }
 
         // ===== AUTH =====
@@ -4493,18 +4497,18 @@
             renderCalendar();
         };
 
-        // ===== CAL PERIOD PICKER =====
-        let calPickerYear = new Date().getFullYear();
-        let calPickerMonthSel = null;
+        // ===== CAL PERIOD PICKER (полноценный календарь с выбором даты) =====
+        let calPickerMonthDate = new Date();
+
+        window.shiftCalWeek = function(delta) {
+            calWeekOffset += delta;
+            renderCalendar();
+        };
 
         window.openCalPicker = function() {
             const days = getWeekDays();
-            calPickerYear = days[0].getFullYear();
-            calPickerMonthSel = null;
-            document.getElementById('calPickerWeeks').style.display = 'none';
-            document.getElementById('calPickerMonths').style.display = 'grid';
-            renderCalPickerYear();
-            renderCalPickerMonths();
+            calPickerMonthDate = new Date(days[0].getFullYear(), days[0].getMonth(), 1);
+            renderCalPickerCalendar();
             document.body.classList.add('modal-open');
             document.getElementById('moCalPicker').classList.add('open');
         };
@@ -4514,82 +4518,47 @@
             document.getElementById('moCalPicker').classList.remove('open');
         };
 
-        window.calPickerShiftYear = function(delta) {
-            calPickerYear += delta;
-            renderCalPickerYear();
-            renderCalPickerMonths();
+        window.calPickerShiftMonth = function(delta) {
+            calPickerMonthDate = new Date(calPickerMonthDate.getFullYear(), calPickerMonthDate.getMonth() + delta, 1);
+            renderCalPickerCalendar();
         };
 
-        function renderCalPickerYear() {
-            document.getElementById('calPickerYear').textContent = calPickerYear;
-        }
+        function renderCalPickerCalendar() {
+            const year = calPickerMonthDate.getFullYear();
+            const month = calPickerMonthDate.getMonth();
+            const label = document.getElementById('calPickerMonthYearLabel');
+            label.textContent =
+                `${MONTH_NAMES_FULL[month].charAt(0).toUpperCase() + MONTH_NAMES_FULL[month].slice(1)} ${year}`;
 
-        function renderCalPickerMonths() {
-            const wrap = document.getElementById('calPickerMonths');
-            const now = new Date();
-            const days = getWeekDays();
-            const selMonth = days[0].getMonth();
-            const selYear = days[0].getFullYear();
-            wrap.innerHTML = '';
-            MONTH_NAMES_SHORT.forEach((name, i) => {
-                const isCurrent = calPickerYear === now.getFullYear() && i === now.getMonth();
-                const isSelected = calPickerYear === selYear && i === selMonth;
-                const btn = document.createElement('div');
-                btn.className = 'cal-picker-month' + (isCurrent ? ' current' : '') + (isSelected ? ' selected' : '');
-                btn.textContent = name.charAt(0).toUpperCase() + name.slice(1);
-                btn.onclick = () => openCalPickerWeeks(i);
-                wrap.appendChild(btn);
-            });
-        }
+            const grid = document.getElementById('calPickerDays');
+            grid.innerHTML = '';
 
-        function openCalPickerWeeks(monthIndex) {
-            calPickerMonthSel = monthIndex;
-            document.getElementById('calPickerMonths').style.display = 'none';
-            document.getElementById('calPickerWeeks').style.display = 'block';
-            document.getElementById('calPickerWeeksTitle').textContent =
-                `${MONTH_NAMES_FULL[monthIndex].charAt(0).toUpperCase() + MONTH_NAMES_FULL[monthIndex].slice(1)} ${calPickerYear}`;
-            renderCalPickerWeeksList(monthIndex);
-        }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selDays = getWeekDays();
+            const selStart = selDays[0].getTime();
+            const selEnd = selDays[6].getTime();
 
-        window.calPickerBackToMonths = function() {
-            document.getElementById('calPickerWeeks').style.display = 'none';
-            document.getElementById('calPickerMonths').style.display = 'grid';
-            renderCalPickerMonths();
-        };
-
-        function renderCalPickerWeeksList(monthIndex) {
-            const list = document.getElementById('calPickerWeeksList');
-            list.innerHTML = '';
-            const firstOfMonth = new Date(calPickerYear, monthIndex, 1);
-            const lastOfMonth = new Date(calPickerYear, monthIndex + 1, 0);
-            const todayMonday = getMondayOf(new Date());
-
-            // Собираем все недели (понедельники), затрагивающие этот месяц
-            let monday = getMondayOf(firstOfMonth);
-            const weeks = [];
-            while (monday <= lastOfMonth) {
-                const sunday = new Date(monday);
-                sunday.setDate(monday.getDate() + 6);
-                weeks.push(new Date(monday));
-                monday = new Date(monday);
-                monday.setDate(monday.getDate() + 7);
+            const firstOfMonth = new Date(year, month, 1);
+            const startGrid = getMondayOf(firstOfMonth);
+            // 6 строк по 7 дней — гарантированно покрывает любой месяц
+            for (let i = 0; i < 42; i++) {
+                const d = new Date(startGrid);
+                d.setDate(startGrid.getDate() + i);
+                d.setHours(0, 0, 0, 0);
+                const cell = document.createElement('div');
+                cell.className = 'cal-picker-day';
+                if (d.getMonth() !== month) cell.classList.add('other-month');
+                if (d.getTime() === today.getTime()) cell.classList.add('today');
+                if (d.getTime() >= selStart && d.getTime() <= selEnd) cell.classList.add('in-selected-week');
+                cell.textContent = d.getDate();
+                cell.onclick = () => selectCalPickerDate(d);
+                grid.appendChild(cell);
             }
-
-            weeks.forEach((wMonday, idx) => {
-                const wSunday = new Date(wMonday);
-                wSunday.setDate(wMonday.getDate() + 6);
-                const isCurrentWeek = wMonday.getTime() === todayMonday.getTime();
-                const row = document.createElement('div');
-                row.className = 'cal-picker-week' + (isCurrentWeek ? ' current' : '');
-                const label = `${wMonday.getDate()} ${MONTH_NAMES_SHORT[wMonday.getMonth()]} – ${wSunday.getDate()} ${MONTH_NAMES_SHORT[wSunday.getMonth()]}`;
-                row.innerHTML =
-                    `<span class="cal-picker-week-num">${idx + 1}-я неделя</span><span class="cal-picker-week-range">${label}</span>`;
-                row.onclick = () => selectCalPickerWeek(wMonday);
-                list.appendChild(row);
-            });
         }
 
-        function selectCalPickerWeek(monday) {
+        function selectCalPickerDate(d) {
+            const monday = getMondayOf(d);
             calWeekOffset = weekOffsetForMonday(monday);
             calDate = new Date(monday.getFullYear(), monday.getMonth(), 1);
             renderCalendar();
