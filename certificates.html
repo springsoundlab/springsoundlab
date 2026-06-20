@@ -5480,7 +5480,9 @@
                 filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === currentMonthKey);
             }
             if (currentStatusFilter === 'work') {
-                filtered = filtered.filter(r => !r.completed && (r.total || 0) === (r.fullTotal || r.total || 0));
+                // "В работе" = всё, что ещё не подтверждено (совпадает с красным кружком в календаре),
+                // независимо от того, есть долг или нет
+                filtered = filtered.filter(r => !r.completed);
             } else if (currentStatusFilter === 'done') {
                 filtered = filtered.filter(r => r.completed);
             } else if (currentStatusFilter === 'debt') {
