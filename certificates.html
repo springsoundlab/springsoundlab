@@ -82,7 +82,6 @@
             width: 100%;
             top: 0;
             left: 0;
-            /* Предотвращаем пружинистость на iOS */
             position: fixed;
         }
         body {
@@ -92,7 +91,6 @@
             display: flex;
             transition: background 0.3s, color 0.3s;
             padding: 0;
-            /* Убираем отступы для safe-area, будем управлять через topbar */
             -webkit-overflow-scrolling: touch;
         }
         ::-webkit-scrollbar {
@@ -336,7 +334,6 @@
             flex-shrink: 0;
             gap: 6px;
             transition: background 0.3s;
-            /* Безопасная зона только для topbar */
             padding-top: env(safe-area-inset-top, 0px);
         }
         .topbar .topbar-left {
@@ -389,6 +386,10 @@
             }
             input[type="month"]::-webkit-calendar-picker-indicator {
                 filter: invert(1);
+            }
+            /* Скрываем кнопку Меню на десктопе */
+            .topbar .topbar-left .tb-btn:first-child {
+                display: none !important;
             }
         }
 
@@ -822,6 +823,7 @@
                 gap: 6px !important;
                 max-height: 80vh !important;
                 overflow-y: auto !important;
+                z-index: 99999 !important;
             }
             .sort-dropdown-menu.open {
                 display: grid !important;
@@ -921,6 +923,8 @@
         }
         .fin-card .fin-status {
             margin-left: auto;
+            display: flex;
+            align-items: center;
         }
         .fin-card .fin-prog {
             margin: 2px 0 6px 0;
@@ -1029,6 +1033,33 @@
             font-style: italic;
             margin-top: 2px;
             text-align: center;
+        }
+
+        /* Стили для статусов в финансах (восстановлены) */
+        .ss-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            letter-spacing: 0.3px;
+            display: inline-block;
+            border: 1px solid;
+            text-transform: uppercase;
+        }
+        .ss-work {
+            background: var(--red-bg);
+            color: var(--red);
+            border-color: var(--red);
+        }
+        .ss-done {
+            background: var(--green-bg);
+            color: var(--green);
+            border-color: var(--green);
+        }
+        .ss-debt {
+            background: var(--gold-bg);
+            color: var(--gold);
+            border-color: var(--gold);
         }
 
         /* CERTS */
@@ -1235,6 +1266,7 @@
             -webkit-overflow-scrolling: touch;
             align-items: center;
             justify-content: center;
+            overscroll-behavior: none;
         }
         .mo.open {
             display: flex;
@@ -1250,6 +1282,8 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
             max-height: 95vh;
             overflow-y: auto;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
         }
         .mb-title {
             font-size: 14px;
@@ -1914,20 +1948,23 @@
                 padding-left: 18px !important;
                 padding-right: 12px !important;
                 gap: 4px;
-                /* Убираем дополнительный отступ сверху на мобильных, так как safe-area уже учтён */
                 padding-top: env(safe-area-inset-top, 0px);
+                height: 60px !important; /* Увеличиваем для iOS */
             }
             .topbar .topbar-right input[type="month"] {
                 width: 110px;
-                font-size: 11px;
-                padding: 3px 6px;
+                font-size: 12px;
+                padding: 4px 8px;
             }
             .topbar .tb-btn {
-                padding: 3px 8px;
-                font-size: 10px;
+                padding: 5px 12px;
+                font-size: 12px;
             }
             .topbar .zoom-controls-top {
                 display: none !important;
+            }
+            .topbar .topbar-left .tb-btn:first-child {
+                display: flex !important; /* показываем кнопку меню на мобильных */
             }
             .sb-logo-t,
             .sb-logo-s,
@@ -2144,6 +2181,7 @@
                 height: auto !important;
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
+                overscroll-behavior: none !important;
             }
             #moRecord .mb,
             #moClientEdit .mb,
@@ -2160,6 +2198,7 @@
                 height: auto !important;
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
+                overscroll-behavior: none !important;
             }
             #moRecord .mb .mb-btns {
                 margin-top: 15px;
@@ -2530,7 +2569,6 @@
         /* ===== ДОПОЛНИТЕЛЬНЫЕ ПРАВКИ ДЛЯ PWA ===== */
         @media all and (display-mode: standalone) {
             body {
-                /* Убираем пружинистость на iOS в standalone */
                 overflow: hidden;
                 position: fixed;
                 width: 100%;
@@ -2541,7 +2579,6 @@
                 padding-top: env(safe-area-inset-top, 0px);
             }
             .sidebar {
-                /* Убираем лишний отступ сверху, только topbar отвечает за safe-area */
                 padding-top: 0;
             }
             .main {
@@ -2551,13 +2588,14 @@
             .content {
                 height: 100%;
             }
-            /* Убираем пружинистость у всех прокручиваемых элементов */
             .cal-body,
             .cl-grid,
             .fin-grid,
             .certs-wrap,
             .ana-wrap,
-            .sb-nav {
+            .sb-nav,
+            .mo,
+            .mb {
                 overscroll-behavior: none;
                 -webkit-overflow-scrolling: touch;
             }
@@ -2566,21 +2604,15 @@
             min-height: 100vh;
             min-height: -webkit-fill-available;
         }
-        /* Дополнительно убираем пружинистость для iOS */
         .cal-body,
         .cl-grid,
         .fin-grid,
         .certs-wrap,
         .ana-wrap,
-        .sb-nav {
-            overscroll-behavior: none;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .mo {
-            -webkit-overflow-scrolling: touch;
-        }
+        .sb-nav,
+        .mo,
         .mb {
+            overscroll-behavior: none;
             -webkit-overflow-scrolling: touch;
         }
     </style>
@@ -3078,9 +3110,7 @@
         (function injectManifest() {
             try {
                 const iconUrl = "https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg";
-                // Получаем полный URL без параметров
                 const startUrl = window.location.href.split('?')[0];
-                // Добавляем параметр, чтобы форсировать загрузку приложения
                 const fullStartUrl = startUrl + (startUrl.includes('?') ? '&' : '?') + 'from=pwa';
 
                 const manifest = {
@@ -3105,7 +3135,6 @@
                         purpose: "any maskable"
                     }]
                 };
-                // Используем data URI для максимальной совместимости
                 const manifestStr = JSON.stringify(manifest);
                 const base64 = btoa(unescape(encodeURIComponent(manifestStr)));
                 const dataUri = "data:application/json;charset=utf-8;base64," + base64;
@@ -3119,7 +3148,6 @@
                     newLink.href = dataUri;
                     document.head.appendChild(newLink);
                 }
-                // Обновляем theme-color динамически
                 const metaTheme = document.querySelector('meta[name="theme-color"]');
                 if (metaTheme) {
                     const dark = '#0e0e12';
@@ -3130,7 +3158,7 @@
                         metaTheme.content = e.matches ? dark : light;
                     });
                 }
-                console.log('✅ PWA manifest injected (data URI) with full start_url and scope');
+                console.log('✅ PWA manifest injected (data URI)');
             } catch (e) {
                 console.warn('⚠️ PWA manifest injection failed:', e);
             }
@@ -4010,7 +4038,6 @@
 
         // ===== НАСТРОЙКИ АККАУНТА =====
         function openSettingsModal() {
-            // Закрываем сайдбар (на мобильных устройствах)
             const sidebar = document.getElementById('sidebar');
             if (sidebar) sidebar.classList.remove('mobile-open');
 
@@ -4125,11 +4152,9 @@
                     if (avatarDataUrl !== null) window.PROFILE.avatar = avatarDataUrl;
                     else delete window.PROFILE.avatar;
                     updateUserUI(window.PROFILE);
-                    // Закрываем окно без алерта
                     closeSettingsModal();
                 })
                 .catch(err => {
-                    // Только ошибки показываем пользователю
                     handleError(err, 'Ошибка при сохранении настроек: ' + err.message);
                     avatarDataUrl = (window.PROFILE?.avatar && typeof window.PROFILE.avatar === 'string' && window.PROFILE
                         .avatar.startsWith('data:image'))
@@ -4433,7 +4458,6 @@
                 const role = escapeHTML(u.role || 'Сотрудник');
                 const bg = u.color ? palByHex(u.color).bg : '#333';
                 const clr = u.color || '#fff';
-                // Проверяем аватар
                 let avatarHtml = '';
                 if (u.avatar && typeof u.avatar === 'string' && u.avatar.startsWith('data:image')) {
                     avatarHtml = `<img src="${u.avatar}" alt="avatar">`;
@@ -5648,8 +5672,7 @@
             if (isSessionsActive) calControls.classList.add('active');
         });
 
-        console.log('✅ CRM v3 — PWA: мгновенная установка и открытие, iOS исправлена.');
-        console.log('✅ Аватарки в сотрудниках, убрана пружинистость, меню на месте.');
+        console.log('✅ CRM v3 — все исправления применены: статусы, сортировка, меню, размеры, пружинистость.');
     </script>
 </body>
 </html>
