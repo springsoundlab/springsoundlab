@@ -83,6 +83,7 @@
             top: 0;
             left: 0;
             position: fixed;
+            background: var(--bg);
         }
         body {
             background: var(--bg);
@@ -92,6 +93,10 @@
             transition: background 0.3s, color 0.3s;
             padding: 0;
             -webkit-overflow-scrolling: touch;
+            /* Убираем лишние отступы для safe-area */
+            padding-top: env(safe-area-inset-top, 0px);
+            /* Нижний отступ убираем, чтобы не было чёрной полосы */
+            padding-bottom: 0;
         }
         ::-webkit-scrollbar {
             width: 4px;
@@ -206,7 +211,6 @@
             height: 100%;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
         }
         .sb-logo {
             display: flex;
@@ -241,7 +245,6 @@
             gap: 2px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
         }
         .nav-i {
             display: flex;
@@ -323,6 +326,10 @@
             overflow: hidden;
             height: 100%;
             position: relative;
+            /* Заполняем всё пространство */
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            background: var(--bg);
         }
         .topbar {
             display: flex;
@@ -335,6 +342,8 @@
             gap: 6px;
             transition: background 0.3s;
             padding-top: env(safe-area-inset-top, 0px);
+            /* Убираем нижний отступ, чтобы не было полосы */
+            padding-bottom: 0;
         }
         .topbar .topbar-left {
             display: flex;
@@ -518,7 +527,6 @@
             display: grid;
             grid-template-columns: 56px repeat(7, 1fr);
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
         }
         .cal-time-col {
             border-right: 1px solid var(--border);
@@ -616,7 +624,6 @@
             align-content: start;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
         }
         .cl-card {
             background: var(--surface);
@@ -823,7 +830,7 @@
                 gap: 6px !important;
                 max-height: 80vh !important;
                 overflow-y: auto !important;
-                z-index: 99999 !important;
+                z-index: 999999 !important;
             }
             .sort-dropdown-menu.open {
                 display: grid !important;
@@ -878,7 +885,6 @@
             gap: 12px;
             align-content: start;
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
         }
         .fin-card {
             background: var(--surface);
@@ -1035,7 +1041,7 @@
             text-align: center;
         }
 
-        /* Стили для статусов в финансах (восстановлены) */
+        /* Стили для статусов в финансах */
         .ss-badge {
             font-size: 10px;
             font-weight: 700;
@@ -1068,7 +1074,6 @@
             overflow-y: auto;
             padding: 14px 18px;
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
         }
         .cert-grid {
             display: grid;
@@ -1134,7 +1139,6 @@
             overflow-y: auto;
             padding: 14px 18px;
             -webkit-overflow-scrolling: touch;
-            overscroll-behavior: none;
         }
         .ana-hd {
             display: grid;
@@ -1266,7 +1270,6 @@
             -webkit-overflow-scrolling: touch;
             align-items: center;
             justify-content: center;
-            overscroll-behavior: none;
         }
         .mo.open {
             display: flex;
@@ -1282,7 +1285,6 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
             max-height: 95vh;
             overflow-y: auto;
-            overscroll-behavior: none;
             -webkit-overflow-scrolling: touch;
         }
         .mb-title {
@@ -1911,9 +1913,31 @@
             .svc-mode-switcher {
                 margin-left: auto;
             }
+            /* На десктопе убираем пружинистость */
+            .cal-body,
+            .cl-grid,
+            .fin-grid,
+            .certs-wrap,
+            .ana-wrap,
+            .sb-nav,
+            .mo,
+            .mb {
+                overscroll-behavior: none;
+            }
         }
 
         @media(max-width:768px) {
+            /* На мобильных возвращаем пружинистость (overscroll-behavior по умолчанию auto) */
+            .cal-body,
+            .cl-grid,
+            .fin-grid,
+            .certs-wrap,
+            .ana-wrap,
+            .sb-nav,
+            .mo,
+            .mb {
+                overscroll-behavior: auto;
+            }
             .sidebar {
                 position: fixed !important;
                 top: 0;
@@ -1938,6 +1962,8 @@
                 height: 100%;
                 top: 0;
                 left: 0;
+                padding-top: env(safe-area-inset-top, 0px);
+                padding-bottom: 0;
             }
             .main {
                 width: 100vw !important;
@@ -1949,6 +1975,7 @@
                 padding-right: 12px !important;
                 gap: 4px;
                 padding-top: env(safe-area-inset-top, 0px);
+                padding-bottom: 0;
                 height: 60px !important; /* Увеличиваем для iOS */
             }
             .topbar .topbar-right input[type="month"] {
@@ -2181,7 +2208,6 @@
                 height: auto !important;
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
-                overscroll-behavior: none !important;
             }
             #moRecord .mb,
             #moClientEdit .mb,
@@ -2198,7 +2224,6 @@
                 height: auto !important;
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
-                overscroll-behavior: none !important;
             }
             #moRecord .mb .mb-btns {
                 margin-top: 15px;
@@ -2574,9 +2599,12 @@
                 width: 100%;
                 height: 100%;
                 padding: 0;
+                padding-top: env(safe-area-inset-top, 0px);
+                padding-bottom: 0;
             }
             .topbar {
                 padding-top: env(safe-area-inset-top, 0px);
+                padding-bottom: 0;
             }
             .sidebar {
                 padding-top: 0;
@@ -2584,36 +2612,15 @@
             .main {
                 height: 100vh;
                 height: -webkit-fill-available;
+                padding-bottom: 0;
             }
             .content {
                 height: 100%;
-            }
-            .cal-body,
-            .cl-grid,
-            .fin-grid,
-            .certs-wrap,
-            .ana-wrap,
-            .sb-nav,
-            .mo,
-            .mb {
-                overscroll-behavior: none;
-                -webkit-overflow-scrolling: touch;
             }
         }
         .main {
             min-height: 100vh;
             min-height: -webkit-fill-available;
-        }
-        .cal-body,
-        .cl-grid,
-        .fin-grid,
-        .certs-wrap,
-        .ana-wrap,
-        .sb-nav,
-        .mo,
-        .mb {
-            overscroll-behavior: none;
-            -webkit-overflow-scrolling: touch;
         }
     </style>
 </head>
@@ -2731,7 +2738,7 @@
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%;">
                             <span style="font-size:11px;color:var(--text3);" id="clCount">0 клиентов</span>
                             <div class="sort-dropdown-wrapper">
-                                <button class="tb-btn" id="sortToggleBtn" onclick="toggleSortDropdown()">
+                                <button class="tb-btn" id="sortToggleBtn" onclick="toggleSortDropdown(event)">
                                     <i class="fa-solid fa-arrow-up-wide-short"></i> Сортировать
                                 </button>
                                 <div class="sort-dropdown-menu" id="sortDropdownMenu">
@@ -3106,7 +3113,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
     </script>
     <script>
-        // ===== PWA: ДИНАМИЧЕСКИЙ МАНИФЕСТ С ПРАВИЛЬНЫМИ НАСТРОЙКАМИ =====
+        // ===== PWA: ДИНАМИЧЕСКИЙ МАНИФЕСТ =====
         (function injectManifest() {
             try {
                 const iconUrl = "https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg";
@@ -3158,7 +3165,7 @@
                         metaTheme.content = e.matches ? dark : light;
                     });
                 }
-                console.log('✅ PWA manifest injected (data URI)');
+                console.log('✅ PWA manifest injected');
             } catch (e) {
                 console.warn('⚠️ PWA manifest injection failed:', e);
             }
@@ -3328,16 +3335,19 @@
 
         function getEffectiveZoomForSave() { return isMobileDevice ? currentHourHeightMobile : currentHourHeight; }
 
-        // ===== getMyData =====
-        function getMyData() {
+        // ===== getMyData (только завершённые записи для клиентов) =====
+        function getMyData(includeUncompleted = false) {
             if (!window.PROFILE) return [];
             const currentUid = window.PROFILE.uid;
             const currentPhone = norm(window.PROFILE.phone || '');
-            return window.CRM.filter(r => {
+            const all = window.CRM.filter(r => {
                 if (r.authorUid === currentUid) return true;
                 if (!r.authorUid && r.authorPhone && norm(r.authorPhone) === currentPhone) return true;
                 return false;
             });
+            if (includeUncompleted) return all;
+            // По умолчанию возвращаем только завершённые (для клиентов)
+            return all.filter(r => r.completed === true);
         }
 
         function isAuthorOf(row) {
@@ -3821,7 +3831,8 @@
         window.doLogout = function() { if (confirm('Выйти?')) auth.signOut(); };
 
         // ===== КЛИЕНТСКАЯ СОРТИРОВКА С ДРОПДАУНОМ =====
-        function toggleSortDropdown() {
+        function toggleSortDropdown(e) {
+            if (e) e.stopPropagation();
             const menu = document.getElementById('sortDropdownMenu');
             if (menu.classList.contains('open')) {
                 closeSortDropdown();
@@ -3846,37 +3857,46 @@
 
         document.addEventListener('click', function(e) {
             const option = e.target.closest('.sort-option');
-            if (!option) return;
-            const menu = document.getElementById('sortDropdownMenu');
-            if (!menu.contains(option)) return;
-            const isMobile = window.innerWidth <= 768;
-            if (!isMobile) {
-                const sortVal = option.dataset.sort;
-                const periodVal = option.dataset.period;
-                if (sortVal) {
-                    clientSort = sortVal;
-                    if (window.PROFILE && window.PROFILE.uid) {
-                        UC.doc(window.PROFILE.uid).update({ clientSort: clientSort })
-                            .catch(err => console.error('Ошибка сохранения сортировки:', err));
+            if (option) {
+                const menu = document.getElementById('sortDropdownMenu');
+                if (!menu.contains(option)) return;
+                const isMobile = window.innerWidth <= 768;
+                if (!isMobile) {
+                    const sortVal = option.dataset.sort;
+                    const periodVal = option.dataset.period;
+                    if (sortVal) {
+                        clientSort = sortVal;
+                        if (window.PROFILE && window.PROFILE.uid) {
+                            UC.doc(window.PROFILE.uid).update({ clientSort: clientSort })
+                                .catch(err => console.error('Ошибка сохранения сортировки:', err));
+                        }
+                    } else if (periodVal) {
+                        clientPeriod = periodVal;
+                        if (window.PROFILE && window.PROFILE.uid) {
+                            UC.doc(window.PROFILE.uid).update({ clientPeriod: clientPeriod })
+                                .catch(err => console.error('Ошибка сохранения периода:', err));
+                        }
                     }
-                } else if (periodVal) {
-                    clientPeriod = periodVal;
-                    if (window.PROFILE && window.PROFILE.uid) {
-                        UC.doc(window.PROFILE.uid).update({ clientPeriod: clientPeriod })
-                            .catch(err => console.error('Ошибка сохранения периода:', err));
+                    closeSortDropdown();
+                    renderClients();
+                } else {
+                    if (option.dataset.sort) {
+                        tempClientSort = option.dataset.sort;
+                        document.querySelectorAll('.sort-option[data-sort]').forEach(el => el.classList.remove('active'));
+                        option.classList.add('active');
+                    } else if (option.dataset.period) {
+                        tempClientPeriod = option.dataset.period;
+                        document.querySelectorAll('.sort-option[data-period]').forEach(el => el.classList.remove('active'));
+                        option.classList.add('active');
                     }
                 }
-                closeSortDropdown();
-                renderClients();
-            } else {
-                if (option.dataset.sort) {
-                    tempClientSort = option.dataset.sort;
-                    document.querySelectorAll('.sort-option[data-sort]').forEach(el => el.classList.remove('active'));
-                    option.classList.add('active');
-                } else if (option.dataset.period) {
-                    tempClientPeriod = option.dataset.period;
-                    document.querySelectorAll('.sort-option[data-period]').forEach(el => el.classList.remove('active'));
-                    option.classList.add('active');
+                return;
+            }
+            // Закрываем меню при клике вне wrapper
+            const wrapper = document.querySelector('.sort-dropdown-wrapper');
+            if (wrapper && !wrapper.contains(e.target)) {
+                if (isSortDropdownOpen) {
+                    closeSortDropdown();
                 }
             }
         });
@@ -3894,15 +3914,6 @@
 
         window.selectSort = function() {};
         window.setClientPeriod = function() {};
-
-        document.addEventListener('click', function(e) {
-            const wrapper = document.querySelector('.sort-dropdown-wrapper');
-            if (wrapper && !wrapper.contains(e.target)) {
-                if (isSortDropdownOpen) {
-                    closeSortDropdown();
-                }
-            }
-        });
 
         document.addEventListener('click', function(e) {
             if (window.innerWidth > 768) {
@@ -4444,7 +4455,7 @@
             }, 50);
         }
 
-        // ===== EMPLOYEES (с аватарами) =====
+        // ===== EMPLOYEES =====
         function renderEmployees() {
             const grid = document.getElementById('empGrid');
             if (!grid) return;
@@ -4899,12 +4910,14 @@
 
         function renderSessions() {}
 
-        // ===== CLIENTS =====
+        // ===== CLIENTS (только завершённые записи) =====
         function renderClients() {
             const grid = document.getElementById('clGrid');
             grid.innerHTML = '';
 
-            const myData = getMyData();
+            // Используем только завершённые записи (completed === true)
+            const myData = getMyData(false); // false = только completed
+
             const map = {};
             myData.forEach(r => {
                 let fullName = r.client || r.song || '';
@@ -5143,7 +5156,7 @@
 
         // ===== FINANCE =====
         function renderFinance() {
-            const myData = getMyData();
+            const myData = getMyData(true); // все записи для финансов
             const grid = document.getElementById('finGrid');
             if (!grid) return;
             let filtered = myData;
@@ -5297,7 +5310,7 @@
 
         // ===== ANALYTICS =====
         function renderAnalytics() {
-            const myData = getMyData();
+            const myData = getMyData(true); // все записи
             let totalRev = 0,
                 yearRev = 0,
                 totalDbt = 0,
@@ -5672,7 +5685,7 @@
             if (isSessionsActive) calControls.classList.add('active');
         });
 
-        console.log('✅ CRM v3 — все исправления применены: статусы, сортировка, меню, размеры, пружинистость.');
+        console.log('✅ CRM v3 — все исправления применены: клиенты по готовым, сортировка, пружинистость, iOS safe-area.');
     </script>
 </body>
 </html>
