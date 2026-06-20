@@ -385,6 +385,16 @@
             gap: 4px;
             margin-right: 8px;
         }
+        .topbar .fin-zoom-btn {
+            display: none;
+        }
+        @media(max-width:768px) {
+            body.sec-finance-active .topbar .fin-zoom-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
         @media(min-width:769px) {
             .topbar .zoom-controls-top {
                 display: flex;
@@ -2198,6 +2208,67 @@
                 grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
                 gap: 10px;
             }
+            .fin-grid.compact {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            .fin-grid.compact .fin-card {
+                padding: 7px;
+                gap: 3px;
+                border-radius: 8px;
+            }
+            .fin-grid.compact .fin-card .fin-header {
+                gap: 4px;
+            }
+            .fin-grid.compact .fin-card .fin-color-bar {
+                width: 2px;
+                height: 16px;
+            }
+            .fin-grid.compact .fin-card .fin-name {
+                font-size: 11px;
+            }
+            .fin-grid.compact .fin-card .ss-badge {
+                font-size: 7px;
+                padding: 2px 5px;
+                letter-spacing: 0;
+            }
+            .fin-grid.compact .fin-card .fin-prog {
+                margin: 1px 0 3px 0;
+            }
+            .fin-grid.compact .fin-card .fin-prog .prog {
+                height: 4px;
+            }
+            .fin-grid.compact .fin-card .fin-details {
+                font-size: 8px;
+                padding: 2px 0;
+                line-height: 1.25;
+            }
+            .fin-grid.compact .fin-card .fin-stats {
+                gap: 3px;
+                margin-top: 1px;
+            }
+            .fin-grid.compact .fin-card .fin-stat {
+                padding: 2px 3px;
+            }
+            .fin-grid.compact .fin-card .fin-stat-l {
+                font-size: 6px;
+            }
+            .fin-grid.compact .fin-card .fin-stat-v {
+                font-size: 9px;
+            }
+            .fin-grid.compact .fin-card .fin-comment {
+                font-size: 7px;
+                margin-top: 1px;
+            }
+            .fin-grid.compact .fin-card .fin-actions {
+                gap: 4px;
+                margin-top: 3px;
+            }
+            .fin-grid.compact .fin-card .fin-actions .act-ic {
+                height: 26px;
+                font-size: 11px;
+                border-radius: 5px;
+            }
             #secFinance .toolbar {
                 display: flex;
                 flex-wrap: nowrap;
@@ -2827,6 +2898,9 @@
                     <div class="tb-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">
                         <i class="fa-solid fa-bars"></i> Меню
                     </div>
+                    <button class="tb-btn fin-zoom-btn" id="finZoomBtn" onclick="toggleFinCardZoom()" title="Уменьшить карточки (2 в ряд)">
+                        <i class="fa-solid fa-table-cells"></i>
+                    </button>
                     <div class="zoom-controls-top">
                         <button class="tb-btn" onclick="zoomCalendar(1)" title="Увеличить масштаб"><i class="fa-solid fa-plus"></i></button>
                         <button class="tb-btn" onclick="zoomCalendar(-1)" title="Уменьшить масштаб"><i class="fa-solid fa-minus"></i></button>
@@ -4480,6 +4554,8 @@
                 calControls.classList.remove('active');
             }
 
+            document.body.classList.toggle('sec-finance-active', s === 'finance');
+
             const sidebar = document.getElementById('sidebar');
             if (sidebar) sidebar.classList.remove('mobile-open');
             renderAll();
@@ -5471,6 +5547,29 @@
             }
             renderFinance();
         };
+
+        // ===== ЗУМ КАРТОЧЕК ФИНАНСОВ (только мобильная версия) =====
+        let finCardsCompact = (localStorage.getItem('finCardsCompact') === 'true');
+
+        function applyFinCardZoomState() {
+            const grid = document.getElementById('finGrid');
+            if (grid) grid.classList.toggle('compact', finCardsCompact);
+            const btn = document.getElementById('finZoomBtn');
+            if (btn) {
+                btn.innerHTML = finCardsCompact ?
+                    '<i class="fa-solid fa-table-cells-large"></i>' :
+                    '<i class="fa-solid fa-table-cells"></i>';
+                btn.title = finCardsCompact ? 'Обычный размер карточек' : 'Уменьшить карточки (2 в ряд)';
+            }
+        }
+
+        window.toggleFinCardZoom = function() {
+            finCardsCompact = !finCardsCompact;
+            localStorage.setItem('finCardsCompact', finCardsCompact ? 'true' : 'false');
+            applyFinCardZoomState();
+        };
+
+        document.addEventListener('DOMContentLoaded', applyFinCardZoomState);
 
         // ===== FINANCE =====
         function renderFinance() {
