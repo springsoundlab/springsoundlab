@@ -2,15 +2,26 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SPRING SOUND LAB | CRM v3</title>
+
+    <!-- PWA / Android + iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SSL CRM">
+    <meta name="theme-color" content="#0e0e12" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f0f0f5" media="(prefers-color-scheme: light)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="SSL CRM">
+    <meta name="apple-touch-fullscreen" content="yes">
+
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg">
     <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg">
+    <link rel="manifest" id="manifestLink">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         :root {
             --bg: #0e0e12;
@@ -73,6 +84,8 @@
             height: 100vh;
             overflow: hidden;
             transition: background 0.3s, color 0.3s;
+            /* безопасная зона для PWA */
+            padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
         }
         ::-webkit-scrollbar {
             width: 4px;
@@ -2467,6 +2480,34 @@
                 padding: 8px 16px;
             }
         }
+
+        /* ===== ДОПОЛНИТЕЛЬНЫЕ ПРАВКИ ДЛЯ PWA ===== */
+        /* убираем полосу прокрутки в standalone-режиме */
+        @media all and (display-mode: standalone) {
+            body {
+                padding-top: env(safe-area-inset-top, 0px);
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+            }
+            .topbar {
+                padding-top: env(safe-area-inset-top, 0px);
+            }
+            .sidebar {
+                padding-top: env(safe-area-inset-top, 0px);
+            }
+            /* на Android убираем лишние отступы */
+            .main {
+                height: 100vh;
+                height: -webkit-fill-available;
+            }
+            .content {
+                height: 100%;
+            }
+        }
+        /* поддержка -webkit-fill-available для Android */
+        .main {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+        }
     </style>
 </head>
 <body>
@@ -2958,6 +2999,59 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
     </script>
     <script>
+        // ===== PWA: ДИНАМИЧЕСКИЙ МАНИФЕСТ =====
+        (function injectManifest() {
+            try {
+                const manifest = {
+                    name: "SPRING SOUND LAB CRM",
+                    short_name: "SSL CRM",
+                    description: "Recording Studio CRM",
+                    start_url: window.location.href.split('?')[0],
+                    display: "standalone",
+                    orientation: "portrait",
+                    background_color: "#0e0e12",
+                    theme_color: "#0e0e12",
+                    icons: [{
+                        src: "https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg",
+                        sizes: "192x192",
+                        type: "image/jpeg",
+                        purpose: "any maskable"
+                    }, {
+                        src: "https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg",
+                        sizes: "512x512",
+                        type: "image/jpeg",
+                        purpose: "any maskable"
+                    }]
+                };
+                const blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const link = document.getElementById('manifestLink');
+                if (link) {
+                    link.href = url;
+                } else {
+                    const newLink = document.createElement('link');
+                    newLink.id = 'manifestLink';
+                    newLink.rel = 'manifest';
+                    newLink.href = url;
+                    document.head.appendChild(newLink);
+                }
+                // theme-color динамически подстраивается под тему
+                const metaTheme = document.querySelector('meta[name="theme-color"]');
+                if (metaTheme) {
+                    const dark = '#0e0e12';
+                    const light = '#f0f0f5';
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    metaTheme.content = prefersDark ? dark : light;
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                        metaTheme.content = e.matches ? dark : light;
+                    });
+                }
+                console.log('✅ PWA manifest injected');
+            } catch (e) {
+                console.warn('⚠️ PWA manifest injection failed:', e);
+            }
+        })();
+
         // ===== ЗАЩИТА ОТ XSS =====
         function escapeHTML(text) {
             if (text === null || text === undefined) return '';
@@ -5457,8 +5551,8 @@
             if (isSessionsActive) calControls.classList.add('active');
         });
 
-        console.log('✅ CRM v3 — исправлена ошибка с аватаркой, добавлена защита от больших изображений.');
-        console.log('✅ Настройки аккаунта: кнопка "Удалить" справа от "Загрузить фото", тихое сохранение, закрытие сайдбара.');
+        console.log('✅ CRM v3 — PWA ready, full-screen standalone on Android & iOS');
+        console.log('✅ Добавлена поддержка standalone-режима, убрана поисковая строка на Android.');
     </script>
 </body>
 </html>
