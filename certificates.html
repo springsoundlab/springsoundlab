@@ -586,6 +586,22 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .cal-event-status {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 3;
+            box-shadow: 0 0 0 1.5px rgba(0,0,0,.25);
+        }
+        .cal-event-status.pending {
+            background: var(--red);
+        }
+        .cal-event-status.done {
+            background: var(--green);
+        }
         .cal-now-line {
             position: absolute;
             left: 0;
@@ -4449,6 +4465,9 @@
                     const isDone = ev.completed;
                     const evName = escapeHTML(ev.client || ev.song || '—');
                     const evSvc = escapeHTML(ev.services || ev.type || '');
+                    const statusDot = isSound ?
+                        `<div class="cal-event-status ${isDone ? 'done' : 'pending'}" title="${isDone ? 'Готово' : 'В работе'}"></div>` :
+                        '';
                     const evEl = document.createElement('div');
                     evEl.className = 'cal-event';
                     evEl.style.top = Math.max(0, top) + 'px';
@@ -4459,7 +4478,7 @@
                     evEl.style.borderLeft = '3px solid ' + color;
                     evEl.style.opacity = isDone ? '0.55' : '1';
                     evEl.innerHTML =
-                        `<div class="cal-event-name" style="color:${color}">${evName}</div><div class="cal-event-svc" style="color:${color}99">${evSvc}</div>`;
+                        `${statusDot}<div class="cal-event-name" style="color:${color}">${evName}</div><div class="cal-event-svc" style="color:${color}99">${evSvc}</div>`;
                     evEl.onclick = function(e) {
                         e.stopPropagation();
                         openEdit(ev.id);
