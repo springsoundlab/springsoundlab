@@ -93,9 +93,7 @@
             transition: background 0.3s, color 0.3s;
             padding: 0;
             -webkit-overflow-scrolling: touch;
-            /* Убираем лишние отступы для safe-area */
             padding-top: env(safe-area-inset-top, 0px);
-            /* Нижний отступ убираем, чтобы не было чёрной полосы */
             padding-bottom: 0;
         }
         ::-webkit-scrollbar {
@@ -211,6 +209,9 @@
             height: 100%;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            /* Исправление для iOS safe-area */
+            padding-top: env(safe-area-inset-top, 0px);
+            box-sizing: border-box;
         }
         .sb-logo {
             display: flex;
@@ -326,10 +327,10 @@
             overflow: hidden;
             height: 100%;
             position: relative;
-            /* Заполняем всё пространство */
             min-height: 100vh;
             min-height: -webkit-fill-available;
             background: var(--bg);
+            padding-bottom: 0;
         }
         .topbar {
             display: flex;
@@ -342,7 +343,6 @@
             gap: 6px;
             transition: background 0.3s;
             padding-top: env(safe-area-inset-top, 0px);
-            /* Убираем нижний отступ, чтобы не было полосы */
             padding-bottom: 0;
         }
         .topbar .topbar-left {
@@ -396,7 +396,6 @@
             input[type="month"]::-webkit-calendar-picker-indicator {
                 filter: invert(1);
             }
-            /* Скрываем кнопку Меню на десктопе */
             .topbar .topbar-left .tb-btn:first-child {
                 display: none !important;
             }
@@ -754,15 +753,15 @@
         }
         .sort-dropdown-menu {
             display: none;
-            position: absolute;
-            top: 100%;
+            position: fixed;
+            top: 0;
             left: 0;
             background: var(--surface2);
             border: 1px solid var(--border);
             border-radius: var(--r-sm);
             padding: 8px;
             min-width: 320px;
-            z-index: 9999;
+            z-index: 999999;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
             margin-top: 4px;
             grid-template-columns: 1fr 1fr;
@@ -1950,6 +1949,8 @@
                 display: flex !important;
                 flex-direction: column !important;
                 border-right: 1px solid var(--border);
+                padding-top: env(safe-area-inset-top, 0px);
+                box-sizing: border-box;
             }
             .sidebar.mobile-open {
                 left: 0 !important;
@@ -2607,7 +2608,8 @@
                 padding-bottom: 0;
             }
             .sidebar {
-                padding-top: 0;
+                padding-top: env(safe-area-inset-top, 0px);
+                box-sizing: border-box;
             }
             .main {
                 height: 100vh;
@@ -2741,24 +2743,6 @@
                                 <button class="tb-btn" id="sortToggleBtn" onclick="toggleSortDropdown(event)">
                                     <i class="fa-solid fa-arrow-up-wide-short"></i> Сортировать
                                 </button>
-                                <div class="sort-dropdown-menu" id="sortDropdownMenu">
-                                    <div class="sort-column">
-                                        <div class="sort-option" data-sort="date_desc">по дате (сначала новые)</div>
-                                        <div class="sort-option" data-sort="date_asc">по дате (сначала старые)</div>
-                                        <div class="sort-option" data-sort="total_desc">по сумме (сначала большие)</div>
-                                        <div class="sort-option" data-sort="total_asc">по сумме (сначала маленькие)</div>
-                                    </div>
-                                    <div class="sort-column period-column">
-                                        <div class="sort-option" data-period="all">Все</div>
-                                        <div class="sort-option" data-period="week">Неделя</div>
-                                        <div class="sort-option" data-period="month">Месяц</div>
-                                        <div class="sort-option" data-period="year">Год</div>
-                                    </div>
-                                    <div class="sort-actions">
-                                        <button class="mb-btn cancel-btn" onclick="closeSortDropdown()">Отмена</button>
-                                        <button class="mb-btn ok-btn" onclick="applySort()">Окей</button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -3106,6 +3090,26 @@
         </div>
     </div>
 
+    <!-- ===== ВЫНЕСЕННОЕ МЕНЮ СОРТИРОВКИ (прямой потомок body) ===== -->
+    <div class="sort-dropdown-menu" id="sortDropdownMenu">
+        <div class="sort-column">
+            <div class="sort-option" data-sort="date_desc">по дате (сначала новые)</div>
+            <div class="sort-option" data-sort="date_asc">по дате (сначала старые)</div>
+            <div class="sort-option" data-sort="total_desc">по сумме (сначала большие)</div>
+            <div class="sort-option" data-sort="total_asc">по сумме (сначала маленькие)</div>
+        </div>
+        <div class="sort-column period-column">
+            <div class="sort-option" data-period="all">Все</div>
+            <div class="sort-option" data-period="week">Неделя</div>
+            <div class="sort-option" data-period="month">Месяц</div>
+            <div class="sort-option" data-period="year">Год</div>
+        </div>
+        <div class="sort-actions">
+            <button class="mb-btn cancel-btn" onclick="closeSortDropdown()">Отмена</button>
+            <button class="mb-btn ok-btn" onclick="applySort()">Окей</button>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
@@ -3300,6 +3304,10 @@
         // Настройки
         let currentTheme = 'dark';
         let avatarDataUrl = null;
+
+        // ===== ЯВНО ОБЪЯВЛЯЕМ ПЕРЕМЕННЫЕ СОРТИРОВКИ =====
+        let clientSort = 'date_desc';
+        let clientPeriod = 'all';
 
         // ===== DETECT MOBILE =====
         function detectMobile() {
@@ -3846,6 +3854,21 @@
             document.querySelectorAll('.sort-option[data-period]').forEach(el => {
                 el.classList.toggle('active', el.dataset.period === tempClientPeriod);
             });
+
+            // Позиционируем меню на десктопе под кнопкой
+            if (window.innerWidth > 768) {
+                const btn = document.getElementById('sortToggleBtn');
+                if (btn) {
+                    const rect = btn.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + 4) + 'px';
+                    menu.style.left = rect.left + 'px';
+                    menu.style.transform = 'none';
+                }
+            } else {
+                menu.style.top = '';
+                menu.style.left = '';
+                menu.style.transform = '';
+            }
             menu.classList.add('open');
             isSortDropdownOpen = true;
         }
@@ -3892,11 +3915,26 @@
                 }
                 return;
             }
-            // Закрываем меню при клике вне wrapper
+            // Закрываем меню при клике вне wrapper и самого меню
             const wrapper = document.querySelector('.sort-dropdown-wrapper');
-            if (wrapper && !wrapper.contains(e.target)) {
+            const menu = document.getElementById('sortDropdownMenu');
+            if (!menu.contains(e.target) && (!wrapper || !wrapper.contains(e.target))) {
                 if (isSortDropdownOpen) {
                     closeSortDropdown();
+                }
+            }
+        });
+
+        // Пересчёт позиции при ресайзе
+        window.addEventListener('resize', function() {
+            if (isSortDropdownOpen && window.innerWidth > 768) {
+                const menu = document.getElementById('sortDropdownMenu');
+                const btn = document.getElementById('sortToggleBtn');
+                if (menu && btn) {
+                    const rect = btn.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + 4) + 'px';
+                    menu.style.left = rect.left + 'px';
+                    menu.style.transform = 'none';
                 }
             }
         });
