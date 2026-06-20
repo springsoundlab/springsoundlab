@@ -17,7 +17,6 @@
 
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg">
     <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg">
-    <!-- Манифест будет вставлен динамически, но также добавим статический link с data URI для надёжности -->
     <link rel="manifest" id="manifestLink">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -80,11 +79,11 @@
         html, body {
             height: 100%;
             overflow: hidden;
-            /* Предотвращаем пружинистость на iOS */
-            position: fixed;
             width: 100%;
             top: 0;
             left: 0;
+            /* Предотвращаем пружинистость на iOS */
+            position: fixed;
         }
         body {
             background: var(--bg);
@@ -92,7 +91,8 @@
             font-family: 'Inter', sans-serif;
             display: flex;
             transition: background 0.3s, color 0.3s;
-            padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+            padding: 0;
+            /* Убираем отступы для safe-area, будем управлять через topbar */
             -webkit-overflow-scrolling: touch;
         }
         ::-webkit-scrollbar {
@@ -208,6 +208,7 @@
             height: 100%;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
         .sb-logo {
             display: flex;
@@ -241,6 +242,8 @@
             flex-direction: column;
             gap: 2px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
         .nav-i {
             display: flex;
@@ -270,13 +273,14 @@
             text-align: center;
         }
         .sb-user {
-            padding: 10px 12px 14px;
+            padding: 12px 12px 16px;
             border-top: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 9px;
             cursor: pointer;
             flex-shrink: 0;
+            min-height: 56px;
         }
         .u-av {
             width: 30px;
@@ -308,6 +312,9 @@
         .u-role {
             font-size: 10px;
             color: var(--text3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* MAIN & TOPBAR */
@@ -329,7 +336,7 @@
             flex-shrink: 0;
             gap: 6px;
             transition: background 0.3s;
-            /* безопасная зона */
+            /* Безопасная зона только для topbar */
             padding-top: env(safe-area-inset-top, 0px);
         }
         .topbar .topbar-left {
@@ -390,7 +397,6 @@
             overflow: hidden;
             display: flex;
             position: relative;
-            /* предотвращаем прокрутку на iOS */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -511,6 +517,7 @@
             display: grid;
             grid-template-columns: 56px repeat(7, 1fr);
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
         .cal-time-col {
             border-right: 1px solid var(--border);
@@ -608,6 +615,7 @@
             align-content: start;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
         .cl-card {
             background: var(--surface);
@@ -868,6 +876,7 @@
             gap: 12px;
             align-content: start;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
         .fin-card {
             background: var(--surface);
@@ -1028,6 +1037,7 @@
             overflow-y: auto;
             padding: 14px 18px;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
         .cert-grid {
             display: grid;
@@ -1093,6 +1103,7 @@
             overflow-y: auto;
             padding: 14px 18px;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
         }
         .ana-hd {
             display: grid;
@@ -1903,6 +1914,8 @@
                 padding-left: 18px !important;
                 padding-right: 12px !important;
                 gap: 4px;
+                /* Убираем дополнительный отступ сверху на мобильных, так как safe-area уже учтён */
+                padding-top: env(safe-area-inset-top, 0px);
             }
             .topbar .topbar-right input[type="month"] {
                 width: 110px;
@@ -2517,19 +2530,19 @@
         /* ===== ДОПОЛНИТЕЛЬНЫЕ ПРАВКИ ДЛЯ PWA ===== */
         @media all and (display-mode: standalone) {
             body {
-                padding-top: env(safe-area-inset-top, 0px);
-                padding-bottom: env(safe-area-inset-bottom, 0px);
                 /* Убираем пружинистость на iOS в standalone */
                 overflow: hidden;
                 position: fixed;
                 width: 100%;
                 height: 100%;
+                padding: 0;
             }
             .topbar {
                 padding-top: env(safe-area-inset-top, 0px);
             }
             .sidebar {
-                padding-top: env(safe-area-inset-top, 0px);
+                /* Убираем лишний отступ сверху, только topbar отвечает за safe-area */
+                padding-top: 0;
             }
             .main {
                 height: 100vh;
@@ -2538,13 +2551,32 @@
             .content {
                 height: 100%;
             }
+            /* Убираем пружинистость у всех прокручиваемых элементов */
+            .cal-body,
+            .cl-grid,
+            .fin-grid,
+            .certs-wrap,
+            .ana-wrap,
+            .sb-nav {
+                overscroll-behavior: none;
+                -webkit-overflow-scrolling: touch;
+            }
         }
         .main {
             min-height: 100vh;
             min-height: -webkit-fill-available;
         }
+        /* Дополнительно убираем пружинистость для iOS */
+        .cal-body,
+        .cl-grid,
+        .fin-grid,
+        .certs-wrap,
+        .ana-wrap,
+        .sb-nav {
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
+        }
 
-        /* убираем скролл на iOS в модалках */
         .mo {
             -webkit-overflow-scrolling: touch;
         }
@@ -3042,15 +3074,21 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
     </script>
     <script>
-        // ===== PWA: ДИНАМИЧЕСКИЙ МАНИФЕСТ С ПРАВИЛЬНЫМИ ИКОНКАМИ =====
+        // ===== PWA: ДИНАМИЧЕСКИЙ МАНИФЕСТ С ПРАВИЛЬНЫМИ НАСТРОЙКАМИ =====
         (function injectManifest() {
             try {
                 const iconUrl = "https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg";
+                // Получаем полный URL без параметров
+                const startUrl = window.location.href.split('?')[0];
+                // Добавляем параметр, чтобы форсировать загрузку приложения
+                const fullStartUrl = startUrl + (startUrl.includes('?') ? '&' : '?') + 'from=pwa';
+
                 const manifest = {
                     name: "SPRING SOUND LAB CRM",
                     short_name: "SSL CRM",
                     description: "Recording Studio CRM",
-                    start_url: window.location.href.split('?')[0],
+                    start_url: fullStartUrl,
+                    scope: window.location.pathname || "/",
                     display: "standalone",
                     orientation: "portrait",
                     background_color: "#0e0e12",
@@ -3067,7 +3105,7 @@
                         purpose: "any maskable"
                     }]
                 };
-                // Используем data URI для манифеста, чтобы гарантировать загрузку до установки
+                // Используем data URI для максимальной совместимости
                 const manifestStr = JSON.stringify(manifest);
                 const base64 = btoa(unescape(encodeURIComponent(manifestStr)));
                 const dataUri = "data:application/json;charset=utf-8;base64," + base64;
@@ -3092,7 +3130,7 @@
                         metaTheme.content = e.matches ? dark : light;
                     });
                 }
-                console.log('✅ PWA manifest injected (data URI)');
+                console.log('✅ PWA manifest injected (data URI) with full start_url and scope');
             } catch (e) {
                 console.warn('⚠️ PWA manifest injection failed:', e);
             }
@@ -5610,10 +5648,8 @@
             if (isSessionsActive) calControls.classList.add('active');
         });
 
-        console.log('✅ CRM v3 — PWA fully fixed, avatars in employees, iOS bounce removed.');
-        console.log('✅ Теперь приложение устанавливается на Android с иконкой и открывается полноэкранно.');
-        console.log('✅ Аватарки отображаются у каждого сотрудника в разделе "Сотрудники".');
-        console.log('✅ На iOS убрана пружинистость и восстановлено нормальное меню.');
+        console.log('✅ CRM v3 — PWA: мгновенная установка и открытие, iOS исправлена.');
+        console.log('✅ Аватарки в сотрудниках, убрана пружинистость, меню на месте.');
     </script>
 </body>
 </html>
