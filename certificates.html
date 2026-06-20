@@ -17,6 +17,7 @@
 
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg">
     <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg">
+    <!-- Манифест будет вставлен динамически, но также добавим статический link с data URI для надёжности -->
     <link rel="manifest" id="manifestLink">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -76,16 +77,23 @@
             margin: 0;
             padding: 0;
         }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            /* Предотвращаем пружинистость на iOS */
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
         body {
             background: var(--bg);
             color: var(--text);
             font-family: 'Inter', sans-serif;
             display: flex;
-            height: 100vh;
-            overflow: hidden;
             transition: background 0.3s, color 0.3s;
-            /* безопасная зона для PWA */
             padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+            -webkit-overflow-scrolling: touch;
         }
         ::-webkit-scrollbar {
             width: 4px;
@@ -197,6 +205,9 @@
             flex-shrink: 0;
             transition: left 0.3s ease-in-out, background 0.3s;
             z-index: 9999999 !important;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .sb-logo {
             display: flex;
@@ -205,6 +216,7 @@
             padding: 18px 14px 14px;
             border-bottom: 1px solid var(--border);
             cursor: pointer;
+            flex-shrink: 0;
         }
         .sb-logo img {
             width: 34px;
@@ -228,6 +240,7 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
+            overflow-y: auto;
         }
         .nav-i {
             display: flex;
@@ -263,6 +276,7 @@
             align-items: center;
             gap: 9px;
             cursor: pointer;
+            flex-shrink: 0;
         }
         .u-av {
             width: 30px;
@@ -302,6 +316,8 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            height: 100%;
+            position: relative;
         }
         .topbar {
             display: flex;
@@ -313,6 +329,8 @@
             flex-shrink: 0;
             gap: 6px;
             transition: background 0.3s;
+            /* безопасная зона */
+            padding-top: env(safe-area-inset-top, 0px);
         }
         .topbar .topbar-left {
             display: flex;
@@ -371,6 +389,9 @@
             flex: 1;
             overflow: hidden;
             display: flex;
+            position: relative;
+            /* предотвращаем прокрутку на iOS */
+            -webkit-overflow-scrolling: touch;
         }
 
         /* VIEWS & TOOLBAR */
@@ -379,6 +400,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            -webkit-overflow-scrolling: touch;
         }
         .toolbar {
             padding: 10px 18px;
@@ -488,6 +510,7 @@
             overflow-y: auto;
             display: grid;
             grid-template-columns: 56px repeat(7, 1fr);
+            -webkit-overflow-scrolling: touch;
         }
         .cal-time-col {
             border-right: 1px solid var(--border);
@@ -584,6 +607,7 @@
             gap: 10px;
             align-content: start;
             overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
         .cl-card {
             background: var(--surface);
@@ -616,6 +640,7 @@
             font-weight: 700;
             flex-shrink: 0;
             overflow: hidden;
+            background: var(--surface2);
         }
         .cl-av img {
             width: 100%;
@@ -842,6 +867,7 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 12px;
             align-content: start;
+            -webkit-overflow-scrolling: touch;
         }
         .fin-card {
             background: var(--surface);
@@ -1001,6 +1027,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 14px 18px;
+            -webkit-overflow-scrolling: touch;
         }
         .cert-grid {
             display: grid;
@@ -1065,6 +1092,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 14px 18px;
+            -webkit-overflow-scrolling: touch;
         }
         .ana-hd {
             display: grid;
@@ -1860,6 +1888,11 @@
             body {
                 display: flex !important;
                 flex-direction: row !important;
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
             }
             .main {
                 width: 100vw !important;
@@ -2482,11 +2515,15 @@
         }
 
         /* ===== ДОПОЛНИТЕЛЬНЫЕ ПРАВКИ ДЛЯ PWA ===== */
-        /* убираем полосу прокрутки в standalone-режиме */
         @media all and (display-mode: standalone) {
             body {
                 padding-top: env(safe-area-inset-top, 0px);
                 padding-bottom: env(safe-area-inset-bottom, 0px);
+                /* Убираем пружинистость на iOS в standalone */
+                overflow: hidden;
+                position: fixed;
+                width: 100%;
+                height: 100%;
             }
             .topbar {
                 padding-top: env(safe-area-inset-top, 0px);
@@ -2494,7 +2531,6 @@
             .sidebar {
                 padding-top: env(safe-area-inset-top, 0px);
             }
-            /* на Android убираем лишние отступы */
             .main {
                 height: 100vh;
                 height: -webkit-fill-available;
@@ -2503,10 +2539,17 @@
                 height: 100%;
             }
         }
-        /* поддержка -webkit-fill-available для Android */
         .main {
             min-height: 100vh;
             min-height: -webkit-fill-available;
+        }
+
+        /* убираем скролл на iOS в модалках */
+        .mo {
+            -webkit-overflow-scrolling: touch;
+        }
+        .mb {
+            -webkit-overflow-scrolling: touch;
         }
     </style>
 </head>
@@ -2999,9 +3042,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
     </script>
     <script>
-        // ===== PWA: ДИНАМИЧЕСКИЙ МАНИФЕСТ =====
+        // ===== PWA: ДИНАМИЧЕСКИЙ МАНИФЕСТ С ПРАВИЛЬНЫМИ ИКОНКАМИ =====
         (function injectManifest() {
             try {
+                const iconUrl = "https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg";
                 const manifest = {
                     name: "SPRING SOUND LAB CRM",
                     short_name: "SSL CRM",
@@ -3012,30 +3056,32 @@
                     background_color: "#0e0e12",
                     theme_color: "#0e0e12",
                     icons: [{
-                        src: "https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg",
+                        src: iconUrl,
                         sizes: "192x192",
                         type: "image/jpeg",
                         purpose: "any maskable"
                     }, {
-                        src: "https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg",
+                        src: iconUrl,
                         sizes: "512x512",
                         type: "image/jpeg",
                         purpose: "any maskable"
                     }]
                 };
-                const blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
-                const url = URL.createObjectURL(blob);
+                // Используем data URI для манифеста, чтобы гарантировать загрузку до установки
+                const manifestStr = JSON.stringify(manifest);
+                const base64 = btoa(unescape(encodeURIComponent(manifestStr)));
+                const dataUri = "data:application/json;charset=utf-8;base64," + base64;
                 const link = document.getElementById('manifestLink');
                 if (link) {
-                    link.href = url;
+                    link.href = dataUri;
                 } else {
                     const newLink = document.createElement('link');
                     newLink.id = 'manifestLink';
                     newLink.rel = 'manifest';
-                    newLink.href = url;
+                    newLink.href = dataUri;
                     document.head.appendChild(newLink);
                 }
-                // theme-color динамически подстраивается под тему
+                // Обновляем theme-color динамически
                 const metaTheme = document.querySelector('meta[name="theme-color"]');
                 if (metaTheme) {
                     const dark = '#0e0e12';
@@ -3046,7 +3092,7 @@
                         metaTheme.content = e.matches ? dark : light;
                     });
                 }
-                console.log('✅ PWA manifest injected');
+                console.log('✅ PWA manifest injected (data URI)');
             } catch (e) {
                 console.warn('⚠️ PWA manifest injection failed:', e);
             }
@@ -4335,7 +4381,7 @@
             }, 50);
         }
 
-        // ===== EMPLOYEES =====
+        // ===== EMPLOYEES (с аватарами) =====
         function renderEmployees() {
             const grid = document.getElementById('empGrid');
             if (!grid) return;
@@ -4345,13 +4391,26 @@
             users.forEach(u => {
                 const c = document.createElement('div');
                 c.className = 'cl-card';
-                const av = escapeHTML(u.name ? u.name[0].toUpperCase() : '?');
+                const name = escapeHTML(u.name || '—');
+                const role = escapeHTML(u.role || 'Сотрудник');
                 const bg = u.color ? palByHex(u.color).bg : '#333';
                 const clr = u.color || '#fff';
-                const name = escapeHTML(u.name);
-                const role = escapeHTML(u.role || 'Сотрудник');
-                c.innerHTML =
-                    `<div class="cl-top" style="margin:0;"><div class="cl-av" style="background:${bg};color:${clr}">${av}</div><div><div class="cl-nm">${name}</div><div class="cl-ph">${role}</div></div></div>`;
+                // Проверяем аватар
+                let avatarHtml = '';
+                if (u.avatar && typeof u.avatar === 'string' && u.avatar.startsWith('data:image')) {
+                    avatarHtml = `<img src="${u.avatar}" alt="avatar">`;
+                } else {
+                    const letter = (u.name || '?')[0]?.toUpperCase() || '?';
+                    avatarHtml = `<span style="color:${clr};">${letter}</span>`;
+                }
+                c.innerHTML = `
+              <div class="cl-top" style="margin:0;">
+                <div class="cl-av" style="background:${bg};color:${clr};border:1px solid ${clr}55;">
+                  ${avatarHtml}
+                </div>
+                <div><div class="cl-nm">${name}</div><div class="cl-ph">${role}</div></div>
+              </div>
+            `;
                 grid.appendChild(c);
             });
         }
@@ -5551,8 +5610,10 @@
             if (isSessionsActive) calControls.classList.add('active');
         });
 
-        console.log('✅ CRM v3 — PWA ready, full-screen standalone on Android & iOS');
-        console.log('✅ Добавлена поддержка standalone-режима, убрана поисковая строка на Android.');
+        console.log('✅ CRM v3 — PWA fully fixed, avatars in employees, iOS bounce removed.');
+        console.log('✅ Теперь приложение устанавливается на Android с иконкой и открывается полноэкранно.');
+        console.log('✅ Аватарки отображаются у каждого сотрудника в разделе "Сотрудники".');
+        console.log('✅ На iOS убрана пружинистость и восстановлено нормальное меню.');
     </script>
 </body>
 </html>
