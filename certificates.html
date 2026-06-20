@@ -3854,6 +3854,7 @@
             swipeHandled = false;
         const SWIPE_MIN_DISTANCE = 60; // минимальная дистанция по горизонтали, чтобы засчитать свайп
         const SWIPE_MAX_VERTICAL = 45; // максимальное отклонение по вертикали, иначе это скролл, а не свайп
+        const SIDEBAR_EDGE_ZONE = 40; // полоса у левого края экрана (px), зарезервированная только за открытием/закрытием меню
 
         function handleTouchStart(e) {
             if (e.touches.length === 2) {
@@ -3869,6 +3870,13 @@
             if (e.touches.length === 1 && !isPinching) {
                 swipeStartX = e.touches[0].clientX;
                 swipeStartY = e.touches[0].clientY;
+                // Если палец стартовал у самого левого края — это жест открытия меню,
+                // не даём ему переключать недели, чтобы жесты не конфликтовали
+                if (swipeStartX < SIDEBAR_EDGE_ZONE) {
+                    swipeActive = false;
+                    swipeHandled = true;
+                    return;
+                }
                 swipeActive = true;
                 swipeHandled = false;
             }
@@ -5774,7 +5782,7 @@
                 }
                 if (sidebar && !sidebar.classList.contains('mobile-open')) {
                     const swipeRight = touchEndX - touchStartX;
-                    if (touchStartX < 30 && swipeRight > 50 && swipeRight > diffY) {
+                    if (touchStartX < SIDEBAR_EDGE_ZONE && swipeRight > 50 && swipeRight > diffY) {
                         sidebar.classList.add('mobile-open');
                     }
                 }
