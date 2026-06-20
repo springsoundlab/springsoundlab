@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        /* ===== ТЕМЫ ===== */
         :root {
             --bg: #0e0e12;
             --surface: #16161c;
@@ -38,6 +39,28 @@
             --r: 12px;
             --r-sm: 8px;
         }
+        body.light-theme {
+            --bg: #f0f0f5;
+            --surface: #ffffff;
+            --surface2: #e8e8ef;
+            --surface3: #d5d5e0;
+            --border: rgba(0,0,0,0.08);
+            --border2: rgba(0,0,0,0.15);
+            --text: #1e1e26;
+            --text2: #5a5a6a;
+            --text3: #8a8a9a;
+            --accent: #6a5ee0;
+            --accent2: #7c6fff;
+            --accent-bg: rgba(106,94,224,0.1);
+            --green: #2db87a;
+            --green-bg: rgba(45,184,122,0.08);
+            --red: #e04a5a;
+            --red-bg: rgba(224,74,90,0.08);
+            --gold: #c9a032;
+            --gold-bg: rgba(201,160,50,0.12);
+            --blue: #2b7fd4;
+            --blue-bg: rgba(43,127,212,0.1);
+        }
         * {
             box-sizing: border-box;
             margin: 0;
@@ -50,6 +73,7 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
+            transition: background 0.3s, color 0.3s;
         }
         ::-webkit-scrollbar {
             width: 4px;
@@ -144,7 +168,7 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            transition: left 0.3s ease-in-out;
+            transition: left 0.3s ease-in-out, background 0.3s;
             z-index: 9999999 !important;
         }
         .sb-logo {
@@ -226,6 +250,12 @@
             font-weight: 700;
             color: var(--accent2);
             flex-shrink: 0;
+            overflow: hidden;
+        }
+        .u-av img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .u-name {
             font-size: 12px;
@@ -255,6 +285,7 @@
             padding: 0 18px;
             flex-shrink: 0;
             gap: 6px;
+            transition: background 0.3s;
         }
         .topbar .topbar-left {
             display: flex;
@@ -291,15 +322,22 @@
         .topbar .topbar-right .cal-controls {
             display: none;
         }
-        /* Показываем только когда активен журнал */
         .topbar .topbar-right .cal-controls.active {
             display: flex;
             align-items: center;
             gap: 6px;
         }
-
-        /* ПК – иконка календаря белая */
+        /* Контролы зума в топбаре (только ПК) */
+        .topbar .zoom-controls-top {
+            display: none;
+            gap: 4px;
+            margin-right: 8px;
+        }
         @media(min-width:769px) {
+            .topbar .zoom-controls-top {
+                display: flex;
+            }
+            /* ПК – иконка календаря белая */
             input[type="month"]::-webkit-calendar-picker-indicator {
                 filter: invert(1);
             }
@@ -372,11 +410,9 @@
             background: var(--gold-bg);
         }
 
-        /* Кнопки зума (только ПК) */
+        /* Кнопки зума (старые, теперь не используются) */
         .zoom-controls {
-            display: flex;
-            gap: 4px;
-            margin-right: 8px;
+            display: none !important;
         }
 
         /* CALENDAR VIEW */
@@ -558,6 +594,12 @@
             font-size: 13px;
             font-weight: 700;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+        .cl-av img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .cl-nm {
             font-size: 13px;
@@ -703,13 +745,12 @@
             .sort-dropdown-menu .sort-actions {
                 display: none !important;
             }
-            /* На ПК меню сортировки остается как есть, без дополнительных элементов */
             .sort-dropdown-menu {
                 padding: 8px;
             }
         }
 
-        /* На мобильных показываем крестик и кнопки, увеличиваем текст */
+        /* На мобильных показываем кнопки, но крестик убран */
         @media(max-width:768px) {
             .sort-dropdown-menu {
                 position: fixed !important;
@@ -735,19 +776,11 @@
             }
             .sort-option {
                 padding: 8px 12px !important;
-                font-size: 14px !important; /* увеличен шрифт */
+                font-size: 14px !important;
                 white-space: normal !important;
             }
             .sort-close {
-                display: flex !important;
-                justify-content: flex-end;
-                margin-bottom: 0;
-                padding: 0;
-            }
-            .sort-close .mb-close {
-                width: 28px;
-                height: 28px;
-                font-size: 16px;
+                display: none !important; /* крестик убран */
             }
             .sort-actions {
                 display: flex !important;
@@ -1728,6 +1761,12 @@
                 left: auto;
                 transform: none;
             }
+            #moSubscription .mb {
+                width: 540px !important; /* увеличенное окно абонемента */
+            }
+            #moSettings .mb {
+                width: 540px !important; /* окно настроек такого же размера */
+            }
             #moClientEdit .f-group {
                 margin-bottom: 10px;
             }
@@ -1827,6 +1866,9 @@
                 padding: 3px 8px;
                 font-size: 10px;
             }
+            .topbar .zoom-controls-top {
+                display: none !important; /* скрываем зум на мобильных */
+            }
 
             .sb-logo-t,
             .sb-logo-s,
@@ -1847,12 +1889,11 @@
                 padding: 8px 12px;
             }
             .zoom-controls {
-                display: none !important; /* скрываем зум на мобильных */
+                display: none !important;
             }
             .tb-btn {
                 justify-content: center;
             }
-            /* Скрываем старую навигацию календаря в тулбаре */
             .cal-nav {
                 display: none !important;
             }
@@ -1974,7 +2015,12 @@
             #moClientEdit .mb {
                 width: 95vw !important;
             }
-            /* Сетка записей клиента на мобильных — 4 колонки, центрирование */
+            #moSubscription .mb {
+                width: 95vw !important;
+            }
+            #moSettings .mb {
+                width: 95vw !important;
+            }
             .client-sessions-grid {
                 display: grid;
                 grid-template-columns: 1fr 1fr 2fr 1fr !important;
@@ -2045,7 +2091,8 @@
             #moClientEdit .mb,
             #moAddPackage .mb,
             #moEditSvc .mb,
-            #moSubscription .mb {
+            #moSubscription .mb,
+            #moSettings .mb {
                 width: 95% !important;
                 max-width: 500px !important;
                 border-radius: 16px !important;
@@ -2139,7 +2186,6 @@
                 font-size: 12px;
             }
 
-            /* Увеличиваем кнопку сохранить на мобильных */
             #moRecord .mb-confirm {
                 padding: 14px 10px;
                 font-size: 15px;
@@ -2270,12 +2316,6 @@
         }
 
         /* ===== МОДАЛКА ДЛЯ АБОНЕМЕНТА ===== */
-        #moSubscription .mb {
-            max-width: 420px;
-        }
-        #moSubscription .mb .mb-title {
-            font-size: 15px;
-        }
         #moSubscription .mb .f-group {
             margin-bottom: 14px;
         }
@@ -2324,6 +2364,102 @@
         }
         .mb-save-wrap .mb-btn:hover {
             background: #6a5ee0;
+        }
+
+        /* ===== НАСТРОЙКИ АККАУНТА ===== */
+        #moSettings .mb .settings-row {
+            margin-bottom: 16px;
+        }
+        #moSettings .mb .settings-row .f-label {
+            margin-bottom: 4px;
+        }
+        #moSettings .mb .avatar-upload {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        #moSettings .mb .avatar-upload .avatar-preview {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 2px solid var(--border2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text2);
+            flex-shrink: 0;
+        }
+        #moSettings .mb .avatar-upload .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #moSettings .mb .avatar-upload .avatar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        #moSettings .mb .avatar-upload .avatar-actions label {
+            padding: 6px 12px;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text2);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .15s;
+            text-align: center;
+        }
+        #moSettings .mb .avatar-upload .avatar-actions label:hover {
+            color: var(--text);
+            border-color: var(--border2);
+        }
+        #moSettings .mb .avatar-upload .avatar-actions .remove-avatar {
+            padding: 6px 12px;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--red);
+            background: transparent;
+            color: var(--red);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .15s;
+            text-align: center;
+        }
+        #moSettings .mb .avatar-upload .avatar-actions .remove-avatar:hover {
+            background: var(--red-bg);
+        }
+        /* Переключатель темы */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+        .theme-toggle .theme-label {
+            font-size: 12px;
+            color: var(--text2);
+        }
+        .theme-toggle .tgl {
+            width: 40px;
+            height: 22px;
+        }
+        .theme-toggle .tgl-s {
+            border-radius: 22px;
+        }
+        .theme-toggle .tgl-s::before {
+            width: 16px;
+            height: 16px;
+            left: 3px;
+            bottom: 3px;
+        }
+        .theme-toggle .tgl input:checked+.tgl-s::before {
+            transform: translateX(18px);
         }
     </style>
 </head>
@@ -2395,20 +2531,26 @@
                 <div class="nav-i" onclick="goSec('certs')" id="nav-certs"><i class="fa-solid fa-gift"></i> Сертификаты</div>
                 <div class="nav-i" onclick="goSec('analytics')" id="nav-analytics"><i class="fa-solid fa-chart-simple"></i> Аналитика</div>
                 <div class="nav-i" onclick="goSec('employees')" id="nav-employees"><i class="fa-solid fa-users"></i> Сотрудники</div>
+                <div class="nav-i" onclick="openSettingsModal()" id="nav-settings"><i class="fa-solid fa-gear"></i> Настройки аккаунта</div>
             </div>
             <div class="sb-user" onclick="doLogout()" title="Выйти">
-                <div class="u-av" id="uAv">А</div>
+                <div class="u-av" id="uAv"><span id="uAvLetter">А</span></div>
                 <div style="flex:1;min-width:0;"><div class="u-name" id="uName">—</div><div class="u-role" id="uRole">—</div></div>
                 <i class="fa-solid fa-arrow-right-from-bracket" style="font-size:10px;color:var(--text3);"></i>
             </div>
         </nav>
 
         <div class="main">
-            <!-- TOPBAR — содержит навигацию по дате и кнопку сброса (только в журнале) -->
+            <!-- TOPBAR — содержит навигацию по дате и кнопку сброса (только в журнале) и контролы зума (ПК) -->
             <div class="topbar">
                 <div class="topbar-left">
                     <div class="tb-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">
                         <i class="fa-solid fa-bars"></i> Меню
+                    </div>
+                    <!-- Контролы зума (только ПК) -->
+                    <div class="zoom-controls-top">
+                        <button class="tb-btn" onclick="zoomCalendar(1)" title="Увеличить масштаб"><i class="fa-solid fa-plus"></i></button>
+                        <button class="tb-btn" onclick="zoomCalendar(-1)" title="Уменьшить масштаб"><i class="fa-solid fa-minus"></i></button>
                     </div>
                 </div>
                 <div class="topbar-right">
@@ -2424,10 +2566,7 @@
                 <!-- ЖУРНАЛ -->
                 <div id="secSessions" class="view active">
                     <div class="toolbar">
-                        <div class="zoom-controls">
-                            <button class="tb-btn" onclick="zoomCalendar(1)" title="Увеличить масштаб"><i class="fa-solid fa-plus"></i></button>
-                            <button class="tb-btn" onclick="zoomCalendar(-1)" title="Уменьшить масштаб"><i class="fa-solid fa-minus"></i></button>
-                        </div>
+                        <!-- Зум-контролы теперь в топбаре, здесь пусто -->
                     </div>
                     <div id="calView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
                         <div class="cal-head" id="calHead"></div>
@@ -2446,10 +2585,7 @@
                                     <i class="fa-solid fa-arrow-up-wide-short"></i> Сортировать
                                 </button>
                                 <div class="sort-dropdown-menu" id="sortDropdownMenu">
-                                    <!-- Крестик (только на мобильных) -->
-                                    <div class="sort-close">
-                                        <div class="mb-close" onclick="closeSortDropdown()"><i class="fa-solid fa-xmark"></i></div>
-                                    </div>
+                                    <!-- Крестик убран -->
                                     <div class="sort-column">
                                         <div class="sort-option" data-sort="date_desc">по дате (сначала новые)</div>
                                         <div class="sort-option" data-sort="date_asc">по дате (сначала старые)</div>
@@ -2607,7 +2743,6 @@
                 <div class="f-row full">
                     <div class="f-group"><div class="f-label">Комментарий / Заметка</div><textarea id="fComment" class="f-inp" placeholder="Детали записи, пожелания клиента..."></textarea></div>
                 </div>
-                <!-- Одна кнопка Сохранить -->
                 <div class="mb-save-wrap">
                     <button class="mb-btn mb-confirm" onclick="saveRecord()">Сохранить</button>
                 </div>
@@ -2740,7 +2875,7 @@
         </div>
     </div>
 
-    <!-- ===== НОВАЯ МОДАЛКА ДЛЯ АБОНЕМЕНТА ===== -->
+    <!-- ===== МОДАЛКА ДЛЯ АБОНЕМЕНТА ===== -->
     <div class="mo" id="moSubscription">
         <div class="mb mb-sm">
             <div class="mb-header">
@@ -2770,6 +2905,48 @@
             <div class="mb-btns">
                 <button class="mb-btn mb-cancel" onclick="closeSubscriptionModal()">Отмена</button>
                 <button class="mb-btn mb-confirm gold-btn" onclick="confirmSubscription()">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА НАСТРОЕК АККАУНТА ===== -->
+    <div class="mo" id="moSettings">
+        <div class="mb mb-sm">
+            <div class="mb-header">
+                <div class="mb-title"><i class="fa-solid fa-gear" style="margin-right:6px;"></i> Настройки аккаунта</div>
+                <div class="mb-close" onclick="closeSettingsModal()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <div class="settings-row">
+                <div class="f-label">Аватар</div>
+                <div class="avatar-upload">
+                    <div class="avatar-preview" id="settingsAvatarPreview">
+                        <span id="settingsAvatarLetter">А</span>
+                    </div>
+                    <div class="avatar-actions">
+                        <label for="avatarFileInput">Загрузить фото</label>
+                        <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+                        <button class="remove-avatar" onclick="removeAvatar()">Удалить</button>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-row">
+                <div class="f-label">Имя</div>
+                <input type="text" id="settingsName" class="f-inp" placeholder="Ваше имя">
+            </div>
+            <div class="settings-row">
+                <div class="f-label">Тема</div>
+                <div class="theme-toggle">
+                    <span class="theme-label">🌙 Тёмная</span>
+                    <label class="tgl">
+                        <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+                        <div class="tgl-s"></div>
+                    </label>
+                    <span class="theme-label">☀️ Светлая</span>
+                </div>
+            </div>
+            <div class="mb-btns">
+                <button class="mb-btn mb-cancel" onclick="closeSettingsModal()">Отмена</button>
+                <button class="mb-btn mb-confirm" onclick="saveSettings()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -2869,7 +3046,7 @@
         let formTotal=0;
         let currentCertId=null;
         let appStarted=false;
-        let viewMode='calendar'; // всегда calendar, список удалён
+        let viewMode='calendar';
         let svcMode='preset';
         let isSound=false;
         let isVocal=false;
@@ -2883,15 +3060,16 @@
         let currentStatusFilter='all';
         let clientEditIds=[];
         let userPackages=[];
-        // переменные для сортировки (временные)
         let tempClientSort='date_desc';
         let tempClientPeriod='all';
         let isSortDropdownOpen=false;
-
         let isMobileDevice=false;
         let _subClientHasSubscription = false;
         let _subClientSubData = null;
         let _lastCheckedClientName = '';
+        // Настройки
+        let currentTheme = 'dark'; // 'dark' или 'light'
+        let avatarDataUrl = null;
 
         // ===== DETECT MOBILE =====
         function detectMobile() {
@@ -3377,7 +3555,7 @@
             lockButton(btn);
             try{
                 const c=await auth.createUserWithEmailAndPassword(toEmail(ph),pw);
-                await UC.doc(c.user.uid).set({name,phone:ph,role,color:regSelectedColor,createdAt:Date.now(), packages: [], clientSort: 'date_desc', clientPeriod: 'all'});
+                await UC.doc(c.user.uid).set({name,phone:ph,role,color:regSelectedColor,createdAt:Date.now(), packages: [], clientSort: 'date_desc', clientPeriod: 'all', theme: 'dark'});
             }catch(e){
                 let m='Ошибка регистрации.';
                 if(e.code==='auth/email-already-in-use') m='Номер уже зарегистрирован.';
@@ -3397,10 +3575,8 @@
                 closeSortDropdown();
                 return;
             }
-            // Загружаем текущие значения в временные
             tempClientSort = clientSort;
             tempClientPeriod = clientPeriod;
-            // Обновляем визуальное состояние в меню
             document.querySelectorAll('.sort-option[data-sort]').forEach(el => {
                 el.classList.toggle('active', el.dataset.sort === tempClientSort);
             });
@@ -3416,16 +3592,13 @@
             isSortDropdownOpen = false;
         }
 
-        // Обработчик кликов по опциям сортировки (работает на всех устройствах)
         document.addEventListener('click', function(e) {
             const option = e.target.closest('.sort-option');
             if (!option) return;
             const menu = document.getElementById('sortDropdownMenu');
             if (!menu.contains(option)) return;
-            // Определяем, мобильное устройство или ПК
             const isMobile = window.innerWidth <= 768;
             if (!isMobile) {
-                // На ПК применяем сразу
                 const sortVal = option.dataset.sort;
                 const periodVal = option.dataset.period;
                 if (sortVal) {
@@ -3444,7 +3617,6 @@
                 closeSortDropdown();
                 renderClients();
             } else {
-                // На мобильных только визуальное выделение
                 if (option.dataset.sort) {
                     tempClientSort = option.dataset.sort;
                     document.querySelectorAll('.sort-option[data-sort]').forEach(el => el.classList.remove('active'));
@@ -3468,7 +3640,6 @@
             renderClients();
         }
 
-        // Переопределяем старые функции, чтобы они не мешали
         window.selectSort = function() {};
         window.setClientPeriod = function() {};
 
@@ -3504,6 +3675,7 @@
                 if(!p){const ph=(user.email||'').split('@')[0];p={name:ph,phone:ph,role:'Сотрудник',color:PALETTE[0].hex};}
                 p.uid=user.uid;
                 if(!p.color)p.color=PALETTE[0].hex;
+                if(!p.theme) p.theme = 'dark';
 
                 isMobileDevice = detectMobile();
                 if (isMobileDevice) {
@@ -3527,14 +3699,28 @@
                 const subBtn = document.getElementById('svcModeSubscription');
                 if (subBtn) subBtn.style.display = (isVocal || isGuitar) ? 'inline-flex' : 'none';
                 selectedFormColor=p.color;
-                document.getElementById('uAv').textContent=(p.name||'?').trim()[0].toUpperCase();
-                document.getElementById('uAv').style.background=palByHex(p.color).bg;
-                document.getElementById('uAv').style.color=p.color;
-                document.getElementById('uAv').style.borderColor=p.color+'55';
-                document.getElementById('uName').textContent=p.name;
-                document.getElementById('uRole').textContent=p.role;
-                document.getElementById('colorPreview').style.background = p.color;
-                document.getElementById('formColorNote').textContent = 'Ваш цвет';
+
+                // Тема
+                currentTheme = p.theme || 'dark';
+                if (currentTheme === 'light') {
+                    document.body.classList.add('light-theme');
+                    document.getElementById('themeToggle').checked = true;
+                } else {
+                    document.body.classList.remove('light-theme');
+                    document.getElementById('themeToggle').checked = false;
+                }
+
+                // Аватар
+                if (p.avatar) {
+                    avatarDataUrl = p.avatar;
+                    updateAvatarUI(p.avatar);
+                } else {
+                    avatarDataUrl = null;
+                    const letter = (p.name||'?').trim()[0]?.toUpperCase() || '?';
+                    updateAvatarUI(null, letter);
+                }
+
+                updateUserUI(p);
                 document.getElementById('authScreen').style.display='none';
                 document.getElementById('appRoot').style.display='flex';
                 if(!appStarted){appStarted=true;startApp();}
@@ -3545,6 +3731,160 @@
                 document.getElementById('appRoot').style.display='none';
             }
         });
+
+        // ===== ОБНОВЛЕНИЕ UI ПОЛЬЗОВАТЕЛЯ =====
+        function updateUserUI(p) {
+            const name = p.name || '—';
+            const role = p.role || '—';
+            document.getElementById('uName').textContent = name;
+            document.getElementById('uRole').textContent = role;
+            const color = p.color || PALETTE[0].hex;
+            const av = document.getElementById('uAv');
+            av.style.background = palByHex(color).bg;
+            av.style.borderColor = color + '55';
+            const letter = name[0]?.toUpperCase() || '?';
+            if (!avatarDataUrl) {
+                updateAvatarUI(null, letter);
+            }
+            // В настройках
+            document.getElementById('settingsName').value = name;
+            document.getElementById('settingsAvatarLetter').textContent = letter;
+            if (avatarDataUrl) {
+                const preview = document.getElementById('settingsAvatarPreview');
+                preview.innerHTML = `<img src="${avatarDataUrl}" alt="avatar">`;
+            } else {
+                const preview = document.getElementById('settingsAvatarPreview');
+                preview.innerHTML = `<span id="settingsAvatarLetter">${letter}</span>`;
+            }
+        }
+
+        function updateAvatarUI(dataUrl, letter) {
+            const av = document.getElementById('uAv');
+            if (dataUrl) {
+                av.innerHTML = `<img src="${dataUrl}" alt="avatar">`;
+            } else {
+                const l = letter || (window.PROFILE?.name?.[0]?.toUpperCase() || '?');
+                av.innerHTML = `<span id="uAvLetter">${l}</span>`;
+            }
+            // Также обновляем превью в настройках, если окно открыто
+            const settingsPreview = document.getElementById('settingsAvatarPreview');
+            if (settingsPreview) {
+                if (dataUrl) {
+                    settingsPreview.innerHTML = `<img src="${dataUrl}" alt="avatar">`;
+                } else {
+                    const l = letter || (window.PROFILE?.name?.[0]?.toUpperCase() || '?');
+                    settingsPreview.innerHTML = `<span id="settingsAvatarLetter">${l}</span>`;
+                }
+            }
+        }
+
+        // ===== НАСТРОЙКИ АККАУНТА =====
+        function openSettingsModal() {
+            document.body.classList.add('modal-open');
+            const p = window.PROFILE;
+            if (p) {
+                document.getElementById('settingsName').value = p.name || '';
+                // Аватар
+                if (p.avatar) {
+                    const preview = document.getElementById('settingsAvatarPreview');
+                    preview.innerHTML = `<img src="${p.avatar}" alt="avatar">`;
+                } else {
+                    const letter = (p.name||'?')[0]?.toUpperCase() || '?';
+                    const preview = document.getElementById('settingsAvatarPreview');
+                    preview.innerHTML = `<span id="settingsAvatarLetter">${letter}</span>`;
+                }
+                // Тема
+                const isLight = (p.theme === 'light');
+                document.getElementById('themeToggle').checked = isLight;
+            }
+            document.getElementById('moSettings').classList.add('open');
+        }
+
+        function closeSettingsModal() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('moSettings').classList.remove('open');
+        }
+
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                // Сжимаем до разумного размера (макс 200x200)
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX = 200;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > MAX) { h = h * MAX / w; w = MAX; } }
+                    else { if (h > MAX) { w = w * MAX / h; h = MAX; } }
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const compressed = canvas.toDataURL('image/jpeg', 0.7);
+                    avatarDataUrl = compressed;
+                    updateAvatarUI(compressed);
+                    // Обновим превью в настройках
+                    const preview = document.getElementById('settingsAvatarPreview');
+                    preview.innerHTML = `<img src="${compressed}" alt="avatar">`;
+                };
+                img.src = dataUrl;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = ''; // сбросить input
+        }
+
+        function removeAvatar() {
+            if (confirm('Удалить аватар?')) {
+                avatarDataUrl = null;
+                const letter = (window.PROFILE?.name||'?')[0]?.toUpperCase() || '?';
+                updateAvatarUI(null, letter);
+                const preview = document.getElementById('settingsAvatarPreview');
+                preview.innerHTML = `<span id="settingsAvatarLetter">${letter}</span>`;
+            }
+        }
+
+        function toggleTheme() {
+            const isLight = document.getElementById('themeToggle').checked;
+            if (isLight) {
+                document.body.classList.add('light-theme');
+                currentTheme = 'light';
+            } else {
+                document.body.classList.remove('light-theme');
+                currentTheme = 'dark';
+            }
+        }
+
+        function saveSettings() {
+            const newName = document.getElementById('settingsName').value.trim();
+            if (!newName) { alert('Имя не может быть пустым'); return; }
+            const updateData = {
+                name: newName,
+                theme: currentTheme
+            };
+            if (avatarDataUrl !== null && avatarDataUrl !== window.PROFILE?.avatar) {
+                updateData.avatar = avatarDataUrl;
+            } else if (avatarDataUrl === null && window.PROFILE?.avatar) {
+                updateData.avatar = firebase.firestore.FieldValue.delete();
+            }
+            const btn = document.querySelector('#moSettings .mb-confirm');
+            if (btn) lockButton(btn);
+            UC.doc(window.PROFILE.uid).update(updateData)
+                .then(() => {
+                    window.PROFILE.name = newName;
+                    window.PROFILE.theme = currentTheme;
+                    if (avatarDataUrl !== null) window.PROFILE.avatar = avatarDataUrl;
+                    else delete window.PROFILE.avatar;
+                    updateUserUI(window.PROFILE);
+                    closeSettingsModal();
+                    alert('Настройки сохранены!');
+                })
+                .catch(err => {
+                    handleError(err, 'Ошибка сохранения настроек');
+                })
+                .finally(() => { if (btn) unlockButton(btn); });
+        }
 
         // ===== APP =====
         function startApp(){
@@ -3560,7 +3900,6 @@
             CERTC.onSnapshot(snap=>{certs={};snap.forEach(d=>certs[d.id]=d.data());renderCerts();}, err=>console.error('❌ Ошибка загрузки сертификатов:', err));
             setInterval(()=>{if(viewMode==='calendar')renderCalendar();},60000);
 
-            // Привязываем выбор месяца в топбаре
             const monthPickerTop = document.getElementById('calMonthPickerTop');
             if (monthPickerTop) {
                 const now = new Date();
@@ -3638,11 +3977,9 @@
             all.forEach(id=>document.getElementById('sec'+id.charAt(0).toUpperCase()+id.slice(1)).style.display='none');
             const currentSec = document.getElementById('sec'+s.charAt(0).toUpperCase()+s.slice(1));
             currentSec.style.display='flex';
-            // Добавляем класс active для показа кнопки сброса только в журнале
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             currentSec.classList.add('active');
 
-            // Управление видимостью элементов календаря в топбаре
             const calControls = document.getElementById('calControls');
             if (s === 'sessions') {
                 calControls.classList.add('active');
@@ -3662,11 +3999,6 @@
             if(privacyOn){privacyOn=false;applyBlur();}
             else{privacyOn=true;removeBlur();}
         };
-
-        // ===== НАВИГАЦИЯ ДАТ =====
-        function updateMnavLabel(){
-            // не используется, оставлено для совместимости
-        }
 
         // ===== СБРОС КАЛЕНДАРЯ =====
         window.resetCalendarView = function() {
@@ -4093,9 +4425,6 @@
             if(!privacyOn)applyBlur();
         }
 
-        // ===== ОЧИСТКА И СБРОС ФОРМЫ (удалены, так как кнопок нет) =====
-        // Функции clearForm и resetForm удалены, так как больше не используются
-
         // ===== SAVE RECORD =====
         window.saveRecord = async function(){
             const btn = document.querySelector('#moRecord .mb-confirm');
@@ -4223,10 +4552,7 @@
             } finally { if (btn) unlockButton(btn); }
         };
 
-        // ===== SESSIONS LIST (только для отображения в списке — но мы его убрали, оставим заглушку) =====
-        function renderSessions(){
-            // Список удалён, ничего не делаем
-        }
+        function renderSessions(){}
 
         // ===== CLIENTS =====
         function renderClients() {
@@ -4396,7 +4722,6 @@
             const listDiv = document.getElementById('clientEditSessions');
             listDiv.innerHTML = '';
             records.sort((a,b) => (b.date||'').localeCompare(a.date||''));
-            // Создаём сетку с 4 колонками: Дата, Время, Услуга, Сумма
             const header = document.createElement('div');
             header.className = 'client-sessions-grid header';
             header.innerHTML = `<span class="cell">Дата</span><span class="cell">Время</span><span class="cell">Услуга</span><span class="cell">Сумма</span>`;
@@ -4829,7 +5154,6 @@
 
         // ===== НОВЫЙ АБОНЕМЕНТ — МОДАЛКА =====
         function openSubscriptionModal() {
-            // Сворачиваем меню на мобильных
             const sidebar = document.getElementById('sidebar');
             if (sidebar) sidebar.classList.remove('mobile-open');
             document.body.classList.add('modal-open');
@@ -4953,17 +5277,15 @@
             }
         }
 
-        // ===== ДОПОЛНИТЕЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ПОСЛЕ ЗАГРУЗКИ =====
+        // ===== ДОПОЛНИТЕЛЬНАЯ ИНИЦИАЛИЗАЦИЯ =====
         document.addEventListener('DOMContentLoaded', function() {
-            // Убеждаемся, что календарь скрыт по умолчанию
             const calControls = document.getElementById('calControls');
             if (calControls) calControls.classList.remove('active');
-            // Показываем только если активен журнал
             const isSessionsActive = document.getElementById('secSessions').style.display !== 'none';
             if (isSessionsActive) calControls.classList.add('active');
         });
 
-        console.log('✅ CRM v3 — исправлена сортировка (ПК без кнопок, мобильные с кнопкой Окей), убраны лишние кнопки в форме записи, календарь и сброс только в журнале, иконка календаря белая на ПК.');
+        console.log('✅ CRM v3 — обновлена: контролы зума в топбаре, убран крестик в сортировке, добавлены настройки аккаунта с темой, аватаркой и сменой имени.');
     </script>
 </body>
 </html>
