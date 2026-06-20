@@ -2812,6 +2812,55 @@
                 height: 100%;
             }
         }
+        /* ===== ГОЛОСОВОЙ ВВОД (Gemini) ===== */
+        .voice-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 6px 20px rgba(124, 111, 255, 0.4);
+            cursor: pointer;
+            z-index: 99998;
+            transition: transform 0.15s, background 0.2s;
+        }
+        .voice-fab:active { transform: scale(0.92); }
+        .voice-fab.listening {
+            background: var(--red);
+            animation: voicePulse 1.2s ease-in-out infinite;
+        }
+        @keyframes voicePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 92, 106, 0.5); }
+            50% { box-shadow: 0 0 0 14px rgba(255, 92, 106, 0); }
+        }
+        .voice-toast {
+            position: fixed;
+            bottom: 92px;
+            right: 24px;
+            max-width: 280px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: var(--r);
+            padding: 12px 14px;
+            font-size: 13px;
+            line-height: 1.4;
+            color: var(--text);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            z-index: 99999;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.25s, transform 0.25s;
+            pointer-events: none;
+        }
+        .voice-toast.show { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
@@ -6112,7 +6161,207 @@
             if (isSessionsActive) calControls.classList.add('active');
         });
 
+        // ===========================================================
+        // ===== ГОЛОСОВОЙ ВВОД ЧЕРЕЗ GEMINI (работает в браузере и в PWA, Android + iOS) =====
+        // Записываем звук через MediaRecorder и отправляем сам аудиофайл в Gemini —
+        // он распознаёт речь и сразу извлекает данные о записи. Это не зависит от
+        // браузерного Web Speech API, которого в принципе нет на iOS/Safari.
+        // ===========================================================
+
+        // ⚠️ Вставьте сюда свой ключ из https://aistudio.google.com/app/apikey
+        const GEMINI_API_KEY = 'ВСТАВЬТЕ_СЮДА_СВОЙ_КЛЮЧ';
+        const GEMINI_MODEL = 'gemini-2.5-flash'; // можно заменить на gemini-2.5-flash-lite
+
+        let voiceMediaRecorder = null;
+        let voiceStream = null;
+        let voiceChunks = [];
+        let voiceIsRecording = false;
+        let voiceMaxTimer = null;
+        const VOICE_MAX_RECORD_MS = 15000; // защитный лимит записи
+
+        function showVoiceToast(text, autoHideMs) {
+            const el = document.getElementById('voiceToast');
+            if (!el) return;
+            el.textContent = text;
+            el.classList.add('show');
+            clearTimeout(el._hideTimer);
+            if (autoHideMs) {
+                el._hideTimer = setTimeout(() => el.classList.remove('show'), autoHideMs);
+            }
+        }
+
+        function pickVoiceMimeType() {
+            const candidates = [
+                'audio/webm;codecs=opus',
+                'audio/webm',
+                'audio/mp4',
+                'audio/aac',
+                'audio/mp4;codecs=mp4a.40.2'
+            ];
+            for (const t of candidates) {
+                if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) {
+                    return t;
+                }
+            }
+            return ''; // пусть браузер сам выберет формат по умолчанию
+        }
+
+        window.toggleVoiceInput = async function() {
+            if (voiceIsRecording) {
+                stopVoiceRecording();
+                return;
+            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+                alert('Этот браузер не поддерживает запись звука. Попробуйте открыть CRM в обычном вкладке Safari/Chrome (не в установленном приложении).');
+                return;
+            }
+            try {
+                voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch (e) {
+                alert('Не удалось получить доступ к микрофону. Проверьте разрешения для CRM в настройках телефона (Настройки → Safari/Chrome → Микрофон).');
+                return;
+            }
+            const mimeType = pickVoiceMimeType();
+            try {
+                voiceMediaRecorder = mimeType ? new MediaRecorder(voiceStream, { mimeType }) : new MediaRecorder(voiceStream);
+            } catch (e) {
+                voiceMediaRecorder = new MediaRecorder(voiceStream);
+            }
+            voiceChunks = [];
+            voiceMediaRecorder.ondataavailable = function(e) {
+                if (e.data && e.data.size > 0) voiceChunks.push(e.data);
+            };
+            voiceMediaRecorder.onstop = function() {
+                const usedType = voiceMediaRecorder.mimeType || mimeType || 'audio/webm';
+                const blob = new Blob(voiceChunks, { type: usedType });
+                if (voiceStream) {
+                    voiceStream.getTracks().forEach(t => t.stop());
+                    voiceStream = null;
+                }
+                blobToVoiceCommand(blob, usedType);
+            };
+
+            const btn = document.getElementById('voiceFabBtn');
+            voiceIsRecording = true;
+            if (btn) btn.classList.add('listening');
+            showVoiceToast('🎙 Идёт запись… нажмите ещё раз, чтобы закончить');
+
+            voiceMediaRecorder.start();
+            clearTimeout(voiceMaxTimer);
+            voiceMaxTimer = setTimeout(stopVoiceRecording, VOICE_MAX_RECORD_MS);
+        };
+
+        function stopVoiceRecording() {
+            clearTimeout(voiceMaxTimer);
+            const btn = document.getElementById('voiceFabBtn');
+            voiceIsRecording = false;
+            if (btn) btn.classList.remove('listening');
+            if (voiceMediaRecorder && voiceMediaRecorder.state !== 'inactive') {
+                voiceMediaRecorder.stop();
+            }
+        }
+
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function blobToVoiceCommand(blob, mimeType) {
+            showVoiceToast('🎙 Распознаю и обрабатываю…');
+            try {
+                const base64Audio = await blobToBase64(blob);
+                const parsed = await parseVoiceCommandWithGemini(base64Audio, mimeType);
+                if (!parsed.ok || !parsed.clientName) {
+                    const heard = parsed.transcript ? (' Услышал: «' + parsed.transcript + '»') : '';
+                    showVoiceToast('⚠️ Не разобрал команду.' + heard + ' Назовите чётче имя клиента, день и время.', 5000);
+                    return;
+                }
+                openNewForm();
+                document.getElementById('fName').value = parsed.clientName;
+                if (parsed.date) document.getElementById('fDate').value = parsed.date;
+                if (parsed.timeStart) document.getElementById('fTime').value = parsed.timeStart;
+                if (parsed.timeEnd) document.getElementById('fTimeEnd').value = parsed.timeEnd;
+                if (parsed.comment) document.getElementById('fComment').value = parsed.comment;
+                await saveRecord();
+                const range = parsed.timeStart ? (parsed.timeStart + (parsed.timeEnd ? '–' + parsed.timeEnd : '')) : '';
+                showVoiceToast('✅ Добавлено: ' + parsed.clientName + ' ' + range, 4500);
+            } catch (e) {
+                console.error(e);
+                showVoiceToast('❌ Ошибка: ' + (e.message || e), 5000);
+            }
+        }
+
+        async function parseVoiceCommandWithGemini(base64Audio, mimeType) {
+            const now = new Date();
+            const todayISO = now.getFullYear() + '-' +
+                String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                String(now.getDate()).padStart(2, '0');
+            const weekday = now.toLocaleDateString('ru-RU', { weekday: 'long' });
+
+            const schema = {
+                type: 'OBJECT',
+                properties: {
+                    ok: { type: 'BOOLEAN', description: 'true, если удалось распознать хотя бы имя клиента' },
+                    transcript: { type: 'STRING', description: 'То, что было сказано в записи, как можно точнее' },
+                    clientName: { type: 'STRING' },
+                    date: { type: 'STRING', description: 'Дата занятия в формате YYYY-MM-DD' },
+                    timeStart: { type: 'STRING', description: 'Время начала, формат HH:MM, 24-часовой формат. Пустая строка, если не указано.' },
+                    timeEnd: { type: 'STRING', description: 'Время окончания, формат HH:MM, 24-часовой формат. Пустая строка, если не указано.' },
+                    comment: { type: 'STRING', description: 'Любые дополнительные детали из фразы, иначе пустая строка' }
+                },
+                required: ['ok', 'transcript', 'clientName', 'date', 'timeStart', 'timeEnd', 'comment']
+            };
+
+            const prompt = 'Сегодня ' + todayISO + ' (' + weekday + '). Ты помощник администратора музыкальной студии. ' +
+                'В приложенном аудио преподаватель на русском языке диктует данные о записи клиента на занятие. ' +
+                'Сначала распознай речь, затем извлеки из неё данные. ' +
+                'Если названы день недели или относительная дата ("субботу", "завтра", "послезавтра") — посчитай точную дату относительно сегодняшней. ' +
+                'Время указывай в 24-часовом формате с учётом контекста ("2 часа дня" = 14:00, "с 2 до 4 вечера" = 14:00–16:00). ' +
+                'Телефон клиента не извлекай, он не нужен.';
+
+            const resp = await fetch(
+                'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + GEMINI_API_KEY,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            role: 'user',
+                            parts: [
+                                { text: prompt },
+                                { inlineData: { mimeType: mimeType, data: base64Audio } }
+                            ]
+                        }],
+                        generationConfig: {
+                            responseMimeType: 'application/json',
+                            responseSchema: schema
+                        }
+                    })
+                }
+            );
+            if (!resp.ok) {
+                const errText = await resp.text();
+                throw new Error('Gemini API вернул ошибку ' + resp.status + ': ' + errText.slice(0, 200));
+            }
+            const data = await resp.json();
+            const text = data && data.candidates && data.candidates[0] && data.candidates[0].content &&
+                data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
+                data.candidates[0].content.parts[0].text;
+            if (!text) throw new Error('Пустой ответ от Gemini');
+            return JSON.parse(text);
+        }
+
         console.log('✅ CRM v3 — все исправления применены: клиенты по готовым, сортировка, пружинистость, iOS safe-area, убран воздух в тулбаре.');
     </script>
+    <!-- ===== ГОЛОСОВОЙ ВВОД ===== -->
+    <button class="voice-fab" id="voiceFabBtn" onclick="toggleVoiceInput()" title="Голосовая запись">
+        <i class="fa-solid fa-microphone" id="voiceFabIcon"></i>
+    </button>
+    <div class="voice-toast" id="voiceToast"></div>
+
 </body>
 </html>
