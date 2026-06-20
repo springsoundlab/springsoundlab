@@ -6168,15 +6168,11 @@
         // браузерного Web Speech API, которого в принципе нет на iOS/Safari.
         // ===========================================================
 
-        // ⚠️ Ключ хранится в закодированном виде (не как открытый текст), чтобы автоматические
-        // сканеры секретов (GitHub Secret Scanning и боты, ищущие ключи по шаблону) не находили
-        // и не блокировали его. Это НЕ настоящая защита от человека, который специально откроет
-        // консоль разработчика в браузере — там ключ всё равно можно увидеть. Это значит, что
-        // безопасно полагаться на это можно только пока сайтом пользуются доверенные люди.
-        // Если когда-нибудь сайт станет публичным для всех — нужно будет вернуться к варианту
-        // с сервером-прокси (Cloud Function), который мы обсуждали.
-        const GEMINI_API_KEY = atob('QVEuQWI4Uk42SkNrQlVhckdzSHhFeXBCdGk2d29RQ0lRdWMzYUVvNHVIb080elk0SnZ4ZUE=');
-        const GEMINI_MODEL = 'gemini-2.5-flash';
+        // Ключ Gemini больше НЕ хранится в браузере. Запрос идёт через Cloudflare Worker —
+        // он сам хранит ключ как зашифрованный Secret и обращается к Gemini API от своего имени.
+        // Это решает две проблемы сразу: ключ не виден в коде, и запрос идёт не с российского IP
+        // пользователя, а с сервера Cloudflare — поэтому Gemini больше не блокирует по геолокации.
+        const VOICE_PROXY_URL = 'https://shrill-sun-9a9f.dropshotrr4.workers.dev/';
 
         let voiceMediaRecorder = null;
         let voiceStream = null;
@@ -6308,57 +6304,17 @@
                 String(now.getDate()).padStart(2, '0');
             const weekday = now.toLocaleDateString('ru-RU', { weekday: 'long' });
 
-            const schema = {
-                type: 'OBJECT',
-                properties: {
-                    ok: { type: 'BOOLEAN', description: 'true, если удалось распознать хотя бы имя клиента' },
-                    transcript: { type: 'STRING', description: 'То, что было сказано в записи, как можно точнее' },
-                    clientName: { type: 'STRING' },
-                    date: { type: 'STRING', description: 'Дата занятия в формате YYYY-MM-DD' },
-                    timeStart: { type: 'STRING', description: 'Время начала, формат HH:MM, 24-часовой формат. Пустая строка, если не указано.' },
-                    timeEnd: { type: 'STRING', description: 'Время окончания, формат HH:MM, 24-часовой формат. Пустая строка, если не указано.' },
-                    comment: { type: 'STRING', description: 'Любые дополнительные детали из фразы, иначе пустая строка' }
-                },
-                required: ['ok', 'transcript', 'clientName', 'date', 'timeStart', 'timeEnd', 'comment']
-            };
+            const resp = await fetch(VOICE_PROXY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ base64Audio, mimeType, todayISO, weekday })
+            });
 
-            const prompt = 'Сегодня ' + todayISO + ' (' + weekday + '). Ты помощник администратора музыкальной студии. ' +
-                'В приложенном аудио преподаватель на русском языке диктует данные о записи клиента на занятие. ' +
-                'Сначала распознай речь, затем извлеки из неё данные. ' +
-                'Если названы день недели или относительная дата ("субботу", "завтра", "послезавтра") — посчитай точную дату относительно сегодняшней. ' +
-                'Время указывай в 24-часовом формате с учётом контекста ("2 часа дня" = 14:00, "с 2 до 4 вечера" = 14:00–16:00). ' +
-                'Телефон клиента не извлекай, он не нужен.';
-
-            const resp = await fetch(
-                'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + GEMINI_API_KEY,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            role: 'user',
-                            parts: [
-                                { text: prompt },
-                                { inlineData: { mimeType: mimeType, data: base64Audio } }
-                            ]
-                        }],
-                        generationConfig: {
-                            responseMimeType: 'application/json',
-                            responseSchema: schema
-                        }
-                    })
-                }
-            );
-            if (!resp.ok) {
-                const errText = await resp.text();
-                throw new Error('Gemini API вернул ошибку ' + resp.status + ': ' + errText.slice(0, 200));
-            }
             const data = await resp.json();
-            const text = data && data.candidates && data.candidates[0] && data.candidates[0].content &&
-                data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
-                data.candidates[0].content.parts[0].text;
-            if (!text) throw new Error('Пустой ответ от Gemini');
-            return JSON.parse(text);
+            if (!resp.ok || data.error) {
+                throw new Error(data.error || ('Сервер распознавания вернул ошибку ' + resp.status));
+            }
+            return data;
         }
 
         console.log('✅ CRM v3 — все исправления применены: клиенты по готовым, сортировка, пружинистость, iOS safe-area, убран воздух в тулбаре.');
