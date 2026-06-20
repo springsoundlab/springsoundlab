@@ -5460,6 +5460,15 @@
                 if (btn) btn.classList.add('active');
                 currentStatusFilter = filter;
             }
+            // "В работе" и "Долг" показывают записи по всем месяцам сразу,
+            // поэтому выбор месяца на них не влияет — наглядно гасим picker
+            const monthPicker = document.getElementById('finMonthPicker');
+            if (monthPicker) {
+                const isOpenItemsFilter = (filter === 'work' || filter === 'debt');
+                monthPicker.disabled = isOpenItemsFilter;
+                monthPicker.style.opacity = isOpenItemsFilter ? '0.4' : '1';
+                monthPicker.title = isOpenItemsFilter ? 'Здесь показаны записи за все месяцы' : '';
+            }
             renderFinance();
         };
 
@@ -5469,15 +5478,21 @@
             const grid = document.getElementById('finGrid');
             if (!grid) return;
             let filtered = myData;
-            const monthPicker = document.getElementById('finMonthPicker');
-            if (monthPicker && monthPicker.value) {
-                const [year, month] = monthPicker.value.split('-');
-                const monthKey = '.' + month + '.' + year;
-                filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === monthKey);
-            } else {
-                const now = new Date();
-                const currentMonthKey = getMonthKeyFromDate(now);
-                filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === currentMonthKey);
+            // "В работе" и "Долг" — это списки открытых задач (что подтвердить и кто должен).
+            // Их нужно показывать по всем месяцам сразу, как и в Аналитике, иначе часть
+            // записей из других месяцев "пропадает" из вида при выборе текущего месяца
+            const isOpenItemsFilter = (currentStatusFilter === 'work' || currentStatusFilter === 'debt');
+            if (!isOpenItemsFilter) {
+                const monthPicker = document.getElementById('finMonthPicker');
+                if (monthPicker && monthPicker.value) {
+                    const [year, month] = monthPicker.value.split('-');
+                    const monthKey = '.' + month + '.' + year;
+                    filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === monthKey);
+                } else {
+                    const now = new Date();
+                    const currentMonthKey = getMonthKeyFromDate(now);
+                    filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === currentMonthKey);
+                }
             }
             if (currentStatusFilter === 'work') {
                 // "В работе" = всё, что ещё не подтверждено (совпадает с красным кружком в календаре),
@@ -5486,13 +5501,15 @@
             } else if (currentStatusFilter === 'done') {
                 filtered = filtered.filter(r => r.completed);
             } else if (currentStatusFilter === 'debt') {
-                filtered = filtered.filter(r => !r.completed && ((r.fullTotal || r.total || 0) - (r.total || 0) > 0));
+                // есть остаток к оплате — независимо от того, подтверждена запись или нет,
+                // чтобы совпадало с «Остатки долгов» в Аналитике
+                filtered = filtered.filter(r => (r.fullTotal || r.total || 0) - (r.total || 0) > 0);
             }
             grid.innerHTML = '';
             document.getElementById('finCount').textContent = filtered.length + ' записей';
             if (!filtered.length) {
                 grid.innerHTML =
-                    '<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">Нет записей за выбранный месяц</div>';
+                    `<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">${isOpenItemsFilter ? 'Нет записей' : 'Нет записей за выбранный месяц'}</div>`;
                 return;
             }
             filtered.forEach(r => {
@@ -5510,8 +5527,8 @@
                 const card = document.createElement('div');
                 card.className = 'fin-card';
                 card.setAttribute('data-id', r.id);
-                if (isDone) card.classList.add('row-done');
-                else if (rest > 0) card.classList.add('row-debt');
+                if (rest > 0) card.classList.add('row-debt');
+                else if (isDone) card.classList.add('row-done');
                 const header = document.createElement('div');
                 header.className = 'fin-header';
                 const clientName = escapeHTML(r.client || r.song || '—');
