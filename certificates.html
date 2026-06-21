@@ -5073,15 +5073,18 @@
             }
             const updateData = { completed: isCompleting };
             if (isCompleting) {
-                updateData.completedDate = todayStr();
+                // Дату подтверждения проставляем только при первом подтверждении.
+                // Если "Готово" сняли и поставили заново — старая дата не перезатирается,
+                // запись остаётся привязана к тому же месяцу, что и раньше
+                if (!row.completedDate) updateData.completedDate = todayStr();
                 const full = Number(row.fullTotal) || Number(row.total) || 0;
                 const paid = Number(row.total) || 0;
                 const remaining = full - paid;
                 if (remaining > 0) { updateData.completionPayment = remaining;
                     updateData.total = full; }
-            } else {
-                updateData.completedDate = firebase.firestore.FieldValue.delete();
             }
+            // При снятии "Готово" дату подтверждения больше не удаляем — она хранится
+            // на случай повторного подтверждения той же записи
             SC.doc(id).update(updateData).catch(err => { handleError(err, 'Ошибка при обновлении статуса готово.'); if (btn)
                     unlockButton(btn); }).finally(() => { setTimeout(() => { if (btn) unlockButton(btn); }, 500); });
         };
@@ -6045,7 +6048,10 @@
                 if (r.completed) done++;
                 else work++;
                 if (r.completed) {
-                    const refDate = r.completedDate || r.date;
+                    // Доход месяца считаем по дате самой записи (сессии/урока), а не по дате
+                    // нажатия "Готово" — иначе при переключении статуса (например, при
+                    // тестировании) запись "переезжает" в текущий месяц
+                    const refDate = r.date;
                     if (refDate) {
                         const [d, m, y] = refDate.split('.');
                         if (y === curY) {
