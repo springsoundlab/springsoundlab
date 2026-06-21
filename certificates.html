@@ -6187,7 +6187,9 @@
         let voiceChunks = [];
         let voiceIsRecording = false;
         let voiceMaxTimer = null;
+        let voiceReleaseTimer = null;
         const VOICE_MAX_RECORD_MS = 15000; // защитный лимит записи
+        const VOICE_RELEASE_IDLE_MS = 90000; // через сколько простоя отпускаем микрофон (гасим индикатор записи)
 
         function showVoiceToast(text, autoHideMs) {
             const el = document.getElementById('voiceToast');
@@ -6216,6 +6218,18 @@
             return ''; // пусть браузер сам выберет формат по умолчанию
         }
 
+        function releaseVoiceStream() {
+            clearTimeout(voiceReleaseTimer);
+            if (voiceStream) {
+                voiceStream.getTracks().forEach(t => t.stop());
+                voiceStream = null;
+            }
+        }
+
+        function voiceStreamIsLive() {
+            return !!(voiceStream && voiceStream.getTracks().some(t => t.readyState === 'live'));
+        }
+
         window.toggleVoiceInput = async function() {
             if (voiceIsRecording) {
                 stopVoiceRecording();
@@ -6225,11 +6239,18 @@
                 alert('Этот браузер не поддерживает запись звука. Попробуйте открыть CRM в обычном вкладке Safari/Chrome (не в установленном приложении).');
                 return;
             }
-            try {
-                voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            } catch (e) {
-                alert('Не удалось получить доступ к микрофону. Проверьте разрешения для CRM в настройках телефона (Настройки → Safari/Chrome → Микрофон).');
-                return;
+            clearTimeout(voiceReleaseTimer);
+            // Запрашиваем доступ к микрофону только если ещё нет активного разрешённого потока —
+            // переиспользуем его для следующих записей. Раньше поток запрашивался и тут же
+            // полностью останавливался после каждой записи, из-за чего iOS на установленном
+            // (через "На экран Домой") приложении спрашивал разрешение на микрофон каждый раз.
+            if (!voiceStreamIsLive()) {
+                try {
+                    voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                } catch (e) {
+                    alert('Не удалось получить доступ к микрофону. Проверьте разрешения для CRM в настройках телефона (Настройки → Safari/Chrome → Микрофон).');
+                    return;
+                }
             }
             const mimeType = pickVoiceMimeType();
             try {
@@ -6244,10 +6265,10 @@
             voiceMediaRecorder.onstop = function() {
                 const usedType = voiceMediaRecorder.mimeType || mimeType || 'audio/webm';
                 const blob = new Blob(voiceChunks, { type: usedType });
-                if (voiceStream) {
-                    voiceStream.getTracks().forEach(t => t.stop());
-                    voiceStream = null;
-                }
+                // Поток микрофона не останавливаем сразу — оставляем "тёплым" на случай
+                // следующей записи, а гасим (releaseVoiceStream) только после простоя.
+                clearTimeout(voiceReleaseTimer);
+                voiceReleaseTimer = setTimeout(releaseVoiceStream, VOICE_RELEASE_IDLE_MS);
                 blobToVoiceCommand(blob, usedType);
             };
 
@@ -6270,6 +6291,11 @@
                 voiceMediaRecorder.stop();
             }
         }
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && !voiceIsRecording) releaseVoiceStream();
+        });
+        window.addEventListener('pagehide', releaseVoiceStream);
 
         function blobToBase64(blob) {
             return new Promise((resolve, reject) => {
