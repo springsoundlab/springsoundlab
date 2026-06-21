@@ -2327,6 +2327,7 @@
             }
             #secFinance .toolbar {
                 display: flex;
+                flex-direction: row;
                 flex-wrap: nowrap;
                 justify-content: flex-start;
                 align-items: center;
@@ -3432,7 +3433,6 @@
         <div class="ff-option" data-fin-filter="done">Готово</div>
         <div class="ff-option" data-fin-filter="debt">Долг</div>
         <div class="ff-option" data-fin-filter="subs">Абонементы</div>
-        <div class="ff-option" data-fin-filter="certs">Сертификаты</div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
@@ -4316,7 +4316,7 @@
         // ===== ФИЛЬТР ЗАПИСЕЙ С ДРОПДАУНОМ =====
         const FIN_FILTER_LABELS = {
             all: 'Все', work: 'В работе', done: 'Готово', debt: 'Долг',
-            subs: 'Абонементы', certs: 'Сертификаты'
+            subs: 'Абонементы'
         };
         let isFinFilterDropdownOpen = false;
 
@@ -4662,10 +4662,7 @@
             }, err => console.error('❌ Ошибка загрузки сессий:', err));
             CERTC.onSnapshot(snap => { certs = {};
                 snap.forEach(d => certs[d.id] = d.data());
-                renderCerts();
-                if (currentStatusFilter === 'certs' && document.getElementById('secFinance')?.style.display !==
-                    'none') renderFinanceCerts();
-            }, err => console.error('❌ Ошибка загрузки сертификатов:', err));
+                renderCerts(); }, err => console.error('❌ Ошибка загрузки сертификатов:', err));
             setInterval(() => { if (viewMode === 'calendar') renderCalendar(); }, 60000);
 
             updateCalPeriodLabel();
@@ -4980,7 +4977,7 @@
                     const isDone = ev.completed;
                     const evName = escapeHTML(ev.client || ev.song || '—');
                     const evSvc = escapeHTML(ev.services || ev.type || '');
-                    const statusDot = isSound ?
+                    const statusDot = (isSound && isAuthorOf(ev)) ?
                         `<div class="cal-event-status ${isDone ? 'done' : 'pending'}" title="${isDone ? 'Готово' : 'В работе'}"></div>` :
                         '';
                     const evEl = document.createElement('div');
@@ -5715,8 +5712,7 @@
             // к конкретному месяцу, поэтому выбор месяца на них не влияет — наглядно гасим picker
             const monthPicker = document.getElementById('finMonthPicker');
             if (monthPicker) {
-                const isOpenItemsFilter = (filter === 'work' || filter === 'debt' || filter === 'subs' || filter ===
-                    'certs');
+                const isOpenItemsFilter = (filter === 'work' || filter === 'debt' || filter === 'subs');
                 monthPicker.disabled = isOpenItemsFilter;
                 monthPicker.style.opacity = isOpenItemsFilter ? '0.4' : '1';
                 monthPicker.title = isOpenItemsFilter ? 'Здесь показаны записи за всё время' : '';
@@ -5752,7 +5748,6 @@
             const grid = document.getElementById('finGrid');
             if (!grid) return;
             if (currentStatusFilter === 'subs') { renderFinanceSubs(); return; }
-            if (currentStatusFilter === 'certs') { renderFinanceCerts(); return; }
             grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
             const myData = getMyData(true); // все записи для финансов
             let filtered = myData;
@@ -5950,38 +5945,6 @@
             });
         };
 
-        // ===== ЗАПИСИ: ФИЛЬТР «СЕРТИФИКАТЫ» =====
-        // Та же база сертификатов, что и в разделе "Сертификаты", просто доступна
-        // и из выпадающего фильтра раздела "Записи".
-        function renderFinanceCerts() {
-            const grid = document.getElementById('finGrid');
-            grid.className = 'cert-grid';
-            grid.innerHTML = '';
-            document.getElementById('finCount').textContent = '300 сертификатов';
-            let arr = [];
-            for (let i = 1; i <= 300; i++) {
-                const id = 'SSL-' + String(i).padStart(3, '0');
-                const d = certs[id];
-                arr.push({ id, active: d ? d.active : false, name: d ? d.name : '', firstName: d ? d.firstName : '',
-                    lastName: d ? d.lastName : '', service: d ? d.service : '', date: d ? d.date : '',
-                    expiry: d ? d.expiry : '' });
-            }
-            arr.forEach(c => {
-                const el = document.createElement('div');
-                el.className = 'cert-c' + (c.active ? ' used' : '');
-                const certId = escapeHTML(c.id);
-                const certName = escapeHTML(c.name || '—');
-                const status = c.active ? 'ИСПОЛЬЗОВАН' : 'СВОБОДЕН';
-                const statusClass = c.active ? 'cb-used' : 'cb-free';
-                const firstName = escapeHTML(c.firstName || '');
-                const lastName = escapeHTML(c.lastName || '');
-                el.innerHTML =
-                    `<div class="cert-id">${certId}</div><div class="cert-nm">${certName}</div><div class="cert-b ${statusClass}">${status}</div>${c.active ? `<div style="font-size:9px;color:var(--text3);margin-top:4px;">${firstName} ${lastName}</div>` : ''}`;
-                el.onclick = () => { if (!c.active) { currentCertId = c.id;
-                        openCertModal(); } };
-                grid.appendChild(el);
-            });
-        }
 
         // ===== CERTS =====
         function renderCerts() {
