@@ -5897,6 +5897,12 @@
                 infoDiv.textContent = infoText;
                 infoDiv.style.display = 'block';
                 cancelBtn.textContent = 'Закрыть';
+            } else if (type === 'confirm') {
+                // Простое подтверждение без поля ввода. infoText здесь используется
+                // как текст кнопки (например, "Перенести"), а не как информационный текст.
+                cf.className = 'mb-btn mb-confirm';
+                cf.textContent = infoText || 'Подтвердить';
+                cf.style.display = 'block';
             } else {
                 inp.value = defVal;
                 inp.style.display = 'block';
@@ -6305,6 +6311,111 @@
             });
         }
 
+        function voiceTodayISO() {
+            const d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+
+        // Ищет в window.CRM записи, подходящие под имя клиента (по подстроке, без учёта регистра)
+        // и дату (если она передана). Если совпадений по дате несколько и названо время — сужает по времени.
+        // Абонементы (isSubscription) из поиска исключаются — их перенос/удаление голосом не поддерживается.
+        function findVoiceRecord(clientName, dateISO, timeStart) {
+            const nameLower = (clientName || '').toLowerCase().trim();
+            if (!nameLower) return [];
+            const dateRu = dateISO ? inputToDate(dateISO) : '';
+            let candidates = (window.CRM || []).filter(r => {
+                if (!r.client || r.isSubscription) return false;
+                const rNameLower = r.client.toLowerCase().trim();
+                const nameMatches = rNameLower.includes(nameLower) || nameLower.includes(rNameLower);
+                if (!nameMatches) return false;
+                if (dateRu && r.date !== dateRu) return false;
+                return true;
+            });
+            if (timeStart && candidates.length > 1) {
+                const exact = candidates.filter(r => r.time === timeStart);
+                if (exact.length) candidates = exact;
+            }
+            return candidates;
+        }
+
+        function handleVoiceDelete(parsed) {
+            const dateISO = parsed.date || voiceTodayISO();
+            const candidates = findVoiceRecord(parsed.clientName, dateISO, parsed.timeStart);
+            const dateLabel = inputToDate(dateISO);
+            if (candidates.length === 0) {
+                showVoiceToast('⚠️ Не нашёл запись «' + parsed.clientName + '» на ' + dateLabel + ' для удаления.', 5000);
+                return;
+            }
+            if (candidates.length > 1) {
+                showVoiceToast('⚠️ Нашёл несколько записей «' + parsed.clientName + '» на ' + dateLabel + '. Уточните время в команде или удалите вручную.', 5500);
+                return;
+            }
+            const row = candidates[0];
+            if (!isAuthorOf(row)) {
+                showVoiceToast('⚠️ Эту запись нельзя удалить голосом — она создана не вами.', 4500);
+                return;
+            }
+            const label = row.client + ' (' + row.date + (row.time ? ', ' + row.time : '') + ')';
+            openSM('Удалить запись «' + label + '»?', 'delete', () => {
+                SC.doc(row.id).delete()
+                    .then(() => { showVoiceToast('🗑 Удалено: ' + label, 4000); closeSM(); })
+                    .catch(err => handleError(err, 'Ошибка при удалении записи.'));
+            });
+        }
+
+        function handleVoiceReschedule(parsed) {
+            const dateISO = parsed.date || voiceTodayISO();
+            const candidates = findVoiceRecord(parsed.clientName, dateISO, parsed.timeStart);
+            const dateLabel = inputToDate(dateISO);
+            if (candidates.length === 0) {
+                showVoiceToast('⚠️ Не нашёл запись «' + parsed.clientName + '» на ' + dateLabel + ' для переноса.', 5000);
+                return;
+            }
+            if (candidates.length > 1) {
+                showVoiceToast('⚠️ Нашёл несколько записей «' + parsed.clientName + '» на ' + dateLabel + '. Уточните время в команде или перенесите вручную.', 5500);
+                return;
+            }
+            const row = candidates[0];
+            if (!isAuthorOf(row)) {
+                showVoiceToast('⚠️ Эту запись нельзя перенести голосом — она создана не вами.', 4500);
+                return;
+            }
+            if (!parsed.newDate && !parsed.newTimeStart) {
+                showVoiceToast('⚠️ Не понял, на какую дату или время перенести. Скажите, например: «перенеси Иванова на пятницу» или «на 3 часа дня».', 5500);
+                return;
+            }
+            const newDateRu = parsed.newDate ? inputToDate(parsed.newDate) : row.date;
+            let newTime = row.time || '';
+            let newTimeEnd = row.timeEnd || '';
+            if (parsed.newTimeStart) {
+                newTime = parsed.newTimeStart;
+                if (parsed.newTimeEnd) {
+                    newTimeEnd = parsed.newTimeEnd;
+                } else if (row.duration && newTime) {
+                    // Время окончания не озвучено — сохраняем исходную длительность приёма
+                    const [h, m] = newTime.split(':').map(Number);
+                    const endMinutes = h * 60 + m + row.duration;
+                    newTimeEnd = String(Math.floor(endMinutes / 60) % 24).padStart(2, '0') + ':' + String(endMinutes % 60).padStart(2, '0');
+                }
+            } else if (parsed.newTimeEnd) {
+                newTimeEnd = parsed.newTimeEnd;
+            }
+            let newDuration = row.duration || 60;
+            if (newTime && newTimeEnd) {
+                const [h1, m1] = newTime.split(':').map(Number);
+                const [h2, m2] = newTimeEnd.split(':').map(Number);
+                const d = (h2 * 60 + m2) - (h1 * 60 + m1);
+                if (d > 0) newDuration = d;
+            }
+            const updateData = { date: newDateRu, time: newTime, timeEnd: newTimeEnd, duration: newDuration };
+            const label = row.client + ': ' + row.date + (row.time ? ', ' + row.time : '') + ' → ' + newDateRu + (newTime ? ', ' + newTime + (newTimeEnd ? '–' + newTimeEnd : '') : '');
+            openSM('Перенести запись «' + row.client + '» на ' + newDateRu + (newTime ? ', ' + newTime : '') + '?', 'confirm', () => {
+                SC.doc(row.id).update(updateData)
+                    .then(() => { showVoiceToast('↪️ Перенесено: ' + label, 4800); closeSM(); })
+                    .catch(err => handleError(err, 'Ошибка при переносе записи.'));
+            }, '', 'Перенести');
+        }
+
         async function blobToVoiceCommand(blob, mimeType) {
             showVoiceToast('🎙 Распознаю и обрабатываю…');
             try {
@@ -6313,6 +6424,15 @@
                 if (!parsed.ok || !parsed.clientName) {
                     const heard = parsed.transcript ? (' Услышал: «' + parsed.transcript + '»') : '';
                     showVoiceToast('⚠️ Не разобрал команду.' + heard + ' Назовите чётче имя клиента, день и время.', 5000);
+                    return;
+                }
+                const voiceAction = parsed.action || 'create';
+                if (voiceAction === 'delete') {
+                    handleVoiceDelete(parsed);
+                    return;
+                }
+                if (voiceAction === 'reschedule') {
+                    handleVoiceReschedule(parsed);
                     return;
                 }
                 openNewForm();
