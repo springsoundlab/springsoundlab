@@ -6288,6 +6288,12 @@
                 if (parsed.timeStart) document.getElementById('fTime').value = parsed.timeStart;
                 if (parsed.timeEnd) document.getElementById('fTimeEnd').value = parsed.timeEnd;
                 if (parsed.comment) document.getElementById('fComment').value = parsed.comment;
+                // Если Gemini нашёл, что названная услуга совпадает с одним из ваших пакетов —
+                // добавляем её как настоящую услугу (с ценой), а не просто текстом в комментарий.
+                if (parsed.matchedPackage) {
+                    const pkg = userPackages.find(p => p.name === parsed.matchedPackage);
+                    if (pkg) addPreSvc(pkg.name, pkg.price, pkg.color);
+                }
                 await saveRecord();
                 const range = parsed.timeStart ? (parsed.timeStart + (parsed.timeEnd ? '–' + parsed.timeEnd : '')) : '';
                 showVoiceToast('✅ Добавлено: ' + parsed.clientName + ' ' + range, 4500);
@@ -6303,11 +6309,12 @@
                 String(now.getMonth() + 1).padStart(2, '0') + '-' +
                 String(now.getDate()).padStart(2, '0');
             const weekday = now.toLocaleDateString('ru-RU', { weekday: 'long' });
+            const availablePackages = (userPackages || []).map(p => p.name);
 
             const resp = await fetch(VOICE_PROXY_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ base64Audio, mimeType, todayISO, weekday })
+                body: JSON.stringify({ base64Audio, mimeType, todayISO, weekday, availablePackages })
             });
 
             const data = await resp.json();
