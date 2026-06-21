@@ -6326,11 +6326,26 @@
                 // добавляем её как настоящую услугу (с ценой), а не просто текстом в комментарий.
                 if (parsed.matchedPackage) {
                     const pkg = userPackages.find(p => p.name === parsed.matchedPackage);
-                    if (pkg) addPreSvc(pkg.name, pkg.price, pkg.color);
+                    if (pkg) {
+                        addPreSvc(pkg.name, pkg.price, pkg.color);
+                        // "Предоплата"/"внесено" — это сумма, которую клиент дал сейчас, а НЕ полная
+                        // цена пакета. Полную цену (fullPrice) не трогаем — она нужна, чтобы остаток
+                        // считался как долг. Меняем только "оплачено сейчас".
+                        if (parsed.paidAmount && parsed.paidAmount > 0 && parsed.paidAmount < pkg.price) {
+                            const justAdded = formDetails[formDetails.length - 1];
+                            if (justAdded) {
+                                justAdded.price = parsed.paidAmount;
+                                justAdded.name = pkg.name + ' (внесено ' + parsed.paidAmount.toLocaleString() + ' ₽)';
+                                formTotal = formDetails.reduce((s, i) => s + i.price, 0);
+                                renderFormSvcs();
+                            }
+                        }
+                    }
                 }
                 await saveRecord();
                 const range = parsed.timeStart ? (parsed.timeStart + (parsed.timeEnd ? '–' + parsed.timeEnd : '')) : '';
-                showVoiceToast('✅ Добавлено: ' + parsed.clientName + ' ' + range, 4500);
+                const depositNote = (parsed.paidAmount && parsed.paidAmount > 0) ? (', внесено ' + parsed.paidAmount.toLocaleString() + ' ₽') : '';
+                showVoiceToast('✅ Добавлено: ' + parsed.clientName + ' ' + range + depositNote, 4500);
             } catch (e) {
                 console.error(e);
                 showVoiceToast('❌ Ошибка: ' + (e.message || e), 5000);
