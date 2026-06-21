@@ -2813,33 +2813,16 @@
             }
         }
         /* ===== ГОЛОСОВОЙ ВВОД (Gemini) ===== */
-        .voice-fab {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 6px 20px rgba(124, 111, 255, 0.4);
-            cursor: pointer;
-            z-index: 99998;
-            transition: transform 0.15s, background 0.2s;
+        #nav-voice.listening {
+            color: var(--red) !important;
+            background: rgba(255, 92, 106, 0.12);
         }
-        .voice-fab:active { transform: scale(0.92); }
-        .voice-fab.listening {
-            background: var(--red);
+        #nav-voice.listening #voiceFabIcon {
             animation: voicePulse 1.2s ease-in-out infinite;
         }
         @keyframes voicePulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 92, 106, 0.5); }
-            50% { box-shadow: 0 0 0 14px rgba(255, 92, 106, 0); }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
         }
         .voice-toast {
             position: fixed;
@@ -2924,6 +2907,7 @@
                 <div><div class="sb-logo-t">SPRING SOUND <span style="color:var(--blue);">LAB</span></div><div class="sb-logo-s">Studio CRM</div></div>
             </div>
             <div class="sb-nav">
+                <div class="nav-i" onclick="toggleVoiceInput()" id="nav-voice"><i class="fa-solid fa-microphone" id="voiceFabIcon"></i> Голосовой ввод</div>
                 <div class="nav-i active" onclick="goSec('sessions')" id="nav-sessions"><i class="fa-regular fa-calendar-check"></i> Журнал</div>
                 <div class="nav-i" onclick="goSec('clients')" id="nav-clients"><i class="fa-regular fa-user"></i> Клиенты</div>
                 <div class="nav-i" onclick="goSec('finance')" id="nav-finance"><i class="fa-solid fa-wallet"></i> Финансы</div>
@@ -6243,7 +6227,7 @@
                 blobToVoiceCommand(blob, usedType);
             };
 
-            const btn = document.getElementById('voiceFabBtn');
+            const btn = document.getElementById('nav-voice');
             voiceIsRecording = true;
             if (btn) btn.classList.add('listening');
             showVoiceToast('🎙 Идёт запись… нажмите ещё раз, чтобы закончить');
@@ -6255,7 +6239,7 @@
 
         function stopVoiceRecording() {
             clearTimeout(voiceMaxTimer);
-            const btn = document.getElementById('voiceFabBtn');
+            const btn = document.getElementById('nav-voice');
             voiceIsRecording = false;
             if (btn) btn.classList.remove('listening');
             if (voiceMediaRecorder && voiceMediaRecorder.state !== 'inactive') {
@@ -6327,9 +6311,6 @@
         console.log('✅ CRM v3 — все исправления применены: клиенты по готовым, сортировка, пружинистость, iOS safe-area, убран воздух в тулбаре.');
     </script>
     <!-- ===== ГОЛОСОВОЙ ВВОД ===== -->
-    <button class="voice-fab" id="voiceFabBtn" onclick="toggleVoiceInput()" title="Голосовая запись">
-        <i class="fa-solid fa-microphone" id="voiceFabIcon"></i>
-    </button>
     <div class="voice-toast" id="voiceToast"></div>
 
 </body>
