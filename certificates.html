@@ -886,72 +886,6 @@
             }
         }
 
-        /* ===== ВЫПАДАЮЩЕЕ МЕНЮ ФИЛЬТРА ЗАПИСЕЙ ===== */
-        .ff-dropdown-wrapper {
-            position: relative;
-            display: inline-block;
-            z-index: 9999;
-        }
-        .ff-dropdown-menu {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: var(--r-sm);
-            padding: 6px;
-            min-width: 190px;
-            z-index: 999999;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-            margin-top: 4px;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .ff-dropdown-menu.open {
-            display: flex;
-        }
-        .ff-option {
-            padding: 7px 10px;
-            font-size: 11px;
-            color: var(--text2);
-            cursor: pointer;
-            transition: .15s;
-            border-radius: 4px;
-            white-space: nowrap;
-        }
-        .ff-option:hover {
-            background: var(--surface3);
-            color: var(--text);
-        }
-        .ff-option.active {
-            background: var(--accent-bg);
-            color: var(--accent2);
-        }
-        @media(max-width:768px) {
-            .ff-dropdown-menu {
-                position: fixed !important;
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                min-width: 80vw !important;
-                max-width: 320px !important;
-                width: auto !important;
-                border: 1px solid var(--border2) !important;
-                border-radius: 12px !important;
-                padding: 14px !important;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
-                margin: 0 !important;
-                max-height: 80vh !important;
-                overflow-y: auto !important;
-                z-index: 999999 !important;
-            }
-            .ff-option {
-                padding: 9px 12px !important;
-                font-size: 13px !important;
-            }
-        }
-
         /* FINANCE */
         .fin-grid {
             flex: 1;
@@ -2338,11 +2272,6 @@
             #secFinance .toolbar>* {
                 flex: 0 0 auto;
             }
-            #secFinance .toolbar #finMonthPicker {
-                max-width: 120px;
-                font-size: 11px;
-                padding: 3px 6px;
-            }
             #secFinance .toolbar #finCount {
                 display: none;
             }
@@ -3071,10 +3000,9 @@
                     <div class="toolbar">
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                             <span style="font-size:11px;color:var(--text3);" id="finCount">0 записей</span>
-                            <input type="month" id="finMonthPicker" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;">
-                            <div class="ff-dropdown-wrapper" style="margin-left:4px;">
-                                <button class="tb-btn" id="finFilterToggleBtn" onclick="toggleFinFilterDropdown(event)">
-                                    <i class="fa-solid fa-filter"></i> <span id="finFilterLabel">Все</span>
+                            <div class="sort-dropdown-wrapper">
+                                <button class="tb-btn" id="finSortToggleBtn" onclick="toggleFinSortDropdown(event)">
+                                    <i class="fa-solid fa-arrow-up-wide-short"></i> Сортировать
                                 </button>
                             </div>
                         </div>
@@ -3426,13 +3354,24 @@
         </div>
     </div>
 
-    <!-- ===== ВЫНЕСЕННОЕ МЕНЮ ФИЛЬТРА ЗАПИСЕЙ (прямой потомок body) ===== -->
-    <div class="ff-dropdown-menu" id="finFilterMenu">
-        <div class="ff-option" data-fin-filter="all">Все</div>
-        <div class="ff-option" data-fin-filter="work">В работе</div>
-        <div class="ff-option" data-fin-filter="done">Готово</div>
-        <div class="ff-option" data-fin-filter="debt">Долг</div>
-        <div class="ff-option" data-fin-filter="subs">Абонементы</div>
+    <!-- ===== ВЫНЕСЕННОЕ МЕНЮ СОРТИРОВКИ ЗАПИСЕЙ (прямой потомок body) ===== -->
+    <div class="sort-dropdown-menu" id="finSortDropdownMenu">
+        <div class="sort-column">
+            <div class="sort-option" data-fin-filter="all">Все</div>
+            <div class="sort-option" data-fin-filter="work">В работе</div>
+            <div class="sort-option" data-fin-filter="done">Готово</div>
+            <div class="sort-option" data-fin-filter="debt">Долг</div>
+            <div class="sort-option" data-fin-filter="subs">Абонементы</div>
+        </div>
+        <div class="sort-column period-column">
+            <div class="sort-option" data-fin-period="month">Этот месяц</div>
+            <div class="sort-option" data-fin-period="year">Год</div>
+            <div class="sort-option" data-fin-period="all">Все время</div>
+        </div>
+        <div class="sort-actions">
+            <button class="mb-btn cancel-btn" onclick="closeFinSortDropdown()">Отмена</button>
+            <button class="mb-btn ok-btn" onclick="applyFinSort()">Окей</button>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
@@ -3655,10 +3594,6 @@
 
         function parseDate(ds) { if (!ds) return null; const [d, m, y] = ds.split('.').map(Number); return new Date(y, m - 1,
             d); }
-
-        function monthKeyFromDateStr(ds) { if (!ds) return ''; const [d, m, y] = ds.split('.'); return '.' + m + '.' + y; }
-
-        function getMonthKeyFromDate(d) { return '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear(); }
 
         function getEffectiveZoom() { return isMobileDevice ? currentHourHeightMobile : currentHourHeight; }
 
@@ -4188,7 +4123,8 @@
             try {
                 const c = await auth.createUserWithEmailAndPassword(toEmail(ph), pw);
                 await UC.doc(c.user.uid).set({ name, phone: ph, role, color: regSelectedColor, createdAt: Date.now(),
-                    packages: [], clientSort: 'date_desc', clientPeriod: 'all', theme: 'dark' });
+                    packages: [], clientSort: 'date_desc', clientPeriod: 'all', finFilter: 'all', finPeriod: 'all',
+                    theme: 'dark' });
             } catch (e) {
                 let m = 'Ошибка регистрации.';
                 if (e.code === 'auth/email-already-in-use') m = 'Номер уже зарегистрирован.';
@@ -4313,26 +4249,29 @@
             renderClients();
         }
 
-        // ===== ФИЛЬТР ЗАПИСЕЙ С ДРОПДАУНОМ =====
-        const FIN_FILTER_LABELS = {
-            all: 'Все', work: 'В работе', done: 'Готово', debt: 'Долг',
-            subs: 'Абонементы'
-        };
-        let isFinFilterDropdownOpen = false;
+        // ===== СОРТИРОВКА ЗАПИСЕЙ (категория + период), точно как у "Клиентов" =====
+        let tempFinFilter = 'all';
+        let tempFinPeriod = 'all';
+        let finPeriod = 'all';
+        let isFinSortDropdownOpen = false;
 
-        function toggleFinFilterDropdown(e) {
+        function toggleFinSortDropdown(e) {
             if (e) e.stopPropagation();
-            const menu = document.getElementById('finFilterMenu');
+            const menu = document.getElementById('finSortDropdownMenu');
             if (menu.classList.contains('open')) {
-                closeFinFilterDropdown();
+                closeFinSortDropdown();
                 return;
             }
-            const active = currentStatusFilter || 'all';
-            document.querySelectorAll('.ff-option[data-fin-filter]').forEach(el => {
-                el.classList.toggle('active', el.dataset.finFilter === active);
+            tempFinFilter = currentStatusFilter || 'all';
+            tempFinPeriod = finPeriod;
+            document.querySelectorAll('.sort-option[data-fin-filter]').forEach(el => {
+                el.classList.toggle('active', el.dataset.finFilter === tempFinFilter);
+            });
+            document.querySelectorAll('.sort-option[data-fin-period]').forEach(el => {
+                el.classList.toggle('active', el.dataset.finPeriod === tempFinPeriod);
             });
             if (window.innerWidth > 768) {
-                const btn = document.getElementById('finFilterToggleBtn');
+                const btn = document.getElementById('finSortToggleBtn');
                 if (btn) {
                     const rect = btn.getBoundingClientRect();
                     menu.style.top = (rect.bottom + 4) + 'px';
@@ -4345,34 +4284,56 @@
                 menu.style.transform = '';
             }
             menu.classList.add('open');
-            isFinFilterDropdownOpen = true;
+            isFinSortDropdownOpen = true;
         }
 
-        function closeFinFilterDropdown() {
-            document.getElementById('finFilterMenu').classList.remove('open');
-            isFinFilterDropdownOpen = false;
+        function closeFinSortDropdown() {
+            document.getElementById('finSortDropdownMenu').classList.remove('open');
+            isFinSortDropdownOpen = false;
         }
 
         document.addEventListener('click', function(e) {
-            const option = e.target.closest('.ff-option[data-fin-filter]');
-            if (option) {
-                const menu = document.getElementById('finFilterMenu');
+            const option = e.target.closest('.sort-option');
+            if (option && (option.dataset.finFilter !== undefined || option.dataset.finPeriod !== undefined)) {
+                const menu = document.getElementById('finSortDropdownMenu');
                 if (!menu.contains(option)) return;
-                toggleFilter(option.dataset.finFilter);
-                closeFinFilterDropdown();
+                const isMobile = window.innerWidth <= 768;
+                if (!isMobile) {
+                    if (option.dataset.finFilter !== undefined) {
+                        currentStatusFilter = (option.dataset.finFilter === 'all') ? null : option.dataset.finFilter;
+                    } else if (option.dataset.finPeriod !== undefined) {
+                        finPeriod = option.dataset.finPeriod;
+                    }
+                    saveFinSortPrefs();
+                    closeFinSortDropdown();
+                    renderFinance();
+                } else {
+                    if (option.dataset.finFilter !== undefined) {
+                        tempFinFilter = option.dataset.finFilter;
+                        document.querySelectorAll('.sort-option[data-fin-filter]').forEach(el => el.classList.remove(
+                            'active'));
+                        option.classList.add('active');
+                    } else if (option.dataset.finPeriod !== undefined) {
+                        tempFinPeriod = option.dataset.finPeriod;
+                        document.querySelectorAll('.sort-option[data-fin-period]').forEach(el => el.classList.remove(
+                            'active'));
+                        option.classList.add('active');
+                    }
+                }
                 return;
             }
-            const wrapper = document.querySelector('.ff-dropdown-wrapper');
-            const menu = document.getElementById('finFilterMenu');
+            const btnEl = document.getElementById('finSortToggleBtn');
+            const wrapper = btnEl ? btnEl.closest('.sort-dropdown-wrapper') : null;
+            const menu = document.getElementById('finSortDropdownMenu');
             if (menu && !menu.contains(e.target) && (!wrapper || !wrapper.contains(e.target))) {
-                if (isFinFilterDropdownOpen) closeFinFilterDropdown();
+                if (isFinSortDropdownOpen) closeFinSortDropdown();
             }
         });
 
         window.addEventListener('resize', function() {
-            if (isFinFilterDropdownOpen && window.innerWidth > 768) {
-                const menu = document.getElementById('finFilterMenu');
-                const btn = document.getElementById('finFilterToggleBtn');
+            if (isFinSortDropdownOpen && window.innerWidth > 768) {
+                const menu = document.getElementById('finSortDropdownMenu');
+                const btn = document.getElementById('finSortToggleBtn');
                 if (menu && btn) {
                     const rect = btn.getBoundingClientRect();
                     menu.style.top = (rect.bottom + 4) + 'px';
@@ -4381,6 +4342,23 @@
                 }
             }
         });
+
+        function saveFinSortPrefs() {
+            if (window.PROFILE && window.PROFILE.uid) {
+                UC.doc(window.PROFILE.uid).update({
+                    finFilter: currentStatusFilter || 'all',
+                    finPeriod: finPeriod
+                }).catch(err => console.error('Ошибка сохранения сортировки записей:', err));
+            }
+        }
+
+        function applyFinSort() {
+            currentStatusFilter = (tempFinFilter === 'all') ? null : tempFinFilter;
+            finPeriod = tempFinPeriod;
+            saveFinSortPrefs();
+            closeFinSortDropdown();
+            renderFinance();
+        }
 
         window.selectSort = function() {};
         window.setClientPeriod = function() {};
@@ -4427,6 +4405,11 @@
                 clientPeriod = p.clientPeriod || 'all';
                 tempClientSort = clientSort;
                 tempClientPeriod = clientPeriod;
+
+                currentStatusFilter = (p.finFilter && p.finFilter !== 'all') ? p.finFilter : null;
+                finPeriod = p.finPeriod || 'all';
+                tempFinFilter = p.finFilter || 'all';
+                tempFinPeriod = finPeriod;
 
                 window.PROFILE = p;
                 isSound = p.role === 'Звукорежиссёр';
@@ -4666,14 +4649,6 @@
             setInterval(() => { if (viewMode === 'calendar') renderCalendar(); }, 60000);
 
             updateCalPeriodLabel();
-
-            const monthPickerFin = document.getElementById('finMonthPicker');
-            if (monthPickerFin) {
-                const now = new Date();
-                monthPickerFin.value = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-                monthPickerFin.addEventListener('change', function() { selectedMonth = this.value;
-                    renderFinance(); });
-            }
 
             const calView = document.getElementById('calView');
             if (calView) {
@@ -5717,17 +5692,6 @@
             }
         }
 
-        // ===== ФИЛЬТР ПО СТАТУСУ / ТИПУ ЗАПИСЕЙ =====
-        window.toggleFilter = function(filter) {
-            currentStatusFilter = (filter === 'all') ? null : filter;
-            const label = document.getElementById('finFilterLabel');
-            if (label) label.textContent = FIN_FILTER_LABELS[filter] || 'Все';
-            document.querySelectorAll('.ff-option[data-fin-filter]').forEach(el => {
-                el.classList.toggle('active', el.dataset.finFilter === filter);
-            });
-            renderFinance();
-        };
-
         // ===== ЗУМ КАРТОЧЕК ФИНАНСОВ (только мобильная версия) =====
         let finCardsCompact = (localStorage.getItem('finCardsCompact') === 'true');
 
@@ -5759,27 +5723,22 @@
             grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
             const myData = getMyData(true); // все записи для финансов
             let filtered = myData;
-            // Месяц как конкретный отчётный период имеет смысл только для "Готово"
-            // (доход за такой-то месяц). "Все", "В работе" и "Долг" — это списки
-            // записей/задач за всё время, чтобы ничего не "пропадало" из вида
-            // при выбранном месяце без подходящих записей
-            const monthScoped = (currentStatusFilter === 'done');
-            const monthPickerEl = document.getElementById('finMonthPicker');
-            if (monthPickerEl) {
-                monthPickerEl.disabled = !monthScoped;
-                monthPickerEl.style.opacity = monthScoped ? '1' : '0.4';
-                monthPickerEl.title = monthScoped ? '' : 'Здесь показаны записи за всё время';
-            }
-            if (monthScoped) {
-                if (monthPickerEl && monthPickerEl.value) {
-                    const [year, month] = monthPickerEl.value.split('-');
-                    const monthKey = '.' + month + '.' + year;
-                    filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === monthKey);
-                } else {
-                    const now = new Date();
-                    const currentMonthKey = getMonthKeyFromDate(now);
-                    filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === currentMonthKey);
-                }
+            // Период (этот месяц / год / всё время) — отдельный фильтр по дате самой
+            // записи, независимый от категории, как и в "Клиентах"
+            if (finPeriod === 'month') {
+                const now = new Date();
+                const curM = now.getMonth(),
+                    curY = now.getFullYear();
+                filtered = filtered.filter(r => {
+                    const d = parseDate(r.date);
+                    return d && d.getMonth() === curM && d.getFullYear() === curY;
+                });
+            } else if (finPeriod === 'year') {
+                const curY = new Date().getFullYear();
+                filtered = filtered.filter(r => {
+                    const d = parseDate(r.date);
+                    return d && d.getFullYear() === curY;
+                });
             }
             if (currentStatusFilter === 'work') {
                 // "В работе" = всё, что ещё не подтверждено (совпадает с красным кружком в календаре),
@@ -5796,7 +5755,7 @@
             document.getElementById('finCount').textContent = filtered.length + ' записей';
             if (!filtered.length) {
                 grid.innerHTML =
-                    `<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">${monthScoped ? 'Нет записей за выбранный месяц' : 'Нет записей'}</div>`;
+                    `<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">${finPeriod !== 'all' ? 'Нет записей за выбранный период' : 'Нет записей'}</div>`;
                 return;
             }
             filtered.forEach(r => {
