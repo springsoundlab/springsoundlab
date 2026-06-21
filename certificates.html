@@ -5517,7 +5517,8 @@
                 }
                 map[key].visits++;
                 map[key].total += Number(r.total || 0);
-                if (!map[key].last || r.date > map[key].last) map[key].last = r.date;
+                if (!map[key].last || (parseDate(r.date) && (!parseDate(map[key].last) || parseDate(r.date) >
+                        parseDate(map[key].last)))) map[key].last = r.date;
                 if (r.phone && !map[key].phone) map[key].phone = r.phone;
                 const t = r.services || r.type || 'Другое';
                 map[key].types[t] = (map[key].types[t] || 0) + 1;
@@ -5535,14 +5536,27 @@
                 } else if (clientPeriod === 'year') {
                     startDate.setFullYear(now.getFullYear() - 1);
                 }
-                const startStr = startDate.toLocaleDateString('ru-RU');
-                cls = cls.filter(c => c.last >= startStr);
+                startDate.setHours(0, 0, 0, 0);
+                cls = cls.filter(c => {
+                    const d = parseDate(c.last);
+                    return d && d >= startDate;
+                });
             }
 
             if (clientSort === 'date_desc') {
-                cls.sort((a, b) => b.last.localeCompare(a.last) || b.visits - a.visits);
+                cls.sort((a, b) => {
+                    const da = parseDate(a.last),
+                        db = parseDate(b.last);
+                    const diff = (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+                    return diff !== 0 ? diff : b.visits - a.visits;
+                });
             } else if (clientSort === 'date_asc') {
-                cls.sort((a, b) => a.last.localeCompare(b.last) || b.visits - a.visits);
+                cls.sort((a, b) => {
+                    const da = parseDate(a.last),
+                        db = parseDate(b.last);
+                    const diff = (da ? da.getTime() : 0) - (db ? db.getTime() : 0);
+                    return diff !== 0 ? diff : b.visits - a.visits;
+                });
             } else if (clientSort === 'total_desc') {
                 cls.sort((a, b) => b.total - a.total);
             } else if (clientSort === 'total_asc') {
