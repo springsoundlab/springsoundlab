@@ -459,16 +459,6 @@
         .tb-btn.green-btn:hover {
             background: var(--green-bg);
         }
-        .tb-btn.filter-btn.active {
-            background: var(--accent-bg);
-            color: var(--accent);
-            border-color: rgba(124, 111, 255, .3);
-        }
-        .tb-btn.filter-btn.all-active {
-            background: var(--accent-bg);
-            color: var(--accent);
-            border-color: rgba(124, 111, 255, .3);
-        }
         .tb-btn.sub-btn {
             color: var(--gold);
             border-color: rgba(212, 175, 55, 0.3);
@@ -893,6 +883,72 @@
             }
             .sort-actions .mb-btn.cancel-btn:hover {
                 background: var(--surface3);
+            }
+        }
+
+        /* ===== ВЫПАДАЮЩЕЕ МЕНЮ ФИЛЬТРА ЗАПИСЕЙ ===== */
+        .ff-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+            z-index: 9999;
+        }
+        .ff-dropdown-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 6px;
+            min-width: 190px;
+            z-index: 999999;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 4px;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .ff-dropdown-menu.open {
+            display: flex;
+        }
+        .ff-option {
+            padding: 7px 10px;
+            font-size: 11px;
+            color: var(--text2);
+            cursor: pointer;
+            transition: .15s;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .ff-option:hover {
+            background: var(--surface3);
+            color: var(--text);
+        }
+        .ff-option.active {
+            background: var(--accent-bg);
+            color: var(--accent2);
+        }
+        @media(max-width:768px) {
+            .ff-dropdown-menu {
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                min-width: 80vw !important;
+                max-width: 320px !important;
+                width: auto !important;
+                border: 1px solid var(--border2) !important;
+                border-radius: 12px !important;
+                padding: 14px !important;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
+                margin: 0 !important;
+                max-height: 80vh !important;
+                overflow-y: auto !important;
+                z-index: 999999 !important;
+            }
+            .ff-option {
+                padding: 9px 12px !important;
+                font-size: 13px !important;
             }
         }
 
@@ -2281,17 +2337,6 @@
             #secFinance .toolbar>* {
                 flex: 0 0 auto;
             }
-            #secFinance .toolbar .fin-filters {
-                display: flex;
-                flex-wrap: nowrap;
-                gap: 4px;
-                margin-left: 4px;
-            }
-            #secFinance .toolbar .fin-filters .tb-btn {
-                font-size: 9px;
-                padding: 4px 8px;
-                white-space: nowrap;
-            }
             #secFinance .toolbar #finMonthPicker {
                 max-width: 120px;
                 font-size: 11px;
@@ -3026,11 +3071,10 @@
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                             <span style="font-size:11px;color:var(--text3);" id="finCount">0 записей</span>
                             <input type="month" id="finMonthPicker" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;outline:none;">
-                            <div class="fin-filters" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:4px;">
-                                <button class="tb-btn filter-btn active" data-filter="all" onclick="toggleFilter('all')">Все</button>
-                                <button class="tb-btn filter-btn" data-filter="work" onclick="toggleFilter('work')">В работе</button>
-                                <button class="tb-btn filter-btn" data-filter="done" onclick="toggleFilter('done')">Готово</button>
-                                <button class="tb-btn filter-btn" data-filter="debt" onclick="toggleFilter('debt')">Долг</button>
+                            <div class="ff-dropdown-wrapper" style="margin-left:4px;">
+                                <button class="tb-btn" id="finFilterToggleBtn" onclick="toggleFinFilterDropdown(event)">
+                                    <i class="fa-solid fa-filter"></i> <span id="finFilterLabel">Все</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -3379,6 +3423,16 @@
             <button class="mb-btn cancel-btn" onclick="closeSortDropdown()">Отмена</button>
             <button class="mb-btn ok-btn" onclick="applySort()">Окей</button>
         </div>
+    </div>
+
+    <!-- ===== ВЫНЕСЕННОЕ МЕНЮ ФИЛЬТРА ЗАПИСЕЙ (прямой потомок body) ===== -->
+    <div class="ff-dropdown-menu" id="finFilterMenu">
+        <div class="ff-option" data-fin-filter="all">Все</div>
+        <div class="ff-option" data-fin-filter="work">В работе</div>
+        <div class="ff-option" data-fin-filter="done">Готово</div>
+        <div class="ff-option" data-fin-filter="debt">Долг</div>
+        <div class="ff-option" data-fin-filter="subs">Абонементы</div>
+        <div class="ff-option" data-fin-filter="certs">Сертификаты</div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
@@ -4259,6 +4313,75 @@
             renderClients();
         }
 
+        // ===== ФИЛЬТР ЗАПИСЕЙ С ДРОПДАУНОМ =====
+        const FIN_FILTER_LABELS = {
+            all: 'Все', work: 'В работе', done: 'Готово', debt: 'Долг',
+            subs: 'Абонементы', certs: 'Сертификаты'
+        };
+        let isFinFilterDropdownOpen = false;
+
+        function toggleFinFilterDropdown(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('finFilterMenu');
+            if (menu.classList.contains('open')) {
+                closeFinFilterDropdown();
+                return;
+            }
+            const active = currentStatusFilter || 'all';
+            document.querySelectorAll('.ff-option[data-fin-filter]').forEach(el => {
+                el.classList.toggle('active', el.dataset.finFilter === active);
+            });
+            if (window.innerWidth > 768) {
+                const btn = document.getElementById('finFilterToggleBtn');
+                if (btn) {
+                    const rect = btn.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + 4) + 'px';
+                    menu.style.left = rect.left + 'px';
+                    menu.style.transform = 'none';
+                }
+            } else {
+                menu.style.top = '';
+                menu.style.left = '';
+                menu.style.transform = '';
+            }
+            menu.classList.add('open');
+            isFinFilterDropdownOpen = true;
+        }
+
+        function closeFinFilterDropdown() {
+            document.getElementById('finFilterMenu').classList.remove('open');
+            isFinFilterDropdownOpen = false;
+        }
+
+        document.addEventListener('click', function(e) {
+            const option = e.target.closest('.ff-option[data-fin-filter]');
+            if (option) {
+                const menu = document.getElementById('finFilterMenu');
+                if (!menu.contains(option)) return;
+                toggleFilter(option.dataset.finFilter);
+                closeFinFilterDropdown();
+                return;
+            }
+            const wrapper = document.querySelector('.ff-dropdown-wrapper');
+            const menu = document.getElementById('finFilterMenu');
+            if (menu && !menu.contains(e.target) && (!wrapper || !wrapper.contains(e.target))) {
+                if (isFinFilterDropdownOpen) closeFinFilterDropdown();
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (isFinFilterDropdownOpen && window.innerWidth > 768) {
+                const menu = document.getElementById('finFilterMenu');
+                const btn = document.getElementById('finFilterToggleBtn');
+                if (menu && btn) {
+                    const rect = btn.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + 4) + 'px';
+                    menu.style.left = rect.left + 'px';
+                    menu.style.transform = 'none';
+                }
+            }
+        });
+
         window.selectSort = function() {};
         window.setClientPeriod = function() {};
 
@@ -4539,7 +4662,10 @@
             }, err => console.error('❌ Ошибка загрузки сессий:', err));
             CERTC.onSnapshot(snap => { certs = {};
                 snap.forEach(d => certs[d.id] = d.data());
-                renderCerts(); }, err => console.error('❌ Ошибка загрузки сертификатов:', err));
+                renderCerts();
+                if (currentStatusFilter === 'certs' && document.getElementById('secFinance')?.style.display !==
+                    'none') renderFinanceCerts();
+            }, err => console.error('❌ Ошибка загрузки сертификатов:', err));
             setInterval(() => { if (viewMode === 'calendar') renderCalendar(); }, 60000);
 
             updateCalPeriodLabel();
@@ -5577,29 +5703,23 @@
             }
         }
 
-        // ===== ФИЛЬТР ПО СТАТУСУ =====
+        // ===== ФИЛЬТР ПО СТАТУСУ / ТИПУ ЗАПИСЕЙ =====
         window.toggleFilter = function(filter) {
-            const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
-            const workBtn = document.querySelector('.filter-btn[data-filter="work"]');
-            const doneBtn = document.querySelector('.filter-btn[data-filter="done"]');
-            const debtBtn = document.querySelector('.filter-btn[data-filter="debt"]');
-            [allBtn, workBtn, doneBtn, debtBtn].forEach(b => b.classList.remove('active'));
-            if (filter === 'all') {
-                if (allBtn) allBtn.classList.add('active');
-                currentStatusFilter = null;
-            } else {
-                const btn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
-                if (btn) btn.classList.add('active');
-                currentStatusFilter = filter;
-            }
-            // "В работе" и "Долг" показывают записи по всем месяцам сразу,
-            // поэтому выбор месяца на них не влияет — наглядно гасим picker
+            currentStatusFilter = (filter === 'all') ? null : filter;
+            const label = document.getElementById('finFilterLabel');
+            if (label) label.textContent = FIN_FILTER_LABELS[filter] || 'Все';
+            document.querySelectorAll('.ff-option[data-fin-filter]').forEach(el => {
+                el.classList.toggle('active', el.dataset.finFilter === filter);
+            });
+            // "В работе", "Долг", "Абонементы" и "Сертификаты" — это списки, которые не привязаны
+            // к конкретному месяцу, поэтому выбор месяца на них не влияет — наглядно гасим picker
             const monthPicker = document.getElementById('finMonthPicker');
             if (monthPicker) {
-                const isOpenItemsFilter = (filter === 'work' || filter === 'debt');
+                const isOpenItemsFilter = (filter === 'work' || filter === 'debt' || filter === 'subs' || filter ===
+                    'certs');
                 monthPicker.disabled = isOpenItemsFilter;
                 monthPicker.style.opacity = isOpenItemsFilter ? '0.4' : '1';
-                monthPicker.title = isOpenItemsFilter ? 'Здесь показаны записи за все месяцы' : '';
+                monthPicker.title = isOpenItemsFilter ? 'Здесь показаны записи за всё время' : '';
             }
             renderFinance();
         };
@@ -5629,9 +5749,12 @@
 
         // ===== FINANCE =====
         function renderFinance() {
-            const myData = getMyData(true); // все записи для финансов
             const grid = document.getElementById('finGrid');
             if (!grid) return;
+            if (currentStatusFilter === 'subs') { renderFinanceSubs(); return; }
+            if (currentStatusFilter === 'certs') { renderFinanceCerts(); return; }
+            grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
+            const myData = getMyData(true); // все записи для финансов
             let filtered = myData;
             // "В работе" и "Долг" — это списки открытых задач (что подтвердить и кто должен).
             // Их нужно показывать по всем месяцам сразу, как и в Аналитике, иначе часть
@@ -5725,6 +5848,139 @@
                 grid.appendChild(card);
             });
             if (!privacyOn) applyBlur();
+        }
+
+        // ===== ЗАПИСИ: ФИЛЬТР «АБОНЕМЕНТЫ» =====
+        // Показывает все абонементы текущего пользователя, в том числе те, у которых
+        // больше нет ни одной записи (и поэтому нет карточки в "Клиентах") — именно
+        // такие "осиротевшие" абонементы иначе нигде не видны.
+        function renderFinanceSubs() {
+            const grid = document.getElementById('finGrid');
+            grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
+            grid.innerHTML =
+                '<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">Загрузка...</div>';
+            if (!window.PROFILE || !window.PROFILE.uid) return;
+            SUBC.where('authorUid', '==', window.PROFILE.uid).get().then(snap => {
+                grid.innerHTML = '';
+                document.getElementById('finCount').textContent = snap.size + ' абонементов';
+                if (snap.empty) {
+                    grid.innerHTML =
+                        '<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">Нет абонементов</div>';
+                    return;
+                }
+                const items = [];
+                snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                items.sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || ''));
+                items.forEach(d => {
+                    const used = d.used || 0;
+                    const total = d.total || 0;
+                    const left = Math.max(0, total - used);
+                    const isExhausted = left <= 0;
+                    const perc = total > 0 ? Math.min((used / total) * 100, 100) : 0;
+                    const card = document.createElement('div');
+                    card.className = 'fin-card';
+                    card.classList.add(isExhausted ? 'row-done' : 'row-debt');
+                    card.setAttribute('data-id', d.id);
+                    card.setAttribute('data-name', d.clientName || '');
+                    const name = escapeHTML(d.clientName || '—');
+                    const phone = escapeHTML(d.clientPhone || '—');
+                    const dateStr = escapeHTML(d.createdDate || '—');
+                    const price = (d.price || 0).toLocaleString();
+                    const header = document.createElement('div');
+                    header.className = 'fin-header';
+                    header.innerHTML =
+                        `<div class="fin-color-bar" style="background:${PALETTE[0].hex};"></div><div class="fin-name">${name}</div><span class="ss-badge ${isExhausted ? 'ss-done' : 'ss-work'} fin-status">${isExhausted ? 'Использован' : used + '/' + total}</span>`;
+                    card.appendChild(header);
+                    const progWrap = document.createElement('div');
+                    progWrap.className = 'fin-prog';
+                    progWrap.innerHTML =
+                        `<div class="prog"><div class="prog-fill" style="width:${perc}%;background:${isExhausted ? 'var(--green)' : 'var(--gold)'};"></div></div>`;
+                    card.appendChild(progWrap);
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.className = 'fin-details';
+                    detailsDiv.innerHTML =
+                        `<div class="detail-row"><span class="detail-label">Телефон:</span> <span>${phone}</span></div><div class="detail-row"><span class="detail-label">Создан:</span> <span>${dateStr}</span></div><div class="detail-row"><span class="detail-label">Цена занятия:</span> <span>${price} ₽</span></div>`;
+                    card.appendChild(detailsDiv);
+                    const stats = document.createElement('div');
+                    stats.className = 'fin-stats';
+                    stats.innerHTML =
+                        `<div class="fin-stat"><div class="fin-stat-l">Использовано</div><div class="fin-stat-v pv">${used}/${total}</div></div><div class="fin-stat"><div class="fin-stat-l">Осталось</div><div class="fin-stat-v pv" style="color:var(--gold);">${left}</div></div>`;
+                    card.appendChild(stats);
+                    const actions = document.createElement('div');
+                    actions.className = 'fin-actions';
+                    actions.innerHTML =
+                        `<div class="act-ic b" title="Изменить использовано" onclick="event.stopPropagation(); editSubUsage('${d.id}', ${used}, ${total})"><i class="fa-solid fa-pen"></i></div><div class="act-ic r" title="Удалить абонемент" onclick="event.stopPropagation(); delSub('${d.id}')"><i class="fa-solid fa-trash"></i></div>`;
+                    card.appendChild(actions);
+                    grid.appendChild(card);
+                });
+                if (!privacyOn) applyBlur();
+            }).catch(err => {
+                handleError(err, 'Ошибка загрузки абонементов.');
+            });
+        }
+
+        window.editSubUsage = function(id, used, total) {
+            const card = document.querySelector(`.fin-card[data-id="${id}"]`);
+            const btn = card ? card.querySelector('.act-ic.b') : null;
+            if (btn) lockButton(btn);
+            openSM('Сколько занятий использовано (всего ' + total + ')', 'number', () => {
+                const v = parseInt(document.getElementById('msInput').value);
+                if (!isNaN(v) && v >= 0) {
+                    const newUsed = Math.min(v, total);
+                    SUBC.doc(id).update({ used: newUsed }).then(() => {
+                        closeSM();
+                        renderFinanceSubs();
+                    }).catch(err => { handleError(err, 'Ошибка при обновлении абонемента.'); if (btn) unlockButton(
+                            btn); });
+                } else { if (btn) unlockButton(btn);
+                    closeSM(); }
+            }, used);
+        };
+
+        window.delSub = function(id) {
+            const card = document.querySelector(`.fin-card[data-id="${id}"]`);
+            const name = card ? (card.dataset.name || '') : '';
+            const btn = card ? card.querySelector('.act-ic.r') : null;
+            if (btn) lockButton(btn);
+            openSM('Удалить абонемент' + (name ? ' «' + name + '»' : '') + '?', 'delete', () => {
+                SUBC.doc(id).delete().then(() => {
+                    closeSM();
+                    renderFinanceSubs();
+                }).catch(err => { handleError(err, 'Ошибка при удалении абонемента.'); if (btn) unlockButton(btn); });
+            });
+        };
+
+        // ===== ЗАПИСИ: ФИЛЬТР «СЕРТИФИКАТЫ» =====
+        // Та же база сертификатов, что и в разделе "Сертификаты", просто доступна
+        // и из выпадающего фильтра раздела "Записи".
+        function renderFinanceCerts() {
+            const grid = document.getElementById('finGrid');
+            grid.className = 'cert-grid';
+            grid.innerHTML = '';
+            document.getElementById('finCount').textContent = '300 сертификатов';
+            let arr = [];
+            for (let i = 1; i <= 300; i++) {
+                const id = 'SSL-' + String(i).padStart(3, '0');
+                const d = certs[id];
+                arr.push({ id, active: d ? d.active : false, name: d ? d.name : '', firstName: d ? d.firstName : '',
+                    lastName: d ? d.lastName : '', service: d ? d.service : '', date: d ? d.date : '',
+                    expiry: d ? d.expiry : '' });
+            }
+            arr.forEach(c => {
+                const el = document.createElement('div');
+                el.className = 'cert-c' + (c.active ? ' used' : '');
+                const certId = escapeHTML(c.id);
+                const certName = escapeHTML(c.name || '—');
+                const status = c.active ? 'ИСПОЛЬЗОВАН' : 'СВОБОДЕН';
+                const statusClass = c.active ? 'cb-used' : 'cb-free';
+                const firstName = escapeHTML(c.firstName || '');
+                const lastName = escapeHTML(c.lastName || '');
+                el.innerHTML =
+                    `<div class="cert-id">${certId}</div><div class="cert-nm">${certName}</div><div class="cert-b ${statusClass}">${status}</div>${c.active ? `<div style="font-size:9px;color:var(--text3);margin-top:4px;">${firstName} ${lastName}</div>` : ''}`;
+                el.onclick = () => { if (!c.active) { currentCertId = c.id;
+                        openCertModal(); } };
+                grid.appendChild(el);
+            });
         }
 
         // ===== CERTS =====
