@@ -2813,16 +2813,34 @@
             }
         }
         /* ===== ГОЛОСОВОЙ ВВОД (Gemini) ===== */
-        #nav-voice.listening {
-            color: var(--red) !important;
-            background: rgba(255, 92, 106, 0.12);
+        .voice-fab {
+            flex-shrink: 0;
+            margin: 0 12px 10px;
+            padding: 10px 12px;
+            border-radius: var(--r-sm);
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: transform 0.15s, background 0.2s;
         }
-        #nav-voice.listening #voiceFabIcon {
+        .voice-fab:hover { background: #6a5ee0; }
+        .voice-fab i { font-size: 14px; }
+        .voice-fab:active { transform: scale(0.96); }
+        .voice-fab.listening {
+            background: var(--red);
             animation: voicePulse 1.2s ease-in-out infinite;
         }
         @keyframes voicePulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.35; }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 92, 106, 0.5); }
+            50% { box-shadow: 0 0 0 14px rgba(255, 92, 106, 0); }
         }
         .voice-toast {
             position: fixed;
@@ -2907,7 +2925,6 @@
                 <div><div class="sb-logo-t">SPRING SOUND <span style="color:var(--blue);">LAB</span></div><div class="sb-logo-s">Studio CRM</div></div>
             </div>
             <div class="sb-nav">
-                <div class="nav-i" onclick="toggleVoiceInput()" id="nav-voice"><i class="fa-solid fa-microphone" id="voiceFabIcon"></i> Голосовой ввод</div>
                 <div class="nav-i active" onclick="goSec('sessions')" id="nav-sessions"><i class="fa-regular fa-calendar-check"></i> Журнал</div>
                 <div class="nav-i" onclick="goSec('clients')" id="nav-clients"><i class="fa-regular fa-user"></i> Клиенты</div>
                 <div class="nav-i" onclick="goSec('finance')" id="nav-finance"><i class="fa-solid fa-wallet"></i> Финансы</div>
@@ -2917,6 +2934,11 @@
                 <div class="nav-i" onclick="goSec('employees')" id="nav-employees"><i class="fa-solid fa-users"></i> Сотрудники</div>
                 <div class="nav-i" onclick="openSettingsModal()" id="nav-settings"><i class="fa-solid fa-gear"></i> Настройки аккаунта</div>
             </div>
+            <!-- ===== ГОЛОСОВОЙ ВВОД ===== -->
+            <button class="voice-fab" id="voiceFabBtn" onclick="toggleVoiceInput()" title="Голосовая запись">
+                <i class="fa-solid fa-microphone" id="voiceFabIcon"></i>
+                <span>Голосовой ввод</span>
+            </button>
             <div class="sb-user" onclick="doLogout()" title="Выйти">
                 <div class="u-av" id="uAv"><span id="uAvLetter">А</span></div>
                 <div style="flex:1;min-width:0;"><div class="u-name" id="uName">—</div><div class="u-role" id="uRole">—</div></div>
@@ -6227,7 +6249,7 @@
                 blobToVoiceCommand(blob, usedType);
             };
 
-            const btn = document.getElementById('nav-voice');
+            const btn = document.getElementById('voiceFabBtn');
             voiceIsRecording = true;
             if (btn) btn.classList.add('listening');
             showVoiceToast('🎙 Идёт запись… нажмите ещё раз, чтобы закончить');
@@ -6239,7 +6261,7 @@
 
         function stopVoiceRecording() {
             clearTimeout(voiceMaxTimer);
-            const btn = document.getElementById('nav-voice');
+            const btn = document.getElementById('voiceFabBtn');
             voiceIsRecording = false;
             if (btn) btn.classList.remove('listening');
             if (voiceMediaRecorder && voiceMediaRecorder.state !== 'inactive') {
@@ -6310,7 +6332,6 @@
 
         console.log('✅ CRM v3 — все исправления применены: клиенты по готовым, сортировка, пружинистость, iOS safe-area, убран воздух в тулбаре.');
     </script>
-    <!-- ===== ГОЛОСОВОЙ ВВОД ===== -->
     <div class="voice-toast" id="voiceToast"></div>
 
 </body>
