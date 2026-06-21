@@ -5725,15 +5725,6 @@
             document.querySelectorAll('.ff-option[data-fin-filter]').forEach(el => {
                 el.classList.toggle('active', el.dataset.finFilter === filter);
             });
-            // "В работе", "Долг", "Абонементы" и "Сертификаты" — это списки, которые не привязаны
-            // к конкретному месяцу, поэтому выбор месяца на них не влияет — наглядно гасим picker
-            const monthPicker = document.getElementById('finMonthPicker');
-            if (monthPicker) {
-                const isOpenItemsFilter = (filter === 'work' || filter === 'debt' || filter === 'subs');
-                monthPicker.disabled = isOpenItemsFilter;
-                monthPicker.style.opacity = isOpenItemsFilter ? '0.4' : '1';
-                monthPicker.title = isOpenItemsFilter ? 'Здесь показаны записи за всё время' : '';
-            }
             renderFinance();
         };
 
@@ -5768,14 +5759,20 @@
             grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
             const myData = getMyData(true); // все записи для финансов
             let filtered = myData;
-            // "В работе" и "Долг" — это списки открытых задач (что подтвердить и кто должен).
-            // Их нужно показывать по всем месяцам сразу, как и в Аналитике, иначе часть
-            // записей из других месяцев "пропадает" из вида при выборе текущего месяца
-            const isOpenItemsFilter = (currentStatusFilter === 'work' || currentStatusFilter === 'debt');
-            if (!isOpenItemsFilter) {
-                const monthPicker = document.getElementById('finMonthPicker');
-                if (monthPicker && monthPicker.value) {
-                    const [year, month] = monthPicker.value.split('-');
+            // Месяц как конкретный отчётный период имеет смысл только для "Готово"
+            // (доход за такой-то месяц). "Все", "В работе" и "Долг" — это списки
+            // записей/задач за всё время, чтобы ничего не "пропадало" из вида
+            // при выбранном месяце без подходящих записей
+            const monthScoped = (currentStatusFilter === 'done');
+            const monthPickerEl = document.getElementById('finMonthPicker');
+            if (monthPickerEl) {
+                monthPickerEl.disabled = !monthScoped;
+                monthPickerEl.style.opacity = monthScoped ? '1' : '0.4';
+                monthPickerEl.title = monthScoped ? '' : 'Здесь показаны записи за всё время';
+            }
+            if (monthScoped) {
+                if (monthPickerEl && monthPickerEl.value) {
+                    const [year, month] = monthPickerEl.value.split('-');
                     const monthKey = '.' + month + '.' + year;
                     filtered = myData.filter(r => r.date && monthKeyFromDateStr(r.date) === monthKey);
                 } else {
@@ -5799,7 +5796,7 @@
             document.getElementById('finCount').textContent = filtered.length + ' записей';
             if (!filtered.length) {
                 grid.innerHTML =
-                    `<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">${isOpenItemsFilter ? 'Нет записей' : 'Нет записей за выбранный месяц'}</div>`;
+                    `<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">${monthScoped ? 'Нет записей за выбранный месяц' : 'Нет записей'}</div>`;
                 return;
             }
             filtered.forEach(r => {
