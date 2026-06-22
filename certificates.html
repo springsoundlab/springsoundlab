@@ -2855,6 +2855,26 @@
                 height: 100%;
             }
         }
+
+        /* ===== ДОБАВЛЕННЫЕ АНИМАЦИИ ДЛЯ УПРАВЛЕНИЯ КОМАНДОЙ ===== */
+        #masterEmpGrid .tb-btn {
+            transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+        }
+        #masterEmpGrid .tb-btn:hover {
+            transform: scale(1.15);
+        }
+        #masterEmpGrid .tb-btn:active {
+            transform: scale(0.95);
+        }
+        #masterEmpGrid .delete-btn:hover {
+            background: var(--red-bg) !important;
+            border-color: var(--red) !important;
+        }
+        #masterEmpGrid .tb-btn[onclick*="toggleBlockUser"]:hover {
+            background: var(--accent-bg) !important;
+            border-color: var(--accent) !important;
+        }
+
         /* ===== ГОЛОСОВОЙ ВВОД (Gemini) ===== */
         .voice-fab {
             flex-shrink: 0;
@@ -3180,7 +3200,7 @@
                 <div id="secMasterFinance" class="view" style="display:none;">
                     <div class="toolbar">
                         <span style="font-size:11px;color:var(--text3);font-weight:700;">ФИНАНСЫ СТУДИИ</span>
-                        <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+                        <div style="display:flex; align-items:center; gap:6px; margin-left:12px;">
                             <label style="font-size:10px;color:var(--text3);">Сотрудник:</label>
                             <select id="masterFinanceFilterUser" class="f-inp" style="width:auto;padding:4px 8px;height:28px;" onchange="renderMasterFinance()"></select>
                         </div>
@@ -6757,12 +6777,12 @@
                             ${isMaster ? '<span style="color:var(--gold);font-size:14px;" title="Мастер">👑</span>' : ''}
                             ${isBlocked ? '<span style="color:var(--red);font-size:14px;" title="Заблокирован">🔒</span>' : ''}
                             ${!isMaster ? `
-                                <button class="tb-btn" style="padding:4px 6px;font-size:14px;background:transparent;border:1px solid var(--border);" onclick="toggleBlockUser('${u.uid}')" title="${isBlocked ? 'Разблокировать' : 'Заблокировать'}">
+                                <button class="tb-btn" style="padding:2px 6px;font-size:14px;background:transparent;border:1px solid var(--border);border-radius:4px;cursor:pointer;" onclick="toggleBlockUser('${u.uid}')" title="${isBlocked ? 'Разблокировать' : 'Заблокировать'}">
                                     ${isBlocked ? '🔓' : '🔒'}
                                 </button>
                             ` : ''}
                             ${!isMaster ? `
-                                <button class="tb-btn" style="padding:4px 6px;font-size:16px;background:transparent;border:1px solid var(--red);color:var(--red);" onclick="deleteUser('${u.uid}')" title="Удалить">
+                                <button class="tb-btn delete-btn" style="padding:2px 6px;font-size:14px;background:transparent;border:1px solid var(--red);color:var(--red);border-radius:4px;cursor:pointer;" onclick="deleteUser('${u.uid}')" title="Удалить">
                                     ❌
                                 </button>
                             ` : ''}
@@ -6796,21 +6816,28 @@
             }
         }
 
-        // ===== ПРИГЛАШЕНИЯ =====
+        // ===== ПРИГЛАШЕНИЯ (исправлено: добавлена обработка ошибок) =====
         async function generateInviteKey() {
             if (!isCurrentUserMaster()) return alert('Доступно только мастеру.');
-            const key = 'INV-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Math.random().toString(36)
-                .substring(2, 8).toUpperCase();
-            await INVITES.add({
-                key,
-                createdBy: window.PROFILE.uid,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                used: false,
-                usedByPhone: null,
-                usedAt: null,
-                expiresAt: null
-            });
-            renderMasterInvites();
+            try {
+                const key = 'INV-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Math.random().toString(36)
+                    .substring(2, 8).toUpperCase();
+                await INVITES.add({
+                    key,
+                    createdBy: window.PROFILE.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    used: false,
+                    usedByPhone: null,
+                    usedAt: null,
+                    expiresAt: null
+                });
+                renderMasterInvites();
+                alert('✅ Ключ ' + key + ' успешно создан!');
+            } catch (e) {
+                console.error('❌ Ошибка генерации ключа:', e);
+                alert('❌ Не удалось создать ключ. Возможно, коллекция "invites" не создана в Firestore, или недостаточно прав.\n\n' +
+                    'Решение: в консоли Firebase создайте коллекцию "invites" (любое имя документа) или проверьте правила безопасности.');
+            }
         }
 
         async function revokeInvite(id) {
