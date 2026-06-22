@@ -1634,9 +1634,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 0;
-            flex-wrap: nowrap;
-            height: 38px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
         }
         .color-pick-row .color-pick-label {
             display: none;
@@ -1645,9 +1644,7 @@
             background: var(--surface2);
             border: 1px solid var(--border);
             border-radius: var(--r-sm);
-            padding: 0 14px;
-            height: 38px;
-            box-sizing: border-box;
+            padding: 6px 14px;
             color: var(--text2);
             font-size: 12px;
             cursor: pointer;
@@ -1655,7 +1652,6 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            flex-shrink: 0;
         }
         .color-pick-btn:hover {
             color: var(--text);
@@ -1672,9 +1668,6 @@
             font-size: 10px;
             color: var(--text3);
             margin-left: 2px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .preset-grid {
@@ -2498,6 +2491,10 @@
             .color-pick-row .color-pick-label {
                 display: none !important;
             }
+            .color-pick-btn {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
             .color-pick-btn .color-preview {
                 width: 18px;
                 height: 18px;
@@ -2943,6 +2940,9 @@
                 <div class="auth-lbl">Пароль</div>
                 <input type="password" id="loginPass" class="auth-inp" placeholder="Введите пароль" onkeydown="if(event.key==='Enter')doLogin()">
                 <button class="auth-btn" id="loginBtn" onclick="doLogin()">Войти</button>
+                <div style="margin-top:10px; text-align:center;">
+                    <a href="#" onclick="openPasswordResetRequest()" style="color:var(--text2); font-size:12px; text-decoration:underline;">Забыли пароль?</a>
+                </div>
             </div>
             <div id="regForm" style="display:none;">
                 <div class="auth-lbl">Ваше имя</div>
@@ -2951,6 +2951,8 @@
                 <input type="tel" id="regPhone" class="auth-inp" placeholder="+7 900 000-00-00" inputmode="tel">
                 <div class="auth-lbl">Пароль</div>
                 <input type="password" id="regPass" class="auth-inp" placeholder="Минимум 8 символов">
+                <div class="auth-lbl">Ключ приглашения</div>
+                <input type="text" id="regInviteKey" class="auth-inp" placeholder="Введите ключ, полученный от администратора">
                 <div class="auth-lbl">Роль</div>
                 <div class="auth-roles" id="regRoles">
                     <div class="auth-role sel" data-role="Звукорежиссёр" onclick="selRole(this)">🎧 Звук</div>
@@ -2961,7 +2963,7 @@
                 <div id="regColorPick" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"></div>
                 <button class="auth-btn" id="regBtn" onclick="doRegister()">Создать аккаунт</button>
             </div>
-            <div class="auth-hint">Для регистрации обратитесь к администратору студии.</div>
+            <div class="auth-hint">Для регистрации требуется ключ приглашения. Обратитесь к администратору.</div>
         </div>
     </div>
 
@@ -2980,6 +2982,13 @@
                 <div class="nav-i" onclick="goSec('certs')" id="nav-certs"><i class="fa-solid fa-gift"></i> Сертификаты</div>
                 <div class="nav-i" onclick="goSec('analytics')" id="nav-analytics"><i class="fa-solid fa-chart-simple"></i> Аналитика</div>
                 <div class="nav-i" onclick="goSec('employees')" id="nav-employees"><i class="fa-solid fa-users"></i> Сотрудники</div>
+                <!-- Мастер-разделы (скрыты по умолчанию) -->
+                <div class="nav-i master-only" onclick="goSec('masterEmployees')" id="nav-masterEmployees" style="display:none;"><i class="fa-solid fa-user-gear"></i> Управление командой</div>
+                <div class="nav-i master-only" onclick="goSec('masterInvites')" id="nav-masterInvites" style="display:none;"><i class="fa-solid fa-key"></i> Приглашения</div>
+                <div class="nav-i master-only" onclick="goSec('masterReset')" id="nav-masterReset" style="display:none;"><i class="fa-solid fa-rotate-left"></i> Запросы на сброс</div>
+                <div class="nav-i master-only" onclick="goSec('masterAllSessions')" id="nav-masterAllSessions" style="display:none;"><i class="fa-solid fa-calendar-plus"></i> Все записи</div>
+                <div class="nav-i master-only" onclick="goSec('masterFinance')" id="nav-masterFinance" style="display:none;"><i class="fa-solid fa-coins"></i> Финансы студии</div>
+                <div class="nav-i master-only" onclick="goSec('masterPackages')" id="nav-masterPackages" style="display:none;"><i class="fa-solid fa-cubes"></i> Услуги</div>
                 <div class="nav-i" onclick="openSettingsModal()" id="nav-settings"><i class="fa-solid fa-gear"></i> Настройки аккаунта</div>
             </div>
             <!-- ===== ГОЛОСОВОЙ ВВОД ===== -->
@@ -3066,7 +3075,7 @@
                     <div class="cl-grid" id="clGrid"></div>
                 </div>
 
-                <!-- ФИНАНСЫ -->
+                <!-- ФИНАНСЫ (мои записи) -->
                 <div id="secFinance" class="view" style="display:none;">
                     <div class="toolbar">
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -3088,7 +3097,7 @@
                     <div class="certs-wrap"><div class="cert-grid" id="certGrid"></div></div>
                 </div>
 
-                <!-- АНАЛИТИКА -->
+                <!-- АНАЛИТИКА (моя) -->
                 <div id="secAnalytics" class="view" style="display:none;">
                     <div class="ana-wrap">
                         <div class="ana-hd">
@@ -3117,12 +3126,84 @@
                     </div>
                 </div>
 
-                <!-- СОТРУДНИКИ -->
+                <!-- СОТРУДНИКИ (общий список) -->
                 <div id="secEmployees" class="view" style="display:none;">
                     <div class="toolbar">
                         <span style="font-size:11px;color:var(--text3);font-weight:700;">КОМАНДА СТУДИИ</span>
                     </div>
                     <div class="cl-grid" id="empGrid"></div>
+                </div>
+
+                <!-- НОВЫЕ РАЗДЕЛЫ ДЛЯ МАСТЕРА -->
+                <!-- Управление сотрудниками -->
+                <div id="secMasterEmployees" class="view" style="display:none;">
+                    <div class="toolbar">
+                        <span style="font-size:11px;color:var(--text3);font-weight:700;">УПРАВЛЕНИЕ СОТРУДНИКАМИ</span>
+                    </div>
+                    <div class="cl-grid" id="masterEmpGrid"></div>
+                </div>
+
+                <!-- Приглашения -->
+                <div id="secMasterInvites" class="view" style="display:none;">
+                    <div class="toolbar">
+                        <button class="tb-btn green-btn" onclick="generateInviteKey()"><i class="fa-solid fa-plus"></i> Сгенерировать ключ</button>
+                        <span style="font-size:11px;color:var(--text3);" id="inviteCount">0 ключей</span>
+                    </div>
+                    <div class="certs-wrap">
+                        <div id="inviteList" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;"></div>
+                    </div>
+                </div>
+
+                <!-- Запросы на сброс пароля -->
+                <div id="secMasterReset" class="view" style="display:none;">
+                    <div class="toolbar">
+                        <span style="font-size:11px;color:var(--text3);font-weight:700;">ЗАПРОСЫ НА ВОССТАНОВЛЕНИЕ ПАРОЛЯ</span>
+                    </div>
+                    <div class="certs-wrap">
+                        <div id="resetRequestsList" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
+                    </div>
+                </div>
+
+                <!-- Все записи (для мастера) -->
+                <div id="secMasterAllSessions" class="view" style="display:none;">
+                    <div class="toolbar">
+                        <span style="font-size:11px;color:var(--text3);font-weight:700;">ВСЕ ЗАПИСИ СТУДИИ</span>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <label style="font-size:10px;color:var(--text3);">Сотрудник:</label>
+                            <select id="masterFilterUser" class="f-inp" style="width:auto;padding:4px 8px;height:28px;" onchange="renderMasterAllSessions()"></select>
+                        </div>
+                    </div>
+                    <div class="fin-grid" id="masterAllSessionsGrid"></div>
+                </div>
+
+                <!-- Финансы студии -->
+                <div id="secMasterFinance" class="view" style="display:none;">
+                    <div class="toolbar">
+                        <span style="font-size:11px;color:var(--text3);font-weight:700;">ФИНАНСЫ СТУДИИ</span>
+                    </div>
+                    <div class="ana-wrap">
+                        <div class="ana-hd">
+                            <div class="ana-c"><div class="ana-l">Общий доход</div><div class="ana-v pv" id="masterTotalRev">0 ₽</div><div class="ana-s">за все время</div></div>
+                            <div class="ana-c"><div class="ana-l">Общий долг</div><div class="ana-v pv" id="masterTotalDebt" style="color:var(--gold);">0 ₽</div><div class="ana-s">к получению</div></div>
+                            <div class="ana-c"><div class="ana-l">Всего записей</div><div class="ana-v" id="masterTotalSessions">0</div><div class="ana-s">в базе</div></div>
+                            <div class="ana-c"><div class="ana-l">Активных сотрудников</div><div class="ana-v" id="masterActiveUsers">0</div><div class="ana-s">в системе</div></div>
+                        </div>
+                        <div class="chart-s">
+                            <div class="chart-ttl">Доход по месяцам (все сотрудники)</div>
+                            <div class="bar-chart" id="masterMonthChart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Услуги (централизованные) -->
+                <div id="secMasterPackages" class="view" style="display:none;">
+                    <div class="toolbar">
+                        <span style="font-size:11px;color:var(--text3);font-weight:700;">ЦЕНТРАЛИЗОВАННЫЕ УСЛУГИ</span>
+                        <button class="tb-btn green-btn" onclick="openMasterAddPackage()"><i class="fa-solid fa-plus"></i> Добавить услугу</button>
+                    </div>
+                    <div class="certs-wrap">
+                        <div id="masterPackageList" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3408,6 +3489,7 @@
                     <span class="theme-label">☀️ Светлая</span>
                 </div>
             </div>
+            <!-- Блок переключателя мастер-режима (будет добавлен скриптом, если пользователь мастер) -->
             <div class="mb-btns">
                 <button class="mb-btn mb-cancel" onclick="closeSettingsModal()">Отмена</button>
                 <button class="mb-btn mb-confirm" onclick="saveSettings()">Сохранить</button>
@@ -3456,6 +3538,71 @@
             <button class="mb-btn ok-btn" onclick="applyFinSort()">Окей</button>
         </div>
     </div>
+
+    <!-- ===== МОДАЛКА ЗАПРОСА ВОССТАНОВЛЕНИЯ ПАРОЛЯ ===== -->
+    <div class="mo" id="moPasswordResetRequest">
+        <div class="mb mb-sm" style="max-width:400px;">
+            <div class="mb-header">
+                <div class="mb-title">Восстановление пароля</div>
+                <div class="mb-close" onclick="closePasswordResetRequest()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <p style="font-size:12px; color:var(--text2); margin-bottom:12px;">Введите ваш номер телефона. Администратор получит запрос и выдаст вам временный пароль.</p>
+            <div class="f-group">
+                <div class="f-label">Номер телефона</div>
+                <input type="tel" id="resetRequestPhone" class="f-inp" placeholder="+7 900 000-00-00">
+            </div>
+            <div class="mb-btns">
+                <button class="mb-btn mb-cancel" onclick="closePasswordResetRequest()">Отмена</button>
+                <button class="mb-btn mb-confirm" onclick="sendPasswordResetRequest()">Отправить запрос</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА ВЫДАЧИ ВРЕМЕННОГО ПАРОЛЯ МАСТЕРОМ ===== -->
+    <div class="mo" id="moMasterResetAction">
+        <div class="mb mb-sm">
+            <div class="mb-header">
+                <div class="mb-title">Выдача временного пароля</div>
+                <div class="mb-close" onclick="closeMasterResetAction()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <p style="font-size:12px; color:var(--text2); margin-bottom:12px;">Сгенерируйте временный пароль для пользователя <span id="resetActionUser">—</span>.</p>
+            <div class="f-group">
+                <div class="f-label">Новый пароль</div>
+                <input type="text" id="resetActionNewPass" class="f-inp mono" value="" readonly>
+            </div>
+            <div class="mb-btns">
+                <button class="mb-btn mb-cancel" onclick="closeMasterResetAction()">Закрыть</button>
+                <button class="mb-btn mb-confirm" onclick="generateTempPassword()">Сгенерировать и выдать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА ДОБАВЛЕНИЯ ЦЕНТРАЛИЗОВАННОЙ УСЛУГИ ===== -->
+    <div class="mo" id="moMasterAddPackage">
+        <div class="mb mb-sm">
+            <div class="mb-header">
+                <div class="mb-title">Новая услуга</div>
+                <div class="mb-close" onclick="closeMasterAddPackage()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <div class="f-group">
+                <div class="f-label">Название</div>
+                <input type="text" id="masterPkgName" class="f-inp" placeholder="Урок вокала">
+            </div>
+            <div class="f-group">
+                <div class="f-label">Цена (₽)</div>
+                <input type="number" id="masterPkgPrice" class="f-inp mono" placeholder="1000">
+            </div>
+            <div class="f-group">
+                <div class="f-label">Цвет</div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;" id="masterPkgColorPick"></div>
+            </div>
+            <div class="mb-btns">
+                <button class="mb-btn mb-cancel" onclick="closeMasterAddPackage()">Отмена</button>
+                <button class="mb-btn mb-confirm" onclick="saveMasterPackage()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
     </script>
@@ -3573,6 +3720,10 @@
         const UC = db.collection("users");
         const CERTC = db.collection("certificates");
         const SUBC = db.collection("subscriptions");
+        // НОВЫЕ КОЛЛЕКЦИИ
+        const INVITES = db.collection("invites");
+        const RESET_REQUESTS = db.collection("passwordResetRequests");
+        const GLOBAL_PACKAGES = db.collection("globalPackages");
 
         // ===== PALETTE =====
         const PALETTE = [
@@ -3656,6 +3807,14 @@
         let clientSort = 'date_desc';
         let clientPeriod = 'all';
 
+        // ===== ПЕРЕМЕННЫЕ МАСТЕРА =====
+        let isMasterMode = false;
+        let masterPackages = [];
+        let allUsersList = [];
+        let currentResetRequestId = null;
+        let currentResetUid = null;
+        let editingMasterPkgId = null;
+
         // ===== DETECT MOBILE =====
         function detectMobile() {
             return window.innerWidth <= 768 || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -3697,7 +3856,6 @@
                 return false;
             });
             if (includeUncompleted) return all;
-            // По умолчанию возвращаем только завершённые (для клиентов)
             return all.filter(r => r.completed === true);
         }
 
@@ -3717,7 +3875,7 @@
             }
         }
 
-        // ===== РАБОТА С ПАКЕТАМИ =====
+        // ===== РАБОТА С ПАКЕТАМИ (личные) =====
         function loadUserPackages() {
             if (!window.PROFILE) return;
             const pkgs = window.PROFILE.packages || [];
@@ -3800,7 +3958,7 @@
             }
         }
 
-        // ===== РЕДАКТИРОВАНИЕ УСЛУГ (новая модалка) =====
+        // ===== РЕДАКТИРОВАНИЕ УСЛУГ (личные) =====
         let _editSvcIndex = null;
         let _editSvcMode = null;
 
@@ -3854,7 +4012,7 @@
             closeEditSvcModal();
         }
 
-        // ===== МОДАЛКА ДОБАВЛЕНИЯ ПАКЕТА =====
+        // ===== МОДАЛКА ДОБАВЛЕНИЯ ЛИЧНОГО ПАКЕТА =====
         let pkgSelectedColor = PALETTE[0].hex;
 
         function openAddPackageModal() {
@@ -4052,18 +4210,14 @@
             if (!privacyOn && !_subClientHasSubscription) applyBlur();
         }
 
-        function onPrepaidInput() {
-            // hint обновляется через updateTotalDisplay, ничего дополнительного не нужно
-        }
-
         // ===== МУЛЬТИТАЧ =====
         let swipeStartX = 0,
             swipeStartY = 0,
             swipeActive = false,
             swipeHandled = false;
-        const SWIPE_MIN_DISTANCE = 60; // минимальная дистанция по горизонтали, чтобы засчитать свайп
-        const SWIPE_MAX_VERTICAL = 45; // максимальное отклонение по вертикали, иначе это скролл, а не свайп
-        const SIDEBAR_EDGE_ZONE = 40; // полоса у левого края экрана (px), зарезервированная только за открытием/закрытием меню
+        const SWIPE_MIN_DISTANCE = 60;
+        const SWIPE_MAX_VERTICAL = 45;
+        const SIDEBAR_EDGE_ZONE = 40;
 
         function handleTouchStart(e) {
             if (e.touches.length === 2) {
@@ -4079,8 +4233,6 @@
             if (e.touches.length === 1 && !isPinching) {
                 swipeStartX = e.touches[0].clientX;
                 swipeStartY = e.touches[0].clientY;
-                // Если палец стартовал у самого левого края — это жест открытия меню,
-                // не даём ему переключать недели, чтобы жесты не конфликтовали
                 if (swipeStartX < SIDEBAR_EDGE_ZONE) {
                     swipeActive = false;
                     swipeHandled = true;
@@ -4118,9 +4270,9 @@
                 if (Math.abs(dx) > SWIPE_MIN_DISTANCE && Math.abs(dy) < SWIPE_MAX_VERTICAL) {
                     swipeHandled = true;
                     if (dx > 0) {
-                        shiftCalWeek(-1); // свайп вправо -> предыдущая неделя
+                        shiftCalWeek(-1);
                     } else {
-                        shiftCalWeek(1); // свайп влево -> следующая неделя
+                        shiftCalWeek(1);
                     }
                 }
             }
@@ -4140,8 +4292,7 @@
             swipeHandled = false;
         }
 
-        // ===== СВАЙП В РАЗДЕЛЕ "ЗАПИСИ" — переключает только категорию (Все/В работе/
-        // Готово/Долг/Абонементы), выбранный период (этот месяц/год/всё время) не меняется =====
+        // ===== СВАЙП В РАЗДЕЛЕ "ЗАПИСИ" =====
         const FIN_FILTER_ORDER = ['all', 'work', 'done', 'debt', 'subs'];
         const FIN_FILTER_DISPLAY_LABELS = {
             all: 'Все', work: 'В работе', done: 'Готово', debt: 'Долг', subs: 'Абонементы'
@@ -4188,7 +4339,6 @@
                 const dy = e.touches[0].clientY - finSwipeStartY;
                 if (Math.abs(dx) > SWIPE_MIN_DISTANCE && Math.abs(dy) < SWIPE_MAX_VERTICAL) {
                     finSwipeHandled = true;
-                    // свайп влево -> следующая категория, свайп вправо -> предыдущая (как в календаре)
                     shiftFinFilter(dx > 0 ? -1 : 1);
                 }
             }
@@ -4237,6 +4387,7 @@
             e.textContent = m;
             e.style.display = 'block'; }
 
+        // ===== ОБНОВЛЁННЫЙ doLogin (с поддержкой временного пароля) =====
         window.doLogin = async function() {
             document.getElementById('authErr').style.display = 'none';
             const ph = norm(document.getElementById('loginPhone').value);
@@ -4247,6 +4398,23 @@
             lockButton(btn);
             try {
                 await auth.signInWithEmailAndPassword(toEmail(ph), pw);
+                const user = auth.currentUser;
+                if (user) {
+                    const doc = await UC.doc(user.uid).get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        if (data.tempPassword && data.tempPasswordExpiry && data.tempPasswordExpiry.toDate() > new Date()) {
+                            const newPass = prompt('Вы вошли по временному паролю. Установите новый постоянный пароль:');
+                            if (newPass && newPass.length >= 8) {
+                                await user.updatePassword(newPass);
+                                await UC.doc(user.uid).update({ tempPassword: null, tempPasswordExpiry: null });
+                                alert('Пароль успешно изменён!');
+                            } else {
+                                alert('Пароль не изменён. Временный пароль действует 24 часа.');
+                            }
+                        }
+                    }
+                }
             } catch (e) {
                 let m = 'Неверный номер или пароль.';
                 if (e.code === 'auth/too-many-requests') m = 'Слишком много попыток.';
@@ -4257,22 +4425,53 @@
             }
         };
 
+        // ===== ОБНОВЛЁННЫЙ doRegister (с проверкой ключа приглашения) =====
         window.doRegister = async function() {
             document.getElementById('authErr').style.display = 'none';
             const name = document.getElementById('regName').value.trim();
             const ph = norm(document.getElementById('regPhone').value);
             const pw = document.getElementById('regPass').value;
+            const key = document.getElementById('regInviteKey').value.trim().toUpperCase();
             const role = document.querySelector('#regRoles .auth-role.sel')?.dataset.role || 'Сотрудник';
             if (!name) { showErr('Введите имя'); return; }
             if (ph.length < 10) { showErr('Введите корректный номер'); return; }
             if (pw.length < 8) { showErr('Пароль должен содержать минимум 8 символов'); return; }
+            if (!key) { showErr('Введите ключ приглашения'); return; }
+
             const btn = document.getElementById('regBtn');
             lockButton(btn);
+
             try {
+                const snap = await INVITES.where('key', '==', key).get();
+                if (snap.empty) { showErr('Неверный ключ приглашения.'); unlockButton(btn); return; }
+                const doc = snap.docs[0];
+                const data = doc.data();
+                if (data.used) { showErr('Этот ключ уже использован.'); unlockButton(btn); return; }
+                if (data.expiresAt && data.expiresAt.toDate() < new Date()) { showErr('Срок действия ключа истёк.'); unlockButton(
+                        btn); return; }
+
                 const c = await auth.createUserWithEmailAndPassword(toEmail(ph), pw);
-                await UC.doc(c.user.uid).set({ name, phone: ph, role, color: regSelectedColor, createdAt: Date.now(),
-                    packages: [], clientSort: 'date_desc', clientPeriod: 'all', finFilter: 'all', finPeriod: 'all',
-                    theme: 'dark' });
+                await UC.doc(c.user.uid).set({
+                    name,
+                    phone: ph,
+                    role,
+                    color: regSelectedColor,
+                    createdAt: Date.now(),
+                    packages: [],
+                    clientSort: 'date_desc',
+                    clientPeriod: 'all',
+                    finFilter: 'all',
+                    finPeriod: 'all',
+                    theme: 'dark',
+                    isMaster: false
+                });
+
+                await doc.ref.update({
+                    used: true,
+                    usedByPhone: ph,
+                    usedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
             } catch (e) {
                 let m = 'Ошибка регистрации.';
                 if (e.code === 'auth/email-already-in-use') m = 'Номер уже зарегистрирован.';
@@ -4302,7 +4501,6 @@
                 el.classList.toggle('active', el.dataset.period === tempClientPeriod);
             });
 
-            // Позиционируем меню на десктопе под кнопкой
             if (window.innerWidth > 768) {
                 const btn = document.getElementById('sortToggleBtn');
                 if (btn) {
@@ -4362,7 +4560,6 @@
                 }
                 return;
             }
-            // Закрываем меню при клике вне wrapper и самого меню
             const wrapper = document.querySelector('.sort-dropdown-wrapper');
             const menu = document.getElementById('sortDropdownMenu');
             if (!menu.contains(e.target) && (!wrapper || !wrapper.contains(e.target))) {
@@ -4372,7 +4569,6 @@
             }
         });
 
-        // Пересчёт позиции при ресайзе
         window.addEventListener('resize', function() {
             if (isSortDropdownOpen && window.innerWidth > 768) {
                 const menu = document.getElementById('sortDropdownMenu');
@@ -4397,7 +4593,7 @@
             renderClients();
         }
 
-        // ===== СОРТИРОВКА ЗАПИСЕЙ (категория + период), точно как у "Клиентов" =====
+        // ===== СОРТИРОВКА ЗАПИСЕЙ (категория + период) =====
         let tempFinFilter = 'all';
         let tempFinPeriod = 'all';
         let finPeriod = 'all';
@@ -4524,6 +4720,7 @@
             }
         });
 
+        // ===== AUTH STATE =====
         auth.onAuthStateChanged(async (user) => {
             const loader = document.getElementById('loadingScreen');
             loader.classList.add('hidden');
@@ -4588,6 +4785,21 @@
                     updateAvatarUI(null, letter);
                 }
 
+                // Мастер-режим
+                if (p.isMaster === true) {
+                    // Показываем мастер-пункты, если включён режим
+                    if (p.masterMode) {
+                        isMasterMode = true;
+                        document.querySelectorAll('.master-only').forEach(el => el.style.display = 'flex');
+                    } else {
+                        isMasterMode = false;
+                        document.querySelectorAll('.master-only').forEach(el => el.style.display = 'none');
+                    }
+                } else {
+                    isMasterMode = false;
+                    document.querySelectorAll('.master-only').forEach(el => el.style.display = 'none');
+                }
+
                 try {
                     updateUserUI(p);
                 } catch (uiErr) {
@@ -4599,11 +4811,18 @@
                     startApp(); }
                 loadUserPackages();
                 loadUsedColors();
+                // Загружаем централизованные услуги, если мастер
+                if (isCurrentUserMaster()) renderMasterPackages();
             } else {
                 document.getElementById('authScreen').style.display = 'flex';
                 document.getElementById('appRoot').style.display = 'none';
             }
         });
+
+        // ===== ФУНКЦИЯ ПРОВЕРКИ МАСТЕРА =====
+        function isCurrentUserMaster() {
+            return window.PROFILE && window.PROFILE.isMaster === true;
+        }
 
         // ===== ОБНОВЛЕНИЕ UI ПОЛЬЗОВАТЕЛЯ =====
         function updateUserUI(p) {
@@ -4619,13 +4838,12 @@
             if (!avatarDataUrl) {
                 updateAvatarUI(null, letter);
             }
-            // В настройках
             document.getElementById('settingsName').value = name;
             const preview = document.getElementById('settingsAvatarPreview');
             if (avatarDataUrl) {
                 if (preview) preview.innerHTML = `<img src="${avatarDataUrl}" alt="avatar">`;
             } else {
-                if (preview) preview.innerHTML = `<span id="settingsAvatarLetter">${letter}</span>`;
+                if (preview) preview.innerHTML = `<span id="settingsAvatarLetter">${letter}</span>";
             }
         }
 
@@ -4648,8 +4866,8 @@
             }
         }
 
-        // ===== НАСТРОЙКИ АККАУНТА =====
-        function openSettingsModal() {
+        // ===== НАСТРОЙКИ АККАУНТА (с мастер-переключателем) =====
+        window.openSettingsModal = function() {
             const sidebar = document.getElementById('sidebar');
             if (sidebar) sidebar.classList.remove('mobile-open');
 
@@ -4667,15 +4885,60 @@
                 }
                 const isLight = (p.theme === 'light');
                 document.getElementById('themeToggle').checked = isLight;
+
+                // Добавляем переключатель мастер-режима, если пользователь мастер
+                const container = document.getElementById('moSettings').querySelector('.mb');
+                const existing = document.getElementById('masterModeToggleWrap');
+                if (isCurrentUserMaster()) {
+                    if (!existing) {
+                        const wrap = document.createElement('div');
+                        wrap.id = 'masterModeToggleWrap';
+                        wrap.className = 'settings-row';
+                        wrap.innerHTML = `
+                            <div class="f-label">Режим мастера</div>
+                            <div style="display:flex; align-items:center; gap:12px; padding:4px 0;">
+                                <span style="font-size:12px;color:var(--text2);">Выключен</span>
+                                <label class="tgl" style="width:48px;height:24px;">
+                                    <input type="checkbox" id="masterModeToggle" ${isMasterMode ? 'checked' : ''} onchange="toggleMasterMode()">
+                                    <div class="tgl-s" style="border-radius:24px;"></div>
+                                </label>
+                                <span style="font-size:12px;color:var(--text2);">Включен</span>
+                            </div>
+                            <div style="font-size:10px;color:var(--text3);margin-top:4px;">Включите для доступа к управлению студией</div>
+                        `;
+                        const btns = container.querySelector('.mb-btns');
+                        if (btns) container.insertBefore(wrap, btns);
+                    }
+                } else {
+                    if (existing) existing.remove();
+                }
             }
             document.getElementById('moSettings').classList.add('open');
-        }
+        };
 
-        function closeSettingsModal() {
+        window.closeSettingsModal = function() {
             document.body.classList.remove('modal-open');
             document.getElementById('moSettings').classList.remove('open');
-        }
+        };
 
+        // Переключение мастер-режима
+        window.toggleMasterMode = function() {
+            isMasterMode = document.getElementById('masterModeToggle').checked;
+            document.querySelectorAll('.master-only').forEach(el => {
+                el.style.display = isMasterMode ? 'flex' : 'none';
+            });
+            if (!isMasterMode) {
+                const current = document.querySelector('.nav-i.active');
+                if (current && current.id.startsWith('nav-master')) {
+                    goSec('sessions');
+                }
+            }
+            if (window.PROFILE) {
+                UC.doc(window.PROFILE.uid).update({ masterMode: isMasterMode }).catch(err => console.warn(err));
+            }
+        };
+
+        // Обработка аватара
         function handleAvatarUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -4783,13 +5046,24 @@
         function startApp() {
             UC.onSnapshot(snap => {
                 window.ALL_USERS = {};
-                snap.forEach(d => { window.ALL_USERS[d.id] = { ...d.data(), uid: d.id }; });
+                allUsersList = [];
+                snap.forEach(d => {
+                    const data = { ...d.data(), uid: d.id };
+                    window.ALL_USERS[d.id] = data;
+                    allUsersList.push(data);
+                });
                 if (document.getElementById('secEmployees').style.display !== 'none') renderEmployees();
+                if (document.getElementById('secMasterEmployees').style.display !== 'none') renderMasterEmployees();
+                populateMasterUserFilter();
+                if (document.getElementById('secMasterAllSessions').style.display !== 'none') renderMasterAllSessions();
+                if (document.getElementById('secMasterFinance').style.display !== 'none') renderMasterFinance();
             }, err => console.error('❌ Ошибка загрузки пользователей:', err));
             SC.orderBy('timestamp', 'desc').onSnapshot({ includeMetadataChanges: false }, snap => {
                 window.CRM = [];
                 snap.forEach(d => window.CRM.push({ id: d.id, ...d.data() }));
                 renderAll();
+                if (document.getElementById('secMasterAllSessions').style.display !== 'none') renderMasterAllSessions();
+                if (document.getElementById('secMasterFinance').style.display !== 'none') renderMasterFinance();
             }, err => console.error('❌ Ошибка загрузки сессий:', err));
             CERTC.onSnapshot(snap => { certs = {};
                 snap.forEach(d => certs[d.id] = d.data());
@@ -4837,6 +5111,12 @@
             else if (sec === 'analytics') renderAnalytics();
             else if (sec === 'employees') renderEmployees();
             else if (sec === 'certs') renderCerts();
+            else if (sec === 'masterEmployees') renderMasterEmployees();
+            else if (sec === 'masterInvites') renderMasterInvites();
+            else if (sec === 'masterReset') renderResetRequests();
+            else if (sec === 'masterAllSessions') { populateMasterUserFilter();
+                renderMasterAllSessions(); } else if (sec === 'masterFinance') renderMasterFinance();
+            else if (sec === 'masterPackages') renderMasterPackages();
         }
 
         function closeEvPopup() {
@@ -4849,13 +5129,20 @@
             closeEvPopup();
             document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('active'));
             document.getElementById('nav-' + s).classList.add('active');
-            const all = ['sessions', 'clients', 'finance', 'certs', 'analytics', 'employees'];
-            all.forEach(id => document.getElementById('sec' + id.charAt(0).toUpperCase() + id.slice(1)).style.display =
-            'none');
+            const all = ['sessions', 'clients', 'finance', 'certs', 'analytics', 'employees',
+                'masterEmployees', 'masterInvites', 'masterReset', 'masterAllSessions', 'masterFinance', 'masterPackages'
+            ];
+            all.forEach(id => {
+                const el = document.getElementById('sec' + id.charAt(0).toUpperCase() + id.slice(1));
+                if (el) el.style.display = 'none';
+            });
             const currentSec = document.getElementById('sec' + s.charAt(0).toUpperCase() + s.slice(1));
-            currentSec.style.display = 'flex';
+            if (currentSec) {
+                currentSec.style.display = 'flex';
+                currentSec.classList.add('active');
+            }
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            currentSec.classList.add('active');
+            if (currentSec) currentSec.classList.add('active');
 
             const calControls = document.getElementById('calControls');
             if (s === 'sessions') {
@@ -4864,7 +5151,7 @@
                 calControls.classList.remove('active');
             }
 
-            document.body.classList.toggle('sec-finance-active', s === 'finance');
+            document.body.classList.toggle('sec-finance-active', s === 'finance' || s === 'masterFinance');
 
             const sidebar = document.getElementById('sidebar');
             if (sidebar) sidebar.classList.remove('mobile-open');
@@ -4872,11 +5159,11 @@
         }
 
         // ===== PRIVACY =====
-        function applyBlur() { document.querySelectorAll('#secFinance .pv, #secAnalytics .pv').forEach(el => el.style
-                .filter = 'blur(7px)'); }
+        function applyBlur() { document.querySelectorAll('#secFinance .pv, #secAnalytics .pv, #secMasterFinance .pv')
+                .forEach(el => el.style.filter = 'blur(7px)'); }
 
-        function removeBlur() { document.querySelectorAll('#secFinance .pv, #secAnalytics .pv').forEach(el => el.style
-                .filter = 'none'); }
+        function removeBlur() { document.querySelectorAll('#secFinance .pv, #secAnalytics .pv, #secMasterFinance .pv')
+                .forEach(el => el.style.filter = 'none'); }
         window.togglePrivacy = function() {
             if (privacyOn) { privacyOn = false;
                 applyBlur(); } else { privacyOn = true;
@@ -4891,7 +5178,7 @@
             renderCalendar();
         };
 
-        // ===== CAL PERIOD PICKER (полноценный календарь с выбором даты) =====
+        // ===== CAL PERIOD PICKER =====
         let calPickerMonthDate = new Date();
 
         window.shiftCalWeek = function(delta) {
@@ -4935,7 +5222,6 @@
 
             const firstOfMonth = new Date(year, month, 1);
             const startGrid = getMondayOf(firstOfMonth);
-            // 6 строк по 7 дней — гарантированно покрывает любой месяц
             for (let i = 0; i < 42; i++) {
                 const d = new Date(startGrid);
                 d.setDate(startGrid.getDate() + i);
@@ -4959,7 +5245,6 @@
             closeCalPicker();
         }
 
-        // ===== WEEK HELPERS =====
         function getMondayOf(d) {
             const dayOfWeek = d.getDay();
             const diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
@@ -5149,7 +5434,7 @@
             }, 50);
         }
 
-        // ===== EMPLOYEES =====
+        // ===== EMPLOYEES (общий список) =====
         function renderEmployees() {
             const grid = document.getElementById('empGrid');
             if (!grid) return;
@@ -5171,13 +5456,13 @@
                     avatarHtml = `<span style="color:${clr};">${letter}</span>`;
                 }
                 c.innerHTML = `
-              <div class="cl-top" style="margin:0;">
-                <div class="cl-av" style="background:${bg};color:${clr};border:1px solid ${clr}55;">
-                  ${avatarHtml}
-                </div>
-                <div><div class="cl-nm">${name}</div><div class="cl-ph">${role}</div></div>
-              </div>
-            `;
+                    <div class="cl-top" style="margin:0;">
+                        <div class="cl-av" style="background:${bg};color:${clr};border:1px solid ${clr}55;">
+                            ${avatarHtml}
+                        </div>
+                        <div><div class="cl-nm">${name}</div><div class="cl-ph">${role}</div></div>
+                    </div>
+                `;
                 grid.appendChild(c);
             });
         }
@@ -5203,9 +5488,6 @@
             }
             const updateData = { completed: isCompleting };
             if (isCompleting) {
-                // Дату подтверждения проставляем только при первом подтверждении.
-                // Если "Готово" сняли и поставили заново — старая дата не перезатирается,
-                // запись остаётся привязана к тому же месяцу, что и раньше
                 if (!row.completedDate) updateData.completedDate = todayStr();
                 const full = Number(row.fullTotal) || Number(row.total) || 0;
                 const paid = Number(row.total) || 0;
@@ -5213,8 +5495,6 @@
                 if (remaining > 0) { updateData.completionPayment = remaining;
                     updateData.total = full; }
             }
-            // При снятии "Готово" дату подтверждения больше не удаляем — она хранится
-            // на случай повторного подтверждения той же записи
             SC.doc(id).update(updateData).catch(err => { handleError(err, 'Ошибка при обновлении статуса готово.'); if (btn)
                     unlockButton(btn); }).finally(() => { setTimeout(() => { if (btn) unlockButton(btn); }, 500); });
         };
@@ -5331,7 +5611,6 @@
             document.getElementById('fPhone').value = row.phone || '';
             document.getElementById('fComment').value = row.comment || '';
             document.getElementById('preToggle').checked = false;
-            // При редактировании заполняем поле «Внесено» из сохранённого total
             const prepaidEl = document.getElementById('fPrepaid');
             if (prepaidEl) prepaidEl.value = (row.total !== undefined && row.total !== null) ? row.total : '';
             document.getElementById('colorPreview').style.background = selectedFormColor;
@@ -5450,14 +5729,14 @@
                 const svcName = escapeHTML(item.name);
                 const price = escapeHTML(item.price.toLocaleString());
                 d.innerHTML = `
-              <div class="asvc-dot" style="background:${dotColor}"></div>
-              <div class="asvc-name">${svcName}</div>
-              <div class="asvc-price">${price} ₽</div>
-              <div class="asvc-actions">
-                <span class="asvc-edit" onclick="editFormSvc(${i})"><i class="fa-solid fa-pen"></i></span>
-                <span class="asvc-rm" onclick="removeFormSvc(${i})"><i class="fa-solid fa-xmark"></i></span>
-              </div>
-            `;
+                    <div class="asvc-dot" style="background:${dotColor}"></div>
+                    <div class="asvc-name">${svcName}</div>
+                    <div class="asvc-price">${price} ₽</div>
+                    <div class="asvc-actions">
+                        <span class="asvc-edit" onclick="editFormSvc(${i})"><i class="fa-solid fa-pen"></i></span>
+                        <span class="asvc-rm" onclick="removeFormSvc(${i})"><i class="fa-solid fa-xmark"></i></span>
+                    </div>
+                `;
                 cont.appendChild(d);
             });
             updateTotalDisplay();
@@ -5554,7 +5833,6 @@
                 const details = JSON.parse(JSON.stringify(formDetails));
                 const svcsLabel = details.length ? details.map(i => i.name).join(', ') : type;
                 const fullT = details.reduce((s, i) => s + (i.fullPrice || i.price), 0) || 0;
-                // Поле «Внесено»: если заполнено — используем его, иначе считаем как полная оплата
                 const prepaidEl = document.getElementById('fPrepaid');
                 const prepaidVal = prepaidEl && prepaidEl.value !== '' ? parseInt(prepaidEl.value) : NaN;
                 const paid = !isNaN(prepaidVal) ? Math.max(0, Math.min(prepaidVal, fullT)) : fullT;
@@ -5620,9 +5898,7 @@
             const grid = document.getElementById('clGrid');
             grid.innerHTML = '';
 
-            // Используем только завершённые записи (completed === true)
-            const myData = getMyData(false); // false = только completed
-
+            const myData = getMyData(false);
             const map = {};
             myData.forEach(r => {
                 let fullName = r.client || r.song || '';
@@ -5763,24 +6039,24 @@
                 }
             }
             card.innerHTML = `
-            <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start;">
-              <div style="display:flex; gap:9px; align-items:center;">
-                <div class="cl-av" style="background:${pal.bg};color:${pal.hex}">${name[0]?.toUpperCase() || '?'}</div>
-                <div><div class="cl-nm">${name}</div><div class="cl-ph">${phone}</div></div>
-              </div>
-              <button class="cl-edit-btn" onclick="event.stopPropagation(); openClientEdit('${c.ids.join(',')}')" title="Редактировать клиента">
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-              </button>
-            </div>
-            ${subBadge}
-            <div class="cl-stats">
-              <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${c.visits}</div></div>
-              <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${total}</div></div>
-              <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
-              <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
-            </div>
-            ${subHtml}
-          `;
+                <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div style="display:flex; gap:9px; align-items:center;">
+                        <div class="cl-av" style="background:${pal.bg};color:${pal.hex}">${name[0]?.toUpperCase() || '?'}</div>
+                        <div><div class="cl-nm">${name}</div><div class="cl-ph">${phone}</div></div>
+                    </div>
+                    <button class="cl-edit-btn" onclick="event.stopPropagation(); openClientEdit('${c.ids.join(',')}')" title="Редактировать клиента">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                </div>
+                ${subBadge}
+                <div class="cl-stats">
+                    <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${c.visits}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${total}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
+                </div>
+                ${subHtml}
+            `;
             card.onclick = (e) => {
                 if (e.target.closest('.cl-edit-btn')) return;
                 openClientEdit(c.ids.join(','));
@@ -5810,11 +6086,11 @@
                 const row = document.createElement('div');
                 row.className = 'client-sessions-grid';
                 row.innerHTML = `
-              <span class="cell">${escapeHTML(r.date||'—')}</span>
-              <span class="cell">${escapeHTML(r.time||'—')}</span>
-              <span class="cell">${escapeHTML(r.services||'—')}</span>
-              <span class="cell" style="font-weight:600;">${Number(r.total||0).toLocaleString()} ₽</span>
-            `;
+                    <span class="cell">${escapeHTML(r.date||'—')}</span>
+                    <span class="cell">${escapeHTML(r.time||'—')}</span>
+                    <span class="cell">${escapeHTML(r.services||'—')}</span>
+                    <span class="cell" style="font-weight:600;">${Number(r.total||0).toLocaleString()} ₽</span>
+                `;
                 listDiv.appendChild(row);
             });
             document.body.classList.add('modal-open');
@@ -5855,7 +6131,7 @@
             }
         }
 
-        // ===== ЗУМ КАРТОЧЕК ФИНАНСОВ (только мобильная версия) =====
+        // ===== ЗУМ КАРТОЧЕК ФИНАНСОВ =====
         let finCardsCompact = (localStorage.getItem('finCardsCompact') === 'true');
 
         function applyFinCardZoomState() {
@@ -5878,17 +6154,15 @@
 
         document.addEventListener('DOMContentLoaded', applyFinCardZoomState);
 
-        // ===== FINANCE =====
+        // ===== FINANCE (мои записи) =====
         function renderFinance() {
             const grid = document.getElementById('finGrid');
             if (!grid) return;
             updateFinSwipeIndicator();
             if (currentStatusFilter === 'subs') { renderFinanceSubs(); return; }
             grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
-            const myData = getMyData(true); // все записи для финансов
+            const myData = getMyData(true);
             let filtered = myData;
-            // Период (этот месяц / год / всё время) — отдельный фильтр по дате самой
-            // записи, независимый от категории, как и в "Клиентах"
             if (finPeriod === 'month') {
                 const now = new Date();
                 const curM = now.getMonth(),
@@ -5905,14 +6179,10 @@
                 });
             }
             if (currentStatusFilter === 'work') {
-                // "В работе" = всё, что ещё не подтверждено (совпадает с красным кружком в календаре),
-                // независимо от того, есть долг или нет
                 filtered = filtered.filter(r => !r.completed);
             } else if (currentStatusFilter === 'done') {
                 filtered = filtered.filter(r => r.completed);
             } else if (currentStatusFilter === 'debt') {
-                // есть остаток к оплате — независимо от того, подтверждена запись или нет,
-                // чтобы совпадало с «Остатки долгов» в Аналитике
                 filtered = filtered.filter(r => (r.fullTotal || r.total || 0) - (r.total || 0) > 0);
             }
             grid.innerHTML = '';
@@ -5953,7 +6223,6 @@
                 const detailsDiv = document.createElement('div');
                 detailsDiv.className = 'fin-details';
                 const timeStr = r.time ? escapeHTML(r.time) + (r.timeEnd ? ' — ' + escapeHTML(r.timeEnd) : '') : '—';
-                // Подсвечиваем время и дату приглушённым красным, если запись на будущее
                 let timeHtml, dateHtml;
                 if (r.date) {
                     const recordDate = parseDate(r.date);
@@ -5964,7 +6233,6 @@
                         const recordDT = new Date(recordDate.getFullYear(), recordDate.getMonth(), recordDate.getDate(), rh, rm);
                         isFuture = recordDT > now;
                     } else {
-                        // Нет времени — сравниваем только по дате (конец дня)
                         const endOfDay = new Date(recordDate.getFullYear(), recordDate.getMonth(), recordDate.getDate(), 23, 59);
                         isFuture = endOfDay > now;
                     }
@@ -6010,9 +6278,6 @@
         }
 
         // ===== ЗАПИСИ: ФИЛЬТР «АБОНЕМЕНТЫ» =====
-        // Показывает все абонементы текущего пользователя, в том числе те, у которых
-        // больше нет ни одной записи (и поэтому нет карточки в "Клиентах") — именно
-        // такие "осиротевшие" абонементы иначе нигде не видны.
         function renderFinanceSubs() {
             const grid = document.getElementById('finGrid');
             grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
@@ -6109,7 +6374,6 @@
             });
         };
 
-
         // ===== CERTS =====
         function renderCerts() {
             const grid = document.getElementById('certGrid');
@@ -6174,9 +6438,9 @@
                     btn); }
         };
 
-        // ===== ANALYTICS =====
+        // ===== ANALYTICS (моя) =====
         function renderAnalytics() {
-            const myData = getMyData(true); // все записи
+            const myData = getMyData(true);
             let totalRev = 0,
                 yearRev = 0,
                 totalDbt = 0,
@@ -6195,9 +6459,6 @@
                 if (r.completed) done++;
                 else work++;
                 if (r.completed) {
-                    // Доход месяца считаем по дате самой записи (сессии/урока), а не по дате
-                    // нажатия "Готово" — иначе при переключении статуса (например, при
-                    // тестировании) запись "переезжает" в текущий месяц
                     const refDate = r.date;
                     if (refDate) {
                         const [d, m, y] = refDate.split('.');
@@ -6284,8 +6545,6 @@
                 infoDiv.style.display = 'block';
                 cancelBtn.textContent = 'Закрыть';
             } else if (type === 'confirm') {
-                // Простое подтверждение без поля ввода. infoText здесь используется
-                // как текст кнопки (например, "Перенести"), а не как информационный текст.
                 cf.className = 'mb-btn mb-confirm';
                 cf.textContent = infoText || 'Подтвердить';
                 cf.style.display = 'block';
@@ -6561,16 +6820,406 @@
         });
 
         // ===========================================================
-        // ===== ГОЛОСОВОЙ ВВОД ЧЕРЕЗ GEMINI (работает в браузере и в PWA, Android + iOS) =====
-        // Записываем звук через MediaRecorder и отправляем сам аудиофайл в Gemini —
-        // он распознаёт речь и сразу извлекает данные о записи. Это не зависит от
-        // браузерного Web Speech API, которого в принципе нет на iOS/Safari.
+        // ===== НОВЫЕ ФУНКЦИИ ДЛЯ МАСТЕР-АККАУНТА =====
         // ===========================================================
 
-        // Ключ Gemini больше НЕ хранится в браузере. Запрос идёт через Cloudflare Worker —
-        // он сам хранит ключ как зашифрованный Secret и обращается к Gemini API от своего имени.
-        // Это решает две проблемы сразу: ключ не виден в коде, и запрос идёт не с российского IP
-        // пользователя, а с сервера Cloudflare — поэтому Gemini больше не блокирует по геолокации.
+        // ===== УПРАВЛЕНИЕ СОТРУДНИКАМИ =====
+        function renderMasterEmployees() {
+            const grid = document.getElementById('masterEmpGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            // используем allUsersList
+            if (!allUsersList.length) {
+                grid.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Нет сотрудников</div>';
+                return;
+            }
+            allUsersList.forEach(u => {
+                const card = document.createElement('div');
+                card.className = 'cl-card';
+                const name = u.name || '—';
+                const role = u.role || '—';
+                const isBlocked = u.blocked === true;
+                const bg = u.color ? palByHex(u.color).bg : '#333';
+                const clr = u.color || '#fff';
+                const isMaster = u.isMaster === true;
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; gap:9px; align-items:center;">
+                            <div class="cl-av" style="background:${bg};color:${clr};">
+                                ${u.avatar && u.avatar.startsWith('data:image') ? `<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;">` : (name[0]?.toUpperCase()||'?')}
+                            </div>
+                            <div><div class="cl-nm">${escapeHTML(name)}</div><div class="cl-ph">${escapeHTML(role)}</div></div>
+                        </div>
+                        <div style="display:flex; gap:4px; align-items:center;">
+                            ${isMaster ? '<span style="color:var(--gold);font-size:10px;">👑 Мастер</span>' : ''}
+                            ${isBlocked ? '<span style="color:var(--red);font-size:10px;">🔒</span>' : ''}
+                            ${!isMaster ? `<button class="tb-btn" style="padding:2px 6px;font-size:10px;" onclick="toggleBlockUser('${u.uid}')">${isBlocked ? 'Разблокировать' : 'Заблокировать'}</button>` : ''}
+                            ${!isMaster ? `<button class="tb-btn" style="padding:2px 6px;font-size:10px;background:var(--red);color:#fff;" onclick="deleteUser('${u.uid}')">Удалить</button>` : ''}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        async function toggleBlockUser(uid) {
+            if (!isCurrentUserMaster()) return;
+            if (uid === window.PROFILE.uid) { alert('Нельзя заблокировать себя.'); return; }
+            const doc = await UC.doc(uid).get();
+            if (!doc.exists) return;
+            const current = doc.data().blocked || false;
+            await UC.doc(uid).update({ blocked: !current });
+            renderMasterEmployees();
+        }
+
+        async function deleteUser(uid) {
+            if (!isCurrentUserMaster()) return;
+            if (uid === window.PROFILE.uid) { alert('Нельзя удалить свой аккаунт.'); return; }
+            if (!confirm('Удалить этого пользователя навсегда? Это действие нельзя отменить.')) return;
+            try {
+                // Помечаем как заблокированного и удаляем из Auth (если есть admin SDK, но у нас нет – просто блокируем)
+                await UC.doc(uid).update({ blocked: true, deleted: true });
+                // Удаляем документ (опционально, но оставим для истории)
+                // await UC.doc(uid).delete();
+                renderMasterEmployees();
+                alert('Пользователь заблокирован и не сможет войти.');
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+            }
+        }
+
+        // ===== ПРИГЛАШЕНИЯ =====
+        async function generateInviteKey() {
+            if (!isCurrentUserMaster()) return alert('Доступно только мастеру.');
+            const key = 'INV-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Math.random().toString(36)
+                .substring(2, 8).toUpperCase();
+            await INVITES.add({
+                key,
+                createdBy: window.PROFILE.uid,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                used: false,
+                usedByPhone: null,
+                usedAt: null,
+                expiresAt: null
+            });
+            renderMasterInvites();
+        }
+
+        async function revokeInvite(id) {
+            if (!confirm('Отозвать этот ключ?')) return;
+            await INVITES.doc(id).delete();
+            renderMasterInvites();
+        }
+
+        function renderMasterInvites() {
+            const container = document.getElementById('inviteList');
+            if (!container) return;
+            INVITES.orderBy('createdAt', 'desc').onSnapshot(snap => {
+                container.innerHTML = '';
+                let count = 0;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    count++;
+                    const card = document.createElement('div');
+                    card.className = 'cl-card';
+                    card.style.padding = '10px';
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between;">
+                            <span style="font-family:monospace; font-weight:700;">${d.key}</span>
+                            <span style="font-size:10px; color:${d.used ? 'var(--green)' : 'var(--gold)'};">${d.used ? '✅ Использован' : '🟢 Активен'}</span>
+                        </div>
+                        <div style="font-size:10px; color:var(--text3); margin-top:4px;">
+                            ${d.used ? 'Использован: ' + (d.usedByPhone || '—') : 'Создан: ' + (d.createdAt?.toDate?.().toLocaleDateString() || '—')}
+                        </div>
+                        ${!d.used ? `<button class="tb-btn" style="margin-top:6px;" onclick="revokeInvite('${doc.id}')">Отозвать</button>` : ''}
+                    `;
+                    container.appendChild(card);
+                });
+                document.getElementById('inviteCount').textContent = count + ' ключей';
+            });
+        }
+
+        // ===== ЗАПРОСЫ НА ВОССТАНОВЛЕНИЕ ПАРОЛЯ =====
+        function openPasswordResetRequest() {
+            document.body.classList.add('modal-open');
+            document.getElementById('resetRequestPhone').value = '';
+            document.getElementById('moPasswordResetRequest').classList.add('open');
+        }
+
+        function closePasswordResetRequest() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('moPasswordResetRequest').classList.remove('open');
+        }
+
+        async function sendPasswordResetRequest() {
+            const phone = norm(document.getElementById('resetRequestPhone').value);
+            if (phone.length < 10) { alert('Введите корректный номер'); return; }
+            const snap = await UC.where('phone', '==', phone).get();
+            if (snap.empty) { alert('Пользователь с таким номером не найден.'); return; }
+            const userDoc = snap.docs[0];
+            const uid = userDoc.id;
+
+            await RESET_REQUESTS.add({
+                phone,
+                uid,
+                requestedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'pending',
+                tempPassword: null,
+                issuedAt: null
+            });
+
+            alert('Запрос отправлен администратору. Ожидайте временный пароль.');
+            closePasswordResetRequest();
+        }
+
+        function renderResetRequests() {
+            const container = document.getElementById('resetRequestsList');
+            if (!container) return;
+            RESET_REQUESTS.where('status', '==', 'pending').orderBy('requestedAt', 'desc').onSnapshot(snap => {
+                container.innerHTML = '';
+                if (snap.empty) {
+                    container.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Нет активных запросов</div>';
+                    return;
+                }
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 'cl-card';
+                    card.style.padding = '10px';
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between;">
+                            <span><strong>${d.phone}</strong></span>
+                            <span style="font-size:10px;color:var(--text3);">${d.requestedAt?.toDate?.().toLocaleString() || '—'}</span>
+                        </div>
+                        <div style="margin-top:6px;">
+                            <button class="tb-btn green-btn" onclick="openMasterResetAction('${doc.id}', '${d.phone}', '${d.uid}')">Выдать временный пароль</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function openMasterResetAction(requestId, phone, uid) {
+            if (!isCurrentUserMaster()) { alert('Доступно только мастеру.'); return; }
+            currentResetRequestId = requestId;
+            currentResetUid = uid;
+            document.getElementById('resetActionUser').textContent = phone;
+            document.getElementById('resetActionNewPass').value = '';
+            document.body.classList.add('modal-open');
+            document.getElementById('moMasterResetAction').classList.add('open');
+        }
+
+        function closeMasterResetAction() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('moMasterResetAction').classList.remove('open');
+            currentResetRequestId = null;
+            currentResetUid = null;
+        }
+
+        async function generateTempPassword() {
+            if (!currentResetRequestId || !currentResetUid) return;
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let pass = '';
+            for (let i = 0; i < 8; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+
+            await RESET_REQUESTS.doc(currentResetRequestId).update({
+                status: 'completed',
+                tempPassword: pass,
+                issuedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            await UC.doc(currentResetUid).update({
+                tempPassword: pass,
+                tempPasswordExpiry: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 24 * 60 * 60 * 1000))
+            });
+
+            document.getElementById('resetActionNewPass').value = pass;
+            alert('Временный пароль сгенерирован. Сообщите его пользователю.\nПароль: ' + pass);
+            setTimeout(closeMasterResetAction, 3000);
+            renderResetRequests();
+        }
+
+        // ===== ВСЕ ЗАПИСИ (МАСТЕР) =====
+        function populateMasterUserFilter() {
+            const sel = document.getElementById('masterFilterUser');
+            if (!sel) return;
+            sel.innerHTML = '<option value="all">Все</option>';
+            allUsersList.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.uid;
+                opt.textContent = u.name || u.phone || '—';
+                sel.appendChild(opt);
+            });
+        }
+
+        function renderMasterAllSessions() {
+            const grid = document.getElementById('masterAllSessionsGrid');
+            if (!grid) return;
+            const filterUid = document.getElementById('masterFilterUser')?.value || 'all';
+            let data = window.CRM;
+            if (filterUid !== 'all') data = data.filter(r => r.authorUid === filterUid);
+            data.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            grid.innerHTML = '';
+            if (!data.length) {
+                grid.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Нет записей</div>';
+                return;
+            }
+            data.forEach(r => {
+                const card = document.createElement('div');
+                card.className = 'fin-card';
+                const author = allUsersList.find(u => u.uid === r.authorUid)?.name || 'Неизвестный';
+                const isDone = r.completed;
+                card.innerHTML = `
+                    <div class="fin-header">
+                        <div class="fin-color-bar" style="background:${r.eventColor||'#9090a0'};"></div>
+                        <div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${escapeHTML(r.client||'—')}</div>
+                        <span style="font-size:10px;color:var(--text3);">${escapeHTML(author)}</span>
+                    </div>
+                    <div class="fin-details">
+                        <div class="detail-row"><span class="detail-label">Дата:</span> <span>${escapeHTML(r.date||'—')}</span></div>
+                        <div class="detail-row"><span class="detail-label">Время:</span> <span>${escapeHTML(r.time||'—')}</span></div>
+                        <div class="detail-row"><span class="detail-label">Сумма:</span> <span>${Number(r.total||0).toLocaleString()} ₽</span></div>
+                    </div>
+                    <div class="fin-actions">
+                        <div class="act-ic b" onclick="openEdit('${r.id}')"><i class="fa-solid fa-pen"></i></div>
+                        <div class="act-ic r" onclick="delRec('${r.id}')"><i class="fa-solid fa-trash"></i></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ===== ФИНАНСЫ СТУДИИ (МАСТЕР) =====
+        function renderMasterFinance() {
+            const allSessions = window.CRM;
+            let totalRev = 0,
+                totalDebt = 0;
+            const monthMap = new Array(12).fill(0);
+            allSessions.forEach(r => {
+                const paid = Number(r.total || 0);
+                const full = Number(r.fullTotal || r.total || 0);
+                totalRev += paid;
+                totalDebt += Math.max(0, full - paid);
+                if (r.completed && r.date) {
+                    const [d, m, y] = r.date.split('.');
+                    if (y === String(new Date().getFullYear())) {
+                        const idx = parseInt(m) - 1;
+                        if (idx >= 0 && idx < 12) monthMap[idx] += paid;
+                    }
+                }
+            });
+            document.getElementById('masterTotalRev').textContent = totalRev.toLocaleString() + ' ₽';
+            document.getElementById('masterTotalDebt').textContent = totalDebt.toLocaleString() + ' ₽';
+            document.getElementById('masterTotalSessions').textContent = allSessions.length;
+            document.getElementById('masterActiveUsers').textContent = allUsersList.filter(u => !u.blocked).length;
+
+            const chart = document.getElementById('masterMonthChart');
+            chart.innerHTML = '';
+            const max = Math.max(...monthMap, 1);
+            monthMap.forEach((v, i) => {
+                const h = (v / max) * 100;
+                const col = document.createElement('div');
+                col.className = 'bar-col';
+                col.innerHTML =
+                    `<div class="bar-val">${(v/1000).toFixed(0)}k</div><div class="bar" style="height:${Math.max(h,3)}%;background:var(--accent);"></div><div class="bar-lbl">${MNSh[i]}</div>`;
+                chart.appendChild(col);
+            });
+        }
+
+        // ===== ЦЕНТРАЛИЗОВАННЫЕ УСЛУГИ (МАСТЕР) =====
+        function renderMasterPackages() {
+            const container = document.getElementById('masterPackageList');
+            if (!container) return;
+            GLOBAL_PACKAGES.orderBy('createdAt', 'desc').onSnapshot(snap => {
+                container.innerHTML = '';
+                masterPackages = [];
+                snap.forEach(doc => {
+                    const p = { id: doc.id, ...doc.data() };
+                    masterPackages.push(p);
+                    const card = document.createElement('div');
+                    card.className = 'cl-card';
+                    card.style.padding = '8px 12px';
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span><span style="color:${p.color||'#fff'};">●</span> ${p.name}</span>
+                            <span style="font-weight:700;">${p.price} ₽</span>
+                            <div>
+                                <button class="tb-btn" style="padding:2px 6px;font-size:10px;" onclick="editMasterPackage('${doc.id}')"><i class="fa-solid fa-pen"></i></button>
+                                <button class="tb-btn" style="padding:2px 6px;font-size:10px;background:var(--red);color:#fff;" onclick="deleteMasterPackage('${doc.id}')"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        function openMasterAddPackage(pkgId) {
+            document.body.classList.add('modal-open');
+            if (pkgId) {
+                const p = masterPackages.find(x => x.id === pkgId);
+                if (p) {
+                    document.getElementById('masterPkgName').value = p.name;
+                    document.getElementById('masterPkgPrice').value = p.price;
+                    editingMasterPkgId = pkgId;
+                    document.querySelector('#moMasterAddPackage .mb-confirm').textContent = 'Сохранить';
+                }
+            } else {
+                document.getElementById('masterPkgName').value = '';
+                document.getElementById('masterPkgPrice').value = '';
+                editingMasterPkgId = null;
+                document.querySelector('#moMasterAddPackage .mb-confirm').textContent = 'Добавить';
+            }
+            const colorContainer = document.getElementById('masterPkgColorPick');
+            colorContainer.innerHTML = '';
+            PALETTE.forEach(p => {
+                const dot = document.createElement('div');
+                dot.style.cssText =
+                    `width:24px;height:24px;border-radius:50%;background:${p.hex};border:2px solid transparent;cursor:pointer;`;
+                dot.onclick = () => {
+                    colorContainer.querySelectorAll('div').forEach(d => d.style.borderColor = 'transparent');
+                    dot.style.borderColor = '#fff';
+                    window._masterPkgColor = p.hex;
+                };
+                colorContainer.appendChild(dot);
+            });
+            window._masterPkgColor = PALETTE[0].hex;
+            document.getElementById('moMasterAddPackage').classList.add('open');
+        }
+
+        function closeMasterAddPackage() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('moMasterAddPackage').classList.remove('open');
+            editingMasterPkgId = null;
+        }
+
+        async function saveMasterPackage() {
+            const name = document.getElementById('masterPkgName').value.trim();
+            const price = parseInt(document.getElementById('masterPkgPrice').value);
+            if (!name || isNaN(price) || price <= 0) { alert('Заполните поля'); return; }
+            const color = window._masterPkgColor || PALETTE[0].hex;
+            const data = { name, price, color, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+            if (editingMasterPkgId) {
+                await GLOBAL_PACKAGES.doc(editingMasterPkgId).update(data);
+            } else {
+                await GLOBAL_PACKAGES.add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            }
+            closeMasterAddPackage();
+            renderMasterPackages();
+        }
+
+        async function deleteMasterPackage(id) {
+            if (!confirm('Удалить услугу?')) return;
+            await GLOBAL_PACKAGES.doc(id).delete();
+            renderMasterPackages();
+        }
+
+        function editMasterPackage(id) {
+            openMasterAddPackage(id);
+        }
+
+        // ===== ГОЛОСОВОЙ ВВОД (GEMINI) — БЕЗ ИЗМЕНЕНИЙ =====
         const VOICE_PROXY_URL = 'https://shrill-sun-9a9f.dropshotrr4.workers.dev/';
 
         let voiceMediaRecorder = null;
@@ -6579,8 +7228,8 @@
         let voiceIsRecording = false;
         let voiceMaxTimer = null;
         let voiceReleaseTimer = null;
-        const VOICE_MAX_RECORD_MS = 15000; // защитный лимит записи
-        const VOICE_RELEASE_IDLE_MS = 90000; // через сколько простоя отпускаем микрофон (гасим индикатор записи)
+        const VOICE_MAX_RECORD_MS = 15000;
+        const VOICE_RELEASE_IDLE_MS = 90000;
 
         function showVoiceToast(text, autoHideMs) {
             const el = document.getElementById('voiceToast');
@@ -6606,7 +7255,7 @@
                     return t;
                 }
             }
-            return ''; // пусть браузер сам выберет формат по умолчанию
+            return '';
         }
 
         function releaseVoiceStream() {
@@ -6631,10 +7280,6 @@
                 return;
             }
             clearTimeout(voiceReleaseTimer);
-            // Запрашиваем доступ к микрофону только если ещё нет активного разрешённого потока —
-            // переиспользуем его для следующих записей. Раньше поток запрашивался и тут же
-            // полностью останавливался после каждой записи, из-за чего iOS на установленном
-            // (через "На экран Домой") приложении спрашивал разрешение на микрофон каждый раз.
             if (!voiceStreamIsLive()) {
                 try {
                     voiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -6656,8 +7301,6 @@
             voiceMediaRecorder.onstop = function() {
                 const usedType = voiceMediaRecorder.mimeType || mimeType || 'audio/webm';
                 const blob = new Blob(voiceChunks, { type: usedType });
-                // Поток микрофона не останавливаем сразу — оставляем "тёплым" на случай
-                // следующей записи, а гасим (releaseVoiceStream) только после простоя.
                 clearTimeout(voiceReleaseTimer);
                 voiceReleaseTimer = setTimeout(releaseVoiceStream, VOICE_RELEASE_IDLE_MS);
                 blobToVoiceCommand(blob, usedType);
@@ -6702,9 +7345,6 @@
             return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         }
 
-        // Ищет в window.CRM записи, подходящие под имя клиента (по подстроке, без учёта регистра)
-        // и дату (если она передана). Если совпадений по дате несколько и названо время — сужает по времени.
-        // Абонементы (isSubscription) из поиска исключаются — их перенос/удаление голосом не поддерживается.
         function findVoiceRecord(clientName, dateISO, timeStart) {
             const nameLower = (clientName || '').toLowerCase().trim();
             if (!nameLower) return [];
@@ -6733,7 +7373,9 @@
                 return;
             }
             if (candidates.length > 1) {
-                showVoiceToast('⚠️ Нашёл несколько записей «' + parsed.clientName + '» на ' + dateLabel + '. Уточните время в команде или удалите вручную.', 5500);
+                showVoiceToast(
+                    '⚠️ Нашёл несколько записей «' + parsed.clientName + '» на ' + dateLabel +
+                    '. Уточните время в команде или удалите вручную.', 5500);
                 return;
             }
             const row = candidates[0];
@@ -6744,7 +7386,8 @@
             const label = row.client + ' (' + row.date + (row.time ? ', ' + row.time : '') + ')';
             openSM('Удалить запись «' + label + '»?', 'delete', () => {
                 SC.doc(row.id).delete()
-                    .then(() => { showVoiceToast('🗑 Удалено: ' + label, 4000); closeSM(); })
+                    .then(() => { showVoiceToast('🗑 Удалено: ' + label, 4000);
+                        closeSM(); })
                     .catch(err => handleError(err, 'Ошибка при удалении записи.'));
             });
         }
@@ -6758,7 +7401,9 @@
                 return;
             }
             if (candidates.length > 1) {
-                showVoiceToast('⚠️ Нашёл несколько записей «' + parsed.clientName + '» на ' + dateLabel + '. Уточните время в команде или перенесите вручную.', 5500);
+                showVoiceToast(
+                    '⚠️ Нашёл несколько записей «' + parsed.clientName + '» на ' + dateLabel +
+                    '. Уточните время в команде или перенесите вручную.', 5500);
                 return;
             }
             const row = candidates[0];
@@ -6767,7 +7412,9 @@
                 return;
             }
             if (!parsed.newDate && !parsed.newTimeStart) {
-                showVoiceToast('⚠️ Не понял, на какую дату или время перенести. Скажите, например: «перенеси Иванова на пятницу» или «на 3 часа дня».', 5500);
+                showVoiceToast(
+                    '⚠️ Не понял, на какую дату или время перенести. Скажите, например: «перенеси Иванова на пятницу» или «на 3 часа дня».',
+                    5500);
                 return;
             }
             const newDateRu = parsed.newDate ? inputToDate(parsed.newDate) : row.date;
@@ -6778,10 +7425,10 @@
                 if (parsed.newTimeEnd) {
                     newTimeEnd = parsed.newTimeEnd;
                 } else if (row.duration && newTime) {
-                    // Время окончания не озвучено — сохраняем исходную длительность приёма
                     const [h, m] = newTime.split(':').map(Number);
                     const endMinutes = h * 60 + m + row.duration;
-                    newTimeEnd = String(Math.floor(endMinutes / 60) % 24).padStart(2, '0') + ':' + String(endMinutes % 60).padStart(2, '0');
+                    newTimeEnd = String(Math.floor(endMinutes / 60) % 24).padStart(2, '0') + ':' + String(endMinutes % 60)
+                        .padStart(2, '0');
                 }
             } else if (parsed.newTimeEnd) {
                 newTimeEnd = parsed.newTimeEnd;
@@ -6794,12 +7441,15 @@
                 if (d > 0) newDuration = d;
             }
             const updateData = { date: newDateRu, time: newTime, timeEnd: newTimeEnd, duration: newDuration };
-            const label = row.client + ': ' + row.date + (row.time ? ', ' + row.time : '') + ' → ' + newDateRu + (newTime ? ', ' + newTime + (newTimeEnd ? '–' + newTimeEnd : '') : '');
-            openSM('Перенести запись «' + row.client + '» на ' + newDateRu + (newTime ? ', ' + newTime : '') + '?', 'confirm', () => {
-                SC.doc(row.id).update(updateData)
-                    .then(() => { showVoiceToast('↪️ Перенесено: ' + label, 4800); closeSM(); })
-                    .catch(err => handleError(err, 'Ошибка при переносе записи.'));
-            }, '', 'Перенести');
+            const label = row.client + ': ' + row.date + (row.time ? ', ' + row.time : '') + ' → ' + newDateRu + (newTime ?
+                ', ' + newTime + (newTimeEnd ? '–' + newTimeEnd : '') : '');
+            openSM('Перенести запись «' + row.client + '» на ' + newDateRu + (newTime ? ', ' + newTime : '') + '?',
+                'confirm', () => {
+                    SC.doc(row.id).update(updateData)
+                        .then(() => { showVoiceToast('↪️ Перенесено: ' + label, 4800);
+                            closeSM(); })
+                        .catch(err => handleError(err, 'Ошибка при переносе записи.'));
+                }, '', 'Перенести');
         }
 
         async function blobToVoiceCommand(blob, mimeType) {
@@ -6827,12 +7477,9 @@
                 if (parsed.timeStart) document.getElementById('fTime').value = parsed.timeStart;
                 if (parsed.timeEnd) document.getElementById('fTimeEnd').value = parsed.timeEnd;
                 if (parsed.comment) document.getElementById('fComment').value = parsed.comment;
-                // Если Gemini нашёл, что названная услуга совпадает с одним из ваших пакетов —
-                // добавляем её как настоящую услугу (с ценой), а не просто текстом в комментарий.
                 if (parsed.matchedPackage) {
                     const pkg = userPackages.find(p => p.name === parsed.matchedPackage);
                     if (pkg) {
-                        // Вычисляем длительность в часах, чтобы добавить нужное количество пакетов
                         let hoursCount = 1;
                         if (parsed.timeStart && parsed.timeEnd) {
                             const [h1, m1] = parsed.timeStart.split(':').map(Number);
@@ -6841,17 +7488,12 @@
                             if (durationMin > 0) hoursCount = Math.round(durationMin / 60);
                             if (hoursCount < 1) hoursCount = 1;
                         }
-                        // Добавляем пакет hoursCount раз — fullPrice = цена пакета, price тоже
-                        // (реальную сумму «внесено» выставим через поле fPrepaid ниже)
                         for (let i = 0; i < hoursCount; i++) {
                             addPreSvc(pkg.name, pkg.price, pkg.color, true);
                         }
                         renderFormSvcs();
                     }
                 }
-                // Выставляем поле «Внесено»:
-                // — если paidAmount явно назван (даже 0) — используем его
-                // — если не назван — ставим 0 (пусть мастер сам проставит при получении)
                 const prepaidEl = document.getElementById('fPrepaid');
                 if (prepaidEl) {
                     const pa = (parsed.paidAmount !== undefined && parsed.paidAmount !== null)
@@ -6860,7 +7502,8 @@
                 }
                 await saveRecord();
                 const range = parsed.timeStart ? (parsed.timeStart + (parsed.timeEnd ? '–' + parsed.timeEnd : '')) : '';
-                const depositNote = (parsed.paidAmount && parsed.paidAmount > 0) ? (', внесено ' + parsed.paidAmount.toLocaleString() + ' ₽') : '';
+                const depositNote = (parsed.paidAmount && parsed.paidAmount > 0) ? (', внесено ' + parsed.paidAmount
+                    .toLocaleString() + ' ₽') : '';
                 showVoiceToast('✅ Добавлено: ' + parsed.clientName + ' ' + range + depositNote, 4500);
             } catch (e) {
                 console.error(e);
@@ -6889,7 +7532,7 @@
             return data;
         }
 
-        console.log('✅ CRM v3 — свайп-индикатор фиолетовый, плашка периода, разграничение сортировок, красное время будущих записей.');
+        console.log('✅ CRM v3 с мастер-аккаунтом полностью интегрирована.');
     </script>
     <div class="voice-toast" id="voiceToast"></div>
 
