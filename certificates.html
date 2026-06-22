@@ -650,6 +650,110 @@
             border-color: var(--border2);
             background: var(--surface2);
         }
+        /* ===== ПРИГЛАШЕНИЯ: компактные карточки ключей ===== */
+        .invite-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 280px));
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .inv-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 12px;
+            transition: .15s;
+        }
+        .inv-card:hover {
+            border-color: var(--border2);
+            background: var(--surface2);
+        }
+        .inv-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .inv-num {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text3);
+            background: var(--surface3);
+            border-radius: 999px;
+            padding: 2px 8px;
+        }
+        .inv-status {
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .inv-key-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 6px 6px 6px 10px;
+            margin-bottom: 8px;
+        }
+        .inv-key-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .inv-copy-btn {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--border);
+            background: var(--surface3);
+            color: var(--text2);
+            cursor: pointer;
+            transition: .15s;
+            font-size: 12px;
+        }
+        .inv-copy-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent2);
+            background: var(--accent-bg);
+        }
+        .inv-copy-btn.copied {
+            border-color: var(--green);
+            color: var(--green);
+            background: var(--green-bg);
+        }
+        .inv-meta {
+            font-size: 11px;
+            color: var(--text2);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .inv-meta .inv-meta-label {
+            color: var(--text3);
+        }
+        .inv-role-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: var(--accent-bg);
+            color: var(--accent2);
+            margin-top: 2px;
+        }
         .cl-top {
             display: flex;
             align-items: center;
@@ -3166,11 +3270,11 @@
                 <!-- Приглашения -->
                 <div id="secMasterInvites" class="view" style="display:none;">
                     <div class="toolbar">
-                        <button class="tb-btn green-btn" onclick="generateInviteKey()"><i class="fa-solid fa-plus"></i> Сгенерировать ключ</button>
+                        <button class="tb-btn green-btn" onclick="openInviteModal()"><i class="fa-solid fa-plus"></i> Сгенерировать ключ</button>
                         <span style="font-size:11px;color:var(--text3);" id="inviteCount">0 ключей</span>
                     </div>
                     <div class="certs-wrap">
-                        <div id="inviteList" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;"></div>
+                        <div id="inviteList" class="invite-grid"></div>
                     </div>
                 </div>
 
@@ -3355,6 +3459,36 @@
             <div class="mb-btns">
                 <button class="mb-btn mb-cancel" onclick="closeCertModal()">Отмена</button>
                 <button class="mb-btn mb-confirm" onclick="activateCert()">Активировать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для генерации ключа-приглашения -->
+    <div class="mo" id="moInvite">
+        <div class="mb" style="width:420px;max-width:95vw;">
+            <div class="mb-header">
+                <div class="mb-title">Новый ключ-приглашение</div>
+                <div class="mb-close" onclick="closeInviteModal()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <div class="f-row">
+                <div class="f-group"><div class="f-label">Имя</div><input type="text" id="invFirstName" class="f-inp" placeholder="Имя сотрудника"></div>
+                <div class="f-group"><div class="f-label">Фамилия</div><input type="text" id="invLastName" class="f-inp" placeholder="Фамилия"></div>
+            </div>
+            <div class="f-group">
+                <div class="f-label">Номер телефона</div>
+                <input type="tel" id="invPhone" class="f-inp" placeholder="+7 900 000-00-00" inputmode="tel">
+            </div>
+            <div class="f-group">
+                <div class="f-label">Должность</div>
+                <div class="auth-roles" id="invRoles">
+                    <div class="auth-role sel" data-role="Звукорежиссёр" onclick="selInviteRole(this)">🎧 Звук</div>
+                    <div class="auth-role" data-role="Вокал" onclick="selInviteRole(this)">🎤 Вокал</div>
+                    <div class="auth-role" data-role="Гитара" onclick="selInviteRole(this)">🎸 Гитара</div>
+                </div>
+            </div>
+            <div class="mb-btns">
+                <button class="mb-btn mb-cancel" onclick="closeInviteModal()">Отмена</button>
+                <button class="mb-btn mb-confirm" onclick="generateInviteKey()">Сгенерировать</button>
             </div>
         </div>
     </div>
@@ -6829,9 +6963,41 @@
             }
         }
 
-        // ===== ПРИГЛАШЕНИЯ (исправлено: добавлена обработка ошибок) =====
+        // ===== ПРИГЛАШЕНИЯ (попап с данными сотрудника + копирование ключа) =====
+        let _inviteSelectedRole = 'Звукорежиссёр';
+
+        function openInviteModal() {
+            if (!isCurrentUserMaster()) return alert('Доступно только мастеру.');
+            document.body.classList.add('modal-open');
+            document.getElementById('invFirstName').value = '';
+            document.getElementById('invLastName').value = '';
+            document.getElementById('invPhone').value = '';
+            _inviteSelectedRole = 'Звукорежиссёр';
+            document.querySelectorAll('#invRoles .auth-role').forEach(o => o.classList.remove('sel'));
+            document.querySelector('#invRoles .auth-role[data-role="Звукорежиссёр"]').classList.add('sel');
+            document.getElementById('moInvite').classList.add('open');
+        }
+
+        function closeInviteModal() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('moInvite').classList.remove('open');
+        }
+
+        function selInviteRole(el) {
+            document.querySelectorAll('#invRoles .auth-role').forEach(o => o.classList.remove('sel'));
+            el.classList.add('sel');
+            _inviteSelectedRole = el.dataset.role;
+        }
+
         async function generateInviteKey() {
             if (!isCurrentUserMaster()) return alert('Доступно только мастеру.');
+            const firstName = document.getElementById('invFirstName').value.trim();
+            const lastName = document.getElementById('invLastName').value.trim();
+            const phone = document.getElementById('invPhone').value.trim();
+            const role = _inviteSelectedRole || 'Звукорежиссёр';
+            if (!firstName) {
+                return alert('Укажите имя сотрудника.');
+            }
             try {
                 const key = 'INV-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Math.random().toString(36)
                     .substring(2, 8).toUpperCase();
@@ -6839,13 +7005,18 @@
                     key,
                     createdBy: window.PROFILE.uid,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    employeeFirstName: firstName,
+                    employeeLastName: lastName,
+                    employeePhone: phone,
+                    employeeRole: role,
                     used: false,
                     usedByPhone: null,
                     usedAt: null,
                     expiresAt: null
                 });
+                closeInviteModal();
                 renderMasterInvites();
-                alert('✅ Ключ ' + key + ' успешно создан!');
+                showVoiceToast('✅ Ключ ' + key + ' создан для ' + firstName + (lastName ? ' ' + lastName : ''), 4000);
             } catch (e) {
                 console.error('❌ Ошибка генерации ключа:', e);
                 alert('❌ Не удалось создать ключ. Возможно, коллекция "invites" не создана в Firestore, или недостаточно прав.\n\n' +
@@ -6859,27 +7030,74 @@
             renderMasterInvites();
         }
 
+        function copyInviteKey(btn, key) {
+            const doCopiedUI = () => {
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.classList.remove('copied');
+                }, 1500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(key).then(doCopiedUI).catch(() => {
+                    fallbackCopy(key);
+                    doCopiedUI();
+                });
+            } else {
+                fallbackCopy(key);
+                doCopiedUI();
+            }
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+        }
+
+        const ROLE_EMOJI = { 'Звукорежиссёр': '🎧', 'Вокал': '🎤', 'Гитара': '🎸' };
+
         function renderMasterInvites() {
             const container = document.getElementById('inviteList');
             if (!container) return;
             INVITES.orderBy('createdAt', 'desc').onSnapshot(snap => {
                 container.innerHTML = '';
                 let count = 0;
-                snap.forEach(doc => {
+                const docs = snap.docs;
+                const total = docs.length;
+                docs.forEach((doc, idx) => {
                     const d = doc.data();
                     count++;
+                    const num = total - idx;
+                    const fullName = [d.employeeFirstName, d.employeeLastName].filter(Boolean).join(' ') || '—';
+                    const roleEmoji = ROLE_EMOJI[d.employeeRole] || '👤';
                     const card = document.createElement('div');
-                    card.className = 'cl-card';
-                    card.style.padding = '10px';
+                    card.className = 'inv-card';
                     card.innerHTML = `
-                        <div style="display:flex; justify-content:space-between;">
-                            <span style="font-family:monospace; font-weight:700;">${d.key}</span>
-                            <span style="font-size:10px; color:${d.used ? 'var(--green)' : 'var(--gold)'};">${d.used ? '✅ Использован' : '🟢 Активен'}</span>
+                        <div class="inv-top">
+                            <span class="inv-num">#${num}</span>
+                            <span class="inv-status" style="color:${d.used ? 'var(--green)' : 'var(--gold)'};">${d.used ? '✅ Использован' : '🟢 Активен'}</span>
                         </div>
-                        <div style="font-size:10px; color:var(--text3); margin-top:4px;">
+                        <div class="inv-key-row">
+                            <span class="inv-key-text">${d.key}</span>
+                            <button class="inv-copy-btn" title="Скопировать ключ" onclick="copyInviteKey(this, '${d.key}')"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                        <div class="inv-meta">
+                            <span class="inv-meta-label">Сотрудник:</span> ${fullName}<br>
+                            ${d.employeePhone ? `<span class="inv-meta-label">Телефон:</span> ${d.employeePhone}<br>` : ''}
+                            <span class="inv-role-chip">${roleEmoji} ${d.employeeRole || '—'}</span>
+                        </div>
+                        <div class="inv-meta" style="margin-bottom:0;">
                             ${d.used ? 'Использован: ' + (d.usedByPhone || '—') : 'Создан: ' + (d.createdAt?.toDate?.().toLocaleDateString() || '—')}
                         </div>
-                        ${!d.used ? `<button class="tb-btn" style="margin-top:6px;" onclick="revokeInvite('${doc.id}')">Отозвать</button>` : ''}
+                        ${!d.used ? `<button class="tb-btn" style="margin-top:8px;width:100%;justify-content:center;" onclick="revokeInvite('${doc.id}')">Отозвать</button>` : ''}
                     `;
                     container.appendChild(card);
                 });
