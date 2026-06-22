@@ -5118,6 +5118,15 @@
                     window.ALL_USERS[d.id] = data;
                     allUsersList.push(data);
                 });
+
+                // ===== РЕАЛ-ТАЙМ ПРОВЕРКА БЛОКИРОВКИ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ =====
+                const myUid = window.PROFILE?.uid;
+                if (myUid && window.ALL_USERS[myUid] && window.ALL_USERS[myUid].blocked === true) {
+                    alert('Ваш аккаунт заблокирован администратором. Доступ закрыт.');
+                    auth.signOut();
+                    return;
+                }
+
                 if (document.getElementById('secEmployees').style.display !== 'none') renderEmployees();
                 if (document.getElementById('secMasterEmployees').style.display !== 'none') renderMasterEmployees();
                 populateMasterUserFilter();
@@ -7737,6 +7746,16 @@
                     if (!p) {
                         const ph = (user.email || '').split('@')[0];
                         p = { name: ph, phone: ph, role: 'Сотрудник', color: PALETTE[0].hex };
+                    }
+                    if (p.blocked === true) {
+                        console.warn('🚫 Пользователь заблокирован, выход из системы.');
+                        await auth.signOut();
+                        loader.classList.add('hidden');
+                        setTimeout(() => { loader.style.display = 'none'; }, 800);
+                        document.getElementById('authScreen').style.display = 'flex';
+                        document.getElementById('appRoot').style.display = 'none';
+                        alert('Ваш аккаунт заблокирован администратором. Обратитесь к мастеру студии.');
+                        return;
                     }
                     p.uid = user.uid;
                     if (!p.color) p.color = PALETTE[0].hex;
