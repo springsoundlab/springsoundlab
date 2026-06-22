@@ -5003,7 +5003,28 @@
             if (window.PROFILE) {
                 UC.doc(window.PROFILE.uid).update({ masterMode: isMasterMode }).catch(err => console.warn(err));
             }
+            // При включении мастер-режима — физически удаляем старые soft-deleted записи из базы
+            if (isMasterMode) {
+                cleanupSoftDeletedRecords();
+            }
         };
+
+        // Физическое удаление записей, помеченных soft-delete (deleted: true)
+        // Вызывается автоматически при включении мастер-режима
+        async function cleanupSoftDeletedRecords() {
+            if (!isCurrentUserMaster()) return;
+            try {
+                const snap = await SC.where('deleted', '==', true).get();
+                if (snap.empty) return;
+                const batch = db.batch();
+                snap.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+                console.log(`✅ Мастер: физически удалено ${snap.size} soft-deleted записей из базы.`);
+            } catch (err) {
+                // Если нет прав — значит правила Firestore нужно обновить (см. комментарий в delRec)
+                console.warn('⚠️ Не удалось очистить soft-deleted записи:', err.message);
+            }
+        }
 
         // Обработка аватара
         function handleAvatarUpload(event) {
@@ -5460,7 +5481,16 @@
                     const isDone = ev.completed;
                     const evName = escapeHTML(ev.client || ev.song || '—');
                     const evSvc = escapeHTML(ev.services || ev.type || '');
-                    const statusDot = (isSound && isAuthorOf(ev)) ?
+                    // Кружочек статуса — ТОЛЬКО для звукорежиссёров на их собственных записях.
+                    // В мастер-режиме при просмотре чужих записей кружочек НЕ показывается.
+                    const isOwnRecord = ev.authorUid === window.PROFILE?.uid ||
+                        (!ev.authorUid && ev.authorPhone && typeof norm === 'function' && norm(ev.authorPhone) === norm(window.PROFILE?.phone || ''));
+                    const evAuthorIsSound = (() => {
+                        if (!ev.authorUid) return isOwnRecord && isSound;
+                        const authorProfile = window.ALL_USERS && window.ALL_USERS[ev.authorUid];
+                        return authorProfile ? authorProfile.role === 'Звукорежиссёр' : (isOwnRecord && isSound);
+                    })();
+                    const statusDot = (evAuthorIsSound && isOwnRecord) ?
                         `<div class="cal-event-status ${isDone ? 'done' : 'pending'}" title="${isDone ? 'Готово' : 'В работе'}"></div>` :
                         '';
                     const evEl = document.createElement('div');
@@ -5575,13 +5605,44 @@
             if (btn) lockButton(btn);
             openSM('Удалить запись?', 'delete', () => {
                 const isMasterDeletingOthers = isCurrentUserMaster() && isMasterMode && row.authorUid !== window.PROFILE.uid;
-                const deleteOp = isMasterDeletingOthers
-                    ? SC.doc(id).update({ deleted: true, deletedByMaster: true, deletedAt: Date.now() })
-                    : SC.doc(id).delete();
-                deleteOp.catch(err => { handleError(err, 'Ошибка при удалении записи.'); if (btn)
-                        unlockButton(btn); }).finally(() => { setTimeout(() => { if (btn) unlockButton(
-                            btn); }, 500);
-                    closeSM(); });
+                if (isMasterDeletingOthers) {
+                    // Мастер удаляет чужую запись — пробуем физическое удаление
+                    SC.doc(id).delete()
+                        .then(() => {
+                            // Физически удалено из Firestore — убираем из локального массива
+                            window.CRM = window.CRM.filter(r => r.id !== id);
+                            renderAll();
+                        })
+                        .catch(err => {
+                            console.warn('Физическое удаление не прошло (правила Firestore):', err.code, '— делаем soft delete и убираем локально');
+                            // Fallback: помечаем { deleted: true } и сразу убираем из UI
+                            SC.doc(id).update({ deleted: true, deletedByMaster: true, deletedAt: Date.now() })
+                                .then(() => {
+                                    window.CRM = window.CRM.filter(r => r.id !== id);
+                                    renderAll();
+                                })
+                                .catch(err2 => {
+                                    handleError(err2, 'Ошибка при удалении записи.');
+                                    if (btn) unlockButton(btn);
+                                });
+                        })
+                        .finally(() => {
+                            setTimeout(() => { if (btn) unlockButton(btn); }, 500);
+                            closeSM();
+                        });
+                } else {
+                    // Обычное удаление своей записи
+                    SC.doc(id).delete()
+                        .then(() => {
+                            window.CRM = window.CRM.filter(r => r.id !== id);
+                            renderAll();
+                        })
+                        .catch(err => { handleError(err, 'Ошибка при удалении записи.'); if (btn) unlockButton(btn); })
+                        .finally(() => {
+                            setTimeout(() => { if (btn) unlockButton(btn); }, 500);
+                            closeSM();
+                        });
+                }
             });
         };
 
