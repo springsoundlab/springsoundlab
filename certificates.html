@@ -5925,29 +5925,39 @@
                 card.appendChild(progWrap);
                 const detailsDiv = document.createElement('div');
                 detailsDiv.className = 'fin-details';
-                const timeStr = r.time ? 'в ' + escapeHTML(r.time) + (r.timeEnd ? ' — ' + escapeHTML(r.timeEnd) : '') :
-                '—';
-                // Подсвечиваем время красным, если запись на будущее (дата/время ещё не наступили)
-                let timeHtml;
-                if (r.time && r.date) {
+                const timeStr = r.time ? escapeHTML(r.time) + (r.timeEnd ? ' — ' + escapeHTML(r.timeEnd) : '') : '—';
+                // Подсвечиваем время и дату приглушённым красным, если запись на будущее
+                let timeHtml, dateHtml;
+                if (r.date) {
                     const recordDate = parseDate(r.date);
                     const now = new Date();
-                    const [rh, rm] = r.time.split(':').map(Number);
-                    const recordDT = new Date(recordDate.getFullYear(), recordDate.getMonth(), recordDate.getDate(), rh, rm);
-                    const isFuture = recordDT > now;
+                    let isFuture = false;
+                    if (r.time) {
+                        const [rh, rm] = r.time.split(':').map(Number);
+                        const recordDT = new Date(recordDate.getFullYear(), recordDate.getMonth(), recordDate.getDate(), rh, rm);
+                        isFuture = recordDT > now;
+                    } else {
+                        // Нет времени — сравниваем только по дате (конец дня)
+                        const endOfDay = new Date(recordDate.getFullYear(), recordDate.getMonth(), recordDate.getDate(), 23, 59);
+                        isFuture = endOfDay > now;
+                    }
+                    const futureStyle = 'color:rgba(255,92,106,0.75);font-weight:700;';
                     if (isFuture) {
-                        const tStr = escapeHTML(r.time) + (r.timeEnd ? ' — ' + escapeHTML(r.timeEnd) : '');
-                        timeHtml = 'в <span style="color:var(--red);font-weight:700;">' + tStr + '</span>';
+                        timeHtml = r.time
+                            ? '<span style="' + futureStyle + '">' + escapeHTML(r.time) + (r.timeEnd ? ' — ' + escapeHTML(r.timeEnd) : '') + '</span>'
+                            : '—';
+                        dateHtml = '<span style="' + futureStyle + '">' + escapeHTML(r.date || '—') + '</span>';
                     } else {
                         timeHtml = timeStr;
+                        dateHtml = escapeHTML(r.date || '—');
                     }
                 } else {
                     timeHtml = timeStr;
+                    dateHtml = '—';
                 }
                 const servicesStr = escapeHTML(r.services || 'Услуги не указаны');
-                const dateStr = escapeHTML(r.date || '—');
                 detailsDiv.innerHTML =
-                    `<div class="detail-row"><span class="detail-label">Дата:</span> <span>${dateStr}</span></div><div class="detail-row"><span class="detail-label">Время:</span> <span>${timeHtml}</span></div><div class="detail-row"><span class="detail-label">Услуги:</span> <span>${servicesStr}</span></div>`;
+                    `<div class="detail-row"><span class="detail-label">Дата:</span> <span>${dateHtml}</span></div><div class="detail-row"><span class="detail-label">Время:</span> <span>${timeHtml}</span></div><div class="detail-row"><span class="detail-label">Услуги:</span> <span>${servicesStr}</span></div>`;
                 card.appendChild(detailsDiv);
                 const stats = document.createElement('div');
                 stats.className = 'fin-stats';
