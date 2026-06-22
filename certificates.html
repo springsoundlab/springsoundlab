@@ -1770,7 +1770,7 @@
             align-items: baseline;
             padding: 8px 0;
             border-top: 1px solid var(--border);
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
         .total-lbl {
             font-size: 11px;
@@ -1784,6 +1784,43 @@
         .total-val.sub-usage {
             color: var(--gold);
             font-size: 22px;
+        }
+        /* Строка «Внесено» в форме записи */
+        .prepaid-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0 12px 0;
+        }
+        .prepaid-input-row .pi-lbl {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            white-space: nowrap;
+        }
+        .prepaid-input-row input {
+            flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 7px 10px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            transition: .15s;
+            min-width: 0;
+        }
+        .prepaid-input-row input:focus {
+            border-color: var(--accent);
+        }
+        .prepaid-input-row .pi-hint {
+            font-size: 11px;
+            color: var(--text3);
+            white-space: nowrap;
         }
 
         .prepaid-row {
@@ -3191,6 +3228,11 @@
                 </div>
                 <div class="added-svcs" id="addedSvcs"></div>
                 <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val pv" id="formTotal">0 ₽</div></div>
+                <div class="prepaid-input-row" id="prepaidInputRow">
+                    <span class="pi-lbl">Внесено</span>
+                    <input type="number" id="fPrepaid" placeholder="0" min="0" oninput="onPrepaidInput()" inputmode="numeric">
+                    <span class="pi-hint" id="prepaidHint">из 0 ₽</span>
+                </div>
                 <div class="f-row full">
                     <div class="f-group"><div class="f-label">Комментарий / Заметка</div><textarea id="fComment" class="f-inp" placeholder="Детали записи, пожелания клиента..."></textarea></div>
                 </div>
@@ -4021,6 +4063,7 @@
 
         function updateTotalDisplay() {
             const totalEl = document.getElementById('formTotal');
+            const hintEl = document.getElementById('prepaidHint');
             if (_subClientHasSubscription && _subClientSubData) {
                 const used = _subClientSubData.used || 0;
                 const total = _subClientSubData.total || 0;
@@ -4034,7 +4077,13 @@
                 totalEl.className = 'total-val pv';
                 totalEl.title = '';
             }
+            if (hintEl) hintEl.textContent = 'из ' + formTotal.toLocaleString() + ' ₽';
             if (!privacyOn && !_subClientHasSubscription) applyBlur();
+        }
+
+        function onPrepaidInput() {
+            const hintEl = document.getElementById('prepaidHint');
+            if (hintEl) hintEl.textContent = 'из ' + formTotal.toLocaleString() + ' ₽';
         }
 
         // ===== МУЛЬТИТАЧ =====
@@ -5263,6 +5312,8 @@
             document.getElementById('preToggle').checked = false;
             document.getElementById('colorPreview').style.background = selectedFormColor;
             document.getElementById('formColorNote').textContent = 'Ваш цвет';
+            const prepaidEl = document.getElementById('fPrepaid');
+            if (prepaidEl) prepaidEl.value = '';
             renderFormSvcs();
             setupFormMode();
             const modal = document.getElementById('moRecord');
@@ -5310,6 +5361,9 @@
             document.getElementById('fPhone').value = row.phone || '';
             document.getElementById('fComment').value = row.comment || '';
             document.getElementById('preToggle').checked = false;
+            // При редактировании заполняем поле «Внесено» из сохранённого total
+            const prepaidEl = document.getElementById('fPrepaid');
+            if (prepaidEl) prepaidEl.value = (row.total !== undefined && row.total !== null) ? row.total : '';
             document.getElementById('colorPreview').style.background = selectedFormColor;
             document.getElementById('formColorNote').textContent = 'Ваш цвет';
             renderFormSvcs();
@@ -5530,7 +5584,10 @@
                 const details = JSON.parse(JSON.stringify(formDetails));
                 const svcsLabel = details.length ? details.map(i => i.name).join(', ') : type;
                 const fullT = details.reduce((s, i) => s + (i.fullPrice || i.price), 0) || 0;
-                const paid = details.reduce((s, i) => s + i.price, 0) || 0;
+                // Поле «Внесено»: если заполнено — используем его, иначе считаем как полная оплата
+                const prepaidEl = document.getElementById('fPrepaid');
+                const prepaidVal = prepaidEl && prepaidEl.value !== '' ? parseInt(prepaidEl.value) : NaN;
+                const paid = !isNaN(prepaidVal) ? Math.max(0, Math.min(prepaidVal, fullT)) : fullT;
                 let duration = 60;
                 if (time && timeEnd) {
                     const [h1, m1] = time.split(':').map(Number);
@@ -6814,28 +6871,22 @@
                             if (durationMin > 0) hoursCount = Math.round(durationMin / 60);
                             if (hoursCount < 1) hoursCount = 1;
                         }
-                        // Добавляем пакет hoursCount раз (по одному часу за раз)
+                        // Добавляем пакет hoursCount раз — fullPrice = цена пакета, price тоже
+                        // (реальную сумму «внесено» выставим через поле fPrepaid ниже)
                         for (let i = 0; i < hoursCount; i++) {
-                            addPreSvc(pkg.name, pkg.price, pkg.color);
+                            addPreSvc(pkg.name, pkg.price, pkg.color, true);
                         }
-                        // "Предоплата"/"внесено" — это сумма, которую клиент дал сейчас, а НЕ полная
-                        // цена пакета. Меняем только "оплачено сейчас" у последнего добавленного.
-                        if (parsed.paidAmount && parsed.paidAmount > 0 && parsed.paidAmount < pkg.price * hoursCount) {
-                            // Убираем все добавленные позиции и ставим одну итоговую с нужной суммой
-                            const totalFull = pkg.price * hoursCount;
-                            formDetails.splice(formDetails.length - hoursCount, hoursCount);
-                            formTotal = formDetails.reduce((s, i) => s + i.price, 0);
-                            formDetails.push({
-                                name: pkg.name + (hoursCount > 1 ? ' × ' + hoursCount + ' ч' : '') + ' (внесено ' + parsed.paidAmount.toLocaleString() + ' ₽)',
-                                price: parsed.paidAmount,
-                                fullPrice: totalFull,
-                                originalColor: pkg.color,
-                                basePrice: pkg.price
-                            });
-                            formTotal += parsed.paidAmount;
-                            renderFormSvcs();
-                        }
+                        renderFormSvcs();
                     }
+                }
+                // Выставляем поле «Внесено»:
+                // — если paidAmount явно назван (даже 0) — используем его
+                // — если не назван — ставим 0 (пусть мастер сам проставит при получении)
+                const prepaidEl = document.getElementById('fPrepaid');
+                if (prepaidEl) {
+                    const pa = (parsed.paidAmount !== undefined && parsed.paidAmount !== null)
+                        ? parsed.paidAmount : 0;
+                    prepaidEl.value = pa;
                 }
                 await saveRecord();
                 const range = parsed.timeStart ? (parsed.timeStart + (parsed.timeEnd ? '–' + parsed.timeEnd : '')) : '';
