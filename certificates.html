@@ -3626,7 +3626,7 @@
             </div>
         </div>
     </div>
-        <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+           <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
     </script>
@@ -4409,7 +4409,7 @@
             e.textContent = m;
             e.style.display = 'block'; }
 
-        // ===== ОБНОВЛЁННЫЙ doLogin (с поддержкой временного пароля) =====
+        // ===== ОБНОВЛЁННЫЙ doLogin (с поддержкой временного пароля и проверкой blocked) =====
         window.doLogin = async function() {
             document.getElementById('authErr').style.display = 'none';
             const ph = norm(document.getElementById('loginPhone').value);
@@ -4425,6 +4425,14 @@
                     const doc = await UC.doc(user.uid).get();
                     if (doc.exists) {
                         const data = doc.data();
+                        // Проверка на блокировку
+                        if (data.blocked === true) {
+                            await auth.signOut();
+                            showErr('Ваш аккаунт заблокирован. Обратитесь к администратору.');
+                            unlockButton(btn);
+                            return;
+                        }
+                        // Проверка временного пароля
                         if (data.tempPassword && data.tempPasswordExpiry && data.tempPasswordExpiry.toDate() > new Date()) {
                             const newPass = prompt('Вы вошли по временному паролю. Установите новый постоянный пароль:');
                             if (newPass && newPass.length >= 8) {
@@ -4485,7 +4493,8 @@
                     finFilter: 'all',
                     finPeriod: 'all',
                     theme: 'dark',
-                    isMaster: false
+                    isMaster: false,
+                    blocked: false // по умолчанию не заблокирован
                 });
 
                 await doc.ref.update({
@@ -6803,16 +6812,20 @@
             renderMasterEmployees();
         }
 
+        // УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ (улучшено)
         async function deleteUser(uid) {
             if (!isCurrentUserMaster()) return;
             if (uid === window.PROFILE.uid) { alert('Нельзя удалить свой аккаунт.'); return; }
             if (!confirm('Удалить этого пользователя навсегда? Это действие нельзя отменить.')) return;
             try {
+                // 1. Блокируем пользователя в Firestore (чтобы он не мог войти)
                 await UC.doc(uid).update({ blocked: true, deleted: true });
+                // 2. (Опционально) Удаляем все его сессии (записи) – но лучше оставить для истории
+                // 3. Показываем уведомление
                 renderMasterEmployees();
-                alert('Пользователь заблокирован и не сможет войти.');
+                alert('✅ Пользователь заблокирован и удалён из системы. Он не сможет войти без нового ключа.');
             } catch (e) {
-                alert('Ошибка: ' + e.message);
+                alert('❌ Ошибка при удалении: ' + e.message);
             }
         }
 
@@ -7615,4 +7628,5 @@
 
     <div class="voice-toast" id="voiceToast"></div>
 </body>
+</html>
 </html>
