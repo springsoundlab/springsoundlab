@@ -1025,7 +1025,9 @@
         .fin-card .fin-details .detail-row span:last-child {
             min-width: 0;
             text-align: right;
-            overflow-wrap: anywhere;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .fin-card .fin-details .detail-label {
             color: var(--text3);
@@ -1785,43 +1787,7 @@
             color: var(--gold);
             font-size: 22px;
         }
-        /* Строка «Внесено» в форме записи */
-        .prepaid-input-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 0 12px 0;
-        }
-        .prepaid-input-row .pi-lbl {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text3);
-            text-transform: uppercase;
-            letter-spacing: .4px;
-            white-space: nowrap;
-        }
-        .prepaid-input-row input {
-            flex: 1;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: var(--r-sm);
-            padding: 7px 10px;
-            color: var(--text);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            font-weight: 600;
-            outline: none;
-            transition: .15s;
-            min-width: 0;
-        }
-        .prepaid-input-row input:focus {
-            border-color: var(--accent);
-        }
-        .prepaid-input-row .pi-hint {
-            font-size: 11px;
-            color: var(--text3);
-            white-space: nowrap;
-        }
+        /* (prepaid-input-row removed, field now inline in form grid) */
 
         .prepaid-row {
             display: flex;
@@ -3186,6 +3152,16 @@
                         <div class="f-group"><div class="f-label">Имя клиента</div><input type="text" id="fName" class="f-inp" placeholder="Иван Иванов" oninput="checkSubscriptionForClient()"></div>
                         <div class="f-group"><div class="f-label">Телефон</div><input type="tel" id="fPhone" class="f-inp" placeholder="+7 900 000-00-00" inputmode="tel"></div>
                     </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="f-group">
+                            <div class="f-label">Внесено (₽)</div>
+                            <input type="number" id="fPrepaid" class="f-inp mono" placeholder="0" min="0" oninput="onPrepaidInput()" inputmode="numeric">
+                        </div>
+                        <div class="f-group" id="prepaidHintGroup" style="display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:2px;">
+                            <div class="f-label" style="visibility:hidden;">.</div>
+                            <div style="font-size:11px;color:var(--text3);padding:9px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);">Итого: <span id="prepaidHint" style="font-weight:700;color:var(--text2);">0 ₽</span></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="color-pick-row">
                     <button class="color-pick-btn" id="colorPickBtn" onclick="openColorPickerModal()">
@@ -3228,11 +3204,6 @@
                 </div>
                 <div class="added-svcs" id="addedSvcs"></div>
                 <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val pv" id="formTotal">0 ₽</div></div>
-                <div class="prepaid-input-row" id="prepaidInputRow">
-                    <span class="pi-lbl">Внесено</span>
-                    <input type="number" id="fPrepaid" placeholder="0" min="0" oninput="onPrepaidInput()" inputmode="numeric">
-                    <span class="pi-hint" id="prepaidHint">из 0 ₽</span>
-                </div>
                 <div class="f-row full">
                     <div class="f-group"><div class="f-label">Комментарий / Заметка</div><textarea id="fComment" class="f-inp" placeholder="Детали записи, пожелания клиента..."></textarea></div>
                 </div>
@@ -4077,13 +4048,12 @@
                 totalEl.className = 'total-val pv';
                 totalEl.title = '';
             }
-            if (hintEl) hintEl.textContent = 'из ' + formTotal.toLocaleString() + ' ₽';
+            if (hintEl) hintEl.textContent = formTotal.toLocaleString() + ' ₽';
             if (!privacyOn && !_subClientHasSubscription) applyBlur();
         }
 
         function onPrepaidInput() {
-            const hintEl = document.getElementById('prepaidHint');
-            if (hintEl) hintEl.textContent = 'из ' + formTotal.toLocaleString() + ' ₽';
+            // hint обновляется через updateTotalDisplay, ничего дополнительного не нужно
         }
 
         // ===== МУЛЬТИТАЧ =====
