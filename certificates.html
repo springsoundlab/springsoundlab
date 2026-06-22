@@ -4017,6 +4017,7 @@
 
         function isAuthorOf(row) {
             if (!window.PROFILE) return false;
+            if (isCurrentUserMaster()) return true;
             if (row.authorUid === window.PROFILE.uid) return true;
             if (!row.authorUid && row.authorPhone && norm(row.authorPhone) === norm(window.PROFILE.phone || '')) return true;
             return false;
@@ -5118,15 +5119,6 @@
                     window.ALL_USERS[d.id] = data;
                     allUsersList.push(data);
                 });
-
-                // ===== РЕАЛ-ТАЙМ ПРОВЕРКА БЛОКИРОВКИ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ =====
-                const myUid = window.PROFILE?.uid;
-                if (myUid && window.ALL_USERS[myUid] && window.ALL_USERS[myUid].blocked === true) {
-                    alert('Ваш аккаунт заблокирован администратором. Доступ закрыт.');
-                    auth.signOut();
-                    return;
-                }
-
                 if (document.getElementById('secEmployees').style.display !== 'none') renderEmployees();
                 if (document.getElementById('secMasterEmployees').style.display !== 'none') renderMasterEmployees();
                 populateMasterUserFilter();
@@ -7219,12 +7211,15 @@
         function populateMasterUserFilter() {
             const sel = document.getElementById('masterFilterUser');
             if (!sel) return;
+            const prevVal = sel.value;
+            sel.innerHTML = '<option value="all">Все сотрудники</option>';
             allUsersList.filter(u => u.deleted !== true).forEach(u => {
                 const opt = document.createElement('option');
                 opt.value = u.uid;
                 opt.textContent = u.name || u.phone || '—';
                 sel.appendChild(opt);
             });
+            if (prevVal) sel.value = prevVal;
         }
 
         function renderMasterAllSessions() {
@@ -7746,16 +7741,6 @@
                     if (!p) {
                         const ph = (user.email || '').split('@')[0];
                         p = { name: ph, phone: ph, role: 'Сотрудник', color: PALETTE[0].hex };
-                    }
-                    if (p.blocked === true) {
-                        console.warn('🚫 Пользователь заблокирован, выход из системы.');
-                        await auth.signOut();
-                        loader.classList.add('hidden');
-                        setTimeout(() => { loader.style.display = 'none'; }, 800);
-                        document.getElementById('authScreen').style.display = 'flex';
-                        document.getElementById('appRoot').style.display = 'none';
-                        alert('Ваш аккаунт заблокирован администратором. Обратитесь к мастеру студии.');
-                        return;
                     }
                     p.uid = user.uid;
                     if (!p.color) p.color = PALETTE[0].hex;
