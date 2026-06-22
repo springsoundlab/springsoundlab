@@ -4017,7 +4017,7 @@
 
         function isAuthorOf(row) {
             if (!window.PROFILE) return false;
-            if (isCurrentUserMaster()) return true;
+            if (isCurrentUserMaster() && isMasterMode) return true;
             if (row.authorUid === window.PROFILE.uid) return true;
             if (!row.authorUid && row.authorPhone && norm(row.authorPhone) === norm(window.PROFILE.phone || '')) return true;
             return false;
@@ -5128,7 +5128,7 @@
             }, err => console.error('❌ Ошибка загрузки пользователей:', err));
             SC.orderBy('timestamp', 'desc').onSnapshot({ includeMetadataChanges: false }, snap => {
                 window.CRM = [];
-                snap.forEach(d => window.CRM.push({ id: d.id, ...d.data() }));
+                snap.forEach(d => { const data = d.data(); if (data.deleted !== true) window.CRM.push({ id: d.id, ...data }); });
                 renderAll();
                 if (document.getElementById('secMasterAllSessions').style.display !== 'none') renderMasterAllSessions();
                 if (document.getElementById('secMasterFinance').style.display !== 'none') renderMasterFinance();
@@ -5574,7 +5574,11 @@
             const btn = document.querySelector(`.act-ic.r[onclick*="delRec('${id}')"]`);
             if (btn) lockButton(btn);
             openSM('Удалить запись?', 'delete', () => {
-                SC.doc(id).delete().catch(err => { handleError(err, 'Ошибка при удалении записи.'); if (btn)
+                const isMasterDeletingOthers = isCurrentUserMaster() && isMasterMode && row.authorUid !== window.PROFILE.uid;
+                const deleteOp = isMasterDeletingOthers
+                    ? SC.doc(id).update({ deleted: true, deletedByMaster: true, deletedAt: Date.now() })
+                    : SC.doc(id).delete();
+                deleteOp.catch(err => { handleError(err, 'Ошибка при удалении записи.'); if (btn)
                         unlockButton(btn); }).finally(() => { setTimeout(() => { if (btn) unlockButton(
                             btn); }, 500);
                     closeSM(); });
