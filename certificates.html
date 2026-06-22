@@ -5506,7 +5506,7 @@
             const grid = document.getElementById('empGrid');
             if (!grid) return;
             grid.innerHTML = '';
-            const users = Object.values(window.ALL_USERS);
+            const users = Object.values(window.ALL_USERS).filter(u => u.deleted !== true);
             if (!users.length) { grid.innerHTML = '<div style="padding:20px; color:var(--text3);">Нет данных</div>'; return; }
             users.forEach(u => {
                 const c = document.createElement('div');
@@ -7210,8 +7210,7 @@
         function populateMasterUserFilter() {
             const sel = document.getElementById('masterFilterUser');
             if (!sel) return;
-            sel.innerHTML = '<option value="all">Все</option>';
-            allUsersList.forEach(u => {
+            allUsersList.filter(u => u.deleted !== true).forEach(u => {
                 const opt = document.createElement('option');
                 opt.value = u.uid;
                 opt.textContent = u.name || u.phone || '—';
@@ -7261,7 +7260,7 @@
             const sel = document.getElementById('masterFinanceFilterUser');
             if (!sel) return;
             sel.innerHTML = '<option value="all">Все сотрудники</option>';
-            allUsersList.forEach(u => {
+            allUsersList.filter(u => u.deleted !== true).forEach(u => {
                 const opt = document.createElement('option');
                 opt.value = u.uid;
                 opt.textContent = u.name || u.phone || '—';
