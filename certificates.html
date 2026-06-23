@@ -4008,7 +4008,13 @@
             const currentPhone = norm(window.PROFILE.phone || '');
             const all = window.CRM.filter(r => {
                 if (r.authorUid === currentUid) return true;
-                if (!r.authorUid && r.authorPhone && norm(r.authorPhone) === currentPhone) return true;
+                if (r.authorPhone) {
+                    const rPhone = norm(r.authorPhone);
+                    if (rPhone === currentPhone) return true;
+                    // Запасной вариант: сравниваем последние 10 цифр номера
+                    if (rPhone.length >= 10 && currentPhone.length >= 10 &&
+                        rPhone.slice(-10) === currentPhone.slice(-10)) return true;
+                }
                 return false;
             });
             if (includeUncompleted) return all;
@@ -6302,13 +6308,15 @@
                     curY = now.getFullYear();
                 filtered = filtered.filter(r => {
                     const d = parseDate(r.date);
-                    return d && d.getMonth() === curM && d.getFullYear() === curY;
+                    if (!d) return true; // записи без даты всегда показываем
+                    return d.getMonth() === curM && d.getFullYear() === curY;
                 });
             } else if (finPeriod === 'year') {
                 const curY = new Date().getFullYear();
                 filtered = filtered.filter(r => {
                     const d = parseDate(r.date);
-                    return d && d.getFullYear() === curY;
+                    if (!d) return true; // записи без даты всегда показываем
+                    return d.getFullYear() === curY;
                 });
             }
             if (currentStatusFilter === 'work') {
@@ -6591,13 +6599,14 @@
                 totalDbt += rem;
                 if (r.completed) done++;
                 else work++;
-                if (r.completed) {
-                    const refDate = r.date;
-                    if (refDate) {
-                        const [d, m, y] = refDate.split('.');
-                        if (y === curY) {
+                const refDate = r.date;
+                if (refDate) {
+                    const parts = refDate.split('.');
+                    if (parts.length === 3) {
+                        const y2 = parts[2];
+                        if (y2 === curY) {
                             yearRev += paid;
-                            const mIdx = parseInt(m) - 1;
+                            const mIdx = parseInt(parts[1]) - 1;
                             if (mIdx >= 0 && mIdx < 12) mRev[mIdx] += paid;
                         }
                     }
