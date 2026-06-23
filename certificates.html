@@ -6320,36 +6320,38 @@
             let filtered = myData;
             let carryoverDebts = []; // долги из прошлых месяцев
 
+            // Карточки с переносом показываем только в фильтрах "все" и "долг"
+            const showCarryovers = !currentStatusFilter || currentStatusFilter === 'debt';
+
+            // Всегда собираем переносы (записи из прошлых периодов с непогашенным долгом)
+            const now2 = new Date();
+            const curM2 = now2.getMonth(), curY2 = now2.getFullYear();
+            carryoverDebts = myData.filter(r => {
+                const d = parseDate(r.date);
+                if (!d) return false;
+                // только прошлые месяцы (до текущего)
+                if (d.getFullYear() > curY2) return false;
+                if (d.getFullYear() === curY2 && d.getMonth() >= curM2) return false;
+                const full = r.fullTotal || r.total || 0;
+                const paid = r.total || 0;
+                const rest = Math.max(0, full - paid);
+                return rest > 0 && !r.completed;
+            });
+
             if (finPeriod === 'month') {
-                const now = new Date();
-                const curM = now.getMonth(),
-                    curY = now.getFullYear();
-                // Записи текущего месяца
                 filtered = filtered.filter(r => {
                     const d = parseDate(r.date);
-                    if (!d) return true; // записи без даты всегда показываем
-                    return d.getMonth() === curM && d.getFullYear() === curY;
-                });
-                // Долги из прошлых месяцев — если не погашены и не завершены
-                carryoverDebts = myData.filter(r => {
-                    const d = parseDate(r.date);
-                    if (!d) return false;
-                    // только прошлые месяцы
-                    if (d.getFullYear() > curY) return false;
-                    if (d.getFullYear() === curY && d.getMonth() >= curM) return false;
-                    const full = r.fullTotal || r.total || 0;
-                    const paid = r.total || 0;
-                    const rest = Math.max(0, full - paid);
-                    return rest > 0 && !r.completed;
+                    if (!d) return true;
+                    return d.getMonth() === curM2 && d.getFullYear() === curY2;
                 });
             } else if (finPeriod === 'year') {
-                const curY = new Date().getFullYear();
                 filtered = filtered.filter(r => {
                     const d = parseDate(r.date);
-                    if (!d) return true; // записи без даты всегда показываем
-                    return d.getFullYear() === curY;
+                    if (!d) return true;
+                    return d.getFullYear() === curY2;
                 });
             }
+
             if (currentStatusFilter === 'work') {
                 filtered = filtered.filter(r => !r.completed);
             } else if (currentStatusFilter === 'done') {
@@ -6358,19 +6360,21 @@
                 filtered = filtered.filter(r => (r.fullTotal || r.total || 0) - (r.total || 0) > 0);
             }
 
-            // Добавляем переносимые долги в конец (справа), свежие переносы левее старых
+            // Добавляем переносы в конец (справа), только если фильтр "все" или "долг"
             const filteredIds = new Set(filtered.map(r => r.id));
-            const uniqueCarryovers = carryoverDebts.filter(r => !filteredIds.has(r.id))
-                .map(r => ({ ...r, _isCarryover: true }));
-            // Сортируем переносы: более свежие (дата новее) — левее (первее в массиве переносов)
-            uniqueCarryovers.sort((a, b) => {
-                const da = parseDate(a.date), db = parseDate(b.date);
-                if (!da && !db) return 0;
-                if (!da) return 1;
-                if (!db) return -1;
-                return db - da;
-            });
-            filtered = [...filtered, ...uniqueCarryovers];
+            if (showCarryovers) {
+                const uniqueCarryovers = carryoverDebts.filter(r => !filteredIds.has(r.id))
+                    .map(r => ({ ...r, _isCarryover: true }));
+                // Свежие переносы (дата новее) — левее старых
+                uniqueCarryovers.sort((a, b) => {
+                    const da = parseDate(a.date), db = parseDate(b.date);
+                    if (!da && !db) return 0;
+                    if (!da) return 1;
+                    if (!db) return -1;
+                    return db - da;
+                });
+                filtered = [...filtered, ...uniqueCarryovers];
+            }
             grid.innerHTML = '';
             document.getElementById('finCount').textContent = filtered.length + ' записей';
             if (!filtered.length) {
@@ -6403,7 +6407,7 @@
                     ? `<span class="ss-badge" style="background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);font-size:9px;padding:2px 5px;margin-left:4px;flex-shrink:0;">↩ Перенос</span>`
                     : '';
                 header.innerHTML =
-                    `<div class="fin-color-bar" style="background:${color};"></div>${carryoverBadge}<div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div><span class="ss-badge ${statusClass} fin-status">${statusText}</span>`;
+                    `<div class="fin-color-bar" style="background:${color};"></div><div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div>${carryoverBadge}<span class="ss-badge ${statusClass} fin-status">${statusText}</span>`;
                 card.appendChild(header);
                 const progWrap = document.createElement('div');
                 progWrap.className = 'fin-prog';
