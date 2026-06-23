@@ -5966,35 +5966,12 @@
                         total: subCount,
                         used: 0,
                         price: subPrice,
+                        totalAmount: subPrice * subCount,
                         createdDate: date,
                         authorUid: window.PROFILE.uid,
                         authorPhone: window.PROFILE.phone,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    const data = {
-                        date,
-                        time: '',
-                        timeEnd: '',
-                        duration: 0,
-                        client: name,
-                        song: name,
-                        phone,
-                        type: 'Абонемент',
-                        services: `Абонемент (${subCount} занятий)`,
-                        details: [],
-                        total: subPrice * subCount,
-                        fullTotal: subPrice * subCount,
-                        comment: comment || 'Абонемент создан',
-                        authorName: window.PROFILE.name,
-                        authorUid: window.PROFILE.uid,
-                        authorPhone: window.PROFILE.phone,
-                        eventColor: selectedFormColor || window.PROFILE?.color || PALETTE[0].hex,
-                        timestamp: Date.now(),
-                        completed: false,
-                        isSubscription: true,
-                        subscriptionId: subRef.id
-                    };
-                    await SC.add(data);
                     closeRecModal();
                     unlockButton(btn);
                     alert(`✅ Абонемент для "${name}" создан! Клиент появился в разделе "Клиенты".`);
@@ -6725,9 +6702,72 @@
                     }
                 }
             });
-            const avg = done > 0 ? Math.round(totalRev / done) : 0;
-            document.getElementById('anaAvg').textContent = avg.toLocaleString() + ' ₽';
-            document.getElementById('anaTotal').textContent = myData.length;
+
+            // Подгружаем абонементы и добавляем их суммы в аналитику
+            if (window.PROFILE && window.PROFILE.uid) {
+                SUBC.where('authorUid', '==', window.PROFILE.uid).get().then(subSnap => {
+                    let subRev = 0, subRevYear = 0;
+                    const subMRev = new Array(12).fill(0);
+                    subSnap.forEach(doc => {
+                        const d = doc.data();
+                        const amount = d.totalAmount || (d.price * d.total) || 0;
+                        subRev += amount;
+                        if (d.createdDate) {
+                            const parts = d.createdDate.split('.');
+                            if (parts.length === 3 && parts[2] === curY) {
+                                subRevYear += amount;
+                                const mIdx = parseInt(parts[1]) - 1;
+                                if (mIdx >= 0 && mIdx < 12) subMRev[mIdx] += amount;
+                            }
+                        }
+                    });
+                    const finalTotal = totalRev + subRev;
+                    const finalYear = yearRev + subRevYear;
+                    const finalMRev = mRev.map((v, i) => v + subMRev[i]);
+                    document.getElementById('anaAvg').textContent = (done > 0 ? Math.round(finalTotal / done) : 0).toLocaleString() + ' ₽';
+                    document.getElementById('anaTotal').textContent = myData.length;
+                    document.getElementById('anaDone').textContent = done;
+                    document.getElementById('anaWork').textContent = work;
+                    document.getElementById('anaYear').textContent = finalYear.toLocaleString() + ' ₽';
+                    document.getElementById('anaDbt').textContent = totalDbt.toLocaleString() + ' ₽';
+                    document.getElementById('anaChY').textContent = curY;
+                    const chart = document.getElementById('anaChart');
+                    chart.innerHTML = '';
+                    const maxM = Math.max(...finalMRev, 1);
+                    finalMRev.forEach((v, i) => {
+                        const h = (v / maxM) * 100;
+                        const col = document.createElement('div');
+                        col.className = 'bar-col';
+                        col.innerHTML =
+                            `<div class="bar-val pv" style="opacity:${v>0?1:0}">${(v/1000).toFixed(0)}k</div><div class="bar" style="height:${Math.max(h,3)}%;background:var(--accent);" title="${v.toLocaleString()} ₽"></div><div class="bar-lbl">${MNSh[i]}</div>`;
+                        col.onclick = () => openMonthInfo(i, finalMRev[i]);
+                        chart.appendChild(col);
+                    });
+                    const rnk = document.getElementById('anaRnk');
+                    rnk.innerHTML = '';
+                    const topSvc = Object.entries(svcMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                    const maxS = Math.max(...topSvc.map(x => x[1]), 1);
+                    topSvc.forEach(s => {
+                        const w = (s[1] / maxS) * 100;
+                        const d2 = document.createElement('div');
+                        d2.className = 'svc-rr';
+                        d2.innerHTML =
+                            `<div class="svc-rn">${escapeHTML(s[0])}</div><div class="svc-rt"><div class="svc-rf" style="width:${w}%;background:var(--accent);"></div></div><div class="svc-rc">${s[1]}</div>`;
+                        rnk.appendChild(d2);
+                    });
+                    if (!privacyOn) applyBlur();
+                }).catch(() => {
+                    // Если не удалось загрузить абонементы — показываем без них
+                    _renderAnalyticsDisplay(totalRev, yearRev, mRev, done, work, totalDbt, curY, svcMap);
+                });
+            } else {
+                _renderAnalyticsDisplay(totalRev, yearRev, mRev, done, work, totalDbt, curY, svcMap);
+            }
+        }
+
+        function _renderAnalyticsDisplay(totalRev, yearRev, mRev, done, work, totalDbt, curY, svcMap) {
+            document.getElementById('anaAvg').textContent = (done > 0 ? Math.round(totalRev / done) : 0).toLocaleString() + ' ₽';
+            document.getElementById('anaTotal').textContent = (done + work);
             document.getElementById('anaDone').textContent = done;
             document.getElementById('anaWork').textContent = work;
             document.getElementById('anaYear').textContent = yearRev.toLocaleString() + ' ₽';
@@ -6753,9 +6793,8 @@
                 const w = (s[1] / maxS) * 100;
                 const d = document.createElement('div');
                 d.className = 'svc-rr';
-                const svcName = escapeHTML(s[0]);
                 d.innerHTML =
-                    `<div class="svc-rn">${svcName}</div><div class="svc-rt"><div class="svc-rf" style="width:${w}%;background:var(--accent);"></div></div><div class="svc-rc">${s[1]}</div>`;
+                    `<div class="svc-rn">${escapeHTML(s[0])}</div><div class="svc-rt"><div class="svc-rf" style="width:${w}%;background:var(--accent);"></div></div><div class="svc-rc">${s[1]}</div>`;
                 rnk.appendChild(d);
             });
             if (!privacyOn) applyBlur();
@@ -6969,34 +7008,11 @@
                     total: sessions,
                     used: 0,
                     price: price,
+                    totalAmount: price * sessions,
                     createdDate: date,
                     authorUid: window.PROFILE.uid,
                     authorPhone: window.PROFILE.phone,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                await SC.add({
-                    date,
-                    time: '',
-                    timeEnd: '',
-                    duration: 0,
-                    client: name,
-                    song: name,
-                    phone: phone,
-                    type: 'Абонемент',
-                    services: `Абонемент (${sessions} занятий)`,
-                    details: [],
-                    total: 0,
-                    fullTotal: 0,
-                    comment: `Абонемент создан: ${sessions} занятий`,
-                    authorName: window.PROFILE.name,
-                    authorUid: window.PROFILE.uid,
-                    authorPhone: window.PROFILE.phone,
-                    eventColor: window.PROFILE?.color || PALETTE[0].hex,
-                    timestamp: Date.now(),
-                    completed: true,
-                    isSubscription: true,
-                    subscriptionId: subRef.id
                 });
 
                 const msg = document.getElementById('subCreatedMsg');
