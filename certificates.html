@@ -1243,6 +1243,41 @@
             border-color: var(--gold);
         }
 
+        /* БЕЙДЖ ПЕРЕНОС */
+        .carryover-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(212,175,55,0.15);
+            color: var(--gold);
+            border: 1px solid rgba(212,175,55,0.35);
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .carryover-badge__icon {
+            font-size: 10px;
+        }
+        /* На мобильном — только иконка, без текста, того же размера что ss-badge */
+        @media (max-width: 768px) {
+            .carryover-badge {
+                padding: 3px 6px;
+                border-radius: 12px;
+                gap: 0;
+            }
+            .carryover-badge__text {
+                display: none;
+            }
+            .carryover-badge__icon {
+                font-size: 10px;
+            }
+        }
+
         /* CERTS */
         .certs-wrap {
             flex: 1;
@@ -2393,6 +2428,14 @@
                 font-size: 7px;
                 padding: 2px 5px;
                 letter-spacing: 0;
+            }
+            .fin-grid.compact .fin-card .carryover-badge {
+                font-size: 7px;
+                padding: 2px 4px;
+                border-radius: 8px;
+            }
+            .fin-grid.compact .fin-card .carryover-badge__icon {
+                font-size: 7px;
             }
             .fin-grid.compact .fin-card .fin-prog {
                 margin: 1px 0 3px 0;
@@ -6404,7 +6447,7 @@
                 const clientName = escapeHTML(r.client || r.song || '—');
                 // Бейдж "Перенос" для долгов из прошлых месяцев — не меняет размер карточки
                 const carryoverBadge = r._isCarryover
-                    ? `<span class="ss-badge" style="background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);font-size:9px;padding:2px 5px;margin-left:4px;flex-shrink:0;">↩ Перенос</span>`
+                    ? `<span class="carryover-badge" title="Перенос из прошлого периода"><i class="fa-solid fa-rotate-left carryover-badge__icon"></i><span class="carryover-badge__text">Перенос</span></span>`
                     : '';
                 header.innerHTML =
                     `<div class="fin-color-bar" style="background:${color};"></div><div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div>${carryoverBadge}<span class="ss-badge ${statusClass} fin-status">${statusText}</span>`;
