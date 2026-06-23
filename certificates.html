@@ -4203,13 +4203,21 @@
         }
 
         // ===== ЦВЕТА: занятые цвета =====
+        // colorOwners: { hex -> имя сотрудника } для отображения при наведении
+        window.colorOwners = {};
+
         async function loadUsedColors() {
             try {
                 const snap = await UC.get();
                 usedColors = [];
+                window.colorOwners = {};
                 snap.forEach(doc => {
                     const data = doc.data();
-                    if (data.color) usedColors.push(data.color);
+                    // Цвет освобождается если сотрудник удалён или заблокирован
+                    if (data.color && data.blocked !== true && data.deleted !== true) {
+                        usedColors.push(data.color);
+                        window.colorOwners[data.color] = data.name || 'Сотрудник';
+                    }
                 });
             } catch (e) { console.error('Ошибка загрузки цветов:', e); }
         }
@@ -4224,7 +4232,8 @@
                 const d = document.createElement('div');
                 d.className = 'color-dot' + (currentColor === p.hex ? ' sel' : '') + (isTaken ? ' taken' : '');
                 d.style.background = p.hex;
-                d.title = isTaken ? p.label + ' (занят)' : p.label;
+                const ownerName = isTaken ? (window.colorOwners[p.hex] || 'Сотрудник') : null;
+                d.title = isTaken ? p.label + ' — занят: ' + ownerName : p.label;
                 if (isTaken) {
                     const lock = document.createElement('span');
                     lock.className = 'color-lock';
@@ -5244,6 +5253,13 @@
                 calControls.classList.add('active');
             } else {
                 calControls.classList.remove('active');
+            }
+
+            // Показываем кнопки зума +/- только в разделе "Журнал" на десктопе
+            const zoomTop = document.querySelector('.zoom-controls-top');
+            if (zoomTop) {
+                const isMobile = window.innerWidth <= 768;
+                zoomTop.style.display = (s === 'sessions' && !isMobile) ? 'flex' : 'none';
             }
 
             document.body.classList.toggle('sec-finance-active', s === 'finance' || s === 'masterFinance');
@@ -6302,14 +6318,29 @@
             grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
             const myData = getMyData(true);
             let filtered = myData;
+            let carryoverDebts = []; // долги из прошлых месяцев
+
             if (finPeriod === 'month') {
                 const now = new Date();
                 const curM = now.getMonth(),
                     curY = now.getFullYear();
+                // Записи текущего месяца
                 filtered = filtered.filter(r => {
                     const d = parseDate(r.date);
                     if (!d) return true; // записи без даты всегда показываем
                     return d.getMonth() === curM && d.getFullYear() === curY;
+                });
+                // Долги из прошлых месяцев — если не погашены и не завершены
+                carryoverDebts = myData.filter(r => {
+                    const d = parseDate(r.date);
+                    if (!d) return false;
+                    // только прошлые месяцы
+                    if (d.getFullYear() > curY) return false;
+                    if (d.getFullYear() === curY && d.getMonth() >= curM) return false;
+                    const full = r.fullTotal || r.total || 0;
+                    const paid = r.total || 0;
+                    const rest = Math.max(0, full - paid);
+                    return rest > 0 && !r.completed;
                 });
             } else if (finPeriod === 'year') {
                 const curY = new Date().getFullYear();
@@ -6326,6 +6357,12 @@
             } else if (currentStatusFilter === 'debt') {
                 filtered = filtered.filter(r => (r.fullTotal || r.total || 0) - (r.total || 0) > 0);
             }
+
+            // Добавляем переносимые долги в начало (без дублей)
+            const filteredIds = new Set(filtered.map(r => r.id));
+            const uniqueCarryovers = carryoverDebts.filter(r => !filteredIds.has(r.id))
+                .map(r => ({ ...r, _isCarryover: true }));
+            filtered = [...uniqueCarryovers, ...filtered];
             grid.innerHTML = '';
             document.getElementById('finCount').textContent = filtered.length + ' записей';
             if (!filtered.length) {
@@ -6353,8 +6390,12 @@
                 const header = document.createElement('div');
                 header.className = 'fin-header';
                 const clientName = escapeHTML(r.client || r.song || '—');
+                // Бейдж "Перенос" для долгов из прошлых месяцев — не меняет размер карточки
+                const carryoverBadge = r._isCarryover
+                    ? `<span class="ss-badge" style="background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);font-size:9px;padding:2px 5px;margin-left:4px;flex-shrink:0;">↩ Перенос</span>`
+                    : '';
                 header.innerHTML =
-                    `<div class="fin-color-bar" style="background:${color};"></div><div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div><span class="ss-badge ${statusClass} fin-status">${statusText}</span>`;
+                    `<div class="fin-color-bar" style="background:${color};"></div><div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div><span class="ss-badge ${statusClass} fin-status">${statusText}</span>${carryoverBadge}`;
                 card.appendChild(header);
                 const progWrap = document.createElement('div');
                 progWrap.className = 'fin-prog';
