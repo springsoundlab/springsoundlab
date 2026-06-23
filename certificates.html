@@ -1814,6 +1814,9 @@
             grid-template-columns: 1fr 1fr;
             gap: 8px;
             margin-bottom: 12px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 2px;
         }
         .svc-chip {
             font-size: 11px;
@@ -3550,6 +3553,61 @@
     </div>
 
     <!-- Модальное окно для редактирования клиента -->
+    <!-- Модальное окно редактирования клиента с абонементом -->
+    <div class="mo" id="moSubClientEdit">
+        <div class="mb" style="width:480px;max-width:95vw;">
+            <div class="mb-header">
+                <div class="mb-title"><i class="fa-solid fa-ticket" style="color:var(--gold);margin-right:6px;"></i> Клиент с абонементом</div>
+                <div class="mb-close" onclick="closeSubClientEdit()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <input type="hidden" id="subEditId">
+            <div class="f-group" style="margin-bottom:12px;">
+                <div class="f-label">Имя</div>
+                <input type="text" id="subEditClientName" class="f-inp" placeholder="Имя клиента">
+            </div>
+            <div class="f-group" style="margin-bottom:16px;">
+                <div class="f-label">Телефон</div>
+                <input type="tel" id="subEditClientPhone" class="f-inp" placeholder="+7 900 000-00-00">
+            </div>
+            <div style="background:var(--surface2);border-radius:var(--r);padding:14px;margin-bottom:16px;border:1px solid var(--border);">
+                <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Абонемент</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
+                        <div class="fin-stat-l">Занятий всего</div>
+                        <div class="fin-stat-v" id="subEditTotal">—</div>
+                    </div>
+                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
+                        <div class="fin-stat-l">Использовано</div>
+                        <div class="fin-stat-v" id="subEditUsed">—</div>
+                    </div>
+                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
+                        <div class="fin-stat-l">Осталось</div>
+                        <div class="fin-stat-v" id="subEditLeft" id="subEditLeftWrap" style="color:var(--green);">—</div>
+                    </div>
+                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
+                        <div class="fin-stat-l">Цена занятия</div>
+                        <div class="fin-stat-v" id="subEditPrice">—</div>
+                    </div>
+                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
+                        <div class="fin-stat-l">Оплачено всего</div>
+                        <div class="fin-stat-v pv" style="color:var(--green);" id="subEditAmount">—</div>
+                    </div>
+                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
+                        <div class="fin-stat-l">Дата оформления</div>
+                        <div class="fin-stat-v" style="font-size:11px;" id="subEditDate">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-btns" style="justify-content:space-between;">
+                <button class="mb-btn mb-delete" onclick="deleteSubClient()" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red);"><i class="fa-solid fa-trash" style="margin-right:4px;"></i>Удалить</button>
+                <div style="display:flex;gap:8px;">
+                    <button class="mb-btn mb-cancel" onclick="closeSubClientEdit()">Отмена</button>
+                    <button class="mb-btn mb-confirm" onclick="saveSubClientEdit()">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="mo" id="moClientEdit">
         <div class="mb" style="width:520px;max-width:95vw;">
             <div class="mb-header">
@@ -4110,7 +4168,7 @@
             const container = document.getElementById('presetChips');
             if (!container) return;
             container.innerHTML = '';
-            const displayPackages = userPackages.slice(0, 8);
+            const displayPackages = userPackages; // показываем все услуги со скроллом
             displayPackages.forEach((pkg) => {
                 const chip = document.createElement('div');
                 chip.className = 'svc-chip';
@@ -6082,35 +6140,34 @@
                 if (!key.includes(' ')) {
                     key = key + '_' + r.id;
                 }
-                if (r.isSubscription) {
-                    if (!map[key]) {
-                        map[key] = {
-                            name: fullName.trim(),
-                            phone: r.phone || '',
-                            visits: 0,
-                            total: 0,
-                            last: '',
-                            types: {},
-                            ids: []
-                        };
-                    }
-                    return;
-                }
                 if (!map[key]) {
                     map[key] = {
                         name: fullName.trim(),
                         phone: r.phone || '',
                         visits: 0,
                         total: 0,
-                        last: '',
+                        last: r.date || '',
+                        timestamp: r.timestamp || 0,
                         types: {},
-                        ids: []
+                        ids: [],
+                        isSubscriptionOnly: !!r.isSubscription
                     };
                 }
+                if (r.isSubscription) {
+                    // обновляем телефон и timestamp если нужно
+                    if (r.phone && !map[key].phone) map[key].phone = r.phone;
+                    if ((r.timestamp || 0) > map[key].timestamp) {
+                        map[key].timestamp = r.timestamp;
+                        map[key].last = r.date || map[key].last;
+                    }
+                    return;
+                }
+                map[key].isSubscriptionOnly = false;
                 map[key].visits++;
                 map[key].total += Number(r.total || 0);
                 if (!map[key].last || (parseDate(r.date) && (!parseDate(map[key].last) || parseDate(r.date) >
                         parseDate(map[key].last)))) map[key].last = r.date;
+                if ((r.timestamp || 0) > map[key].timestamp) map[key].timestamp = r.timestamp || 0;
                 if (r.phone && !map[key].phone) map[key].phone = r.phone;
                 const t = r.services || r.type || 'Другое';
                 map[key].types[t] = (map[key].types[t] || 0) + 1;
@@ -6137,16 +6194,18 @@
 
             if (clientSort === 'date_desc') {
                 cls.sort((a, b) => {
-                    const da = parseDate(a.last),
-                        db = parseDate(b.last);
-                    const diff = (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+                    const da = parseDate(a.last), db = parseDate(b.last);
+                    const ta = da ? da.getTime() : (a.timestamp || 0);
+                    const tb = db ? db.getTime() : (b.timestamp || 0);
+                    const diff = tb - ta;
                     return diff !== 0 ? diff : b.visits - a.visits;
                 });
             } else if (clientSort === 'date_asc') {
                 cls.sort((a, b) => {
-                    const da = parseDate(a.last),
-                        db = parseDate(b.last);
-                    const diff = (da ? da.getTime() : 0) - (db ? db.getTime() : 0);
+                    const da = parseDate(a.last), db = parseDate(b.last);
+                    const ta = da ? da.getTime() : (a.timestamp || 0);
+                    const tb = db ? db.getTime() : (b.timestamp || 0);
+                    const diff = ta - tb;
                     return diff !== 0 ? diff : b.visits - a.visits;
                 });
             } else if (clientSort === 'total_desc') {
@@ -6234,10 +6293,99 @@
             `;
             card.onclick = (e) => {
                 if (e.target.closest('.cl-edit-btn')) return;
-                openClientEdit(c.ids.join(','));
+                if (c.isSubscriptionOnly && subInfo) {
+                    openSubClientEdit(c.name, c.phone, subInfo);
+                } else {
+                    openClientEdit(c.ids.join(','));
+                }
             };
+            // Кнопка «...» тоже учитывает тип клиента
+            const editBtn = card.querySelector('.cl-edit-btn');
+            if (editBtn) {
+                editBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (c.isSubscriptionOnly && subInfo) {
+                        openSubClientEdit(c.name, c.phone, subInfo);
+                    } else {
+                        openClientEdit(c.ids.join(','));
+                    }
+                };
+            }
             grid.appendChild(card);
         }
+
+        // ===== РЕДАКТИРОВАНИЕ КЛИЕНТА С АБОНЕМЕНТОМ =====
+        let _subEditClientName = '';
+
+        window.openSubClientEdit = async function(clientName, phone, subInfo) {
+            _subEditClientName = clientName;
+            document.getElementById('subEditClientName').value = clientName;
+            document.getElementById('subEditClientPhone').value = phone || '';
+            // Загружаем актуальные данные абонемента
+            try {
+                const snap = await SUBC
+                    .where('clientName', '==', clientName)
+                    .where('authorUid', '==', window.PROFILE.uid)
+                    .get();
+                if (!snap.empty) {
+                    const d = snap.docs[0].data();
+                    const subId = snap.docs[0].id;
+                    document.getElementById('subEditId').value = subId;
+                    document.getElementById('subEditUsed').textContent = d.used || 0;
+                    document.getElementById('subEditTotal').textContent = d.total || 0;
+                    document.getElementById('subEditPrice').textContent = (d.price || 0).toLocaleString() + ' ₽';
+                    document.getElementById('subEditAmount').textContent = ((d.totalAmount || (d.price * d.total)) || 0).toLocaleString() + ' ₽';
+                    document.getElementById('subEditDate').textContent = d.createdDate || '—';
+                    document.getElementById('subEditLeft').textContent = Math.max(0, (d.total || 0) - (d.used || 0));
+                    const leftEl = document.getElementById('subEditLeftWrap');
+                    const isExhausted = (d.used || 0) >= (d.total || 0);
+                    leftEl.style.color = isExhausted ? 'var(--red)' : 'var(--green)';
+                }
+            } catch(e) { console.error(e); }
+            document.body.classList.add('modal-open');
+            document.getElementById('moSubClientEdit').classList.add('open');
+        };
+
+        window.closeSubClientEdit = function() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('moSubClientEdit').classList.remove('open');
+            _subEditClientName = '';
+        };
+
+        window.saveSubClientEdit = async function() {
+            const newName = document.getElementById('subEditClientName').value.trim();
+            const newPhone = document.getElementById('subEditClientPhone').value.trim();
+            const subId = document.getElementById('subEditId').value;
+            if (!newName) { alert('Имя не может быть пустым'); return; }
+            const btn = document.querySelector('#moSubClientEdit .mb-confirm');
+            if (btn) lockButton(btn);
+            try {
+                const batch = db.batch();
+                if (subId) {
+                    batch.update(SUBC.doc(subId), { clientName: newName, clientPhone: newPhone });
+                }
+                await batch.commit();
+                closeSubClientEdit();
+                renderClients();
+            } catch(e) {
+                handleError(e, 'Ошибка при сохранении');
+            } finally {
+                if (btn) unlockButton(btn);
+            }
+        };
+
+        window.deleteSubClient = async function() {
+            const subId = document.getElementById('subEditId').value;
+            const name = _subEditClientName;
+            openSM('Удалить клиента «' + name + '» и его абонемент?', 'delete', async () => {
+                try {
+                    if (subId) await SUBC.doc(subId).delete();
+                    closeSM();
+                    closeSubClientEdit();
+                    renderClients();
+                } catch(e) { handleError(e, 'Ошибка при удалении'); }
+            });
+        };
 
         // ===== РЕДАКТИРОВАНИЕ КЛИЕНТА =====
         function openClientEdit(idsStr) {
