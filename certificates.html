@@ -1191,9 +1191,9 @@
             border-color: rgba(62, 207, 142, .3);
         }
         .fin-card .fin-actions .act-ic.g.active {
-            background: var(--green-bg);
-            color: var(--green);
-            border-color: var(--green);
+            background: var(--surface2);
+            color: var(--text2);
+            border-color: var(--border);
         }
         .fin-card .fin-actions .act-ic.r:hover {
             color: var(--red);
@@ -6358,11 +6358,19 @@
                 filtered = filtered.filter(r => (r.fullTotal || r.total || 0) - (r.total || 0) > 0);
             }
 
-            // Добавляем переносимые долги в начало (без дублей)
+            // Добавляем переносимые долги в конец (справа), свежие переносы левее старых
             const filteredIds = new Set(filtered.map(r => r.id));
             const uniqueCarryovers = carryoverDebts.filter(r => !filteredIds.has(r.id))
                 .map(r => ({ ...r, _isCarryover: true }));
-            filtered = [...uniqueCarryovers, ...filtered];
+            // Сортируем переносы: более свежие (дата новее) — левее (первее в массиве переносов)
+            uniqueCarryovers.sort((a, b) => {
+                const da = parseDate(a.date), db = parseDate(b.date);
+                if (!da && !db) return 0;
+                if (!da) return 1;
+                if (!db) return -1;
+                return db - da;
+            });
+            filtered = [...filtered, ...uniqueCarryovers];
             grid.innerHTML = '';
             document.getElementById('finCount').textContent = filtered.length + ' записей';
             if (!filtered.length) {
@@ -6395,7 +6403,7 @@
                     ? `<span class="ss-badge" style="background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);font-size:9px;padding:2px 5px;margin-left:4px;flex-shrink:0;">↩ Перенос</span>`
                     : '';
                 header.innerHTML =
-                    `<div class="fin-color-bar" style="background:${color};"></div><div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div><span class="ss-badge ${statusClass} fin-status">${statusText}</span>${carryoverBadge}`;
+                    `<div class="fin-color-bar" style="background:${color};"></div>${carryoverBadge}<div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div><span class="ss-badge ${statusClass} fin-status">${statusText}</span>`;
                 card.appendChild(header);
                 const progWrap = document.createElement('div');
                 progWrap.className = 'fin-prog';
@@ -7351,14 +7359,24 @@
             }
             data.forEach(r => {
                 const card = document.createElement('div');
-                card.className = 'fin-card';
-                const author = allUsersList.find(u => u.uid === r.authorUid)?.name || 'Неизвестный';
+                const full = r.fullTotal || r.total || 0;
+                const paid = r.total || 0;
+                const rest = Math.max(0, full - paid);
                 const isDone = r.completed;
+                card.className = 'fin-card';
+                if (rest > 0) card.classList.add('row-debt');
+                else if (isDone) card.classList.add('row-done');
+                const author = allUsersList.find(u => u.uid === r.authorUid)?.name || 'Неизвестный';
+                let statusText, statusClass;
+                if (isDone) { statusText = 'Готово'; statusClass = 'ss-done'; }
+                else if (rest > 0) { statusText = 'Долг'; statusClass = 'ss-debt'; }
+                else { statusText = 'В работе'; statusClass = 'ss-work'; }
                 card.innerHTML = `
                     <div class="fin-header">
                         <div class="fin-color-bar" style="background:${r.eventColor||'#9090a0'};"></div>
                         <div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${escapeHTML(r.client||'—')}</div>
-                        <span style="font-size:10px;color:var(--text3);">${escapeHTML(author)}</span>
+                        <span class="ss-badge ${statusClass} fin-status">${statusText}</span>
+                        <span style="font-size:10px;color:var(--text3);margin-left:4px;">${escapeHTML(author)}</span>
                     </div>
                     <div class="fin-details">
                         <div class="detail-row"><span class="detail-label">Дата:</span> <span>${escapeHTML(r.date||'—')}</span></div>
