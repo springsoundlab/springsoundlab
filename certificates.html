@@ -6359,7 +6359,7 @@
             updateFinSwipeIndicator();
             if (currentStatusFilter === 'subs') { renderFinanceSubs(); return; }
             grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
-            const myData = getMyData(true);
+            const myData = getMyData(true).filter(r => !r.isSubscription); // абонементы только в разделе "Абонементы"
             let filtered = myData;
             let carryoverDebts = []; // долги из прошлых месяцев
 
@@ -6677,7 +6677,7 @@
 
         // ===== ANALYTICS (моя) =====
         function renderAnalytics() {
-            const myData = getMyData(true);
+            const myData = getMyData(true).filter(r => !r.isSubscription);
             let totalRev = 0,
                 yearRev = 0,
                 totalDbt = 0,
@@ -7396,7 +7396,7 @@
             const grid = document.getElementById('masterAllSessionsGrid');
             if (!grid) return;
             const filterUid = document.getElementById('masterFilterUser')?.value || 'all';
-            let data = window.CRM;
+            let data = window.CRM.filter(r => !r.isSubscription); // абонементы не показываем в "Все записи"
             if (filterUid !== 'all') data = data.filter(r => r.authorUid === filterUid);
             data.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             grid.innerHTML = '';
@@ -7456,7 +7456,7 @@
         function renderMasterFinance() {
             const allSessions = window.CRM;
             const filterUid = document.getElementById('masterFinanceFilterUser')?.value || 'all';
-            let data = allSessions;
+            let data = allSessions.filter(r => !r.isSubscription); // абонементы не учитываем в финансовой статистике
             if (filterUid !== 'all') data = data.filter(r => r.authorUid === filterUid);
 
             let totalRev = 0,
