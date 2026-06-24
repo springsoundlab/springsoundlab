@@ -640,7 +640,7 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--r);
-            padding: 14px;
+            padding: 12px;
             cursor: pointer;
             transition: .15s;
             position: relative;
@@ -648,6 +648,7 @@
             height: 175px;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         /* Карточки сотрудников — маленькие, без фиксированной высоты */
         #empGrid .cl-card, #masterEmpGrid .cl-card {
@@ -769,7 +770,9 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 9px;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+            min-width: 0;
         }
         .cl-av {
             width: 38px;
@@ -805,13 +808,18 @@
         .cl-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-top: 10px;
+            gap: 5px;
+            margin-top: 6px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
         }
         .cl-st {
             background: var(--surface2);
             border-radius: 7px;
-            padding: 7px 9px;
+            padding: 5px 8px;
+            overflow: hidden;
+            min-width: 0;
         }
         .cl-st-l {
             font-size: 9px;
@@ -822,12 +830,13 @@
         }
         .cl-st-v {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             margin-top: 3px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            max-width: 100%;
         }
         .cl-edit-btn {
             position: absolute;
@@ -914,24 +923,25 @@
             display: inline-block;
             margin-top: 4px;
         }
-        /* Компактная пометка «Абонемент» рядом с именем клиента в карточке списка —
-           не занимает отдельную строку, карточка остаётся той же высоты, что и обычные. */
+        /* Значок абонемента — только иконка, рядом с кнопкой «...» */
         .cl-sub-tag {
             display: inline-flex;
             align-items: center;
-            gap: 3px;
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .3px;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            font-size: 11px;
             color: var(--gold);
             background: var(--gold-bg);
             border: 1px solid var(--gold);
-            border-radius: 999px;
-            padding: 1px 7px;
-            margin-top: 2px;
-            white-space: nowrap;
+            border-radius: 5px;
             flex-shrink: 0;
+            cursor: default;
+        }
+        .cl-sub-tag.history-sub {
+            color: var(--text3);
+            background: var(--surface3);
+            border-color: var(--border2);
         }
 
         /* ===== ИНДИКАТОР ТЕКУЩЕЙ КАТЕГОРИИ (только отображение, переключается свайпом) =====
@@ -6568,9 +6578,9 @@
             // Всё развёрнуто (used/total, цена, история) показывается при открытии карточки.
             let subTag = '';
             if (subInfo) {
-                subTag = `<span class="cl-sub-tag"><i class="fa-solid fa-ticket"></i> Абонемент</span>`;
+                subTag = `<span class="cl-sub-tag" title="Активный абонемент"><i class="fa-solid fa-ticket"></i></span>`;
             } else if (subHistory.length > 0) {
-                subTag = `<span class="cl-sub-tag" style="color:var(--text3);background:var(--surface3);border-color:var(--border2);"><i class="fa-solid fa-clock-rotate-left"></i> Был абонемент</span>`;
+                subTag = `<span class="cl-sub-tag history-sub" title="Был абонемент"><i class="fa-solid fa-clock-rotate-left"></i></span>`;
             }
 
             // Содержимое сетки 2×2: для клиента с абонементом показываем прогресс
@@ -6600,19 +6610,17 @@
             }
 
             card.innerHTML = `
-                <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start; padding-right:30px;">
-                    <div style="display:flex; gap:9px; align-items:center; min-width:0; flex:1;">
-                        <div class="cl-av" style="background:${pal.bg};color:${pal.hex}; flex-shrink:0;">${name[0]?.toUpperCase() || '?'}</div>
-                        <div style="min-width:0;">
-                            <div class="cl-nm">${name}</div>
-                            <div class="cl-ph">${phone}</div>
-                        </div>
+                <div class="cl-top" style="padding-right:56px;">
+                    <div class="cl-av" style="background:${pal.bg};color:${pal.hex}; flex-shrink:0;">${name[0]?.toUpperCase() || '?'}</div>
+                    <div style="min-width:0; flex:1;">
+                        <div class="cl-nm">${name}</div>
+                        <div class="cl-ph">${phone}</div>
                     </div>
-                    ${subTag}
                 </div>
                 <div class="cl-stats">
                     ${statsHtml}
                 </div>
+                ${subTag ? `<div style="position:absolute;top:10px;right:40px;">${subTag}</div>` : ''}
                 <button class="cl-edit-btn" title="Редактировать клиента"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             `;
 
