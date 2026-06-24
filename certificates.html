@@ -645,7 +645,7 @@
             transition: .15s;
             position: relative;
             min-width: 0;
-            min-height: 175px;
+            height: 175px;
             display: flex;
             flex-direction: column;
         }
@@ -806,7 +806,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6px;
-            margin-top: auto;
+            margin-top: 10px;
         }
         .cl-st {
             background: var(--surface2);
@@ -913,6 +913,25 @@
             font-weight: 700;
             display: inline-block;
             margin-top: 4px;
+        }
+        /* Компактная пометка «Абонемент» рядом с именем клиента в карточке списка —
+           не занимает отдельную строку, карточка остаётся той же высоты, что и обычные. */
+        .cl-sub-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            color: var(--gold);
+            background: var(--gold-bg);
+            border: 1px solid var(--gold);
+            border-radius: 999px;
+            padding: 1px 7px;
+            margin-top: 2px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         /* ===== ИНДИКАТОР ТЕКУЩЕЙ КАТЕГОРИИ (только отображение, переключается свайпом) =====
@@ -5884,7 +5903,7 @@
                 if (isCompleting) card.classList.add('row-done');
                 else {
                     const full = row.fullTotal || row.total || 0;
-                    const paid = row.total || 0;
+                    const paid = row.isSubscriptionVisit ? full : (row.total || 0);
                     const rest = Math.max(0, full - paid);
                     if (rest > 0) card.classList.add('row-debt');
                 }
@@ -6542,50 +6561,58 @@
             const total = c.total.toLocaleString();
             const last = escapeHTML(c.last || '—');
             const topTypeName = topType ? escapeHTML(topType[0]) : '—';
-            let subHtml = '';
-            let subBadge = '';
+
+            // Компактная пометка «Абонемент» рядом с именем — заменяет старые громоздкие
+            // отдельные блоки (sub-badge / sub-history-badge / cl-subscription), чтобы
+            // карточка в списке оставалась той же высоты, что и у всех остальных клиентов.
+            // Всё развёрнуто (used/total, цена, история) показывается при открытии карточки.
+            let subTag = '';
+            if (subInfo) {
+                subTag = `<span class="cl-sub-tag"><i class="fa-solid fa-ticket"></i> Абонемент</span>`;
+            } else if (subHistory.length > 0) {
+                subTag = `<span class="cl-sub-tag" style="color:var(--text3);background:var(--surface3);border-color:var(--border2);"><i class="fa-solid fa-clock-rotate-left"></i> Был абонемент</span>`;
+            }
+
+            // Содержимое сетки 2×2: для клиента с абонементом показываем прогресс
+            // занятий и цену вместо «Визитов/Услуга», которые для него не информативны.
+            let statsHtml;
             if (subInfo) {
                 const used = subInfo.used || 0;
                 const totalSessions = subInfo.total || 0;
                 const pricePerSession = subInfo.price || 0;
-                subHtml =
-                    `<div class="cl-subscription"><span>Абонемент</span><span>${used}/${totalSessions}</span></div>` +
-                    (pricePerSession ? `<div class="cl-subscription"><span>Цена занятия</span><span>${pricePerSession.toLocaleString()} ₽</span></div>` : '');
-                if (used < totalSessions) {
-                    subBadge = `<div class="sub-badge">${totalSessions - used} занятий осталось</div>`;
-                } else {
-                    subBadge =
-                        `<div class="sub-badge" style="border-color:var(--red);color:var(--red);background:var(--red-bg);">Абонемент использован</div>`;
-                }
+                const left = Math.max(0, totalSessions - used);
+                const isExhausted = used >= totalSessions;
+                statsHtml = `
+                    <div class="cl-st"><div class="cl-st-l">Занятий</div><div class="cl-st-v" style="color:${pal.hex}">${used}/${totalSessions}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Цена занятия</div><div class="cl-st-v pv">${pricePerSession ? pricePerSession.toLocaleString() + ' ₽' : '—'}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Статус</div><div class="cl-st-v" style="font-size:10px;color:${isExhausted ? 'var(--red)' : 'var(--green)'};">${isExhausted ? 'Использован' : left + ' осталось'}</div></div>
+                `;
+            } else {
+                const visitsDisplay = c.isSubscriptionOnly ? '—' : c.visits;
+                const totalDisplay = c.isSubscriptionOnly ? '—' : total + ' ₽';
+                statsHtml = `
+                    <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${visitsDisplay}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${totalDisplay}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
+                `;
             }
-            // Историческая пометка удалённых абонементов
-            let subHistoryHtml = '';
-            if (subHistory.length > 0) {
-                subHistoryHtml = subHistory.map(h =>
-                    `<div class="sub-history-badge"><i class="fa-solid fa-clock-rotate-left"></i>Был абонемент: ${h.used} из ${h.total} занятий${h.createdDate ? ' · ' + h.createdDate : ''}</div>`
-                ).join('');
-            }
-
-            // Для subscription-only клиента без активного абонемента — показываем нулевую статистику
-            const visitsDisplay = c.isSubscriptionOnly && !subInfo ? '—' : c.visits;
-            const totalDisplay = c.isSubscriptionOnly && !subInfo ? '—' : total + ' ₽';
 
             card.innerHTML = `
                 <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start; padding-right:30px;">
                     <div style="display:flex; gap:9px; align-items:center; min-width:0; flex:1;">
                         <div class="cl-av" style="background:${pal.bg};color:${pal.hex}; flex-shrink:0;">${name[0]?.toUpperCase() || '?'}</div>
-                        <div style="min-width:0;"><div class="cl-nm">${name}</div><div class="cl-ph">${phone}</div></div>
+                        <div style="min-width:0;">
+                            <div class="cl-nm">${name}</div>
+                            <div class="cl-ph">${phone}</div>
+                        </div>
                     </div>
+                    ${subTag}
                 </div>
-                ${subBadge}
-                ${subHistoryHtml}
-                <div class="cl-stats" style="margin-top:5px;">
-                    <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${visitsDisplay}</div></div>
-                    <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${totalDisplay}</div></div>
-                    <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
-                    <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
+                <div class="cl-stats">
+                    ${statsHtml}
                 </div>
-                ${subHtml}
                 <button class="cl-edit-btn" title="Редактировать клиента"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             `;
 
@@ -6926,6 +6953,7 @@
                 // только прошлые месяцы (до текущего)
                 if (d.getFullYear() > curY2) return false;
                 if (d.getFullYear() === curY2 && d.getMonth() >= curM2) return false;
+                if (r.isSubscriptionVisit) return false;
                 const full = r.fullTotal || r.total || 0;
                 const paid = r.total || 0;
                 const rest = Math.max(0, full - paid);
@@ -6951,7 +6979,7 @@
             } else if (currentStatusFilter === 'done') {
                 filtered = filtered.filter(r => r.completed);
             } else if (currentStatusFilter === 'debt') {
-                filtered = filtered.filter(r => (r.fullTotal || r.total || 0) - (r.total || 0) > 0);
+                filtered = filtered.filter(r => !r.isSubscriptionVisit && (r.fullTotal || r.total || 0) - (r.total || 0) > 0);
             }
 
             // Добавляем переносы в конец (справа), только если фильтр "все" или "долг"
@@ -6978,7 +7006,10 @@
             }
             filtered.forEach(r => {
                 const full = r.fullTotal || r.total || 0;
-                const paid = r.total || 0;
+                // Занятие по абонементу уже оплачено при покупке абонемента — долг для
+                // таких записей никогда не показываем, даже если суммы в данных
+                // почему-то не совпадают (например, старая запись до этого исправления).
+                const paid = r.isSubscriptionVisit ? full : (r.total || 0);
                 const rest = Math.max(0, full - paid);
                 const perc = full > 0 ? Math.min((paid / full) * 100, 100) : 0;
                 const isDone = r.completed;
@@ -7384,8 +7415,8 @@
             const mRev = new Array(12).fill(0);
             const svcMap = {};
             myData.forEach(r => {
-                const paid = Number(r.total || 0);
                 const full = Number(r.fullTotal || r.total || 0);
+                const paid = r.isSubscriptionVisit ? full : Number(r.total || 0);
                 const rem = Math.max(0, full - paid);
                 totalRev += paid;
                 totalDbt += rem;
@@ -8187,7 +8218,7 @@
             data.forEach(r => {
                 const card = document.createElement('div');
                 const full = r.fullTotal || r.total || 0;
-                const paid = r.total || 0;
+                const paid = r.isSubscriptionVisit ? full : (r.total || 0);
                 const rest = Math.max(0, full - paid);
                 const isDone = r.completed;
                 card.className = 'fin-card';
@@ -8198,10 +8229,14 @@
                 if (isDone) { statusText = 'Готово'; statusClass = 'ss-done'; }
                 else if (rest > 0) { statusText = 'Долг'; statusClass = 'ss-debt'; }
                 else { statusText = 'В работе'; statusClass = 'ss-work'; }
+                const subscriptionVisitBadge = r.isSubscriptionVisit
+                    ? `<span class="subscription-badge" title="Занятие по абонементу"><i class="fa-solid fa-ticket subscription-badge__icon"></i><span class="subscription-badge__text">Абонемент</span></span>`
+                    : '';
                 card.innerHTML = `
                     <div class="fin-header">
                         <div class="fin-color-bar" style="background:${r.eventColor||'#9090a0'};"></div>
                         <div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${escapeHTML(r.client||'—')}</div>
+                        ${subscriptionVisitBadge}
                         <span class="ss-badge ${statusClass} fin-status">${statusText}</span>
                         <span style="font-size:10px;color:var(--text3);margin-left:4px;">${escapeHTML(author)}</span>
                     </div>
@@ -8243,8 +8278,8 @@
                 totalDebt = 0;
             const monthMap = new Array(12).fill(0);
             data.forEach(r => {
-                const paid = Number(r.total || 0);
                 const full = Number(r.fullTotal || r.total || 0);
+                const paid = r.isSubscriptionVisit ? full : Number(r.total || 0);
                 totalRev += paid;
                 totalDebt += Math.max(0, full - paid);
                 if (r.completed && r.date) {
