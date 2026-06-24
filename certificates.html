@@ -835,6 +835,42 @@
             border-color: var(--border2);
             background: var(--surface3);
         }
+        .cl-del-btn {
+            position: absolute;
+            top: 10px;
+            right: 42px;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,92,106,.25);
+            background: var(--red-bg);
+            color: var(--red);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            transition: .15s;
+            opacity: 0.55;
+        }
+        .cl-del-btn:hover {
+            opacity: 1;
+            border-color: var(--red);
+            background: rgba(255,92,106,.18);
+        }
+        .sub-history-badge {
+            margin-top: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: var(--surface3);
+            border: 1px solid var(--border2);
+            font-size: 10px;
+            color: var(--text3);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .sub-history-badge i { color: var(--gold); font-size: 9px; }
         .cl-subscription {
             margin-top: 8px;
             padding: 4px 8px;
@@ -4412,6 +4448,7 @@
                 const snap = await SUBC
                     .where("clientName", "==", clientName.trim())
                     .where("authorUid", "==", window.PROFILE.uid)
+                    .where("deleted", "==", false)
                     .get();
                 if (snap.empty) return null;
                 const doc = snap.docs[0];
@@ -6047,6 +6084,8 @@
                         createdDate: date,
                         authorUid: window.PROFILE.uid,
                         authorPhone: window.PROFILE.phone,
+                        deleted: false,
+                        countInAnalytics: true,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     closeRecModal();
@@ -6194,6 +6233,37 @@
             });
 
             let cls = Object.values(map);
+
+            // Дополнительно: клиенты у которых был ТОЛЬКО абонемент (нет сессий в window.CRM),
+            // и абонемент был удалён — их нет в map, но они должны отображаться с историей.
+            // Загружаем их асинхронно из Firestore.
+            if (window.PROFILE && window.PROFILE.uid) {
+                SUBC.where('authorUid', '==', window.PROFILE.uid).where('deleted', '==', true).get().then(delSnap => {
+                    delSnap.forEach(doc => {
+                        const d = doc.data();
+                        const nm = (d.clientName || '').trim();
+                        if (!nm) return;
+                        // Проверяем — есть ли этот клиент уже в map (по имени)
+                        const alreadyInMap = cls.some(c => c.name === nm);
+                        if (!alreadyInMap) {
+                            // Добавляем как subscription-only клиента без сессий
+                            const ghost = {
+                                name: nm,
+                                phone: d.clientPhone || '',
+                                visits: 0,
+                                total: 0,
+                                last: d.createdDate || '',
+                                timestamp: d.createdAt ? (d.createdAt.toMillis ? d.createdAt.toMillis() : 0) : 0,
+                                types: {},
+                                ids: [],
+                                isSubscriptionOnly: true,
+                                _ghostFromDeletedSub: true
+                            };
+                            renderClientCard(ghost, null, [{ used: d.used || 0, total: d.total || 0, createdDate: d.createdDate || '' }]);
+                        }
+                    });
+                }).catch(() => {});
+            }
             if (clientPeriod !== 'all') {
                 const now = new Date();
                 let startDate = new Date();
@@ -6242,31 +6312,45 @@
 
             const promises = cls.map(async (c) => {
                 try {
+                    // Ищем активный абонемент
                     const subSnap = await SUBC
                         .where("clientName", "==", c.name)
                         .where("authorUid", "==", window.PROFILE.uid)
+                        .where("deleted", "==", false)
                         .get();
                     let subInfo = null;
                     if (!subSnap.empty) {
                         const subDoc = subSnap.docs[0];
                         const subData = subDoc.data();
-                        subInfo = { used: subData.used || 0, total: subData.total || 0 };
+                        subInfo = { id: subDoc.id, used: subData.used || 0, total: subData.total || 0 };
                     }
-                    return { client: c, subInfo };
+                    // Ищем историю удалённых абонементов
+                    const delSubSnap = await SUBC
+                        .where("clientName", "==", c.name)
+                        .where("authorUid", "==", window.PROFILE.uid)
+                        .where("deleted", "==", true)
+                        .get();
+                    let subHistory = [];
+                    delSubSnap.forEach(doc => {
+                        const d = doc.data();
+                        subHistory.push({ used: d.used || 0, total: d.total || 0, createdDate: d.createdDate || '' });
+                    });
+                    return { client: c, subInfo, subHistory };
                 } catch (e) {
                     console.error('Ошибка загрузки подписки:', e);
-                    return { client: c, subInfo: null };
+                    return { client: c, subInfo: null, subHistory: [] };
                 }
             });
 
             Promise.all(promises).then(results => {
-                results.forEach(({ client, subInfo }) => {
-                    renderClientCard(client, subInfo);
+                results.forEach(({ client, subInfo, subHistory }) => {
+                    renderClientCard(client, subInfo, subHistory);
                 });
             });
         }
 
-        function renderClientCard(c, subInfo) {
+        function renderClientCard(c, subInfo, subHistory) {
+            subHistory = subHistory || [];
             const grid = document.getElementById('clGrid');
             const pal = palByHex(PALETTE[0].hex);
             const topType = Object.entries(c.types).sort((a, b) => b[1] - a[1])[0];
@@ -6291,45 +6375,82 @@
                         `<div class="sub-badge" style="border-color:var(--red);color:var(--red);background:var(--red-bg);">Абонемент использован</div>`;
                 }
             }
+            // Историческая пометка удалённых абонементов
+            let subHistoryHtml = '';
+            if (subHistory.length > 0) {
+                subHistoryHtml = subHistory.map(h =>
+                    `<div class="sub-history-badge"><i class="fa-solid fa-clock-rotate-left"></i>Был абонемент: ${h.used} из ${h.total} занятий${h.createdDate ? ' · ' + h.createdDate : ''}</div>`
+                ).join('');
+            }
+
+            // Для subscription-only клиента без активного абонемента — показываем нулевую статистику
+            const visitsDisplay = c.isSubscriptionOnly && !subInfo ? '—' : c.visits;
+            const totalDisplay = c.isSubscriptionOnly && !subInfo ? '—' : total + ' ₽';
+
             card.innerHTML = `
-                <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start; padding-right:60px;">
                     <div style="display:flex; gap:9px; align-items:center;">
                         <div class="cl-av" style="background:${pal.bg};color:${pal.hex}">${name[0]?.toUpperCase() || '?'}</div>
                         <div><div class="cl-nm">${name}</div><div class="cl-ph">${phone}</div></div>
                     </div>
-                    <button class="cl-edit-btn" onclick="event.stopPropagation(); openClientEdit('${c.ids.join(',')}')" title="Редактировать клиента">
-                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                    </button>
                 </div>
                 ${subBadge}
-                <div class="cl-stats">
-                    <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${c.visits}</div></div>
-                    <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${total}</div></div>
+                ${subHistoryHtml}
+                <div class="cl-stats" style="margin-top:8px;">
+                    <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${visitsDisplay}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${totalDisplay}</div></div>
                     <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
                     <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
                 </div>
                 ${subHtml}
+                <button class="cl-del-btn" title="Удалить клиента"><i class="fa-solid fa-trash"></i></button>
+                <button class="cl-edit-btn" title="Редактировать клиента"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             `;
+
+            // Клик на карточку
             card.onclick = (e) => {
-                if (e.target.closest('.cl-edit-btn')) return;
+                if (e.target.closest('.cl-del-btn') || e.target.closest('.cl-edit-btn')) return;
                 if (c.isSubscriptionOnly && subInfo) {
                     openSubClientEdit(c.name, c.phone, subInfo);
+                } else if (c.isSubscriptionOnly && !subInfo) {
+                    // Был только абонемент, теперь удалён — показываем модалку с историей
+                    openSubHistoryModal(c.name, c.phone, subHistory);
                 } else {
                     openClientEdit(c.ids.join(','));
                 }
             };
-            // Кнопка «...» тоже учитывает тип клиента
+
+            // Кнопка редактирования «...»
             const editBtn = card.querySelector('.cl-edit-btn');
             if (editBtn) {
                 editBtn.onclick = (e) => {
                     e.stopPropagation();
                     if (c.isSubscriptionOnly && subInfo) {
                         openSubClientEdit(c.name, c.phone, subInfo);
+                    } else if (c.isSubscriptionOnly && !subInfo) {
+                        openSubHistoryModal(c.name, c.phone, subHistory);
                     } else {
                         openClientEdit(c.ids.join(','));
                     }
                 };
             }
+
+            // Кнопка удаления — иконка урны
+            const delBtn = card.querySelector('.cl-del-btn');
+            if (delBtn) {
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (c.isSubscriptionOnly) {
+                        // Клиент только с абонементом — удаляем через deleteSubClient-like логику
+                        deleteSubOnlyClient(c.name, subInfo, subHistory);
+                    } else {
+                        // Обычный клиент — используем deleteClientAndRecords с ids
+                        clientEditIds = c.ids;
+                        deleteClientAndRecords(c.name);
+                    }
+                };
+            }
+
             grid.appendChild(card);
         }
 
@@ -6425,18 +6546,10 @@
         window.deleteSubClient = async function() {
             const subId = document.getElementById('subEditId').value;
             const name = _subEditClientName;
-            openSM('Удалить клиента «' + name + '» и все его данные (абонемент + записи)?', 'delete', async () => {
+            openSM('Удалить абонемент клиента «' + name + '»? Карточка клиента сохранится с историей занятий.', 'delete', async () => {
                 try {
-                    const batch = db.batch();
-                    // 1. Удаляем абонемент
-                    if (subId) batch.delete(SUBC.doc(subId));
-                    // 2. Удаляем все записи-сессии этого клиента у текущего пользователя
-                    const sessSnap = await SC
-                        .where('authorUid', '==', window.PROFILE.uid)
-                        .where('client', '==', name)
-                        .get();
-                    sessSnap.forEach(doc => batch.delete(doc.ref));
-                    await batch.commit();
+                    // Мягкое удаление — история сохраняется в Firestore
+                    if (subId) await SUBC.doc(subId).update({ deleted: true, deletedAt: Date.now() });
                     closeSM();
                     closeSubClientEdit();
                     renderClients();
@@ -6445,23 +6558,30 @@
         };
 
         // ===== ПОЛНОЕ УДАЛЕНИЕ ОБЫЧНОГО КЛИЕНТА (все записи + абонемент если есть) =====
-        window.deleteClientAndRecords = async function() {
-            if (!clientEditIds.length) return;
-            const records = window.CRM.filter(r => clientEditIds.includes(r.id));
-            const name = records[0]?.client || records[0]?.song || '?';
+        window.deleteClientAndRecords = async function(nameOverride) {
+            if (!nameOverride && !clientEditIds.length) return;
+            let name, ids;
+            if (nameOverride) {
+                name = nameOverride;
+                ids = clientEditIds; // могут быть пустыми если вызов из карточки
+            } else {
+                const records = window.CRM.filter(r => clientEditIds.includes(r.id));
+                name = records[0]?.client || records[0]?.song || '?';
+                ids = clientEditIds;
+            }
             openSM('Удалить клиента «' + name + '» и все его записи? Это нельзя отменить.', 'delete', async () => {
                 try {
                     const batch = db.batch();
                     // Удаляем все записи-сессии
-                    clientEditIds.forEach(id => batch.delete(SC.doc(id)));
-                    // Если у клиента был абонемент — удаляем и его
+                    if (ids && ids.length) ids.forEach(id => batch.delete(SC.doc(id)));
+                    // Если у клиента был абонемент — удаляем полностью (hard delete)
                     try {
                         const subSnap = await SUBC
                             .where('authorUid', '==', window.PROFILE.uid)
                             .where('clientName', '==', name)
                             .get();
                         subSnap.forEach(doc => batch.delete(doc.ref));
-                    } catch(e) { /* абонемента нет — не критично */ }
+                    } catch(e) { /* не критично */ }
                     await batch.commit();
                     closeSM();
                     closeClientEdit();
@@ -6729,7 +6849,7 @@
             grid.innerHTML =
                 '<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">Загрузка...</div>';
             if (!window.PROFILE || !window.PROFILE.uid) return;
-            SUBC.where('authorUid', '==', window.PROFILE.uid).get().then(snap => {
+            SUBC.where('authorUid', '==', window.PROFILE.uid).where('deleted', '==', false).get().then(snap => {
                 grid.innerHTML = '';
                 document.getElementById('finCount').textContent = snap.size + ' абонементов';
                 if (snap.empty) {
@@ -6811,13 +6931,69 @@
             const name = card ? (card.dataset.name || '') : '';
             const btn = card ? card.querySelector('.act-ic.r') : null;
             if (btn) lockButton(btn);
-            openSM('Удалить абонемент' + (name ? ' «' + name + '»' : '') + '?', 'delete', () => {
-                SUBC.doc(id).delete().then(() => {
+            openSM('Удалить абонемент' + (name ? ' «' + name + '»' : '') + '? История занятий сохранится в карточке клиента.', 'delete', () => {
+                // Мягкое удаление — ставим флаг deleted:true, данные остаются для истории
+                SUBC.doc(id).update({ deleted: true, deletedAt: Date.now() }).then(() => {
                     closeSM();
                     renderFinanceSubs();
+                    renderClients();
                 }).catch(err => { handleError(err, 'Ошибка при удалении абонемента.'); if (btn) unlockButton(btn); });
             });
         };
+
+        // Удаление subscription-only клиента (полностью, включая историю)
+        async function deleteSubOnlyClient(name, subInfo, subHistory) {
+            openSM('Удалить клиента «' + escapeHTML(name) + '» полностью? Будут удалены абонемент и вся история.', 'delete', async () => {
+                try {
+                    // Удаляем все документы абонементов (активные и удалённые) этого клиента
+                    const snap = await SUBC
+                        .where('authorUid', '==', window.PROFILE.uid)
+                        .where('clientName', '==', name)
+                        .get();
+                    const batch = db.batch();
+                    snap.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                    closeSM();
+                    renderClients();
+                } catch(e) { handleError(e, 'Ошибка при удалении клиента'); }
+            });
+        }
+
+        // Модалка истории абонементов для клиентов без активного абонемента
+        function openSubHistoryModal(name, phone, subHistory) {
+            const histHtml = subHistory.length
+                ? subHistory.map(h => `
+                    <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border);margin-bottom:8px;">
+                        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">${h.createdDate ? 'Оформлен ' + h.createdDate : 'Дата неизвестна'}</div>
+                        <div style="font-size:13px;font-weight:600;color:var(--text);">Пройдено: ${h.used} из ${h.total} занятий</div>
+                    </div>`).join('')
+                : '<div style="color:var(--text3);font-size:12px;">История не найдена</div>';
+
+            // Переиспользуем moSubClientEdit как просмотровую модалку
+            document.getElementById('subEditId').value = '';
+            document.getElementById('subEditClientName').value = name;
+            document.getElementById('subEditClientPhone').value = phone || '';
+            document.getElementById('subEditUsed').textContent = '—';
+            document.getElementById('subEditTotal').textContent = '—';
+            document.getElementById('subEditPrice').textContent = '—';
+            document.getElementById('subEditAmount').textContent = '—';
+            document.getElementById('subEditDate').textContent = '—';
+            document.getElementById('subEditLeft').textContent = '—';
+            // Вставляем историю в блок абонемента
+            const abBlock = document.querySelector('#moSubClientEdit [style*="background:var(--surface2)"][style*="border-radius:var(--r)"]');
+            if (abBlock) {
+                abBlock.innerHTML = `
+                    <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
+                        <i class="fa-solid fa-clock-rotate-left" style="color:var(--gold);margin-right:5px;"></i>История абонементов
+                    </div>
+                    ${histHtml}`;
+            }
+            _subEditCountInAnalytics = true;
+            _updateSubAnalyticsToggleUI(true);
+            _subEditClientName = name;
+            document.body.classList.add('modal-open');
+            document.getElementById('moSubClientEdit').classList.add('open');
+        }
 
         // ===== CERTS =====
         function renderCerts() {
@@ -6936,7 +7112,7 @@
 
             // Подгружаем абонементы и добавляем их суммы в аналитику
             if (window.PROFILE && window.PROFILE.uid) {
-                SUBC.where('authorUid', '==', window.PROFILE.uid).get().then(subSnap => {
+                SUBC.where('authorUid', '==', window.PROFILE.uid).where('deleted', '==', false).get().then(subSnap => {
                     let subRev = 0, subRevYear = 0;
                     const subMRev = new Array(12).fill(0);
                     subSnap.forEach(doc => {
@@ -7245,6 +7421,8 @@
                     createdDate: date,
                     authorUid: window.PROFILE.uid,
                     authorPhone: window.PROFILE.phone,
+                    deleted: false,
+                    countInAnalytics: true,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
