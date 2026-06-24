@@ -4211,6 +4211,33 @@
 
         function getEffectiveZoomForSave() { return isMobileDevice ? currentHourHeightMobile : currentHourHeight; }
 
+        // ===== ВСЕ ID записей клиента по имени, независимо от флагов (completed/isSubscription/и т.п.) =====
+        // Используется при удалении карточки клиента, чтобы гарантированно зацепить
+        // ЛЮБЫЕ записи этого клиента в SC — включая старые «служебные» записи-маркеры
+        // абонементов (isSubscription:true) или записи, не попавшие в обычный список
+        // (clientEditIds), оставшиеся от старых версий приложения. Без этого иногда
+        // карточка клиента «не удаляется» — запись-сирота остаётся в window.CRM
+        // и снова собирает клиента в список.
+        function findAllMyRecordIdsByName(name) {
+            if (!name || !window.PROFILE) return [];
+            const target = name.trim();
+            if (!target) return [];
+            const currentUid = window.PROFILE.uid;
+            const currentPhone = norm(window.PROFILE.phone || '');
+            return window.CRM.filter(r => {
+                const rName = (r.client || r.song || '').trim();
+                if (rName !== target) return false;
+                if (r.authorUid === currentUid) return true;
+                if (r.authorPhone) {
+                    const rPhone = norm(r.authorPhone);
+                    if (rPhone === currentPhone) return true;
+                    if (rPhone.length >= 10 && currentPhone.length >= 10 &&
+                        rPhone.slice(-10) === currentPhone.slice(-10)) return true;
+                }
+                return false;
+            }).map(r => r.id);
+        }
+
         // ===== getMyData (только завершённые записи для клиентов) =====
         function getMyData(includeUncompleted = false) {
             if (!window.PROFILE) return [];
@@ -6644,6 +6671,10 @@
                 name = records[0]?.client || records[0]?.song || '?';
                 ids = clientEditIds;
             }
+            // Дособираем ВСЕ записи этого клиента по имени — включая «осиротевшие»
+            // служебные записи (например старые маркеры абонементов isSubscription:true),
+            // которые не попали в clientEditIds, но из-за которых карточка не удалялась.
+            const allIds = Array.from(new Set([...(ids || []), ...findAllMyRecordIdsByName(name)]));
             openSM(
                 'Удалить клиента «' + name + '»? Это нельзя отменить.',
                 'delete',
@@ -6656,8 +6687,8 @@
                         if (keepInAnalytics) {
                             // Мягкое удаление: карточка скрывается из «Клиенты»,
                             // но записи остаются в базе для Аналитики и Финансов.
-                            if (ids && ids.length) {
-                                ids.forEach(id => batch.update(SC.doc(id), {
+                            if (allIds.length) {
+                                allIds.forEach(id => batch.update(SC.doc(id), {
                                     hiddenFromClients: true,
                                     hiddenFromClientsAt: Date.now()
                                 }));
@@ -6675,13 +6706,11 @@
                             await batch.commit();
                             // Локально помечаем сразу, чтобы карточка пропала из списка
                             // не дожидаясь следующего onSnapshot от Firestore.
-                            if (ids && ids.length) {
-                                window.CRM.forEach(r => { if (ids.includes(r.id)) r.hiddenFromClients = true; });
-                            }
+                            window.CRM.forEach(r => { if (allIds.includes(r.id)) r.hiddenFromClients = true; });
                         } else {
                             // Полное удаление — записи и абонемент стираются безвозвратно,
                             // суммы клиента пропадают и из аналитики.
-                            if (ids && ids.length) ids.forEach(id => batch.delete(SC.doc(id)));
+                            if (allIds.length) allIds.forEach(id => batch.delete(SC.doc(id)));
                             try {
                                 const subSnap = await SUBC
                                     .where('authorUid', '==', window.PROFILE.uid)
@@ -6690,6 +6719,8 @@
                                 subSnap.forEach(doc => batch.delete(doc.ref));
                             } catch(e) { /* не критично */ }
                             await batch.commit();
+                            // Сразу убираем удалённые записи из локального кэша
+                            window.CRM = window.CRM.filter(r => !allIds.includes(r.id));
                         }
                         closeSM();
                         closeClientEdit();
@@ -7072,6 +7103,12 @@
 
         // Удаление subscription-only клиента (полностью, включая историю)
         async function deleteSubOnlyClient(name, subInfo, subHistory) {
+            // ВАЖНО: у такого клиента в «Клиенты» может не быть ни одного актуального
+            // документа в SUBC (абонемент уже удалён/история пуста), а карточка всё
+            // равно держится за счёт «осиротевшей» служебной записи в SC (коллекция
+            // обычных записей), которая регистрирует имя клиента, но не была заведена
+            // ни в clientEditIds, ни найдена через SUBC. Поэтому ищем и чистим SC по имени.
+            const orphanIds = findAllMyRecordIdsByName(name);
             openSM(
                 'Удалить клиента «' + escapeHTML(name) + '»? Это нельзя отменить.',
                 'delete',
@@ -7092,11 +7129,21 @@
                                 hiddenFromClients: true,
                                 hiddenFromClientsAt: Date.now()
                             }));
+                            orphanIds.forEach(id => batch.update(SC.doc(id), {
+                                hiddenFromClients: true,
+                                hiddenFromClientsAt: Date.now()
+                            }));
                         } else {
                             // Полное безвозвратное удаление, включая аналитику
                             snap.forEach(doc => batch.delete(doc.ref));
+                            orphanIds.forEach(id => batch.delete(SC.doc(id)));
                         }
                         await batch.commit();
+                        if (keepInAnalytics) {
+                            window.CRM.forEach(r => { if (orphanIds.includes(r.id)) r.hiddenFromClients = true; });
+                        } else {
+                            window.CRM = window.CRM.filter(r => !orphanIds.includes(r.id));
+                        }
                         closeSM();
                         renderClients();
                     } catch(e) {
