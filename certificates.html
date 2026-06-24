@@ -4546,7 +4546,7 @@
             }
         }
 
-        async function updateSubscriptionUsage(clientName, hours = 1) {
+        async function updateSubscriptionUsage(clientName, sessionsToDeduct = 1) {
             if (!clientName || !window.PROFILE) return null;
             try {
                 const snap = await SUBC
@@ -4558,12 +4558,12 @@
                 const data = doc.data();
                 const used = data.used || 0;
                 const total = data.total || 0;
-                const newUsed = Math.min(used + hours, total);
-                if (newUsed > total) {
-                    alert(`⚠️ У клиента осталось только ${total - used} занятий, а вы ставите на ${hours} час(ов). Будет списано ${total - used} занятий.`);
+                const newUsed = Math.min(used + sessionsToDeduct, total);
+                if (used + sessionsToDeduct > total) {
+                    alert(`⚠️ У клиента осталось только ${Math.max(0, total - used)} занятий. Будет списано ${Math.max(0, total - used)} занятий.`);
                 }
                 await doc.ref.update({ used: newUsed });
-                console.log(`✅ Списано ${hours} занятий для ${clientName}. Использовано: ${newUsed}/${total}`);
+                console.log(`✅ Списано ${sessionsToDeduct} занятие(й) для ${clientName}. Использовано: ${newUsed}/${total}`);
                 return { used: newUsed, total };
             } catch (e) {
                 console.error('Ошибка обновления абонемента:', e);
@@ -4606,7 +4606,12 @@
             if (_subClientHasSubscription && _subClientSubData) {
                 const used = _subClientSubData.used || 0;
                 const total = _subClientSubData.total || 0;
-                const next = Math.min(used + 1, total);
+                // Для НОВОЙ записи показываем «следующий» номер занятия (used+1),
+                // потому что списание ещё не произошло — оно случится при сохранении.
+                // Для УЖЕ СУЩЕСТВУЮЩЕЙ записи (editId задан) занятие уже было списано
+                // при её создании, поэтому показываем текущий used без дополнительного +1,
+                // иначе номер занятия задваивается при каждом открытии записи на просмотр.
+                const next = editId ? Math.min(Math.max(used, 1), total) : Math.min(used + 1, total);
                 const label = `${next}/${total}`;
                 totalEl.textContent = label;
                 totalEl.className = 'total-val sub-usage';
@@ -6221,7 +6226,9 @@
                     duration = (h2 * 60 + m2) - (h1 * 60 + m1);
                     if (duration <= 0) duration = 60;
                 }
-                const hours = Math.ceil(duration / 60);
+                // Одна запись = одно занятие из абонемента, независимо от продолжительности.
+                // Стандартное занятие длится 2 часа, но если поставить дольше или короче,
+                // списываться должно всё равно ровно одно занятие (а не «по часам»).
                 const data = {
                     date,
                     time,
@@ -6254,8 +6261,7 @@
                 if (!editId) {
                     const sub = await getSubscriptionForClient(name);
                     if (sub) {
-                        const hoursToDeduct = Math.max(1, hours);
-                        await updateSubscriptionUsage(name, hoursToDeduct);
+                        await updateSubscriptionUsage(name, 1);
                         _subClientHasSubscription = true;
                         _subClientSubData = await getSubscriptionForClient(name);
                         _lastCheckedClientName = name;
@@ -6325,37 +6331,49 @@
 
             let cls = Object.values(map);
 
-            // Дополнительно: клиенты у которых был ТОЛЬКО абонемент (нет сессий в window.CRM),
-            // и абонемент был удалён — их нет в map, но они должны отображаться с историей.
+            // Дополнительно: клиенты у которых есть ТОЛЬКО абонемент (нет сессий в window.CRM).
+            // Это касается как АКТИВНЫХ абонементов (клиент только что создан через
+            // «Новый абонемент» и пока не имеет ни одной записи в журнале), так и
+            // удалённых (история). Их нет в map, но они должны отображаться в «Клиентах».
             // Загружаем их асинхронно из Firestore.
             if (window.PROFILE && window.PROFILE.uid) {
-                SUBC.where('authorUid', '==', window.PROFILE.uid).where('deleted', '==', true).get().then(delSnap => {
-                    delSnap.forEach(doc => {
+                SUBC.where('authorUid', '==', window.PROFILE.uid).get().then(allSubSnap => {
+                    // Группируем все абонементы клиента (активные + удалённые) по имени
+                    const byName = {};
+                    allSubSnap.forEach(doc => {
                         const d = doc.data();
-                        // Этот клиент был удалён с сохранением в аналитике — не показываем его
-                        // призрачную карточку в списке клиентов, хотя сумма абонемента
-                        // остаётся учтённой в Аналитике.
-                        if (d.hiddenFromClients === true) return;
                         const nm = (d.clientName || '').trim();
                         if (!nm) return;
-                        // Проверяем — есть ли этот клиент уже в map (по имени)
-                        const alreadyInMap = cls.some(c => c.name === nm);
-                        if (!alreadyInMap) {
-                            // Добавляем как subscription-only клиента без сессий
-                            const ghost = {
-                                name: nm,
-                                phone: d.clientPhone || '',
-                                visits: 0,
-                                total: 0,
-                                last: d.createdDate || '',
-                                timestamp: d.createdAt ? (d.createdAt.toMillis ? d.createdAt.toMillis() : 0) : 0,
-                                types: {},
-                                ids: [],
-                                isSubscriptionOnly: true,
-                                _ghostFromDeletedSub: true
-                            };
-                            renderClientCard(ghost, null, [{ used: d.used || 0, total: d.total || 0, createdDate: d.createdDate || '' }]);
+                        if (!byName[nm]) byName[nm] = { active: null, history: [] };
+                        if (d.deleted === true) {
+                            if (d.hiddenFromClients !== true) {
+                                byName[nm].history.push({ used: d.used || 0, total: d.total || 0, createdDate: d.createdDate || '' });
+                            }
+                        } else {
+                            byName[nm].active = { id: doc.id, used: d.used || 0, total: d.total || 0, price: d.price || 0, createdDate: d.createdDate || '', createdAtMs: d.createdAt ? (d.createdAt.toMillis ? d.createdAt.toMillis() : 0) : 0, phone: d.clientPhone || '' };
                         }
+                    });
+                    Object.keys(byName).forEach(nm => {
+                        // Проверяем — есть ли этот клиент уже в map (по имени), то есть
+                        // у него уже есть обычные записи в журнале (карточка отрисуется
+                        // основным циклом выше вместе со своим subInfo).
+                        const alreadyInMap = cls.some(c => c.name === nm);
+                        if (alreadyInMap) return;
+                        const entry = byName[nm];
+                        const ghost = {
+                            name: nm,
+                            phone: (entry.active && entry.active.phone) || '',
+                            visits: 0,
+                            total: 0,
+                            last: (entry.active && entry.active.createdDate) || '',
+                            timestamp: (entry.active && entry.active.createdAtMs) || 0,
+                            types: {},
+                            ids: [],
+                            isSubscriptionOnly: true,
+                            _ghostFromSub: true
+                        };
+                        const subInfoForGhost = entry.active ? { id: entry.active.id, used: entry.active.used, total: entry.active.total, price: entry.active.price } : null;
+                        renderClientCard(ghost, subInfoForGhost, entry.history);
                     });
                 }).catch(() => {});
             }
@@ -6417,7 +6435,7 @@
                     if (!subSnap.empty) {
                         const subDoc = subSnap.docs[0];
                         const subData = subDoc.data();
-                        subInfo = { id: subDoc.id, used: subData.used || 0, total: subData.total || 0 };
+                        subInfo = { id: subDoc.id, used: subData.used || 0, total: subData.total || 0, price: subData.price || 0 };
                     }
                     // Ищем историю удалённых абонементов
                     const delSubSnap = await SUBC
@@ -6480,8 +6498,10 @@
             if (subInfo) {
                 const used = subInfo.used || 0;
                 const totalSessions = subInfo.total || 0;
+                const pricePerSession = subInfo.price || 0;
                 subHtml =
-                    `<div class="cl-subscription"><span>Абонемент</span><span>${used}/${totalSessions}</span></div>`;
+                    `<div class="cl-subscription"><span>Абонемент</span><span>${used}/${totalSessions}</span></div>` +
+                    (pricePerSession ? `<div class="cl-subscription"><span>Цена занятия</span><span>${pricePerSession.toLocaleString()} ₽</span></div>` : '');
                 if (used < totalSessions) {
                     subBadge = `<div class="sub-badge">${totalSessions - used} занятий осталось</div>`;
                 } else {
