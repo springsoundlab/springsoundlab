@@ -3626,9 +3626,12 @@
                 <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
                 <div id="clientEditSessions" style="max-height:200px;overflow-y:auto;font-size:12px;color:var(--text2);"></div>
             </div>
-            <div class="mb-btns">
-                <button class="mb-btn mb-cancel" onclick="closeClientEdit()">Отмена</button>
-                <button class="mb-btn mb-confirm" onclick="saveClientEdit()">Сохранить</button>
+            <div class="mb-btns" style="justify-content:space-between;">
+                <button class="mb-btn" style="color:var(--red);border-color:rgba(255,92,106,.3);background:var(--red-bg);" onclick="deleteClientAndRecords()"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Удалить клиента</button>
+                <div style="display:flex;gap:8px;">
+                    <button class="mb-btn mb-cancel" onclick="closeClientEdit()">Отмена</button>
+                    <button class="mb-btn mb-confirm" onclick="saveClientEdit()">Сохранить</button>
+                </div>
             </div>
         </div>
     </div>
@@ -4601,6 +4604,12 @@
             if (e.touches.length === 1) {
                 finSwipeStartX = e.touches[0].clientX;
                 finSwipeStartY = e.touches[0].clientY;
+                // Не перехватываем свайп из зоны открытия бокового меню
+                if (finSwipeStartX < SIDEBAR_EDGE_ZONE) {
+                    finSwipeActive = false;
+                    finSwipeHandled = true;
+                    return;
+                }
                 finSwipeActive = true;
                 finSwipeHandled = false;
             }
@@ -6377,13 +6386,48 @@
         window.deleteSubClient = async function() {
             const subId = document.getElementById('subEditId').value;
             const name = _subEditClientName;
-            openSM('Удалить клиента «' + name + '» и его абонемент?', 'delete', async () => {
+            openSM('Удалить клиента «' + name + '» и все его данные (абонемент + записи)?', 'delete', async () => {
                 try {
-                    if (subId) await SUBC.doc(subId).delete();
+                    const batch = db.batch();
+                    // 1. Удаляем абонемент
+                    if (subId) batch.delete(SUBC.doc(subId));
+                    // 2. Удаляем все записи-сессии этого клиента у текущего пользователя
+                    const sessSnap = await SC
+                        .where('authorUid', '==', window.PROFILE.uid)
+                        .where('client', '==', name)
+                        .get();
+                    sessSnap.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
                     closeSM();
                     closeSubClientEdit();
                     renderClients();
                 } catch(e) { handleError(e, 'Ошибка при удалении'); }
+            });
+        };
+
+        // ===== ПОЛНОЕ УДАЛЕНИЕ ОБЫЧНОГО КЛИЕНТА (все записи + абонемент если есть) =====
+        window.deleteClientAndRecords = async function() {
+            if (!clientEditIds.length) return;
+            const records = window.CRM.filter(r => clientEditIds.includes(r.id));
+            const name = records[0]?.client || records[0]?.song || '?';
+            openSM('Удалить клиента «' + name + '» и все его записи? Это нельзя отменить.', 'delete', async () => {
+                try {
+                    const batch = db.batch();
+                    // Удаляем все записи-сессии
+                    clientEditIds.forEach(id => batch.delete(SC.doc(id)));
+                    // Если у клиента был абонемент — удаляем и его
+                    try {
+                        const subSnap = await SUBC
+                            .where('authorUid', '==', window.PROFILE.uid)
+                            .where('clientName', '==', name)
+                            .get();
+                        subSnap.forEach(doc => batch.delete(doc.ref));
+                    } catch(e) { /* абонемента нет — не критично */ }
+                    await batch.commit();
+                    closeSM();
+                    closeClientEdit();
+                    renderClients();
+                } catch(e) { handleError(e, 'Ошибка при удалении клиента'); }
             });
         };
 
