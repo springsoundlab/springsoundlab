@@ -7054,6 +7054,10 @@
 
         window.deleteSubHistoryClient = function() {
             const name = _subHistoryClientName;
+            // Close history modal first, then open confirm dialog
+            document.getElementById('moSubHistory').classList.remove('open');
+            const anyOtherOpen = document.querySelector('.mo.open:not(#moSimple)');
+            if (!anyOtherOpen) document.body.classList.remove('modal-open');
             deleteSubOnlyClient(name, null, _subHistoryClientSubHistory);
         };
 
@@ -7332,8 +7336,10 @@
             mo.classList.add('open');
         };
         window.closeSM = function() {
-            document.body.classList.remove('modal-open');
             document.getElementById('moSimple').classList.remove('open');
+            // Only remove modal-open if no other modals are still open
+            const anyOtherOpen = document.querySelector('.mo.open:not(#moSimple)');
+            if (!anyOtherOpen) document.body.classList.remove('modal-open');
         };
 
         function openMonthInfo(idx, value) {
