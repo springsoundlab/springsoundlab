@@ -6402,7 +6402,8 @@
             let visible = 0;
             cards.forEach(card => {
                 const name = (card.getAttribute('data-client-name') || '').toLowerCase();
-                const match = !q || name.startsWith(q);
+                const words = name.split(/[\s()\[\]_,.-]+/).filter(Boolean);
+                const match = !q || words.some(w => w.startsWith(q));
                 card.style.display = match ? '' : 'none';
                 if (match) visible++;
             });
