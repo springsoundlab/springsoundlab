@@ -645,6 +645,10 @@
             transition: .15s;
             position: relative;
             min-width: 0;
+            height: 190px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         .cl-card:hover {
             border-color: var(--border2);
@@ -781,7 +785,10 @@
         .cl-nm {
             font-size: 13px;
             font-weight: 600;
-            word-break: break-word;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
         }
         .cl-ph {
             font-size: 10px;
@@ -3672,9 +3679,12 @@
                 <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
                 <div id="clientEditSessions" style="max-height:200px;overflow-y:auto;font-size:12px;color:var(--text2);"></div>
             </div>
-            <div class="mb-btns">
-                <button class="mb-btn mb-cancel" onclick="closeClientEdit()">Отмена</button>
-                <button class="mb-btn mb-confirm" onclick="saveClientEdit()">Сохранить</button>
+            <div class="mb-btns" style="justify-content:space-between;">
+                <button class="mb-btn mb-delete" onclick="deleteClientAndRecords()" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red);"><i class="fa-solid fa-trash" style="margin-right:4px;"></i>Удалить</button>
+                <div style="display:flex;gap:8px;">
+                    <button class="mb-btn mb-cancel" onclick="closeClientEdit()">Отмена</button>
+                    <button class="mb-btn mb-confirm" onclick="saveClientEdit()">Сохранить</button>
+                </div>
             </div>
         </div>
     </div>
@@ -3691,7 +3701,18 @@
                 <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="subHistoryClientPhone">—</div>
             </div>
             <div id="subHistoryContent" style="max-height:300px;overflow-y:auto;"></div>
-            <div class="mb-btns" style="margin-top:16px;">
+            <!-- Тоггл аналитики для истории абонементов -->
+            <div id="subHistoryAnalyticsWrap" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:16px;gap:12px;">
+                <div>
+                    <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Учитывать в аналитике</div>
+                    <div style="font-size:10px;color:var(--text3);">Включает сумму этого абонемента в общий доход</div>
+                </div>
+                <button id="subHistoryAnalyticsBtn" onclick="toggleSubHistoryAnalytics()" style="flex-shrink:0;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;border:1.5px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;transition:.15s;white-space:nowrap;">
+                    ✅ Включено
+                </button>
+            </div>
+            <div class="mb-btns" style="margin-top:16px;justify-content:space-between;">
+                <button class="mb-btn mb-delete" onclick="deleteSubHistoryClient()" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red);"><i class="fa-solid fa-trash" style="margin-right:4px;"></i>Удалить</button>
                 <button class="mb-btn mb-cancel" onclick="closeSubHistoryModal()">Закрыть</button>
             </div>
         </div>
@@ -6403,10 +6424,10 @@
             const totalDisplay = c.isSubscriptionOnly && !subInfo ? '—' : total + ' ₽';
 
             card.innerHTML = `
-                <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start; padding-right:60px;">
-                    <div style="display:flex; gap:9px; align-items:center;">
-                        <div class="cl-av" style="background:${pal.bg};color:${pal.hex}">${name[0]?.toUpperCase() || '?'}</div>
-                        <div><div class="cl-nm">${name}</div><div class="cl-ph">${phone}</div></div>
+                <div class="cl-top" style="display:flex; justify-content:space-between; align-items:flex-start; padding-right:30px;">
+                    <div style="display:flex; gap:9px; align-items:center; min-width:0; flex:1;">
+                        <div class="cl-av" style="background:${pal.bg};color:${pal.hex}; flex-shrink:0;">${name[0]?.toUpperCase() || '?'}</div>
+                        <div style="min-width:0;"><div class="cl-nm">${name}</div><div class="cl-ph">${phone}</div></div>
                     </div>
                 </div>
                 ${subBadge}
@@ -6418,13 +6439,12 @@
                     <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
                 </div>
                 ${subHtml}
-                <button class="cl-del-btn" title="Удалить клиента"><i class="fa-solid fa-trash"></i></button>
                 <button class="cl-edit-btn" title="Редактировать клиента"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             `;
 
             // Клик на карточку
             card.onclick = (e) => {
-                if (e.target.closest('.cl-del-btn') || e.target.closest('.cl-edit-btn')) return;
+                if (e.target.closest('.cl-edit-btn')) return;
                 if (c.isSubscriptionOnly && subInfo) {
                     openSubClientEdit(c.name, c.phone, subInfo);
                 } else if (c.isSubscriptionOnly && !subInfo) {
@@ -6445,22 +6465,6 @@
                         openSubHistoryModal(c.name, c.phone, subHistory);
                     } else {
                         openClientEdit(c.ids.join(','), c.name, c.phone);
-                    }
-                };
-            }
-
-            // Кнопка удаления — иконка урны
-            const delBtn = card.querySelector('.cl-del-btn');
-            if (delBtn) {
-                delBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    if (c.isSubscriptionOnly) {
-                        // Клиент только с абонементом — удаляем через deleteSubClient-like логику
-                        deleteSubOnlyClient(c.name, subInfo, subHistory);
-                    } else {
-                        // Обычный клиент — используем deleteClientAndRecords с ids
-                        clientEditIds = c.ids;
-                        deleteClientAndRecords(c.name);
                     }
                 };
             }
@@ -6977,7 +6981,23 @@
         }
 
         // Модалка истории абонементов для клиентов без активного абонемента
+        let _subHistoryClientName = '';
+        let _subHistoryClientSubHistory = [];
         function openSubHistoryModal(name, phone, subHistory) {
+            _subHistoryClientName = name || '';
+            _subHistoryClientSubHistory = subHistory || [];
+            _subHistoryCountInAnalytics = true;
+            _updateSubHistoryAnalyticsBtnUI(true);
+            // Загружаем состояние аналитики из первого абонемента
+            if (window.PROFILE && name) {
+                SUBC.where('clientName','==',name).where('authorUid','==',window.PROFILE.uid).get().then(snap => {
+                    if (!snap.empty) {
+                        const d = snap.docs[0].data();
+                        _subHistoryCountInAnalytics = (d.countInAnalytics !== false);
+                        _updateSubHistoryAnalyticsBtnUI(_subHistoryCountInAnalytics);
+                    }
+                }).catch(()=>{});
+            }
             document.getElementById('subHistoryClientName').textContent = name || '—';
             document.getElementById('subHistoryClientPhone').textContent = phone || '—';
             const content = document.getElementById('subHistoryContent');
@@ -6998,6 +7018,35 @@
             document.body.classList.remove('modal-open');
             document.getElementById('moSubHistory').classList.remove('open');
         }
+
+        window.deleteSubHistoryClient = function() {
+            const name = _subHistoryClientName;
+            deleteSubOnlyClient(name, null, _subHistoryClientSubHistory);
+        };
+
+        let _subHistoryCountInAnalytics = true;
+        function _updateSubHistoryAnalyticsBtnUI(val) {
+            const btn = document.getElementById('subHistoryAnalyticsBtn');
+            if (!btn) return;
+            if (val) {
+                btn.textContent = '✅ Включено';
+                btn.style.borderColor = 'var(--green)'; btn.style.background = 'var(--green-bg)'; btn.style.color = 'var(--green)';
+            } else {
+                btn.textContent = '⛔ Выключено';
+                btn.style.borderColor = 'var(--red)'; btn.style.background = 'var(--red-bg)'; btn.style.color = 'var(--red)';
+            }
+        }
+        window.toggleSubHistoryAnalytics = async function() {
+            _subHistoryCountInAnalytics = !_subHistoryCountInAnalytics;
+            _updateSubHistoryAnalyticsBtnUI(_subHistoryCountInAnalytics);
+            // Сохраняем во все удалённые абонементы этого клиента
+            try {
+                const snap = await SUBC.where('clientName','==',_subHistoryClientName).where('authorUid','==',window.PROFILE.uid).get();
+                const batch = db.batch();
+                snap.forEach(doc => batch.update(doc.ref, { countInAnalytics: _subHistoryCountInAnalytics }));
+                await batch.commit();
+            } catch(e) { console.error(e); }
+        };
 
         // ===== CERTS =====
         function renderCerts() {
