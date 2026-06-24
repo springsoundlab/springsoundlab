@@ -3672,12 +3672,27 @@
                 <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
                 <div id="clientEditSessions" style="max-height:200px;overflow-y:auto;font-size:12px;color:var(--text2);"></div>
             </div>
-            <div class="mb-btns" style="justify-content:space-between;">
-                <button class="mb-btn" style="color:var(--red);border-color:rgba(255,92,106,.3);background:var(--red-bg);" onclick="deleteClientAndRecords()"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Удалить клиента</button>
-                <div style="display:flex;gap:8px;">
-                    <button class="mb-btn mb-cancel" onclick="closeClientEdit()">Отмена</button>
-                    <button class="mb-btn mb-confirm" onclick="saveClientEdit()">Сохранить</button>
-                </div>
+            <div class="mb-btns">
+                <button class="mb-btn mb-cancel" onclick="closeClientEdit()">Отмена</button>
+                <button class="mb-btn mb-confirm" onclick="saveClientEdit()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно истории абонементов (отдельное, не портит moSubClientEdit) -->
+    <div class="mo" id="moSubHistory">
+        <div class="mb" style="width:420px;max-width:95vw;">
+            <div class="mb-header">
+                <div class="mb-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--gold);margin-right:6px;"></i> История абонементов</div>
+                <div class="mb-close" onclick="closeSubHistoryModal()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <div style="margin-bottom:10px;">
+                <div style="font-size:13px;font-weight:600;color:var(--text);" id="subHistoryClientName">—</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="subHistoryClientPhone">—</div>
+            </div>
+            <div id="subHistoryContent" style="max-height:300px;overflow-y:auto;"></div>
+            <div class="mb-btns" style="margin-top:16px;">
+                <button class="mb-btn mb-cancel" onclick="closeSubHistoryModal()">Закрыть</button>
             </div>
         </div>
     </div>
@@ -6413,10 +6428,9 @@
                 if (c.isSubscriptionOnly && subInfo) {
                     openSubClientEdit(c.name, c.phone, subInfo);
                 } else if (c.isSubscriptionOnly && !subInfo) {
-                    // Был только абонемент, теперь удалён — показываем модалку с историей
                     openSubHistoryModal(c.name, c.phone, subHistory);
                 } else {
-                    openClientEdit(c.ids.join(','));
+                    openClientEdit(c.ids.join(','), c.name, c.phone);
                 }
             };
 
@@ -6430,7 +6444,7 @@
                     } else if (c.isSubscriptionOnly && !subInfo) {
                         openSubHistoryModal(c.name, c.phone, subHistory);
                     } else {
-                        openClientEdit(c.ids.join(','));
+                        openClientEdit(c.ids.join(','), c.name, c.phone);
                     }
                 };
             }
@@ -6591,34 +6605,37 @@
         };
 
         // ===== РЕДАКТИРОВАНИЕ КЛИЕНТА =====
-        function openClientEdit(idsStr) {
-            const ids = idsStr.split(',').filter(id => id.trim());
-            if (!ids.length) return;
+        // nameHint/phoneHint используются когда ids пустые (клиент без обычных записей)
+        function openClientEdit(idsStr, nameHint, phoneHint) {
+            const ids = (idsStr || '').split(',').filter(id => id.trim());
             clientEditIds = ids;
-            const records = window.CRM.filter(r => ids.includes(r.id));
-            if (!records.length) return;
+            const records = ids.length ? window.CRM.filter(r => ids.includes(r.id)) : [];
             const first = records[0];
-            document.getElementById('clientEditName').value = first.client || first.song || '';
-            document.getElementById('clientEditPhone').value = first.phone || '';
+            document.getElementById('clientEditName').value = (first && (first.client || first.song)) || nameHint || '';
+            document.getElementById('clientEditPhone').value = (first && first.phone) || phoneHint || '';
             const listDiv = document.getElementById('clientEditSessions');
             listDiv.innerHTML = '';
-            records.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-            const header = document.createElement('div');
-            header.className = 'client-sessions-grid header';
-            header.innerHTML =
-                `<span class="cell">Дата</span><span class="cell">Время</span><span class="cell">Услуга</span><span class="cell">Сумма</span>`;
-            listDiv.appendChild(header);
-            records.forEach(r => {
-                const row = document.createElement('div');
-                row.className = 'client-sessions-grid';
-                row.innerHTML = `
-                    <span class="cell">${escapeHTML(r.date||'—')}</span>
-                    <span class="cell">${escapeHTML(r.time||'—')}</span>
-                    <span class="cell">${escapeHTML(r.services||'—')}</span>
-                    <span class="cell" style="font-weight:600;">${Number(r.total||0).toLocaleString()} ₽</span>
-                `;
-                listDiv.appendChild(row);
-            });
+            if (records.length) {
+                records.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+                const header = document.createElement('div');
+                header.className = 'client-sessions-grid header';
+                header.innerHTML =
+                    `<span class="cell">Дата</span><span class="cell">Время</span><span class="cell">Услуга</span><span class="cell">Сумма</span>`;
+                listDiv.appendChild(header);
+                records.forEach(r => {
+                    const row = document.createElement('div');
+                    row.className = 'client-sessions-grid';
+                    row.innerHTML = `
+                        <span class="cell">${escapeHTML(r.date||'—')}</span>
+                        <span class="cell">${escapeHTML(r.time||'—')}</span>
+                        <span class="cell">${escapeHTML(r.services||'—')}</span>
+                        <span class="cell" style="font-weight:600;">${Number(r.total||0).toLocaleString()} ₽</span>
+                    `;
+                    listDiv.appendChild(row);
+                });
+            } else {
+                listDiv.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:6px 0;">Нет записей</div>';
+            }
             document.body.classList.add('modal-open');
             document.getElementById('moClientEdit').classList.add('open');
         }
@@ -6961,38 +6978,25 @@
 
         // Модалка истории абонементов для клиентов без активного абонемента
         function openSubHistoryModal(name, phone, subHistory) {
-            const histHtml = subHistory.length
-                ? subHistory.map(h => `
+            document.getElementById('subHistoryClientName').textContent = name || '—';
+            document.getElementById('subHistoryClientPhone').textContent = phone || '—';
+            const content = document.getElementById('subHistoryContent');
+            if (subHistory && subHistory.length) {
+                content.innerHTML = subHistory.map(h => `
                     <div style="background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border);margin-bottom:8px;">
-                        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">${h.createdDate ? 'Оформлен ' + h.createdDate : 'Дата неизвестна'}</div>
+                        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">${h.createdDate ? 'Оформлен ' + escapeHTML(h.createdDate) : 'Дата неизвестна'}</div>
                         <div style="font-size:13px;font-weight:600;color:var(--text);">Пройдено: ${h.used} из ${h.total} занятий</div>
-                    </div>`).join('')
-                : '<div style="color:var(--text3);font-size:12px;">История не найдена</div>';
-
-            // Переиспользуем moSubClientEdit как просмотровую модалку
-            document.getElementById('subEditId').value = '';
-            document.getElementById('subEditClientName').value = name;
-            document.getElementById('subEditClientPhone').value = phone || '';
-            document.getElementById('subEditUsed').textContent = '—';
-            document.getElementById('subEditTotal').textContent = '—';
-            document.getElementById('subEditPrice').textContent = '—';
-            document.getElementById('subEditAmount').textContent = '—';
-            document.getElementById('subEditDate').textContent = '—';
-            document.getElementById('subEditLeft').textContent = '—';
-            // Вставляем историю в блок абонемента
-            const abBlock = document.querySelector('#moSubClientEdit [style*="background:var(--surface2)"][style*="border-radius:var(--r)"]');
-            if (abBlock) {
-                abBlock.innerHTML = `
-                    <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">
-                        <i class="fa-solid fa-clock-rotate-left" style="color:var(--gold);margin-right:5px;"></i>История абонементов
-                    </div>
-                    ${histHtml}`;
+                    </div>`).join('');
+            } else {
+                content.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:8px 0;">История не найдена</div>';
             }
-            _subEditCountInAnalytics = true;
-            _updateSubAnalyticsToggleUI(true);
-            _subEditClientName = name;
             document.body.classList.add('modal-open');
-            document.getElementById('moSubClientEdit').classList.add('open');
+            document.getElementById('moSubHistory').classList.add('open');
+        }
+
+        function closeSubHistoryModal() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('moSubHistory').classList.remove('open');
         }
 
         // ===== CERTS =====
