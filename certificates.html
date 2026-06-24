@@ -3282,11 +3282,15 @@
                 <div id="secClients" class="view" style="display:none;">
                     <div class="toolbar">
                         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%;">
-                            <span style="font-size:11px;color:var(--text3);" id="clCount">0 клиентов</span>
-                            <div class="sort-dropdown-wrapper">
+                            <span style="font-size:11px;color:var(--text3);flex-shrink:0;" id="clCount">0 клиентов</span>
+                            <div class="sort-dropdown-wrapper" style="flex-shrink:0;">
                                 <button class="tb-btn" id="sortToggleBtn" onclick="toggleSortDropdown(event)">
                                     <i class="fa-solid fa-arrow-up-wide-short"></i> Сортировать
                                 </button>
+                            </div>
+                            <div style="position:relative;flex:1;min-width:120px;max-width:260px;">
+                                <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);pointer-events:none;"></i>
+                                <input type="text" id="clSearch" placeholder="Поиск клиента..." oninput="filterClientsBySearch()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 8px 6px 26px;color:var(--text);font-size:12px;font-family:inherit;outline:none;transition:.15s;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
                             </div>
                         </div>
                     </div>
@@ -4151,6 +4155,7 @@
         // ===== ЯВНО ОБЪЯВЛЯЕМ ПЕРЕМЕННЫЕ СОРТИРОВКИ =====
         let clientSort = 'date_desc';
         let clientPeriod = 'all';
+        let clientSearchQuery = '';
 
         // ===== ПЕРЕМЕННЫЕ МАСТЕРА =====
         let isMasterMode = false;
@@ -6385,8 +6390,25 @@
                 results.forEach(({ client, subInfo, subHistory }) => {
                     renderClientCard(client, subInfo, subHistory);
                 });
+                // Re-apply search filter if active
+                if (clientSearchQuery) filterClientsBySearch();
             });
         }
+
+        window.filterClientsBySearch = function() {
+            const q = (document.getElementById('clSearch')?.value || '').trim().toLowerCase();
+            clientSearchQuery = q;
+            const cards = document.querySelectorAll('#clGrid .cl-card[data-client-name]');
+            let visible = 0;
+            cards.forEach(card => {
+                const name = (card.getAttribute('data-client-name') || '').toLowerCase();
+                const match = !q || name.includes(q);
+                card.style.display = match ? '' : 'none';
+                if (match) visible++;
+            });
+            const countEl = document.getElementById('clCount');
+            if (countEl) countEl.textContent = visible + ' клиентов';
+        };
 
         function renderClientCard(c, subInfo, subHistory) {
             subHistory = subHistory || [];
@@ -6395,6 +6417,7 @@
             const topType = Object.entries(c.types).sort((a, b) => b[1] - a[1])[0];
             const card = document.createElement('div');
             card.className = 'cl-card';
+            card.setAttribute('data-client-name', (c.name || '').toLowerCase());
             const name = escapeHTML(c.name);
             const phone = escapeHTML(c.phone || '—');
             const total = c.total.toLocaleString();
