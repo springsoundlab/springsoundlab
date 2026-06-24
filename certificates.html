@@ -640,13 +640,12 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--r);
-            padding: 12px;
+            padding: 14px;
             cursor: pointer;
             transition: .15s;
             position: relative;
             min-width: 0;
-            height: 175px;
-            overflow: hidden;
+            min-height: 175px;
             display: flex;
             flex-direction: column;
         }
@@ -770,16 +769,16 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 7px;
+            margin-bottom: 9px;
         }
         .cl-av {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             flex-shrink: 0;
             overflow: hidden;
@@ -791,7 +790,7 @@
             object-fit: cover;
         }
         .cl-nm {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
@@ -799,22 +798,23 @@
             max-width: 140px;
         }
         .cl-ph {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text3);
             word-break: break-word;
         }
         .cl-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 4px;
+            gap: 6px;
+            margin-top: auto;
         }
         .cl-st {
             background: var(--surface2);
-            border-radius: 5px;
-            padding: 4px 6px;
+            border-radius: 7px;
+            padding: 7px 9px;
         }
         .cl-st-l {
-            font-size: 8px;
+            font-size: 9px;
             color: var(--text3);
             font-weight: 700;
             text-transform: uppercase;
@@ -822,9 +822,9 @@
         }
         .cl-st-v {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 700;
-            margin-top: 1px;
+            margin-top: 3px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1329,6 +1329,34 @@
             }
             .carryover-badge__icon {
                 font-size: 10px;
+            }
+        }
+
+        /* БЕЙДЖ АБОНЕМЕНТ (записи клиента, чей визит оплачен абонементом) — зелёный, по аналогии с «Перенос» */
+        .subscription-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid rgba(62,207,142,0.35);
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .subscription-badge__icon {
+            font-size: 10px;
+        }
+        /* На мобильном пока оставляем текст видимым (значок можно будет включить позже) */
+        @media (max-width: 768px) {
+            .subscription-badge {
+                padding: 3px 6px;
+                border-radius: 12px;
             }
         }
 
@@ -2494,6 +2522,14 @@
             .fin-grid.compact .fin-card .carryover-badge__icon {
                 font-size: 7px;
             }
+            .fin-grid.compact .fin-card .subscription-badge {
+                font-size: 7px;
+                padding: 2px 4px;
+                border-radius: 8px;
+            }
+            .fin-grid.compact .fin-card .subscription-badge__icon {
+                font-size: 7px;
+            }
             .fin-grid.compact .fin-card .fin-prog {
                 margin: 1px 0 3px 0;
             }
@@ -2727,23 +2763,23 @@
             }
             .cl-card {
                 min-width: 0;
-                padding: 12px;
+                padding: 13px;
             }
             .cl-top {
                 flex-wrap: wrap;
             }
             .cl-nm {
-                font-size: 12px;
+                font-size: 13px;
             }
             .cl-stats {
                 grid-template-columns: 1fr 1fr;
-                gap: 4px;
+                gap: 6px;
             }
             .cl-st {
-                padding: 4px 6px;
+                padding: 7px 9px;
             }
             .cl-st-v {
-                font-size: 12px;
+                font-size: 13px;
             }
             #moRecord .mb-confirm {
                 padding: 14px 10px;
@@ -3676,12 +3712,10 @@
                     ✅ Включено
                 </button>
             </div>
-            <div class="mb-btns" style="justify-content:space-between;">
-                <button onclick="deleteSubClient()" title="Удалить абонемент" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,92,106,.3);background:var(--red-bg);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:.15s;"><i class="fa-solid fa-trash"></i></button>
-                <div style="display:flex;gap:8px;">
-                    <button class="mb-btn mb-cancel" onclick="closeSubClientEdit()">Отмена</button>
-                    <button class="mb-btn mb-confirm" onclick="saveSubClientEdit()">Сохранить</button>
-                </div>
+            <div class="mb-btns" style="display:flex;gap:8px;">
+                <button onclick="deleteSubClient()" title="Удалить абонемент" class="mb-btn" style="flex:1;justify-content:center;background:var(--red-bg);color:var(--red);border:1px solid rgba(255,92,106,.3);"><i class="fa-solid fa-trash"></i></button>
+                <button class="mb-btn mb-cancel" style="flex:1;justify-content:center;" onclick="closeSubClientEdit()">Отмена</button>
+                <button class="mb-btn mb-confirm" style="flex:1;justify-content:center;" onclick="saveSubClientEdit()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -6218,7 +6252,7 @@
                 const fullT = details.reduce((s, i) => s + (i.fullPrice || i.price), 0) || 0;
                 const prepaidEl = document.getElementById('fPrepaid');
                 const prepaidVal = prepaidEl && prepaidEl.value !== '' ? parseInt(prepaidEl.value) : NaN;
-                const paid = !isNaN(prepaidVal) ? Math.max(0, Math.min(prepaidVal, fullT)) : fullT;
+                let paid = !isNaN(prepaidVal) ? Math.max(0, Math.min(prepaidVal, fullT)) : fullT;
                 let duration = 60;
                 if (time && timeEnd) {
                     const [h1, m1] = time.split(':').map(Number);
@@ -6229,6 +6263,23 @@
                 // Одна запись = одно занятие из абонемента, независимо от продолжительности.
                 // Стандартное занятие длится 2 часа, но если поставить дольше или короче,
                 // списываться должно всё равно ровно одно занятие (а не «по часам»).
+
+                // Если у клиента есть активный абонемент и это НОВАЯ запись — занятие уже
+                // оплачено абонементом при его покупке, поэтому запись не должна создавать
+                // «долг»: помечаем визит как оплаченный абонементом (total = fullTotal),
+                // и ставим флаг isSubscriptionVisit для бейджа «Абонемент» в разделе «Записи».
+                let isSubscriptionVisit = false;
+                let subForVisit = null;
+                if (!editId) {
+                    subForVisit = await getSubscriptionForClient(name);
+                    if (subForVisit) {
+                        isSubscriptionVisit = true;
+                        paid = fullT;
+                    }
+                } else {
+                    const existingForFlag = window.CRM.find(r => r.id === editId);
+                    isSubscriptionVisit = !!(existingForFlag && existingForFlag.isSubscriptionVisit);
+                }
                 const data = {
                     date,
                     time,
@@ -6242,6 +6293,7 @@
                     details,
                     total: paid,
                     fullTotal: fullT,
+                    isSubscriptionVisit,
                     comment,
                     authorName: author,
                     authorUid,
@@ -6258,15 +6310,12 @@
                 } else {
                     await SC.add(data);
                 }
-                if (!editId) {
-                    const sub = await getSubscriptionForClient(name);
-                    if (sub) {
-                        await updateSubscriptionUsage(name, 1);
-                        _subClientHasSubscription = true;
-                        _subClientSubData = await getSubscriptionForClient(name);
-                        _lastCheckedClientName = name;
-                        updateTotalDisplay();
-                    }
+                if (!editId && subForVisit) {
+                    await updateSubscriptionUsage(name, 1);
+                    _subClientHasSubscription = true;
+                    _subClientSubData = await getSubscriptionForClient(name);
+                    _lastCheckedClientName = name;
+                    updateTotalDisplay();
                 }
                 closeRecModal();
             } catch (e) {
@@ -6951,8 +7000,12 @@
                 const carryoverBadge = r._isCarryover
                     ? `<span class="carryover-badge" title="Перенос из прошлого периода"><i class="fa-solid fa-rotate-left carryover-badge__icon"></i><span class="carryover-badge__text">Перенос</span></span>`
                     : '';
+                // Бейдж "Абонемент" — занятие списано/оплачено абонементом клиента
+                const subscriptionVisitBadge = r.isSubscriptionVisit
+                    ? `<span class="subscription-badge" title="Занятие по абонементу"><i class="fa-solid fa-ticket subscription-badge__icon"></i><span class="subscription-badge__text">Абонемент</span></span>`
+                    : '';
                 header.innerHTML =
-                    `<div class="fin-color-bar" style="background:${color};"></div><div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div>${carryoverBadge}<span class="ss-badge ${statusClass} fin-status">${statusText}</span>`;
+                    `<div class="fin-color-bar" style="background:${color};"></div><div class="fin-name" style="${isDone ? 'color:var(--green);' : ''}">${clientName}</div>${subscriptionVisitBadge}${carryoverBadge}<span class="ss-badge ${statusClass} fin-status">${statusText}</span>`;
                 card.appendChild(header);
                 const progWrap = document.createElement('div');
                 progWrap.className = 'fin-prog';
