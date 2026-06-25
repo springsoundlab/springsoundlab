@@ -4003,11 +4003,15 @@
             </div>
             <div class="f-group">
                 <div class="f-label">Стоимость занятия (₽)</div>
-                <input type="number" id="subTotalPrice" class="f-inp mono" placeholder="5000">
+                <input type="number" id="subTotalPrice" class="f-inp mono" placeholder="5000" oninput="updateNewSubscriptionTotal()">
             </div>
             <div class="f-group">
                 <div class="f-label">Количество занятий</div>
-                <input type="number" id="subTotalSessions" class="f-inp mono" placeholder="10">
+                <input type="number" id="subTotalSessions" class="f-inp mono" placeholder="10" oninput="updateNewSubscriptionTotal()">
+            </div>
+            <div class="total-row">
+                <div class="total-lbl">ИТОГО</div>
+                <div class="total-val pv" id="subNewTotalVal">0 ₽</div>
             </div>
             <div class="sub-created-msg" id="subCreatedMsg">
                 <div class="msg-title">✅ Абонемент создан!</div>
@@ -7945,6 +7949,20 @@
         };
 
         // ===== НОВЫЙ АБОНЕМЕНТ — МОДАЛКА =====
+        function updateNewSubscriptionTotal() {
+            const price = parseInt(document.getElementById('subTotalPrice').value) || 0;
+            const sessions = parseInt(document.getElementById('subTotalSessions').value) || 0;
+            const total = price * sessions;
+            const totalEl = document.getElementById('subNewTotalVal');
+            if (total > 0) {
+                totalEl.textContent = total.toLocaleString() + ' ₽';
+                totalEl.className = 'total-val sub-usage';
+            } else {
+                totalEl.textContent = '0 ₽';
+                totalEl.className = 'total-val pv';
+            }
+        }
+
         function openSubscriptionModal() {
             const sidebar = document.getElementById('sidebar');
             if (sidebar) sidebar.classList.remove('mobile-open');
@@ -7954,6 +7972,7 @@
             document.getElementById('subTotalPrice').value = '';
             document.getElementById('subTotalSessions').value = '';
             document.getElementById('subCreatedMsg').classList.remove('show');
+            updateNewSubscriptionTotal();
             document.getElementById('moSubscription').classList.add('open');
         }
 
@@ -8014,6 +8033,7 @@
                 document.getElementById('subClientPhone').value = '';
                 document.getElementById('subTotalPrice').value = '';
                 document.getElementById('subTotalSessions').value = '';
+                updateNewSubscriptionTotal();
 
                 setTimeout(() => {
                     closeSubscriptionModal();
