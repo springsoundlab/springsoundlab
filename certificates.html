@@ -7200,6 +7200,7 @@
             if (!filtered.length) {
                 grid.innerHTML =
                     `<div style="color:var(--text3);font-size:12px;padding:18px;text-align:center;">${finPeriod !== 'all' ? 'Нет записей за выбранный период' : 'Нет записей'}</div>`;
+                renderActiveSubsInFinance(false);
                 return;
             }
             filtered.forEach(r => {
@@ -7295,7 +7296,85 @@
                 card.appendChild(actions);
                 grid.appendChild(card);
             });
+            renderActiveSubsInFinance(true);
             if (!privacyOn) applyBlur();
+        }
+
+        // ===== Построение красной карточки абонемента (используется и в «Все», и в «Абонементы») =====
+        function buildSubscriptionFinCard(d) {
+            const used = d.used || 0;
+            const total = d.total || 0;
+            const left = Math.max(0, total - used);
+            const isExhausted = left <= 0;
+            const perc = total > 0 ? Math.min((used / total) * 100, 100) : 0;
+            const card = document.createElement('div');
+            card.className = 'fin-card';
+            card.classList.add(isExhausted ? 'row-done' : 'row-debt');
+            card.setAttribute('data-id', d.id);
+            card.setAttribute('data-name', d.clientName || '');
+            const name = escapeHTML(d.clientName || '—');
+            const phone = escapeHTML(d.clientPhone || '—');
+            const dateStr = escapeHTML(d.createdDate || '—');
+            const price = (d.price || 0).toLocaleString();
+            const header = document.createElement('div');
+            header.className = 'fin-header';
+            header.innerHTML =
+                `<div class="fin-color-bar" style="background:${PALETTE[0].hex};"></div><div class="fin-name">${name}</div><span class="ss-badge ${isExhausted ? 'ss-done' : 'ss-work'} fin-status">${isExhausted ? 'Использован' : used + '/' + total}</span>`;
+            card.appendChild(header);
+            const progWrap = document.createElement('div');
+            progWrap.className = 'fin-prog';
+            progWrap.innerHTML =
+                `<div class="prog"><div class="prog-fill" style="width:${perc}%;background:${isExhausted ? 'var(--green)' : 'var(--gold)'};"></div></div>`;
+            card.appendChild(progWrap);
+            const detailsDiv = document.createElement('div');
+            detailsDiv.className = 'fin-details';
+            detailsDiv.innerHTML =
+                `<div class="detail-row"><span class="detail-label">Телефон:</span> <span>${phone}</span></div><div class="detail-row"><span class="detail-label">Создан:</span> <span>${dateStr}</span></div><div class="detail-row"><span class="detail-label">Цена занятия:</span> <span>${price} ₽</span></div>`;
+            card.appendChild(detailsDiv);
+            const stats = document.createElement('div');
+            stats.className = 'fin-stats';
+            stats.innerHTML =
+                `<div class="fin-stat"><div class="fin-stat-l">Использовано</div><div class="fin-stat-v pv">${used}/${total}</div></div><div class="fin-stat"><div class="fin-stat-l">Осталось</div><div class="fin-stat-v pv" style="color:var(--gold);">${left}</div></div>`;
+            card.appendChild(stats);
+            const actions = document.createElement('div');
+            actions.className = 'fin-actions';
+            actions.innerHTML =
+                `<div class="act-ic b" title="Изменить использовано" onclick="event.stopPropagation(); editSubUsage('${d.id}', ${used}, ${total})"><i class="fa-solid fa-pen"></i></div><div class="act-ic r" title="Удалить абонемент" onclick="event.stopPropagation(); delSub('${d.id}')"><i class="fa-solid fa-trash"></i></div>`;
+            card.appendChild(actions);
+            return card;
+        }
+
+        // ===== ЗАПИСИ: ВСТАВКА АКТИВНЫХ АБОНЕМЕНТОВ В РАЗДЕЛ «ВСЕ» =====
+        // Показываем абонемент (красная карточка) прямо в общем списке «Все», независимо
+        // от выбранного периода (месяц/год/всё) — пока в нём остались занятия.
+        // В фильтрах «В работе» и «Готово» абонементы не нужны — там их не показываем.
+        function renderActiveSubsInFinance(hadOtherRecords) {
+            if (currentStatusFilter) return; // показываем только в «Все»
+            if (!window.PROFILE || !window.PROFILE.uid) return;
+            SUBC.where('authorUid', '==', window.PROFILE.uid).where('deleted', '==', false).get().then(snap => {
+                // Пока шла загрузка, пользователь мог переключить фильтр — тогда не трогаем сетку
+                if (currentStatusFilter) return;
+                const grid = document.getElementById('finGrid');
+                if (!grid) return;
+                const items = [];
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d.hiddenFromClients === true) return;
+                    const used = d.used || 0;
+                    const total = d.total || 0;
+                    const left = Math.max(0, total - used);
+                    if (left <= 0) return; // исчерпанные абонементы видны в разделе «Абонементы», в «Все» не нужны
+                    items.push({ id: doc.id, ...d });
+                });
+                if (!items.length) return;
+                items.sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || ''));
+                if (!hadOtherRecords) grid.innerHTML = ''; // убираем плейсхолдер «Нет записей»
+                const cards = items.map(d => buildSubscriptionFinCard(d));
+                grid.prepend(...cards);
+                if (!privacyOn) applyBlur();
+            }).catch(err => {
+                console.error('Ошибка загрузки абонементов для раздела «Все»:', err);
+            });
         }
 
         // ===== ЗАПИСИ: ФИЛЬТР «АБОНЕМЕНТЫ» =====
@@ -7323,46 +7402,7 @@
                 }
                 items.sort((a, b) => (b.createdDate || '').localeCompare(a.createdDate || ''));
                 items.forEach(d => {
-                    const used = d.used || 0;
-                    const total = d.total || 0;
-                    const left = Math.max(0, total - used);
-                    const isExhausted = left <= 0;
-                    const perc = total > 0 ? Math.min((used / total) * 100, 100) : 0;
-                    const card = document.createElement('div');
-                    card.className = 'fin-card';
-                    card.classList.add(isExhausted ? 'row-done' : 'row-debt');
-                    card.setAttribute('data-id', d.id);
-                    card.setAttribute('data-name', d.clientName || '');
-                    const name = escapeHTML(d.clientName || '—');
-                    const phone = escapeHTML(d.clientPhone || '—');
-                    const dateStr = escapeHTML(d.createdDate || '—');
-                    const price = (d.price || 0).toLocaleString();
-                    const header = document.createElement('div');
-                    header.className = 'fin-header';
-                    header.innerHTML =
-                        `<div class="fin-color-bar" style="background:${PALETTE[0].hex};"></div><div class="fin-name">${name}</div><span class="ss-badge ${isExhausted ? 'ss-done' : 'ss-work'} fin-status">${isExhausted ? 'Использован' : used + '/' + total}</span>`;
-                    card.appendChild(header);
-                    const progWrap = document.createElement('div');
-                    progWrap.className = 'fin-prog';
-                    progWrap.innerHTML =
-                        `<div class="prog"><div class="prog-fill" style="width:${perc}%;background:${isExhausted ? 'var(--green)' : 'var(--gold)'};"></div></div>`;
-                    card.appendChild(progWrap);
-                    const detailsDiv = document.createElement('div');
-                    detailsDiv.className = 'fin-details';
-                    detailsDiv.innerHTML =
-                        `<div class="detail-row"><span class="detail-label">Телефон:</span> <span>${phone}</span></div><div class="detail-row"><span class="detail-label">Создан:</span> <span>${dateStr}</span></div><div class="detail-row"><span class="detail-label">Цена занятия:</span> <span>${price} ₽</span></div>`;
-                    card.appendChild(detailsDiv);
-                    const stats = document.createElement('div');
-                    stats.className = 'fin-stats';
-                    stats.innerHTML =
-                        `<div class="fin-stat"><div class="fin-stat-l">Использовано</div><div class="fin-stat-v pv">${used}/${total}</div></div><div class="fin-stat"><div class="fin-stat-l">Осталось</div><div class="fin-stat-v pv" style="color:var(--gold);">${left}</div></div>`;
-                    card.appendChild(stats);
-                    const actions = document.createElement('div');
-                    actions.className = 'fin-actions';
-                    actions.innerHTML =
-                        `<div class="act-ic b" title="Изменить использовано" onclick="event.stopPropagation(); editSubUsage('${d.id}', ${used}, ${total})"><i class="fa-solid fa-pen"></i></div><div class="act-ic r" title="Удалить абонемент" onclick="event.stopPropagation(); delSub('${d.id}')"><i class="fa-solid fa-trash"></i></div>`;
-                    card.appendChild(actions);
-                    grid.appendChild(card);
+                    grid.appendChild(buildSubscriptionFinCard(d));
                 });
                 if (!privacyOn) applyBlur();
             }).catch(err => {
@@ -7380,7 +7420,7 @@
                     const newUsed = Math.min(v, total);
                     SUBC.doc(id).update({ used: newUsed }).then(() => {
                         closeSM();
-                        renderFinanceSubs();
+                        renderFinance();
                     }).catch(err => { handleError(err, 'Ошибка при обновлении абонемента.'); if (btn) unlockButton(
                             btn); });
                 } else { if (btn) unlockButton(btn);
@@ -7397,7 +7437,7 @@
                 // Мягкое удаление — ставим флаг deleted:true, данные остаются для истории
                 SUBC.doc(id).update({ deleted: true, deletedAt: Date.now() }).then(() => {
                     closeSM();
-                    renderFinanceSubs();
+                    renderFinance();
                     renderClients();
                 }).catch(err => { handleError(err, 'Ошибка при удалении абонемента.'); if (btn) unlockButton(btn); });
             });
