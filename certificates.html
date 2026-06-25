@@ -2631,6 +2631,7 @@
                 padding: 10px 12px;
                 gap: 8px;
                 overflow-x: hidden;
+                align-content: start;
             }
             .cal-head {
                 grid-template-columns: 36px repeat(7, 1fr);
@@ -6496,11 +6497,6 @@
 
             document.getElementById('clCount').textContent = cls.length + ' клиентов';
 
-            if (!cls.length) {
-                grid.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Нет клиентов</div>';
-                return;
-            }
-
             const promises = cls.map(async (c) => {
                 try {
                     // Ищем активный абонемент
@@ -6539,6 +6535,14 @@
                 });
                 // Re-apply search filter if active
                 if (clientSearchQuery) filterClientsBySearch();
+                // Показываем «Нет клиентов» только если после всех async-операций
+                // (включая ghost-карточки из абонементов) сетка действительно пуста
+                setTimeout(() => {
+                    const g = document.getElementById('clGrid');
+                    if (g && g.querySelectorAll('.cl-card').length === 0) {
+                        g.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Нет клиентов</div>';
+                    }
+                }, 500);
             });
         }
 
