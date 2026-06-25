@@ -3821,32 +3821,59 @@
                 <div class="f-label">Телефон</div>
                 <input type="tel" id="subEditClientPhone" class="f-inp" placeholder="+7 900 000-00-00">
             </div>
-            <div style="background:var(--surface2);border-radius:var(--r);padding:14px;margin-bottom:16px;border:1px solid var(--border);">
-                <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Абонемент</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
-                        <div class="fin-stat-l">Занятий всего</div>
-                        <div class="fin-stat-v" id="subEditTotal">—</div>
+            <!-- Блок абонемента — красивое оформление -->
+            <div style="background:var(--surface2);border-radius:var(--r);padding:16px;margin-bottom:16px;border:1px solid var(--border);">
+                <!-- Заголовок раздела -->
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                    <i class="fa-solid fa-ticket" style="color:var(--gold);font-size:13px;"></i>
+                    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);">Абонемент</span>
+                </div>
+
+                <!-- Прогресс занятий — широкая строка на всю ширину -->
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">
+                        <div>
+                            <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Прогресс занятий</div>
+                            <div style="font-size:22px;font-weight:700;color:var(--text);line-height:1;">
+                                <span id="subEditUsed">—</span><span style="font-size:13px;font-weight:400;color:var(--text3);margin-left:3px;">/ <span id="subEditTotal">—</span></span>
+                            </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;">Осталось</div>
+                            <div style="font-size:22px;font-weight:700;line-height:1;" id="subEditLeft" id="subEditLeftWrap">—</div>
+                        </div>
                     </div>
-                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
-                        <div class="fin-stat-l">Использовано</div>
-                        <div class="fin-stat-v" id="subEditUsed">—</div>
+                    <!-- Прогресс-бар -->
+                    <div style="height:6px;background:var(--border);border-radius:99px;overflow:hidden;">
+                        <div id="subEditProgressBar" style="height:100%;width:0%;background:var(--gold);border-radius:99px;transition:.4s;"></div>
                     </div>
-                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
-                        <div class="fin-stat-l">Осталось</div>
-                        <div class="fin-stat-v" id="subEditLeft" id="subEditLeftWrap" style="color:var(--green);">—</div>
+                </div>
+
+                <!-- Сетка 2×2: финансы и дата -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <!-- Цена занятия -->
+                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+                        <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+                            <i class="fa-solid fa-ruble-sign" style="font-size:9px;color:var(--text3);"></i>
+                            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);">Цена занятия</span>
+                        </div>
+                        <div style="font-size:18px;font-weight:700;color:var(--text);" id="subEditPrice">—</div>
                     </div>
-                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
-                        <div class="fin-stat-l">Цена занятия</div>
-                        <div class="fin-stat-v" id="subEditPrice">—</div>
+                    <!-- Оплачено всего -->
+                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+                        <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+                            <i class="fa-solid fa-wallet" style="font-size:9px;color:var(--text3);"></i>
+                            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);">Оплачено всего</span>
+                        </div>
+                        <div style="font-size:18px;font-weight:700;color:var(--green);" class="pv" id="subEditAmount">—</div>
                     </div>
-                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
-                        <div class="fin-stat-l">Оплачено всего</div>
-                        <div class="fin-stat-v pv" style="color:var(--green);" id="subEditAmount">—</div>
-                    </div>
-                    <div class="fin-stat" style="background:var(--surface);border-radius:8px;padding:8px 10px;">
-                        <div class="fin-stat-l">Дата оформления</div>
-                        <div class="fin-stat-v" style="font-size:11px;" id="subEditDate">—</div>
+                    <!-- Дата оформления — на всю ширину -->
+                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;grid-column:1/-1;">
+                        <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+                            <i class="fa-solid fa-calendar-check" style="font-size:9px;color:var(--text3);"></i>
+                            <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);">Дата оформления</span>
+                        </div>
+                        <div style="font-size:15px;font-weight:600;color:var(--text);" id="subEditDate">—</div>
                     </div>
                 </div>
             </div>
@@ -6812,10 +6839,18 @@
                     document.getElementById('subEditPrice').textContent = (d.price || 0).toLocaleString() + ' ₽';
                     document.getElementById('subEditAmount').textContent = ((d.totalAmount || (d.price * d.total)) || 0).toLocaleString() + ' ₽';
                     document.getElementById('subEditDate').textContent = d.createdDate || '—';
-                    document.getElementById('subEditLeft').textContent = Math.max(0, (d.total || 0) - (d.used || 0));
-                    const leftEl = document.getElementById('subEditLeftWrap');
+                    const left = Math.max(0, (d.total || 0) - (d.used || 0));
+                    document.getElementById('subEditLeft').textContent = left;
+                    const leftEl = document.getElementById('subEditLeft');
                     const isExhausted = (d.used || 0) >= (d.total || 0);
                     leftEl.style.color = isExhausted ? 'var(--red)' : 'var(--green)';
+                    // Прогресс-бар
+                    const bar = document.getElementById('subEditProgressBar');
+                    if (bar && (d.total || 0) > 0) {
+                        const pct = Math.min(100, Math.round(((d.used || 0) / d.total) * 100));
+                        bar.style.width = pct + '%';
+                        bar.style.background = isExhausted ? 'var(--red)' : 'var(--gold)';
+                    }
                     // Аналитика всегда включена — тоггл перенесён в окно удаления
                 }
             } catch(e) { console.error(e); }
