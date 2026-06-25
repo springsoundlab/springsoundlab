@@ -388,8 +388,16 @@
         .topbar .fin-zoom-btn {
             display: none;
         }
+        .topbar .cl-zoom-btn {
+            display: none;
+        }
         @media(max-width:768px) {
             body.sec-finance-active .topbar .fin-zoom-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            body.sec-clients-active .topbar .cl-zoom-btn {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -2844,6 +2852,69 @@
             #clGrid .cl-top {
                 padding-right: 56px !important;
             }
+
+            /* ── КОМПАКТНЫЙ РЕЖИМ (2 карточки в ряд) ── */
+            .cl-grid.compact {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .cl-grid.compact .cl-card {
+                padding: 9px;
+                height: auto;
+                min-height: 150px;
+            }
+            .cl-grid.compact .cl-top {
+                padding-right: 28px !important;
+                margin-bottom: 6px;
+                gap: 5px;
+            }
+            .cl-grid.compact .cl-av {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+                flex-shrink: 0;
+            }
+            .cl-grid.compact .cl-nm {
+                font-size: 11px;
+            }
+            .cl-grid.compact .cl-ph {
+                font-size: 9px;
+            }
+            .cl-grid.compact .cl-stats {
+                gap: 4px;
+            }
+            .cl-grid.compact .cl-st {
+                padding: 4px 5px;
+                border-radius: 6px;
+            }
+            .cl-grid.compact .cl-st-l {
+                font-size: 7px;
+                letter-spacing: 0.2px;
+                line-height: 1.1;
+            }
+            .cl-grid.compact .cl-st-v {
+                font-size: 10px;
+                margin-top: 2px;
+            }
+            .cl-grid.compact .cl-edit-btn {
+                top: 7px;
+                right: 7px;
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+            }
+            .cl-grid.compact .cl-del-btn {
+                top: 7px;
+                right: 31px;
+                width: 20px;
+                height: 20px;
+                font-size: 9px;
+            }
+            .cl-grid.compact .cl-sub-tag {
+                width: 16px;
+                height: 16px;
+                font-size: 8px;
+            }
             #moRecord .mb-confirm {
                 padding: 14px 10px;
                 font-size: 15px;
@@ -3348,6 +3419,9 @@
                         <button class="tb-btn" id="resetCalBtn" onclick="resetCalendarView()" title="Вернуться к текущей дате"><i class="fa-solid fa-rotate-left"></i> Сбросить</button>
                     </div>
                     <button class="tb-btn fin-zoom-btn" id="finZoomBtn" onclick="toggleFinCardZoom()" title="Уменьшить карточки (2 в ряд)">
+                        <i class="fa-solid fa-table-cells"></i>
+                    </button>
+                    <button class="tb-btn cl-zoom-btn" id="clZoomBtn" onclick="toggleClCardZoom()" title="Уменьшить карточки (2 в ряд)">
                         <i class="fa-solid fa-table-cells"></i>
                     </button>
                 </div>
@@ -5609,6 +5683,7 @@
             }
 
             document.body.classList.toggle('sec-finance-active', s === 'finance' || s === 'masterFinance');
+            document.body.classList.toggle('sec-clients-active', s === 'clients');
 
             const sidebar = document.getElementById('sidebar');
             if (sidebar) sidebar.classList.remove('mobile-open');
@@ -6393,6 +6468,7 @@
         function renderClients() {
             const grid = document.getElementById('clGrid');
             grid.innerHTML = '';
+            applyClCardZoomState();
 
             const myData = getMyData(false);
             const map = {};
@@ -6974,6 +7050,29 @@
         };
 
         document.addEventListener('DOMContentLoaded', applyFinCardZoomState);
+
+        // ===== ЗУМ КАРТОЧЕК КЛИЕНТОВ =====
+        let clCardsCompact = (localStorage.getItem('clCardsCompact') === 'true');
+
+        function applyClCardZoomState() {
+            const grid = document.getElementById('clGrid');
+            if (grid) grid.classList.toggle('compact', clCardsCompact);
+            const btn = document.getElementById('clZoomBtn');
+            if (btn) {
+                btn.innerHTML = clCardsCompact ?
+                    '<i class="fa-solid fa-table-cells-large"></i>' :
+                    '<i class="fa-solid fa-table-cells"></i>';
+                btn.title = clCardsCompact ? 'Обычный размер карточек' : 'Уменьшить карточки (2 в ряд)';
+            }
+        }
+
+        window.toggleClCardZoom = function() {
+            clCardsCompact = !clCardsCompact;
+            localStorage.setItem('clCardsCompact', clCardsCompact ? 'true' : 'false');
+            applyClCardZoomState();
+        };
+
+        document.addEventListener('DOMContentLoaded', applyClCardZoomState);
 
         // ===== FINANCE (мои записи) =====
         function renderFinance() {
