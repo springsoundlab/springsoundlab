@@ -7135,7 +7135,10 @@
             updateFinSwipeIndicator();
             if (currentStatusFilter === 'subs') { renderFinanceSubs(); return; }
             grid.className = 'fin-grid' + (finCardsCompact ? ' compact' : '');
-            const myData = getMyData(true).filter(r => !r.isSubscription); // абонементы только в разделе "Абонементы"
+            // Записи отдельных занятий, оплаченных абонементом (isSubscriptionVisit), в разделе
+            // «Записи» больше не показываем отдельной карточкой — для клиента с абонементом
+            // там должна быть только одна сводная (красная) карточка абонемента.
+            const myData = getMyData(true).filter(r => !r.isSubscription && !r.isSubscriptionVisit);
             let filtered = myData;
             let carryoverDebts = []; // долги из прошлых месяцев
 
