@@ -945,6 +945,10 @@
             border-radius: 5px;
             flex-shrink: 0;
             cursor: default;
+            /* Позиционирование рядом с кнопкой «...» */
+            position: absolute;
+            top: 10px;
+            right: 40px;
         }
         .cl-sub-tag.history-sub {
             color: var(--text3);
@@ -2883,10 +2887,14 @@
             }
             .cl-grid.compact .cl-stats {
                 gap: 4px;
+                align-items: stretch;  /* все ячейки одной высоты */
             }
             .cl-grid.compact .cl-st {
                 padding: 4px 5px;
                 border-radius: 6px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
             .cl-grid.compact .cl-st-l {
                 font-size: 7px;
@@ -2912,9 +2920,11 @@
                 font-size: 9px;
             }
             .cl-grid.compact .cl-sub-tag {
-                width: 16px;
-                height: 16px;
-                font-size: 8px;
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+                top: 7px;
+                right: 31px;   /* вплотную левее кнопки «...» (right:7px + width:20px + gap:4px) */
             }
             #moRecord .mb-confirm {
                 padding: 14px 10px;
@@ -6709,8 +6719,8 @@
                 statsHtml = `
                     <div class="cl-st"><div class="cl-st-l">Занятий</div><div class="cl-st-v" style="color:${pal.hex}">${used}/${totalSessions}</div></div>
                     <div class="cl-st"><div class="cl-st-l">Цена занятия</div><div class="cl-st-v pv">${pricePerSession ? pricePerSession.toLocaleString() + ' ₽' : '—'}</div></div>
-                    <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
-                    <div class="cl-st"><div class="cl-st-l">Статус</div><div class="cl-st-v" style="font-size:10px;color:${isExhausted ? 'var(--red)' : 'var(--green)'};">${isExhausted ? 'Использован' : left + ' осталось'}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v">${last}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Статус</div><div class="cl-st-v" style="color:${isExhausted ? 'var(--red)' : 'var(--green)'};">${isExhausted ? 'Использован' : left + ' осталось'}</div></div>
                 `;
             } else {
                 const visitsDisplay = c.isSubscriptionOnly ? '—' : c.visits;
@@ -6718,8 +6728,8 @@
                 statsHtml = `
                     <div class="cl-st"><div class="cl-st-l">Визитов</div><div class="cl-st-v" style="color:${pal.hex}">${visitsDisplay}</div></div>
                     <div class="cl-st"><div class="cl-st-l">Потрачено</div><div class="cl-st-v pv" style="color:${pal.hex}">${totalDisplay}</div></div>
-                    <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v" style="font-size:11px;">${last}</div></div>
-                    <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v" style="font-size:10px;">${topTypeName}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v">${last}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Услуга</div><div class="cl-st-v">${topTypeName}</div></div>
                 `;
             }
 
@@ -6734,7 +6744,7 @@
                 <div class="cl-stats">
                     ${statsHtml}
                 </div>
-                ${subTag ? `<div style="position:absolute;top:10px;right:40px;">${subTag}</div>` : ''}
+                ${subTag || ''}
                 <button class="cl-edit-btn" title="Редактировать клиента"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             `;
 
