@@ -3877,6 +3877,10 @@
                     </div>
                 </div>
             </div>
+            <div style="margin:12px 0;border-top:1px solid var(--border);padding-top:12px;">
+                <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
+                <div id="subEditClientSessions" style="max-height:200px;overflow-y:auto;font-size:12px;color:var(--text2);"></div>
+            </div>
             <div class="mb-btns" style="display:flex;gap:8px;">
                 <button onclick="deleteSubClient()" title="Удалить абонемент" class="mb-btn" style="flex:1;justify-content:center;background:var(--red-bg);color:var(--red);border:1px solid rgba(255,92,106,.3);"><i class="fa-solid fa-trash"></i></button>
                 <button class="mb-btn mb-cancel" style="flex:1;justify-content:center;" onclick="closeSubClientEdit()">Отмена</button>
@@ -6858,6 +6862,7 @@
                     // Аналитика всегда включена — тоггл перенесён в окно удаления
                 }
             } catch(e) { console.error(e); }
+            renderClientSessionsList('subEditClientSessions', clientName);
             document.body.classList.add('modal-open');
             document.getElementById('moSubClientEdit').classList.add('open');
         };
@@ -7012,16 +7017,13 @@
             );
         };
 
-        // ===== РЕДАКТИРОВАНИЕ КЛИЕНТА =====
-        // nameHint/phoneHint используются когда ids пустые (клиент без обычных записей)
-        function openClientEdit(idsStr, nameHint, phoneHint) {
-            const ids = (idsStr || '').split(',').filter(id => id.trim());
-            clientEditIds = ids;
-            const records = ids.length ? window.CRM.filter(r => ids.includes(r.id)) : [];
-            const first = records[0];
-            document.getElementById('clientEditName').value = (first && (first.client || first.song)) || nameHint || '';
-            document.getElementById('clientEditPhone').value = (first && first.phone) || phoneHint || '';
-            const listDiv = document.getElementById('clientEditSessions');
+        // ===== Список визитов клиента (дата/время/услуга/сумма) — используется и в обычной
+        // карточке клиента, и в карточке клиента с абонементом, чтобы видеть историю посещений =====
+        function renderClientSessionsList(containerId, clientName) {
+            const listDiv = document.getElementById(containerId);
+            if (!listDiv) return;
+            const ids = findAllMyRecordIdsByName(clientName);
+            const records = window.CRM.filter(r => ids.includes(r.id));
             listDiv.innerHTML = '';
             if (records.length) {
                 records.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -7044,6 +7046,19 @@
             } else {
                 listDiv.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:6px 0;">Нет записей</div>';
             }
+        }
+
+        // ===== РЕДАКТИРОВАНИЕ КЛИЕНТА =====
+        // nameHint/phoneHint используются когда ids пустые (клиент без обычных записей)
+        function openClientEdit(idsStr, nameHint, phoneHint) {
+            const ids = (idsStr || '').split(',').filter(id => id.trim());
+            clientEditIds = ids;
+            const records = ids.length ? window.CRM.filter(r => ids.includes(r.id)) : [];
+            const first = records[0];
+            const clientName = (first && (first.client || first.song)) || nameHint || '';
+            document.getElementById('clientEditName').value = clientName;
+            document.getElementById('clientEditPhone').value = (first && first.phone) || phoneHint || '';
+            renderClientSessionsList('clientEditSessions', clientName);
             document.body.classList.add('modal-open');
             document.getElementById('moClientEdit').classList.add('open');
         }
