@@ -6959,9 +6959,15 @@
             _subEditCurrentData = null;
             document.getElementById('subEditClientName').value = clientName;
             document.getElementById('subEditClientPhone').value = phone || '';
-            // Блок абонемента всегда открывается развёрнутым
+            // Состояние «свёрнуто/развёрнуто» — персональная настройка текущего
+            // пользователя (своя для каждого мастера/сотрудника, общая для всех его
+            // карточек клиентов и для всех его устройств). Применяется ровно так,
+            // как было оставлено в прошлый раз, пока пользователь не переключит сам.
             const block = document.getElementById('subEditBlock');
-            if (block) block.classList.remove('collapsed');
+            if (block) {
+                const collapsed = !!(window.PROFILE && window.PROFILE.subDetailsCollapsed);
+                block.classList.toggle('collapsed', collapsed);
+            }
             // Загружаем актуальные данные абонемента
             try {
                 const snap = await SUBC
@@ -7007,11 +7013,19 @@
 
         // Сворачивает/разворачивает блок с деталями абонемента (Прогресс занятий,
         // цена, дата оформления) внутри карточки клиента — нажатие на круглую
-        // кнопку-шеврон рядом с заголовком «Абонемент».
+        // кнопку-шеврон рядом с заголовком «Абонемент». Выбор сохраняется в профиле
+        // текущего пользователя в Firestore, поэтому действует на всех его
+        // устройствах и для всех клиентов, пока он сам не переключит обратно —
+        // но не затрагивает других сотрудников/мастеров в этой CRM.
         window.toggleSubEditBlock = function() {
             const block = document.getElementById('subEditBlock');
             if (!block) return;
-            block.classList.toggle('collapsed');
+            const collapsedNow = block.classList.toggle('collapsed');
+            if (window.PROFILE) window.PROFILE.subDetailsCollapsed = collapsedNow;
+            if (window.PROFILE && window.PROFILE.uid) {
+                UC.doc(window.PROFILE.uid).update({ subDetailsCollapsed: collapsedNow })
+                    .catch(err => console.error('Ошибка сохранения состояния блока абонемента:', err));
+            }
         };
 
         window.saveSubClientEdit = async function() {
@@ -9241,6 +9255,9 @@
                     p.uid = user.uid;
                     if (!p.color) p.color = PALETTE[0].hex;
                     if (!p.theme) p.theme = 'dark';
+                    // Персональная настройка: свёрнут ли блок деталей абонемента в
+                    // карточке клиента. По умолчанию (если ещё не сохранено) — развёрнут.
+                    if (typeof p.subDetailsCollapsed !== 'boolean') p.subDetailsCollapsed = false;
 
                     isMobileDevice = detectMobile();
                     if (isMobileDevice) {
