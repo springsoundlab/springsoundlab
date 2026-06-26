@@ -959,6 +959,56 @@
             border-color: var(--border2);
         }
 
+        /* ===== СВОРАЧИВАНИЕ БЛОКА «АБОНЕМЕНТ» В ОКНЕ КЛИЕНТА ===== */
+        .sub-collapse-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1.5px solid var(--text3);
+            background: transparent;
+            color: var(--text3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            flex-shrink: 0;
+            transition: .15s;
+        }
+        .sub-collapse-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent2);
+            background: var(--accent-bg);
+        }
+        .sub-collapse-btn i {
+            transition: transform .25s ease;
+        }
+        #subEditBlock.collapsed .sub-collapse-btn i {
+            transform: rotate(180deg);
+        }
+        #subEditBlock .sub-block-body {
+            overflow: hidden;
+            max-height: 600px;
+            opacity: 1;
+            transition: max-height .28s ease, opacity .2s ease, margin-top .28s ease;
+        }
+        #subEditBlock.collapsed .sub-block-body {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0 !important;
+            pointer-events: none;
+        }
+        #subEditBlock .sub-block-head {
+            cursor: pointer;
+            user-select: none;
+        }
+        #subEditBlock.collapsed {
+            padding-bottom: 14px !important;
+        }
+        #subEditBlock.collapsed .sub-block-head {
+            margin-bottom: 0 !important;
+        }
+
         /* ===== ИНДИКАТОР ТЕКУЩЕЙ КАТЕГОРИИ (только отображение, переключается свайпом) =====
            Нужен только на мобильных, где есть жест свайпа — на компьютере скрыт по умолчанию */
         .fin-swipe-indicator {
@@ -3825,13 +3875,18 @@
                 <input type="tel" id="subEditClientPhone" class="f-inp" placeholder="+7 900 000-00-00">
             </div>
             <!-- Блок абонемента — красивое оформление -->
-            <div style="background:var(--surface2);border-radius:var(--r);padding:16px;margin-bottom:16px;border:1px solid var(--border);">
+            <div id="subEditBlock" style="background:var(--surface2);border-radius:var(--r);padding:16px;margin-bottom:16px;border:1px solid var(--border);">
                 <!-- Заголовок раздела -->
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-                    <i class="fa-solid fa-ticket" style="color:var(--gold);font-size:13px;"></i>
-                    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);">Абонемент</span>
+                <div class="sub-block-head" onclick="toggleSubEditBlock()" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-ticket" style="color:var(--gold);font-size:13px;"></i>
+                        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);">Абонемент</span>
+                        <span style="font-size:10px;color:var(--text3);font-weight:600;">· Детали</span>
+                    </div>
+                    <button type="button" class="sub-collapse-btn" title="Свернуть/развернуть"><i class="fa-solid fa-chevron-down"></i></button>
                 </div>
 
+                <div class="sub-block-body">
                 <!-- Прогресс занятий — широкая строка на всю ширину -->
                 <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
                     <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">
@@ -3879,6 +3934,7 @@
                         <div style="font-size:15px;font-weight:600;color:var(--text);" id="subEditDate">—</div>
                     </div>
                 </div>
+                </div>
             </div>
             <div style="margin:12px 0;border-top:1px solid var(--border);padding-top:12px;">
                 <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
@@ -3886,8 +3942,64 @@
             </div>
             <div class="mb-btns" style="display:flex;gap:8px;">
                 <button onclick="deleteSubClient()" title="Удалить абонемент" class="mb-btn" style="flex:1;justify-content:center;background:var(--red-bg);color:var(--red);border:1px solid rgba(255,92,106,.3);"><i class="fa-solid fa-trash"></i></button>
-                <button class="mb-btn mb-cancel" style="flex:1;justify-content:center;" onclick="closeSubClientEdit()">Отмена</button>
+                <button class="mb-btn" style="flex:1;justify-content:center;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold);" onclick="openSubTopUpModal()"><i class="fa-solid fa-rotate" style="margin-right:5px;"></i>Пополнить</button>
                 <button class="mb-btn mb-confirm" style="flex:1;justify-content:center;" onclick="saveSubClientEdit()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА «ПОПОЛНИТЬ АБОНЕМЕНТ» ===== -->
+    <div class="mo" id="moSubTopUp">
+        <div class="mb mb-sm">
+            <div class="mb-header">
+                <div class="mb-title"><i class="fa-solid fa-rotate" style="color:var(--gold);margin-right:6px;"></i> Пополнить абонемент</div>
+                <div class="mb-close" onclick="closeSubTopUpModal()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <input type="hidden" id="topUpSubId">
+            <div class="f-group">
+                <div class="f-label">Имя клиента</div>
+                <input type="text" id="topUpClientName" class="f-inp" placeholder="Иван Иванов">
+            </div>
+            <div class="f-group">
+                <div class="f-label">Телефон</div>
+                <input type="tel" id="topUpClientPhone" class="f-inp" placeholder="+7 900 000-00-00" inputmode="tel">
+            </div>
+
+            <!-- Текущее состояние абонемента, для контекста -->
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div style="font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;">Сейчас на абонементе</div>
+                    <div style="font-size:13px;font-weight:600;color:var(--text);"><span id="topUpCurrentUsed">0</span>/<span id="topUpCurrentTotal">0</span> занятий</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:9px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;">Оплачено всего</div>
+                    <div style="font-size:13px;font-weight:600;color:var(--green);" id="topUpCurrentAmount">0 ₽</div>
+                </div>
+            </div>
+
+            <div class="f-group">
+                <div class="f-label">Стоимость занятия (₽)</div>
+                <input type="number" id="topUpPrice" class="f-inp mono" placeholder="1500" oninput="updateSubTopUpTotal()">
+            </div>
+            <div class="f-group">
+                <div class="f-label">Добавить занятий</div>
+                <input type="number" id="topUpSessions" class="f-inp mono" placeholder="5" oninput="updateSubTopUpTotal()">
+            </div>
+            <div class="total-row">
+                <div class="total-lbl">К ОПЛАТЕ ЗА ПОПОЛНЕНИЕ</div>
+                <div class="total-val pv" id="topUpAddedVal">0 ₽</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 2px 0;font-size:11px;color:var(--text3);">
+                <span>Будет всего занятий:</span>
+                <span style="font-weight:700;color:var(--gold);" id="topUpResultSessions">0</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 2px 12px;font-size:11px;color:var(--text3);">
+                <span>Будет оплачено всего:</span>
+                <span style="font-weight:700;color:var(--green);" id="topUpResultAmount">0 ₽</span>
+            </div>
+            <div class="mb-btns">
+                <button class="mb-btn mb-cancel" onclick="closeSubTopUpModal()">Отмена</button>
+                <button class="mb-btn mb-confirm gold-btn" onclick="confirmSubTopUp()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -6727,10 +6839,15 @@
             // отдельные блоки (sub-badge / sub-history-badge / cl-subscription), чтобы
             // карточка в списке оставалась той же высоты, что и у всех остальных клиентов.
             // Всё развёрнуто (used/total, цена, история) показывается при открытии карточки.
+            // Жёлтая иконка билета показывается только пока есть НЕИЗРАСХОДОВАННЫЕ занятия —
+            // как только used >= total, абонемент считается использованным, и иконка
+            // полностью исчезает (хотя сам абонемент остаётся активным/не удалённым до
+            // пополнения — при пополнении used < total снова, и иконка появится сама).
+            const subIsExhausted = subInfo ? ((subInfo.used || 0) >= (subInfo.total || 0)) : false;
             let subTag = '';
-            if (subInfo) {
+            if (subInfo && !subIsExhausted) {
                 subTag = `<span class="cl-sub-tag" title="Активный абонемент"><i class="fa-solid fa-ticket"></i></span>`;
-            } else if (subHistory.length > 0) {
+            } else if (subHistory.length > 0 && !subInfo) {
                 subTag = `<span class="cl-sub-tag history-sub" title="Был абонемент"><i class="fa-solid fa-clock-rotate-left"></i></span>`;
             }
 
@@ -6830,19 +6947,29 @@
             _updateSubAnalyticsToggleUI(_subEditCountInAnalytics);
         };
 
+        // Снимок текущих данных активного абонемента открытого в moSubClientEdit —
+        // используется для предзаполнения модалки «Пополнить».
+        let _subEditCurrentData = null;
+
         window.openSubClientEdit = async function(clientName, phone, subInfo) {
             _subEditClientName = clientName;
+            _subEditCurrentData = null;
             document.getElementById('subEditClientName').value = clientName;
             document.getElementById('subEditClientPhone').value = phone || '';
+            // Блок абонемента всегда открывается развёрнутым
+            const block = document.getElementById('subEditBlock');
+            if (block) block.classList.remove('collapsed');
             // Загружаем актуальные данные абонемента
             try {
                 const snap = await SUBC
                     .where('clientName', '==', clientName)
                     .where('authorUid', '==', window.PROFILE.uid)
+                    .where('deleted', '==', false)
                     .get();
                 if (!snap.empty) {
                     const d = snap.docs[0].data();
                     const subId = snap.docs[0].id;
+                    _subEditCurrentData = Object.assign({}, d, { id: subId });
                     document.getElementById('subEditId').value = subId;
                     document.getElementById('subEditUsed').textContent = d.used || 0;
                     document.getElementById('subEditTotal').textContent = d.total || 0;
@@ -6873,6 +7000,15 @@
             document.body.classList.remove('modal-open');
             document.getElementById('moSubClientEdit').classList.remove('open');
             _subEditClientName = '';
+        };
+
+        // Сворачивает/разворачивает блок с деталями абонемента (Прогресс занятий,
+        // цена, дата оформления) внутри карточки клиента — нажатие на круглую
+        // кнопку-шеврон рядом с заголовком «Абонемент».
+        window.toggleSubEditBlock = function() {
+            const block = document.getElementById('subEditBlock');
+            if (!block) return;
+            block.classList.toggle('collapsed');
         };
 
         window.saveSubClientEdit = async function() {
@@ -6931,7 +7067,94 @@
             );
         };
 
-        // ===== ПОЛНОЕ УДАЛЕНИЕ ОБЫЧНОГО КЛИЕНТА (все записи + абонемент если есть) =====
+        // ===== ПОПОЛНЕНИЕ АБОНЕМЕНТА =====
+        // Открывается из карточки клиента (кнопка «Пополнить» на месте старой
+        // «Отмена»). Предзаполняет имя/телефон, показывает текущее состояние
+        // абонемента и позволяет добавить занятия + сумму оплаты к уже существующим.
+        window.openSubTopUpModal = function() {
+            if (!_subEditCurrentData) {
+                alert('Не удалось загрузить данные абонемента. Попробуйте закрыть и открыть карточку клиента снова.');
+                return;
+            }
+            const d = _subEditCurrentData;
+            document.getElementById('topUpSubId').value = d.id || '';
+            document.getElementById('topUpClientName').value = document.getElementById('subEditClientName').value || '';
+            document.getElementById('topUpClientPhone').value = document.getElementById('subEditClientPhone').value || '';
+            document.getElementById('topUpCurrentUsed').textContent = d.used || 0;
+            document.getElementById('topUpCurrentTotal').textContent = d.total || 0;
+            document.getElementById('topUpCurrentAmount').textContent = ((d.totalAmount || (d.price * d.total)) || 0).toLocaleString() + ' ₽';
+            // Стоимость занятия предзаполняем текущей ценой — обычно она не меняется
+            document.getElementById('topUpPrice').value = d.price || '';
+            document.getElementById('topUpSessions').value = '';
+            updateSubTopUpTotal();
+            document.getElementById('moSubTopUp').classList.add('open');
+        };
+
+        window.closeSubTopUpModal = function() {
+            document.getElementById('moSubTopUp').classList.remove('open');
+        };
+
+        window.updateSubTopUpTotal = function() {
+            const d = _subEditCurrentData || {};
+            const price = parseInt(document.getElementById('topUpPrice').value) || 0;
+            const addSessions = parseInt(document.getElementById('topUpSessions').value) || 0;
+            const addedAmount = price * addSessions;
+            const addedEl = document.getElementById('topUpAddedVal');
+            if (addedAmount > 0) {
+                addedEl.textContent = addedAmount.toLocaleString() + ' ₽';
+                addedEl.className = 'total-val sub-usage';
+            } else {
+                addedEl.textContent = '0 ₽';
+                addedEl.className = 'total-val pv';
+            }
+            const currentTotal = d.total || 0;
+            const currentAmount = (d.totalAmount || ((d.price || 0) * (d.total || 0))) || 0;
+            document.getElementById('topUpResultSessions').textContent = currentTotal + addSessions;
+            document.getElementById('topUpResultAmount').textContent = (currentAmount + addedAmount).toLocaleString() + ' ₽';
+        };
+
+        window.confirmSubTopUp = async function() {
+            const btn = document.querySelector('#moSubTopUp .mb-confirm');
+            if (btn) lockButton(btn);
+            try {
+                const subId = document.getElementById('topUpSubId').value;
+                const name = document.getElementById('topUpClientName').value.trim();
+                const phone = document.getElementById('topUpClientPhone').value.trim();
+                const price = parseInt(document.getElementById('topUpPrice').value);
+                const addSessions = parseInt(document.getElementById('topUpSessions').value);
+
+                if (!subId) { alert('Абонемент не найден'); if (btn) unlockButton(btn); return; }
+                if (!name) { alert('Введите имя клиента'); if (btn) unlockButton(btn); return; }
+                if (isNaN(price) || price <= 0) { alert('Введите корректную стоимость занятия'); if (btn) unlockButton(btn); return; }
+                if (isNaN(addSessions) || addSessions <= 0) { alert('Введите количество занятий для пополнения'); if (btn) unlockButton(btn); return; }
+
+                const d = _subEditCurrentData || {};
+                const newTotal = (d.total || 0) + addSessions;
+                const addedAmount = price * addSessions;
+                const newTotalAmount = ((d.totalAmount || ((d.price || 0) * (d.total || 0))) || 0) + addedAmount;
+                const newDate = todayStr();
+
+                await SUBC.doc(subId).update({
+                    clientName: name,
+                    clientPhone: phone,
+                    total: newTotal,
+                    price: price,
+                    totalAmount: newTotalAmount,
+                    createdDate: newDate,        // дата оформления обновляется на дату пополнения
+                    countInAnalytics: true
+                });
+
+                closeSubTopUpModal();
+                closeSubClientEdit();
+                renderClients();
+            } catch(e) {
+                handleError(e, 'Ошибка при пополнении абонемента');
+            } finally {
+                if (btn) unlockButton(btn);
+            }
+        };
+
+
         // Предлагает выбор:
         //  • «Сохранить в аналитике» (по умолчанию) — карточка клиента скрывается из раздела
         //    «Клиенты» и больше не мешает в списке, но все его записи и суммы остаются
