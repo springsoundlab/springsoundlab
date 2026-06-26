@@ -3840,22 +3840,21 @@
             <div class="mb-title" id="msTitle">—</div>
             <div class="mb-info" id="msInfo" style="display:none;"></div>
             <input type="number" class="mb-num-input" id="msInput" placeholder="0" onkeydown="if(event.key==='Enter')document.getElementById('msConfirm').click()">
-            <!-- Тоггл: сохранить данные клиента в аналитике при удалении карточки -->
-            <div id="msAnalyticsToggleWrap" style="display:none;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin:14px 0;gap:12px;">
-                <div>
-                    <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Сохранить в аналитике</div>
-                    <div style="font-size:10px;color:var(--text3);" id="msAnalyticsToggleHint">Сумма и история останутся в общем доходе, даже когда карточка клиента удалена</div>
-                </div>
-                <button id="msAnalyticsToggleBtn" type="button" onclick="toggleMsAnalyticsKeep()" style="flex-shrink:0;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;border:1.5px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;transition:.15s;white-space:nowrap;">
-                    ✅ Сохранить
-                </button>
-            </div>
-            <div class="mb-btns">
+            <!-- Подсказка про аналитику — показывается только когда есть выбор «куда удалять» -->
+            <div id="msAnalyticsToggleWrap" style="display:none;font-size:11px;color:var(--text3);line-height:1.5;margin:10px 0 14px;"></div>
+            <div class="mb-btns" id="msBtnsDefault">
                 <button class="mb-btn mb-cancel" onclick="closeSM()">Отмена</button>
                 <button class="mb-btn mb-confirm" id="msConfirm">Готово</button>
             </div>
+            <!-- Две явные кнопки выбора при удалении с аналитикой — один клик и всё решено -->
+            <div class="mb-btns" id="msBtnsAnalytics" style="display:none;flex-direction:column;gap:8px;">
+                <button class="mb-btn" id="msConfirmKeep" style="width:100%;justify-content:center;background:var(--surface3);color:var(--text);border:1px solid var(--border2);">Удалить (сохранить в аналитике)</button>
+                <button class="mb-btn mb-delete" id="msConfirmWipe" style="width:100%;justify-content:center;">Удалить полностью</button>
+                <button class="mb-btn mb-cancel" style="width:100%;justify-content:center;" onclick="closeSM()">Отмена</button>
+            </div>
         </div>
     </div>
+
 
     <!-- Модальное окно для редактирования клиента -->
     <!-- Модальное окно редактирования клиента с абонементом -->
@@ -4022,6 +4021,10 @@
                 <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
                 <div id="clientEditSessions" style="max-height:200px;overflow-y:auto;font-size:12px;color:var(--text2);"></div>
             </div>
+            <!-- Показывается только если у клиента была история абонементов (даже если сейчас абонемент удалён/закончился) -->
+            <button id="clientEditSubHistoryBtn" type="button" onclick="openSubHistoryFromClientEdit()" style="display:none;width:100%;justify-content:center;align-items:center;gap:6px;background:var(--surface2);color:var(--gold);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:10px;transition:.15s;">
+                <i class="fa-solid fa-clock-rotate-left"></i> История абонементов
+            </button>
             <div class="mb-btns" style="display:flex;gap:8px;">
                 <button onclick="deleteClientAndRecords()" title="Удалить клиента" class="mb-btn" style="flex:1;justify-content:center;background:var(--red-bg);color:var(--red);border:1px solid rgba(255,92,106,.3);"><i class="fa-solid fa-trash"></i></button>
                 <button class="mb-btn mb-confirm" style="flex:1;justify-content:center;" onclick="saveClientEdit()">Сохранить</button>
@@ -6893,14 +6896,16 @@
             `;
 
             // Клик на карточку
+            // Если активного абонемента нет (закончился/удалён), карточка — обычная
+            // карточка клиента (имя/телефон/обычное удаление), а история абонементов
+            // доступна внутри по кнопке «История абонементов», а не отдельным
+            // урезанным окном.
             card.onclick = (e) => {
                 if (e.target.closest('.cl-edit-btn')) return;
                 if (c.isSubscriptionOnly && subInfo) {
                     openSubClientEdit(c.name, c.phone, subInfo);
-                } else if (c.isSubscriptionOnly && !subInfo) {
-                    openSubHistoryModal(c.name, c.phone, subHistory);
                 } else {
-                    openClientEdit(c.ids.join(','), c.name, c.phone);
+                    openClientEdit(c.ids.join(','), c.name, c.phone, subHistory);
                 }
             };
 
@@ -6911,10 +6916,8 @@
                     e.stopPropagation();
                     if (c.isSubscriptionOnly && subInfo) {
                         openSubClientEdit(c.name, c.phone, subInfo);
-                    } else if (c.isSubscriptionOnly && !subInfo) {
-                        openSubHistoryModal(c.name, c.phone, subHistory);
                     } else {
-                        openClientEdit(c.ids.join(','), c.name, c.phone);
+                        openClientEdit(c.ids.join(','), c.name, c.phone, subHistory);
                     }
                 };
             }
@@ -7044,6 +7047,8 @@
                 'Удалить абонемент клиента «' + name + '»? Карточка клиента сохранится с историей занятий.',
                 'delete',
                 async () => {
+                    const confirmBtn = _msActiveConfirmBtn();
+                    if (confirmBtn) lockButton(confirmBtn);
                     try {
                         const keepInAnalytics = _msKeepInAnalytics;
                         // Мягкое удаление — история сохраняется в Firestore
@@ -7055,13 +7060,16 @@
                         closeSM();
                         closeSubClientEdit();
                         renderClients();
-                    } catch(e) { handleError(e, 'Ошибка при удалении'); }
+                    } catch(e) {
+                        handleError(e, 'Ошибка при удалении');
+                    } finally {
+                        if (confirmBtn) unlockButton(confirmBtn);
+                    }
                 },
                 '',
                 '',
                 {
                     showAnalyticsToggle: true,
-                    analyticsDefault: true,
                     analyticsHint: 'Сумма абонемента останется в общем доходе, даже когда карточка клиента удалена.'
                 }
             );
@@ -7162,7 +7170,12 @@
         //  • «Удалить» (тоггл выключен) — классическое полное и безвозвратное удаление:
         //    записи и абонемент стираются из базы, суммы пропадают из аналитики.
         window.deleteClientAndRecords = async function(nameOverride) {
-            if (!nameOverride && !clientEditIds.length) return;
+            if (!nameOverride && !clientEditIds.length) {
+                // У клиента может не быть ни одной записи в SC (только абонемент/история) —
+                // в этом случае берём имя прямо из открытой карточки, а не выходим молча.
+                nameOverride = (document.getElementById('clientEditName').value || '').trim();
+                if (!nameOverride) return;
+            }
             let name, ids;
             if (nameOverride) {
                 name = nameOverride;
@@ -7181,7 +7194,7 @@
                 'delete',
                 async () => {
                     const keepInAnalytics = _msKeepInAnalytics;
-                    const confirmBtn = document.getElementById('msConfirm');
+                    const confirmBtn = _msActiveConfirmBtn();
                     if (confirmBtn) lockButton(confirmBtn);
                     try {
                         const batch = db.batch();
@@ -7236,7 +7249,6 @@
                 '',
                 {
                     showAnalyticsToggle: true,
-                    analyticsDefault: true,
                     analyticsHint: 'Сумма и история визитов останутся в общем доходе, даже когда карточка клиента удалена. Полезно, например, после возврата денег конфликтному клиенту.'
                 }
             );
@@ -7275,18 +7287,38 @@
 
         // ===== РЕДАКТИРОВАНИЕ КЛИЕНТА =====
         // nameHint/phoneHint используются когда ids пустые (клиент без обычных записей)
-        function openClientEdit(idsStr, nameHint, phoneHint) {
+        // _clientEditSubHistory — история абонементов текущего открытого клиента
+        // (если когда-либо были абонементы), используется кнопкой «История абонементов».
+        let _clientEditSubHistory = [];
+        // _clientEditOriginalName — имя клиента на момент открытия карточки. Нужно,
+        // чтобы при сохранении найти и переименовать его абонементы в SUBC, даже если
+        // у клиента нет ни одной обычной записи в SC (clientEditIds пуст).
+        let _clientEditOriginalName = '';
+
+        function openClientEdit(idsStr, nameHint, phoneHint, subHistory) {
             const ids = (idsStr || '').split(',').filter(id => id.trim());
             clientEditIds = ids;
             const records = ids.length ? window.CRM.filter(r => ids.includes(r.id)) : [];
             const first = records[0];
             const clientName = (first && (first.client || first.song)) || nameHint || '';
+            _clientEditOriginalName = clientName;
             document.getElementById('clientEditName').value = clientName;
             document.getElementById('clientEditPhone').value = (first && first.phone) || phoneHint || '';
             renderClientSessionsList('clientEditSessions', clientName);
+            _clientEditSubHistory = subHistory || [];
+            const histBtn = document.getElementById('clientEditSubHistoryBtn');
+            if (histBtn) histBtn.style.display = _clientEditSubHistory.length ? 'flex' : 'none';
             document.body.classList.add('modal-open');
             document.getElementById('moClientEdit').classList.add('open');
         }
+
+        // Открывает окно истории абонементов прямо из обычной карточки клиента
+        // (кнопка «История абонементов»), без необходимости отдельного «недо-клиента».
+        window.openSubHistoryFromClientEdit = function() {
+            const name = document.getElementById('clientEditName').value || '';
+            const phone = document.getElementById('clientEditPhone').value || '';
+            openSubHistoryModal(name, phone, _clientEditSubHistory);
+        };
 
         function closeClientEdit() {
             document.body.classList.remove('modal-open');
@@ -7295,14 +7327,20 @@
         }
 
         async function saveClientEdit() {
-            if (!clientEditIds.length) return;
             const newName = document.getElementById('clientEditName').value.trim();
             const newPhone = document.getElementById('clientEditPhone').value.trim();
             if (!newName) { alert('Имя не может быть пустым'); return; }
+            // Раньше функция выходила молча, если у клиента не было ни одной записи
+            // в SC (например клиент только с историей абонементов) — кнопка
+            // «Сохранить» просто ничего не делала. Теперь обновляем, что есть:
+            // обычные записи (если они есть) и/или документы абонементов в SUBC
+            // (по старому имени), так что переименование работает для любой карточки.
+            if (!clientEditIds.length && !_clientEditOriginalName) return;
             const btn = document.querySelector('#moClientEdit .mb-confirm');
             if (btn) lockButton(btn);
             try {
                 const batch = db.batch();
+                let hasOps = false;
                 const records = window.CRM.filter(r => clientEditIds.includes(r.id));
                 records.forEach(r => {
                     const ref = SC.doc(r.id);
@@ -7311,8 +7349,19 @@
                         song: newName,
                         phone: newPhone
                     });
+                    hasOps = true;
                 });
-                await batch.commit();
+                if (_clientEditOriginalName && window.PROFILE && window.PROFILE.uid) {
+                    const subSnap = await SUBC
+                        .where('authorUid', '==', window.PROFILE.uid)
+                        .where('clientName', '==', _clientEditOriginalName)
+                        .get();
+                    subSnap.forEach(doc => {
+                        batch.update(doc.ref, { clientName: newName, clientPhone: newPhone });
+                        hasOps = true;
+                    });
+                }
+                if (hasOps) await batch.commit();
                 closeClientEdit();
                 renderClients();
             } catch (e) {
@@ -7686,66 +7735,9 @@
             });
         };
 
-        // Удаление subscription-only клиента (полностью, включая историю)
-        async function deleteSubOnlyClient(name, subInfo, subHistory) {
-            // ВАЖНО: у такого клиента в «Клиенты» может не быть ни одного актуального
-            // документа в SUBC (абонемент уже удалён/история пуста), а карточка всё
-            // равно держится за счёт «осиротевшей» служебной записи в SC (коллекция
-            // обычных записей), которая регистрирует имя клиента, но не была заведена
-            // ни в clientEditIds, ни найдена через SUBC. Поэтому ищем и чистим SC по имени.
-            const orphanIds = findAllMyRecordIdsByName(name);
-            openSM(
-                'Удалить клиента «' + escapeHTML(name) + '»? Это нельзя отменить.',
-                'delete',
-                async () => {
-                    const keepInAnalytics = _msKeepInAnalytics;
-                    const confirmBtn = document.getElementById('msConfirm');
-                    if (confirmBtn) lockButton(confirmBtn);
-                    try {
-                        // Все документы абонементов (активные и из истории) этого клиента
-                        const snap = await SUBC
-                            .where('authorUid', '==', window.PROFILE.uid)
-                            .where('clientName', '==', name)
-                            .get();
-                        const batch = db.batch();
-                        if (keepInAnalytics) {
-                            // Скрываем из «Клиенты», суммы остаются в Аналитике
-                            snap.forEach(doc => batch.update(doc.ref, {
-                                hiddenFromClients: true,
-                                hiddenFromClientsAt: Date.now()
-                            }));
-                            orphanIds.forEach(id => batch.update(SC.doc(id), {
-                                hiddenFromClients: true,
-                                hiddenFromClientsAt: Date.now()
-                            }));
-                        } else {
-                            // Полное безвозвратное удаление, включая аналитику
-                            snap.forEach(doc => batch.delete(doc.ref));
-                            orphanIds.forEach(id => batch.delete(SC.doc(id)));
-                        }
-                        await batch.commit();
-                        if (keepInAnalytics) {
-                            window.CRM.forEach(r => { if (orphanIds.includes(r.id)) r.hiddenFromClients = true; });
-                        } else {
-                            window.CRM = window.CRM.filter(r => !orphanIds.includes(r.id));
-                        }
-                        closeSM();
-                        renderClients();
-                    } catch(e) {
-                        handleError(e, 'Ошибка при удалении клиента');
-                    } finally {
-                        if (confirmBtn) unlockButton(confirmBtn);
-                    }
-                },
-                '',
-                '',
-                {
-                    showAnalyticsToggle: true,
-                    analyticsDefault: true,
-                    analyticsHint: 'Сумма абонемента останется в общем доходе, даже когда карточка клиента удалена.'
-                }
-            );
-        }
+        // Удаление subscription-only клиента теперь идёт через единую
+        // deleteClientAndRecords() — она уже умеет находить и чистить/скрывать
+        // абонементы клиента по имени, даже если у него нет записей в SC.
 
         // Модалка истории абонементов для клиентов без активного абонемента
         let _subHistoryClientName = '';
@@ -7788,11 +7780,11 @@
 
         window.deleteSubHistoryClient = function() {
             const name = _subHistoryClientName;
-            // Close history modal first, then open confirm dialog
+            // Закрываем окно истории — основную карточку клиента (moClientEdit)
+            // не трогаем, она тоже закроется внутри deleteClientAndRecords после
+            // подтверждения, так что не нужно дублировать логику удаления здесь.
             document.getElementById('moSubHistory').classList.remove('open');
-            const anyOtherOpen = document.querySelector('.mo.open:not(#moSimple)');
-            if (!anyOtherOpen) document.body.classList.remove('modal-open');
-            deleteSubOnlyClient(name, null, _subHistoryClientSubHistory);
+            deleteClientAndRecords(name);
         };
 
         let _subHistoryCountInAnalytics = true;
@@ -8034,9 +8026,13 @@
         }
 
         // ===== SIMPLE MODAL =====
-        // extra = { showAnalyticsToggle: true, analyticsDefault: true, analyticsHint: '...' }
+        // extra = { showAnalyticsToggle: true, analyticsHint: '...' }
         // Используется, когда удаление карточки клиента должно предлагать выбор:
         // сохранить его суммы в аналитике или удалить полностью (включая аналитику).
+        // Раньше это решалось тогглом + отдельной кнопкой «Удалить» (2 клика).
+        // Теперь — сразу две кнопки с явным результатом, один клик и всё готово:
+        // «Удалить (сохранить в аналитике)» вызывает onConfirm(true),
+        // «Удалить полностью» вызывает onConfirm(false).
         window.openSM = function(title, type, onConfirm, defVal = '', infoText = '', extra = null) {
             document.body.classList.add('modal-open');
             document.getElementById('msTitle').textContent = title;
@@ -8044,23 +8040,38 @@
             const infoDiv = document.getElementById('msInfo');
             const mo = document.getElementById('moSimple');
             const cf = document.getElementById('msConfirm');
-            const cancelBtn = mo.querySelector('.mb-cancel');
+            const btnsDefault = document.getElementById('msBtnsDefault');
+            const btnsAnalytics = document.getElementById('msBtnsAnalytics');
             const analyticsWrap = document.getElementById('msAnalyticsToggleWrap');
-            const analyticsHint = document.getElementById('msAnalyticsToggleHint');
+            const keepBtn = document.getElementById('msConfirmKeep');
+            const wipeBtn = document.getElementById('msConfirmWipe');
+            const cancelBtn = mo.querySelector('#msBtnsDefault .mb-cancel');
             infoDiv.style.display = 'none';
             inp.style.display = 'none';
             cf.style.display = 'none';
             cancelBtn.textContent = 'Отмена';
             unlockButton(cf);
+            unlockButton(keepBtn);
+            unlockButton(wipeBtn);
+
             if (extra && extra.showAnalyticsToggle) {
-                _msKeepInAnalytics = extra.analyticsDefault !== false; // по умолчанию true — сохранить
-                _updateMsAnalyticsToggleUI(_msKeepInAnalytics);
-                if (analyticsHint) analyticsHint.textContent = extra.analyticsHint ||
+                // Режим выбора: две кнопки сразу решают и подтверждают действие.
+                _msKeepInAnalytics = true; // значение по умолчанию, актуализируется при клике
+                analyticsWrap.textContent = extra.analyticsHint ||
                     'Сумма и история останутся в общем доходе, даже когда карточка клиента удалена';
-                analyticsWrap.style.display = 'flex';
-            } else {
-                analyticsWrap.style.display = 'none';
+                analyticsWrap.style.display = 'block';
+                btnsDefault.style.display = 'none';
+                btnsAnalytics.style.display = 'flex';
+                keepBtn.onclick = () => { _msKeepInAnalytics = true; onConfirm(); };
+                wipeBtn.onclick = () => { _msKeepInAnalytics = false; onConfirm(); };
+                mo.classList.add('open');
+                return;
             }
+
+            analyticsWrap.style.display = 'none';
+            btnsAnalytics.style.display = 'none';
+            btnsDefault.style.display = 'flex';
+
             if (type === 'delete') {
                 cf.className = 'mb-btn mb-delete';
                 cf.textContent = 'Удалить';
@@ -8093,27 +8104,20 @@
             if (!anyOtherOpen) document.body.classList.remove('modal-open');
         };
 
-        // ===== Тоггл «Сохранить в аналитике» для модалки удаления клиента =====
+        // _msKeepInAnalytics — хранит выбор пользователя (какую из двух кнопок
+        // нажал), читается внутри onConfirm в местах вызова openSM с showAnalyticsToggle.
         let _msKeepInAnalytics = true;
-        function _updateMsAnalyticsToggleUI(val) {
-            const btn = document.getElementById('msAnalyticsToggleBtn');
-            if (!btn) return;
-            if (val) {
-                btn.textContent = '✅ Сохранить';
-                btn.style.borderColor = 'var(--green)';
-                btn.style.background = 'var(--green-bg)';
-                btn.style.color = 'var(--green)';
-            } else {
-                btn.textContent = '⛔ Удалить';
-                btn.style.borderColor = 'var(--red)';
-                btn.style.background = 'var(--red-bg)';
-                btn.style.color = 'var(--red)';
+
+        // Возвращает кнопку, которая фактически была нажата в текущем диалоге
+        // openSM — нужно блокировать именно её на время асинхронной операции,
+        // а не общий msConfirm (его не видно, когда открыт режим с двумя кнопками).
+        function _msActiveConfirmBtn() {
+            const btnsAnalytics = document.getElementById('msBtnsAnalytics');
+            if (btnsAnalytics && btnsAnalytics.style.display !== 'none') {
+                return _msKeepInAnalytics ? document.getElementById('msConfirmKeep') : document.getElementById('msConfirmWipe');
             }
+            return document.getElementById('msConfirm');
         }
-        window.toggleMsAnalyticsKeep = function() {
-            _msKeepInAnalytics = !_msKeepInAnalytics;
-            _updateMsAnalyticsToggleUI(_msKeepInAnalytics);
-        };
 
         function openMonthInfo(idx, value) {
             const monthName = MNL[idx];
