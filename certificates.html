@@ -3754,16 +3754,6 @@
                 </div>
                 <div class="added-svcs" id="addedSvcs"></div>
                 <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val pv" id="formTotal">0 ₽</div></div>
-                <!-- Тоггл абонемента — появляется только когда есть активный абонемент -->
-                <div id="subVisitToggleBanner" style="display:none;align-items:center;justify-content:space-between;gap:10px;background:var(--gold-bg);border:1px solid var(--gold);border-radius:var(--r-sm);padding:10px 14px;margin-top:10px;">
-                    <div style="font-size:11px;color:var(--gold);font-weight:600;line-height:1.4;">
-                        <i class="fa-solid fa-ticket" style="margin-right:5px;"></i>
-                        У клиента есть активный абонемент
-                    </div>
-                    <button id="subVisitToggleBtn" onclick="toggleSubVisitMode()" style="flex-shrink:0;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold);">
-                        <i class="fa-solid fa-ticket" style="margin-right:5px;color:var(--gold);"></i>Списать с абонемента
-                    </button>
-                </div>
                 <div class="f-row full">
                     <div class="f-group"><div class="f-label">Комментарий / Заметка</div><textarea id="fComment" class="f-inp" placeholder="Детали записи, пожелания клиента..."></textarea></div>
                 </div>
@@ -4502,7 +4492,6 @@
         let isSortDropdownOpen = false;
         let isMobileDevice = false;
         let _subClientHasSubscription = false;
-        let _skipSubscriptionForThisVisit = false;
         let _subClientSubData = null;
         let _lastCheckedClientName = '';
         // Настройки
@@ -4944,26 +4933,9 @@
         function updateTotalDisplay() {
             const totalEl = document.getElementById('formTotal');
             const hintEl = document.getElementById('prepaidHint');
-            // Show/hide the subscription toggle banner
-            const subToggleBanner = document.getElementById('subVisitToggleBanner');
-            if (subToggleBanner) {
-                subToggleBanner.style.display = (_subClientHasSubscription && _subClientSubData) ? 'flex' : 'none';
-                const btn = document.getElementById('subVisitToggleBtn');
-                if (btn) {
-                    if (_skipSubscriptionForThisVisit) {
-                        btn.innerHTML = '<i class="fa-solid fa-credit-card" style="margin-right:5px;"></i>\u041e\u0442\u0434\u0435\u043b\u044c\u043d\u0430\u044f \u043e\u043f\u043b\u0430\u0442\u0430';
-                        btn.style.background = 'var(--surface3)';
-                        btn.style.color = 'var(--text2)';
-                        btn.style.border = '1px solid var(--border2)';
-                    } else {
-                        btn.innerHTML = '<i class="fa-solid fa-ticket" style="margin-right:5px;color:var(--gold);"></i>\u0421\u043f\u0438\u0441\u0430\u0442\u044c \u0441 \u0430\u0431\u043e\u043d\u0435\u043c\u0435\u043d\u0442\u0430';
-                        btn.style.background = 'var(--gold-bg)';
-                        btn.style.color = 'var(--gold)';
-                        btn.style.border = '1px solid var(--gold)';
-                    }
-                }
-            }
-            if (_subClientHasSubscription && _subClientSubData && !_skipSubscriptionForThisVisit) {
+            // Show X/Y subscription display ONLY when no services selected (pure subscription visit)
+            const hasServices = formDetails && formDetails.length > 0;
+            if (_subClientHasSubscription && _subClientSubData && !hasServices) {
                 const used = _subClientSubData.used || 0;
                 const total = _subClientSubData.total || 0;
                 // Для НОВОЙ записи показываем «следующий» номер занятия (used+1),
@@ -4984,11 +4956,6 @@
             if (hintEl) hintEl.textContent = formTotal.toLocaleString() + ' ₽';
             if (!privacyOn && !_subClientHasSubscription) applyBlur();
         }
-
-        window.toggleSubVisitMode = function() {
-            _skipSubscriptionForThisVisit = !_skipSubscriptionForThisVisit;
-            updateTotalDisplay();
-        };
 
         // ===== МУЛЬТИТАЧ =====
         let swipeStartX = 0,
@@ -6322,7 +6289,6 @@
             _subClientHasSubscription = false;
             _subClientSubData = null;
             _lastCheckedClientName = '';
-            _skipSubscriptionForThisVisit = false;
             document.getElementById('mbRecTitle').textContent = 'Новая запись';
             document.getElementById('fDate').value = dateToInput(todayStr());
             document.getElementById('fTime').value = '';
@@ -6374,7 +6340,6 @@
             _subClientHasSubscription = false;
             _subClientSubData = null;
             _lastCheckedClientName = '';
-            _skipSubscriptionForThisVisit = false;
             document.getElementById('mbRecTitle').textContent = 'Редактирование записи';
             document.getElementById('fDate').value = dateToInput(row.date || '');
             document.getElementById('fTime').value = row.time || '';
@@ -6414,7 +6379,6 @@
             _subClientHasSubscription = false;
             _subClientSubData = null;
             _lastCheckedClientName = '';
-            _skipSubscriptionForThisVisit = false;
         };
 
         // ===== PRESET SERVICES =====
@@ -6606,7 +6570,8 @@
                 let isSubscriptionVisit = false;
                 let subForVisit = null;
                 if (!editId) {
-                    if (!_skipSubscriptionForThisVisit) {
+                    // Only mark as subscription visit if NO services were selected
+                    if (!details || details.length === 0) {
                         subForVisit = await getSubscriptionForClient(name);
                         if (subForVisit) {
                             isSubscriptionVisit = true;
