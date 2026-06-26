@@ -4021,9 +4021,11 @@
                 <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
                 <div id="clientEditSessions" style="max-height:200px;overflow-y:auto;font-size:12px;color:var(--text2);"></div>
             </div>
-            <!-- Показывается только если у клиента была история абонементов (даже если сейчас абонемент удалён/закончился) -->
+            <!-- Показывается если у клиента есть история абонементов и/или текущий
+                 исчерпанный (но не удалённый) абонемент — внутри доступны детали
+                 и кнопка «Пополнить», чтобы вернуть абонемент в активное состояние -->
             <button id="clientEditSubHistoryBtn" type="button" onclick="openSubHistoryFromClientEdit()" style="display:none;width:100%;justify-content:center;align-items:center;gap:6px;background:var(--surface2);color:var(--gold);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:10px;transition:.15s;">
-                <i class="fa-solid fa-clock-rotate-left"></i> История абонементов
+                <i class="fa-solid fa-ticket"></i> Абонемент
             </button>
             <div class="mb-btns" style="display:flex;gap:8px;">
                 <button onclick="deleteClientAndRecords()" title="Удалить клиента" class="mb-btn" style="flex:1;justify-content:center;background:var(--red-bg);color:var(--red);border:1px solid rgba(255,92,106,.3);"><i class="fa-solid fa-trash"></i></button>
@@ -4036,12 +4038,28 @@
     <div class="mo" id="moSubHistory">
         <div class="mb" style="width:420px;max-width:95vw;">
             <div class="mb-header">
-                <div class="mb-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--gold);margin-right:6px;"></i> История абонементов</div>
+                <div class="mb-title"><i class="fa-solid fa-ticket" style="color:var(--gold);margin-right:6px;"></i> Абонемент</div>
                 <div class="mb-close" onclick="closeSubHistoryModal()"><i class="fa-solid fa-xmark"></i></div>
             </div>
             <div style="margin-bottom:10px;">
                 <div style="font-size:13px;font-weight:600;color:var(--text);" id="subHistoryClientName">—</div>
                 <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="subHistoryClientPhone">—</div>
+            </div>
+            <!-- Текущий абонемент, у которого закончились занятия (used >= total), но
+                 документ не удалён — показывается только если такой абонемент есть.
+                 Отсюда же можно его пополнить, чтобы он снова стал активным. -->
+            <div id="subHistoryCurrentWrap" style="display:none;background:var(--surface2);border:1px solid var(--gold);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Абонемент использован</div>
+                    <div style="font-size:13px;font-weight:700;color:var(--gold);" id="subHistoryCurrentUsed">0/0</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:10px;">
+                    <span>Оформлен <span id="subHistoryCurrentDate">—</span></span>
+                    <span id="subHistoryCurrentAmount">0 ₽</span>
+                </div>
+                <button type="button" onclick="openSubTopUpModalFromHistory()" style="width:100%;justify-content:center;align-items:center;gap:6px;display:flex;background:var(--gold);color:#000;border:none;border-radius:var(--r-sm);padding:9px;font-size:12px;font-weight:700;cursor:pointer;">
+                    <i class="fa-solid fa-rotate"></i> Пополнить
+                </button>
             </div>
             <div id="subHistoryContent" style="max-height:300px;overflow-y:auto;"></div>
             <!-- Тоггл аналитики для истории абонементов -->
@@ -4870,6 +4888,20 @@
             }
         }
 
+        // Абонемент, по которому можно ещё списывать занятия: существует, не удалён
+        // и used < total. Когда занятия закончились (used >= total), клиент в журнале
+        // и в карточке должен вести себя как обычный — с обычной суммой за услугу,
+        // без «X из Y занятий» и без списания. Используется именно для журнала
+        // записей; проверка «есть ли вообще абонемент» (включая исчерпанный) — по-прежнему
+        // через getSubscriptionForClient, например при создании нового абонемента,
+        // чтобы не плодить два документа абонемента у одного клиента.
+        async function getActiveSubscriptionForClient(clientName) {
+            const sub = await getSubscriptionForClient(clientName);
+            if (!sub) return null;
+            if ((sub.used || 0) >= (sub.total || 0)) return null;
+            return sub;
+        }
+
         async function updateSubscriptionUsage(clientName, sessionsToDeduct = 1) {
             if (!clientName || !window.PROFILE) return null;
             try {
@@ -4882,10 +4914,15 @@
                 const data = doc.data();
                 const used = data.used || 0;
                 const total = data.total || 0;
-                const newUsed = Math.min(used + sessionsToDeduct, total);
-                if (used + sessionsToDeduct > total) {
-                    alert(`⚠️ У клиента осталось только ${Math.max(0, total - used)} занятий. Будет списано ${Math.max(0, total - used)} занятий.`);
+                // Если занятий уже не осталось — больше не списываем и не показываем
+                // никаких предупреждений про абонемент. Запись в журнале к этому моменту
+                // уже сохранена как обычная услуга (см. getActiveSubscriptionForClient),
+                // так что сюда попадать в этом случае не должны, но проверка остаётся
+                // на случай прямого вызова — чтобы used никогда не «перепрыгивал» total.
+                if (used >= total) {
+                    return { used, total };
                 }
+                const newUsed = Math.min(used + sessionsToDeduct, total);
                 await doc.ref.update({ used: newUsed });
                 console.log(`✅ Списано ${sessionsToDeduct} занятие(й) для ${clientName}. Использовано: ${newUsed}/${total}`);
                 return { used: newUsed, total };
@@ -4910,7 +4947,7 @@
                 return;
             }
             _lastCheckedClientName = name;
-            const sub = await getSubscriptionForClient(name);
+            const sub = await getActiveSubscriptionForClient(name);
             if (sub) {
                 _subClientHasSubscription = true;
                 _subClientSubData = sub;
@@ -6348,7 +6385,7 @@
             setupFormMode();
             const name = row.client || row.song || '';
             if (name) {
-                getSubscriptionForClient(name).then(sub => {
+                getActiveSubscriptionForClient(name).then(sub => {
                     if (sub) {
                         _subClientHasSubscription = true;
                         _subClientSubData = sub;
@@ -6555,14 +6592,18 @@
                 // Стандартное занятие длится 2 часа, но если поставить дольше или короче,
                 // списываться должно всё равно ровно одно занятие (а не «по часам»).
 
-                // Если у клиента есть активный абонемент и это НОВАЯ запись — занятие уже
-                // оплачено абонементом при его покупке, поэтому запись не должна создавать
-                // «долг»: помечаем визит как оплаченный абонементом (total = fullTotal),
-                // и ставим флаг isSubscriptionVisit для бейджа «Абонемент» в разделе «Записи».
+                // Если у клиента есть активный (неисчерпанный) абонемент и это НОВАЯ
+                // запись — занятие уже оплачено абонементом при его покупке, поэтому
+                // запись не должна создавать «долг»: помечаем визит как оплаченный
+                // абонементом (total = fullTotal), и ставим флаг isSubscriptionVisit
+                // для бейджа «Абонемент» в разделе «Записи».
+                // Если занятия по абонементу закончились (used >= total), клиент
+                // в журнале ведёт себя как обычный — обычная сумма за услугу, без
+                // списания и без пометки «занятие из абонемента».
                 let isSubscriptionVisit = false;
                 let subForVisit = null;
                 if (!editId) {
-                    subForVisit = await getSubscriptionForClient(name);
+                    subForVisit = await getActiveSubscriptionForClient(name);
                     if (subForVisit) {
                         isSubscriptionVisit = true;
                         paid = fullT;
@@ -6854,20 +6895,23 @@
                 subTag = `<span class="cl-sub-tag history-sub" title="Был абонемент"><i class="fa-solid fa-clock-rotate-left"></i></span>`;
             }
 
-            // Содержимое сетки 2×2: для клиента с абонементом показываем прогресс
-            // занятий и цену вместо «Визитов/Услуга», которые для него не информативны.
+            // Содержимое сетки 2×2: для клиента с АКТИВНЫМ (неисчерпанным) абонементом
+            // показываем прогресс занятий и цену вместо «Визитов/Услуга». Как только
+            // занятия заканчиваются (subIsExhausted), карточка полностью переходит на
+            // обычный вид «Визитов/Потрачено» — клиент с этого момента ведёт себя как
+            // обычный, даже если технически документ абонемента ещё существует в базе
+            // (он оживает только при пополнении).
             let statsHtml;
-            if (subInfo) {
+            if (subInfo && !subIsExhausted) {
                 const used = subInfo.used || 0;
                 const totalSessions = subInfo.total || 0;
                 const pricePerSession = subInfo.price || 0;
                 const left = Math.max(0, totalSessions - used);
-                const isExhausted = used >= totalSessions;
                 statsHtml = `
                     <div class="cl-st"><div class="cl-st-l">Занятий</div><div class="cl-st-v" style="color:${pal.hex}">${used}/${totalSessions}</div></div>
                     <div class="cl-st"><div class="cl-st-l">Цена занятия</div><div class="cl-st-v pv">${pricePerSession ? pricePerSession.toLocaleString() + ' ₽' : '—'}</div></div>
                     <div class="cl-st"><div class="cl-st-l">Последний визит</div><div class="cl-st-v">${last}</div></div>
-                    <div class="cl-st"><div class="cl-st-l">Статус</div><div class="cl-st-v" style="color:${isExhausted ? 'var(--red)' : 'var(--green)'};">${isExhausted ? 'Использован' : left + ' осталось'}</div></div>
+                    <div class="cl-st"><div class="cl-st-l">Статус</div><div class="cl-st-v" style="color:var(--green);">${left} осталось</div></div>
                 `;
             } else {
                 const visitsDisplay = c.isSubscriptionOnly ? '—' : c.visits;
@@ -6896,16 +6940,17 @@
             `;
 
             // Клик на карточку
-            // Если активного абонемента нет (закончился/удалён), карточка — обычная
-            // карточка клиента (имя/телефон/обычное удаление), а история абонементов
-            // доступна внутри по кнопке «История абонементов», а не отдельным
-            // урезанным окном.
+            // Спец-окно абонемента («Прогресс занятий», цена, дата) открывается только
+            // если абонемент ещё активен (есть свободные занятия). Как только занятия
+            // заканчиваются — карточка ведёт себя как обычная карточка клиента (имя,
+            // телефон, обычное удаление, визиты), а детали бывшего абонемента и кнопка
+            // «Пополнить» доступны внутри неё по кнопке «История абонементов».
             card.onclick = (e) => {
                 if (e.target.closest('.cl-edit-btn')) return;
-                if (c.isSubscriptionOnly && subInfo) {
+                if (subInfo && !subIsExhausted) {
                     openSubClientEdit(c.name, c.phone, subInfo);
                 } else {
-                    openClientEdit(c.ids.join(','), c.name, c.phone, subHistory);
+                    openClientEdit(c.ids.join(','), c.name, c.phone, subHistory, subInfo);
                 }
             };
 
@@ -6914,10 +6959,10 @@
             if (editBtn) {
                 editBtn.onclick = (e) => {
                     e.stopPropagation();
-                    if (c.isSubscriptionOnly && subInfo) {
+                    if (subInfo && !subIsExhausted) {
                         openSubClientEdit(c.name, c.phone, subInfo);
                     } else {
-                        openClientEdit(c.ids.join(','), c.name, c.phone, subHistory);
+                        openClientEdit(c.ids.join(','), c.name, c.phone, subHistory, subInfo);
                     }
                 };
             }
@@ -7166,8 +7211,16 @@
                     countInAnalytics: true
                 });
 
+                // Пополнение может быть вызвано двумя путями: из спец-окна абонемента
+                // (moSubClientEdit, когда он ещё активен) или из истории внутри обычной
+                // карточки клиента (moSubHistory внутри moClientEdit, когда абонемент уже
+                // был исчерпан). Закрываем всю цепочку независимо от пути входа — после
+                // пополнения карточка снова активна, и пользователь откроет её заново.
                 closeSubTopUpModal();
                 closeSubClientEdit();
+                document.getElementById('moSubHistory').classList.remove('open');
+                closeClientEdit();
+                document.body.classList.remove('modal-open');
                 renderClients();
             } catch(e) {
                 handleError(e, 'Ошибка при пополнении абонемента');
@@ -7308,8 +7361,12 @@
         // чтобы при сохранении найти и переименовать его абонементы в SUBC, даже если
         // у клиента нет ни одной обычной записи в SC (clientEditIds пуст).
         let _clientEditOriginalName = '';
+        // _clientEditHasSubAccess — есть ли у клиента хоть что-то абонементное для
+        // показа: история прошлых (удалённых) абонементов ИЛИ текущий исчерпанный,
+        // но не удалённый документ (subInfo) — на случай если used >= total.
+        let _clientEditHasSubAccess = false;
 
-        function openClientEdit(idsStr, nameHint, phoneHint, subHistory) {
+        function openClientEdit(idsStr, nameHint, phoneHint, subHistory, subInfo) {
             const ids = (idsStr || '').split(',').filter(id => id.trim());
             clientEditIds = ids;
             const records = ids.length ? window.CRM.filter(r => ids.includes(r.id)) : [];
@@ -7320,8 +7377,9 @@
             document.getElementById('clientEditPhone').value = (first && first.phone) || phoneHint || '';
             renderClientSessionsList('clientEditSessions', clientName);
             _clientEditSubHistory = subHistory || [];
+            _clientEditHasSubAccess = !!(_clientEditSubHistory.length || subInfo);
             const histBtn = document.getElementById('clientEditSubHistoryBtn');
-            if (histBtn) histBtn.style.display = _clientEditSubHistory.length ? 'flex' : 'none';
+            if (histBtn) histBtn.style.display = _clientEditHasSubAccess ? 'flex' : 'none';
             document.body.classList.add('modal-open');
             document.getElementById('moClientEdit').classList.add('open');
         }
@@ -7753,7 +7811,9 @@
         // deleteClientAndRecords() — она уже умеет находить и чистить/скрывать
         // абонементы клиента по имени, даже если у него нет записей в SC.
 
-        // Модалка истории абонементов для клиентов без активного абонемента
+        // Модалка истории абонементов — показывает: (1) текущий абонемент, у которого
+        // закончились занятия, но документ не удалён (с кнопкой «Пополнить»), и
+        // (2) историю прошлых, удалённых абонементов, если она есть.
         let _subHistoryClientName = '';
         let _subHistoryClientSubHistory = [];
         function openSubHistoryModal(name, phone, subHistory) {
@@ -7761,13 +7821,25 @@
             _subHistoryClientSubHistory = subHistory || [];
             _subHistoryCountInAnalytics = true;
             _updateSubHistoryAnalyticsBtnUI(true);
-            // Загружаем состояние аналитики из первого абонемента
+            const currentWrap = document.getElementById('subHistoryCurrentWrap');
+            if (currentWrap) currentWrap.style.display = 'none';
+            _subEditCurrentData = null;
+            // Загружаем актуальный (не удалённый) документ абонемента, если он есть —
+            // это и есть «исчерпанный, но не удалённый» абонемент, который можно пополнить.
             if (window.PROFILE && name) {
-                SUBC.where('clientName','==',name).where('authorUid','==',window.PROFILE.uid).get().then(snap => {
+                SUBC.where('clientName', '==', name).where('authorUid', '==', window.PROFILE.uid).where('deleted', '==', false).get().then(snap => {
                     if (!snap.empty) {
                         const d = snap.docs[0].data();
+                        const subId = snap.docs[0].id;
+                        _subEditCurrentData = Object.assign({}, d, { id: subId });
                         _subHistoryCountInAnalytics = (d.countInAnalytics !== false);
                         _updateSubHistoryAnalyticsBtnUI(_subHistoryCountInAnalytics);
+                        if (currentWrap) {
+                            currentWrap.style.display = 'block';
+                            document.getElementById('subHistoryCurrentUsed').textContent = (d.used || 0) + '/' + (d.total || 0);
+                            document.getElementById('subHistoryCurrentDate').textContent = d.createdDate || '—';
+                            document.getElementById('subHistoryCurrentAmount').textContent = ((d.totalAmount || (d.price * d.total)) || 0).toLocaleString() + ' ₽';
+                        }
                     }
                 }).catch(()=>{});
             }
@@ -7786,6 +7858,15 @@
             document.body.classList.add('modal-open');
             document.getElementById('moSubHistory').classList.add('open');
         }
+
+        // Открывает «Пополнить абонемент» прямо из окна истории — предзаполняет
+        // именем/телефоном текущего клиента и данными его исчерпанного абонемента.
+        window.openSubTopUpModalFromHistory = function() {
+            if (!_subEditCurrentData) return;
+            document.getElementById('subEditClientName').value = _subHistoryClientName || '';
+            document.getElementById('subEditClientPhone').value = document.getElementById('subHistoryClientPhone').textContent === '—' ? '' : document.getElementById('subHistoryClientPhone').textContent;
+            openSubTopUpModal();
+        };
 
         function closeSubHistoryModal() {
             document.body.classList.remove('modal-open');
