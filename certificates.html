@@ -3753,6 +3753,10 @@
                     <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">При сохранении абонемент будет привязан к клиенту.</div>
                 </div>
                 <div class="added-svcs" id="addedSvcs"></div>
+                <!-- Кнопка Списать с абонемента: появляется только когда есть активный абонемент -->
+                <button id="subChargeBtn" onclick="chargeFromSubscription()" style="display:none;width:100%;padding:11px;margin-bottom:8px;background:var(--gold-bg);color:var(--gold);border:1.5px solid var(--gold);border-radius:var(--r-sm);font-size:13px;font-weight:700;cursor:pointer;transition:.15s;text-align:center;">
+                    <i class="fa-solid fa-ticket" style="margin-right:7px;"></i>Списать с абонемента
+                </button>
                 <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val pv" id="formTotal">0 ₽</div></div>
                 <div class="f-row full">
                     <div class="f-group"><div class="f-label">Комментарий / Заметка</div><textarea id="fComment" class="f-inp" placeholder="Детали записи, пожелания клиента..."></textarea></div>
@@ -4933,9 +4937,12 @@
         function updateTotalDisplay() {
             const totalEl = document.getElementById('formTotal');
             const hintEl = document.getElementById('prepaidHint');
+            const subChargeBtn = document.getElementById('subChargeBtn');
+            if (subChargeBtn) subChargeBtn.style.display = (_subClientHasSubscription && _subClientSubData) ? 'block' : 'none';
             // Show X/Y subscription display ONLY when no services selected (pure subscription visit)
             const hasServices = formDetails && formDetails.length > 0;
-            if (_subClientHasSubscription && _subClientSubData && !hasServices) {
+            // Show X/Y: no services selected, OR user explicitly pressed chargeFromSubscription
+            if (_subClientHasSubscription && _subClientSubData && (!hasServices || window._forceSubscriptionVisit)) {
                 const used = _subClientSubData.used || 0;
                 const total = _subClientSubData.total || 0;
                 // Для НОВОЙ записи показываем «следующий» номер занятия (used+1),
@@ -4956,6 +4963,22 @@
             if (hintEl) hintEl.textContent = formTotal.toLocaleString() + ' ₽';
             if (!privacyOn && !_subClientHasSubscription) applyBlur();
         }
+
+        // chargeFromSubscription: помечает запись как абонементную
+        window._forceSubscriptionVisit = false;
+        window.chargeFromSubscription = function() {
+            if (!_subClientHasSubscription || !_subClientSubData) return;
+            window._forceSubscriptionVisit = true;
+            const btn = document.getElementById('subChargeBtn');
+            if (btn) {
+                btn.style.background = 'var(--green-bg)';
+                btn.style.color = 'var(--green)';
+                btn.style.border = '1.5px solid var(--green)';
+                btn.innerHTML = '<i class="fa-solid fa-check" style="margin-right:7px;"></i>'
+                    + 'Будет списано с абонемента — нажмите ещё раз для отмены';
+            }
+            updateTotalDisplay();
+        };
 
         // ===== МУЛЬТИТАЧ =====
         let swipeStartX = 0,
@@ -6289,6 +6312,15 @@
             _subClientHasSubscription = false;
             _subClientSubData = null;
             _lastCheckedClientName = '';
+            window._forceSubscriptionVisit = false;
+            const _sbBtnReset = document.getElementById('subChargeBtn');
+            if (_sbBtnReset) {
+                _sbBtnReset.style.display = 'none';
+                _sbBtnReset.style.background = 'var(--gold-bg)';
+                _sbBtnReset.style.color = 'var(--gold)';
+                _sbBtnReset.style.border = '1.5px solid var(--gold)';
+                _sbBtnReset.innerHTML = '<i class="fa-solid fa-ticket" style="margin-right:7px;"></i>Списать с абонемента';
+            }
             document.getElementById('mbRecTitle').textContent = 'Новая запись';
             document.getElementById('fDate').value = dateToInput(todayStr());
             document.getElementById('fTime').value = '';
@@ -6340,6 +6372,15 @@
             _subClientHasSubscription = false;
             _subClientSubData = null;
             _lastCheckedClientName = '';
+            window._forceSubscriptionVisit = false;
+            const _sbBtnReset = document.getElementById('subChargeBtn');
+            if (_sbBtnReset) {
+                _sbBtnReset.style.display = 'none';
+                _sbBtnReset.style.background = 'var(--gold-bg)';
+                _sbBtnReset.style.color = 'var(--gold)';
+                _sbBtnReset.style.border = '1.5px solid var(--gold)';
+                _sbBtnReset.innerHTML = '<i class="fa-solid fa-ticket" style="margin-right:7px;"></i>Списать с абонемента';
+            }
             document.getElementById('mbRecTitle').textContent = 'Редактирование записи';
             document.getElementById('fDate').value = dateToInput(row.date || '');
             document.getElementById('fTime').value = row.time || '';
@@ -6379,6 +6420,15 @@
             _subClientHasSubscription = false;
             _subClientSubData = null;
             _lastCheckedClientName = '';
+            window._forceSubscriptionVisit = false;
+            const sbBtn = document.getElementById('subChargeBtn');
+            if (sbBtn) {
+                sbBtn.style.background = 'var(--gold-bg)';
+                sbBtn.style.color = 'var(--gold)';
+                sbBtn.style.border = '1.5px solid var(--gold)';
+                sbBtn.innerHTML = '<i class="fa-solid fa-ticket" style="margin-right:7px;"></i>'
+                    + 'Списать с абонемента';
+            }
         };
 
         // ===== PRESET SERVICES =====
@@ -6570,8 +6620,9 @@
                 let isSubscriptionVisit = false;
                 let subForVisit = null;
                 if (!editId) {
-                    // Only mark as subscription visit if NO services were selected
-                    if (!details || details.length === 0) {
+                    // Mark as subscription visit if: no services selected, OR user pressed chargeFromSubscription
+                    const noServices = !details || details.length === 0;
+                    if (noServices || window._forceSubscriptionVisit) {
                         subForVisit = await getSubscriptionForClient(name);
                         if (subForVisit) {
                             isSubscriptionVisit = true;
