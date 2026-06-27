@@ -614,6 +614,27 @@
             background: var(--red);
         }
 
+        /* ===== DRAG-TO-CREATE GHOST ===== */
+        .cal-drag-ghost {
+            position: absolute;
+            left: 3px;
+            right: 3px;
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 20;
+            border: 2px dashed transparent;
+        }
+        .cal-drag-ghost-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
         .tbl-wrap {
             display: none;
         }
@@ -4434,7 +4455,10 @@
             return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
         }
         function calEventBg(hex) {
-            return palByHex(hex).bg;
+            const [r, g, b] = hexToRgbArr(hex);
+            const isLight = document.body.classList.contains('light-theme');
+            const alpha = isLight ? 0.6 : 0.48;
+            return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
         }
 
         const CM = { white: '#9090a0', purple: '#a099ff', red: '#ff5c6a', green: '#3ecf8e', gold: '#d4af37',
@@ -6155,16 +6179,165 @@
                     };
                     col.appendChild(evEl);
                 });
-                col.onclick = function(e) {
-                    if (e.target.closest('.cal-event')) return;
-                    const rect = this.getBoundingClientRect();
-                    const y = e.clientY - rect.top;
-                    const totalHeight = (HOURS_END - HOURS_START) * zoom;
-                    let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
-                    hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
-                    const hourStr = String(hour).padStart(2, '0') + ':00';
-                    openNewFormOnDate(ds, hourStr);
-                };
+                // ===== DRAG-TO-CREATE =====
+                (function setupDragCreate(col, ds) {
+                    const userColor = window.PROFILE?.color || PALETTE[0].hex;
+                    const pal = palByHex(userColor);
+                    // ghost element
+                    let ghost = null;
+                    let dragStartMin = null;
+                    let isDragging = false;
+                    const DRAG_THRESHOLD_PX = 8;
+                    let startY = null;
+
+                    function minsToTimeStr(mins) {
+                        const h = Math.floor(mins / 60);
+                        const m = mins % 60;
+                        return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+                    }
+
+                    function yToMins(clientY) {
+                        const rect = col.getBoundingClientRect();
+                        const body = document.getElementById('calBody');
+                        const scrollTop = body ? body.scrollTop : 0;
+                        const y = clientY - rect.top + (body ? body.scrollTop - scrollTop : 0);
+                        const yFixed = clientY - rect.top;
+                        const totalHeight = (HOURS_END - HOURS_START) * zoom;
+                        const ratio = Math.max(0, Math.min(1, yFixed / totalHeight));
+                        const totalMins = (HOURS_END - HOURS_START) * 60;
+                        let mins = Math.round((HOURS_START * 60) + ratio * totalMins);
+                        // snap to 15 min
+                        mins = Math.round(mins / 15) * 15;
+                        return Math.min(Math.max(mins, HOURS_START * 60), HOURS_END * 60);
+                    }
+
+                    function createGhost() {
+                        ghost = document.createElement('div');
+                        ghost.className = 'cal-drag-ghost';
+                        ghost.style.background = pal.bg;
+                        ghost.style.borderColor = userColor;
+                        const lbl = document.createElement('div');
+                        lbl.className = 'cal-drag-ghost-label';
+                        lbl.style.color = userColor;
+                        ghost.appendChild(lbl);
+                        col.appendChild(ghost);
+                    }
+
+                    function updateGhost(startMin, endMin) {
+                        if (!ghost) return;
+                        const s = Math.min(startMin, endMin);
+                        const e = Math.max(startMin, endMin);
+                        const topPx = ((s / 60) - HOURS_START) * zoom;
+                        const heightPx = Math.max(((e - s) / 60) * zoom, zoom / 4);
+                        ghost.style.top = topPx + 'px';
+                        ghost.style.height = heightPx + 'px';
+                        const lbl = ghost.querySelector('.cal-drag-ghost-label');
+                        if (lbl) lbl.textContent = minsToTimeStr(s) + ' – ' + minsToTimeStr(e);
+                    }
+
+                    function removeGhost() {
+                        if (ghost) { ghost.remove(); ghost = null; }
+                    }
+
+                    function finishDrag(endMin) {
+                        removeGhost();
+                        if (dragStartMin === null) return;
+                        const s = Math.min(dragStartMin, endMin);
+                        const e = Math.max(dragStartMin, endMin);
+                        // минимум 15 минут
+                        const finalEnd = (e - s < 15) ? s + 60 : e;
+                        openNewFormOnDate(ds, minsToTimeStr(s), minsToTimeStr(finalEnd));
+                        dragStartMin = null;
+                        isDragging = false;
+                    }
+
+                    // ---- MOUSE ----
+                    col.addEventListener('mousedown', function(e) {
+                        if (e.button !== 0) return;
+                        if (e.target.closest('.cal-event')) return;
+                        startY = e.clientY;
+                        dragStartMin = yToMins(e.clientY);
+                        isDragging = false;
+                    });
+
+                    document.addEventListener('mousemove', function(e) {
+                        if (dragStartMin === null) return;
+                        if (!isDragging) {
+                            if (Math.abs(e.clientY - startY) < DRAG_THRESHOLD_PX) return;
+                            isDragging = true;
+                            createGhost();
+                        }
+                        const curMin = yToMins(e.clientY);
+                        updateGhost(dragStartMin, curMin);
+                    });
+
+                    document.addEventListener('mouseup', function(e) {
+                        if (dragStartMin === null) return;
+                        if (!isDragging) {
+                            // простой клик — поведение как раньше (без drag)
+                            dragStartMin = null;
+                            return;
+                        }
+                        const endMin = yToMins(e.clientY);
+                        finishDrag(endMin);
+                    });
+
+                    // ---- TOUCH ----
+                    col.addEventListener('touchstart', function(e) {
+                        if (e.target.closest('.cal-event')) return;
+                        const t = e.touches[0];
+                        startY = t.clientY;
+                        dragStartMin = yToMins(t.clientY);
+                        isDragging = false;
+                    }, { passive: true });
+
+                    col.addEventListener('touchmove', function(e) {
+                        if (dragStartMin === null) return;
+                        const t = e.touches[0];
+                        if (!isDragging) {
+                            if (Math.abs(t.clientY - startY) < DRAG_THRESHOLD_PX) return;
+                            isDragging = true;
+                            createGhost();
+                        }
+                        e.preventDefault(); // stop scroll during drag
+                        const curMin = yToMins(t.clientY);
+                        updateGhost(dragStartMin, curMin);
+                    }, { passive: false });
+
+                    col.addEventListener('touchend', function(e) {
+                        if (dragStartMin === null) return;
+                        if (!isDragging) {
+                            // простой тап — старое поведение click
+                            const t = e.changedTouches[0];
+                            const rect = col.getBoundingClientRect();
+                            const y = t.clientY - rect.top;
+                            const totalHeight = (HOURS_END - HOURS_START) * zoom;
+                            let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
+                            hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
+                            const hourStr = String(hour).padStart(2,'0') + ':00';
+                            dragStartMin = null;
+                            openNewFormOnDate(ds, hourStr);
+                            return;
+                        }
+                        const t = e.changedTouches[0];
+                        const endMin = yToMins(t.clientY);
+                        finishDrag(endMin);
+                    });
+
+                    // simple click (no drag)
+                    col.addEventListener('click', function(e) {
+                        if (isDragging) return; // был drag — форма уже открыта
+                        if (e.target.closest('.cal-event')) return;
+                        const rect = this.getBoundingClientRect();
+                        const y = e.clientY - rect.top;
+                        const totalHeight = (HOURS_END - HOURS_START) * zoom;
+                        let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
+                        hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
+                        const hourStr = String(hour).padStart(2, '0') + ':00';
+                        openNewFormOnDate(ds, hourStr);
+                    });
+
+                })(col, ds);
                 body.appendChild(col);
             });
             setTimeout(() => {
@@ -6314,11 +6487,14 @@
         };
 
         // ===== NEW / EDIT FORM =====
-        function openNewFormOnDate(ds, timeStart) {
+        function openNewFormOnDate(ds, timeStart, timeEnd) {
             openNewForm();
             document.getElementById('fDate').value = dateToInput(ds) || dateToInput(todayStr());
             if (timeStart) {
                 document.getElementById('fTime').value = timeStart;
+            }
+            if (timeEnd) {
+                document.getElementById('fTimeEnd').value = timeEnd;
             }
         }
 
