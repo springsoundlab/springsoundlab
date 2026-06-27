@@ -4968,14 +4968,20 @@
         window._forceSubscriptionVisit = false;
         window.chargeFromSubscription = function() {
             if (!_subClientHasSubscription || !_subClientSubData) return;
-            window._forceSubscriptionVisit = true;
+            window._forceSubscriptionVisit = !window._forceSubscriptionVisit; // toggle
             const btn = document.getElementById('subChargeBtn');
             if (btn) {
-                btn.style.background = 'var(--green-bg)';
-                btn.style.color = 'var(--green)';
-                btn.style.border = '1.5px solid var(--green)';
-                btn.innerHTML = '<i class="fa-solid fa-check" style="margin-right:7px;"></i>'
-                    + 'Будет списано с абонемента — нажмите ещё раз для отмены';
+                if (window._forceSubscriptionVisit) {
+                    btn.style.background = 'var(--green-bg)';
+                    btn.style.color = 'var(--green)';
+                    btn.style.border = '1.5px solid var(--green)';
+                    btn.innerHTML = '<i class="fa-solid fa-check" style="margin-right:7px;"></i>Будет списано с абонемента — нажмите для отмены';
+                } else {
+                    btn.style.background = 'var(--gold-bg)';
+                    btn.style.color = 'var(--gold)';
+                    btn.style.border = '1.5px solid var(--gold)';
+                    btn.innerHTML = '<i class="fa-solid fa-ticket" style="margin-right:7px;"></i>Списать с абонемента';
+                }
             }
             updateTotalDisplay();
         };
