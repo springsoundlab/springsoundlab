@@ -6182,12 +6182,12 @@
                     const pal = palByHex(userColor);
                     let ghost = null;
                     let dragStartMin = null;
+                    let dragCurMin = null;   // всегда актуальный конец — читаем при mouseup
                     let isDragging = false;
-                    const DRAG_THRESHOLD_PX = 12;
-                    const TOUCH_HOLD_MS = 200;
+                    const DRAG_THRESHOLD_PX = 10;
+                    let startX = null;
                     let startY = null;
-                    let touchHoldTimer = null;
-                    let touchReady = false;
+                    let touchCancelled = false; // горизонтальный свайп — отменяем drag
 
                     function minsToTimeStr(mins) {
                         const h = Math.floor(mins / 60);
@@ -6201,8 +6201,7 @@
                         const totalHeight = (HOURS_END - HOURS_START) * zoom;
                         const ratio = Math.max(0, Math.min(1, yFixed / totalHeight));
                         let mins = HOURS_START * 60 + ratio * (HOURS_END - HOURS_START) * 60;
-                        // снаппинг по целым часам
-                        mins = Math.round(mins / 60) * 60;
+                        mins = Math.round(mins / 60) * 60; // снаппинг по целым часам
                         return Math.min(Math.max(mins, HOURS_START * 60), HOURS_END * 60);
                     }
 
@@ -6214,14 +6213,19 @@
                         ghost.style.overflow = 'visible';
                         const lbl = document.createElement('div');
                         lbl.className = 'cal-drag-ghost-label';
-                        lbl.style.color = userColor;
-                        lbl.style.position = 'absolute';
-                        lbl.style.top = '-18px';
-                        lbl.style.left = '4px';
-                        lbl.style.transform = 'none';
-                        lbl.style.fontSize = '10px';
-                        lbl.style.fontWeight = '700';
-                        lbl.style.whiteSpace = 'nowrap';
+                        // крупная метка, по центру над прямоугольником
+                        lbl.style.cssText = [
+                            'position:absolute',
+                            'top:-24px',
+                            'left:50%',
+                            'transform:translateX(-50%)',
+                            'font-size:13px',
+                            'font-weight:800',
+                            'white-space:nowrap',
+                            'color:' + userColor,
+                            'pointer-events:none',
+                            'letter-spacing:0.3px',
+                        ].join(';');
                         ghost.appendChild(lbl);
                         col.appendChild(ghost);
                     }
@@ -6230,6 +6234,7 @@
                         if (!ghost) return;
                         const s = Math.min(startMin, endMin);
                         const e = Math.max(startMin, endMin);
+                        dragCurMin = e; // сохраняем актуальный конец
                         const topPx = ((s / 60) - HOURS_START) * zoom;
                         const heightPx = Math.max(((e - s) / 60) * zoom, zoom / 2);
                         ghost.style.top = topPx + 'px';
@@ -6244,27 +6249,32 @@
 
                     function resetState() {
                         dragStartMin = null;
+                        dragCurMin = null;
                         isDragging = false;
-                        touchReady = false;
-                        clearTimeout(touchHoldTimer);
+                        touchCancelled = false;
                     }
 
-                    function finishDrag(endMin) {
+                    function finishDrag() {
+                        // берём время из состояния ghost, а не из координат мыши
+                        const endMin = dragCurMin !== null ? dragCurMin : dragStartMin;
                         removeGhost();
                         if (dragStartMin === null) { resetState(); return; }
                         const s = Math.min(dragStartMin, endMin);
                         const e = Math.max(dragStartMin, endMin);
                         const finalEnd = (e - s < 60) ? s + 60 : e;
+                        const t0 = minsToTimeStr(s);
+                        const t1 = minsToTimeStr(finalEnd);
                         resetState();
-                        openNewFormOnDate(ds, minsToTimeStr(s), minsToTimeStr(finalEnd));
+                        openNewFormOnDate(ds, t0, t1);
                     }
 
-                    // ---- MOUSE (без задержки — на десктопе нет свайпа недель) ----
+                    // ---- MOUSE ----
                     col.addEventListener('mousedown', function(e) {
                         if (e.button !== 0) return;
                         if (e.target.closest('.cal-event')) return;
                         startY = e.clientY;
                         dragStartMin = yToMins(e.clientY);
+                        dragCurMin = dragStartMin;
                         isDragging = false;
                     });
 
@@ -6280,63 +6290,66 @@
 
                     document.addEventListener('mouseup', function(e) {
                         if (dragStartMin === null) return;
-                        if (!isDragging) { dragStartMin = null; return; }
-                        finishDrag(yToMins(e.clientY));
+                        if (!isDragging) { dragStartMin = null; dragCurMin = null; return; }
+                        // НЕ пересчитываем yToMins здесь — берём dragCurMin из updateGhost
+                        finishDrag();
                     });
 
-                    // ---- TOUCH (задержка 200мс защищает свайп недели по X) ----
+                    // ---- TOUCH (без задержки; блокируем только горизонтальный свайп) ----
                     col.addEventListener('touchstart', function(e) {
                         if (e.target.closest('.cal-event')) return;
                         const t = e.touches[0];
+                        startX = t.clientX;
                         startY = t.clientY;
                         isDragging = false;
-                        touchReady = false;
-                        dragStartMin = null;
-                        clearTimeout(touchHoldTimer);
-                        const capturedY = t.clientY;
-                        touchHoldTimer = setTimeout(function() {
-                            touchReady = true;
-                            dragStartMin = yToMins(capturedY);
-                        }, TOUCH_HOLD_MS);
+                        touchCancelled = false;
+                        dragStartMin = yToMins(t.clientY);
+                        dragCurMin = dragStartMin;
                     }, { passive: true });
 
                     col.addEventListener('touchmove', function(e) {
+                        if (touchCancelled || dragStartMin === null) return;
                         const t = e.touches[0];
-                        if (!touchReady) {
-                            // Сдвиг до hold — отменяем (это свайп)
-                            clearTimeout(touchHoldTimer);
+                        const dx = Math.abs(t.clientX - startX);
+                        const dy = Math.abs(t.clientY - startY);
+
+                        // горизонтальный свайп — отменяем drag, даём листать недели
+                        if (!isDragging && dx > dy && dx > 6) {
+                            touchCancelled = true;
+                            removeGhost();
+                            dragStartMin = null;
+                            dragCurMin = null;
                             return;
                         }
-                        if (dragStartMin === null) return;
+
                         if (!isDragging) {
-                            if (Math.abs(t.clientY - startY) < DRAG_THRESHOLD_PX) return;
+                            if (dy < DRAG_THRESHOLD_PX) return;
                             isDragging = true;
                             createGhost();
                         }
-                        e.preventDefault();
+                        e.preventDefault(); // блокируем скролл только при вертикальном drag
                         updateGhost(dragStartMin, yToMins(t.clientY));
                     }, { passive: false });
 
                     col.addEventListener('touchend', function(e) {
-                        clearTimeout(touchHoldTimer);
-                        if (!touchReady || dragStartMin === null) {
-                            // не было hold — простой тап
-                            removeGhost();
-                            if (!isDragging) {
-                                const t = e.changedTouches[0];
-                                const rect = col.getBoundingClientRect();
-                                const y = t.clientY - rect.top;
-                                const totalHeight = (HOURS_END - HOURS_START) * zoom;
-                                let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
-                                hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
-                                resetState();
-                                openNewFormOnDate(ds, String(hour).padStart(2,'0') + ':00');
-                                return;
-                            }
+                        if (touchCancelled || dragStartMin === null) {
                             resetState();
                             return;
                         }
-                        finishDrag(yToMins(e.changedTouches[0].clientY));
+                        if (!isDragging) {
+                            // простой тап — открываем по часу
+                            removeGhost();
+                            const t = e.changedTouches[0];
+                            const rect = col.getBoundingClientRect();
+                            const y = t.clientY - rect.top;
+                            const totalHeight = (HOURS_END - HOURS_START) * zoom;
+                            let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
+                            hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
+                            resetState();
+                            openNewFormOnDate(ds, String(hour).padStart(2,'0') + ':00');
+                            return;
+                        }
+                        finishDrag();
                     });
 
                     // клик мышью без drag
