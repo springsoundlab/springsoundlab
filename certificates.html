@@ -4436,7 +4436,10 @@
         function calEventBg(hex) {
             const [r, g, b] = hexToRgbArr(hex);
             const isLight = document.body.classList.contains('light-theme');
-            const alpha = isLight ? 0.6 : 0.48;
+            // Максимально насыщенно, но так, чтобы белый/чёрный текст (var(--text))
+            // оставался читаемым на самом ярком цвете палитры (бирюза) — на тёмной
+            // теме это потолок ~0.55, на светлой запас контраста намного больше.
+            const alpha = isLight ? 0.85 : 0.55;
             return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
         }
 
