@@ -4455,10 +4455,7 @@
             return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
         }
         function calEventBg(hex) {
-            const [r, g, b] = hexToRgbArr(hex);
-            const isLight = document.body.classList.contains('light-theme');
-            const alpha = isLight ? 0.6 : 0.48;
-            return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+            return palByHex(hex).bg;
         }
 
         const CM = { white: '#9090a0', purple: '#a099ff', red: '#ff5c6a', green: '#3ecf8e', gold: '#d4af37',
@@ -6183,12 +6180,14 @@
                 (function setupDragCreate(col, ds) {
                     const userColor = window.PROFILE?.color || PALETTE[0].hex;
                     const pal = palByHex(userColor);
-                    // ghost element
                     let ghost = null;
                     let dragStartMin = null;
                     let isDragging = false;
-                    const DRAG_THRESHOLD_PX = 8;
+                    const DRAG_THRESHOLD_PX = 12;
+                    const TOUCH_HOLD_MS = 200;
                     let startY = null;
+                    let touchHoldTimer = null;
+                    let touchReady = false;
 
                     function minsToTimeStr(mins) {
                         const h = Math.floor(mins / 60);
@@ -6198,16 +6197,12 @@
 
                     function yToMins(clientY) {
                         const rect = col.getBoundingClientRect();
-                        const body = document.getElementById('calBody');
-                        const scrollTop = body ? body.scrollTop : 0;
-                        const y = clientY - rect.top + (body ? body.scrollTop - scrollTop : 0);
                         const yFixed = clientY - rect.top;
                         const totalHeight = (HOURS_END - HOURS_START) * zoom;
                         const ratio = Math.max(0, Math.min(1, yFixed / totalHeight));
-                        const totalMins = (HOURS_END - HOURS_START) * 60;
-                        let mins = Math.round((HOURS_START * 60) + ratio * totalMins);
-                        // snap to 15 min
-                        mins = Math.round(mins / 15) * 15;
+                        let mins = HOURS_START * 60 + ratio * (HOURS_END - HOURS_START) * 60;
+                        // снаппинг по целым часам
+                        mins = Math.round(mins / 60) * 60;
                         return Math.min(Math.max(mins, HOURS_START * 60), HOURS_END * 60);
                     }
 
@@ -6216,9 +6211,17 @@
                         ghost.className = 'cal-drag-ghost';
                         ghost.style.background = pal.bg;
                         ghost.style.borderColor = userColor;
+                        ghost.style.overflow = 'visible';
                         const lbl = document.createElement('div');
                         lbl.className = 'cal-drag-ghost-label';
                         lbl.style.color = userColor;
+                        lbl.style.position = 'absolute';
+                        lbl.style.top = '-18px';
+                        lbl.style.left = '4px';
+                        lbl.style.transform = 'none';
+                        lbl.style.fontSize = '10px';
+                        lbl.style.fontWeight = '700';
+                        lbl.style.whiteSpace = 'nowrap';
                         ghost.appendChild(lbl);
                         col.appendChild(ghost);
                     }
@@ -6228,7 +6231,7 @@
                         const s = Math.min(startMin, endMin);
                         const e = Math.max(startMin, endMin);
                         const topPx = ((s / 60) - HOURS_START) * zoom;
-                        const heightPx = Math.max(((e - s) / 60) * zoom, zoom / 4);
+                        const heightPx = Math.max(((e - s) / 60) * zoom, zoom / 2);
                         ghost.style.top = topPx + 'px';
                         ghost.style.height = heightPx + 'px';
                         const lbl = ghost.querySelector('.cal-drag-ghost-label');
@@ -6239,19 +6242,24 @@
                         if (ghost) { ghost.remove(); ghost = null; }
                     }
 
-                    function finishDrag(endMin) {
-                        removeGhost();
-                        if (dragStartMin === null) return;
-                        const s = Math.min(dragStartMin, endMin);
-                        const e = Math.max(dragStartMin, endMin);
-                        // минимум 15 минут
-                        const finalEnd = (e - s < 15) ? s + 60 : e;
-                        openNewFormOnDate(ds, minsToTimeStr(s), minsToTimeStr(finalEnd));
+                    function resetState() {
                         dragStartMin = null;
                         isDragging = false;
+                        touchReady = false;
+                        clearTimeout(touchHoldTimer);
                     }
 
-                    // ---- MOUSE ----
+                    function finishDrag(endMin) {
+                        removeGhost();
+                        if (dragStartMin === null) { resetState(); return; }
+                        const s = Math.min(dragStartMin, endMin);
+                        const e = Math.max(dragStartMin, endMin);
+                        const finalEnd = (e - s < 60) ? s + 60 : e;
+                        resetState();
+                        openNewFormOnDate(ds, minsToTimeStr(s), minsToTimeStr(finalEnd));
+                    }
+
+                    // ---- MOUSE (без задержки — на десктопе нет свайпа недель) ----
                     col.addEventListener('mousedown', function(e) {
                         if (e.button !== 0) return;
                         if (e.target.closest('.cal-event')) return;
@@ -6267,74 +6275,80 @@
                             isDragging = true;
                             createGhost();
                         }
-                        const curMin = yToMins(e.clientY);
-                        updateGhost(dragStartMin, curMin);
+                        updateGhost(dragStartMin, yToMins(e.clientY));
                     });
 
                     document.addEventListener('mouseup', function(e) {
                         if (dragStartMin === null) return;
-                        if (!isDragging) {
-                            // простой клик — поведение как раньше (без drag)
-                            dragStartMin = null;
-                            return;
-                        }
-                        const endMin = yToMins(e.clientY);
-                        finishDrag(endMin);
+                        if (!isDragging) { dragStartMin = null; return; }
+                        finishDrag(yToMins(e.clientY));
                     });
 
-                    // ---- TOUCH ----
+                    // ---- TOUCH (задержка 200мс защищает свайп недели по X) ----
                     col.addEventListener('touchstart', function(e) {
                         if (e.target.closest('.cal-event')) return;
                         const t = e.touches[0];
                         startY = t.clientY;
-                        dragStartMin = yToMins(t.clientY);
                         isDragging = false;
+                        touchReady = false;
+                        dragStartMin = null;
+                        clearTimeout(touchHoldTimer);
+                        const capturedY = t.clientY;
+                        touchHoldTimer = setTimeout(function() {
+                            touchReady = true;
+                            dragStartMin = yToMins(capturedY);
+                        }, TOUCH_HOLD_MS);
                     }, { passive: true });
 
                     col.addEventListener('touchmove', function(e) {
-                        if (dragStartMin === null) return;
                         const t = e.touches[0];
+                        if (!touchReady) {
+                            // Сдвиг до hold — отменяем (это свайп)
+                            clearTimeout(touchHoldTimer);
+                            return;
+                        }
+                        if (dragStartMin === null) return;
                         if (!isDragging) {
                             if (Math.abs(t.clientY - startY) < DRAG_THRESHOLD_PX) return;
                             isDragging = true;
                             createGhost();
                         }
-                        e.preventDefault(); // stop scroll during drag
-                        const curMin = yToMins(t.clientY);
-                        updateGhost(dragStartMin, curMin);
+                        e.preventDefault();
+                        updateGhost(dragStartMin, yToMins(t.clientY));
                     }, { passive: false });
 
                     col.addEventListener('touchend', function(e) {
-                        if (dragStartMin === null) return;
-                        if (!isDragging) {
-                            // простой тап — старое поведение click
-                            const t = e.changedTouches[0];
-                            const rect = col.getBoundingClientRect();
-                            const y = t.clientY - rect.top;
-                            const totalHeight = (HOURS_END - HOURS_START) * zoom;
-                            let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
-                            hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
-                            const hourStr = String(hour).padStart(2,'0') + ':00';
-                            dragStartMin = null;
-                            openNewFormOnDate(ds, hourStr);
+                        clearTimeout(touchHoldTimer);
+                        if (!touchReady || dragStartMin === null) {
+                            // не было hold — простой тап
+                            removeGhost();
+                            if (!isDragging) {
+                                const t = e.changedTouches[0];
+                                const rect = col.getBoundingClientRect();
+                                const y = t.clientY - rect.top;
+                                const totalHeight = (HOURS_END - HOURS_START) * zoom;
+                                let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
+                                hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
+                                resetState();
+                                openNewFormOnDate(ds, String(hour).padStart(2,'0') + ':00');
+                                return;
+                            }
+                            resetState();
                             return;
                         }
-                        const t = e.changedTouches[0];
-                        const endMin = yToMins(t.clientY);
-                        finishDrag(endMin);
+                        finishDrag(yToMins(e.changedTouches[0].clientY));
                     });
 
-                    // simple click (no drag)
+                    // клик мышью без drag
                     col.addEventListener('click', function(e) {
-                        if (isDragging) return; // был drag — форма уже открыта
+                        if (isDragging) return;
                         if (e.target.closest('.cal-event')) return;
                         const rect = this.getBoundingClientRect();
                         const y = e.clientY - rect.top;
                         const totalHeight = (HOURS_END - HOURS_START) * zoom;
                         let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
                         hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
-                        const hourStr = String(hour).padStart(2, '0') + ':00';
-                        openNewFormOnDate(ds, hourStr);
+                        openNewFormOnDate(ds, String(hour).padStart(2,'0') + ':00');
                     });
 
                 })(col, ds);
