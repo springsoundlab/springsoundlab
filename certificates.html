@@ -4419,6 +4419,30 @@
 
         function palById(id) { return PALETTE.find(p => p.id === id) || PALETTE[0]; }
 
+        // ===== Непрозрачный насыщенный фон для карточки события в календаре =====
+        // Раньше фон карточки был полупрозрачным (rgba с alpha ~0.18), из-за чего
+        // сквозь запись просвечивала сетка календаря, а сам цвет выглядел тусклым.
+        // Здесь цвет, выбранный пользователем, "вмешивается" в базовый цвет
+        // поверхности текущей темы (--surface2) в фиксированной пропорции и
+        // возвращается уже непрозрачным rgb(...) — сетка больше не видна сквозь
+        // запись. На светлой теме доля пользовательского цвета выше, поэтому
+        // карточки выглядят более насыщенными, чем на тёмной.
+        function hexToRgbArr(hex) {
+            hex = (hex || '').replace('#', '');
+            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+            const num = parseInt(hex, 16);
+            return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+        }
+        function calEventBg(hex) {
+            const [r, g, b] = hexToRgbArr(hex);
+            const isLight = document.body.classList.contains('light-theme');
+            // surface2: тёмная тема #1e1e26 → [30,30,38]; светлая тема #e8e8ef → [232,232,239]
+            const base = isLight ? [232, 232, 239] : [30, 30, 38];
+            const ratio = isLight ? 0.34 : 0.26; // доля цвета пользователя в смеси
+            const mix = (channel, baseChannel) => Math.round(channel * ratio + baseChannel * (1 - ratio));
+            return 'rgb(' + mix(r, base[0]) + ',' + mix(g, base[1]) + ',' + mix(b, base[2]) + ')';
+        }
+
         const CM = { white: '#9090a0', purple: '#a099ff', red: '#ff5c6a', green: '#3ecf8e', gold: '#d4af37',
         blue: '#3b9eff' };
         const MNS = ['ЯНВАРЬ', 'ФЕВРАЛЬ', 'МАРТ', 'АПРЕЛЬ', 'МАЙ', 'ИЮНЬ', 'ИЮЛЬ', 'АВГУСТ', 'СЕНТЯБРЬ', 'ОКТЯБРЬ', 'НОЯБРЬ',
@@ -6089,7 +6113,6 @@
                     const colW = 90 / totalCols;
                     const colLeft = 3 + subcol * (colW + 1);
                     const color = ev.eventColor || window.PROFILE?.color || PALETTE[0].hex;
-                    const pal = palByHex(color);
                     const isDone = ev.completed;
                     const evName = escapeHTML(ev.client || ev.song || '—');
                     const evSvc = escapeHTML(ev.services || ev.type || '');
@@ -6118,7 +6141,7 @@
                     evEl.style.height = height + 'px';
                     evEl.style.left = colLeft + '%';
                     evEl.style.width = colW + '%';
-                    evEl.style.background = pal.bg;
+                    evEl.style.background = calEventBg(color);
                     if (showStatusEdge) {
                         const statusColor = isDone ? 'var(--green)' : 'var(--red)';
                         evEl.style.borderLeft = '3px solid ' + statusColor;
