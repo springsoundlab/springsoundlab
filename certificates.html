@@ -4063,20 +4063,6 @@
                 <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="subHistoryClientPhone">—</div>
             </div>
             <div id="subHistoryContent" style="max-height:300px;overflow-y:auto;"></div>
-            <!-- Тоггл аналитики для истории абонементов -->
-            <div id="subHistoryAnalyticsWrap" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:16px;gap:12px;">
-                <div>
-                    <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Учитывать в аналитике</div>
-                    <div style="font-size:10px;color:var(--text3);">Включает сумму этого абонемента в общий доход</div>
-                </div>
-                <button id="subHistoryAnalyticsBtn" onclick="toggleSubHistoryAnalytics()" style="flex-shrink:0;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;border:1.5px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;transition:.15s;white-space:nowrap;">
-                    ✅ Включено
-                </button>
-            </div>
-            <div class="mb-btns" style="margin-top:16px;justify-content:space-between;">
-                <button onclick="deleteSubHistoryClient()" title="Удалить клиента" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,92,106,.3);background:var(--red-bg);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:.15s;"><i class="fa-solid fa-trash"></i></button>
-                <button class="mb-btn mb-cancel" onclick="closeSubHistoryModal()">Закрыть</button>
-            </div>
         </div>
     </div>
 
@@ -7854,18 +7840,6 @@
         function openSubHistoryModal(name, phone, subHistory) {
             _subHistoryClientName = name || '';
             _subHistoryClientSubHistory = subHistory || [];
-            _subHistoryCountInAnalytics = true;
-            _updateSubHistoryAnalyticsBtnUI(true);
-            // Загружаем состояние аналитики из первого абонемента
-            if (window.PROFILE && name) {
-                SUBC.where('clientName','==',name).where('authorUid','==',window.PROFILE.uid).get().then(snap => {
-                    if (!snap.empty) {
-                        const d = snap.docs[0].data();
-                        _subHistoryCountInAnalytics = (d.countInAnalytics !== false);
-                        _updateSubHistoryAnalyticsBtnUI(_subHistoryCountInAnalytics);
-                    }
-                }).catch(()=>{});
-            }
             document.getElementById('subHistoryClientName').textContent = name || '—';
             document.getElementById('subHistoryClientPhone').textContent = phone || '—';
             const content = document.getElementById('subHistoryContent');
@@ -7886,39 +7860,6 @@
             document.body.classList.remove('modal-open');
             document.getElementById('moSubHistory').classList.remove('open');
         }
-
-        window.deleteSubHistoryClient = function() {
-            const name = _subHistoryClientName;
-            // Закрываем окно истории — основную карточку клиента (moClientEdit)
-            // не трогаем, она тоже закроется внутри deleteClientAndRecords после
-            // подтверждения, так что не нужно дублировать логику удаления здесь.
-            document.getElementById('moSubHistory').classList.remove('open');
-            deleteClientAndRecords(name);
-        };
-
-        let _subHistoryCountInAnalytics = true;
-        function _updateSubHistoryAnalyticsBtnUI(val) {
-            const btn = document.getElementById('subHistoryAnalyticsBtn');
-            if (!btn) return;
-            if (val) {
-                btn.textContent = '✅ Включено';
-                btn.style.borderColor = 'var(--green)'; btn.style.background = 'var(--green-bg)'; btn.style.color = 'var(--green)';
-            } else {
-                btn.textContent = '⛔ Выключено';
-                btn.style.borderColor = 'var(--red)'; btn.style.background = 'var(--red-bg)'; btn.style.color = 'var(--red)';
-            }
-        }
-        window.toggleSubHistoryAnalytics = async function() {
-            _subHistoryCountInAnalytics = !_subHistoryCountInAnalytics;
-            _updateSubHistoryAnalyticsBtnUI(_subHistoryCountInAnalytics);
-            // Сохраняем во все удалённые абонементы этого клиента
-            try {
-                const snap = await SUBC.where('clientName','==',_subHistoryClientName).where('authorUid','==',window.PROFILE.uid).get();
-                const batch = db.batch();
-                snap.forEach(doc => batch.update(doc.ref, { countInAnalytics: _subHistoryCountInAnalytics }));
-                await batch.commit();
-            } catch(e) { console.error(e); }
-        };
 
         // ===== CERTS =====
         function renderCerts() {
