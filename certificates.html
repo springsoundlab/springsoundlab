@@ -19,7 +19,7 @@
     <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/springsoundlab/springsoundlab/main/logo%20dly%20prilidcheniz.jpg">
     <link rel="manifest" id="manifestLink">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -571,7 +571,7 @@
             left: 3px;
             right: 3px;
             border-radius: 6px;
-            padding: 4px 6px;
+            padding: 4px 6px 4px 8px;
             overflow: hidden;
             cursor: pointer;
             transition: .15s;
@@ -595,22 +595,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-        .cal-event-status {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 11px;
-            height: 11px;
-            border-radius: 50%;
-            z-index: 3;
-            box-shadow: 0 0 0 1.5px rgba(0,0,0,.25);
-        }
-        .cal-event-status.pending {
-            background: var(--red);
-        }
-        .cal-event-status.done {
-            background: var(--green);
         }
         .cal-now-line {
             position: absolute;
@@ -957,6 +941,56 @@
             color: var(--text3);
             background: var(--surface3);
             border-color: var(--border2);
+        }
+
+        /* ===== СВОРАЧИВАНИЕ БЛОКА «АБОНЕМЕНТ» В ОКНЕ КЛИЕНТА ===== */
+        .sub-collapse-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1.5px solid var(--text3);
+            background: transparent;
+            color: var(--text3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            flex-shrink: 0;
+            transition: .15s;
+        }
+        .sub-collapse-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent2);
+            background: var(--accent-bg);
+        }
+        .sub-collapse-btn i {
+            transition: transform .25s ease;
+        }
+        #subEditBlock.collapsed .sub-collapse-btn i {
+            transform: rotate(180deg);
+        }
+        #subEditBlock .sub-block-body {
+            overflow: hidden;
+            max-height: 600px;
+            opacity: 1;
+            transition: max-height .28s ease, opacity .2s ease, margin-top .28s ease;
+        }
+        #subEditBlock.collapsed .sub-block-body {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0 !important;
+            pointer-events: none;
+        }
+        #subEditBlock .sub-block-head {
+            cursor: pointer;
+            user-select: none;
+        }
+        #subEditBlock.collapsed {
+            padding-bottom: 14px !important;
+        }
+        #subEditBlock.collapsed .sub-block-head {
+            margin-bottom: 0 !important;
         }
 
         /* ===== ИНДИКАТОР ТЕКУЩЕЙ КАТЕГОРИИ (только отображение, переключается свайпом) =====
@@ -3315,6 +3349,15 @@
             pointer-events: none;
         }
         .voice-toast.show { opacity: 1; transform: translateY(0); }
+        /* Force plain zero in JetBrains Mono - no dot, no slash */
+        @font-face {
+            font-family: 'JetBrains Mono';
+            font-feature-settings: "zero" 0;
+        }
+        * {
+            font-variant-numeric: normal;
+            font-feature-settings: "zero" 0, "calt" 0;
+        }
     </style>
 </head>
 <body>
@@ -3703,6 +3746,10 @@
                     <div style="font-size:10px;color:var(--text3);margin-bottom:10px;">При сохранении абонемент будет привязан к клиенту.</div>
                 </div>
                 <div class="added-svcs" id="addedSvcs"></div>
+                <!-- Кнопка Списать с абонемента: появляется только когда есть активный абонемент -->
+                <button id="subChargeBtn" onclick="chargeFromSubscription()" style="display:none;width:100%;padding:11px;margin-bottom:8px;background:var(--gold-bg);color:var(--gold);border:1.5px solid var(--gold);border-radius:var(--r-sm);font-size:13px;font-weight:700;cursor:pointer;transition:.15s;text-align:center;">
+                    <i class="fa-solid fa-ticket" style="margin-right:7px;"></i>Списать с абонемента
+                </button>
                 <div class="total-row"><div class="total-lbl">ИТОГО</div><div class="total-val pv" id="formTotal">0 ₽</div></div>
                 <div class="f-row full">
                     <div class="f-group"><div class="f-label">Комментарий / Заметка</div><textarea id="fComment" class="f-inp" placeholder="Детали записи, пожелания клиента..."></textarea></div>
@@ -3790,22 +3837,21 @@
             <div class="mb-title" id="msTitle">—</div>
             <div class="mb-info" id="msInfo" style="display:none;"></div>
             <input type="number" class="mb-num-input" id="msInput" placeholder="0" onkeydown="if(event.key==='Enter')document.getElementById('msConfirm').click()">
-            <!-- Тоггл: сохранить данные клиента в аналитике при удалении карточки -->
-            <div id="msAnalyticsToggleWrap" style="display:none;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin:14px 0;gap:12px;">
-                <div>
-                    <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Сохранить в аналитике</div>
-                    <div style="font-size:10px;color:var(--text3);" id="msAnalyticsToggleHint">Сумма и история останутся в общем доходе, даже когда карточка клиента удалена</div>
-                </div>
-                <button id="msAnalyticsToggleBtn" type="button" onclick="toggleMsAnalyticsKeep()" style="flex-shrink:0;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;border:1.5px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;transition:.15s;white-space:nowrap;">
-                    ✅ Сохранить
-                </button>
-            </div>
-            <div class="mb-btns">
+            <!-- Подсказка про аналитику — показывается только когда есть выбор «куда удалять» -->
+            <div id="msAnalyticsToggleWrap" style="display:none;font-size:11px;color:var(--text3);line-height:1.5;margin:10px 0 14px;"></div>
+            <div class="mb-btns" id="msBtnsDefault">
                 <button class="mb-btn mb-cancel" onclick="closeSM()">Отмена</button>
                 <button class="mb-btn mb-confirm" id="msConfirm">Готово</button>
             </div>
+            <!-- Две явные кнопки выбора при удалении с аналитикой — один клик и всё решено -->
+            <div class="mb-btns" id="msBtnsAnalytics" style="display:none;flex-direction:column;gap:8px;">
+                <button class="mb-btn" id="msConfirmKeep" style="width:100%;justify-content:center;background:var(--surface3);color:var(--text);border:1px solid var(--border2);">Удалить (сохранить в аналитике)</button>
+                <button class="mb-btn mb-delete" id="msConfirmWipe" style="width:100%;justify-content:center;">Удалить полностью</button>
+                <button class="mb-btn mb-cancel" style="width:100%;justify-content:center;" onclick="closeSM()">Отмена</button>
+            </div>
         </div>
     </div>
+
 
     <!-- Модальное окно для редактирования клиента -->
     <!-- Модальное окно редактирования клиента с абонементом -->
@@ -3825,13 +3871,18 @@
                 <input type="tel" id="subEditClientPhone" class="f-inp" placeholder="+7 900 000-00-00">
             </div>
             <!-- Блок абонемента — красивое оформление -->
-            <div style="background:var(--surface2);border-radius:var(--r);padding:16px;margin-bottom:16px;border:1px solid var(--border);">
+            <div id="subEditBlock" style="background:var(--surface2);border-radius:var(--r);padding:16px;margin-bottom:16px;border:1px solid var(--border);">
                 <!-- Заголовок раздела -->
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-                    <i class="fa-solid fa-ticket" style="color:var(--gold);font-size:13px;"></i>
-                    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);">Абонемент</span>
+                <div class="sub-block-head" onclick="toggleSubEditBlock()" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-ticket" style="color:var(--gold);font-size:13px;"></i>
+                        <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);">Абонемент</span>
+                        <span style="font-size:10px;color:var(--text3);font-weight:600;">· Детали</span>
+                    </div>
+                    <button type="button" class="sub-collapse-btn" title="Свернуть/развернуть"><i class="fa-solid fa-chevron-down"></i></button>
                 </div>
 
+                <div class="sub-block-body">
                 <!-- Прогресс занятий — широкая строка на всю ширину -->
                 <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
                     <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">
@@ -3879,6 +3930,7 @@
                         <div style="font-size:15px;font-weight:600;color:var(--text);" id="subEditDate">—</div>
                     </div>
                 </div>
+                </div>
             </div>
             <div style="margin:12px 0;border-top:1px solid var(--border);padding-top:12px;">
                 <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
@@ -3886,8 +3938,70 @@
             </div>
             <div class="mb-btns" style="display:flex;gap:8px;">
                 <button onclick="deleteSubClient()" title="Удалить абонемент" class="mb-btn" style="flex:1;justify-content:center;background:var(--red-bg);color:var(--red);border:1px solid rgba(255,92,106,.3);"><i class="fa-solid fa-trash"></i></button>
-                <button class="mb-btn mb-cancel" style="flex:1;justify-content:center;" onclick="closeSubClientEdit()">Отмена</button>
+                <button class="mb-btn" style="flex:1;justify-content:center;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold);" onclick="openSubTopUpModal()"><i class="fa-solid fa-rotate" style="margin-right:5px;"></i>Пополнить</button>
                 <button class="mb-btn mb-confirm" style="flex:1;justify-content:center;" onclick="saveSubClientEdit()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА «ПОПОЛНИТЬ АБОНЕМЕНТ» ===== -->
+    <div class="mo" id="moSubTopUp" style="z-index:9999999;">
+        <div class="mb" style="width:440px;max-width:95vw;">
+            <div class="mb-header">
+                <div class="mb-title"><i class="fa-solid fa-rotate" style="color:var(--gold);margin-right:6px;"></i> Пополнить абонемент</div>
+                <div class="mb-close" onclick="closeSubTopUpModal()"><i class="fa-solid fa-xmark"></i></div>
+            </div>
+            <input type="hidden" id="topUpSubId">
+            <div class="f-group" style="margin-bottom:12px;">
+                <div class="f-label">Имя клиента</div>
+                <input type="text" id="topUpClientName" class="f-inp" placeholder="Иван Иванов">
+            </div>
+            <div class="f-group" style="margin-bottom:16px;">
+                <div class="f-label">Телефон</div>
+                <input type="tel" id="topUpClientPhone" class="f-inp" placeholder="+7 900 000-00-00" inputmode="tel">
+            </div>
+
+            <!-- Текущее состояние абонемента, для контекста -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;padding:0 2px;">
+                <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Сейчас на абонементе</div>
+                <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Оплачено всего</div>
+            </div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div style="font-size:18px;font-weight:800;color:var(--text);"><span id="topUpCurrentUsed">0</span>/<span id="topUpCurrentTotal">0</span> <span style="font-size:13px;font-weight:600;color:var(--text2);">занятий</span></div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:18px;font-weight:800;color:var(--green);" id="topUpCurrentAmount">0 ₽</div>
+                </div>
+            </div>
+
+            <div class="f-group" style="margin-bottom:12px;">
+                <div class="f-label">Стоимость занятия (₽)</div>
+                <input type="number" id="topUpPrice" class="f-inp mono" placeholder="1500" oninput="updateSubTopUpTotal()">
+            </div>
+            <div class="f-group" style="margin-bottom:16px;">
+                <div class="f-label">Добавить занятий</div>
+                <input type="number" id="topUpSessions" class="f-inp mono" placeholder="5" oninput="updateSubTopUpTotal()">
+            </div>
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">К ОПЛАТЕ ЗА ПОПОЛНЕНИЕ</div>
+                    <div class="total-val pv" id="topUpAddedVal" style="font-size:18px;font-weight:800;">0 ₽</div>
+                </div>
+                <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;">Будет всего занятий</span>
+                        <span style="font-size:18px;font-weight:800;color:var(--gold);" id="topUpResultSessions">0</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;">Будет оплачено всего</span>
+                        <span style="font-size:18px;font-weight:800;color:var(--green);" id="topUpResultAmount">0 ₽</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-btns" style="margin-top:16px;">
+                <button class="mb-btn mb-cancel" onclick="closeSubTopUpModal()">Отмена</button>
+                <button class="mb-btn mb-confirm gold-btn" onclick="confirmSubTopUp()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -3910,6 +4024,10 @@
                 <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Записи клиента</div>
                 <div id="clientEditSessions" style="max-height:200px;overflow-y:auto;font-size:12px;color:var(--text2);"></div>
             </div>
+            <!-- Показывается только если у клиента была история абонементов (даже если сейчас абонемент удалён/закончился) -->
+            <button id="clientEditSubHistoryBtn" type="button" onclick="openSubHistoryFromClientEdit()" style="display:none;width:100%;justify-content:center;align-items:center;gap:6px;background:var(--surface2);color:var(--gold);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:10px;transition:.15s;">
+                <i class="fa-solid fa-clock-rotate-left"></i> История абонементов
+            </button>
             <div class="mb-btns" style="display:flex;gap:8px;">
                 <button onclick="deleteClientAndRecords()" title="Удалить клиента" class="mb-btn" style="flex:1;justify-content:center;background:var(--red-bg);color:var(--red);border:1px solid rgba(255,92,106,.3);"><i class="fa-solid fa-trash"></i></button>
                 <button class="mb-btn mb-confirm" style="flex:1;justify-content:center;" onclick="saveClientEdit()">Сохранить</button>
@@ -3929,20 +4047,6 @@
                 <div style="font-size:11px;color:var(--text3);margin-top:2px;" id="subHistoryClientPhone">—</div>
             </div>
             <div id="subHistoryContent" style="max-height:300px;overflow-y:auto;"></div>
-            <!-- Тоггл аналитики для истории абонементов -->
-            <div id="subHistoryAnalyticsWrap" style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:16px;gap:12px;">
-                <div>
-                    <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Учитывать в аналитике</div>
-                    <div style="font-size:10px;color:var(--text3);">Включает сумму этого абонемента в общий доход</div>
-                </div>
-                <button id="subHistoryAnalyticsBtn" onclick="toggleSubHistoryAnalytics()" style="flex-shrink:0;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;border:1.5px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;transition:.15s;white-space:nowrap;">
-                    ✅ Включено
-                </button>
-            </div>
-            <div class="mb-btns" style="margin-top:16px;justify-content:space-between;">
-                <button onclick="deleteSubHistoryClient()" title="Удалить клиента" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,92,106,.3);background:var(--red-bg);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:.15s;"><i class="fa-solid fa-trash"></i></button>
-                <button class="mb-btn mb-cancel" onclick="closeSubHistoryModal()">Закрыть</button>
-            </div>
         </div>
     </div>
 
@@ -4314,6 +4418,24 @@
         function palByHex(hex) { return PALETTE.find(p => p.hex === hex) || PALETTE[0]; }
 
         function palById(id) { return PALETTE.find(p => p.id === id) || PALETTE[0]; }
+
+        // ===== Насыщенный полупрозрачный фон для карточки события в календаре =====
+        // Раньше альфа была слишком низкой (~0.18) — цвет выглядел бледным и
+        // сквозь карточку просвечивала сетка календаря. Здесь — тот же самый
+        // цвет, который выбрал пользователь (без подмешивания белого/серого/
+        // чёрного — фиолетовый остаётся фиолетовым), просто с более высокой,
+        // но всё ещё полупрозрачной альфой. На светлой теме альфа чуть выше —
+        // там запас контраста с чёрным текстом намного больше, поэтому цвет
+        // можно сделать заметно насыщеннее.
+        function hexToRgbArr(hex) {
+            hex = (hex || '').replace('#', '');
+            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+            const num = parseInt(hex, 16);
+            return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+        }
+        function calEventBg(hex) {
+            return palByHex(hex).bg;
+        }
 
         const CM = { white: '#9090a0', purple: '#a099ff', red: '#ff5c6a', green: '#3ecf8e', gold: '#d4af37',
         blue: '#3b9eff' };
@@ -4812,7 +4934,12 @@
         function updateTotalDisplay() {
             const totalEl = document.getElementById('formTotal');
             const hintEl = document.getElementById('prepaidHint');
-            if (_subClientHasSubscription && _subClientSubData) {
+            const subChargeBtn = document.getElementById('subChargeBtn');
+            if (subChargeBtn) subChargeBtn.style.display = (_subClientHasSubscription && _subClientSubData) ? 'block' : 'none';
+            // Show X/Y subscription display ONLY when no services selected (pure subscription visit)
+            const hasServices = formDetails && formDetails.length > 0;
+            // Show X/Y: no services selected, OR user explicitly pressed chargeFromSubscription
+            if (_subClientHasSubscription && _subClientSubData && (!hasServices || window._forceSubscriptionVisit)) {
                 const used = _subClientSubData.used || 0;
                 const total = _subClientSubData.total || 0;
                 // Для НОВОЙ записи показываем «следующий» номер занятия (used+1),
@@ -4833,6 +4960,28 @@
             if (hintEl) hintEl.textContent = formTotal.toLocaleString() + ' ₽';
             if (!privacyOn && !_subClientHasSubscription) applyBlur();
         }
+
+        // chargeFromSubscription: помечает запись как абонементную
+        window._forceSubscriptionVisit = false;
+        window.chargeFromSubscription = function() {
+            if (!_subClientHasSubscription || !_subClientSubData) return;
+            window._forceSubscriptionVisit = !window._forceSubscriptionVisit; // toggle
+            const btn = document.getElementById('subChargeBtn');
+            if (btn) {
+                if (window._forceSubscriptionVisit) {
+                    btn.style.background = 'var(--green-bg)';
+                    btn.style.color = 'var(--green)';
+                    btn.style.border = '1.5px solid var(--green)';
+                    btn.innerHTML = '<i class="fa-solid fa-check" style="margin-right:7px;"></i>Будет списано с абонемента — нажмите для отмены';
+                } else {
+                    btn.style.background = 'var(--gold-bg)';
+                    btn.style.color = 'var(--gold)';
+                    btn.style.border = '1.5px solid var(--gold)';
+                    btn.innerHTML = '<i class="fa-solid fa-ticket" style="margin-right:7px;"></i>Списать с абонемента';
+                }
+            }
+            updateTotalDisplay();
+        };
 
         // ===== МУЛЬТИТАЧ =====
         let swipeStartX = 0,
@@ -5557,6 +5706,10 @@
                 document.body.classList.remove('light-theme');
                 currentTheme = 'dark';
             }
+            // Цвета карточек в календаре зависят от темы (calEventBg) — без
+            // повторного рендера они остаются вычисленными для старой темы
+            // до следующего обновления (смена дня/F5). Перерисовываем сразу.
+            if (viewMode === 'calendar') renderCalendar();
         }
 
         function saveSettings() {
@@ -5958,7 +6111,6 @@
                     const colW = 90 / totalCols;
                     const colLeft = 3 + subcol * (colW + 1);
                     const color = ev.eventColor || window.PROFILE?.color || PALETTE[0].hex;
-                    const pal = palByHex(color);
                     const isDone = ev.completed;
                     const evName = escapeHTML(ev.client || ev.song || '—');
                     const evSvc = escapeHTML(ev.services || ev.type || '');
@@ -5971,19 +6123,32 @@
                         const authorProfile = window.ALL_USERS && window.ALL_USERS[ev.authorUid];
                         return authorProfile ? authorProfile.role === 'Звукорежиссёр' : (isOwnRecord && isSound);
                     })();
-                    const statusDot = (evAuthorIsSound && isOwnRecord) ?
-                        `<div class="cal-event-status ${isDone ? 'done' : 'pending'}" title="${isDone ? 'Готово' : 'В работе'}"></div>` :
-                        '';
+                    // No status dot for sound engineering lessons (subscription or standalone)
+                    const isSoundLesson = (() => {
+                        const svcText = ((ev.services || ev.type || '') + ' ' +
+                            (ev.details ? ev.details.map(d => d.name || '').join(' ') : '')).toLowerCase();
+                        return /урок|занятие|lesson/.test(svcText) && /звук|режиссёр|режиссер|sound|audio/.test(svcText);
+                    })();
+                    // Цветной край слева — статус-индикатор ТОЛЬКО для звукорежиссёров
+                    // на их собственных записях. В мастер-режиме при просмотре чужих
+                    // записей статус-индикатор НЕ показывается, край — обычный, цвета записи.
+                    const showStatusEdge = (evAuthorIsSound && isOwnRecord && !isSoundLesson);
                     const evEl = document.createElement('div');
                     evEl.className = 'cal-event';
                     evEl.style.top = Math.max(0, top) + 'px';
                     evEl.style.height = height + 'px';
                     evEl.style.left = colLeft + '%';
                     evEl.style.width = colW + '%';
-                    evEl.style.background = pal.bg;
-                    evEl.style.borderLeft = '3px solid ' + color;
+                    evEl.style.background = calEventBg(color);
+                    if (showStatusEdge) {
+                        const statusColor = isDone ? 'var(--green)' : 'var(--red)';
+                        evEl.style.borderLeft = '6px solid ' + statusColor;
+                        evEl.title = isDone ? 'Готово' : 'В работе';
+                    } else {
+                        evEl.style.borderLeft = '6px solid ' + color;
+                    }
                     evEl.innerHTML =
-                        `${statusDot}<div class="cal-event-name" style="color:${color}">${evName}</div><div class="cal-event-svc" style="color:${color}99">${evSvc}</div>`;
+                        `<div class="cal-event-name" style="color:var(--text)">${evName}</div><div class="cal-event-svc" style="color:var(--text);opacity:.78">${evSvc}</div>`;
                     evEl.onclick = function(e) {
                         e.stopPropagation();
                         openEdit(ev.id);
@@ -6166,6 +6331,15 @@
             _subClientHasSubscription = false;
             _subClientSubData = null;
             _lastCheckedClientName = '';
+            window._forceSubscriptionVisit = false;
+            const _sbBtnReset = document.getElementById('subChargeBtn');
+            if (_sbBtnReset) {
+                _sbBtnReset.style.display = 'none';
+                _sbBtnReset.style.background = 'var(--gold-bg)';
+                _sbBtnReset.style.color = 'var(--gold)';
+                _sbBtnReset.style.border = '1.5px solid var(--gold)';
+                _sbBtnReset.innerHTML = '<i class="fa-solid fa-ticket" style="margin-right:7px;"></i>Списать с абонемента';
+            }
             document.getElementById('mbRecTitle').textContent = 'Новая запись';
             document.getElementById('fDate').value = dateToInput(todayStr());
             document.getElementById('fTime').value = '';
@@ -6217,6 +6391,15 @@
             _subClientHasSubscription = false;
             _subClientSubData = null;
             _lastCheckedClientName = '';
+            window._forceSubscriptionVisit = false;
+            const _sbBtnReset = document.getElementById('subChargeBtn');
+            if (_sbBtnReset) {
+                _sbBtnReset.style.display = 'none';
+                _sbBtnReset.style.background = 'var(--gold-bg)';
+                _sbBtnReset.style.color = 'var(--gold)';
+                _sbBtnReset.style.border = '1.5px solid var(--gold)';
+                _sbBtnReset.innerHTML = '<i class="fa-solid fa-ticket" style="margin-right:7px;"></i>Списать с абонемента';
+            }
             document.getElementById('mbRecTitle').textContent = 'Редактирование записи';
             document.getElementById('fDate').value = dateToInput(row.date || '');
             document.getElementById('fTime').value = row.time || '';
@@ -6238,6 +6421,18 @@
                         _subClientHasSubscription = true;
                         _subClientSubData = sub;
                         _lastCheckedClientName = name;
+                        // If this record was already charged to subscription, show button as active
+                        if (row.isSubscriptionVisit) {
+                            window._forceSubscriptionVisit = true;
+                            const btn = document.getElementById('subChargeBtn');
+                            if (btn) {
+                                btn.style.display = 'block';
+                                btn.style.background = 'var(--green-bg)';
+                                btn.style.color = 'var(--green)';
+                                btn.style.border = '1.5px solid var(--green)';
+                                btn.innerHTML = '<i class="fa-solid fa-check" style="margin-right:7px;"></i>Занятие по абонементу — нажмите для отмены';
+                            }
+                        }
                         updateTotalDisplay();
                     }
                 });
@@ -6256,6 +6451,15 @@
             _subClientHasSubscription = false;
             _subClientSubData = null;
             _lastCheckedClientName = '';
+            window._forceSubscriptionVisit = false;
+            const sbBtn = document.getElementById('subChargeBtn');
+            if (sbBtn) {
+                sbBtn.style.background = 'var(--gold-bg)';
+                sbBtn.style.color = 'var(--gold)';
+                sbBtn.style.border = '1.5px solid var(--gold)';
+                sbBtn.innerHTML = '<i class="fa-solid fa-ticket" style="margin-right:7px;"></i>'
+                    + 'Списать с абонемента';
+            }
         };
 
         // ===== PRESET SERVICES =====
@@ -6447,10 +6651,14 @@
                 let isSubscriptionVisit = false;
                 let subForVisit = null;
                 if (!editId) {
-                    subForVisit = await getSubscriptionForClient(name);
-                    if (subForVisit) {
-                        isSubscriptionVisit = true;
-                        paid = fullT;
+                    // Mark as subscription visit if: no services selected, OR user pressed chargeFromSubscription
+                    const noServices = !details || details.length === 0;
+                    if (noServices || window._forceSubscriptionVisit) {
+                        subForVisit = await getSubscriptionForClient(name);
+                        if (subForVisit) {
+                            isSubscriptionVisit = true;
+                            paid = fullT;
+                        }
                     }
                 } else {
                     const existingForFlag = window.CRM.find(r => r.id === editId);
@@ -6561,10 +6769,12 @@
             // Это касается как АКТИВНЫХ абонементов (клиент только что создан через
             // «Новый абонемент» и пока не имеет ни одной записи в журнале), так и
             // удалённых (история). Их нет в map, но они должны отображаться в «Клиентах».
-            // Загружаем их асинхронно из Firestore.
-            if (window.PROFILE && window.PROFILE.uid) {
-                SUBC.where('authorUid', '==', window.PROFILE.uid).get().then(allSubSnap => {
-                    // Группируем все абонементы клиента (активные + удалённые) по имени
+            // Важно: эти клиенты НЕ должны иметь никакого приоритета в сортировке —
+            // дожидаемся их загрузки и добавляем в общий список cls ДО сортировки,
+            // чтобы они ранжировались строго по тем же правилам (дате/визитам/сумме),
+            // что и все остальные карточки.
+            const ghostClientsPromise = (window.PROFILE && window.PROFILE.uid)
+                ? SUBC.where('authorUid', '==', window.PROFILE.uid).get().then(allSubSnap => {
                     const byName = {};
                     allSubSnap.forEach(doc => {
                         const d = doc.data();
@@ -6579,6 +6789,7 @@
                             byName[nm].active = { id: doc.id, used: d.used || 0, total: d.total || 0, price: d.price || 0, createdDate: d.createdDate || '', createdAtMs: d.createdAt ? (d.createdAt.toMillis ? d.createdAt.toMillis() : 0) : 0, phone: d.clientPhone || '' };
                         }
                     });
+                    const ghosts = [];
                     Object.keys(byName).forEach(nm => {
                         // Проверяем — есть ли этот клиент уже в map (по имени), то есть
                         // у него уже есть обычные записи в журнале (карточка отрисуется
@@ -6596,100 +6807,115 @@
                             types: {},
                             ids: [],
                             isSubscriptionOnly: true,
-                            _ghostFromSub: true
+                            _ghostFromSub: true,
+                            _ghostSubInfo: entry.active ? { id: entry.active.id, used: entry.active.used, total: entry.active.total, price: entry.active.price } : null,
+                            _ghostSubHistory: entry.history
                         };
-                        const subInfoForGhost = entry.active ? { id: entry.active.id, used: entry.active.used, total: entry.active.total, price: entry.active.price } : null;
-                        renderClientCard(ghost, subInfoForGhost, entry.history);
+                        ghosts.push(ghost);
                     });
-                }).catch(() => {});
-            }
-            if (clientPeriod !== 'all') {
-                const now = new Date();
-                let startDate = new Date();
-                if (clientPeriod === 'week') {
-                    startDate.setDate(now.getDate() - 7);
-                } else if (clientPeriod === 'month') {
-                    startDate.setMonth(now.getMonth() - 1);
-                } else if (clientPeriod === 'year') {
-                    startDate.setFullYear(now.getFullYear() - 1);
-                }
-                startDate.setHours(0, 0, 0, 0);
-                cls = cls.filter(c => {
-                    const d = parseDate(c.last);
-                    return d && d >= startDate;
-                });
-            }
+                    return ghosts;
+                }).catch(() => [])
+                : Promise.resolve([]);
 
-            if (clientSort === 'date_desc') {
-                cls.sort((a, b) => {
-                    const da = parseDate(a.last), db = parseDate(b.last);
-                    const ta = da ? da.getTime() : (a.timestamp || 0);
-                    const tb = db ? db.getTime() : (b.timestamp || 0);
-                    const diff = tb - ta;
-                    return diff !== 0 ? diff : b.visits - a.visits;
-                });
-            } else if (clientSort === 'date_asc') {
-                cls.sort((a, b) => {
-                    const da = parseDate(a.last), db = parseDate(b.last);
-                    const ta = da ? da.getTime() : (a.timestamp || 0);
-                    const tb = db ? db.getTime() : (b.timestamp || 0);
-                    const diff = ta - tb;
-                    return diff !== 0 ? diff : b.visits - a.visits;
-                });
-            } else if (clientSort === 'total_desc') {
-                cls.sort((a, b) => b.total - a.total);
-            } else if (clientSort === 'total_asc') {
-                cls.sort((a, b) => a.total - b.total);
-            }
+            ghostClientsPromise.then(ghosts => {
+                cls = cls.concat(ghosts);
 
-            document.getElementById('clCount').textContent = cls.length + ' клиентов';
-
-            const promises = cls.map(async (c) => {
-                try {
-                    // Ищем активный абонемент
-                    const subSnap = await SUBC
-                        .where("clientName", "==", c.name)
-                        .where("authorUid", "==", window.PROFILE.uid)
-                        .where("deleted", "==", false)
-                        .get();
-                    let subInfo = null;
-                    if (!subSnap.empty) {
-                        const subDoc = subSnap.docs[0];
-                        const subData = subDoc.data();
-                        subInfo = { id: subDoc.id, used: subData.used || 0, total: subData.total || 0, price: subData.price || 0 };
+                if (clientPeriod !== 'all') {
+                    const now = new Date();
+                    let startDate = new Date();
+                    if (clientPeriod === 'week') {
+                        startDate.setDate(now.getDate() - 7);
+                    } else if (clientPeriod === 'month') {
+                        startDate.setMonth(now.getMonth() - 1);
+                    } else if (clientPeriod === 'year') {
+                        startDate.setFullYear(now.getFullYear() - 1);
                     }
-                    // Ищем историю удалённых абонементов
-                    const delSubSnap = await SUBC
-                        .where("clientName", "==", c.name)
-                        .where("authorUid", "==", window.PROFILE.uid)
-                        .where("deleted", "==", true)
-                        .get();
-                    let subHistory = [];
-                    delSubSnap.forEach(doc => {
-                        const d = doc.data();
-                        subHistory.push({ used: d.used || 0, total: d.total || 0, createdDate: d.createdDate || '' });
+                    startDate.setHours(0, 0, 0, 0);
+                    cls = cls.filter(c => {
+                        const d = parseDate(c.last);
+                        return d && d >= startDate;
                     });
-                    return { client: c, subInfo, subHistory };
-                } catch (e) {
-                    console.error('Ошибка загрузки подписки:', e);
-                    return { client: c, subInfo: null, subHistory: [] };
                 }
-            });
 
-            Promise.all(promises).then(results => {
-                results.forEach(({ client, subInfo, subHistory }) => {
-                    renderClientCard(client, subInfo, subHistory);
-                });
-                // Re-apply search filter if active
-                if (clientSearchQuery) filterClientsBySearch();
-                // Показываем «Нет клиентов» только если после всех async-операций
-                // (включая ghost-карточки из абонементов) сетка действительно пуста
-                setTimeout(() => {
-                    const g = document.getElementById('clGrid');
-                    if (g && g.querySelectorAll('.cl-card').length === 0) {
-                        g.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Нет клиентов</div>';
+                if (clientSort === 'date_desc') {
+                    cls.sort((a, b) => {
+                        const da = parseDate(a.last), db = parseDate(b.last);
+                        const ta = da ? da.getTime() : (a.timestamp || 0);
+                        const tb = db ? db.getTime() : (b.timestamp || 0);
+                        const diff = tb - ta;
+                        return diff !== 0 ? diff : b.visits - a.visits;
+                    });
+                } else if (clientSort === 'date_asc') {
+                    cls.sort((a, b) => {
+                        const da = parseDate(a.last), db = parseDate(b.last);
+                        const ta = da ? da.getTime() : (a.timestamp || 0);
+                        const tb = db ? db.getTime() : (b.timestamp || 0);
+                        const diff = ta - tb;
+                        return diff !== 0 ? diff : b.visits - a.visits;
+                    });
+                } else if (clientSort === 'total_desc') {
+                    cls.sort((a, b) => b.total - a.total);
+                } else if (clientSort === 'total_asc') {
+                    cls.sort((a, b) => a.total - b.total);
+                }
+
+                document.getElementById('clCount').textContent = cls.length + ' клиентов';
+
+                const promises = cls.map(async (c) => {
+                    // Клиенты "только абонемент" уже несут свой subInfo/subHistory,
+                    // загруженные выше за один общий запрос — повторный запрос не нужен.
+                    if (c._ghostFromSub) {
+                        return { client: c, subInfo: c._ghostSubInfo, subHistory: c._ghostSubHistory || [] };
                     }
-                }, 500);
+                    try {
+                        // Ищем активный абонемент
+                        const subSnap = await SUBC
+                            .where("clientName", "==", c.name)
+                            .where("authorUid", "==", window.PROFILE.uid)
+                            .where("deleted", "==", false)
+                            .get();
+                        let subInfo = null;
+                        if (!subSnap.empty) {
+                            const subDoc = subSnap.docs[0];
+                            const subData = subDoc.data();
+                            subInfo = { id: subDoc.id, used: subData.used || 0, total: subData.total || 0, price: subData.price || 0 };
+                        }
+                        // Ищем историю удалённых абонементов
+                        const delSubSnap = await SUBC
+                            .where("clientName", "==", c.name)
+                            .where("authorUid", "==", window.PROFILE.uid)
+                            .where("deleted", "==", true)
+                            .get();
+                        let subHistory = [];
+                        delSubSnap.forEach(doc => {
+                            const d = doc.data();
+                            subHistory.push({ used: d.used || 0, total: d.total || 0, createdDate: d.createdDate || '' });
+                        });
+                        return { client: c, subInfo, subHistory };
+                    } catch (e) {
+                        console.error('Ошибка загрузки подписки:', e);
+                        return { client: c, subInfo: null, subHistory: [] };
+                    }
+                });
+
+                Promise.all(promises).then(results => {
+                    // Рендерим карточки строго в порядке отсортированного списка cls —
+                    // у клиентов с абонементом нет никакого приоритета, порядок такой
+                    // же, как у обычных клиентов (по дате последнего визита/визитам/сумме).
+                    results.forEach(({ client, subInfo, subHistory }) => {
+                        renderClientCard(client, subInfo, subHistory);
+                    });
+                    // Re-apply search filter if active
+                    if (clientSearchQuery) filterClientsBySearch();
+                    // Показываем «Нет клиентов» только если после всех async-операций
+                    // сетка действительно пуста
+                    setTimeout(() => {
+                        const g = document.getElementById('clGrid');
+                        if (g && g.querySelectorAll('.cl-card').length === 0) {
+                            g.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Нет клиентов</div>';
+                        }
+                    }, 500);
+                });
             });
         }
 
@@ -6727,10 +6953,15 @@
             // отдельные блоки (sub-badge / sub-history-badge / cl-subscription), чтобы
             // карточка в списке оставалась той же высоты, что и у всех остальных клиентов.
             // Всё развёрнуто (used/total, цена, история) показывается при открытии карточки.
+            // Жёлтая иконка билета показывается только пока есть НЕИЗРАСХОДОВАННЫЕ занятия —
+            // как только used >= total, абонемент считается использованным, и иконка
+            // полностью исчезает (хотя сам абонемент остаётся активным/не удалённым до
+            // пополнения — при пополнении used < total снова, и иконка появится сама).
+            const subIsExhausted = subInfo ? ((subInfo.used || 0) >= (subInfo.total || 0)) : false;
             let subTag = '';
-            if (subInfo) {
+            if (subInfo && !subIsExhausted) {
                 subTag = `<span class="cl-sub-tag" title="Активный абонемент"><i class="fa-solid fa-ticket"></i></span>`;
-            } else if (subHistory.length > 0) {
+            } else if (subHistory.length > 0 && !subInfo) {
                 subTag = `<span class="cl-sub-tag history-sub" title="Был абонемент"><i class="fa-solid fa-clock-rotate-left"></i></span>`;
             }
 
@@ -6776,14 +7007,16 @@
             `;
 
             // Клик на карточку
+            // Если активного абонемента нет (закончился/удалён), карточка — обычная
+            // карточка клиента (имя/телефон/обычное удаление), а история абонементов
+            // доступна внутри по кнопке «История абонементов», а не отдельным
+            // урезанным окном.
             card.onclick = (e) => {
                 if (e.target.closest('.cl-edit-btn')) return;
                 if (c.isSubscriptionOnly && subInfo) {
                     openSubClientEdit(c.name, c.phone, subInfo);
-                } else if (c.isSubscriptionOnly && !subInfo) {
-                    openSubHistoryModal(c.name, c.phone, subHistory);
                 } else {
-                    openClientEdit(c.ids.join(','), c.name, c.phone);
+                    openClientEdit(c.ids.join(','), c.name, c.phone, subHistory);
                 }
             };
 
@@ -6794,10 +7027,8 @@
                     e.stopPropagation();
                     if (c.isSubscriptionOnly && subInfo) {
                         openSubClientEdit(c.name, c.phone, subInfo);
-                    } else if (c.isSubscriptionOnly && !subInfo) {
-                        openSubHistoryModal(c.name, c.phone, subHistory);
                     } else {
-                        openClientEdit(c.ids.join(','), c.name, c.phone);
+                        openClientEdit(c.ids.join(','), c.name, c.phone, subHistory);
                     }
                 };
             }
@@ -6830,19 +7061,35 @@
             _updateSubAnalyticsToggleUI(_subEditCountInAnalytics);
         };
 
+        // Снимок текущих данных активного абонемента открытого в moSubClientEdit —
+        // используется для предзаполнения модалки «Пополнить».
+        let _subEditCurrentData = null;
+
         window.openSubClientEdit = async function(clientName, phone, subInfo) {
             _subEditClientName = clientName;
+            _subEditCurrentData = null;
             document.getElementById('subEditClientName').value = clientName;
             document.getElementById('subEditClientPhone').value = phone || '';
+            // Состояние «свёрнуто/развёрнуто» — персональная настройка текущего
+            // пользователя (своя для каждого мастера/сотрудника, общая для всех его
+            // карточек клиентов и для всех его устройств). Применяется ровно так,
+            // как было оставлено в прошлый раз, пока пользователь не переключит сам.
+            const block = document.getElementById('subEditBlock');
+            if (block) {
+                const collapsed = !!(window.PROFILE && window.PROFILE.subDetailsCollapsed);
+                block.classList.toggle('collapsed', collapsed);
+            }
             // Загружаем актуальные данные абонемента
             try {
                 const snap = await SUBC
                     .where('clientName', '==', clientName)
                     .where('authorUid', '==', window.PROFILE.uid)
+                    .where('deleted', '==', false)
                     .get();
                 if (!snap.empty) {
                     const d = snap.docs[0].data();
                     const subId = snap.docs[0].id;
+                    _subEditCurrentData = Object.assign({}, d, { id: subId });
                     document.getElementById('subEditId').value = subId;
                     document.getElementById('subEditUsed').textContent = d.used || 0;
                     document.getElementById('subEditTotal').textContent = d.total || 0;
@@ -6873,6 +7120,23 @@
             document.body.classList.remove('modal-open');
             document.getElementById('moSubClientEdit').classList.remove('open');
             _subEditClientName = '';
+        };
+
+        // Сворачивает/разворачивает блок с деталями абонемента (Прогресс занятий,
+        // цена, дата оформления) внутри карточки клиента — нажатие на круглую
+        // кнопку-шеврон рядом с заголовком «Абонемент». Выбор сохраняется в профиле
+        // текущего пользователя в Firestore, поэтому действует на всех его
+        // устройствах и для всех клиентов, пока он сам не переключит обратно —
+        // но не затрагивает других сотрудников/мастеров в этой CRM.
+        window.toggleSubEditBlock = function() {
+            const block = document.getElementById('subEditBlock');
+            if (!block) return;
+            const collapsedNow = block.classList.toggle('collapsed');
+            if (window.PROFILE) window.PROFILE.subDetailsCollapsed = collapsedNow;
+            if (window.PROFILE && window.PROFILE.uid) {
+                UC.doc(window.PROFILE.uid).update({ subDetailsCollapsed: collapsedNow })
+                    .catch(err => console.error('Ошибка сохранения состояния блока абонемента:', err));
+            }
         };
 
         window.saveSubClientEdit = async function() {
@@ -6908,6 +7172,8 @@
                 'Удалить абонемент клиента «' + name + '»? Карточка клиента сохранится с историей занятий.',
                 'delete',
                 async () => {
+                    const confirmBtn = _msActiveConfirmBtn();
+                    if (confirmBtn) lockButton(confirmBtn);
                     try {
                         const keepInAnalytics = _msKeepInAnalytics;
                         // Мягкое удаление — история сохраняется в Firestore
@@ -6919,19 +7185,109 @@
                         closeSM();
                         closeSubClientEdit();
                         renderClients();
-                    } catch(e) { handleError(e, 'Ошибка при удалении'); }
+                    } catch(e) {
+                        handleError(e, 'Ошибка при удалении');
+                    } finally {
+                        if (confirmBtn) unlockButton(confirmBtn);
+                    }
                 },
                 '',
                 '',
                 {
                     showAnalyticsToggle: true,
-                    analyticsDefault: true,
                     analyticsHint: 'Сумма абонемента останется в общем доходе, даже когда карточка клиента удалена.'
                 }
             );
         };
 
-        // ===== ПОЛНОЕ УДАЛЕНИЕ ОБЫЧНОГО КЛИЕНТА (все записи + абонемент если есть) =====
+        // ===== ПОПОЛНЕНИЕ АБОНЕМЕНТА =====
+        // Открывается из карточки клиента (кнопка «Пополнить» на месте старой
+        // «Отмена»). Предзаполняет имя/телефон, показывает текущее состояние
+        // абонемента и позволяет добавить занятия + сумму оплаты к уже существующим.
+        window.openSubTopUpModal = function() {
+            if (!_subEditCurrentData) {
+                alert('Не удалось загрузить данные абонемента. Попробуйте закрыть и открыть карточку клиента снова.');
+                return;
+            }
+            const d = _subEditCurrentData;
+            document.getElementById('topUpSubId').value = d.id || '';
+            document.getElementById('topUpClientName').value = document.getElementById('subEditClientName').value || '';
+            document.getElementById('topUpClientPhone').value = document.getElementById('subEditClientPhone').value || '';
+            document.getElementById('topUpCurrentUsed').textContent = d.used || 0;
+            document.getElementById('topUpCurrentTotal').textContent = d.total || 0;
+            document.getElementById('topUpCurrentAmount').textContent = ((d.totalAmount || (d.price * d.total)) || 0).toLocaleString() + ' ₽';
+            // Стоимость занятия предзаполняем текущей ценой — обычно она не меняется
+            document.getElementById('topUpPrice').value = d.price || '';
+            document.getElementById('topUpSessions').value = '';
+            updateSubTopUpTotal();
+            document.getElementById('moSubTopUp').classList.add('open');
+        };
+
+        window.closeSubTopUpModal = function() {
+            document.getElementById('moSubTopUp').classList.remove('open');
+        };
+
+        window.updateSubTopUpTotal = function() {
+            const d = _subEditCurrentData || {};
+            const price = parseInt(document.getElementById('topUpPrice').value) || 0;
+            const addSessions = parseInt(document.getElementById('topUpSessions').value) || 0;
+            const addedAmount = price * addSessions;
+            const addedEl = document.getElementById('topUpAddedVal');
+            if (addedAmount > 0) {
+                addedEl.textContent = addedAmount.toLocaleString() + ' ₽';
+                addedEl.className = 'total-val sub-usage';
+            } else {
+                addedEl.textContent = '0 ₽';
+                addedEl.className = 'total-val pv';
+            }
+            const currentTotal = d.total || 0;
+            const currentAmount = (d.totalAmount || ((d.price || 0) * (d.total || 0))) || 0;
+            document.getElementById('topUpResultSessions').textContent = currentTotal + addSessions;
+            document.getElementById('topUpResultAmount').textContent = (currentAmount + addedAmount).toLocaleString() + ' ₽';
+        };
+
+        window.confirmSubTopUp = async function() {
+            const btn = document.querySelector('#moSubTopUp .mb-confirm');
+            if (btn) lockButton(btn);
+            try {
+                const subId = document.getElementById('topUpSubId').value;
+                const name = document.getElementById('topUpClientName').value.trim();
+                const phone = document.getElementById('topUpClientPhone').value.trim();
+                const price = parseInt(document.getElementById('topUpPrice').value);
+                const addSessions = parseInt(document.getElementById('topUpSessions').value);
+
+                if (!subId) { alert('Абонемент не найден'); if (btn) unlockButton(btn); return; }
+                if (!name) { alert('Введите имя клиента'); if (btn) unlockButton(btn); return; }
+                if (isNaN(price) || price <= 0) { alert('Введите корректную стоимость занятия'); if (btn) unlockButton(btn); return; }
+                if (isNaN(addSessions) || addSessions <= 0) { alert('Введите количество занятий для пополнения'); if (btn) unlockButton(btn); return; }
+
+                const d = _subEditCurrentData || {};
+                const newTotal = (d.total || 0) + addSessions;
+                const addedAmount = price * addSessions;
+                const newTotalAmount = ((d.totalAmount || ((d.price || 0) * (d.total || 0))) || 0) + addedAmount;
+                const newDate = todayStr();
+
+                await SUBC.doc(subId).update({
+                    clientName: name,
+                    clientPhone: phone,
+                    total: newTotal,
+                    price: price,
+                    totalAmount: newTotalAmount,
+                    createdDate: newDate,        // дата оформления обновляется на дату пополнения
+                    countInAnalytics: true
+                });
+
+                closeSubTopUpModal();
+                closeSubClientEdit();
+                renderClients();
+            } catch(e) {
+                handleError(e, 'Ошибка при пополнении абонемента');
+            } finally {
+                if (btn) unlockButton(btn);
+            }
+        };
+
+
         // Предлагает выбор:
         //  • «Сохранить в аналитике» (по умолчанию) — карточка клиента скрывается из раздела
         //    «Клиенты» и больше не мешает в списке, но все его записи и суммы остаются
@@ -6939,7 +7295,12 @@
         //  • «Удалить» (тоггл выключен) — классическое полное и безвозвратное удаление:
         //    записи и абонемент стираются из базы, суммы пропадают из аналитики.
         window.deleteClientAndRecords = async function(nameOverride) {
-            if (!nameOverride && !clientEditIds.length) return;
+            if (!nameOverride && !clientEditIds.length) {
+                // У клиента может не быть ни одной записи в SC (только абонемент/история) —
+                // в этом случае берём имя прямо из открытой карточки, а не выходим молча.
+                nameOverride = (document.getElementById('clientEditName').value || '').trim();
+                if (!nameOverride) return;
+            }
             let name, ids;
             if (nameOverride) {
                 name = nameOverride;
@@ -6958,7 +7319,7 @@
                 'delete',
                 async () => {
                     const keepInAnalytics = _msKeepInAnalytics;
-                    const confirmBtn = document.getElementById('msConfirm');
+                    const confirmBtn = _msActiveConfirmBtn();
                     if (confirmBtn) lockButton(confirmBtn);
                     try {
                         const batch = db.batch();
@@ -7013,7 +7374,6 @@
                 '',
                 {
                     showAnalyticsToggle: true,
-                    analyticsDefault: true,
                     analyticsHint: 'Сумма и история визитов останутся в общем доходе, даже когда карточка клиента удалена. Полезно, например, после возврата денег конфликтному клиенту.'
                 }
             );
@@ -7052,18 +7412,38 @@
 
         // ===== РЕДАКТИРОВАНИЕ КЛИЕНТА =====
         // nameHint/phoneHint используются когда ids пустые (клиент без обычных записей)
-        function openClientEdit(idsStr, nameHint, phoneHint) {
+        // _clientEditSubHistory — история абонементов текущего открытого клиента
+        // (если когда-либо были абонементы), используется кнопкой «История абонементов».
+        let _clientEditSubHistory = [];
+        // _clientEditOriginalName — имя клиента на момент открытия карточки. Нужно,
+        // чтобы при сохранении найти и переименовать его абонементы в SUBC, даже если
+        // у клиента нет ни одной обычной записи в SC (clientEditIds пуст).
+        let _clientEditOriginalName = '';
+
+        function openClientEdit(idsStr, nameHint, phoneHint, subHistory) {
             const ids = (idsStr || '').split(',').filter(id => id.trim());
             clientEditIds = ids;
             const records = ids.length ? window.CRM.filter(r => ids.includes(r.id)) : [];
             const first = records[0];
             const clientName = (first && (first.client || first.song)) || nameHint || '';
+            _clientEditOriginalName = clientName;
             document.getElementById('clientEditName').value = clientName;
             document.getElementById('clientEditPhone').value = (first && first.phone) || phoneHint || '';
             renderClientSessionsList('clientEditSessions', clientName);
+            _clientEditSubHistory = subHistory || [];
+            const histBtn = document.getElementById('clientEditSubHistoryBtn');
+            if (histBtn) histBtn.style.display = _clientEditSubHistory.length ? 'flex' : 'none';
             document.body.classList.add('modal-open');
             document.getElementById('moClientEdit').classList.add('open');
         }
+
+        // Открывает окно истории абонементов прямо из обычной карточки клиента
+        // (кнопка «История абонементов»), без необходимости отдельного «недо-клиента».
+        window.openSubHistoryFromClientEdit = function() {
+            const name = document.getElementById('clientEditName').value || '';
+            const phone = document.getElementById('clientEditPhone').value || '';
+            openSubHistoryModal(name, phone, _clientEditSubHistory);
+        };
 
         function closeClientEdit() {
             document.body.classList.remove('modal-open');
@@ -7072,14 +7452,20 @@
         }
 
         async function saveClientEdit() {
-            if (!clientEditIds.length) return;
             const newName = document.getElementById('clientEditName').value.trim();
             const newPhone = document.getElementById('clientEditPhone').value.trim();
             if (!newName) { alert('Имя не может быть пустым'); return; }
+            // Раньше функция выходила молча, если у клиента не было ни одной записи
+            // в SC (например клиент только с историей абонементов) — кнопка
+            // «Сохранить» просто ничего не делала. Теперь обновляем, что есть:
+            // обычные записи (если они есть) и/или документы абонементов в SUBC
+            // (по старому имени), так что переименование работает для любой карточки.
+            if (!clientEditIds.length && !_clientEditOriginalName) return;
             const btn = document.querySelector('#moClientEdit .mb-confirm');
             if (btn) lockButton(btn);
             try {
                 const batch = db.batch();
+                let hasOps = false;
                 const records = window.CRM.filter(r => clientEditIds.includes(r.id));
                 records.forEach(r => {
                     const ref = SC.doc(r.id);
@@ -7088,8 +7474,19 @@
                         song: newName,
                         phone: newPhone
                     });
+                    hasOps = true;
                 });
-                await batch.commit();
+                if (_clientEditOriginalName && window.PROFILE && window.PROFILE.uid) {
+                    const subSnap = await SUBC
+                        .where('authorUid', '==', window.PROFILE.uid)
+                        .where('clientName', '==', _clientEditOriginalName)
+                        .get();
+                    subSnap.forEach(doc => {
+                        batch.update(doc.ref, { clientName: newName, clientPhone: newPhone });
+                        hasOps = true;
+                    });
+                }
+                if (hasOps) await batch.commit();
                 closeClientEdit();
                 renderClients();
             } catch (e) {
@@ -7463,66 +7860,9 @@
             });
         };
 
-        // Удаление subscription-only клиента (полностью, включая историю)
-        async function deleteSubOnlyClient(name, subInfo, subHistory) {
-            // ВАЖНО: у такого клиента в «Клиенты» может не быть ни одного актуального
-            // документа в SUBC (абонемент уже удалён/история пуста), а карточка всё
-            // равно держится за счёт «осиротевшей» служебной записи в SC (коллекция
-            // обычных записей), которая регистрирует имя клиента, но не была заведена
-            // ни в clientEditIds, ни найдена через SUBC. Поэтому ищем и чистим SC по имени.
-            const orphanIds = findAllMyRecordIdsByName(name);
-            openSM(
-                'Удалить клиента «' + escapeHTML(name) + '»? Это нельзя отменить.',
-                'delete',
-                async () => {
-                    const keepInAnalytics = _msKeepInAnalytics;
-                    const confirmBtn = document.getElementById('msConfirm');
-                    if (confirmBtn) lockButton(confirmBtn);
-                    try {
-                        // Все документы абонементов (активные и из истории) этого клиента
-                        const snap = await SUBC
-                            .where('authorUid', '==', window.PROFILE.uid)
-                            .where('clientName', '==', name)
-                            .get();
-                        const batch = db.batch();
-                        if (keepInAnalytics) {
-                            // Скрываем из «Клиенты», суммы остаются в Аналитике
-                            snap.forEach(doc => batch.update(doc.ref, {
-                                hiddenFromClients: true,
-                                hiddenFromClientsAt: Date.now()
-                            }));
-                            orphanIds.forEach(id => batch.update(SC.doc(id), {
-                                hiddenFromClients: true,
-                                hiddenFromClientsAt: Date.now()
-                            }));
-                        } else {
-                            // Полное безвозвратное удаление, включая аналитику
-                            snap.forEach(doc => batch.delete(doc.ref));
-                            orphanIds.forEach(id => batch.delete(SC.doc(id)));
-                        }
-                        await batch.commit();
-                        if (keepInAnalytics) {
-                            window.CRM.forEach(r => { if (orphanIds.includes(r.id)) r.hiddenFromClients = true; });
-                        } else {
-                            window.CRM = window.CRM.filter(r => !orphanIds.includes(r.id));
-                        }
-                        closeSM();
-                        renderClients();
-                    } catch(e) {
-                        handleError(e, 'Ошибка при удалении клиента');
-                    } finally {
-                        if (confirmBtn) unlockButton(confirmBtn);
-                    }
-                },
-                '',
-                '',
-                {
-                    showAnalyticsToggle: true,
-                    analyticsDefault: true,
-                    analyticsHint: 'Сумма абонемента останется в общем доходе, даже когда карточка клиента удалена.'
-                }
-            );
-        }
+        // Удаление subscription-only клиента теперь идёт через единую
+        // deleteClientAndRecords() — она уже умеет находить и чистить/скрывать
+        // абонементы клиента по имени, даже если у него нет записей в SC.
 
         // Модалка истории абонементов для клиентов без активного абонемента
         let _subHistoryClientName = '';
@@ -7530,18 +7870,6 @@
         function openSubHistoryModal(name, phone, subHistory) {
             _subHistoryClientName = name || '';
             _subHistoryClientSubHistory = subHistory || [];
-            _subHistoryCountInAnalytics = true;
-            _updateSubHistoryAnalyticsBtnUI(true);
-            // Загружаем состояние аналитики из первого абонемента
-            if (window.PROFILE && name) {
-                SUBC.where('clientName','==',name).where('authorUid','==',window.PROFILE.uid).get().then(snap => {
-                    if (!snap.empty) {
-                        const d = snap.docs[0].data();
-                        _subHistoryCountInAnalytics = (d.countInAnalytics !== false);
-                        _updateSubHistoryAnalyticsBtnUI(_subHistoryCountInAnalytics);
-                    }
-                }).catch(()=>{});
-            }
             document.getElementById('subHistoryClientName').textContent = name || '—';
             document.getElementById('subHistoryClientPhone').textContent = phone || '—';
             const content = document.getElementById('subHistoryContent');
@@ -7562,39 +7890,6 @@
             document.body.classList.remove('modal-open');
             document.getElementById('moSubHistory').classList.remove('open');
         }
-
-        window.deleteSubHistoryClient = function() {
-            const name = _subHistoryClientName;
-            // Close history modal first, then open confirm dialog
-            document.getElementById('moSubHistory').classList.remove('open');
-            const anyOtherOpen = document.querySelector('.mo.open:not(#moSimple)');
-            if (!anyOtherOpen) document.body.classList.remove('modal-open');
-            deleteSubOnlyClient(name, null, _subHistoryClientSubHistory);
-        };
-
-        let _subHistoryCountInAnalytics = true;
-        function _updateSubHistoryAnalyticsBtnUI(val) {
-            const btn = document.getElementById('subHistoryAnalyticsBtn');
-            if (!btn) return;
-            if (val) {
-                btn.textContent = '✅ Включено';
-                btn.style.borderColor = 'var(--green)'; btn.style.background = 'var(--green-bg)'; btn.style.color = 'var(--green)';
-            } else {
-                btn.textContent = '⛔ Выключено';
-                btn.style.borderColor = 'var(--red)'; btn.style.background = 'var(--red-bg)'; btn.style.color = 'var(--red)';
-            }
-        }
-        window.toggleSubHistoryAnalytics = async function() {
-            _subHistoryCountInAnalytics = !_subHistoryCountInAnalytics;
-            _updateSubHistoryAnalyticsBtnUI(_subHistoryCountInAnalytics);
-            // Сохраняем во все удалённые абонементы этого клиента
-            try {
-                const snap = await SUBC.where('clientName','==',_subHistoryClientName).where('authorUid','==',window.PROFILE.uid).get();
-                const batch = db.batch();
-                snap.forEach(doc => batch.update(doc.ref, { countInAnalytics: _subHistoryCountInAnalytics }));
-                await batch.commit();
-            } catch(e) { console.error(e); }
-        };
 
         // ===== CERTS =====
         function renderCerts() {
@@ -7811,9 +8106,13 @@
         }
 
         // ===== SIMPLE MODAL =====
-        // extra = { showAnalyticsToggle: true, analyticsDefault: true, analyticsHint: '...' }
+        // extra = { showAnalyticsToggle: true, analyticsHint: '...' }
         // Используется, когда удаление карточки клиента должно предлагать выбор:
         // сохранить его суммы в аналитике или удалить полностью (включая аналитику).
+        // Раньше это решалось тогглом + отдельной кнопкой «Удалить» (2 клика).
+        // Теперь — сразу две кнопки с явным результатом, один клик и всё готово:
+        // «Удалить (сохранить в аналитике)» вызывает onConfirm(true),
+        // «Удалить полностью» вызывает onConfirm(false).
         window.openSM = function(title, type, onConfirm, defVal = '', infoText = '', extra = null) {
             document.body.classList.add('modal-open');
             document.getElementById('msTitle').textContent = title;
@@ -7821,23 +8120,38 @@
             const infoDiv = document.getElementById('msInfo');
             const mo = document.getElementById('moSimple');
             const cf = document.getElementById('msConfirm');
-            const cancelBtn = mo.querySelector('.mb-cancel');
+            const btnsDefault = document.getElementById('msBtnsDefault');
+            const btnsAnalytics = document.getElementById('msBtnsAnalytics');
             const analyticsWrap = document.getElementById('msAnalyticsToggleWrap');
-            const analyticsHint = document.getElementById('msAnalyticsToggleHint');
+            const keepBtn = document.getElementById('msConfirmKeep');
+            const wipeBtn = document.getElementById('msConfirmWipe');
+            const cancelBtn = mo.querySelector('#msBtnsDefault .mb-cancel');
             infoDiv.style.display = 'none';
             inp.style.display = 'none';
             cf.style.display = 'none';
             cancelBtn.textContent = 'Отмена';
             unlockButton(cf);
+            unlockButton(keepBtn);
+            unlockButton(wipeBtn);
+
             if (extra && extra.showAnalyticsToggle) {
-                _msKeepInAnalytics = extra.analyticsDefault !== false; // по умолчанию true — сохранить
-                _updateMsAnalyticsToggleUI(_msKeepInAnalytics);
-                if (analyticsHint) analyticsHint.textContent = extra.analyticsHint ||
+                // Режим выбора: две кнопки сразу решают и подтверждают действие.
+                _msKeepInAnalytics = true; // значение по умолчанию, актуализируется при клике
+                analyticsWrap.textContent = extra.analyticsHint ||
                     'Сумма и история останутся в общем доходе, даже когда карточка клиента удалена';
-                analyticsWrap.style.display = 'flex';
-            } else {
-                analyticsWrap.style.display = 'none';
+                analyticsWrap.style.display = 'block';
+                btnsDefault.style.display = 'none';
+                btnsAnalytics.style.display = 'flex';
+                keepBtn.onclick = () => { _msKeepInAnalytics = true; onConfirm(); };
+                wipeBtn.onclick = () => { _msKeepInAnalytics = false; onConfirm(); };
+                mo.classList.add('open');
+                return;
             }
+
+            analyticsWrap.style.display = 'none';
+            btnsAnalytics.style.display = 'none';
+            btnsDefault.style.display = 'flex';
+
             if (type === 'delete') {
                 cf.className = 'mb-btn mb-delete';
                 cf.textContent = 'Удалить';
@@ -7870,27 +8184,20 @@
             if (!anyOtherOpen) document.body.classList.remove('modal-open');
         };
 
-        // ===== Тоггл «Сохранить в аналитике» для модалки удаления клиента =====
+        // _msKeepInAnalytics — хранит выбор пользователя (какую из двух кнопок
+        // нажал), читается внутри onConfirm в местах вызова openSM с showAnalyticsToggle.
         let _msKeepInAnalytics = true;
-        function _updateMsAnalyticsToggleUI(val) {
-            const btn = document.getElementById('msAnalyticsToggleBtn');
-            if (!btn) return;
-            if (val) {
-                btn.textContent = '✅ Сохранить';
-                btn.style.borderColor = 'var(--green)';
-                btn.style.background = 'var(--green-bg)';
-                btn.style.color = 'var(--green)';
-            } else {
-                btn.textContent = '⛔ Удалить';
-                btn.style.borderColor = 'var(--red)';
-                btn.style.background = 'var(--red-bg)';
-                btn.style.color = 'var(--red)';
+
+        // Возвращает кнопку, которая фактически была нажата в текущем диалоге
+        // openSM — нужно блокировать именно её на время асинхронной операции,
+        // а не общий msConfirm (его не видно, когда открыт режим с двумя кнопками).
+        function _msActiveConfirmBtn() {
+            const btnsAnalytics = document.getElementById('msBtnsAnalytics');
+            if (btnsAnalytics && btnsAnalytics.style.display !== 'none') {
+                return _msKeepInAnalytics ? document.getElementById('msConfirmKeep') : document.getElementById('msConfirmWipe');
             }
+            return document.getElementById('msConfirm');
         }
-        window.toggleMsAnalyticsKeep = function() {
-            _msKeepInAnalytics = !_msKeepInAnalytics;
-            _updateMsAnalyticsToggleUI(_msKeepInAnalytics);
-        };
 
         function openMonthInfo(idx, value) {
             const monthName = MNL[idx];
@@ -9014,6 +9321,9 @@
                     p.uid = user.uid;
                     if (!p.color) p.color = PALETTE[0].hex;
                     if (!p.theme) p.theme = 'dark';
+                    // Персональная настройка: свёрнут ли блок деталей абонемента в
+                    // карточке клиента. По умолчанию (если ещё не сохранено) — развёрнут.
+                    if (typeof p.subDetailsCollapsed !== 'boolean') p.subDetailsCollapsed = false;
 
                     isMobileDevice = detectMobile();
                     if (isMobileDevice) {
@@ -9043,7 +9353,7 @@
                     const navCerts = document.getElementById('nav-certs');
                     if (navCerts) navCerts.style.display = isSound ? 'flex' : 'none';
                     const subBtn = document.getElementById('svcModeSubscription');
-                    if (subBtn) subBtn.style.display = (isVocal || isGuitar) ? 'inline-flex' : 'none';
+                    if (subBtn) subBtn.style.display = 'none'; // removed: subscription now handled separately
                     selectedFormColor = p.color;
 
                     currentTheme = p.theme || 'dark';
