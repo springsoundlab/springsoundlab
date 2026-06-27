@@ -6123,7 +6123,13 @@
                         const authorProfile = window.ALL_USERS && window.ALL_USERS[ev.authorUid];
                         return authorProfile ? authorProfile.role === 'Звукорежиссёр' : (isOwnRecord && isSound);
                     })();
-                    const statusDot = (evAuthorIsSound && isOwnRecord) ?
+                    // No status dot for sound engineering lessons (subscription or standalone)
+                    const isSoundLesson = (() => {
+                        const svcText = ((ev.services || ev.type || '') + ' ' +
+                            (ev.details ? ev.details.map(d => d.name || '').join(' ') : '')).toLowerCase();
+                        return /урок|занятие|lesson/.test(svcText) && /звук|режиссёр|режиссер|sound|audio/.test(svcText);
+                    })();
+                    const statusDot = (evAuthorIsSound && isOwnRecord && !isSoundLesson) ?
                         `<div class="cal-event-status ${isDone ? 'done' : 'pending'}" title="${isDone ? 'Готово' : 'В работе'}"></div>` :
                         '';
                     const evEl = document.createElement('div');
