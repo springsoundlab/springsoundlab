@@ -6408,6 +6408,18 @@
                         _subClientHasSubscription = true;
                         _subClientSubData = sub;
                         _lastCheckedClientName = name;
+                        // If this record was already charged to subscription, show button as active
+                        if (row.isSubscriptionVisit) {
+                            window._forceSubscriptionVisit = true;
+                            const btn = document.getElementById('subChargeBtn');
+                            if (btn) {
+                                btn.style.display = 'block';
+                                btn.style.background = 'var(--green-bg)';
+                                btn.style.color = 'var(--green)';
+                                btn.style.border = '1.5px solid var(--green)';
+                                btn.innerHTML = '<i class="fa-solid fa-check" style="margin-right:7px;"></i>Занятие по абонементу — нажмите для отмены';
+                            }
+                        }
                         updateTotalDisplay();
                     }
                 });
