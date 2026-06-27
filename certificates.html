@@ -4419,28 +4419,88 @@
 
         function palById(id) { return PALETTE.find(p => p.id === id) || PALETTE[0]; }
 
-        // ===== Насыщенный полупрозрачный фон для карточки события в календаре =====
-        // Раньше альфа была слишком низкой (~0.18) — цвет выглядел бледным и
-        // сквозь карточку просвечивала сетка календаря. Здесь — тот же самый
-        // цвет, который выбрал пользователь (без подмешивания белого/серого/
-        // чёрного — фиолетовый остаётся фиолетовым), просто с более высокой,
-        // но всё ещё полупрозрачной альфой. На светлой теме альфа чуть выше —
-        // там запас контраста с чёрным текстом намного больше, поэтому цвет
-        // можно сделать заметно насыщеннее.
-        function hexToRgbArr(hex) {
+        // ===== Насыщенный непрозрачный фон для карточки события в календаре =====
+        // Раньше фон был полупрозрачным (rgba с низкой альфой) — из-за смешивания
+        // с фоном страницы цвет выглядел тусклым и блёклым, даже если повышать
+        // альфу. Здесь цвет переводится в HSL: насыщенность поднимается, а
+        // светлота индивидуально подбирается под каждый оттенок так, чтобы
+        // получить одинаково уверенный контраст с текстом (белым на тёмной теме,
+        // чёрным на светлой) — итоговый цвет полностью непрозрачный, плотный и
+        // яркий, как у фирменной кнопки «Сохранить», а не разбавленный пастельный.
+        function hexToHsl(hex) {
             hex = (hex || '').replace('#', '');
             if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
             const num = parseInt(hex, 16);
-            return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+            const r = ((num >> 16) & 255) / 255, g = ((num >> 8) & 255) / 255, b = (num & 255) / 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            const d = max - min;
+            if (d === 0) { h = 0; s = 0; }
+            else {
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+                else if (max === g) h = (b - r) / d + 2;
+                else h = (r - g) / d + 4;
+                h /= 6;
+            }
+            return [h, s, l];
+        }
+        function hslToRgbStr(h, s, l) {
+            let r, g, b;
+            if (s === 0) { r = g = b = l; }
+            else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return 'rgb(' + Math.round(r * 255) + ',' + Math.round(g * 255) + ',' + Math.round(b * 255) + ')';
+        }
+        function relLuminance(r, g, b) {
+            const chan = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+            return 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
+        }
+        function contrastRatio(rgb1, rgb2) {
+            let l1 = relLuminance(rgb1[0], rgb1[1], rgb1[2]), l2 = relLuminance(rgb2[0], rgb2[1], rgb2[2]);
+            if (l1 < l2) { const t = l1; l1 = l2; l2 = t; }
+            return (l1 + 0.05) / (l2 + 0.05);
         }
         function calEventBg(hex) {
-            const [r, g, b] = hexToRgbArr(hex);
+            const [h, s] = hexToHsl(hex);
             const isLight = document.body.classList.contains('light-theme');
-            // Максимально насыщенно, но так, чтобы белый/чёрный текст (var(--text))
-            // оставался читаемым на самом ярком цвете палитры (бирюза) — на тёмной
-            // теме это потолок ~0.55, на светлой запас контраста намного больше.
-            const alpha = isLight ? 0.85 : 0.55;
-            return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+            const newS = Math.min(1, s * 1.05);
+            const textRgb = isLight ? [30, 30, 38] : [240, 240, 245];
+            // Целевой контраст с текстом — одинаковый для любого выбранного цвета,
+            // независимо от его оттенка (зелёный/жёлтый сами по себе кажутся
+            // светлее синего/фиолетового при той же численной светлоте HSL,
+            // поэтому фиксированная светлота давала неровный результат).
+            const targetContrast = isLight ? 5.5 : 4.8;
+            let lo = 0.05, hi = 0.95, bestRgbStr = hslToRgbStr(h, newS, 0.5);
+            for (let i = 0; i < 22; i++) {
+                const mid = (lo + hi) / 2;
+                const rgbStr = hslToRgbStr(h, newS, mid);
+                const m = rgbStr.match(/\d+/g).map(Number);
+                const c = contrastRatio(m, textRgb);
+                bestRgbStr = rgbStr;
+                // Светлее (выше L) -> ближе к светлому фону страницы -> на светлой
+                // теме контраст с чёрным текстом растёт, на тёмной теме контраст
+                // с белым текстом падает. Двигаем границы поиска соответственно.
+                if (isLight) {
+                    if (c > targetContrast) hi = mid; else lo = mid;
+                } else {
+                    if (c > targetContrast) lo = mid; else hi = mid;
+                }
+            }
+            return bestRgbStr;
         }
 
         const CM = { white: '#9090a0', purple: '#a099ff', red: '#ff5c6a', green: '#3ecf8e', gold: '#d4af37',
