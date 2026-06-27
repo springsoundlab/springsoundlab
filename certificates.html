@@ -6120,7 +6120,8 @@
                     evEl.style.width = colW + '%';
                     evEl.style.background = pal.bg;
                     if (showStatusEdge) {
-                        evEl.style.borderLeft = '3px solid ' + (isDone ? 'var(--green)' : 'var(--red)');
+                        const statusColor = isDone ? 'var(--green)' : 'var(--red)';
+                        evEl.style.borderLeft = '3px solid ' + statusColor;
                         evEl.title = isDone ? 'Готово' : 'В работе';
                     } else {
                         evEl.style.borderLeft = '3px solid ' + color;
@@ -6747,10 +6748,12 @@
             // Это касается как АКТИВНЫХ абонементов (клиент только что создан через
             // «Новый абонемент» и пока не имеет ни одной записи в журнале), так и
             // удалённых (история). Их нет в map, но они должны отображаться в «Клиентах».
-            // Загружаем их асинхронно из Firestore.
-            if (window.PROFILE && window.PROFILE.uid) {
-                SUBC.where('authorUid', '==', window.PROFILE.uid).get().then(allSubSnap => {
-                    // Группируем все абонементы клиента (активные + удалённые) по имени
+            // Важно: эти клиенты НЕ должны иметь никакого приоритета в сортировке —
+            // дожидаемся их загрузки и добавляем в общий список cls ДО сортировки,
+            // чтобы они ранжировались строго по тем же правилам (дате/визитам/сумме),
+            // что и все остальные карточки.
+            const ghostClientsPromise = (window.PROFILE && window.PROFILE.uid)
+                ? SUBC.where('authorUid', '==', window.PROFILE.uid).get().then(allSubSnap => {
                     const byName = {};
                     allSubSnap.forEach(doc => {
                         const d = doc.data();
@@ -6765,6 +6768,7 @@
                             byName[nm].active = { id: doc.id, used: d.used || 0, total: d.total || 0, price: d.price || 0, createdDate: d.createdDate || '', createdAtMs: d.createdAt ? (d.createdAt.toMillis ? d.createdAt.toMillis() : 0) : 0, phone: d.clientPhone || '' };
                         }
                     });
+                    const ghosts = [];
                     Object.keys(byName).forEach(nm => {
                         // Проверяем — есть ли этот клиент уже в map (по имени), то есть
                         // у него уже есть обычные записи в журнале (карточка отрисуется
@@ -6782,100 +6786,115 @@
                             types: {},
                             ids: [],
                             isSubscriptionOnly: true,
-                            _ghostFromSub: true
+                            _ghostFromSub: true,
+                            _ghostSubInfo: entry.active ? { id: entry.active.id, used: entry.active.used, total: entry.active.total, price: entry.active.price } : null,
+                            _ghostSubHistory: entry.history
                         };
-                        const subInfoForGhost = entry.active ? { id: entry.active.id, used: entry.active.used, total: entry.active.total, price: entry.active.price } : null;
-                        renderClientCard(ghost, subInfoForGhost, entry.history);
+                        ghosts.push(ghost);
                     });
-                }).catch(() => {});
-            }
-            if (clientPeriod !== 'all') {
-                const now = new Date();
-                let startDate = new Date();
-                if (clientPeriod === 'week') {
-                    startDate.setDate(now.getDate() - 7);
-                } else if (clientPeriod === 'month') {
-                    startDate.setMonth(now.getMonth() - 1);
-                } else if (clientPeriod === 'year') {
-                    startDate.setFullYear(now.getFullYear() - 1);
-                }
-                startDate.setHours(0, 0, 0, 0);
-                cls = cls.filter(c => {
-                    const d = parseDate(c.last);
-                    return d && d >= startDate;
-                });
-            }
+                    return ghosts;
+                }).catch(() => [])
+                : Promise.resolve([]);
 
-            if (clientSort === 'date_desc') {
-                cls.sort((a, b) => {
-                    const da = parseDate(a.last), db = parseDate(b.last);
-                    const ta = da ? da.getTime() : (a.timestamp || 0);
-                    const tb = db ? db.getTime() : (b.timestamp || 0);
-                    const diff = tb - ta;
-                    return diff !== 0 ? diff : b.visits - a.visits;
-                });
-            } else if (clientSort === 'date_asc') {
-                cls.sort((a, b) => {
-                    const da = parseDate(a.last), db = parseDate(b.last);
-                    const ta = da ? da.getTime() : (a.timestamp || 0);
-                    const tb = db ? db.getTime() : (b.timestamp || 0);
-                    const diff = ta - tb;
-                    return diff !== 0 ? diff : b.visits - a.visits;
-                });
-            } else if (clientSort === 'total_desc') {
-                cls.sort((a, b) => b.total - a.total);
-            } else if (clientSort === 'total_asc') {
-                cls.sort((a, b) => a.total - b.total);
-            }
+            ghostClientsPromise.then(ghosts => {
+                cls = cls.concat(ghosts);
 
-            document.getElementById('clCount').textContent = cls.length + ' клиентов';
-
-            const promises = cls.map(async (c) => {
-                try {
-                    // Ищем активный абонемент
-                    const subSnap = await SUBC
-                        .where("clientName", "==", c.name)
-                        .where("authorUid", "==", window.PROFILE.uid)
-                        .where("deleted", "==", false)
-                        .get();
-                    let subInfo = null;
-                    if (!subSnap.empty) {
-                        const subDoc = subSnap.docs[0];
-                        const subData = subDoc.data();
-                        subInfo = { id: subDoc.id, used: subData.used || 0, total: subData.total || 0, price: subData.price || 0 };
+                if (clientPeriod !== 'all') {
+                    const now = new Date();
+                    let startDate = new Date();
+                    if (clientPeriod === 'week') {
+                        startDate.setDate(now.getDate() - 7);
+                    } else if (clientPeriod === 'month') {
+                        startDate.setMonth(now.getMonth() - 1);
+                    } else if (clientPeriod === 'year') {
+                        startDate.setFullYear(now.getFullYear() - 1);
                     }
-                    // Ищем историю удалённых абонементов
-                    const delSubSnap = await SUBC
-                        .where("clientName", "==", c.name)
-                        .where("authorUid", "==", window.PROFILE.uid)
-                        .where("deleted", "==", true)
-                        .get();
-                    let subHistory = [];
-                    delSubSnap.forEach(doc => {
-                        const d = doc.data();
-                        subHistory.push({ used: d.used || 0, total: d.total || 0, createdDate: d.createdDate || '' });
+                    startDate.setHours(0, 0, 0, 0);
+                    cls = cls.filter(c => {
+                        const d = parseDate(c.last);
+                        return d && d >= startDate;
                     });
-                    return { client: c, subInfo, subHistory };
-                } catch (e) {
-                    console.error('Ошибка загрузки подписки:', e);
-                    return { client: c, subInfo: null, subHistory: [] };
                 }
-            });
 
-            Promise.all(promises).then(results => {
-                results.forEach(({ client, subInfo, subHistory }) => {
-                    renderClientCard(client, subInfo, subHistory);
-                });
-                // Re-apply search filter if active
-                if (clientSearchQuery) filterClientsBySearch();
-                // Показываем «Нет клиентов» только если после всех async-операций
-                // (включая ghost-карточки из абонементов) сетка действительно пуста
-                setTimeout(() => {
-                    const g = document.getElementById('clGrid');
-                    if (g && g.querySelectorAll('.cl-card').length === 0) {
-                        g.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Нет клиентов</div>';
+                if (clientSort === 'date_desc') {
+                    cls.sort((a, b) => {
+                        const da = parseDate(a.last), db = parseDate(b.last);
+                        const ta = da ? da.getTime() : (a.timestamp || 0);
+                        const tb = db ? db.getTime() : (b.timestamp || 0);
+                        const diff = tb - ta;
+                        return diff !== 0 ? diff : b.visits - a.visits;
+                    });
+                } else if (clientSort === 'date_asc') {
+                    cls.sort((a, b) => {
+                        const da = parseDate(a.last), db = parseDate(b.last);
+                        const ta = da ? da.getTime() : (a.timestamp || 0);
+                        const tb = db ? db.getTime() : (b.timestamp || 0);
+                        const diff = ta - tb;
+                        return diff !== 0 ? diff : b.visits - a.visits;
+                    });
+                } else if (clientSort === 'total_desc') {
+                    cls.sort((a, b) => b.total - a.total);
+                } else if (clientSort === 'total_asc') {
+                    cls.sort((a, b) => a.total - b.total);
+                }
+
+                document.getElementById('clCount').textContent = cls.length + ' клиентов';
+
+                const promises = cls.map(async (c) => {
+                    // Клиенты "только абонемент" уже несут свой subInfo/subHistory,
+                    // загруженные выше за один общий запрос — повторный запрос не нужен.
+                    if (c._ghostFromSub) {
+                        return { client: c, subInfo: c._ghostSubInfo, subHistory: c._ghostSubHistory || [] };
                     }
-                }, 500);
+                    try {
+                        // Ищем активный абонемент
+                        const subSnap = await SUBC
+                            .where("clientName", "==", c.name)
+                            .where("authorUid", "==", window.PROFILE.uid)
+                            .where("deleted", "==", false)
+                            .get();
+                        let subInfo = null;
+                        if (!subSnap.empty) {
+                            const subDoc = subSnap.docs[0];
+                            const subData = subDoc.data();
+                            subInfo = { id: subDoc.id, used: subData.used || 0, total: subData.total || 0, price: subData.price || 0 };
+                        }
+                        // Ищем историю удалённых абонементов
+                        const delSubSnap = await SUBC
+                            .where("clientName", "==", c.name)
+                            .where("authorUid", "==", window.PROFILE.uid)
+                            .where("deleted", "==", true)
+                            .get();
+                        let subHistory = [];
+                        delSubSnap.forEach(doc => {
+                            const d = doc.data();
+                            subHistory.push({ used: d.used || 0, total: d.total || 0, createdDate: d.createdDate || '' });
+                        });
+                        return { client: c, subInfo, subHistory };
+                    } catch (e) {
+                        console.error('Ошибка загрузки подписки:', e);
+                        return { client: c, subInfo: null, subHistory: [] };
+                    }
+                });
+
+                Promise.all(promises).then(results => {
+                    // Рендерим карточки строго в порядке отсортированного списка cls —
+                    // у клиентов с абонементом нет никакого приоритета, порядок такой
+                    // же, как у обычных клиентов (по дате последнего визита/визитам/сумме).
+                    results.forEach(({ client, subInfo, subHistory }) => {
+                        renderClientCard(client, subInfo, subHistory);
+                    });
+                    // Re-apply search filter if active
+                    if (clientSearchQuery) filterClientsBySearch();
+                    // Показываем «Нет клиентов» только если после всех async-операций
+                    // сетка действительно пуста
+                    setTimeout(() => {
+                        const g = document.getElementById('clGrid');
+                        if (g && g.querySelectorAll('.cl-card').length === 0) {
+                            g.innerHTML = '<div style="color:var(--text3);font-size:12px;padding:18px;">Нет клиентов</div>';
+                        }
+                    }, 500);
+                });
             });
         }
 
