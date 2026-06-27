@@ -596,22 +596,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .cal-event-status {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 11px;
-            height: 11px;
-            border-radius: 50%;
-            z-index: 3;
-            box-shadow: 0 0 0 1.5px rgba(0,0,0,.25);
-        }
-        .cal-event-status.pending {
-            background: var(--red);
-        }
-        .cal-event-status.done {
-            background: var(--green);
-        }
         .cal-now-line {
             position: absolute;
             left: 0;
@@ -6124,9 +6108,10 @@
                             (ev.details ? ev.details.map(d => d.name || '').join(' ') : '')).toLowerCase();
                         return /урок|занятие|lesson/.test(svcText) && /звук|режиссёр|режиссер|sound|audio/.test(svcText);
                     })();
-                    const statusDot = (evAuthorIsSound && isOwnRecord && !isSoundLesson) ?
-                        `<div class="cal-event-status ${isDone ? 'done' : 'pending'}" title="${isDone ? 'Готово' : 'В работе'}"></div>` :
-                        '';
+                    // Цветной край слева — статус-индикатор ТОЛЬКО для звукорежиссёров
+                    // на их собственных записях. В мастер-режиме при просмотре чужих
+                    // записей статус-индикатор НЕ показывается, край — обычный, цвета записи.
+                    const showStatusEdge = (evAuthorIsSound && isOwnRecord && !isSoundLesson);
                     const evEl = document.createElement('div');
                     evEl.className = 'cal-event';
                     evEl.style.top = Math.max(0, top) + 'px';
@@ -6134,9 +6119,14 @@
                     evEl.style.left = colLeft + '%';
                     evEl.style.width = colW + '%';
                     evEl.style.background = pal.bg;
-                    evEl.style.borderLeft = '3px solid ' + color;
+                    if (showStatusEdge) {
+                        evEl.style.borderLeft = '3px solid ' + (isDone ? 'var(--green)' : 'var(--red)');
+                        evEl.title = isDone ? 'Готово' : 'В работе';
+                    } else {
+                        evEl.style.borderLeft = '3px solid ' + color;
+                    }
                     evEl.innerHTML =
-                        `${statusDot}<div class="cal-event-name" style="color:var(--text)">${evName}</div><div class="cal-event-svc" style="color:var(--text);opacity:.78">${evSvc}</div>`;
+                        `<div class="cal-event-name" style="color:var(--text)">${evName}</div><div class="cal-event-svc" style="color:var(--text);opacity:.78">${evSvc}</div>`;
                     evEl.onclick = function(e) {
                         e.stopPropagation();
                         openEdit(ev.id);
