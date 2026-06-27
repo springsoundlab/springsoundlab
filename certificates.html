@@ -6187,6 +6187,7 @@
                     const DRAG_THRESHOLD_PX = 10;
                     let startX = null;
                     let startY = null;
+                    let savedColRect = null; // сохраняем rect колонки при mousedown
                     let touchCancelled = false; // горизонтальный свайп — отменяем drag
 
                     function minsToTimeStr(mins) {
@@ -6195,8 +6196,8 @@
                         return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
                     }
 
-                    function yToMins(clientY) {
-                        const rect = col.getBoundingClientRect();
+                    function yToMins(clientY, rectOverride) {
+                        const rect = rectOverride || col.getBoundingClientRect();
                         const yFixed = clientY - rect.top;
                         const totalHeight = (HOURS_END - HOURS_START) * zoom;
                         const ratio = Math.max(0, Math.min(1, yFixed / totalHeight));
@@ -6273,7 +6274,8 @@
                         if (e.button !== 0) return;
                         if (e.target.closest('.cal-event')) return;
                         startY = e.clientY;
-                        dragStartMin = yToMins(e.clientY);
+                        savedColRect = col.getBoundingClientRect();
+                        dragStartMin = yToMins(e.clientY, savedColRect);
                         dragCurMin = dragStartMin;
                         isDragging = false;
                     });
@@ -6285,13 +6287,18 @@
                             isDragging = true;
                             createGhost();
                         }
-                        updateGhost(dragStartMin, yToMins(e.clientY));
+                        updateGhost(dragStartMin, yToMins(e.clientY, savedColRect));
                     });
 
                     document.addEventListener('mouseup', function(e) {
                         if (dragStartMin === null) return;
                         if (!isDragging) { dragStartMin = null; dragCurMin = null; return; }
-                        // НЕ пересчитываем yToMins здесь — берём dragCurMin из updateGhost
+                        // пересчитываем финальную позицию со снаппингом,
+                        // передаём сохранённый rect чтобы корректно работало
+                        // даже если мышь отпущена за пределами колонки
+                        const snapped = yToMins(e.clientY, savedColRect);
+                        dragCurMin = snapped;
+                        updateGhost(dragStartMin, dragCurMin);
                         finishDrag();
                     });
 
