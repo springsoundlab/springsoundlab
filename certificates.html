@@ -3530,7 +3530,6 @@
                     <div class="toolbar"></div>
                     <div id="calView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
                         <div class="cal-head" id="calHead"></div>
-                        <div id="calDragTimeBar" style="display:none;padding:6px 0;text-align:center;font-size:18px;font-weight:800;letter-spacing:0.5px;flex-shrink:0;transition:opacity 0.15s;"></div>
                         <div class="cal-body" id="calBody"></div>
                     </div>
                     <div id="listView" style="display:none;"></div>
@@ -6193,7 +6192,6 @@
                     let touchLongTimer = null;
                     let touchLongFired = false;
                     const LONG_PRESS_MS = 350;
-                    const timeBar = document.getElementById('calDragTimeBar');
 
                     function minsToTimeStr(mins) {
                         return String(Math.floor(mins / 60)).padStart(2,'0') + ':00';
@@ -6209,18 +6207,8 @@
                         return Math.min(Math.max(mins, HOURS_START * 60), HOURS_END * 60);
                     }
 
-                    function showTimeBar(s, e) {
-                        if (!timeBar) return;
-                        timeBar.textContent = minsToTimeStr(s) + ' \u2013 ' + minsToTimeStr(e);
-                        timeBar.style.color = userColor;
-                        timeBar.style.display = 'block';
-                    }
-
-                    function hideTimeBar() {
-                        if (!timeBar) return;
-                        timeBar.style.display = 'none';
-                        timeBar.textContent = '';
-                    }
+                    function showTimeBar(s, e) {}
+                    function hideTimeBar() {}
 
                     function createGhost() {
                         if (ghost) return;
@@ -6229,6 +6217,22 @@
                         ghost.style.background = pal.bg;
                         ghost.style.borderColor = userColor;
                         ghost.style.overflow = 'visible';
+                        const lbl = document.createElement('div');
+                        lbl.className = 'cal-drag-ghost-label';
+                        lbl.style.cssText = [
+                            'position:absolute',
+                            'bottom:calc(100% + 14px)',
+                            'left:50%',
+                            'transform:translateX(-50%)',
+                            'font-size:18px',
+                            'font-weight:800',
+                            'white-space:nowrap',
+                            'color:' + userColor,
+                            'pointer-events:none',
+                            'letter-spacing:0.5px',
+                            'text-shadow:0 1px 6px rgba(0,0,0,0.18)',
+                        ].join(';');
+                        ghost.appendChild(lbl);
                         col.appendChild(ghost);
                     }
 
@@ -6241,13 +6245,13 @@
                             const heightPx = Math.max(((e - s) / 60) * zoom, zoom / 2);
                             ghost.style.top = topPx + 'px';
                             ghost.style.height = heightPx + 'px';
+                            const lbl = ghost.querySelector('.cal-drag-ghost-label');
+                            if (lbl) lbl.textContent = minsToTimeStr(s) + ' \u2013 ' + minsToTimeStr(e);
                         }
-                        showTimeBar(s, e);
                     }
 
                     function removeGhost() {
                         if (ghost) { ghost.remove(); ghost = null; }
-                        hideTimeBar();
                     }
 
                     function resetState() {
