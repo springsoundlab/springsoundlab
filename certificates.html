@@ -513,7 +513,7 @@
             font-size: 16px;
             font-weight: 700;
             margin-top: 2px;
-            color: var(--text);
+            color: #ffffff !important;
         }
         .cal-day-hd-num.today {
             background: var(--accent);
@@ -5072,9 +5072,15 @@
             }
         }
 
+        let wasPinching = false;
+        let wasPinchingTimer = null;
+
         function handleTouchEnd(e) {
             if (isPinching) {
                 isPinching = false;
+                wasPinching = true;
+                clearTimeout(wasPinchingTimer);
+                wasPinchingTimer = setTimeout(() => { wasPinching = false; }, 300);
                 if (animationFrameRequest !== null) {
                     cancelAnimationFrame(animationFrameRequest);
                     animationFrameRequest = null;
@@ -6363,7 +6369,7 @@
                         clearTimeout(touchLongTimer);
                         if (touchCancelled || !touchLongFired) {
                             removeGhost();
-                            if (!touchCancelled) {
+                            if (!touchCancelled && !isPinching && !wasPinching) {
                                 const t = e.changedTouches[0];
                                 const r = savedColRect || col.getBoundingClientRect();
                                 const y = t.clientY - r.top;
