@@ -6317,13 +6317,26 @@
                     });
 
                     // ---- TOUCH (мобильный) ----
+                    // Флаг: был ли недавно pinch-зум (блокирует открытие новой записи)
+                    let colWasPinching = false;
+                    let colPinchResetTimer = null;
+
                     col.addEventListener('touchstart', function(e) {
                         if (e.target.closest('.cal-event')) return;
                         if (e.touches.length > 1) {
+                            // Мультитач — это pinch, запоминаем
+                            colWasPinching = true;
+                            clearTimeout(colPinchResetTimer);
                             clearTimeout(touchLongTimer);
                             touchCancelled = true;
                             removeGhost();
                             resetState();
+                            return;
+                        }
+                        // Один палец: если только что был pinch — игнорируем этот touchstart
+                        // (пользователь убирает второй палец позже первого)
+                        if (colWasPinching) {
+                            touchCancelled = true;
                             return;
                         }
                         const t = e.touches[0];
@@ -6349,6 +6362,8 @@
                     col.addEventListener('touchmove', function(e) {
                         if (touchCancelled) return;
                         if (e.touches.length > 1) {
+                            colWasPinching = true;
+                            clearTimeout(colPinchResetTimer);
                             clearTimeout(touchLongTimer);
                             touchCancelled = true;
                             removeGhost();
@@ -6373,6 +6388,18 @@
 
                     col.addEventListener('touchend', function(e) {
                         clearTimeout(touchLongTimer);
+
+                        // Если был pinch — сбрасываем флаг с задержкой и НЕ открываем запись
+                        if (colWasPinching) {
+                            clearTimeout(colPinchResetTimer);
+                            colPinchResetTimer = setTimeout(function() {
+                                colWasPinching = false;
+                            }, 300);
+                            removeGhost();
+                            resetState();
+                            return;
+                        }
+
                         if (touchCancelled || !touchLongFired) {
                             removeGhost();
                             if (!touchCancelled) {
