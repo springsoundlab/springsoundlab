@@ -480,6 +480,42 @@
             display: none !important;
         }
 
+        /* ===== MOBILE CALENDAR VIEW TOGGLE ===== */
+        .cal-view-toggle {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .cal-view-toggle {
+                display: flex;
+                align-items: center;
+                background: var(--surface2);
+                border: 1px solid var(--border);
+                border-radius: var(--r-sm);
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+            .cal-view-toggle-btn {
+                padding: 5px 9px;
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--text2);
+                cursor: pointer;
+                border: none;
+                background: transparent;
+                font-family: 'Inter', sans-serif;
+                transition: background 0.15s, color 0.15s;
+                white-space: nowrap;
+                line-height: 1;
+            }
+            .cal-view-toggle-btn.active {
+                background: var(--accent);
+                color: #fff;
+            }
+            .cal-view-toggle-btn + .cal-view-toggle-btn {
+                border-left: 1px solid var(--border);
+            }
+        }
+
         /* CALENDAR */
         .cal-wrap {
             flex: 1;
@@ -3494,6 +3530,12 @@
                     <div class="tb-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">
                         <i class="fa-solid fa-bars"></i> Меню
                     </div>
+                    <!-- Переключатель дней (только мобильные) -->
+                    <div class="cal-view-toggle" id="calViewToggle">
+                        <button class="cal-view-toggle-btn" id="cvt1" onclick="setCalMobileView(1)">1</button>
+                        <button class="cal-view-toggle-btn" id="cvt3" onclick="setCalMobileView(3)">3</button>
+                        <button class="cal-view-toggle-btn active" id="cvt7" onclick="setCalMobileView(7)">7</button>
+                    </div>
                     <div class="zoom-controls-top">
                         <button class="tb-btn" onclick="zoomCalendar(1)" title="Увеличить масштаб"><i class="fa-solid fa-plus"></i></button>
                         <button class="tb-btn" onclick="zoomCalendar(-1)" title="Уменьшить масштаб"><i class="fa-solid fa-minus"></i></button>
@@ -4500,6 +4542,8 @@
         window.ALL_USERS = {};
         let calDate = new Date();
         let calWeekOffset = 0;
+        // Режим отображения календаря на мобильных: 1, 3 или 7 дней
+        let calMobileViewMode = 7;
         let privacyOn = false;
         let certs = {};
         let editId = null;
@@ -5906,6 +5950,10 @@
                 zoomTop.style.display = (s === 'sessions' && !isMobile) ? 'flex' : 'none';
             }
 
+            // Показываем переключатель режима только в журнале
+            const cvToggle = document.getElementById('calViewToggle');
+            if (cvToggle) cvToggle.style.display = (s === 'sessions') ? '' : 'none';
+
             document.body.classList.toggle('sec-finance-active', s === 'finance' || s === 'masterFinance');
             document.body.classList.toggle('sec-clients-active', s === 'clients');
 
@@ -5942,6 +5990,17 @@
             renderCalendar();
         };
 
+        window.setCalMobileView = function(n) {
+            calMobileViewMode = n;
+            calWeekOffset = 0; // сброс позиции при смене режима
+            // Обновляем активную кнопку
+            [1, 3, 7].forEach(function(v) {
+                const btn = document.getElementById('cvt' + v);
+                if (btn) btn.classList.toggle('active', v === n);
+            });
+            renderCalendar();
+        };
+
         window.openCalPicker = function() {
             const days = getWeekDays();
             calPickerMonthDate = new Date(days[0].getFullYear(), days[0].getMonth(), 1);
@@ -5974,7 +6033,7 @@
             today.setHours(0, 0, 0, 0);
             const selDays = getWeekDays();
             const selStart = selDays[0].getTime();
-            const selEnd = selDays[6].getTime();
+            const selEnd = selDays[selDays.length - 1].getTime();
 
             const firstOfMonth = new Date(year, month, 1);
             const startGrid = getMondayOf(firstOfMonth);
@@ -5994,9 +6053,20 @@
         }
 
         function selectCalPickerDate(d) {
-            const monday = getMondayOf(d);
-            calWeekOffset = weekOffsetForMonday(monday);
-            calDate = new Date(monday.getFullYear(), monday.getMonth(), 1);
+            if (isMobileDevice && calMobileViewMode !== 7) {
+                // В режиме 1/3 дней: вычисляем смещение от сегодня в единицах numDays
+                const numDays = calMobileViewMode;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const target = new Date(d);
+                target.setHours(0, 0, 0, 0);
+                const diffDays = Math.round((target.getTime() - today.getTime()) / (1000 * 3600 * 24));
+                calWeekOffset = Math.floor(diffDays / numDays);
+            } else {
+                const monday = getMondayOf(d);
+                calWeekOffset = weekOffsetForMonday(monday);
+                calDate = new Date(monday.getFullYear(), monday.getMonth(), 1);
+            }
             renderCalendar();
             closeCalPicker();
         }
@@ -6028,7 +6098,13 @@
             if (!label) return;
             const days = getWeekDays();
             const first = days[0];
-            const last = days[6];
+            const last = days[days.length - 1];
+            if (isMobileDevice && calMobileViewMode === 1) {
+                // Один день: показываем полную дату
+                const DAY_NAMES_FULL = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+                label.textContent = `${DAY_NAMES_FULL[first.getDay()]}, ${first.getDate()} ${MONTH_NAMES_SHORT[first.getMonth()]}`;
+                return;
+            }
             if (isMobileDevice) {
                 if (first.getMonth() === last.getMonth()) {
                     label.textContent = `${first.getDate()}–${last.getDate()} ${MONTH_NAMES_SHORT[first.getMonth()]}`;
@@ -6050,17 +6126,34 @@
         }
 
         function getWeekDays() {
-            const today = new Date();
-            const dayOfWeek = today.getDay();
-            const diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
-            const monday = new Date(today);
-            monday.setDate(today.getDate() + diffToMon + calWeekOffset * 7);
-            monday.setHours(0, 0, 0, 0);
-            const days = [];
-            for (let i = 0; i < 7; i++) { const d = new Date(monday);
-                d.setDate(monday.getDate() + i);
-                days.push(d); }
-            return days;
+            const numDays = (isMobileDevice && calMobileViewMode !== 7) ? calMobileViewMode : 7;
+            if (numDays === 7) {
+                // Стандартный режим: неделя с понедельника
+                const today = new Date();
+                const dayOfWeek = today.getDay();
+                const diffToMon = (dayOfWeek === 0) ? -6 : 1 - dayOfWeek;
+                const monday = new Date(today);
+                monday.setDate(today.getDate() + diffToMon + calWeekOffset * 7);
+                monday.setHours(0, 0, 0, 0);
+                const days = [];
+                for (let i = 0; i < 7; i++) { const d = new Date(monday);
+                    d.setDate(monday.getDate() + i);
+                    days.push(d); }
+                return days;
+            } else {
+                // Режим 1 или 3 дня: смещение по дням
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const base = new Date(today);
+                base.setDate(today.getDate() + calWeekOffset * numDays);
+                const days = [];
+                for (let i = 0; i < numDays; i++) {
+                    const d = new Date(base);
+                    d.setDate(base.getDate() + i);
+                    days.push(d);
+                }
+                return days;
+            }
         }
 
         function dateStr(d) { return String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2,
@@ -6072,19 +6165,27 @@
 
         function renderCalendar() {
             const days = getWeekDays();
+            const numDays = days.length;
             updateCalPeriodLabel();
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const head = document.getElementById('calHead');
+            // Динамическая сетка под количество дней
+            const timeColW = (isMobileDevice && numDays <= 3) ? '36px' : '56px';
+            const gridCols = `${timeColW} repeat(${numDays}, 1fr)`;
+            head.style.gridTemplateColumns = gridCols;
+            const calBodyEl = document.getElementById('calBody');
+            if (calBodyEl) calBodyEl.style.gridTemplateColumns = gridCols;
             head.innerHTML = '<div class="cal-head-time"></div>';
-            const DAY_NAMES = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+            const DAY_NAMES = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
             const zoom = getEffectiveZoom();
-            days.forEach((d, i) => {
+            days.forEach((d) => {
                 const isToday = d.getTime() === today.getTime();
+                const dayName = DAY_NAMES[d.getDay()];
                 const numEl = isToday ? `<div class="cal-day-hd-num today">${d.getDate()}</div>` :
                     `<div class="cal-day-hd-num">${d.getDate()}</div>`;
                 head.innerHTML +=
-                    `<div class="cal-day-hd"><div class="cal-day-hd-name">${DAY_NAMES[i]}</div>${numEl}</div>`;
+                    `<div class="cal-day-hd"><div class="cal-day-hd-name">${dayName}</div>${numEl}</div>`;
             });
             const body = document.getElementById('calBody');
             if (calInitialized && body.scrollTop > 0) calScrollSaved = body.scrollTop;
