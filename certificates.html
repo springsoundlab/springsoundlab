@@ -3530,6 +3530,7 @@
                     <div class="toolbar"></div>
                     <div id="calView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
                         <div class="cal-head" id="calHead"></div>
+                        <div id="calDragTimeBar" style="display:none;padding:6px 0;text-align:center;font-size:18px;font-weight:800;letter-spacing:0.5px;flex-shrink:0;transition:opacity 0.15s;"></div>
                         <div class="cal-body" id="calBody"></div>
                     </div>
                     <div id="listView" style="display:none;"></div>
@@ -6182,82 +6183,85 @@
                     const pal = palByHex(userColor);
                     let ghost = null;
                     let dragStartMin = null;
-                    let dragCurMin = null;   // всегда актуальный конец — читаем при mouseup
+                    let dragEndMin = null;
                     let isDragging = false;
                     const DRAG_THRESHOLD_PX = 10;
                     let startX = null;
                     let startY = null;
-                    let savedColRect = null; // сохраняем rect колонки при mousedown
-                    let touchCancelled = false; // горизонтальный свайп — отменяем drag
+                    let savedColRect = null;
+                    let touchCancelled = false;
+                    let touchLongTimer = null;
+                    let touchLongFired = false;
+                    const LONG_PRESS_MS = 350;
+                    const timeBar = document.getElementById('calDragTimeBar');
 
                     function minsToTimeStr(mins) {
-                        const h = Math.floor(mins / 60);
-                        const m = mins % 60;
-                        return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+                        return String(Math.floor(mins / 60)).padStart(2,'0') + ':00';
                     }
 
-                    function yToMins(clientY, rectOverride) {
-                        const rect = rectOverride || col.getBoundingClientRect();
-                        const yFixed = clientY - rect.top;
+                    function yToMinsSnapped(clientY, rect) {
+                        const r = rect || col.getBoundingClientRect();
+                        const yFixed = clientY - r.top;
                         const totalHeight = (HOURS_END - HOURS_START) * zoom;
                         const ratio = Math.max(0, Math.min(1, yFixed / totalHeight));
                         let mins = HOURS_START * 60 + ratio * (HOURS_END - HOURS_START) * 60;
-                        mins = Math.round(mins / 60) * 60; // снаппинг по целым часам
+                        mins = Math.round(mins / 60) * 60;
                         return Math.min(Math.max(mins, HOURS_START * 60), HOURS_END * 60);
                     }
 
+                    function showTimeBar(s, e) {
+                        if (!timeBar) return;
+                        timeBar.textContent = minsToTimeStr(s) + ' \u2013 ' + minsToTimeStr(e);
+                        timeBar.style.color = userColor;
+                        timeBar.style.display = 'block';
+                    }
+
+                    function hideTimeBar() {
+                        if (!timeBar) return;
+                        timeBar.style.display = 'none';
+                        timeBar.textContent = '';
+                    }
+
                     function createGhost() {
+                        if (ghost) return;
                         ghost = document.createElement('div');
                         ghost.className = 'cal-drag-ghost';
                         ghost.style.background = pal.bg;
                         ghost.style.borderColor = userColor;
                         ghost.style.overflow = 'visible';
-                        const lbl = document.createElement('div');
-                        lbl.className = 'cal-drag-ghost-label';
-                        // крупная метка, по центру над прямоугольником
-                        lbl.style.cssText = [
-                            'position:absolute',
-                            'top:-24px',
-                            'left:50%',
-                            'transform:translateX(-50%)',
-                            'font-size:13px',
-                            'font-weight:800',
-                            'white-space:nowrap',
-                            'color:' + userColor,
-                            'pointer-events:none',
-                            'letter-spacing:0.3px',
-                        ].join(';');
-                        ghost.appendChild(lbl);
                         col.appendChild(ghost);
                     }
 
                     function updateGhost(startMin, endMin) {
-                        if (!ghost) return;
                         const s = Math.min(startMin, endMin);
                         const e = Math.max(startMin, endMin);
-                        dragCurMin = e; // сохраняем актуальный конец
-                        const topPx = ((s / 60) - HOURS_START) * zoom;
-                        const heightPx = Math.max(((e - s) / 60) * zoom, zoom / 2);
-                        ghost.style.top = topPx + 'px';
-                        ghost.style.height = heightPx + 'px';
-                        const lbl = ghost.querySelector('.cal-drag-ghost-label');
-                        if (lbl) lbl.textContent = minsToTimeStr(s) + ' – ' + minsToTimeStr(e);
+                        dragEndMin = e;
+                        if (ghost) {
+                            const topPx = ((s / 60) - HOURS_START) * zoom;
+                            const heightPx = Math.max(((e - s) / 60) * zoom, zoom / 2);
+                            ghost.style.top = topPx + 'px';
+                            ghost.style.height = heightPx + 'px';
+                        }
+                        showTimeBar(s, e);
                     }
 
                     function removeGhost() {
                         if (ghost) { ghost.remove(); ghost = null; }
+                        hideTimeBar();
                     }
 
                     function resetState() {
                         dragStartMin = null;
-                        dragCurMin = null;
+                        dragEndMin = null;
                         isDragging = false;
                         touchCancelled = false;
+                        touchLongFired = false;
+                        savedColRect = null;
+                        clearTimeout(touchLongTimer);
                     }
 
                     function finishDrag() {
-                        // берём время из состояния ghost, а не из координат мыши
-                        const endMin = dragCurMin !== null ? dragCurMin : dragStartMin;
+                        const endMin = dragEndMin !== null ? dragEndMin : dragStartMin;
                         removeGhost();
                         if (dragStartMin === null) { resetState(); return; }
                         const s = Math.min(dragStartMin, endMin);
@@ -6269,88 +6273,113 @@
                         openNewFormOnDate(ds, t0, t1);
                     }
 
-                    // ---- MOUSE ----
+                    // ---- MOUSE (десктоп) ----
                     col.addEventListener('mousedown', function(e) {
                         if (e.button !== 0) return;
                         if (e.target.closest('.cal-event')) return;
                         startY = e.clientY;
                         savedColRect = col.getBoundingClientRect();
-                        dragStartMin = yToMins(e.clientY, savedColRect);
-                        dragCurMin = dragStartMin;
+                        dragStartMin = yToMinsSnapped(e.clientY, savedColRect);
+                        dragEndMin = dragStartMin;
                         isDragging = false;
                     });
 
                     document.addEventListener('mousemove', function(e) {
-                        if (dragStartMin === null) return;
+                        if (dragStartMin === null || savedColRect === null) return;
                         if (!isDragging) {
                             if (Math.abs(e.clientY - startY) < DRAG_THRESHOLD_PX) return;
                             isDragging = true;
                             createGhost();
                         }
-                        updateGhost(dragStartMin, yToMins(e.clientY, savedColRect));
+                        updateGhost(dragStartMin, yToMinsSnapped(e.clientY, savedColRect));
                     });
 
                     document.addEventListener('mouseup', function(e) {
                         if (dragStartMin === null) return;
-                        if (!isDragging) { dragStartMin = null; dragCurMin = null; return; }
+                        if (!isDragging) { resetState(); return; }
                         finishDrag();
                     });
 
-                    // ---- TOUCH (без задержки; блокируем только горизонтальный свайп) ----
+                    // ---- TOUCH (мобильный) ----
                     col.addEventListener('touchstart', function(e) {
                         if (e.target.closest('.cal-event')) return;
+                        if (e.touches.length > 1) {
+                            clearTimeout(touchLongTimer);
+                            touchCancelled = true;
+                            removeGhost();
+                            resetState();
+                            return;
+                        }
                         const t = e.touches[0];
                         startX = t.clientX;
                         startY = t.clientY;
                         isDragging = false;
                         touchCancelled = false;
-                        dragStartMin = yToMins(t.clientY);
-                        dragCurMin = dragStartMin;
+                        touchLongFired = false;
+                        dragStartMin = null;
+                        dragEndMin = null;
+                        savedColRect = col.getBoundingClientRect();
+                        clearTimeout(touchLongTimer);
+                        const capturedStart = yToMinsSnapped(t.clientY, savedColRect);
+                        touchLongTimer = setTimeout(function() {
+                            touchLongFired = true;
+                            dragStartMin = capturedStart;
+                            dragEndMin = capturedStart + 60;
+                            createGhost();
+                            updateGhost(capturedStart, capturedStart + 60);
+                        }, LONG_PRESS_MS);
                     }, { passive: true });
 
                     col.addEventListener('touchmove', function(e) {
-                        if (touchCancelled || dragStartMin === null) return;
+                        if (touchCancelled) return;
+                        if (e.touches.length > 1) {
+                            clearTimeout(touchLongTimer);
+                            touchCancelled = true;
+                            removeGhost();
+                            resetState();
+                            return;
+                        }
                         const t = e.touches[0];
                         const dx = Math.abs(t.clientX - startX);
                         const dy = Math.abs(t.clientY - startY);
-
-                        // горизонтальный свайп — отменяем drag, даём листать недели
-                        if (!isDragging && dx > dy && dx > 6) {
-                            touchCancelled = true;
-                            removeGhost();
-                            dragStartMin = null;
-                            dragCurMin = null;
+                        if (!touchLongFired) {
+                            if (dx > 8 || dy > 12) {
+                                clearTimeout(touchLongTimer);
+                                touchCancelled = true;
+                            }
                             return;
                         }
-
-                        if (!isDragging) {
-                            if (dy < DRAG_THRESHOLD_PX) return;
-                            isDragging = true;
-                            createGhost();
-                        }
-                        e.preventDefault(); // блокируем скролл только при вертикальном drag
-                        updateGhost(dragStartMin, yToMins(t.clientY));
+                        if (dragStartMin === null) return;
+                        isDragging = true;
+                        e.preventDefault();
+                        updateGhost(dragStartMin, yToMinsSnapped(t.clientY, savedColRect));
                     }, { passive: false });
 
                     col.addEventListener('touchend', function(e) {
-                        if (touchCancelled || dragStartMin === null) {
-                            resetState();
-                            return;
-                        }
-                        if (!isDragging) {
-                            // простой тап — открываем по часу
+                        clearTimeout(touchLongTimer);
+                        if (touchCancelled || !touchLongFired) {
                             removeGhost();
-                            const t = e.changedTouches[0];
-                            const rect = col.getBoundingClientRect();
-                            const y = t.clientY - rect.top;
-                            const totalHeight = (HOURS_END - HOURS_START) * zoom;
-                            let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
-                            hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
+                            if (!touchCancelled) {
+                                const t = e.changedTouches[0];
+                                const r = savedColRect || col.getBoundingClientRect();
+                                const y = t.clientY - r.top;
+                                const totalHeight = (HOURS_END - HOURS_START) * zoom;
+                                let hour = Math.floor((y / totalHeight) * (HOURS_END - HOURS_START)) + HOURS_START;
+                                hour = Math.min(Math.max(hour, HOURS_START), HOURS_END - 1);
+                                resetState();
+                                openNewFormOnDate(ds, String(hour).padStart(2,'0') + ':00');
+                                return;
+                            }
                             resetState();
-                            openNewFormOnDate(ds, String(hour).padStart(2,'0') + ':00');
                             return;
                         }
                         finishDrag();
+                    });
+
+                    col.addEventListener('touchcancel', function() {
+                        clearTimeout(touchLongTimer);
+                        removeGhost();
+                        resetState();
                     });
 
                     // клик мышью без drag
