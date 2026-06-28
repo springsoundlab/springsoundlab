@@ -507,7 +507,7 @@
             flex-shrink: 0;
         }
         .cal-head-time {
-            border-right: 1px solid var(--border);
+            /* Sticky объявлен вместе с cal-time-col ниже */
         }
         .cal-day-hd {
             padding: 8px 6px;
@@ -547,6 +547,17 @@
         }
         .cal-time-col {
             border-right: 1px solid var(--border);
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background: var(--bg);
+        }
+        .cal-head-time {
+            border-right: 1px solid var(--border);
+            position: sticky;
+            left: 0;
+            z-index: 3;
+            background: var(--surface);
         }
         .cal-time-slot {
             position: relative;
@@ -2729,9 +2740,11 @@
             }
             .cal-head {
                 grid-template-columns: 36px repeat(7, 1fr);
+                overflow-x: auto;
             }
             .cal-body {
                 grid-template-columns: 36px repeat(7, 1fr);
+                overflow-x: auto;
             }
             .cal-event-svc,
             .cal-event-price {
@@ -5838,6 +5851,25 @@
 
             updateCalPeriodLabel();
 
+            // Синхронизация горизонтального скролла шапки и тела календаря
+            const calHeadEl = document.getElementById('calHead');
+            const calBodySyncEl = document.getElementById('calBody');
+            if (calHeadEl && calBodySyncEl) {
+                let syncingFromBody = false, syncingFromHead = false;
+                calBodySyncEl.addEventListener('scroll', function() {
+                    if (syncingFromHead) return;
+                    syncingFromBody = true;
+                    calHeadEl.scrollLeft = calBodySyncEl.scrollLeft;
+                    syncingFromBody = false;
+                }, { passive: true });
+                calHeadEl.addEventListener('scroll', function() {
+                    if (syncingFromBody) return;
+                    syncingFromHead = true;
+                    calBodySyncEl.scrollLeft = calHeadEl.scrollLeft;
+                    syncingFromHead = false;
+                }, { passive: true });
+            }
+
             const calView = document.getElementById('calView');
             if (calView) {
                 calView.addEventListener('touchstart', handleTouchStart, { passive: false });
@@ -6163,8 +6195,12 @@
             today.setHours(0, 0, 0, 0);
             const head = document.getElementById('calHead');
             // Динамическая сетка под количество дней
-            const timeColW = (isMobileDevice && numDays <= 3) ? '36px' : '56px';
-            const gridCols = `${timeColW} repeat(${numDays}, 1fr)`;
+            const timeColW = (isMobileDevice && numDays <= 3) ? '36px' : '36px';
+            // На мобильных в режиме 7 дней — минимальная ширина колонки чтобы sticky работал
+            const dayColDef = (isMobileDevice && numDays === 7)
+                ? 'minmax(42px, 1fr)'
+                : '1fr';
+            const gridCols = `${timeColW} repeat(${numDays}, ${dayColDef})`;
             head.style.gridTemplateColumns = gridCols;
             const calBodyEl = document.getElementById('calBody');
             if (calBodyEl) calBodyEl.style.gridTemplateColumns = gridCols;
