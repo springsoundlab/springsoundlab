@@ -513,7 +513,7 @@
             font-size: 16px;
             font-weight: 700;
             margin-top: 2px;
-            color: var(--text);
+            color: #ffffff !important;
         }
         .cal-day-hd-num.today {
             background: var(--accent);
@@ -831,7 +831,7 @@
         }
         .cl-st {
             background: var(--surface2);
-            border: 1px solid var(--cl-card-border);
+            border: none;
             border-radius: 7px;
             padding: 5px 8px;
             overflow: hidden;
@@ -4403,8 +4403,6 @@
         let pinchStartDistance = 0;
         let pinchStartHeight = 60;
         let isPinching = false;
-        let wasPinching = false;
-        let wasPinchingTimer = null;
         let animationFrameRequest = null;
         const SENSITIVITY = 2.5;
         let usedColors = [];
@@ -5077,9 +5075,6 @@
         function handleTouchEnd(e) {
             if (isPinching) {
                 isPinching = false;
-                wasPinching = true;
-                clearTimeout(wasPinchingTimer);
-                wasPinchingTimer = setTimeout(() => { wasPinching = false; }, 400);
                 if (animationFrameRequest !== null) {
                     cancelAnimationFrame(animationFrameRequest);
                     animationFrameRequest = null;
@@ -6368,7 +6363,7 @@
                         clearTimeout(touchLongTimer);
                         if (touchCancelled || !touchLongFired) {
                             removeGhost();
-                            if (!touchCancelled && !isPinching && !wasPinching) {
+                            if (!touchCancelled) {
                                 const t = e.changedTouches[0];
                                 const r = savedColRect || col.getBoundingClientRect();
                                 const y = t.clientY - r.top;
